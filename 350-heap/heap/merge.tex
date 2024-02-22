@@ -1,0 +1,321 @@
+%-*-latex-*-
+\section{Merge}
+
+Suppose you're two max heaps.
+Is there an efficient way to put them together to get a max heap?
+This is called a heap \defone{merge} or a heap \defone{union}.
+
+For instance suppose, suppose a machine has
+two exact same server process running the same software,
+answering to HTTP requests.
+Each server software maintains it's own queue of server requests.
+However something bad happened: one of the server process is stuck
+(hackers?)
+A main master process that watches the two server processes
+sees that one of server processes is stuck.
+So it transfers the queue of requests to the one that is still alive
+and kills the server that is stuck.
+Somehow the two queues of requests has to be merged.
+
+By the way.
+I hope you realize that if you have a max heap and you remove the
+root, then the two subtrees are themselves max heaps.
+For instance if you remove the root from this max heap:
+
+\begin{python}
+from latextool_basic import *
+print(r"""
+\begin{center}
+%s
+\end{center}
+""" % graph(yscale=1, xscale=1,
+layout="""
+        A 
+    B       C 
+  D   E   F   G
+ H I J K L M N O
+P
+""",
+minimum_size='8mm',
+edges='A-B,A-C,B-D,B-E,C-G,C-F,D-H,D-I,E-J,E-K,F-L,F-M,G-N,G-O,H-P',
+A=r'label=\texttt{34}',
+B=r'label=\texttt{28}',
+C=r'label=\texttt{16}',
+D=r'label=\texttt{23}',
+E=r'label=\texttt{25}',
+F=r'label=\texttt{13}',
+G=r'label=\texttt{7}',
+H=r'label=\texttt{10}',
+I=r'label=\texttt{8}',
+J=r'label=\texttt{24}',
+K=r'label=\texttt{14}',
+L=r'label=\texttt{3}',
+M=r'label=\texttt{9}',
+N=r'label=\texttt{5}',
+O=r'label=\texttt{4}',
+P=r'label=\texttt{9}',
+))
+\end{python}
+
+you get the left subtree which is a max heap:
+
+\begin{python}
+from latextool_basic import *
+print(r"""
+\begin{center}
+%s
+\end{center}
+""" % graph(yscale=1, xscale=1,
+layout="""
+    B        
+  D   E      
+ H I J K 
+P
+""",
+minimum_size='8mm',
+edges='B-D,B-E,D-H,D-I,E-J,E-K,H-P',
+A=r'label=\texttt{34}',
+B=r'label=\texttt{28}',
+D=r'label=\texttt{23}',
+E=r'label=\texttt{25}',
+H=r'label=\texttt{10}',
+I=r'label=\texttt{8}',
+J=r'label=\texttt{24}',
+K=r'label=\texttt{14}',
+P=r'label=\texttt{9}',
+))
+\end{python}
+
+and the right subtree which is also a max heap:
+
+\begin{python}
+from latextool_basic import *
+print(r"""
+\begin{center}
+%s
+\end{center}
+""" % graph(yscale=1, xscale=1,
+layout="""
+            C 
+          F   G
+         L M N O
+""",
+minimum_size='8mm',
+edges='C-G,C-F,F-L,F-M,G-N,G-O',
+B=r'label=\texttt{28}',
+C=r'label=\texttt{16}',
+D=r'label=\texttt{23}',
+E=r'label=\texttt{25}',
+F=r'label=\texttt{13}',
+G=r'label=\texttt{7}',
+H=r'label=\texttt{10}',
+I=r'label=\texttt{8}',
+J=r'label=\texttt{24}',
+K=r'label=\texttt{14}',
+L=r'label=\texttt{3}',
+M=r'label=\texttt{9}',
+N=r'label=\texttt{5}',
+O=r'label=\texttt{4}',
+P=r'label=\texttt{9}',
+))
+\end{python}
+
+OK.
+Back to the algorithm of merging two (max) heaps $H_0$ and $H_1$.
+Suppose the total number of nodes in $H_1$ is $m$
+and the total number of nodes in $H_2$ is $n$.
+Without using the existing heap structure in $H_1$ and $H_2$
+and just build a heap from scratch requires $O(n)$ using the build-heap
+operation.
+Also, note that if we can merge two heaps quickly,
+then another way to build a heap is to do it recursively:
+recursive divide a collection of values into two piles,
+make them into heaps, then merge the heaps.
+So what's there not to like?
+
+However, for our max heap, the only way seems to be to copy the
+values from one heap to another and perform build-heap
+which will run in $O(m + n)$
+where $m$ is the size of the first heap and $n$ is the size of the second.
+
+
+\begin{ex}
+Can we merge in $O(\log (m + n))$ time?
+[ANSWER: You'll need a different kind of heap.
+See if you can figure this out on your own.]
+\end{ex}
+
+
+
+\begin{comment}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+h0 = graph2(xoffset=0,yscale=1, xscale=1,
+layout="""
+   A 
+ B   C
+D E G
+""",
+minimum_size='8mm',
+edges='A-B,A-C,B-D,B-E,C-G',
+A=r'label=\texttt{10}',
+B=r'label=\texttt{5}',
+C=r'label=\texttt{7}',
+D=r'label=\texttt{2}',
+E=r'label=\texttt{1}',
+G=r'label=\texttt{5}',
+)
+p += h0
+
+h1 = graph2(xoffset=7,yscale=1, xscale=1,
+layout="""
+   A 
+ B   C
+D E G
+""",
+minimum_size='8mm',
+edges='A-B,A-C,B-D,B-E,C-G',
+A=r'label=\texttt{10}',
+B=r'label=\texttt{5}',
+C=r'label=\texttt{7}',
+D=r'label=\texttt{2}',
+E=r'label=\texttt{1}',
+G=r'label=\texttt{5}',
+)
+p += h1
+
+print(p)
+\end{python}
+
+[Instead of max heap, what is the levels are
+coordinates?
+I.e., the max is root,
+the 2nd and 3rd at level 1,
+the 4th,5th,6th,7th at level 2, etc.
+If so, then during merge, to new heap's root is one of the two roots.
+Say the first heap has a large root.
+Then heap1's level 0 is done.
+For level 1 of teh new heap, we look at level 1 of heap1
+and level0 of heap2.
+Etc.
+
+\begin{python}
+from latextool_basic import *
+print(r"""
+\begin{center}
+%s
+\end{center}
+""" % graph(yscale=1, xscale=1,
+layout="""
+        A 
+    B       C 
+  D   E   F   G
+ H I J K L M N O
+P
+""",
+minimum_size='8mm',
+edges='A-B,A-C,B-D,B-E,C-G,C-F,D-H,D-I,E-J,E-K,F-L,F-M,G-N,G-O,H-P',
+A=r'label=\texttt{34}',
+B=r'label=\texttt{28}',
+C=r'label=\texttt{16}',
+D=r'label=\texttt{23}',
+E=r'label=\texttt{25}',
+F=r'label=\texttt{13}',
+G=r'label=\texttt{7}',
+H=r'label=\texttt{10}',
+I=r'label=\texttt{8}',
+J=r'label=\texttt{24}',
+K=r'label=\texttt{14}',
+L=r'label=\texttt{3}',
+M=r'label=\texttt{9}',
+N=r'label=\texttt{5}',
+O=r'label=\texttt{4}',
+P=r'label=\texttt{9}',
+))
+\end{python}
+
+In the above, 16 should probably be moved the the subtree at 28.
+Who can replaced 16?
+The max of 16's children is 13.
+Or just looking at the subtree at 16, maybe it's better to switch 7 and 9:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += graph2(yscale=1, xscale=1,
+layout="""
+        A 
+    B       C 
+  D   E   F   G
+ H I J K L M N O
+P
+""",
+minimum_size='8mm',
+edges='A-B,A-C,B-D,B-E,C-G,C-F,D-H,D-I,E-J,E-K,F-L,F-M,G-N,G-O,H-P',
+A=r'label=\texttt{34}',
+B=r'label=\texttt{28}',
+C=r'label=\texttt{16}',
+D=r'label=\texttt{23}',
+E=r'label=\texttt{25}',
+F=r'label=\texttt{13}',
+G=r'label=\texttt{7}',
+H=r'label=\texttt{10}',
+I=r'label=\texttt{8}',
+J=r'label=\texttt{24}',
+K=r'label=\texttt{14}',
+L=r'label=\texttt{3}',
+M=r'label=\texttt{9}',
+N=r'label=\texttt{5}',
+O=r'label=\texttt{4}',
+P=r'label=\texttt{9}',
+)
+
+p += r'\path[triangle 60-triangle 60,dashed] (M) edge [] (G);'
+
+print(p)
+\end{python}
+
+or
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += graph2(yscale=1, xscale=1,
+layout="""
+        A 
+    B       C 
+  D   E   F   G
+ H I J K L M N O
+P
+""",
+minimum_size='8mm',
+edges='A-B,A-C,B-D,B-E,C-G,C-F,D-H,D-I,E-J,E-K,F-L,F-M,G-N,G-O,H-P',
+A=r'label=\texttt{34}',
+B=r'label=\texttt{28}',
+C=r'label=\texttt{16}',
+D=r'label=\texttt{23}',
+E=r'label=\texttt{25}',
+F=r'label=\texttt{13}',
+G=r'label=\texttt{7}',
+H=r'label=\texttt{10}',
+I=r'label=\texttt{8}',
+J=r'label=\texttt{24}',
+K=r'label=\texttt{14}',
+L=r'label=\texttt{3}',
+M=r'label=\texttt{9}',
+N=r'label=\texttt{5}',
+O=r'label=\texttt{4}',
+P=r'label=\texttt{9}',
+)
+
+p += r'\path[triangle 60-triangle 60,dashed] (K) edge [] (G);'
+
+print(p)
+\end{python}
+
+]
+\end{comment}

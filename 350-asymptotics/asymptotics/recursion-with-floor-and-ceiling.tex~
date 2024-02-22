@@ -1,0 +1,903 @@
+\section{Recursion with Floors and Ceilings}
+
+I've mentioned that is a recursion involves floors or ceilings, then
+up to big-O, you can forget about the floors or ceilings.
+Mathematically, this means that following.
+Suppose I have
+\[
+T(n) = 2T(\floor{n/2}) + Bn + C
+\]
+(ignore the base case), then
+the big-O of $T(n)$ is the same when you use this:
+\[
+T(n) = 2T(n/2) + Bn + C
+\]
+To be more precise, of course I meant that if I define another function
+\[
+S(n) = 2S(n/2) + Bn + C
+\]
+then
+\[
+T(n) = O(S(n))
+\]
+I hope you realize that the above definition of $S(n)$ has a problem.
+Note that of course I'm extending the domain from positive integers
+to positive real numbers.
+In the case of $T(n)$, suppose the base case if
+\[
+T(0) = A
+\]
+What then can I say about $S(n)$? 
+Is saying
+\[
+S(0) = A
+\]
+good enough?
+Not quite!!! 
+(Are you awake yet???)
+
+Why?
+Because for any positive integer $n$, using the recurrence relations,
+the computation of $T(n)$ will ultimately arrive at $T(0)$.
+Not so for $S(n)$!!!
+For instance if I look at $S(3/2)$. 
+Then $S(3/2)$ is in terms of $S(3/4)$ which is in terms of 
+$S(3/8)$, etc.
+It never reaches $S(0)$!
+Well ... at least it's moving towards 0 (although never reaching it.)
+
+It's far worse for linear recurrence.
+Say
+\[
+T(n) = T(n - 1) + T(n - 2)
+\]
+with $T(0) = T(1) = 1$.
+If I extend $n$ to have a domain of real numbers, I would have
+problems with $T(3/2)$ ... it would ultimately skip $T(0)$ and $T(1)$ and shoot
+past $0$ and go on toward $-\infty$!!!
+
+Everything seems fishy.
+So why is it that so many books just say ... forget about the floors
+ and ceiling?
+Why does it work?
+
+If you have a recurrence of
+\[
+T(n) 
+= 
+\begin{cases}
+A                         & \text{if $n = 0, 1$} \\
+2T(\floor{n/2}) + Bn + C  & \text{otherwise}
+\end{cases}
+\]
+(this is similar to our mergesort
+except that $T(n) = T(\floor{n/2}) + T(n - \floor{n/2}) + Bn + C)$)
+then you define
+\[
+S(n)
+=
+\begin{cases}
+A                 & \text{if $0 \leq n \leq 1$} \\
+2S(n/2) + Bn + C  & \text{otherwise}
+\end{cases}
+\]
+You see that for large $n$, 
+$T(n)$ is very close to $S(n)$.
+In fact because I only care for large $n$, I can even define
+$S(n) = A$ for $0 \leq n \leq 10$
+and then have the recurrence
+\[
+S(n) = 2S(n/2) + Bn + C
+\]
+kick in on $n > 10$.
+It doesn't matter at all.
+Let me plot $T(n)$ and $S(n)$ for the case of
+\[
+A = B = C = 1
+\]
+
+Here's the plot of $T(n)$ (blue) and $S(n)$ (red):
+\begin{python}
+from plot import *
+N = 33
+STEP = 1
+table = {}
+def t(n):
+    n = int(n)
+    if n <= 1: return 1
+    else:
+        if not table.has_key(n):
+            table[n] = 2 * t(n/2) + n + 1
+        return table[n]
+def s(x):
+    x = float(x)
+    if x <= 1: return 1
+    else:
+        return 2 * s(x/2.0) + x + 1
+
+p = Plot(domain="0:%s" % N)
+
+points = [(n, t(n)) for n in range(0, N + 1, STEP)]
+p.add(points, style='step', color='blue', python=1)
+
+points = [(n/50.0, s(n/50.0)) for n in range(0, N*50 + 1, STEP)]
+p.add(points, style='step', color='red', python=1)
+#p.add("s(x)", python=1, color='red', num_points=1000) #??? does not work
+
+print p
+
+\end{python}
+
+(By the way, you notice that there are some sharp jumps.
+For instance there is a sharp jump from $n = 15$ to $n = 16$
+for $T(n)$.
+Likewise there is a jump for $S(n)$.
+I'll let you think about that.)
+
+Here's a zoom in around $n = 16$:
+\begin{python}
+from plot import *
+table = {}
+def t(n):
+    n = int(n)
+    if n <= 1: return 1
+    else:
+        if not table.has_key(n):
+            table[n] = 2 * t(n/2) + n + 1
+        return table[n]
+
+def s(x):
+    x = float(x)
+    if x <= 1: return 1
+    else:
+        return 2 * s(x/2.0) + x + 1
+
+p = Plot(domain="14:17")
+
+points = [(n, t(n)) for n in range(14, 18)]
+p.add(points, style='step', color='blue', python=1)
+
+xs = [14 + 3*n/1000.0 for n in range(1000)]
+points = [(n, s(n)) for n in xs]
+p.add(points, style='step', color='red', python=1)
+
+print p
+
+\end{python}
+
+Now if you look at the section on mergesort where we derived the 
+closed form for a similar function, you see that 
+$S(n)$ will \lq\lq become'' (\lq\lq smooths to''):
+\begin{align*}
+S'(n) 
+&= n S(1) + 1(n \log_2 n) + 1\log_2(n) \\
+&= n + n \log_2 n + \log_2 n \\
+\end{align*}
+Let's plot that too (with green):
+
+\begin{python}
+from plot import *
+N = 1000
+STEP = 1
+table = {}
+def t(n):
+    n = int(n)
+    if n <= 1: return 1
+    else:
+        if not table.has_key(n):
+            table[n] = 2 * t(n/2) + n + 1
+        return table[n]
+def s(x):
+    x = float(x)
+    if x <= 1: return 1
+    else:
+        return 2 * s(x/2.0) + x + 1
+
+p = Plot(domain="0:%s" % N)
+
+points = [(n, t(n)) for n in range(0, N + 1, STEP)]
+p.add(points, style='step', color='blue', python=1)
+
+points = [(n, s(n)) for n in range(0, N + 1, STEP)]
+p.add(points, style='step', color='red', python=1)
+
+p.add("x + x*log(x, 2) + (x - 1)", color='green', python=1, num_points=1000)
+print p
+\end{python}
+
+And here's the plot for a large domain:
+\begin{python}
+from plot import *
+N = 1000000
+STEP = 2000
+table = {}
+def t(n):
+    n = int(n)
+    if n <= 1: return 1
+    else:
+        if not table.has_key(n):
+            table[n] = 2 * t(n/2) + n + 1
+        return table[n]
+def s(x):
+    x = float(x)
+    if x <= 1: return 1
+    else:
+        return 2 * s(x/2.0) + x + 1
+
+p = Plot(domain="0:%s" % N)
+
+points = [(n, t(n)) for n in range(0, N + 1, STEP)]
+p.add(points, style='step', color='blue', python=1)
+
+points = [(n, s(n)) for n in range(0, N + 1, STEP)]
+p.add(points, style='step', color='red', python=1)
+
+p.add("x + x*log(x, 2) + (x - 1)", color='green', python=1, num_points=1000)
+print p
+\end{python}
+and even large domain:
+\begin{python}
+from plot import *
+N = 100000000
+STEP = 200000
+table = {}
+def t(n):
+    n = int(n)
+    if n <= 1: return 1
+    else:
+        if not table.has_key(n):
+            table[n] = 2 * t(n/2) + n + 1
+        return table[n]
+def s(x):
+    x = float(x)
+    if x <= 1: return 1
+    else:
+        return 2 * s(x/2.0) + x + 1
+
+p = Plot(domain="0:%s" % N)
+
+points = [(n, float(t(n))) for n in range(0, N + 1, STEP)]
+p.add(points, style='step', color='blue', python=1)
+
+points = [(n, s(n)) for n in range(0, N + 1, STEP)]
+p.add(points, style='step', color='red', python=1)
+
+p.add("x + x*log(x, 2) + (x - 1)", color='green', python=1, num_points=1000)
+print p
+\end{python}
+
+We see that 
+\[
+T(n) \leq S'(n) \leq S(n)
+\]
+with equality when $n$ is a power of $2$
+and the smooth version of $S(n)$ (which I call $S'(n)$) is somewhere 
+in-between.
+
+Now the closed form
+\[
+S'(n) = n S(1) + 1(n \log_2 n) + 1(\log_2 n)
+\]
+was derived assuming $n = 2^m$.
+Let's look at this plots for a smaller domain:
+\begin{python}
+from plot import *
+N = 20
+STEP = 1
+table = {}
+def t(n):
+    n = int(n)
+    if n <= 1: return 1
+    else:
+        if not table.has_key(n):
+            table[n] = 2 * t(n/2) + n + 1
+        return table[n]
+def s(x):
+    x = float(x)
+    if x <= 1: return 1
+    else:
+        return 2 * s(x/2.0) + x + 1
+
+p = Plot(domain="0:%s" % N)
+
+points = [(n, t(n)) for n in range(0, N + 1, STEP)]
+p.add(points, style='step', color='blue', python=1)
+
+xs = [N * x/1000.0 for x in range(0, 1000)]
+points = [(n, s(n)) for n in xs]
+p.add(points, style='step', color='red', python=1)
+
+p.add("x + x*log(x, 2) + (x - 1)", color='green', python=1, num_points=1000)
+print p
+\end{python}
+
+Note that 
+\[
+T(n) = S(n) = S'(n)
+\]
+if $n$ is a power of 2.
+But what if $n$ is not a power of $2$?
+Suppose $n = 2^4 + 1$.
+Note that 
+\begin{align*}
+T(2^4 + 1) 
+&= 2T(\floor{(2^4 + 1)/2}) + (2^4 + 1)B + C \\
+&= 2T(8) + (2^4 + 1)B + C 
+\end{align*}
+and 
+\[ 
+T(2^4) = 2T(8) + 2^4B + C
+\]
+Hence
+\[
+T(16 + 1) = T(16) + B
+\]
+Therefore, for $T(n)$, from $n=16$ to $n=17$, there's a jump of $B$.
+What about from $S(16)$ and $S(17)$?
+\begin{align*}
+S(2^4 + 1) 
+&= 2S(2^3 + 1/2) + (2^4 + 1)B + C \\
+&= 2(2S(2^2 + 1/4) + (2^3 + 1/2)B + C) + (2^4 + 1)B + C \\
+&= 2^2 S(2^2 + 1/4) + 2(2^4 + 1)B + (1 + 2 + 2^2)C \\
+&= ... \\
+&= 2^4 S(2^0 + 1/16) + 4(2^4 + 1)B + (1 + 2 + 2^3 + 2^4)C
+\end{align*}
+So you see that 
+\begin{align*}
+S(2^m + 1) &= 2^m S(2^0 + 1/2^m) + m(2^m + 1)B + (2^m - 1)C \\
+T(2^m + 1) &= 2^m T(2^0) + m(2^m + 1)B + (2^m - 1)C 
+\end{align*}
+The point is that, for $S(n)$, since there is no floor,
+after $m$ substitutions of the recurrence relation,
+your $S(n)$ reached $S(1 + 1/2^m)$, and {\it not} $S(1)$, 
+which is not in the range 
+of $[0, 1]$ yet.
+This means that you need {\it one} more substitution of the 
+recurrence relation.
+So with one more recurrence on $S$ we get
+\begin{align*}
+S(2^m + 1) 
+&= 2^{m+1} S(2^{-1} + 1/(2^{m+1})) + (m+1)(2^{m+1} + 1)B + (2^{m+1} - 1)C \\
+&= 2^{m+1} + (m+1)(2^{m+1} + 1) + (2^{m+1} - 1) \\
+T(2^m + 1) &= 2^m  + m(2^m + 1) + (2^m - 1) 
+\end{align*}
+And if I express the above in terms of $n$ (i.e., $n = 2^m$):
+\begin{align*}
+S(n + 1) 
+&= 2n + (\log_2(n)+1)(2n + 1) + (2n - 1) \\
+T(n + 1) &= n  + \log_2(n) (n + 1) + (n - 1) 
+\end{align*}
+
+In general for $1 \leq x < 2^m$,
+\begin{align*}
+S(2^m + x) 
+&= 2^{m+1} S(2^{-1} + x/(2^{m+1})) + (m+1)(2^{m+1} + 1)B + (2^{m+1} - 1)C \\
+&= 2^{m+1} + (m+1)(2^{m+1} + 1) + (2^{m+1} - 1) 
+\end{align*}
+
+\begin{python}
+from plot import *
+N = 20
+STEP = 1
+table = {}
+def t(n):
+    n = int(n)
+    if n <= 1: return 1
+    else:
+        if not table.has_key(n):
+            table[n] = 2 * t(n/2) + n + 1
+        return table[n]
+def s(x):
+    x = float(x)
+    if x <= 1: return 1
+    else:
+        return 2 * s(x/2.0) + x + 1
+
+p = Plot(domain="0:%s" % N)
+
+points = [(n, t(n)) for n in range(0, N + 1, STEP)]
+p.add(points, style='step', color='blue', python=1)
+
+xs = [N * x/1000.0 for x in range(0, 1000)]
+points = [(n, s(n)) for n in xs]
+p.add(points, style='step', color='red', python=1)
+
+p.add("x + x*log(x, 2) + (x - 1)", color='green', python=1, num_points=1000)
+print p
+\end{python}
+
+Now I'm going to modify $S(n)$ so that the extra application of
+recurrence is not necessary.
+This means that I want $S(n)$ to satify
+\[
+S(n) = 
+\begin{cases}
+A               & \text{if $0 \leq n < 2$ (see the difference?)} \\
+S(n/2) + Bn + C &\text{otherwise} 
+\end{cases}
+\]
+Now I'm plot the graphs:
+\begin{python}
+from plot import *
+N = 20
+STEP = 1
+table = {}
+def t(n):
+    n = int(n)
+    if n <= 1: return 1
+    else:
+        if not table.has_key(n):
+            table[n] = 2 * t(n/2) + n + 1
+        return table[n]
+
+def s(x):
+    x = float(x)
+    if x < 2: return 1
+    else:
+        return 2 * s(x/2.0) + x + 1
+
+p = Plot(domain="0:%s" % N)
+
+points = [(n, t(n)) for n in range(0, N + 1, STEP)]
+p.add(points, style='step', color='blue', python=1)
+
+xs = [N * x/1000.0 for x in range(0, 1000)]
+points = [(n, s(n)) for n in xs]
+p.add(points, style='step', color='red', python=1)
+
+p.add("x + x*log(x, 2) + (x - 1)", color='green', python=1, num_points=1000)
+print p
+\end{python}
+
+Now $S(n)$ hugs $T(n)$ a lot closer.
+
+As before
+\[
+T(n) \leq S(n) \leq S'(n)
+\]
+for $n \geq 1$ and they all agree at powers of $2$.
+Now let's prove $T(n) \leq S'(n)$
+so that we can conclude 
+\[
+T(n) = O(S'(n))
+\]
+We derived earlier
+In general for $1 \leq x < 2^m$,
+\begin{align*}
+T(2^m + x) &= 2^{m} + m(2^{m} + 1) + (2^{m} - 1)  \\
+S(2^m + x) &= 2^{m} + m(2^{m} + 1) + (2^{m} - 1)  \\
+S'(2^m + x) &= 2^{m} + m(2^{m} + 1) + (2^{m} - 1)
+\end{align*}
+Let's try the case when $n = 2^4 + 2$.
+\begin{align*}
+T(2^4 + 2) 
+&= T(2(2^3 + 1)) \\
+&= 2T(2^3 + 1) + 2(2^3+1)B + C
+\end{align*}
+This leads us to consider the case of $n = 2k$ and $n = 2k + 1$.
+\begin{align*}
+T(2k) &= 2T(k) + 2kB + C \\
+T(2k + 1) &= 2T(k) + (2k + 1)B + C
+\end{align*}
+The problem is that there are 2 cases, i.e., there is no
+single uniform recurrence so that as I try to move from 
+$T(n)$ towards $T(1)$, I have more and more cases to consider.
+
+Is there a uniform way to write the above?
+Of course I can use floors but I want to avoid that
+since floors basically creates cases too.
+
+However I notice that expressions like $n = 2k$ or $n = 2k + 1$
+can be combined: 
+we just use binary numbers.
+If $n$ is written as a binary number, $n$ is $2k$ is
+the lowest order bit is $0$ and $n$ is $2k + 1$ is the lowest
+order bit is $1$.
+And in going from either $2k$ or $2k + 1$ to $k$, 
+in terms of binary representation of $n$, this just mean
+removing the lowest order bit.
+That's a more uniform way of describing the recurrence.
+Let's try that out and see if it works ...
+
+Writing $n$ as a binary number
+\[
+n = c_d\cdots c_0 = c_d2^d + \cdots + c_0d^0
+\]
+we have
+\[
+T(c_d \cdots c_0) 
+= 2T(c_d \cdots c_1) + (c_d \cdots c_0)B + C \\
+\]
+Note that in this form, I don't have to worry about two cases where
+$n$ is even or $n$ is odd -- the floor goes away.
+In other words I have a uniform description of my recurrence relation.
+Therefore I can say the following for {\it any} $n = c_d \cdots c_0$
+(of course $c_d = 1$):
+\begin{align*}
+T(c_d \cdots c_0) 
+&= 2T(c_d \cdots c_1) + (c_d \cdots c_0)B + C \\
+&= 2[2T(c_d \cdots c_2) + (c_d \cdots c_1)B + C] + (c_d \cdots c_0)B + C \\
+&= 2^2T(c_d \cdots c_2) + [2(c_d \cdots c_1) + (c_d \cdots c_0)]B + (1+2)C \\
+&= 2^2[2T(c_d \cdots c_3) + (c_d \cdots c_3)B + C] + [2(c_d \cdots c_1) + (c_d \cdots c_0)]B + (1+2)C \\
+&= 2^3T(c_d \cdots c_3) 
+   + [2^2 (c_d \cdots c_2) + 2(c_d \cdots c_1) + (c_d \cdots c_0)]B 
+   + (1+2+2^2)C \\
+&=... \\
+&= 2^dT(c_d) 
+   + [2^{d-1}(c_d c_{d-1}) + \cdots + 2(c_d \cdots c_1) + (c_d \cdots c_0)]B 
+   + (1+2+2^2 + 2^{d-1})C \\
+&= 2^dT(1) 
+   + [2^{d-1}(c_d c_{d-1}) + \cdots + 2(c_d \cdots c_1) + (c_d \cdots c_0)]B 
+   + (2^d - 1)C 
+\tag{1}\\
+\end{align*}
+Now let's try to prove that 
+\[
+T(n) \leq nA + (n \log_2 n)B + (n - 1)C
+\]
+Of course this means reverting back to $n$ instead of the 
+binary bits of $n$.
+The right-hand side contains information derived from $n$,
+i.e., $d$, $c_0$, ..., $c_d$.
+The relationship between $n$ and all these stuff is
+\[
+n = c_d \cdots c_0 = c_d2^d + \cdots c_0d^0
+\]
+Now clearly we have, since $0 \leq c_i \leq 2$,
+\begin{align*}
+n = c_d2^d + \cdots + c_02^0 
+= 2^d + (c_{d-1}2^{d-1} + \cdots c_0 2^0)
+\geq 2^d
+\tag{2}
+\end{align*}
+I put (2) into (1) to get
+\begin{align*}
+T(n) 
+\leq nA 
+   + [2^{d-1}(c_d c_{d-1}) + \cdots 
+   + 2^1(c_d \cdots c_1) + 2^0(c_d \cdots c_0)]B 
+   + (n - 1)C 
+\end{align*}
+We of course know that the middle part of the above:
+\[
+2^{d-1}(c_d c_{d-1}) + \cdots + 2^1(c_d \cdots c_1) + 2^0(c_d \cdots c_0) 
+\]
+is somehow related to $n \log_2(n)$.
+In particular, we hope that
+\[
+2^{d-1}(c_d c_{d-1}) + \cdots + 2^1(c_d \cdots c_1) + 2^0(c_d \cdots c_0) 
+\leq n \log_2 (n)
+\]
+
+I hope you notice that
+\[
+2^{d-1}(c_d c_{d-1}) 
+= (c_d c_{d-1} 0 \cdots 0)_2 
+\leq (c_dc_{d-1} \cdots c_0)_2 
+= n
+\]
+Likewise all the other terms on the left are actually $n$ 
+except that possibly
+some bits are set to 0 and therefore each term is $\leq n$.
+There are $d$ terms.
+Hence 
+\[
+2^{d-1}(c_d c_{d-1}) + \cdots + 2^1(c_d \cdots c_1) + 2^0(c_d \cdots c_0) 
+\leq nd
+\]
+OK ... now I need to get rid of that pesky $d$.
+Don't forget that $d$ is defined by 
+\[
+n = c_d 2^d + \cdots + c_0 2^0
+\]
+Also remember that $c_d = 1$.
+Therefore
+\[
+n = c_d 2^d + \cdots c_0 2^0 \geq c_d 2^d = 2^d
+\]
+Therefore
+\[
+\log_2 (n) \geq d
+\]
+Hence
+\[
+2^{d-1}(c_d c_{d-1}) + \cdots + 2^1(c_d \cdots c_1) + 2^0(c_d \cdots c_0) 
+\leq nd \leq n \log_2(n)
+\]
+
+Oh, by the way, I hope you notice that since 
+\[
+(c_d c_{d-1} \cdots c_1)
+\]
+is just $n = (c_d c_{d-1} \cdots c_0)_2$ without the rightmost 
+bit, we must have 
+\[
+(c_d c_{d-1} \cdots c_1) = \floor{\frac{n}{2}}
+\]
+Likewise
+\[
+(c_d c_{d-1}\cdots c_2) = \floor{\frac{n}{2^2}}
+\]
+Therefore the above expression
+\[
+2^{d-1}(c_d c_{d-1}) + \cdots + 2^1(c_d \cdots c_1) + 2^0(c_d \cdots c_0)
+\]
+is the same as 
+\[
+2^{d-1}\floor{ \frac{n}{2^{d-1}} } 
++ 2^{d-2}\floor{ \frac{n}{2^{d-2}} } 
++ \cdots
++ 2^1\floor{ \frac{n}{2^1} } 
++ 2^0\floor{ \frac{n}{2^0} } 
+\]
+Therefore the relation I derived earlier:
+\[
+T(c_d \cdots c_0) 
+= 2^dT(1) 
+   + [2^{d-1}(c_d c_{d-1}) + \cdots + 2(c_d \cdots c_1) + (c_d \cdots c_0)]B 
+   + (2^d - 1)C 
+\]
+can also be written as
+\begin{align*}
+T(n) 
+&= 2^dT(1) \\
+&\hspace{0.5cm}
++ \left(
+2^{d-1}\floor{ \frac{n}{2^{d-1}} } 
++ 2^{d-2}\floor{ \frac{n}{2^{d-2}} } 
++ \cdots
++ 2^1\floor{ \frac{n}{2^1} } 
++ 2^0\floor{ \frac{n}{2^0} } 
+\right)B \\ 
+&\hspace{0.5cm}+ (2^d - 1)C 
+\end{align*}
+where $d$ is defined by $n = c_d 2^d + \cdots + c_02^0$ with $c_d = 1$, i.e.,
+$d$ is 1 more than the length of $n$ when written as a binary number.
+If you like, you can also define $d$ without binary numbers:
+$d$ is the largest positive integer such that 
+\[
+\floor{
+\frac{n}{2^d}
+} = 1
+\]
+
+An important idea used above is that if you have something like this:
+\[
+T(n) = f(n) T(\floor{n/2}) + g(n)
+\]
+then writing $n = c_d2^d + \cdots c_02^0 = (c_d \cdots c_0)$, we have
+\[
+T(c_d\cdots c_0) = f(n) T(c_d \cdots c_1) + g(n)
+\]
+
+\begin{ex}
+What would you do if you're given this recurrence instead:
+\[
+T(n) = T(\floor{n/3}) + Bn + C
+\]
+\end{ex}
+
+
+
+What about ceilings?
+\[
+T(n) = T(\ceiling{n/2}) + Bn + C
+\]
+What is the relationship between $n$ and $\ceiling{n/2}$.
+If $n = 2k$, then
+\[
+\ceiling{n/2} = \ceiling{k} = k, 
+\hspace{1cm}
+\ceiling{(c_d \cdots c_0)/2} =  c_d \cdots c_1  
+\]
+and if $n = 2k + 1$, then
+\[
+\ceiling{n/2} = \ceiling{k + 1/2} = k + 1,
+\hspace{1cm}
+\ceiling{(c_d \cdots c_0)/2} =  c_d \cdots c_1  
+\]
+Can we bring them to a uniform format?
+Yes! Because, 
+if $n = 2k$, then
+\[
+\ceiling{n/2} = k = \floor{(n+1)/2}
+\]
+and if $n = 2k + 1$, then
+\[
+\ceiling{n/2} = k + 1 = \floor{(n + 1)/2}
+\]
+
+Therefore
+\[
+T(n) = 2T(\floor{(n+1)/2}) + Bn + C
+\]
+
+Hence
+\begin{align*}
+T(n) 
+&= 2T(\ceiling{n/2}) + Bn + C \\
+&= 2(
+     2T(
+        \ceiling{ 
+         \ceiling{n/2} / 2 
+       }
+      ) 
+     + B(\ceiling{n/2}) + C
+    ) 
+   + Bn + C \\
+&= 2^2T(
+        \ceiling{ 
+         \ceiling{n
+         /2} 
+        /2}
+      ) 
+     + (n + \ceiling{n/2})B + (2 + 1)C
+    \\
+&= 2^2
+   (2T(
+        \ceiling{
+         \ceiling{ 
+          \ceiling{n
+          /2} 
+         /2}
+        /2}
+      )
+    + B(        
+        \ceiling{ 
+         \ceiling{n
+         /2} 
+        /2}
+      )
+    + C
+   ) 
+     + (n + \ceiling{n/2})B + (2 + 1)C
+    \\
+&= 2^3
+   T(
+        \ceiling{
+         \ceiling{ 
+          \ceiling{n
+          /2} 
+         /2}
+        /2}
+      )
+    +         
+       (n 
+        + \ceiling{n/2}
+        +
+        \ceiling{ 
+         \ceiling{n
+         /2} 
+        /2}
+       )B 
+     + (2^2 + 2 + 1)C
+    \\
+\end{align*}
+To make things neat: write
+\[
+f(n) = \ceiling{n/2}
+\]
+and $f^{(0)}(n) = n$,
+$f^{(1)}(n) = f(n)$ and $f^{(i+1)}(n) = f(f^{(i)}(n))$. 
+The above gives us
+\begin{align*}
+T(n) 
+&= 2^d T(1) \\
+&\hspace{0.5cm} + (f^{(0)}(n) + f^{(1)}(n) + \cdots + f^{(d-1)}(n))B \\
+&\hspace{0.5cm} + (2^{d-1} + \cdots + 2 + 1)C \\
+&= 2^d T(1) \\
+&\hspace{0.5cm} + (f^{(0)}(n) + f^{(1)}(n) + \cdots + f^{(d-1)}(n))B \\
+&\hspace{0.5cm} + (2^d - 1)C
+\end{align*}
+Of course $d$ is the number of times I have to use the recurrence relation
+to get to $T(1)$ and it definitely depends on $n$.
+In other words $d$ is the smallest positive integer such that
+\[
+f^{(d)}(n) = 1
+\]
+
+
+
+
+
+Let's make a plot:
+
+
+\begin{python}
+from plot import *
+N = 33
+STEP = 1
+table = {}
+
+def ceiling(x):
+    f = x - int(x)
+    if f == 0: return int(x)
+    else: return int(x) + 1
+
+def t(n):
+    n = int(n)
+    if n <= 1: return 1
+    else:
+        if not table.has_key(n):
+            table[n] = 2 * t(ceiling(n/2.0)) + n + 1
+        return table[n]
+'''
+def s(x):
+    x = float(x)
+    if x <= 1: return 1
+    else:
+        return 2 * s(x/2.0) + x + 1
+'''
+
+p = Plot(domain="0:%s" % N)
+
+points = [(n, t(n)) for n in range(0, N + 1, STEP)]
+p.add(points, style='step', color='blue', python=1)
+
+#points = [(n/50.0, s(n/50.0)) for n in range(0, N*50 + 1, STEP)]
+#p.add(points, style='step', color='red', python=1)
+
+
+p.add("x + x*log(x, 2) + (x - 1)", color='green', python=1, num_points=100)
+print p
+
+\end{python}
+
+
+
+
+
+
+
+
+
+
+
+Note that the recurrence relation relates $T(n)$ to $T(\floor{n/2}))$
+and not $T(n - 1)$.
+This implies straightaway that we should use the weak form 
+of mathematical induction.
+Let's look at the inductive case of induction first.
+Assume that
+\[
+T(i) \leq i + i \log_2 i + \log_2 i
+\]
+holds for for $1 \leq i \leq n$.
+Then by definition
+\[
+T(n + 1) = 2 T(\floor{(n+1)/2}) + n + 1
+\]
+If $n + 1$ is even then the above is
+\[
+T(n + 1) = 2 T((n+1)/2) + n + 1
+\]
+Of course $(n + 1)/2 < n + 1$.
+Therefore
+\newcommand\FFFF{ \frac{n + 1}{2} }
+\newcommand\FFF{ \left (\frac{n + 1}{2} \right) }
+\begin{align*}
+T(n + 1) 
+&= 2 T \left( \FFFF \right) + n + 1 \\
+&\leq 2
+   \left[
+    \FFF + \FFF \log_2 \FFF + \log_2 \FFF 
+   \right]
+   + n + 1 \\
+&= (n + 1) + (n + 1) \log_2 \FFF + 2 \log_2 \FFF
+   + n + 1 \\
+&= (n + 1) + (n + 1) (\log_2 (n+1) - \log_2 2) + 
+   2 (\log_2 (n + 1) - \log_2 2) 
+   + n + 1 \\
+&= (n + 1) + (n + 1) (\log_2 (n+1) - 1) + 
+   2 (\log_2 (n + 1) - 1) 
+   + n + 1 \\
+&= (n + 1) + (n + 1) \log_2 (n+1) + 
+   2 (\log_2 (n + 1) - 1) 
+  \\
+&= \left[
+   (n + 1) + (n + 1) \log_2 (n+1) + 
+   \log_2 (n + 1)  
+   \right]
+   + \log_2 (n + 1) - 1 
+  \\
+\end{align*}

@@ -1,0 +1,62 @@
+%-*-latex-*-
+\section{Compare heap against queue and BST/AVL}
+
+As mentioned earlier, the point of the heap is to
+organized data so that you want remove an item
+with the highest priority (use maxheap or minheap depending
+on whether \lq\lq higher prioriy" mean \lq\lq larger priority number"
+or \lq\lq smaller priority number".
+
+Here is the runtimes of the heap (min or max):
+\begin{enumerate}[nosep]
+\item Insert: $O(\lg n)$
+\item Delete: $O(\lg n)$ (i.e., delete the root)
+\end{enumerate}
+Of course if you just want to peek at the highest priority value without deleting it,
+it's $O(1)$.
+
+If you use a queue (using double linked list) to implement a 
+priority queue,
+\begin{enumerate}[nosep]
+\item Insert: $O(n)$
+\item Delete: $O(1)$ (i.e., delete the root)
+\end{enumerate}
+You might think this is OK since the delete is fast.
+But hang on cowboy ... if you perform $n$ inserts and deletes 
+say alternativing them, the average is going to be $O(n)$ for each.
+The average for the heap is going to be $O(\lg n)$.
+So using a queue is a bad idea.
+
+What about a BST? Say we use the AVL tree.
+\begin{enumerate}[nosep]
+\item Insert: $O(\lg n)$
+\item Delete: $O(\lg n)$ (i.e., delete the minimum)
+\end{enumerate}
+If you want to peek at the minimum without removing it,
+the runtime is $O(\lg n)$.
+Excluding the peek, the insert and delete are the 
+same as the heap.
+But wait ...
+
+When you insert a value into an AVL, what is the runtime?
+The value is inserted as a leaf. The runtime is not just worst
+runtime of $O(\lg n)$. It is in fact exactly $\Theta(\lg n)$.
+
+But what about a heap? Say a minheap?
+While in the case of the AVL tree, you have to walk from the root
+to a leaf, in the case of the insert into a minheap,
+you insert at the leaf and you heapify-up -- but the
+heapify-up might stop \textit{anywhere} along the way to the root.
+
+Assuming the tree is full.
+How many leaves are there? If the height is $h$,
+then there are $2^{h + 1}$ leaves.
+And how many nonleaves are there?
+Well it's $1 + 2 + \cdots + 2^{h} = 2^{h+1} - 1$.
+So there's a 50\% chance that the inserted value is a leaf!
+Which in the case of a heap, it means that there's not
+a whole lot of heapify up at all!!!
+In fact you can show (but you would need probability theory)
+that the \textit{average} runtime of heap insert is $O(1)$.
+
+Wonderful! 

@@ -1,0 +1,152 @@
+%-*-latex-*-
+\section{Heapify-down}
+
+Heapify-down is the opposite of heapify-up:
+you keep pushing a value \verb!v! down, swapping with the largest child
+if that largest child is greater than \verb!v!. 
+Here's an example.
+
+Suppose I have this tree:
+
+\begin{python}
+from latextool_basic import *
+from drawheap import *
+p = Plot()
+edges={'10':['0','8'],
+       '0':['5','2'],
+       '8':['4','6'],
+       '5':['1','3']
+       }
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+This is almost a maxheap except that \verb!0!
+violates the maxheap property.
+I perform heapify-down at \verb!0!, swapping with
+the larger of the children, i.e., \verb!5!
+
+
+\begin{python}
+from latextool_basic import *
+from drawheap import *
+p = Plot()
+edges={'10':['0','8'],
+       '0':['5','2'],
+       '8':['4','6'],
+       '5':['1','3']
+       }
+drawheap(p, edges, include_array=False)
+p += Line(names=['0', '5'], linewidth=0.03, linecolor='red',
+          bend_right=60, endstyle='>', startstyle='>')       
+print(p)
+\end{python}
+
+to get
+
+
+\begin{python}
+from latextool_basic import *
+from drawheap import *
+p = Plot()
+edges={'10':['5','8'],
+       '5':['0','2'],
+       '8':['4','6'],
+       '0':['1','3']
+       }
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+I do it again, swapping \verb!0! with \verb!3! to get
+
+\begin{python}
+from latextool_basic import *
+from drawheap import *
+p = Plot()
+edges={'10':['5','8'],
+       '5':['3','2'],
+       '8':['4','6'],
+       '3':['1','0']
+       }
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+In this case, I stop at a leaf.
+In general, it's possible that the heapify-down stops before
+arriving at a leaf.
+
+Note that I can heapify-down at any value even if
+the tree has multiple spots that violate the
+maxheap property.
+
+\begin{Verbatim}[frame=single]
+ALGORITHM: heapify-down (for maxheap)
+INPUTS: x[0..n-1] -- array
+        i         -- index of x
+
+while i < n and x[i] has a child larger than x[i]:
+    swap x[i] with the largest child, say x[j]
+    set i to j
+x[i] = val
+\end{Verbatim}
+
+In more details:
+
+\begin{Verbatim}[frame=single]
+ALGORITHM: heapify-down (for maxheap)
+INPUTS: x[0..n-1] -- array
+        i         -- index of x
+
+v = x[i]
+while 1:
+
+    # Set j to index of the larger of the left and right
+    # child of v. If there is no left and right child,
+    # j is set to -1.
+    l = left(i)
+    r = right(i)
+    if l == -1:
+        # left child does no exist
+        # (therefore right child does not exist)
+        j = -1
+    else:
+        # left child exists
+        if r == -1:
+            # right child does not exists
+            j = l
+        else:
+            # right child exists
+            if x[l] > x[r]:
+                j = l
+            else:
+                j = r    
+
+    if j != -1 and x[j] > v:
+        # v heapify-down                
+        x[i] = x[j]
+        i = j
+    else:
+        # v arrives at final index
+        x[i] = v
+        break
+\end{Verbatim}
+
+[REDUNDANT PARAGRAPH]
+You can heapify-up or heapify-down at any index position.
+There are times when heapifying-up or heapifying-down depends on the
+value at the given index.
+Let's call the function \verb!heapify!.
+In such cases, if it's possible to heapify-up, then \verb!heapify! will
+heapify-up and if it's possible to heapify-down, then \verb!heapify!
+will heapify-down.
+
+[What if there's a value that can heapify up and can heapify down?]
+
+
+\begin{ex}
+  In terms if actual real time, which cost more, one step of
+  heapify-up or one step of heapify-down?
+  \qed
+\end{ex}

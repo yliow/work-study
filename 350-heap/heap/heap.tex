@@ -1,0 +1,184 @@
+%-*-latex-*-
+\section{Binary heaps}
+
+Look at this tree:
+
+\begin{python}
+from latextool_basic import *
+from drawheap import *
+p = Plot()
+edges={'10':['5','7'],
+       '5':['2','1'],
+       '7':['','0'],
+       }
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+
+
+No is not a BST.
+But the numbers are not totally random:
+each node has value $\geq$ all
+the children.
+This is called a \defone{maxheap}.
+
+Not too surprising, this is called \defone{minheap}:
+
+\begin{python}
+from latextool_basic import *
+from drawheap import *
+p = Plot()
+edges={'5':['8','10'],
+       '8':['12'],
+       '10':['13','15'],
+       }
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+Each node has value $\leq$ all children.
+
+Note that I have only defined max- and minheaps for \textit{binary} 
+trees.
+There are also called \defone{binary heaps}.
+It's not too difficult to see that you can
+generalize these to
+\defone{$k$--ary minheaps}
+or
+\defone{$k$--ary maxheaps}.
+
+More generally you can define heaps with respect to an ordering relation.
+In the above the ordering is $\geq$ (for maxheap)
+and $\leq$ (for minheap).
+
+Let me formalize the definitions for max- and minheap:
+
+A tree satisfies the \defone{maxheap property}
+if every node in the tree is greater than or equal to the children.
+A \defone{maxheap} is a tree that satisfies the maxheap property.
+A $k$--ary tree satisfies the \defone{minheap property}
+if every node in the tree is less than or equal  to the children.
+A \defone{minheap} is a tree that satisfies the maxheap property.
+
+Although most of what we'll talk about regarding heaps works
+for all binary max/minheaps, we are usually only interested in
+complete heaps, i.e., all the levels are full except possibly for the last.
+This will ensure that the height is $O(\log n)$.
+Furthermore, the places where the level is not filled (if any)
+is \lq\lq on the
+right''.
+For instance instead of a maxheap like this:
+
+
+\begin{python}
+from latextool_basic import *
+from drawheap import *
+p = Plot()
+edges={'10':['5','7'],
+       '5':['2', '1'],
+       '7':['','0'],
+       }
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+we will usually consider this instead:
+
+\begin{python}
+from latextool_basic import *
+from drawheap import *
+p = Plot()
+edges={'10':['5','7'],
+       '5':['2', '1'],
+       '7':['0'],
+       }
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+This will ensure that when this heap is implemented
+using an array, the values occupied are contiguous.
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Array2d(0, 0, width=0.6, height=0.6, 
+             xs=[['10','5','7','2','1','0']])
+print(p)
+\end{python}
+
+Cells which are not relevant are left blank.
+Of course there are integer values there --
+but we don't care about them.
+Furthermore, this array would usually come with a
+size or length variable (in the above example size would have value
+\texttt{6}) which is the case if I use
+\verb!std::vector!.
+The size variable would tell me the index position of
+the first available cell in the array
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Array2d(0, 0, width=0.6, height=0.6, 
+             xs=[['10','5','7','2','1','0','?']])
+print(p)
+\end{python}
+
+which would correspond nicely with the
+next available node in the tree to keep the tree
+in the \lq\lq heap shape'',
+i.e., complete and unfilled nodes on a level
+(if any) on the right:
+
+\begin{python}
+from latextool_basic import *
+from drawheap import *  
+p = Plot()
+edges={'10':['5','7'],
+       '5':['2', '1'],
+       '7':['0', '?'],
+       }
+drawheap(p, edges)
+print(p)
+\end{python}
+
+From now on, I will assume that a max- or minheap
+look like that,
+i.e., is complete where the unfilled slots (if any)
+are all on the same level
+and all \lq\lq on the right''.
+
+\newpage
+\begin{ex}
+How many maxheaps can you draw if the heap contains
+the values 1, 2, 3, 4?
+\qed
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Suppose you have this array:
+\[
+5, 4, 3, 2, 1
+\]
+(index 0 is on the left).
+Assume that this array represents a binary tree.
+\begin{tightlist}
+  \item Is this binary tree a maxheap?
+  \item How many arrays with the above values represent a maxheap?
+\end{tightlist}
+\qed
+\end{ex}
+
+\newpage
+\begin{ex}
+  In the array representation of a complete tree of size $n$ where
+  the leaves are all at the same depth and \lq\lq on the left",
+  what are the index values of all the non-leaves
+  and all the index values of all the leaves?
+  How many non-leaves are there altogether?
+  \qed
+\end{ex}

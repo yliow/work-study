@@ -1,0 +1,652 @@
+%-*-latex-*-
+\section{Quicksort: PLTR partition method}
+
+Now that I've given you one partition strategy, let's talk about
+sorting inplace, 
+i.e., without creating extra arrays.
+The idea is just like mergesort.
+In fact when you look at the first partition strategy I've shown,
+you notice that I did not use any extra arrays.
+Therefore if you have an inplace partition strategy, you apply it to
+the whole array, and recursively on the \verb!left! and \verb!right! piles.
+For instance if you have an array of integers values:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=0.8, 
+                 cellheight=0.8,
+                 arr=[20*['']],
+                )
+p.add(s)
+print(p)
+\end{python}
+and you apply a partition strategy to get this, say with a pivot of 
+\verb!42!:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=0.8,
+                 cellheight=0.8,
+                 arr=[7*[''], ['42'], 12*['']],
+                 chunklabels=['left','','right'],
+)
+p.add(s)
+print(p)
+\end{python}
+
+You of course also apply the partition strategy to the \verb!left!,
+say with a pivot of \verb!23!:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=0.8,
+                   cellheight=0.8,
+                   arr=[3*[''],['23'],3*[''], ['42'] + 12*['']],
+                   chunklabels=['left','','right'],
+)
+p.add(s)
+print(p)
+\end{python}
+And you keep doing it until you reach base cases.
+Etc.
+Get it?
+Of course if you apply an inplace partition strategy say to the \verb!right!
+pile of the above:
+it will have its own \verb!left! and \verb!right! of course, say:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=0.8,
+                   cellheight=0.8,
+                   arr=[7*[''] + ['42'], 4*[''], ['83'],7*['']],
+                   chunklabels=['','left','','right'],
+)
+p.add(s)
+print(p)
+\end{python}
+
+Of course this means that, in general, if we have an 
+inplace partition strategy for an \textit{array}, we need to modify it so that
+the partition operate on a \textit{subarray}.
+
+
+Consider this array:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, 
+                   cellheight=0.5,
+                   arr=[[3,2,1,3,4,9,6,7,0,2,4,8]],
+)
+p.add(s)
+print(p)
+\end{python}
+
+y
+The general idea is that first we move the pivot to the front of the
+array.
+Next, excluding the pivot, we continually maintain three \lq\lq sections''
+of the array to be partitioned.
+The first section, which I call \verb!left! contains value
+$\leq$ the pivot.
+This is followed by a section of the array I call \verb!TODO!
+which are values not yet processed.
+The final section of the array is made up of values
+which are $>$ the value of the pivot
+I continually analyze the leftmost value (say \verb!v!) from the
+\verb!TODO! section.
+There are two possibilities:
+
+If \verb!v! is $\leq$ the pivot, then \verb!v! joins \verb!left! --
+the size of the \verb!left! section grows by 1.
+In this case, \verb!v! joins the rightside of \verb!left!.
+I will call this method PLTR (memory aid: pivot-left-todo-right.)
+
+If \verb!v! is $>$ the pivot, then \verb!v! joins \verb!right! --
+the size of \verb!right! grows by 1.
+You will that \verb!v! joins the leftside of \verb!right!:
+this is done by swapping \verb!v! with an appropriate value.
+
+At some point, the \verb!TODO! be empty.
+At that point, we have the pivot following by \verb!left!,
+the empty \verb!TODO!, and \verb!right!.
+We then move the pivot by swapping it with the rightmost
+value of \verb!left! or, if \verb!left! is empty,
+\verb!v! becomes the leftmost value of \verb!right!.
+
+I will assume for simplicity that the we have chosen the first value,
+i.e, \verb!3! to be the pivot.
+
+Let's see the partition strategy in action.
+Here we go:
+
+{\small
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+y = 0
+def xyz(xs):
+    global y
+    y -= 1.8
+    t = chunkedarray(x=0, y=y,
+                        cellwidth=1, 
+                        cellheight=0.5,
+                        arr=xs,
+                        chunklabels=['','left','TODO','right'])
+    return t
+
+def xyz2(xs):
+    global y
+    y -= 1.1
+    t = chunkedarray(x=0, y=y,
+                        cellwidth=1, 
+                        cellheight=0.5,
+                        arr=xs)
+    return t
+
+s = xyz([[3],[],[2,1,3,4,9,6,7,0,2,4,8],[]]); p.add(s)
+s = xyz([[3],[2],[1,3,4,9,6,7,0,2,4,8],[]]); p.add(s)
+s = xyz([[3],[2,1],[3,4,9,6,7,0,2,4,8],[]]); p.add(s)
+s = xyz([[3],[2,1,3],[4,9,6,7,0,2,4,8],[]]); p.add(s)
+s = xyz([[3],[2,1,3],[8,9,6,7,0,2,4],[4]]); p.add(s)
+s = xyz([[3],[2,1,3],[9,6,7,0,2,4],[8,4]]); p.add(s)
+s = xyz2([[3],[2,1,3],[6,7,0,2,4],[9,8,4]]); p.add(s)
+s = xyz2([[3],[2,1,3],[7,0,2,4],[6,9,8,4]]); p.add(s)
+s = xyz2([[3],[2,1,3],[0,2,4],[7,6,9,8,4]]); p.add(s)
+s = xyz2([[3],[2,1,3,0],[2,4],[7,6,9,8,4]]); p.add(s)
+s = xyz2([[3],[2,1,3,0,2],[4],[7,6,9,8,4]]); p.add(s)
+s = xyz2([[3],[2,1,3,0,2],[],[4,7,6,9,8,4]]); p.add(s)
+
+print(p)
+\end{python}
+}
+
+and swapping the pivot \verb!3! with the rightmost value in the \verb!left!
+pile:
+\begin{center}
+(1)
+\end{center}
+{\small
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1,
+                   cellheight=0.5,
+                   arr=[[2,1,3,0,2],[3], [4,7,6,9,8,4],],
+                   chunklabels=['left','pivot','right'],
+)
+p.add(s)
+print(p)
+\end{python}
+}
+
+Now I perform partitioning on the \textit{above} \verb!left! pile,
+choosing the first value of of this section to be the pivot:
+{\small
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+y = 0
+def xyz(xs):
+    global y
+    y -= 1.8
+    t = chunkedarray(x=0, y=y,
+                        cellwidth=1, 
+                        cellheight=0.5,
+                        arr=xs,
+                        chunklabels=['','left','TODO','right'])
+    return t
+
+def xyz2(xs):
+    global y
+    y -= 1.1
+    t = chunkedarray(x=0, y=y,
+                        cellwidth=1, 
+                        cellheight=0.5,
+                        arr=xs)
+    return t
+
+s = xyz([[2],[],[1,3,0,2],[],[3,4,7,6,9,8,4]]); p.add(s)
+s = xyz2([[2],[1],[3,0,2],[],[3,4,7,6,9,8,4]]); p.add(s)
+s = xyz2([[2],[1],[2,0],[3],[3,4,7,6,9,8,4]]); p.add(s)
+s = xyz2([[2],[1,2],[0],[3],[3,4,7,6,9,8,4]]); p.add(s)
+s = xyz2([[2],[1,2,0],[],[3],[3,4,7,6,9,8,4]]); p.add(s)
+print(p)
+\end{python}
+}
+
+and swapping in the pivot to its right position:
+\begin{center}
+(2)
+\end{center}
+{\small
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, 
+                   cellheight=0.5,
+                   arr=[[0,1,2],[2],[3],[3,4,7,6,9,8,4]],
+                   chunklabels=['left',('pivot',1.2),'right']
+)
+p.add(s)
+print(p)
+\end{python}
+}
+For this partitioning, 
+the \verb!left! pile is \verb![0,1,2]!, the pivot is \verb!2!, and
+the \verb!right! pile is \verb![3]!.
+
+Now I partition the above \verb!left! pile using the first element
+\verb!0! as pivot.
+{\small
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+y = 0
+def xyz(xs):
+    global y
+    y -= 1.8
+    t = chunkedarray(x=0, y=y,
+                        cellwidth=1, 
+                        cellheight=0.5,
+                        arr=xs,
+                        chunklabels=['','left',('TODO', 1.2),'right'])
+    return t
+
+def xyz2(xs):
+    global y
+    y -= 1.1
+    t = chunkedarray(x=0, y=y,
+                        cellwidth=1, 
+                        cellheight=0.5,
+                        arr=xs)
+    return t
+
+s = xyz([[0],[],[1,2],[],[2,3,3,4,7,6,9,8,4]]); p.add(s)
+s = xyz2([[0],[],[2],[1],[2,3,3,4,7,6,9,8,4]]); p.add(s)
+s = xyz2([[0],[],[2,1],[2,3,3,4,7,6,9,8,4]]); p.add(s)
+print(p)
+\end{python}
+}
+Swapping with the \verb!left! pile is not necessary since the 
+\verb!left! pile is empty.
+We get
+\begin{center}
+(3)
+\end{center}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1,
+                   cellheight=0.5,
+                   arr=[[],[0],[2,1],[2,3,3,4,7,6,9,8,4]],
+)
+p.add(s)
+print(p)
+\end{python}
+Note that there the \verb!left! pile to the left of the pivot \verb!0!
+is empty -- there's nothing to do!
+We have arrived at a base case!
+
+We continue to execute the partitioning on the \verb!right! pile 
+of the pivot \verb!0!,
+i.e., on \verb![2,1]!.
+The first value \verb!2! is the pivot in this case.
+{\small
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+y = 0
+def xyz(xs):
+    global y
+    y -= 1.8
+    t = chunkedarray(x=0, y=y,
+                        cellwidth=1, 
+                        cellheight=0.5,
+                        arr=xs,
+                        chunklabels=['','','left',('TODO', 1.2),'right'])
+    return t
+
+def xyz2(xs):
+    global y
+    y -= 1.1
+    t = chunkedarray(x=0, y=y,
+                        cellwidth=1.0, 
+                        cellheight=0.5,
+                        arr=xs)
+    return t
+
+s = xyz([[0],[2],[],[1],[],[2,3,3,4,7,6,9,8,4]]); p.add(s)
+s = xyz2([[0],[2],[1],[],[],[2,3,3,4,7,6,9,8,4]]); p.add(s)
+print(p)
+\end{python}
+}
+
+
+Swapping the pivot \verb!2! 
+with the rightmost value in the \verb!left! pile,
+i.e., \verb!1!, we get
+\begin{center}
+(4)
+\end{center}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, 
+                   cellheight=0.5,
+                   arr=[[0],[1],[2],[],[],[2,3,3,4,7,6,9,8,4]],
+)
+p.add(s)
+print(p)
+\end{python}
+I'm now done partitioning the \verb!left! and \verb!right! pile
+from (3).
+Note that (3) was the partition of the \verb!left! pile from (2).
+So I partition the \verb!right! pile at (2).
+But this \verb!right! pile is \verb![3]! which has size 1, i.e., 
+this is the base case, so nothing is done.
+So I'm doing to return from (2) to (1).
+Recall that (2) is partitioning the \verb!left! of (1).
+So now I need to partition the right of (1).
+At (1), the array now looks like this, with the \verb!left! pile 
+completely sorted:
+\begin{center}
+(1)
+\end{center}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1,
+                   cellheight=0.5,
+                   arr=[[0,1,2,2,3],[3], [4,7,6,9,8,4],],
+                   chunklabels=['left','pivot','right'],
+)
+p.add(s)
+print(p)
+\end{python}
+I'll leave it to you to finish the quicksort.
+
+At this point, it's clear that this inplace
+strategy (PLTR) works, executing a partition strategy on part of the array.
+Of course to write a proper algorithm, we will need to specify
+\textit{which} part of the array a recursive call of the quicksort
+is support to work on.
+That's easy. For our recursive function call,
+we just need to carry two index variables
+\verb!start! and \verb!end! that tells which the starting
+index and ending index that particular quicksort invocation
+is suppose to work on.
+So during an invocation of quicksort, the picture is something like this:
+
+\begin{python}
+from quicksort_init import *
+p = Plot()
+from quicksort_init import *
+s = chunkedarray(cellwidth=0.4, 
+                   cellheight=0.4,
+                   arr=[8*[''], ['p'],3*[''],6*[''],4*[''],10*['']],
+                   chunklabels=['', '', 'left', 'TODO', 'right'],
+                   celllabels = [('start', 8, -2),
+                                 ('end',   21, -2),
+                                 ('thead', 12, -1),
+                                 ('ttail', 17, -1),
+                                ]
+)
+p.add(s)
+print(p)
+\end{python}
+(The \verb!p! is the pivot value -- remember that we move the pivot to
+the front.)
+To describe the beginning and end of the \verb!TODO!, I have
+two index variables \verb!thead! and \verb!ttail!
+(memory aid:
+\verb!thead! = \verb!TODO! head and 
+\verb!ttail! = \verb!TODO! tail.)
+
+
+
+Here's the algorithm for the PLTR partition
+that works on the section of the array 
+beginning with index \verb!start! and ending at index
+\verb!end!:
+\begin{console}
+FUNCTION partition(x, start, end):
+
+    choose pivot_index # the index to the pivot
+    pivot = x[pivot_index]
+    swap x[start] and x[pivot_index]
+    thead = start + 1
+    ttail = end
+    while ttail <= thead:
+        if x[thead] <= pivot:
+            thead = thead + 1
+        else:
+            if thead is not ttail:
+               swap x[thead] and x[ttail]
+            ttail = ttail - 1
+    
+    if thead > start + 1:
+        swap x[start] and x[thead - 1]
+
+    return thead - 1
+\end{console}
+(Note that we assume \verb!start < end!.
+If \verb!start == end!, then there's only one value and
+there's nothing to partition.
+If \verb!start > end!, that corresponds to the case where
+the subarray is empty -- again nothing to partition.)
+The value returned is the index of the pivot value after the espivot
+value is moved from the front to its final place in this partition.
+
+Note that at the end of the algorithm we have the following:
+\begin{tightlist}
+  \li \verb!x[start .. thead - 1]! have values $\leq$ \verb!pivot! 
+  \li \verb!x[ttail + 1 .. end]! have values $>$ \verb!pivot!
+\end{tightlist}
+
+Here's the general (inplace) quicksort algorithm:
+\begin{console}
+FUNCTION quicksort(x, start, end):
+
+    if start < end:
+        pivot_index = partition(x, start, end)
+        quicksort(x, start, pivot_index - 1)
+        quicksort(x, pivot_index + 1, end)
+\end{console}
+
+(Of course to sort a whole array, call the function
+with \verb!start = 0! and \verb!end = n - 1! where \verb!n!
+is the size of the array.)
+
+Of course the most important thing is the \verb!partition!
+function which include the selection of the pivot and the
+organization of \verb!left! and \verb!right!.
+
+
+
+
+
+\newpage
+\begin{ex}
+\begin{tightlist}
+\item Using the partitioning strategy in this section,
+execute one single partitioning on the following array
+from index \verb!start = 3! to index \verb!end = 8!
+choosing the value at index 4 as pivot (i.e., the value \verb!7!).
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Array2d(0,0,[[3,1,5,2,7,8,4,6,9,0]],width=0.7,height=0.7)
+print(p)
+\end{python}
+
+Show the state of your array after moving the pivot, at the end of
+processing each value in the \verb!TODO! section of the array,
+and finally after moving the pivot to the right place.
+
+\item For each of the step from above (except for the first and last),
+write down the value of \verb!thead! and \verb!ttail!.
+What is the final index of the pivot (i.e., the value returned
+by the partition method in this section)? 
+\end{tightlist}
+\end{ex}
+
+
+
+\newpage
+\begin{ex}
+\begin{tightlist}
+\item Using the partitioning strategy in this section,
+execute one single partitioning on the following array
+from index \verb!start = 2! to index \verb!end = 8!
+choosing the value at index 4 (i.e., \verb!4!) as pivot.
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Array2d(0,0,[[0,1,2,3,4,5,6,7,8,9]],width=0.7,height=0.7)
+print(p)
+\end{python}
+
+Show the state of your array after moving the pivot, at the end of
+processing each value in the \verb!TODO! section of the array,
+and after moving the pivot to the right place.
+
+\item For each of the step from above (except for the first and last),
+write down the value of \verb!thead! and \verb!ttail!.
+What is the final index of the pivot (i.e., the value returned
+by the partition method in this section)? 
+
+\end{tightlist}
+\qed
+\end{ex}
+
+
+\newpage
+\begin{ex}
+\begin{tightlist}
+\item Using the partitioning strategy in this section,
+execute one single partitioning on the following array
+from index \verb!start = 2! to index \verb!end = 8!
+choosing the value at index 4 as pivot.
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Array2d(0,0,[[9,8,7,6,5,4,3,2,1,0]],width=0.7,height=0.7)
+print(p)
+\end{python}
+
+Show the state of your array after moving the pivot, at the end of
+processing each value in the \verb!TODO! section of the array,
+and after moving the pivot to the right place.
+
+\item For each of the step from above (except for the first and last),
+write down the value of \verb!thead! and \verb!ttail!.
+What is the final index of the pivot (i.e., the value returned
+by the partition method in this section)? 
+
+\end{tightlist}
+\qed
+\end{ex}
+
+\newpage
+\begin{ex}
+\begin{tightlist}
+\item Using the partitioning strategy in this section,
+execute one single partitioning on the following array
+from index \verb!start = 2! to index \verb!end = 8!
+choosing the value at index 2 as pivot.
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Array2d(0,0,[[7,8,9,6,0,3,4,2,1,5]],width=0.7,height=0.7)
+print(p)
+\end{python}
+
+Show the state of your array after moving the pivot, at the end of
+processing each value in the \verb!TODO! section of the array,
+and after moving the pivot to the right place.
+
+\item For each of the step from (a) (except for the first and last),
+write down the value of \verb!thead! and \verb!ttail!.
+What is the final index of the pivot (i.e., the value returned
+by the partition method in this section)? 
+
+\end{tightlist}
+\qed
+\end{ex}
+
+\newpage
+\begin{ex}
+\begin{tightlist}
+\item Using the partitioning strategy in this section,
+execute one single partitioning on the following array
+from index \verb!start = 2! to index \verb!end = 8!
+choosing the value at index 4 as pivot.
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Array2d(0,0,[[7,8,9,6,0,3,4,2,1,5]],width=0.7,height=0.7)
+print(p)
+\end{python}
+
+Show the state of your array after moving the pivot, at the end of
+processing each value in the \verb!TODO! section of the array,
+and after moving the pivot to the right place.
+
+\item For each of the step from (a) (except for the first and last),
+write down the value of \verb!thead! and \verb!ttail!.
+What is the final index of the pivot (i.e., the value returned
+by the partition method in this section)? 
+
+\end{tightlist}
+\qed
+\end{ex}
+
+
+\newpage
+\begin{ex}
+\begin{tightlist}
+\item Using the partitioning strategy in this section,
+execute one single partitioning on the following array
+from index \verb!start = 0! to index \verb!end = 2!
+choosing the value at index 0 as pivot.
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Array2d(0,0,[[0,9,9]],width=0.7,height=0.7)
+print(p)
+\end{python}
+
+\item Is quicksort (using the partition strategy of this section)
+a stable sorting algorithm?
+\qed
+\end{tightlist}
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Describe arrays and pivot values in the arrays that will become
+sorted when you execute one pass of the partition strategy of this section.
+\qed
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Describe sorted arrays and pivot values in the arrays that will become
+unsorted when you execute one pass of the partition strategy of this section.
+\qed
+\end{ex}
+

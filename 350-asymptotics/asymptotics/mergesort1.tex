@@ -1,0 +1,235 @@
+%-*-latex-*-
+\section{Mergesort ... 1st Version}
+
+\input{mergesort-pic.tex}
+
+Before I talk about the actual $\mergesort$, I want to 
+talk about the version that is easier to understand
+but uses a little more memory.
+
+Before I talk about $\mergesort$, I'll talk about $\merge$.
+As I mentioned earlier, the $\mergesort$ uses $\merge$.
+
+\begin{ex}
+First I want you to write a merge function that 
+takes two sorted arrays and put the values, sorted, into another array.
+Here's the C++ prototype:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+void merge(int a[], int size_a;
+           int b[], int size_b;
+           int c[], int & size_c);
+\end{Verbatim}
+\qed
+\end{ex}
+
+Assuming that the lengths of \verb!a! is $n$ or $n - 1$
+and the length of \verb!b! is $n$
+and the length of \verb!c! is $2n - 1$ or $2n$, then
+the runtime of merge is
+\[
+T_{\merge}(n) = O(n)
+\] 
+after all, you need to read all elements of \verb!a!, 
+read all elements of \verb!b!, copy
+$2n - 1$ or $2n$ values to \verb!c!.
+
+\begin{ex}
+Verify the runtime against your implementation of the merge function.
+\qed
+\end{ex}
+ 
+\begin{ex}
+Next I want you to write a split function that 
+take array \verb!x! and put 
+the first half of the values in \verb!x! into array \verb!y!
+and 
+the second half the values in array \verb!z!.
+If the length of \verb!x! is odd, then 
+the length of \verb!y! is one smaller than the length of 
+\verb!z!.
+Here's the C++ prototype:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+void split(int x[], int size_x;
+           int y[], int & size_y;
+           int z[], int & size_z);
+\end{Verbatim}
+\qed
+\end{ex}
+
+The runtime of the split function is
+\[
+T_{\SPLIT}(n) = O(n)
+\]
+That's easy to see since you have to read all values in \verb!x!
+which is $O(n)$, and copy the values to either \verb!y! 
+or \verb!z!.
+
+\begin{ex}
+Now complete the version of mergesort that uses new arrays
+for each function call.
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+void mergesort(int x[], int size_x)
+{
+    if (x_size <= 1)
+    {
+        return;
+    }
+    else
+    {
+        int * y = new int[size_x / 2];
+        int * z = new int[size_x - size_x / 2];
+        split(x, size_x, y, size_y, z, size_z);
+        mergesort(y, size_y);
+        mergesort(z, size_z);
+        merge(y, size_y,
+              z, size_y,
+              x, size_x);
+        return;
+    }
+}
+\end{Verbatim}
+Test your code thoroughly.
+(Remember to deallocate memory used.)
+\qed
+\end{ex}
+
+I will assume the time taken to create the array on the heap
+is constant.
+In that case:
+\begin{align*}
+T_{\mergesort}(n) 
+&= T_{\SPLIT}(n)  \\
+&\hspace{0.5cm} + T_{\mergesort}(\floor{n/2})
+  + T_{\mergesort}(n - \floor{n/2}) \\
+&\hspace{0.5cm} + T_{\merge}(n) + A
+\end{align*}
+Since $n - \floor{n/2} = \ceiling{n/2}$,
+the runtime is 
+\begin{align*}
+T_{\mergesort}(n) 
+&= T_{\SPLIT}(n)  \\
+&\hspace{0.5cm} + T_{\mergesort}(\floor{n/2})
+  + T_{\mergesort}(\ceiling{n/2}) \\
+&\hspace{0.5cm} + T_{\merge}(n) + A
+\end{align*}
+Hence the runtime $T_{\mergesort}(n)$ is of the form
+\begin{align*}
+T(n) \\
+&=
+ \begin{cases}
+  A                             & \text{if $n = 0, 1$} \\
+  T(\floor{n/2}) 
+  + T(\ceiling{n/2}) + Bn + C & \text{otherwise}
+ \end{cases}
+\end{align*}
+
+Ignoring floors and ceilings, 
+the runtime function looks like this:
+\[
+T(n) = 2T(n/2) + Bn + C
+\]
+and this is the case if $n$ is a power of $2$ (right?)
+Let me try to bring this to a closed form.
+If I make the substitution $n = 2^m$, I get
+\begin{align*}
+T(2^m) 
+&= 2T(2^{m-1}) + 2^mB + C \\
+&= 2(2T(2^{m-2}) + 2^{m-1}B + C)+ 2^mB + C \\
+&= 2^2 T(2^{m-2}) + 2 \cdot 2^mB + (1+2)C \\
+&= 2^2 (2T(2^{m-3}) + 2^{m-2}B + C) + 2 \cdot 2^mB + (1+2) C\\
+&= 2^3T(2^{m-3}) + 3 \cdot 2^m B + (1+2+2^2)C
+\end{align*}
+At this point you see that you will get
+\begin{align*}
+T(2^m) 
+&= 2^mT(2^0) + m \cdot 2^m B + (1+2+\cdots+2^{m-1}) C \\
+&= 2^mT(2^0) + m \cdot 2^m B + (2^m - 1) C
+\end{align*}
+Replacing $m$ by $n$ by $n = 2^m$, you get
+\begin{align*}
+T(n) 
+&= nT(1) + (\log_2 n) \cdot n B + (n - 1) C\\
+&= nT(1) + B(n\log_2 n) + (n - 1)C \\
+&= O(n \log_2 n)
+\end{align*}
+assuming $B \neq 0$ of course.
+AHA! This is better than bubblesort which is $O(n^2)$.
+
+Note that the above is not a proof!!!
+All it says is that \textit{if} (a big if) $n$ is a power of $2$, 
+then
+\[
+T(n) = nT(1) + (\log_2 n) \cdot n B + (n - 1) C
+\]
+There's no reason to believe that above is still true if $n$ is 
+not a power of $2$.
+
+Later I'll show you that the computations can be easily
+repaired to take into account the case where $n$ is not a power of 2
+and the end result is that the big-O is actually as stated above.
+
+\begin{ex}
+If the runtime of an algorithm is
+\[
+T(n) = 3T(n/3) + Bn + C
+\]
+compute it's big-O. (Use one of the standard functions.)
+\qed
+\end{ex}
+
+\begin{ex}
+If the runtime of an algorithm is
+\[
+T(n) = 5T(n/3) + Bn + C
+\]
+compute it's big-O. (Use one of the standard functions.)
+\qed
+\end{ex}
+
+\begin{ex}
+If the runtime of an algorithm is
+\[
+T(n) = 2T(n/2) + C
+\]
+compute it's big-O. (Use one of the standard functions.)
+\qed
+\end{ex}
+
+\begin{ex}
+Try this:
+\[
+T(n) = 2T(n/2) + Bn^2 + Cn + D
+\]
+\qed
+\end{ex}
+
+\begin{ex}
+Try this:
+\[
+T(n) = 2T(n/2) + Bn \ln n + C
+\]
+\qed
+\end{ex}
+
+
+As I mentioned earlier, I want to use memory carefully, i.e., 
+I do not want to create new arrays all the time.
+
+Note that the above already has some savings.
+For instance the array \verb!y! and \verb!z! is merged into
+the original \verb!x! (not a new array).
+
+Next, I'm going to move on to the usual mergesort which
+contains the same idea as above except that it uses memory
+more efficiently ...
+
+
+\begin{ex}
+Modify the above mergesort (version 1)
+so that instead of splitting up an array into two, split it into \textit{three}.
+Implement the algorithm. 
+Compute the runtime.
+Compare this version against the original one above.
+\qed
+\end{ex}
+

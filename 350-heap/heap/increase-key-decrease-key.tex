@@ -1,0 +1,243 @@
+%-*-latex-*-
+\section{Increase-key and decrease-key}
+
+So suppose I already have a priority queue (as a heap):
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+edges={'10': ['9','8'],
+       '9': ['5', '3'],
+       '8': ['0', '7'],
+       '5': ['2', '1'],
+     }
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+
+Suppose \texttt{1} is increased to \texttt{12}:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+edges={'10': ['9','8'],
+       '9': ['5', '3'],
+       '8': ['0', '7'],
+       '5': ['2', '12'],
+     }
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+
+I'm sure you can see very quickly that in order to make this back to
+a maxheap, I need to heapify-up \texttt{12}.
+In this case I need to swap 3 times to get this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+edges={'12': ['10','8'],
+       '10': ['9', '3'],
+       '8': ['0', '7'],
+       '9': ['2', '5'],
+     }
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+\begin{console}
+ALGORITHM: increase_key (for max heap)
+INPUT: x - heap (using an array)
+       n - length of heap in x
+       i - index where key will increase
+       k - new key value (k > x[i])
+
+x[i] = k # originally x[i] < k
+Perform heapify-up on x starting at index i.
+\end{console}
+So if the above represent processes with priorities, the low priority
+process moves up, in fact to the top, so it will be the next process to
+be executed.
+The worse runtime of increase-key for max heap is
+\[
+O(\log n)
+\]
+
+Using the above tree
+
+\begin{python}
+from latextool_basic import *
+from drawheap import *  
+p = Plot()
+edges={'12': ['10','8'],
+       '10': ['9', '3'],
+       '8': ['0', '7'],
+       '9': ['2', '5'],
+     }
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+suppose \texttt{10} is decreased to \texttt{1}:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+edges={'12': ['1','8'],
+       '1': ['9', '3'],
+       '8': ['0', '7'],
+       '9': ['2', '5'],
+     }
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+Of course this is not a maxheap anymore.
+To make this back to a maxheap, clearly the simplest thing to do is
+to heapify-down.
+In this case I need two swaps.
+First I do this swap
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+edges={'12': ['1','8'],
+       '1': ['9', '3'],
+       '8': ['0', '7'],
+       '9': ['2', '5'],
+     }
+drawheap(p, edges, include_array=False)
+p += Line(names=['1', '9'], startstyle='>', endstyle='>', linecolor='red', linewidth=0.03, bend_right=60)     
+print(p)
+\end{python}
+
+to get this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+edges={'12': ['9','8'],
+       '9': ['1', '3'],
+       '8': ['0', '7'],
+       '1': ['2', '5'],
+     }
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+Next I do this swap 
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+edges={'12': ['9','8'],
+       '9': ['1', '3'],
+       '8': ['0', '7'],
+       '1': ['2', '5'],
+     }
+drawheap(p, edges, include_array=False)
+p += Line(names=['1', '5'], endstyle='>', startstyle='>', linewidth=0.03, linecolor='red', bend_left=90)     
+print(p)
+\end{python}
+
+to get this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+edges={'12': ['9','8'],
+       '9': ['5', '3'],
+       '8': ['0', '7'],
+       '5': ['2', '1'],
+     }
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+Here's decrease key:
+
+\begin{Verbatim}[frame=single]
+ALGORITHM: decrease_key (for maxheap)
+INPUT: x - heap (using an array)
+       n - length of heap in x
+       i - index where key will increase
+       k - new key value (k < x[i])
+
+x[i] = k # originally x[i] > k
+Perform heapify_down on x at starting at index i.
+\end{Verbatim}
+
+The worse runtime of decrease-key for maxheap is clearly
+\[
+O(\log n)
+\]
+
+It's clear that given a heap (max or min), 
+you can heapify-up and heapify-down.
+I prefer to use 
+\lq\lq heapify-up"
+and 
+\lq\lq heapify-down"
+because the important thing is whether a node moves up or down.
+In the case of maxheap, 
+heapify-up and heapify-down
+are respectively
+increase-key and decrease-key
+whereas
+in the case of minheap
+heapify-up and heapify-down
+are respectively
+decrease-key and increase-key.
+
+
+
+
+\newpage
+\begin{ex}
+Let $x$ be the array
+\[
+4, 9, 2, 6, 3, 8, 0, 1, 5, 7
+\]
+First heapify it.
+Next do the following:
+\begin{tightlist}
+  \item Perform increase-key from on the key with value \texttt{2}
+  and change it to \texttt{11}.
+  \item Perform decrease-key from on the key with value
+  \texttt{7} and change it to \texttt{-1}.
+\end{tightlist}
+\qed
+\end{ex}
+
+
+
+\newpage
+\begin{ex}
+Continuing the implementation of the heap ADT using functions,
+implement the increase-key and decrease-key
+functions:
+\begin{console}
+int x;
+std::vector< int > heap;
+
+heap.resize(5);
+heap[0] = 5;
+heap[1] = 7;
+heap[2] = 8;
+heap[3] = 10;
+heap[4] = 2;
+maxheap_build(heap);      // [10, 7, 8, 5, 2]
+
+maxheap_increasekey(heap, 2, 12); // heap[2] is changed
+                          // to 12. heap has to be
+                          // reorganized to become
+                          // maxheap again.
+                          
+maxheap_decreasekey(heap, 2, 0); // heap[2] is changed
+                          // to 0. heap has to be
+                          // reorganized to become
+                          // maxheap again.
+\end{console}
+\end{ex}

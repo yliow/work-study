@@ -1,0 +1,325 @@
+%-*-latex-*-
+\section{Delete and extract-root}
+
+Suppose I want to delete
+  \texttt{8}
+  from this maxheap:
+
+  \begin{python}
+from latextool_basic import *
+p = Plot()
+edges={20: [10, 8],
+       10: [ 9, 1],
+        8: [ 0, 7],
+        9: [ 2, 5],
+       }
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+In other words I want to delete the value at index 2
+in the array implementation of the above heap.
+
+I'll do it this way:
+I look for the rightmost node of the last level --
+this corresponds to the last value in the array implementation.
+In the above case, that's the value \texttt{5}.
+I then overwrite \texttt{8} with \texttt{5}:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+edges={20: [10, 8],
+       10: [ 9, 1],
+        8: [ 0, 7],
+        9: [ 2, 5],
+       }
+drawheap(p, edges, include_array=False)
+p += Line(names=[5, 8], linewidth=0.03, endstyle='>', linecolor='red')
+print(p)
+\end{python}
+
+to get this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+edges={20: [10, 5],
+       10: [ 9, 1],
+        5: [ 0, 7],
+        9: [ 2],
+       }
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+Now this is not a maxheap. Do you see why?
+
+I look at the children of \texttt{5}: \texttt{0} and \texttt{7}.
+I swap \texttt{5} with the max of the children which is \texttt{7}
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+edges={20: [10, 5],
+       10: [ 9, 1],
+        5: [ 0, 7],
+        9: [ 2],
+      }
+p += Line(names=[5, 7], linewidth=0.03, endstyle='>',
+      startstyle='>', linecolor='red', bend_left=60)
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+and get this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+edges={20: [10, 7],
+       10: [ 9, 1],
+        7: [ 0, 5],
+        9: [ 2],
+      }
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+Clearly, we keep pushing \texttt{5} down as much as possible until
+we get a maxheap again (i.e., heapify-down).
+It might take more than one swap.
+
+This above method works as long as \texttt{5} is a descendent of the
+value to be removed.
+
+Usually the value to be delete is in fact the root of the heap.
+When the root is to be deleted, then the operation is called
+\defone{extract-max} for the case of maxheap
+and \defone{extract-min} for the case of
+minheap.
+I'm going to call both of them \defone{extract-root}.
+
+Let's do another example.
+Let's delete \texttt{20} (the root) from this maxheap:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+edges={20: [10, 8],
+       10: [ 9, 1],
+        8: [ 0, 7],
+        9: [ 2, 5],
+      }
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+
+Again, I overwrite \texttt{20} with \texttt{5}
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+edges={'20': [10, 8],
+       10: [ 9, 1],
+        8: [ 0, 7],
+        9: [ 2, '5'],
+      }
+drawheap(p, edges, include_array=False)
+p += Line(names=['5', '20'], linecolor='red', endstyle='>', linewidth=0.03)      
+print(p)
+\end{python}
+
+(\texttt{5} is chosen, again because it's the rightmost
+in the last level, or equivalently, it's the last in the
+corresponding array implementation.)
+I get this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+edges={5: [10, 8],
+       10: [ 9, 1],
+        8: [ 0, 7],
+        9: [ 2],
+      }
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+I do the same again as above: I pick the larger of the children
+of \texttt{5}, which in this case is \texttt{10} and swap with \texttt{5}.
+I get this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+edges={10: [ 5, 8],
+        5: [ 9, 1],
+        8: [ 0, 7],
+        9: [ 2],
+      }
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+It's not a maxheap yet.
+I look at the children of \texttt{5} and choose the largest,
+which would be \texttt{9}, and swap it with \texttt{5}.
+Here's what I get:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+edges={10: [ 9, 8],
+        9: [ 5, 1],
+        8: [ 0, 7],
+        5: [ 2],
+      }
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+Ahhh ... at this point I have a maxheap.
+I'm done!
+
+\begin{console}[commandchars=\\\{\}]
+ALGORITHM: heap_delete (for maxheap)
+INPUT: x - an array representing a maxheap
+       n - the length of the heap in x (pass by reference)
+       i - index of value to be removed (note usually
+           this is 0)
+
+x[i] = x[n - 1]
+n = n - 1
+heapify_down(x, i)
+\end{console}
+
+(Note that because of the shape of the tree -- a complete tree --
+a node cannot have a right child but no left child.)
+
+Recall what I just said: usually the delete operation for maxheap
+occurs at index 0, i.e., you're removing the maximum value in the maxheap.
+In that case the operation is also called extract-max or delete-max.
+You'll see why when we use this delete operation to perform heapsort
+and when we use this for priority queues.
+
+Note that the runtime is
+\[
+O(\log n)
+\]
+since the heapify-down operation basically moves
+a value in the tree down to the leaf level, possibly stopping
+early.
+This means that the worse runtime must be
+the height of the tree which is $O(\log n)$.
+
+\newpage
+\begin{ex}
+You are given this maxheap:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+edges={'34':['28','16'],
+       '28':['23','25'],
+       '16':['13','7'],
+       '23':['10','8'],
+       '25':['24','14'],
+       '13':['3','11'],
+       '7':['5','4'],
+       '10':['9'],
+       }
+drawheap(p, edges, node_hsep=0.2,
+       include_array=False)
+print(p)
+\end{python}
+
+Do the following operations one after another,
+drawing the tree including the swaps
+and the final
+maxheap.
+Also, draw the corresponding array.
+\begin{tightlist}
+  \item Delete \texttt{28}.
+  \item Delete \texttt{34}
+  \item Delete \texttt{16}
+  \item Delete the maximum value in the maxheap, i.e., perform extract max.
+  \item Delete the maximum value in the maxheap, i.e., perform extract max.
+\end{tightlist}
+\end{ex}
+
+\newpage
+\begin{ex}
+  Draw a minheap with 15 distinct values.
+  Extract the minimum and draw the minheap.
+  Do it again.
+  \qed
+\end{ex}
+
+
+
+
+
+\begin{ex}
+Using an array, 
+build a maxheap by inserting the following into an empty tree:
+1, 3, 5, 7, 6, 4, 2, 0, 8, 9.
+Make sure the tree is complete after each insert and the leaves
+at the lowest level are all on the left.
+Call the array \texttt{x}
+(assume it has size at least 10)
+and use integer variable \texttt{len}
+for the length of \texttt{x}.
+Of course initially \texttt{len} is 0.
+\qed
+\end{ex}
+
+\begin{ex}
+Using the maxheap (using an array) from the previous question,
+remove the following values one after another left to right:
+\[
+1, 3, 5, 7, 6, 4, 2, 0, 8, 9
+\]
+Call the array \texttt{x} and use integer variable \texttt{len}
+for the length of \texttt{x}.
+Of course initially \texttt{len} is 10.
+Make sure that after each delete, the tree is complete after each delete and 
+the leaves
+at the lowest level are all on the left.
+\qed
+\end{ex}
+
+\begin{ex}
+  Suppose during an extract-root for minheap,
+  you need to heapify-down at an index \verb!i!.
+  Suppose the left and right child value of \verb!x[i]! are the same and
+  larger than \verb!x[i]!.
+  Which do you prefer to swap with \verb!x[i]!, the left or the right
+  child?
+\end{ex}
+% choose the right because the tree might be one step shorter on the right
+% and therefore the heapify down might terminate earlier by 1 step
+%
+% Example:
+%     5
+%    1 1
+%   3
+
+\begin{ex}
+  Suppose you have a heap whose array is \verb!x!.
+  In this heap, if you extract the root and you insert the same value back
+  into the heap, will the heap be the same as the original \verb!x!?
+  \qed
+\end{ex}
+%NO
+%    1
+%  2   3
+%
+%    2
+%  3
+%
+%    2      --->      1
+%  3   1            3   2
+%

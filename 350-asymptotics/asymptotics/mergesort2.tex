@@ -1,0 +1,178 @@
+%-*-latex-*-
+\section{Mergesort ... 2nd Version}
+
+Now that you understand the basic idea behind mergesort,
+let's move on to improve the memory usage of the previous
+mergesort.
+
+
+Now I'm going to use the same idea for the splitting part as well.
+Instead of splitting the value of \verb!x! into two different arrays,
+I'm just going to use \verb!x! but with extra index variables to tell
+me the beginning and ending of the two halves.
+As an example, take a look at this:
+\[
+x = [3, 6, 4, 2, 7, 8, 12, 15, 1, 5]
+\]
+I know that $\mergesort$ splits $x$
+into two halves.
+\begin{align*}
+x &= [3, 6, 4, 2, 7, 8, 12, 15, 1, 5] \\
+i = 0, j = 4 &: \text{to denote the left chunk $x[i],...,x[j]$} \\
+j' = 5, k = 9 &: \text{to denote the right chunk $x[j'],...,x[k]$}
+\end{align*}
+Of course $j'$ is redundant since $j' = j + 1$.
+Note that in the mergesort algorithm, the two arrays which are merged
+are contiguous, i.e., next to each other.
+So it is true that $j' = j + 1$.
+
+Note that the first chunk is empty if
+\[
+i > j
+\]
+The second chunk is empty if
+\[
+j + 1 > k
+\]
+
+In terms of C++ the split code would look like this:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+void split(int x[], int i, int & j, int k)
+{
+    j = x_start + (x_end - x_start + 1) / 2;
+}
+\end{Verbatim}
+
+
+Now let's think about the merge operation ...
+
+\begin{ex} (Merge 1)
+The following is a version of merge that does not
+use any extra memory.
+The idea is simple.
+Suppose this is the array
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+x: ..., 1, 3, 5, 7, 2, 4, 6, 8, ...
+        i        j           k
+\end{Verbatim}
+Say $i = 8$, $j = 11$, and $k = 15$.
+Notice that 
+\verb!x[i],...,x[j]!
+and
+\verb!x[j+1],...,x[k]! 
+are already sorted.
+The point is to merge the values in these two chunks.
+Now \verb!x[i] < x[j+1]!, we have
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+x: ..., 1, 3, 5, 7, 2, 4, 6, 8, ...
+           i     j           k
+\end{Verbatim}
+Now $x[i] > x[j]$. we keep $x[j+1]$ somewhere temporarily and shift
+the $x[i,..,j]$ chunk to the right (note the change in $i,j,k$):
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+x: ..., 1, ?, 3, 5, 7, 4, 6, 8, ...
+              i     j        k        t = 2
+\end{Verbatim}
+and then putting the value of \verb!t! into $x[i-1]$ to get
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+x: ..., 1, 2, 3, 5, 7, 4, 6, 8, ...
+              i     j        k       
+\end{Verbatim}
+Repeat!
+Run this function, test it, and then compute the runtime
+assuming the two chunk have length $n$.
+\end{ex}
+
+\begin{ex} (Merge 2)
+In the previous problem (new version of merge), instead of shifting the
+left chunk over by one step, 
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+x: ..., 1, 3, 5, 7, 2, 4, 6, 8, ...
+           i     j           k
+\end{Verbatim}
+becomes
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+x: ..., 1, ?, 3, 5, 7, 4, 6, 8, ...
+              i     j        k        t = 2
+\end{Verbatim}
+and then becomes
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+x: ..., 1, 2, 3, 5, 7, 4, 6, 8, ...
+              i     j        k       
+\end{Verbatim}
+Another strategy is to swap the first elements of the chunks like this:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+x: ..., 1, 3, 5, 7, 2, 4, 6, 8, ...
+           i     j           k
+\end{Verbatim}
+becomes
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+x: ..., 1, 2, 5, 7, 3, 4, 6, 8, ...
+           i     j        k        
+\end{Verbatim}
+and then this
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+x: ..., 1, 2, 5, 7, 3, 4, 6, 8, ...
+              i  j           k       
+\end{Verbatim}
+This avoids the shift.
+However moving the first element of the left chunk 
+might result in the right chunk being unsorted.
+For instance:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+x: ..., 1, 3, 5, 7, 2, 2, 6, 8, ...
+           i     j           k
+\end{Verbatim}
+becomes
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+x: ..., 1, 2, 5, 7, 3, 2, 6, 8, ...
+           i     j        k        
+\end{Verbatim}
+and then this
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+x: ..., 1, 2, 5, 7, 3, 2, 6, 8, ...
+              i  j           k       
+\end{Verbatim}
+Therefore in this case, one has to \lq\lq move past
+smaller values'' in the right chunk:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+x: ..., 1, 2, 5, 7, 3, 2, 6, 8, ...
+              i  j           k       
+\end{Verbatim}
+becomes
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+x: ..., 1, 2, 5, 7, 2, 3, 6, 8, ...
+              i  j           k       
+\end{Verbatim}
+i.e., $3$ moves past the 2.
+
+Write this function, test it, and compute the runtime.
+\qed
+\end{ex}
+
+\begin{ex}
+In the two version of merge above, 
+recall that there's one version that uses \lq\lq shift''
+and another uses \lq\lq swap-and-move-past''.
+Combine both into one merge function choosing the best
+strategy based on the different scenarios.
+\qed
+\end{ex}
+
+All the above does not required an extra array.
+Therefore the space requirement is $O(1)$.
+However they require moving values around so that 
+the runtime is longer.
+
+\begin{ex} (Merge 3)
+If we allow the use of an extra array $t$ of size about $n/2$, we
+can do this:
+first copy the left array into $t$.
+The the space used by left can be used for merging.
+Besides the extra space requirement of $n/2$ (in fact the size is
+exactly the size of left), 
+we also need to copy the left.
+Note that if the original array $x$ has size $n$,
+we need to allocate memory for $n/2$ and we can use this same array
+for every recursive function call to the mergesort.
+\end{ex}

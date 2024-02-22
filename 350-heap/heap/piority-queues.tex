@@ -1,0 +1,63 @@
+%-*-latex-*-
+\section{Priority queues}
+
+Recall a queue is a data structure that supports
+enqueue and dequeue.
+Think of people lining up at a ticket booth.
+A \defterm{priority queue} is queue where people join a queue \textit{but}
+they have priority numbers.
+Say, a higher number means higher priority.
+Obviously, you can implement such a priority queue
+using a maxheap.
+The runtimes are then as follows:
+\begin{tightlist}
+  \item enqueue: $O(\log n)$
+  \item dequeue: $O(\log n)$
+\end{tightlist}
+
+
+In this case, both inserts and deletes have runtime of $O(\log n)$.
+This is obviously better than say using a deque where you have to 
+move a node forward one-step-at-a-time in the deque based on the priority.
+If you use a deque to implement
+a priority queue, then in the worse case, where value enters the
+priority queue with highest priority, this value will enter the
+end of the deque and move one step at a time all the way to the front.
+So using a deque to implement a priority would mean that you have a
+worse runtime of $O(n)$!
+
+
+Sometimes, one needs to change the priority of a job.
+Here's an example ...
+
+Linux allows user to display running processes using the
+\verb!ps! command:
+priority of processes.
+The following is a list of processes that I'm running:
+{\scriptsize
+\begin{console}
+[student@localhost n]$ ps -l
+F S   UID   PID  PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
+0 S  1000  3148 26588  0  80   0 -  8250 poll_s pts/0    00:07:46 xemacs
+0 R  1000  7239 26588  0  80   0 -  1253 -      pts/0    00:00:00 ps
+0 S  1000 26588 20828  0  80   0 -  1574 wait   pts/0    00:00:01 bash
+0 S  1000 28473     1  1  80   0 - 75939 poll_s pts/0    00:00:34 atril
+\end{console}
+}
+The priority is under the column labeled \texttt{NI}.
+Notice that \texttt{xemacs} is running with priority \texttt{0}.
+I can change the priority of my \texttt{xemacs} to this:
+{\scriptsize
+\begin{console}
+F S   UID   PID  PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
+0 S  1000  3148 26588  0  81   1 -  8250 poll_s pts/0    00:07:47 xemacs
+0 R  1000  8093 26588  0  80   0 -  1253 -      pts/0    00:00:00 ps
+0 S  1000 26588 20828  0  80   0 -  1574 wait   pts/0    00:00:01 bash
+0 S  1000 28473     1  1  80   0 - 76240 poll_s pts/0    00:00:35 atril
+\end{console}
+}
+In Linux a higher priority means lower priority number.
+So a min heap is more relevant.
+But I'll stick to max heap since if you understood max heap, then
+min heap is easy.
+

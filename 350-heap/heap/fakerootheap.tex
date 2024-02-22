@@ -1,0 +1,94 @@
+%-*-latex-*-
+\section{Fake root heap}
+
+Suppose you have two max heaps.
+One quick way to merge them is to simply create a new root
+and join the new root to the two roots as parent.
+The value of the new root can be any arbitrary value that
+is larger than the values of the two roots.
+To remind myself that the new root is not really a value in the
+heap, I can use a flag in each node.
+Another thing that I can do it to use a value that is sentinel.
+In the case of max heap, say I call this value $\infty$.
+
+For instance say you have these two max heaps:
+\begin{python}
+from latextool_basic import *
+from drawheap import *
+p = Plot()
+edges={'28':['23','25'],
+       '23':['10','8'],
+       '25':['24','14'],
+       '10':['9'],
+       }
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+and
+
+\begin{python}
+from latextool_basic import *
+from drawheap import *
+p = Plot()
+edges={16: [13, 7],
+       13: [3, 11],
+       7: [5, 4],
+       }
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+
+You can merge them together to get this:
+
+\begin{python}
+from latextool_basic import *
+from drawheap import *
+p = Plot()
+edges={99: [28, 16],
+       28: [23, 25],
+       23: [10, 8],
+       25: [24, 14],
+       10: [9],
+       16: [13, 7],
+       13: [3, 11],
+        7: [5, 4],
+      }
+BinTree.node_hsep=0.01
+drawheap(p, edges, node_hsep=0.2, include_array=False)
+print(p)
+\end{python}
+
+where \verb!99! is a fake value, i.e.,
+it's 
+should not be considered part of the values in
+the heap container.
+
+Of course if two heaps have very different
+heights, then you won't
+be able to achieve
+$O(\lg n)$ runtimes for insert and delete.
+For instance if the second heap from the above
+has only 4 values
+(i.e., \verb!16!, \verb!13!, \verb!7!, \verb!3!),
+then the resulting
+merged heap (using the above method)
+would look like this:
+
+\begin{python}
+from latextool_basic import *
+from drawheap import *
+p = Plot()
+edges={99: [28, 16],
+       28: [23, 25],
+       23: [10, 8],
+       25: [24, 14],
+       10: [9],
+       16: [13, 7],
+       13: [3],
+      }
+BinTree.node_hsep=0.01
+drawheap(p, edges, node_hsep=0.2, include_array=False)
+print(p)
+\end{python}

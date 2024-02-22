@@ -1,0 +1,115 @@
+%-*-latex-*-
+\section{Heapify-up}
+
+The following two operations are the basic tools for min- and maxheaps.
+
+Look at this:
+
+\begin{python}
+from latextool_basic import *
+from drawheap import *  
+p = Plot()
+edges={'10':['5','8'],
+       '5':['2', '1'],
+       '8':['3', '7'],
+       '2':['0', '9'],
+       }
+drawheap(p, edges)
+print(p)
+\end{python}
+
+It's almost a maxheap except for the \verb!9!.
+
+What is the simplest way to make it a maxheap?
+I compare \verb!9! with it's parent, i.e., \verb!2!.
+Since this is a maxheap, something is wrong:
+parents should be larger than children.
+So I swap \verb!9! and \verb!2! to get:
+
+\begin{python}
+from latextool_basic import *
+from drawheap import *  
+p = Plot()
+edges={'10':['5','8'],
+       '5':['9', '1'],
+       '8':['3', '7'],
+       '9':['0', '2'],
+       }
+drawheap(p, edges)
+print(p)
+\end{python}
+
+I then compare \verb!9! and \verb!5! and decide to swap again to get:
+
+\begin{python}
+from latextool_basic import *
+from drawheap import *  
+p = Plot()
+edges={'10':['9','8'],
+       '9':['5', '1'],
+       '8':['3', '7'],
+       '5':['0', '2'],
+       }
+drawheap(p, edges)
+print(p)
+\end{python}
+
+Now it's a maxheap.
+Basically, you continually swap the value in question with
+its parent if the value is larger than the parent.
+
+This is called
+\defone{heapify-up}.
+It's also called
+\defone{bubble up} or
+\defone{percolate up}.
+
+
+In general, if \verb!x[0..n]! is an array
+and I can talk about heapify-up on array \verb!x!
+treating \verb!x! as a maxheap,
+starting at index \verb!i! and going up
+along its path to the root (i.e., index 0).
+
+You can also talk about heapify-up on an array
+treating it as a minheap,
+starting at some index.
+
+For a maxheap, to heapify-up at an index \verb!i!, you compare
+\verb!x[i]! and \verb!x[parent(i)]!
+and swap them if necessary, i.e. if \verb!x[i]! $>$ \verb!x[parent(i)]!
+and you keep following that value up to the root.
+If \verb!x[i]! $\leq$ \verb!x[parent(i)]!, you stop.
+That's it.
+
+\begin{Verbatim}[frame=single]
+ALGORITHM: heapify-up (for maxheap)
+INPUTS: x[0..n-1] -- array
+        i         -- index of x
+
+while 1:
+    if parent(i) < 0: break
+    if x[i] > x[parent(i)]:
+        swap x[i], x[parent(i)]
+        i = parent(i)
+\end{Verbatim}
+
+With a tiny of optimization:
+\begin{Verbatim}[frame=single]
+ALGORITHM: heapify-up (for maxheap)
+INPUTS: x[0..n-1] -- array
+        i         -- index of x
+
+v = x[i]
+while 1:
+    p = parent(i)
+    if p < 0: break
+    if v <= x[p]:
+        x[i] = v
+        break
+    else:
+        x[i] = x[p]
+        i = p
+\end{Verbatim}
+
+The same idea works for minheap.

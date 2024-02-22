@@ -1,0 +1,365 @@
+%-*-latex-*-
+\section{Insert}
+
+Look at this maxheap again:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+edges={'10':['5','7'],
+       '5':['2', '1'],
+       '7':['0'],
+       }
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+Suppose I want to insert a \verb!3! into the above tree.
+To maintain the shape of a heap, I have to do it here:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+edges={'10':['5','7'],
+       '5':['2', '1'],
+       '7':['0', '3'],
+     }
+#BinTree.node_hsep=0.2
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+
+(Don't forget that heaps are implemented with arrays
+and therefore I can find the available slots in the array
+right away with the length variable of the array.)
+In this case the tree becomes perfect.
+It's also a maxheap.
+
+But what if I want to add \verb!8! into the tree instead?
+I can again put it at the same spot:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+edges={'10':['5','7'],
+       '5':['2', '1'],
+       '7':['0', '8'],
+     }
+#BinTree.node_hsep=0.2
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+Of course this is not a maxheap any more.
+What do I do?
+I heapify-up.
+I look at \verb!8!
+and swap it with its parent if \verb!8! is larger than
+its parent.
+In this case, the parent is \verb!7!, so I swap them:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+edges={'10':['5','7'],
+       '5':['2', '1'],
+       '7':['0', '8'],
+     }
+#BinTree.node_hsep=0.2
+p += Line(names=['7', '8'], linecolor='red', bend_left=90,
+          linewidth=0.03, endstyle='>', startstyle='>')
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+to get
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+edges={'10':['5','8'],
+       '5':['2', '1'],
+       '8':['0', '7'],
+     }
+#BinTree.node_hsep=0.2
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+Now it's a maxheap again.
+In general recall that heapify-up might involve
+more than one swap.
+
+In terms of the array implementation of the above heap, basically
+this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Array2d(0, 0, width=0.6, height=0.6, 
+             xs=[['10','5','7','2','1','0','8']])
+print(p)
+\end{python}
+
+becomes this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Array2d(0, 0, width=0.6, height=0.6, 
+             xs=[['10','5','8','2','1','0','7']])
+print(p)
+\end{python}
+
+(Don't forget that technically speaking, there should also be a
+length variable.)
+
+Suppose I do this again: I add a \verb!9!.
+It must go here:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+edges={'10':['5','8'],
+       '5':['2', '1'],
+       '8':['0', '7'],
+       '2':['9'],
+     }
+#BinTree.node_hsep=0.2
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+(Draw the array implementation for the above.)
+I swap \verb!9! and \verb!2! to get this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+edges={'10':['5','8'],
+       '5':['9', '1'],
+       '8':['0', '7'],
+       '9':['2'],
+     }
+#BinTree.node_hsep=0.2
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+and then swap \verb!9! and \verb!5! to get
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+edges={'10':['9','8'],
+       '9':['5', '1'],
+       '8':['0', '7'],
+       '5':['2'],
+     }
+#BinTree.node_hsep=0.2
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+(Draw the arrays for the above so that you see how the array changes.)
+
+This works even when you swap all the way to the root.
+Say I add a \verb!20!.
+It must go here:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+edges={'10':['9','8'],
+       '9':['5', '1'],
+       '8':['0', '7'],
+       '5':['2', '20'],
+     }
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+After 3 swaps I get:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+edges={'20':['10','8'],
+       '10':['9', '1'],
+       '8':['0', '7'],
+       '9':['2', '5'],
+     }
+#BinTree.node_hsep=0.2
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+and I get a maxheap again.
+
+This process is called
+\defterm{heapify-up}\tinysidebar{bubble-up \\ heapify-up \\ percolate up}
+or
+\defterm{bubble-up}
+or
+\defterm{percolate-up}.
+
+\begin{ex}
+Draw the maxheap after each
+of the above swaps and draw the corresponding array.
+\qed
+\end{ex}
+  
+Now if you think about it,
+if you have the following
+\begin{python}
+from latextool_basic import *
+print(r"""
+\begin{center}
+%s
+\end{center}
+""" % graph(yscale=1, xscale=1,
+layout="""
+   A 
+     C
+    F G
+   H I
+""",
+minimum_size='8mm',
+edges='A-C,C-G,C-F,F-H,F-I',
+A=r'shape=None,label=\texttt{}',
+B=r'label=\texttt{5}',
+C=r'label=$\alpha$',
+D=r'label=\texttt{2}',
+E=r'label=\texttt{1}',
+F=r'label=$\beta$',
+G=r'shape=tree,label=$T_3$',
+H=r'shape=tree,label=$T_1$',
+I=r'shape=tree,label=$T_2$',
+))
+\end{python}
+
+where 
+\begin{tightlist}
+\li the subtree at $\beta$ is a maxheap,
+\li the subtree at $\alpha$ is also a maxheap if we ignore the 
+its left subtree, 
+\li and $\beta > \alpha$, 
+\end{tightlist}
+then
+on swapping $\alpha$ and $\beta$:
+\begin{python}
+from latextool_basic import *
+print(r"""
+\begin{center}
+%s
+\end{center}
+""" % graph(yscale=1, xscale=1,
+layout="""
+   A 
+     C
+    F G
+   H I
+""",
+minimum_size='8mm',
+edges='A-C,C-G,C-F,F-H,F-I',
+A=r'shape=None,label=\texttt{}',
+B=r'label=\texttt{5}',
+C=r'label=$\beta$',
+D=r'label=\texttt{2}',
+E=r'label=\texttt{1}',
+F=r'label=$\alpha$',
+G=r'shape=tree,label=$T_3$',
+H=r'shape=tree,label=$T_1$',
+I=r'shape=tree,label=$T_2$',
+))
+\end{python}
+
+we have a maxheap at $\beta$.
+
+\begin{console}[commandchars=\\\{\}]
+ALGORITHM: heap_insert (for maxheap)
+INPUT: x - an array representing a heap
+       n - length of heap (pass by reference)
+       key - value to be inserted
+
+insert node with key as a leaf in the right place, i.e.,
+x[n] = key
+n = n + 1 (note that now the key is at index n - 1)
+heapify_up(x, n - 1)
+\end{console}
+
+The corresponding algorithm for minheap is similar.
+
+Note that the runtime is
+\[
+O(\log n)
+\]
+Why?
+Because the heapify-up basically \lq\lq bubble up''
+the inserted key value from the point of insert (at leaf level)
+up to the root,
+possibly stopping before reaching the root.
+But in the worse case, this means that
+worse runtime depends on the height which is $O(\log n)$
+since the tree is complete.
+
+
+
+%One really important thing to note is this:
+%this works no matter where you put the new node with the new value:
+%any leaf position will work.
+
+
+\newpage
+\begin{ex}
+  Starting with this maxheap:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+edges={'20':['10','8'],
+       '10':['9', '1'],
+       '8':['0', '7'],
+       '9':['2', '5'],
+     }
+#BinTree.node_hsep=0.2
+drawheap(p, edges, include_array=False)
+print(p)
+\end{python}
+
+
+Do the following assuming that the array implementation
+of the above heap is an array of size 20.
+\begin{tightlist}
+\item Draw the array implementation of the above maxheap.
+\item Insert \texttt{5}. Draw the maxheap after the insert
+and after each necessary swap (technically, until all the swaps are done
+the tree is not a max heap). Draw the array implementation
+after each swap.
+\item Do the same with \texttt{15}.
+\item Do the same with \texttt{11}.
+\item Do the same with \texttt{22}.
+\end{tightlist}
+\qed
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Starting with an empty \textit{min} heap.
+Do the following, drawing the heap and the array implementation.
+\begin{tightlist}
+  \item Insert \texttt{10}.
+  \item Insert \texttt{15}.
+  \item Insert \texttt{5}.
+  \item Insert \texttt{2}.
+  \item Insert \texttt{8}.
+  \item Insert \texttt{0}.
+  \item Insert \texttt{5}.
+\end{tightlist}
+(First, you want to study the operations for maxheap very carefully.
+Then, you translate the operations to the case of minheap.)
+\qed
+\end{ex}
+

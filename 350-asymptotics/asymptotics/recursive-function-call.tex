@@ -1,0 +1,103 @@
+%-*-latex-*-
+\sectionthree{Recursive function call}
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+
+Now let me consider the case of recursive functions.
+Recursive functions can take many forms.
+I'll focus on three typical cases.
+
+Of course we have to look at Fibonacci:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+int fib(int n)
+{
+    if (n == 0 || n == 1)
+    {
+        return 1;
+    }
+    else
+    {
+        return fib(n - 1) + fib(n - 2);
+    }
+}
+\end{Verbatim}
+In this case
+\[
+\texttt{fib(n)} \text{ calls \texttt{fib(n - 1)}, \texttt{fib(n - 2)} \text{ and performs some computation}} 
+\]
+In general a recurrence that looks like
+\[
+\texttt{f(n)} \text{ calls \texttt{f(n - 1)} \text{ and performs some computation}} 
+\]
+or
+\[
+\texttt{f(n)} \text{ calls } \texttt{f(n - 1)}, \texttt{f(n - 2)} \text{ and performs some computation} 
+\]
+or
+\[
+\texttt{f(n)} \text{ calls } \texttt{f(n - 1)}, \texttt{f(n - 2)}, \texttt{f(n - 3)} \text{ and performs some computation} 
+\]
+or
+\[
+\texttt{f(n)} \text{ calls } \texttt{f(n - 2)}, ... , \texttt{f(n - 5)} \text{ and performs some computation} 
+\]
+etc.~are called \defone{linear recursion}.
+
+Here's the function call graph for \verb!fib(4)!:
+\input{function_call_4.tex}
+First let's think about the runtime.
+Watchout:
+for this section, the \lq\lq runtime of \verb!f(n)!"
+refers to the time spent in \verb!f()! and \textit{does not} include
+the runtime of the recursive 
+\verb!f(n - 1)! and \verb!f(n - 2)!.
+For the \textit{next} section,
+the \lq\lq runtime of \verb!f(n)!" \textit{will} include
+the runtime of the recursive function calls
+\verb!f(n - 1)! and \verb!f(n - 2)!.
+The second method is more common since there are mathematical techniques
+to handle runtime computations for the second method.
+
+Each \verb!f(n)! takes constant time, whether it's the
+recursive case or the base cases.
+Remember I'm not including the time used in recursive function calls.
+Let $A$ be the maximum time of \verb!f(n)!
+(i.e., maximum of the time for recursive case and the base cases).
+Therefore the total time taken of \verb!f(4)! is
+$\text{(the number of function calls)} \times A$.
+We're tempted to simplify the counting by adding some rectangles
+like this:
+\input{function_call_5.tex}
+In this case, the time taken is $\leq (1 + 2 + 2^2 + 2^3) \times A = (2^4 - 1)A$.
+For \verb!f(n)!, the time taken is $\leq (2^n - 1)A$, i.e.,
+the runtime of the above algorithm is
+\[
+T(n) = O(2^n)
+\]
+But is this a tight asymptotic upper bound?
+In the next section I'll show you more precisely that the runtime is
+\[
+T(n) = O(\phi^n)
+\]
+where $\phi = (1 + \sqrt{5})/2 = 1.6180...$ is the so--called
+\defone{golden ratio}.
+Note that if $c < 2$, then $c^n$ is asymptotically strictly smaller than $2^n$,
+i.e., $c^n = O(2^n)$ but $2^n \neq O(c^n)$.
+
+As for the space complexity,
+each \verb!f(n)! takes constant time,
+whether the recursive case or base case was executed.
+Let $A$ be the maximum space usage of \verb!f(n)!.
+Note that $A$ is constant and does not depend on \verb!n!.
+It's then clear that the space complexity is due to the
+\textit{longest} path in the tree starting from the root:
+\input{function_call_6.tex}
+i.e., it's $4A$.
+In general, the space complexity of \verb!f(n)! is
+\[
+\mathsc{Space}(n) = O(n)
+\]
+
+\newpage\input{exercises/bubblesort-2/main.tex}
+
