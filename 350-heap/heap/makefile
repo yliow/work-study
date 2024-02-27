@@ -1,20 +1,70 @@
 OPEN = xdg-open
-PDF = pdflatex --shell-escape $@.tex; \
-      pdflatex --shell-escape $@.tex; \
-      pdflatex --shell-escape $@.tex; \
-        makeindex $@.idx; \
-        pdflatex --shell-escape $@.tex; \
-        $(OPEN) $@.pdf; 
+PDF = rm -rf solutions; touch solutions.tex; \
+	pdflatex --shell-escape -halt-on-error -interaction=nonstopmode -file-line-error $@.tex && \
+	pythontex main.tex && \
+        makeindex $@.idx && \
+        pdflatex --shell-escape $@.tex && \
+        $(OPEN) $@.pdf;
 LATEXRM = rm -f \
         main.aux main.ilg main.log main.idx main.ind main.out \
         main.py.err main.py.out \
         comment.cut comment.err comment.out \
         latex.py
 
-main: 
+main:  stdout00.tex stdout01.tex stdout02.tex stdout03.tex stdout04.tex stdout05.tex stdout06.tex stdout07.tex stdout08.tex stdout09.tex stdout10.tex stdout11.tex stdout12.tex stdout13.tex stdout14.tex stdout15.tex
 	$(PDF)
 	$(LATEXRM)
 view:
 	$(OPEN) main.pdf
 v:
 	$(OPEN) main.pdf
+c:
+	$(LATEXRM)
+
+stdout00.tex: stdout00.py
+	python stdout00.py > stdout00.tex
+
+stdout01.tex: stdout01.py
+	python stdout01.py > stdout01.tex
+
+stdout02.tex: stdout02.py
+	python stdout02.py > stdout02.tex
+
+stdout03.tex: stdout03.py
+	python stdout03.py > stdout03.tex
+
+stdout04.tex: stdout04.py
+	python stdout04.py > stdout04.tex
+
+stdout05.tex: stdout05.py
+	python stdout05.py > stdout05.tex
+
+stdout06.tex: stdout06.py
+	python stdout06.py > stdout06.tex
+
+stdout07.tex: stdout07.py
+	python stdout07.py > stdout07.tex
+
+stdout08.tex: stdout08.py
+	python stdout08.py > stdout08.tex
+
+stdout09.tex: stdout09.py
+	python stdout09.py > stdout09.tex
+
+stdout10.tex: stdout10.py
+	python stdout10.py > stdout10.tex
+
+stdout11.tex: stdout11.py
+	python stdout11.py > stdout11.tex
+
+stdout12.tex: stdout12.py
+	python stdout12.py > stdout12.tex
+
+stdout13.tex: stdout13.py
+	python stdout13.py > stdout13.tex
+
+stdout14.tex: stdout14.py
+	python stdout14.py > stdout14.tex
+
+stdout15.tex: stdout15.py
+	python stdout15.py > stdout15.tex
