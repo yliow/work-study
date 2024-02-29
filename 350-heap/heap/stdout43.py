@@ -1,9 +1,9 @@
 from latextool_basic import *
 p = Plot()
-edges={20: [10, 8],
-10: [ 9, 1],
+edges={10: [ 5, 8],
+5: [ 9, 1],
 8: [ 0, 7],
-9: [ 2, 5],
+9: [ 2],
 }
 drawheap(p, edges, include_array=False)
 print(p)
