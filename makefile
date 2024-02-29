@@ -7,4 +7,4 @@ r:
 p:
 	git pull
 git:
-	git add -A ; git commit -m "sync" ; git push ; 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
+	cat ~/mytoken.txt ; git add -A ; git commit -m "sync" ; git push
