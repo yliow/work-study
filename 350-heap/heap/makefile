@@ -11,7 +11,7 @@ LATEXRM = rm -f \
         comment.cut comment.err comment.out \
         latex.py
 
-main:  stdout00.tex stdout01.tex stdout02.tex stdout03.tex stdout04.tex stdout05.tex stdout06.tex stdout07.tex stdout08.tex stdout09.tex stdout10.tex stdout11.tex stdout12.tex stdout13.tex stdout14.tex stdout15.tex stdout16.tex stdout17.tex stdout18.tex stdout19.tex stdout20.tex stdout21.tex stdout22.tex stdout23.tex stdout24.tex stdout25.tex stdout26.tex stdout27.tex stdout28.tex stdout29.tex stdout30.tex stdout31.tex stdout32.tex stdout33.tex stdout34.tex
+main:  stdout00.tex stdout01.tex stdout02.tex stdout03.tex stdout04.tex stdout05.tex stdout06.tex stdout07.tex stdout08.tex stdout09.tex stdout10.tex stdout11.tex stdout12.tex stdout13.tex stdout14.tex stdout15.tex stdout16.tex stdout17.tex stdout18.tex stdout19.tex stdout20.tex stdout21.tex stdout22.tex stdout23.tex stdout24.tex stdout25.tex stdout26.tex stdout27.tex stdout28.tex stdout29.tex stdout30.tex stdout31.tex stdout32.tex stdout33.tex stdout34.tex stdout35.tex stdout36.tex stdout37.tex stdout38.tex stdout39.tex stdout40.tex stdout41.tex stdout42.tex stdout43.tex stdout44.tex stdout45.tex
 	$(PDF)
 	$(LATEXRM)
 view:
@@ -125,3 +125,36 @@ stdout33.tex: stdout33.py
 
 stdout34.tex: stdout34.py
 	python stdout34.py > stdout34.tex
+
+stdout35.tex: stdout35.py
+	python stdout35.py > stdout35.tex
+
+stdout36.tex: stdout36.py
+	python stdout36.py > stdout36.tex
+
+stdout37.tex: stdout37.py
+	python stdout37.py > stdout37.tex
+
+stdout38.tex: stdout38.py
+	python stdout38.py > stdout38.tex
+
+stdout39.tex: stdout39.py
+	python stdout39.py > stdout39.tex
+
+stdout40.tex: stdout40.py
+	python stdout40.py > stdout40.tex
+
+stdout41.tex: stdout41.py
+	python stdout41.py > stdout41.tex
+
+stdout42.tex: stdout42.py
+	python stdout42.py > stdout42.tex
+
+stdout43.tex: stdout43.py
+	python stdout43.py > stdout43.tex
+
+stdout44.tex: stdout44.py
+	python stdout44.py > stdout44.tex
+
+stdout45.tex: stdout45.py
+	python stdout45.py > stdout45.tex
