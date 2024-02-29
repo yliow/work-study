@@ -11,7 +11,7 @@ LATEXRM = rm -f \
         comment.cut comment.err comment.out \
         latex.py
 
-main:  stdout00.tex stdout01.tex stdout02.tex stdout03.tex stdout04.tex stdout05.tex stdout06.tex stdout07.tex stdout08.tex stdout09.tex stdout10.tex stdout11.tex stdout12.tex stdout13.tex stdout14.tex stdout15.tex stdout16.tex stdout17.tex stdout18.tex stdout19.tex
+main:  stdout00.tex stdout01.tex stdout02.tex stdout03.tex stdout04.tex stdout05.tex stdout06.tex stdout07.tex stdout08.tex stdout09.tex stdout10.tex stdout11.tex stdout12.tex stdout13.tex stdout14.tex stdout15.tex stdout16.tex stdout17.tex stdout18.tex stdout19.tex stdout20.tex stdout21.tex stdout22.tex stdout23.tex stdout24.tex stdout25.tex stdout26.tex stdout27.tex stdout28.tex stdout29.tex stdout30.tex stdout31.tex stdout32.tex stdout33.tex stdout34.tex
 	$(PDF)
 	$(LATEXRM)
 view:
@@ -69,14 +69,59 @@ stdout14.tex: stdout14.py
 stdout15.tex: stdout15.py
 	python stdout15.py > stdout15.tex
 
-stdout15.tex: stdout16.py
+stdout16.tex: stdout16.py
 	python stdout16.py > stdout16.tex
 
-stdout15.tex: stdout17.py
+stdout17.tex: stdout17.py
 	python stdout17.py > stdout17.tex
 
-stdout15.tex: stdout18.py
+stdout18.tex: stdout18.py
 	python stdout18.py > stdout18.tex
 
-stdout15.tex: stdout19.py
+stdout19.tex: stdout19.py
 	python stdout19.py > stdout19.tex
+
+stdout20.tex: stdout20.py
+	python stdout20.py > stdout20.tex
+
+stdout21.tex: stdout21.py
+	python stdout21.py > stdout21.tex
+
+stdout22.tex: stdout22.py
+	python stdout22.py > stdout22.tex
+
+stdout23.tex: stdout23.py
+	python stdout23.py > stdout23.tex
+
+stdout24.tex: stdout24.py
+	python stdout24.py > stdout24.tex
+
+stdout25.tex: stdout25.py
+	python stdout25.py > stdout25.tex
+
+stdout26.tex: stdout26.py
+	python stdout26.py > stdout26.tex
+
+stdout27.tex: stdout27.py
+	python stdout27.py > stdout27.tex
+
+stdout28.tex: stdout28.py
+	python stdout28.py > stdout28.tex
+
+stdout29.tex: stdout29.py
+	python stdout29.py > stdout29.tex
+
+stdout30.tex: stdout30.py
+	python stdout30.py > stdout30.tex
+
+stdout31.tex: stdout31.py
+	python stdout31.py > stdout31.tex
+
+stdout32.tex: stdout32.py
+	python stdout32.py > stdout32.tex
+
+stdout33.tex: stdout33.py
+	python stdout33.py > stdout33.tex
+
+stdout34.tex: stdout34.py
+	python stdout34.py > stdout34.tex
