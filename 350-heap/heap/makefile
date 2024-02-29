@@ -11,7 +11,7 @@ LATEXRM = rm -f \
         comment.cut comment.err comment.out \
         latex.py
 
-main:  stdout00.tex stdout01.tex stdout02.tex stdout03.tex stdout04.tex stdout05.tex stdout06.tex stdout07.tex stdout08.tex stdout09.tex stdout10.tex stdout11.tex stdout12.tex stdout13.tex stdout14.tex stdout15.tex
+main:  stdout00.tex stdout01.tex stdout02.tex stdout03.tex stdout04.tex stdout05.tex stdout06.tex stdout07.tex stdout08.tex stdout09.tex stdout10.tex stdout11.tex stdout12.tex stdout13.tex stdout14.tex stdout15.tex stdout16.tex stdout17.tex stdout18.tex stdout19.tex
 	$(PDF)
 	$(LATEXRM)
 view:
@@ -68,3 +68,15 @@ stdout14.tex: stdout14.py
 
 stdout15.tex: stdout15.py
 	python stdout15.py > stdout15.tex
+
+stdout15.tex: stdout16.py
+	python stdout16.py > stdout16.tex
+
+stdout15.tex: stdout17.py
+	python stdout17.py > stdout17.tex
+
+stdout15.tex: stdout18.py
+	python stdout18.py > stdout18.tex
+
+stdout15.tex: stdout19.py
+	python stdout19.py > stdout19.tex
