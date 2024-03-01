@@ -9,3 +9,4 @@ edges={'10':['0','8'],
 drawheap(p, edges, include_array=False)
 p += Line(names=['0', '5'], linewidth=0.03, linecolor='red',
           bend_right=60, endstyle='>', startstyle='>')       
+print(p)
