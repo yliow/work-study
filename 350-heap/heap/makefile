@@ -11,7 +11,7 @@ LATEXRM = rm -f \
         comment.cut comment.err comment.out \
         latex.py
 
-main:  stdout00.tex stdout01.tex stdout02.tex stdout03.tex stdout04.tex stdout05.tex stdout06.tex stdout07.tex stdout08.tex stdout09.tex stdout10.tex stdout11.tex stdout12.tex stdout13.tex stdout14.tex stdout15.tex stdout16.tex stdout17.tex stdout18.tex stdout19.tex stdout20.tex stdout21.tex stdout22.tex stdout23.tex stdout24.tex stdout25.tex stdout26.tex stdout27.tex stdout28.tex stdout29.tex stdout30.tex stdout31.tex stdout32.tex stdout33.tex stdout34.tex stdout35.tex stdout36.tex stdout37.tex stdout38.tex stdout39.tex stdout40.tex stdout41.tex stdout42.tex stdout43.tex stdout44.tex stdout45.tex stdout46.tex stdout47.tex stdout48.tex stdout49.tex stdout50.tex stdout51.tex stdout52.tex stdout53.tex stdout54.tex stdout55.tex stdout56.tex stdout57.tex stdout58.tex stdout59.tex stdout60.tex stdout61.tex stdout62.tex stdout63.tex stdout64.tex stdout65.tex stdout66.tex stdout67.tex stdout68.tex stdout69.tex stdout70.tex stdout71.tex stdout72.tex stdout73.tex stdout74.tex stdout75.tex stdout76.tex stdout77.tex stdout78.tex stdout79.tex stdout80.tex stdout81.tex stdout82.tex stdout83.tex stdout84.tex stdout85.tex stdout86.tex stdout87.tex stdout88.tex stdout89.tex stdout90.tex stdout91.tex stdout92.tex stdout93.tex stdout94.tex stdout95.tex stdout96.tex stdout97.tex stdout98.tex stdout99.tex stdout100.tex stdout101.tex stdout102.tex 
+main:  stdout00.tex stdout01.tex stdout02.tex stdout03.tex stdout04.tex stdout05.tex stdout06.tex stdout07.tex stdout08.tex stdout09.tex stdout10.tex stdout11.tex stdout12.tex stdout13.tex stdout14.tex stdout15.tex stdout16.tex stdout17.tex stdout18.tex stdout19.tex stdout20.tex stdout21.tex stdout22.tex stdout23.tex stdout24.tex stdout25.tex stdout26.tex stdout27.tex stdout28.tex stdout29.tex stdout30.tex stdout31.tex stdout32.tex stdout33.tex stdout34.tex stdout35.tex stdout36.tex stdout37.tex stdout38.tex stdout39.tex stdout40.tex stdout41.tex stdout42.tex stdout43.tex stdout44.tex stdout45.tex stdout46.tex stdout47.tex stdout48.tex stdout49.tex stdout50.tex stdout51.tex stdout52.tex stdout53.tex stdout54.tex stdout55.tex stdout56.tex stdout57.tex stdout58.tex stdout59.tex stdout60.tex stdout61.tex stdout62.tex stdout63.tex stdout64.tex stdout65.tex stdout66.tex stdout67.tex stdout68.tex stdout69.tex stdout70.tex stdout71.tex stdout72.tex stdout73.tex stdout74.tex stdout75.tex stdout76.tex stdout77.tex stdout78.tex stdout79.tex stdout80.tex stdout81.tex stdout82.tex stdout83.tex stdout84.tex stdout85.tex stdout86.tex stdout87.tex stdout88.tex stdout89.tex stdout90.tex stdout91.tex stdout92.tex stdout93.tex stdout94.tex stdout95.tex stdout96.tex stdout97.tex stdout98.tex stdout99.tex stdout100.tex stdout101.tex stdout102.tex stdout103.tex stdout104.tex stdout105.tex stdout106.tex 
 	$(PDF)
 	$(LATEXRM)
 view:
@@ -322,10 +322,22 @@ stdout99.tex: stdout99.py
 	python stdout99.py > stdout99.tex
 
 stdout100.tex: stdout100.py
-	python stdout99.py > stdout101.tex
+	python stdout100.py > stdout100.tex
 
 stdout101.tex: stdout101.py
-	python stdout99.py > stdout103.tex
+	python stdout101.py > stdout101.tex
 
 stdout102.tex: stdout102.py
-	python stdout99.py > stdout105.tex
+	python stdout102.py > stdout102.tex
+
+stdout103.tex: stdout103.py
+	python stdout103.py > stdout103.tex
+
+stdout104.tex: stdout104.py
+	python stdout104.py > stdout104.tex
+
+stdout105.tex: stdout105.py
+	python stdout105.py > stdout105.tex
+
+stdout106.tex: stdout106.py
+	python stdout106.py > stdout106.tex
