@@ -7,34 +7,9 @@ from solutions import *; clear()
 Frequently heaps are implemented using arrays,
 i.e., they are array trees.
 
-\newpage
-\begin{ex}
-  Johnny is writing
-  a scheduler for his game
-  and wanted to use a balanced binary search tree (AVL)
-  to handle jobs with priority
-  (collision computation, collisiion resolution, shadow computation,
-  drawing, sound, etc.) with
-  instead of heaps.
-  What are the advantages and disadvantages?
-  Compare and contrast.
-  \qed
-\end{ex}
+\input{exercises/nonarray-implementation-0/main.tex}
 
-\newpage
-\begin{ex}
-  Analyze and implement a FIFOMinHeap.
-  This is a minheap that is FIFO on values with the
-  same priority.
-  In other words, if two values
-  of the same priority
-  are inserted into a minheap,
-  then value inserted earlier will be
-  removed before the other value.
-  (There are at least two different ways of doing
-  the above.)
-\end{ex}
-
+\input{exercises/nonarray-implementation-1/main.tex}
 
 There are 2 ways of doing the above.
 
@@ -69,43 +44,8 @@ Therefore during the extract-root operation,
 need to loop over the extract-root operation until
 the new root is a non-empty linked list.
 
-\begin{ex}
-Write a class \texttt{MaxHeap} that works like this:
-\begin{console}
-int x;
-MaxHeap< int > heap;
-x = heap.size();       // x = 0 
-heap.insert(5);        // [5]
-heap.insert(7);        // [7, 5]
-heap.insert(9);        // [9, 5, 7]
-x = heap.size();       // x = 3
-std::cout << heap;     // Prints "[9, 5, 7]".
+\input{exercises/nonarray-implementation-2/main.tex}
 
-int a = heap.delete(); // [7, 5], deleting at index 0
-                       // a = 9
-x = heap.max();        // x = 9. The root is not deleted.
-
-heap[0] = 1;           // [1, 5], heap is also like a
-                       // std::vector.
-heap.heapify_down(0);  // [5, 1]
-
-heap[1] := 10;         // [5, 10]
-heap.heapify_up(1);    // [10, 5]
-
-heap.resize(5);
-heap[0] = 5;
-heap[1] = 7;
-heap[2] = 8;
-heap[3] = 10;
-heap[4] = 2;
-std::cout << heap;     // Prints "[5, 7, 8, 10, 2]".
-heap.build();          // build-max-heap with 5 values
-                       // already in the heap.
-std::cout << heap;     // Prints "[10, 7, 8, 5, 2]".
-
-heap.clear();          // []
-\end{console}
-\end{ex}
 Clearly the following must work: copy constructor, destructor,
 \verb!operator=!, \verb!operator==!.
 The class should look like this:
@@ -119,54 +59,7 @@ private:
 };
 \end{console}
 
-
-
-\newpage
-\begin{ex}
-  It's common to implement a heap by using arrays and implement the
-  ADT using functions instead of using a class with methods.
-  For instance this would be allow one to implement heapsort easily
-  to sort an array directly.
-  Implement the heap ADT described below where an a vector is used
-  to represent the heap.
-\begin{console}
-int x;
-std::vector< int > heap;
-
-maxheap_insert(heap, 5);   // [5]
-maxheap_insert(heap, 7);   // [7, 5]
-maxheap_insert(heap, 9);   // [9, 5, 7]
-
-int a = maxheap_delete(heap); // [7, 5]
-                           // a = 9
-x = maxheap_max(heap);     // x = 9. Root is not deleted.
-
-heap[0] = 1;               // [1, 5]
-maxheap_heapify_down(heap, 0); // [5, 1]
-
-heap[1] = 10;              // [5, 10]
-maxheap_heapify_up(heap, 1); // [10, 5]
-
-heap.resize(5);
-heap[0] = 5;
-heap[1] = 7;
-heap[2] = 8;
-heap[3] = 10;
-heap[4] = 2;
-maxheap_build(heap);       // [10, 7, 8, 5, 2]
-
-heap.resize(5);
-heap[0] = 2;
-heap[1] = 6;
-heap[2] = 8;
-heap[3] = 10;
-heap[4] = 5;
-maxheap_heapsort(heap)     // [2, 5, 6, 8, 10]
-\end{console}
-The functions above should be function templates.
-\qed
-\end{ex}
-
+\input{exercises/nonarray-implementation-3/main.tex}
 
 \section{Non-array implementation}
 
@@ -210,16 +103,7 @@ Another thing to note is that because of the way I add nodes,
 i.e., always at the lowest level and left-to-right, I should have a pointer
 to the parent where I have a new node.
 
-
-
-
-\begin{ex}
-  Write a function that takes the pointer-to-root of a
-  max heap (or more generally a complete binary
-  tree) and returns the pointer to the node that will be the parent
-  of the next insert.
-  \qed
-\end{ex}
+\input{exercises/nonarray-implementation-4/main.tex}
 
 However that takes $(\log n)$ time.
 So we might as well have a pointer that records where the
@@ -376,7 +260,6 @@ print(p)
 
 Once I add a \texttt{9}, I get this:
 
-
 \input{stdout98.tex}
 
 Get it?
@@ -396,15 +279,6 @@ attached as a left child.
 If the number of children is 1, then the new node should be attached
 as a right child.
 
-\begin{ex}
-  Implement a max heap using the above idea.
-  \qed
-\end{ex}
+\input{exercises/nonarray-implementation-5/main.tex}
 
-
-\begin{ex}
-  Investigate the following implementation:
- Each level is linked up as a doubly linked list.
- What are the pros and cons compared to the above?
- \qed
-\end{ex}
+\input{exercises/nonarray-implementation-6/main.tex}
