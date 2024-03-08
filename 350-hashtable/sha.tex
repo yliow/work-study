@@ -1,0 +1,250 @@
+%-*-latex-*-
+\begin{comment}
+https://stackoverflow.com/questions/2262386/generate-sha256-with-openssl-and-c/10632725
+https://crypto.stackexchange.com/questions/87434/is-double-sha-256-the-best-choice-for-bitcoin
+
+https://www.cs.uaf.edu/2013/spring/cs463/lecture/02_20_SHA256.html
+https://cpp.hotexamples.com/examples/-/-/EVP_sha512/cpp-evp_sha512-function-examples.html
+
+\end{comment}
+
+
+
+\section{SHA256}
+
+As root install the OpenSSL library:
+\begin{console}
+dnf -y install openssl-devel
+\end{console}
+The following is how you should compile your program:
+\begin{console}[fontsize=\small]
+g++ main.cpp -I/opt/ssl/include/ -L/opt/ssl/lib/ -lcrypto
+\end{console}
+\begin{python}
+s = r'''
+#include <iostream>
+#include <iomanip>
+#include <string>
+#include <sstream>
+#include <openssl/evp.h>
+
+bool sha256_hexdigest(const std::string & unhashed, std::string & hashed)
+{
+    bool success = false;
+    EVP_MD_CTX * context = EVP_MD_CTX_new();
+
+    if (context != NULL)
+    {
+        if (EVP_DigestInit_ex(context, EVP_sha256(), NULL))
+        {
+            if (EVP_DigestUpdate(context,
+                                 unhashed.c_str(), unhashed.length()))
+            {
+                unsigned char hash[EVP_MAX_MD_SIZE];
+                unsigned int lengthOfHash = 0;
+                if (EVP_DigestFinal_ex(context, hash, &lengthOfHash))
+                {
+                    std::stringstream ss;
+                    for (unsigned int i = 0; i < lengthOfHash; ++i)
+                    {
+                        ss << std::hex << std::setw(2) << std::setfill('0')
+                           << (int)hash[i];
+                    }
+                    hashed = ss.str();
+                    success = true;
+                }
+            }
+        }
+        EVP_MD_CTX_free(context);
+    }
+    return success;
+}
+
+int main(int argc, char ** argv)
+{
+    std::string input, output;
+
+    input = "hello world";
+    if (sha256_hexdigest(input, output))
+    {
+        std::cout << "hello world: " << output << std::endl;
+    }
+    else
+    {
+        std::cout << "FAILURE!" << std::endl;
+    }
+    
+    input = "hello worle";
+    if (sha256_hexdigest(input, output))
+    {
+        std::cout << "hello worle: " << output << std::endl;
+    }
+    else
+    {
+        std::cout << "FAILURE!" << std::endl;
+    }
+    
+    return 0;
+}
+'''.strip()
+f = open('main1.cpp', 'w'); f.write(s); f.close()
+\end{python}
+\vspace{-0.1cm}
+\VerbatimInput[frame=single,fontsize=\scriptsize]{main1.cpp}
+\begin{python}
+from latextool_basic import *
+print(shell(['g++ main1.cpp -I/opt/ssl/include/ -L/opt/ssl/lib/ -lcrypto', './a.out'], fontsize=r'\scriptsize'))
+\end{python}
+The input is a string and the output
+is a hex string.
+
+The above example is mainly for an input that is an \verb!std::string!.
+For optimization,
+here's a version where the input is a character array
+and a length variable
+which is also better for hashing general data
+such that integers, doubles, etc.:
+
+\begin{python}
+s = r'''
+#include <iomanip>
+#include <iostream>
+#include <cstring>
+#include <sstream>
+#include <string>
+#include <openssl/evp.h>
+
+bool sha256_hexdigest(const char * unhashed, size_t unhashed_length,
+                   std::string & hashed)
+{
+    bool success = false;
+    EVP_MD_CTX * context = EVP_MD_CTX_new();
+
+    if (context != NULL)
+    {
+        if (EVP_DigestInit_ex(context, EVP_sha256(), NULL))
+        {
+            if (EVP_DigestUpdate(context,
+                                 unhashed, unhashed_length))
+            {
+                unsigned char hash[EVP_MAX_MD_SIZE];
+                unsigned int lengthOfHash = 0;
+                if (EVP_DigestFinal_ex(context, hash, &lengthOfHash))
+                {
+                    std::stringstream ss;
+                    for (unsigned int i = 0; i < lengthOfHash; ++i)
+                    {
+                        ss << std::hex << std::setw(2) << std::setfill('0')
+                           << (int)hash[i];
+                    }
+                    hashed = ss.str();
+                    success = true;
+                }
+            }
+        }
+        EVP_MD_CTX_free(context);
+    }
+    return success;
+}
+
+int main(int argc, char ** argv)
+{  
+    char input[1024];
+    std::string output;
+
+    strcpy(input, (const char *)"hello world");
+    if (sha256_hexdigest(input, strlen(input), output))
+    {
+        std::cout << "hello world: " << output << std::endl;
+    }
+    else
+    {
+        std::cout << "FAILURE!" << std::endl;
+    }
+    
+    strcpy(input, (const char *)"hello worle");
+    if (sha256_hexdigest(input, strlen(input), output))
+    {
+        std::cout << "hello worle: " << output << std::endl;
+    }
+    else
+    {
+        std::cout << "FAILURE!" << std::endl;
+    }
+
+    int x;
+    x = 42;
+    if (sha256_hexdigest((const char *)(&x), sizeof(int), output))
+    {
+        std::cout << x << ": " << output << std::endl;
+    }
+    else
+    {
+        std::cout << "FAILURE!" << std::endl;
+    }
+
+    x = 43;
+    if (sha256_hexdigest((const char *)(&x), sizeof(int), output))
+    {
+        std::cout << x << ": " << output << std::endl;
+    }
+    else
+    {
+        std::cout << "FAILURE!" << std::endl;
+    }
+
+    double d;
+    d = 3.1415;
+    if (sha256_hexdigest((const char *)(&d), sizeof(double), output))
+    {
+        std::cout << d << ": " << output << std::endl;
+    }
+    else
+    {
+        std::cout << "FAILURE!" << std::endl;
+    }
+    
+    d = 3.1414;
+    if (sha256_hexdigest((const char *)(&d), sizeof(double), output))
+    {
+        std::cout << d << ": " << output << std::endl;
+    }
+    else
+    {
+        std::cout << "FAILURE!" << std::endl;
+    }
+
+    return 0;
+}
+'''.strip()
+f = open('main2.cpp', 'w'); f.write(s); f.close()
+\end{python}
+\vspace{-0.1cm}
+\VerbatimInput[frame=single,fontsize=\scriptsize]{main2.cpp}
+\begin{python}
+from latextool_basic import *
+print(shell(['g++ main2.cpp -I/opt/ssl/include/ -L/opt/ssl/lib/ -lcrypto', './a.out'], fontsize=r'\scriptsize'))
+\end{python}
+
+
+Note that in the function above SHA256 was chosen
+(see the \verb!EVP_sha256()! in the above code).
+Other options includes
+\begin{Verbatim}[frame=single,fontsize=\small]
+const EVP_MD * EVP_md5(void);
+const EVP_MD * EVP_sha512(void);
+\end{Verbatim}
+See \url{https://linux.die.net/man/3/evp_sha512}
+
+In the examples above the code
+\begin{Verbatim}[frame=single,fontsize=\small]
+std::stringstream ss;
+for (unsigned int i = 0; i < lengthOfHash; ++i)
+{
+    ss << std::hex << std::setw(2) << std::setfill('0')
+       << (int)hash[i];
+}
+hashed = ss.str();
+\end{Verbatim}
+forms a hex string which is the string returned.
+Each of the \verb!hash[i]! is an integer.

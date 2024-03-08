@@ -1,0 +1,45 @@
+#include <iostream>
+
+class Hashable
+{
+public:
+    virtual unsigned int hash(unsigned int s) = 0;
+};
+
+
+class Name
+{
+public:
+    Name(const std::string & s)
+        : _s(s)
+    {}
+private:
+    std::string _s;
+};
+
+class HashableName: public Name, Hashable
+{
+public:
+    HashableName(const std::string s)
+        : Name(s) 
+    {}
+    
+    unsigned int hash(unsigned int s)
+    {
+        unsigned int h = 0;
+        //... compute h using _s...
+        return h % s;
+    }
+};
+
+class X
+{
+public:
+    static enum {A, B, C};
+};
+
+int main()
+{
+    HashableName x("hello world");
+    std::cout << x.hash(10) << '\n';
+}

@@ -1,0 +1,2385 @@
+%-*-latex-*-
+\section{Hash tables}
+
+A hash table (aka unordered associative array)
+is very easy to understand, at least for the simple case.
+Suppose we have an collection of name-height data that I want to 
+keep in a container for later searching (for instance).
+\begin{longtable}{|c|c|}
+\hline
+Name & Height \\
+\hline
+Abe &  6.5 \\
+Tom &  5.5 \\
+Annie &  5.9 \\
+\hline
+\end{longtable}
+The key in this case is the name (of course).
+The idea that I'm going to talk about has nothing to do with
+name-height.
+In general, it works for any so--called key-value table.
+I'm going to call the above collection (vaguely) 
+\defone{key--value pairs}.
+
+Now if you think about an array, you can quickly
+associate values with index values:
+\begin{longtable}{|c|c|}
+\hline
+Index & Height \\
+\hline
+0 &  6.5 \\
+1 &  5.5 \\
+2 &  5.9 \\
+\hline
+\end{longtable}
+The problem of course is that I have names and not index values!
+Of course I can have another array of names to tie Abe, Annie, Tom to
+index values:
+\begin{longtable}{|c|c|}
+\hline
+Index & Name \\
+\hline
+0 &  Abe \\
+1 &  Tom \\
+2 &  Annie \\
+\hline
+\end{longtable}
+But that's a pain.
+Why? 
+Because if you want to search for Annie's height, you
+would have to search the name array to see that Annie's index is 1,
+and \textit{then} go to the height array to find Annie's height.
+If you add another name to the name array, then you might need
+some kind of organization for fast searching.
+You might think: \lq\lq Hey ... let's sort the name array!''
+The problem is that the index values will then change and I 
+would have to change the height array.
+Bad idea!
+
+Another way is to \textit{somehow} associate names to 
+index values using some kind of numeric function.
+In fact, you should know that the characters of the names
+are already associated with integer values: they have ASCII codes.
+For instance \verb!A! has ASCII value of 65.
+Try this C/C++ statement:
+\begin{console}
+std::cout << int('A') << '\n';
+\end{console}
+They have been around for a long time: the ASCII codes were
+designed by IEEE in 1960s.
+So if I take inspiration from the base 10 representation of 
+integers, 
+I can do this to convert Abe to an integer:
+\[
+\text{Abe}
+\rightarrow
+\operatorname{int}(\texttt{A}) \cdot 10^0 +
+\operatorname{int}(\texttt{b}) \cdot 10^1 +
+\operatorname{int}(\texttt{e}) \cdot 10^2
+\]
+where $\operatorname{int}$ means the ASCII value of the relevant character.
+The value you get is
+\begin{python}
+print(r"""\begin{console}
+%s
+\end{console}""" % (ord('A') + ord('b') * 10 + ord('e') * 100))
+\end{python}
+Now what I'm going to do is to create an array of name-height values, say that
+array has size 10.
+The index values are of course from 0 to 9.
+No problem: the above index value, I just do mod 10 and this will give me an integer
+value from 0 to 9. Right?
+This means that the name \verb!Abe! will be associated with index 
+\begin{python}
+v = ord('A') + ord('b') * 10 + ord('e') * 100
+print(r"""\begin{console}
+%s %% 10 = %s
+\end{console}""" % (v, v % 10))
+\end{python}
+
+Such a function that takes data and produce an integer value 
+is a hash function.
+A hash function of course has a finite range.
+In our case, it's from 0 to 9.
+(You'll see later that frequently, you want to have the option of 
+expanding the range.)
+Because we're associating names to index values 0 to 9, we of course
+want to make sure that names go to different index values.
+Clearly with only 10 rows in your array, you cannot avoid 
+hashing names to the same index values, especially if you're looking at 1000 names!
+But say you have only three names.
+Clearly you do want the three names to hash to different index values.
+You'll see that a good quality that we want for hash functions
+is that they should \lq\lq randomly scatter'' values in the range that they 
+can handle. 
+
+First let me put Abe and his height into our array, or hash table.
+The above has hash function hashes Abe to 5.
+So the array looks like this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+C = RectContainer(x=1, y=1, direction='top-to-bottom', align='left')
+
+for a,b,c,d in [(0, 'true' , ''     , ''),
+                (1, 'true' , ''     , ''),
+                (2, 'true' , ''     , ''),
+                (3, 'true' , ''     , ''),
+                (4, ''     , ''     , ''),
+                (5, 'false', 'Abe'  , 6.5), 
+                (6, 'true' , ''     , ''),
+                (7, 'true' , ''     , ''),
+                (8, 'true' , ''     , ''),
+                (9, 'true' , ''     , ''),
+                ]:
+    h = 0.6
+    c0 = RectContainer(x=1, y=1)
+    c0 += Rect2(x0=0, y0=0, x1=0.8, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % a)
+    #c0 += Rect2(x0=0, y0=0, x1=3.5, y1=h, linecolor='black',
+    #            linewidth=0.02,label=r'{\texttt{%s}}' % b)
+    c0 += Rect2(x0=0, y0=0, x1=3, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % c)
+    c0 += Rect2(x0=0, y0=0, x1=1.5, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % d)
+    c0.layout()
+    C += c0; c0.x = c0.x0; c0.y = c0.y0; c0.layout()
+
+C.layout()
+p += C
+
+print(p)
+\end{python}
+
+(The index value is included just for convenience. Of course arrays do not contain index values.)
+The C++ code would look like this:
+{\small
+\begin{console}
+class NameHeight
+{
+public:
+    std::string name_;
+    double height_;
+};
+
+class Hashtable
+{
+public:
+    NameHeight table_[10];
+};
+\end{console}
+}
+
+OK. 
+Now let's put Tom into our hash table.
+The hash value of Tom is
+\begin{python}
+print(r"""\begin{console}
+%s
+\end{console}""" % (ord('T') + ord('o') * 10 + ord('m') * 100))
+\end{python}
+and when I take mod 10, I get 4.
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+C = RectContainer(x=1, y=1, direction='top-to-bottom', align='left')
+
+for a,b,c,d in [(0, 'true' , ''     , ''),
+                (1, 'true' , ''     , ''),
+                (2, 'true' , ''     , ''),
+                (3, 'true' , ''     , ''),
+                (4, 'false', 'Tom'  , 5.5),
+                (5, 'false', 'Abe'  , 6.5), 
+                (6, 'true' , ''     , ''),
+                (7, 'true' , ''     , ''),
+                (8, 'true' , ''     , ''),
+                (9, 'true' , ''     , ''),
+                ]:
+    h = 0.6
+    c0 = RectContainer(x=1, y=1)
+    c0 += Rect2(x0=0, y0=0, x1=0.8, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % a)
+    #c0 += Rect2(x0=0, y0=0, x1=3.5, y1=h, linecolor='black',
+    #            linewidth=0.02,label=r'{\texttt{%s}}' % b)
+    c0 += Rect2(x0=0, y0=0, x1=3, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % c)
+    c0 += Rect2(x0=0, y0=0, x1=1.5, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % d)
+    c0.layout()
+    C += c0; c0.x = c0.x0; c0.y = c0.y0; c0.layout()
+
+C.layout()
+p += C
+
+print(p)
+\end{python}
+
+Let's take a pause and see how 
+this container help us find data.
+So ... if you want to know Abe's height,
+all you need to do is to use our hash function, 
+compute the hash value of Abe, which would be 5,
+and you find what you're looking for.
+Period.
+Easy, right?
+
+If you don't allow the empty string as a name,
+you can initializ the names of your 
+hash table to \verb!""!.
+But what if you allow the empty string
+as a name?
+Well you can for instance include a flag in your
+\verb!NameHeight! class to indicate if there's valid data or not.
+Something like this:
+{\small
+\begin{console}
+class NameHeight
+{
+public:
+    bool available_; // or not_available if you like
+    std::string name_;
+    double height_;
+};
+
+class Hashtable
+{
+public:
+    NameHeight table_[10];
+};
+\end{console}
+}
+If so, the hash table now looks like this
+
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+C = RectContainer(x=1, y=1, direction='top-to-bottom', align='left')
+
+for a,b,c,d in [(0, 'true' , ''     , ''),
+                (1, 'true' , ''     , ''),
+                (2, 'true' , ''     , ''),
+                (3, 'true' , ''     , ''),
+                (4, 'false', 'Tom'  , 5.5),
+                (5, 'false', 'Abe'  , 6.5), 
+                (6, 'true' , ''     , ''),
+                (7, 'true' , ''     , ''),
+                (8, 'true' , ''     , ''),
+                (9, 'true' , ''     , ''),
+                ]:
+    h = 0.6
+    c0 = RectContainer(x=1, y=1)
+    c0 += Rect2(x0=0, y0=0, x1=0.8, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % a)
+    c0 += Rect2(x0=0, y0=0, x1=3.5, y1=h, linecolor='black',
+                linewidth=0.02,label=r'{\texttt{%s}}' % b)
+    c0 += Rect2(x0=0, y0=0, x1=3, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % c)
+    c0 += Rect2(x0=0, y0=0, x1=1.5, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % d)
+    c0.layout()
+    C += c0; c0.x = c0.x0; c0.y = c0.y0; c0.layout()
+
+C.layout()
+p += C
+
+print(p)
+\end{python}
+
+It's also possible to have a hash table that contains
+the keys, but the 
+data can be placed in the heap, i.e.,
+the hash table is an array of key-pointer values.
+In that case, the hash table would take less space --
+don't forget that a huge array makes memory management
+difficult because the array of values must be contiguous.
+And this is a good thing.
+
+\begin{python}
+from latextool_basic import *
+
+p = Plot()
+
+v = RectContainer(x=0, y=0, align='left', direction='top-to-bottom')
+for i in ['', '', '', '', 'Tom', 'Abe', '', '', '', '']: 
+    v += Rect2(0, 0, 2, 0.5, label= r'\texttt{%s}' % i)
+v.layout()
+
+p += v
+v = RectContainer(x=2, y=0, align='left', direction='top-to-bottom')
+for i in range(10):
+    r = Rect2(0, 0, 0.5, 0.5)
+    v += r
+v.layout()
+
+for i in range(10):
+    if i == 4:
+        center = v[i].center()
+        (x0, y0) = center
+        (x1, y1) = (center[0] + 2, center[1] + 0.025)
+        r = Rect2(x1, y1, x1+1.5, y1+0.5, label= r'\texttt{%s}' % 5.5)
+        p += r
+        x1, y1 = r.left()
+        p += Line(x0=x0, y0=y0, x1=x1, y1=y1, linewidth=0.05, startstyle='dot', endstyle='>')
+    elif i == 5:
+        center = v[i].center()
+        (x0, y0) = center
+        (x1, y1) = (center[0] + 2, center[1] - 0.5)
+        r = Rect2(x1, y1, x1+1.5, y1+0.5, label= r'\texttt{%s}' % 6.5)
+        p += r
+        x1, y1 = r.left()
+        p += Line(x0=x0, y0=y0, x1=x1, y1=y1, linewidth=0.05, startstyle='dot', endstyle='>')
+    else:
+        topleft = v[i].topleft()
+        bottomright = v[i].bottomright()
+        (x0, y0) = topleft
+        (x1, y1) = bottomright
+        p += Line(x0=x0, y0=y0, x1=x1, y1=y1, linewidth=0.05)
+        topright = v[i].topright()
+        bottomleft = v[i].bottomleft()
+        (x0, y0) = topright
+        (x1, y1) = bottomleft
+        p += Line(x0=x0, y0=y0, x1=x1, y1=y1, linewidth=0.05)
+
+p += v
+print(p)
+\end{python}
+In this case, we don't even need the availability flag since a
+\verb!NULL! pointer would tell us that the row is available.
+
+But ... we can take this one step further ...
+another option is to have a hash table not be 
+name-pointer rows,
+but of pointers all altogether.
+Here's what I mean (in pictures):
+
+\begin{python}
+from latextool_basic import *
+
+p = Plot()
+
+v = RectContainer(x=2, y=0, align='left', direction='top-to-bottom')
+for i in range(10):
+    r = Rect2(0, 0, 0.5, 0.5)
+    v += r
+
+v.layout()
+
+def node(x, y, key, value):
+    c0 = RectContainer(x=x, y=y)
+    c0 += Rect2(0, 0, 2, 0.5, label= r'\texttt{%s}' % key)
+    c0 += Rect2(0, 0, 1.5, 0.5, label= r'\texttt{%s}' % value)
+    return c0
+
+for i in range(10):
+    if i == 4:
+        center = v[i].center()
+        (x0, y0) = center
+        (x1, y1) = (center[0] + 2, center[1] + 0.025)
+        n = node(x1, y1, "Tom", 5.5)
+        p += n
+        x1, y1 = n.left()
+        p += Line(x0=x0, y0=y0, x1=x1, y1=y1, linewidth=0.05, startstyle='dot', endstyle='>')
+    elif i == 5:
+        center = v[i].center()
+        (x0, y0) = center
+        (x1, y1) = (center[0] + 2, center[1] - 0.5)
+        n = node(x1, y1, "Abe", 6.5)
+        p += n
+        x1, y1 = n.left()
+        p += Line(x0=x0, y0=y0, x1=x1, y1=y1, linewidth=0.05, startstyle='dot', endstyle='>')
+    else:
+        topleft = v[i].topleft()
+        bottomright = v[i].bottomright()
+        (x0, y0) = topleft
+        (x1, y1) = bottomright
+        p += Line(x0=x0, y0=y0, x1=x1, y1=y1, linewidth=0.05)
+        topright = v[i].topright()
+        bottomleft = v[i].bottomleft()
+        (x0, y0) = topright
+        (x1, y1) = bottomleft
+        p += Line(x0=x0, y0=y0, x1=x1, y1=y1, linewidth=0.05)
+
+p += v
+print(p)
+\end{python}
+
+At this point, we have two (extreme) options for our hash table:
+\begin{tightlist}
+\li An array of key-value pairs, each with an \lq\lq available''
+    field.
+\li An array of pointers to key-value pairs, using \verb!NULL!
+    to denote the fact that an array element is available.
+\end{tightlist} 
+
+Very soon we'll see that there are other options.
+
+
+
+
+\newpage
+\section{Hash Collision}
+
+Recall that I want to put the following into our hash table:
+\begin{longtable}{|c|c|}
+\hline
+Name & Height \\
+\hline
+Abe &  6.5 \\
+Tom &  5.5 \\
+Annie &  5.9 \\
+\hline
+\end{longtable}
+Unfortunately, when I hash \verb!Annie! using our
+hash function, I also get \verb!5!.
+What I have here is a hash collision:
+Two keys are hashed to the same integer value!!!
+And \verb!Abe! is already at index \verb!5!. 
+
+Now what?!?!
+
+
+
+
+\newpage
+\section{Collision Resolution}
+
+One thing I can do is to just go onto the \textit{next} index value.
+Don't forget that the index values are from 0 to 9.
+So if I hash to \verb!9! and there's someone at \verb!9!,
+and I compute the \textit{next} index value to get \verb!10!,
+I'm outside the array.
+In other words, I need to mod by 10 (the size of the array).
+
+Computation of new hash values in case of a collision is
+sometimes called \defone{probing}.
+There are many different methods for probing.
+The \lq\lq \textit{go to next one with mod}''
+is called \defone{linear probing}.
+
+Going back to our example, if I use linear probing, since
+\verb!Annie! is hashed to \verb!5!, the row occupied by \verb!Abe!,
+I will put \verb!Annie! at index \verb!6!.
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+C = RectContainer(x=1, y=1, direction='top-to-bottom', align='left')
+
+for a,b,c,d in [(0, 'true' , ''     , ''),
+                (1, 'true' , ''     , ''),
+                (2, 'true' , ''     , ''),
+                (3, 'true' , ''     , ''),
+                (4, 'false', 'Tom'  , 5.5),
+                (5, 'false', 'Abe'  , 6.5), 
+                (6, 'false', 'Annie', 5.9),
+                (7, 'true' , ''     , ''),
+                (8, 'true' , ''     , ''),
+                (9, 'true' , ''     , ''),
+                ]:
+    h = 0.6
+    c0 = RectContainer(x=1, y=1)
+    c0 += Rect2(x0=0, y0=0, x1=0.8, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % a)
+    c0 += Rect2(x0=0, y0=0, x1=3.5, y1=h, linecolor='black',
+                linewidth=0.02,label=r'{\texttt{%s}}' % b)
+    c0 += Rect2(x0=0, y0=0, x1=3, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % c)
+    c0 += Rect2(x0=0, y0=0, x1=1.5, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % d)
+    c0.layout()
+    C += c0; c0.x = c0.x0; c0.y = c0.y0; c0.layout()
+
+C.layout()
+p += C
+
+x0,y0 = C[5][0].left(); y0 -= 0.1
+x1,y1 = C[6][0].left(); y1 += 0.1
+p += Line(points=[(x0,y0), (x0-0.5,y0), (x0-0.5,y1), (x1,y1)], endstyle='>')
+
+print(p)
+\end{python}
+
+One step up is \textbf{quadratic probes}.
+Suppose you hash to value $h$.
+If there's a collision, you look at $h + 1^2$.
+If there's another collision, you look at $h + 2^2$.
+If there's again another collision, you look at $h + 3^2$.
+Etc.
+That's it.
+More generally, instead of using $x^2$, you can 
+use $ax^2 + bx + c$.
+For instance, say whenever you have a hash collision,
+you use
+the quadratic probe with $a = 1$, $b = 1$, $c = 0$.
+If you have a collision with value $h$, then
+the next value to try is 
+$h + 1^2 + 1^1$.
+If that's again a collision, you look at 
+$h + 2^2 + 2^1$.
+And if this is again a collision, you look at
+$h + 3^2 + 3^1$.
+Etc.{double hashing}.
+Here's how it works.
+You need two hash functions.
+Let's say I call them $h$ and $h'$.
+Suppose your key if $k$.
+The first hash value you look at is $h(k)$.
+If there's a collision, you look at 
+$h(k) + h'(k)$.
+If there's another colliion, you look at
+$h(k) + 2h'(k)$.
+If there's yet another collision, you look at
+$h(k) + 3h'(k)$.
+Etc.
+
+\begin{ex}
+Analyze this probing technique.
+Instead of double hashing with $h(k) + ih'(k)$,
+use $h(k) + (ai^2 + bi + c)h'(k)$
+\qed
+\end{ex}
+
+
+\begin{ex}
+Suppose you have a hash function for integer values, say $h'$.
+For instance our hash function
+actually can hash integer values: you simply convert the 
+integer to an integer string. 
+If you have a collision at $h(k)$, look at $h'(h(k))$.
+Now if you have a collision at $h(k)$, look at $h'(h(k) + 1)$.
+If that's again a collision, look at $h'(h(k) + 2)$.
+Etc.
+Analyze this probing technique.
+\qed
+\end{ex}
+
+\begin{ex}
+Suppose you have a hash function for integer values, say $h'$.
+For instance our hash function
+actually can hash integer values: you simply convert the 
+integer to an integer string. 
+Now if you have a collision at $h(k)$, look at $h'(h(k))$.
+If that's again a collision, look at $h'(h'(h(k)))$.
+Etc.
+Analyze this probing technique.
+\qed
+\end{ex}
+
+\begin{ex}
+Suppose you have a hash function for integer values, say $h'$.
+For instance our hash function
+actually can hash integer values: you simply convert the 
+integer to an integer string. 
+Now if you have a collision at $h(k)$, look at $h'(h(k) + 1)$.
+If that's again a collision, look at $h'(h(k) + 2))$.
+Etc.
+Analyze this probing technique.
+\qed
+\end{ex}
+
+\begin{ex}
+Suppose you have a hash function for integer values, say $h'$.
+For instance our hash function
+actually can hash integer values: you simply convert the 
+integer to an integer string. 
+Now if you have a collision at $h(k)$, look at $h'(h(k) + 1)$.
+If that's again a collision, look at $h'(h'(h(k) + 1) + 2)$.
+Etc.
+Analyze this probing technique.
+\qed
+\end{ex}
+
+
+
+
+\newpage
+\section{Connection between hash table and buckets}
+
+Do you remember bucket sort?
+
+You can and \textit{should} think of hash tables
+as a kind of bucketing structure.
+What we have seen so far, each row in the array is a bucket.
+A hash basically place a key into a bucket.
+Each bucket has either one or zero key.
+You can think of probes as a way to overflow from a bucket to another.
+
+(Later we will see that there's another method to let buckets
+have more than one key.)
+
+
+
+
+\newpage
+\section{Avoiding/minimizing collisions}
+
+In general you want your hash functions to randomly
+scatter the keys you are interested in to different index values.
+In other words, you do not want to have too many collisions.
+The best is not to have collisions at all.
+Why?
+Because if there's a collision, then you need to probe.
+
+The technical term to use is that you have your
+hash functions to behave like a uniform random distribution.
+
+In general, designing a good hash function is not easy.
+Our hash function:
+\[
+\text{Abe}
+\rightarrow
+(\operatorname{int}(\texttt{A}) \cdot 10^0 +
+\operatorname{int}(\texttt{b}) \cdot 10^1 +
+\operatorname{int}(\texttt{e}) \cdot 10^2) 
+\mod 10
+\]
+is in fact pretty bad.
+Why?
+Because if you mod by 10 like the above, you actually get
+\[
+\text{Abe}
+\rightarrow
+(\operatorname{int}(\texttt{A}) \cdot 10^0)
+\mod 10
+\]
+That's why \verb!Annie! was hashed to the same index as \verb!Abe!.
+
+It's because of this that table/array sizes should be primes.
+So for instance we 
+could have choosen 13 for a table/array size.
+
+
+
+
+\newpage
+\section{Insert, Delete, Find}
+
+It's clear what you need to do for insert and find.
+When you're given the key $k$, you hash to get $h(k)$.
+If that's available, you put your key-value there.
+If it's occupied, you probe using whatever method you have decided to use.
+If your probe reaches the first hash value, you are in trouble.
+At that point, you should probably throw an exception.
+
+What about delete?
+You might think that all you need to do is to find it
+and then mark the row as available.
+Hang on there ...
+
+This means that you're breaking the chain of collided keys.
+For instance if you're looking for a key that is hashed to
+3 and there are four keys hashed to 3 and resolved using linear 
+probes, then the three keys are at index values 3, 4, 5, 6.
+If your key is at index 5, then marking that row as available,
+when you search for the key at 6, your search algorithm is
+going to stop at 5 and say it's not found. Duh.
+
+There are several pretty obvious options.
+
+\textsc{Option 1.}
+Instead of a flag for each row saying
+\textsc{Available}/\textsc{Not-Available},
+you can have a flag that says
+\textsc{Available}/\textsc{Not-Available}/\textsc{Deleted}.
+In that case the available flag cannot (of course) cannot be a boolean.
+During a search, if you see a row that is \textsc{Deleted},
+you have to continue.
+Your search ends if either you have found the key at a row that is
+marked \textsc{Not-Available} or a row that is marked
+\textsc{Available} or you reached
+your first hash value.
+Rows which are marked as \textsc{Deleted} are sometimes called tombstones.
+
+The earlier table becomes:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+C = RectContainer(x=1, y=1, direction='top-to-bottom', align='left')
+
+for a,b,c,d in [(0, 'Available' , ''     , ''),
+                (1, 'Available' , ''     , ''),
+                (2, 'Available' , ''     , ''),
+                (3, 'Available' , ''     , ''),
+                (4, 'Not-Available', 'Tom'  , 5.5),
+                (5, 'Not-Available', 'Abe'  , 6.5), 
+                (6, 'Not-Available', 'Annie', 5.9),
+                (7, 'Available' , ''     , ''),
+                (8, 'Available' , ''     , ''),
+                (9, 'Available' , ''     , ''),
+                ]:
+    h = 0.6
+    c0 = RectContainer(x=1, y=1)
+    c0 += Rect2(x0=0, y0=0, x1=0.8, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % a)
+    c0 += Rect2(x0=0, y0=0, x1=3.5, y1=h, linecolor='black',
+                linewidth=0.02,label=r'{\texttt{%s}}' % b)
+    c0 += Rect2(x0=0, y0=0, x1=3, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % c)
+    c0 += Rect2(x0=0, y0=0, x1=1.5, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % d)
+    c0.layout()
+    C += c0; c0.x = c0.x0; c0.y = c0.y0; c0.layout()
+
+C.layout()
+p += C
+
+x0,y0 = C[5][0].left(); y0 -= 0.1
+x1,y1 = C[6][0].left(); y1 += 0.1
+p += Line(points=[(x0,y0), (x0-0.5,y0), (x0-0.5,y1), (x1,y1)], endstyle='>')
+
+print(p)
+\end{python}
+
+\textsc{Option 2.}
+The second option is to organize the chain of collided keys by 
+actually moving the keys to overwrite the row to be deleted.
+For instance say your key is hashed to 3 and there four 
+collided keys are index 3, 4, 5, 6.
+Say your key is at index 4.
+Then you have to move the data at index 5 to index 4 and index 6 to index 5
+and then mark row 6 as available.
+If there are not too many colliding keys and long probe sequences,
+this is usually not that bad.
+If the probe sequences are getting long, we will have to to a 
+complete restructuring of the hash table -- see next section.
+
+I will stick to \textsc{Option 1}.
+
+Going back to out earlier table:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+C = RectContainer(x=1, y=1, direction='top-to-bottom', align='left')
+
+for a,b,c,d in [(0, 'Available' , ''     , ''),
+                (1, 'Available' , ''     , ''),
+                (2, 'Available' , ''     , ''),
+                (3, 'Available' , ''     , ''),
+                (4, 'Not-Available', 'Tom'  , 5.5),
+                (5, 'Not-Available', 'Abe'  , 6.5), 
+                (6, 'Not-Available', 'Annie', 5.9),
+                (7, 'Available' , ''     , ''),
+                (8, 'Available' , ''     , ''),
+                (9, 'Available' , ''     , ''),
+                ]:
+    h = 0.6
+    c0 = RectContainer(x=1, y=1)
+    c0 += Rect2(x0=0, y0=0, x1=0.8, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % a)
+    c0 += Rect2(x0=0, y0=0, x1=3.5, y1=h, linecolor='black',
+                linewidth=0.02,label=r'{\texttt{%s}}' % b)
+    c0 += Rect2(x0=0, y0=0, x1=3, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % c)
+    c0 += Rect2(x0=0, y0=0, x1=1.5, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % d)
+    c0.layout()
+    C += c0; c0.x = c0.x0; c0.y = c0.y0; c0.layout()
+
+C.layout()
+p += C
+
+x0,y0 = C[5][0].left(); y0 -= 0.1
+x1,y1 = C[6][0].left(); y1 += 0.1
+p += Line(points=[(x0,y0), (x0-0.5,y0), (x0-0.5,y1), (x1,y1)], endstyle='>')
+
+print(p)
+\end{python}
+
+If I add 
+\texttt{(Tammy, 6.2)}
+and
+then 
+\texttt{(Andrew, 5.7)}.
+and
+then 
+\texttt{(Tania, 6.7)},
+this is the resulting table:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+C = RectContainer(x=1, y=1, direction='top-to-bottom', align='left')
+
+for a,b,c,d in [(0, 'Available' , ''     , ''),
+                (1, 'Available' , ''     , ''),
+                (2, 'Available' , ''     , ''),
+                (3, 'Available' , ''     , ''),
+                (4, 'Not-Available', 'Tom'  , 5.5),
+                (5, 'Not-Available', 'Abe'  , 6.5), 
+                (6, 'Not-Available', 'Annie', 5.9),
+                (7, 'Not-Available', 'Tammy', 6.2),
+                (8, 'Not-Available', 'Andrew', 5.7),
+                (9, 'Not-Available', 'Tania' , 6.7),
+                ]:
+    h = 0.6
+    c0 = RectContainer(x=1, y=1)
+    c0 += Rect2(x0=0, y0=0, x1=0.8, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % a)
+    c0 += Rect2(x0=0, y0=0, x1=3.5, y1=h, linecolor='black',
+                linewidth=0.02,label=r'{\texttt{%s}}' % b)
+    c0 += Rect2(x0=0, y0=0, x1=3, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % c)
+    c0 += Rect2(x0=0, y0=0, x1=1.5, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % d)
+    c0.layout()
+    C += c0; c0.x = c0.x0; c0.y = c0.y0; c0.layout()
+
+C.layout()
+p += C
+
+x0,y0 = C[5][0].left(); y0 -= 0.1
+x1,y1 = C[6][0].left(); y1 += 0.1
+p += Line(points=[(x0,y0), (x0-0.5,y0), (x0-0.5,y1), (x1,y1)], endstyle='>')
+
+x0,y0 = C[6][0].left(); y0 -= 0.1
+x1,y1 = C[8][0].left(); y1 += 0.1
+p += Line(points=[(x0,y0), (x0-0.5,y0), (x0-0.5,y1), (x1,y1)], endstyle='>')
+
+
+x0,y0 = C[4][0].left(); y0 -= 0.1
+x1,y1 = C[7][0].left(); y1 += 0.1
+p += Line(points=[(x0,y0), (x0-1.5,y0), (x0-1.5,y1), (x1,y1)],
+          linecolor='blue', endstyle='>')
+
+x0,y0 = C[7][0].left(); y0 -= 0.1
+x1,y1 = C[9][0].left(); y1 += 0.1
+p += Line(points=[(x0,y0), (x0-1.5,y0), (x0-1.5,y1), (x1,y1)],
+          linecolor='blue', endstyle='>')
+
+
+print(p)
+\end{python}
+
+You can think of (Tom, Tammy, Tania) as forming a chain in the
+hashtable and
+(Abe, Annie, Andrew) forming another.
+
+Now if I delete Tammy, the table becomes
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+C = RectContainer(x=1, y=1, direction='top-to-bottom', align='left')
+
+for a,b,c,d in [(0, 'Available' , ''     , ''),
+                (1, 'Available' , ''     , ''),
+                (2, 'Available' , ''     , ''),
+                (3, 'Available' , ''     , ''),
+                (4, 'Not-Available', 'Tom'  , 5.5),
+                (5, 'Not-Available', 'Abe'  , 6.5), 
+                (6, 'Not-Available', 'Annie', 5.9),
+                (7, 'Deleted'      , 'Tammy', 6.2),
+                (8, 'Not-Available', 'Andrew', 5.7),
+                (9, 'Not-Available', 'Tania' , 6.7),
+                ]:
+    h = 0.6
+    c0 = RectContainer(x=1, y=1)
+    c0 += Rect2(x0=0, y0=0, x1=0.8, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % a)
+    c0 += Rect2(x0=0, y0=0, x1=3.5, y1=h, linecolor='black',
+                linewidth=0.02,label=r'{\texttt{%s}}' % b)
+    c0 += Rect2(x0=0, y0=0, x1=3, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % c)
+    c0 += Rect2(x0=0, y0=0, x1=1.5, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % d)
+    c0.layout()
+    C += c0; c0.x = c0.x0; c0.y = c0.y0; c0.layout()
+
+C.layout()
+p += C
+
+x0,y0 = C[5][0].left(); y0 -= 0.1
+x1,y1 = C[6][0].left(); y1 += 0.1
+p += Line(points=[(x0,y0), (x0-0.5,y0), (x0-0.5,y1), (x1,y1)], endstyle='>')
+
+x0,y0 = C[6][0].left(); y0 -= 0.1
+x1,y1 = C[8][0].left(); y1 += 0.1
+p += Line(points=[(x0,y0), (x0-0.5,y0), (x0-0.5,y1), (x1,y1)], endstyle='>')
+
+
+x0,y0 = C[4][0].left(); y0 -= 0.1
+x1,y1 = C[7][0].left(); y1 += 0.1
+p += Line(points=[(x0,y0), (x0-1.5,y0), (x0-1.5,y1), (x1,y1)],
+          linecolor='blue', endstyle='>')
+
+x0,y0 = C[7][0].left(); y0 -= 0.1
+x1,y1 = C[9][0].left(); y1 += 0.1
+p += Line(points=[(x0,y0), (x0-1.5,y0), (x0-1.5,y1), (x1,y1)],
+          linecolor='blue', endstyle='>')
+
+
+print(p)
+\end{python}
+
+Because of the way in which chains cut into each other's way,
+during a search, you have to keep probing until you find the key you're
+looking for or when you hit \textsc{Available} (i.e. key is not found).
+
+In the case of insert, you insert at the first row that is
+\textsc{Deleted}
+or
+\textsc{Available}
+if you know for sure that the key does not exist in the table.
+If you see the key along the way, then you have an error -- the
+key already exists.
+However if you do \textit{not} know is the key exists,
+you would have to continue to search until you hit a
+row that is \textsc{Available}.
+You can (and should) insert the key at the first row that is
+either \textsc{Deleted} or \textsc{Available}.
+For instance if we insert (Toby, 6.3) into the above table:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+C = RectContainer(x=1, y=1, direction='top-to-bottom', align='left')
+
+for a,b,c,d in [(0, 'Available' , ''     , ''),
+                (1, 'Available' , ''     , ''),
+                (2, 'Available' , ''     , ''),
+                (3, 'Available' , ''     , ''),
+                (4, 'Not-Available', 'Tom'  , 5.5),
+                (5, 'Not-Available', 'Abe'  , 6.5), 
+                (6, 'Not-Available', 'Annie', 5.9),
+                (7, 'Deleted'      , 'Tammy', 6.2),
+                (8, 'Not-Available', 'Andrew', 5.7),
+                (9, 'Not-Available', 'Tania' , 6.7),
+                ]:
+    h = 0.6
+    c0 = RectContainer(x=1, y=1)
+    c0 += Rect2(x0=0, y0=0, x1=0.8, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % a)
+    c0 += Rect2(x0=0, y0=0, x1=3.5, y1=h, linecolor='black',
+                linewidth=0.02,label=r'{\texttt{%s}}' % b)
+    c0 += Rect2(x0=0, y0=0, x1=3, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % c)
+    c0 += Rect2(x0=0, y0=0, x1=1.5, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % d)
+    c0.layout()
+    C += c0; c0.x = c0.x0; c0.y = c0.y0; c0.layout()
+
+C.layout()
+p += C
+
+x0,y0 = C[5][0].left(); y0 -= 0.1
+x1,y1 = C[6][0].left(); y1 += 0.1
+p += Line(points=[(x0,y0), (x0-0.5,y0), (x0-0.5,y1), (x1,y1)], endstyle='>')
+
+x0,y0 = C[6][0].left(); y0 -= 0.1
+x1,y1 = C[8][0].left(); y1 += 0.1
+p += Line(points=[(x0,y0), (x0-0.5,y0), (x0-0.5,y1), (x1,y1)], endstyle='>')
+
+
+x0,y0 = C[4][0].left(); y0 -= 0.1
+x1,y1 = C[7][0].left(); y1 += 0.1
+p += Line(points=[(x0,y0), (x0-1.5,y0), (x0-1.5,y1), (x1,y1)],
+          linecolor='blue', endstyle='>')
+
+x0,y0 = C[7][0].left(); y0 -= 0.1
+x1,y1 = C[9][0].left(); y1 += 0.1
+p += Line(points=[(x0,y0), (x0-1.5,y0), (x0-1.5,y1), (x1,y1)],
+          linecolor='blue', endstyle='>')
+
+
+print(p)
+\end{python}
+you would first get the first empty row at index 7 (where
+the row is \texttt{Delete}) -- you remember this index:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+C = RectContainer(x=1, y=1, direction='top-to-bottom', align='left')
+
+for a,b,c,d in [(0, 'Available' , ''     , ''),
+                (1, 'Available' , ''     , ''),
+                (2, 'Available' , ''     , ''),
+                (3, 'Available' , ''     , ''),
+                (4, 'Not-Available', 'Tom'  , 5.5),
+                (5, 'Not-Available', 'Abe'  , 6.5), 
+                (6, 'Not-Available', 'Annie', 5.9),
+                (7, 'Deleted'      , 'Tammy', 6.2),
+                (8, 'Not-Available', 'Andrew', 5.7),
+                (9, 'Not-Available', 'Tania' , 6.7),
+                ]:
+    h = 0.6
+    c0 = RectContainer(x=1, y=1)
+    c0 += Rect2(x0=0, y0=0, x1=0.8, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % a)
+    c0 += Rect2(x0=0, y0=0, x1=3.5, y1=h, linecolor='black',
+                linewidth=0.02,label=r'{\texttt{%s}}' % b)
+    c0 += Rect2(x0=0, y0=0, x1=3, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % c)
+    c0 += Rect2(x0=0, y0=0, x1=1.5, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % d)
+    c0.layout()
+    C += c0; c0.x = c0.x0; c0.y = c0.y0; c0.layout()
+
+C.layout()
+p += C
+
+x0,y0 = C[5][0].left(); y0 -= 0.1
+x1,y1 = C[6][0].left(); y1 += 0.1
+p += Line(points=[(x0,y0), (x0-0.5,y0), (x0-0.5,y1), (x1,y1)], endstyle='>')
+
+x0,y0 = C[6][0].left(); y0 -= 0.1
+x1,y1 = C[8][0].left(); y1 += 0.1
+p += Line(points=[(x0,y0), (x0-0.5,y0), (x0-0.5,y1), (x1,y1)], endstyle='>')
+
+
+x0,y0 = C[4][0].left(); y0 -= 0.1
+x1,y1 = C[7][0].left(); y1 += 0.1
+p += Line(points=[(x0,y0), (x0-1.5,y0), (x0-1.5,y1), (x1,y1)],
+          linecolor='blue', endstyle='>')
+
+x0,y0 = C[7][0].left(); y0 -= 0.1
+x1,y1 = C[9][0].left(); y1 += 0.1
+p += Line(points=[(x0,y0), (x0-1.5,y0), (x0-1.5,y1), (x1,y1)],
+          linecolor='blue', endstyle='>')
+
+x0,y0 = C[7][3].right()
+p += Line(points=[(x0+1,y0), (x0,y0)],
+          linecolor='red', endstyle='>', linewidth=0.2)
+print(p)
+\end{python}
+
+You would continue until you see the first row that is \textsc{Available}
+-- this is index 0:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+C = RectContainer(x=1, y=1, direction='top-to-bottom', align='left')
+
+for a,b,c,d in [(0, 'Available' , ''     , ''),
+                (1, 'Available' , ''     , ''),
+                (2, 'Available' , ''     , ''),
+                (3, 'Available' , ''     , ''),
+                (4, 'Not-Available', 'Tom'  , 5.5),
+                (5, 'Not-Available', 'Abe'  , 6.5), 
+                (6, 'Not-Available', 'Annie', 5.9),
+                (7, 'Deleted'      , 'Tammy', 6.2),
+                (8, 'Not-Available', 'Andrew', 5.7),
+                (9, 'Not-Available', 'Tania' , 6.7),
+                ]:
+    h = 0.6
+    c0 = RectContainer(x=1, y=1)
+    c0 += Rect2(x0=0, y0=0, x1=0.8, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % a)
+    c0 += Rect2(x0=0, y0=0, x1=3.5, y1=h, linecolor='black',
+                linewidth=0.02,label=r'{\texttt{%s}}' % b)
+    c0 += Rect2(x0=0, y0=0, x1=3, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % c)
+    c0 += Rect2(x0=0, y0=0, x1=1.5, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % d)
+    c0.layout()
+    C += c0; c0.x = c0.x0; c0.y = c0.y0; c0.layout()
+
+C.layout()
+p += C
+
+x0,y0 = C[5][0].left(); y0 -= 0.1
+x1,y1 = C[6][0].left(); y1 += 0.1
+p += Line(points=[(x0,y0), (x0-0.5,y0), (x0-0.5,y1), (x1,y1)], endstyle='>')
+
+x0,y0 = C[6][0].left(); y0 -= 0.1
+x1,y1 = C[8][0].left(); y1 += 0.1
+p += Line(points=[(x0,y0), (x0-0.5,y0), (x0-0.5,y1), (x1,y1)], endstyle='>')
+
+
+x0,y0 = C[4][0].left(); y0 -= 0.1
+x1,y1 = C[7][0].left(); y1 += 0.1
+p += Line(points=[(x0,y0), (x0-1.5,y0), (x0-1.5,y1), (x1,y1)],
+          linecolor='blue', endstyle='>')
+
+x0,y0 = C[7][0].left(); y0 -= 0.1
+x1,y1 = C[9][0].left(); y1 += 0.1
+p += Line(points=[(x0,y0), (x0-1.5,y0), (x0-1.5,y1), (x1,y1)],
+          linecolor='blue', endstyle='>')
+
+x0,y0 = C[7][3].right()
+p += Line(points=[(x0+1,y0), (x0,y0)],
+          linecolor='red', endstyle='>', linewidth=0.2)
+x0,y0 = C[0][3].right()
+p += Line(points=[(x0+1,y0), (x0,y0)],
+          linecolor='red', endstyle='>', linewidth=0.2)
+print(p)
+\end{python}
+
+Since, up to this point in time, you have not seen Toby, you know
+that you can safely add (Toby, 6.3) at index 7 and mark that row
+as \textsc{Not-Available}:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+C = RectContainer(x=1, y=1, direction='top-to-bottom', align='left')
+
+for a,b,c,d in [(0, 'Available' , ''     , ''),
+                (1, 'Available' , ''     , ''),
+                (2, 'Available' , ''     , ''),
+                (3, 'Available' , ''     , ''),
+                (4, 'Not-Available', 'Tom'  , 5.5),
+                (5, 'Not-Available', 'Abe'  , 6.5), 
+                (6, 'Not-Available', 'Annie', 5.9),
+                (7, 'Not-Available', 'Toby', 6.3),
+                (8, 'Not-Available', 'Andrew', 5.7),
+                (9, 'Not-Available', 'Tania' , 6.7),
+                ]:
+    h = 0.6
+    c0 = RectContainer(x=1, y=1)
+    c0 += Rect2(x0=0, y0=0, x1=0.8, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % a)
+    c0 += Rect2(x0=0, y0=0, x1=3.5, y1=h, linecolor='black',
+                linewidth=0.02,label=r'{\texttt{%s}}' % b)
+    c0 += Rect2(x0=0, y0=0, x1=3, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % c)
+    c0 += Rect2(x0=0, y0=0, x1=1.5, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % d)
+    c0.layout()
+    C += c0; c0.x = c0.x0; c0.y = c0.y0; c0.layout()
+
+C.layout()
+p += C
+
+x0,y0 = C[5][0].left(); y0 -= 0.1
+x1,y1 = C[6][0].left(); y1 += 0.1
+p += Line(points=[(x0,y0), (x0-0.5,y0), (x0-0.5,y1), (x1,y1)], endstyle='>')
+
+x0,y0 = C[6][0].left(); y0 -= 0.1
+x1,y1 = C[8][0].left(); y1 += 0.1
+p += Line(points=[(x0,y0), (x0-0.5,y0), (x0-0.5,y1), (x1,y1)], endstyle='>')
+
+
+x0,y0 = C[4][0].left(); y0 -= 0.1
+x1,y1 = C[7][0].left(); y1 += 0.1
+p += Line(points=[(x0,y0), (x0-1.5,y0), (x0-1.5,y1), (x1,y1)],
+          linecolor='blue', endstyle='>')
+
+x0,y0 = C[7][0].left(); y0 -= 0.1
+x1,y1 = C[9][0].left(); y1 += 0.1
+p += Line(points=[(x0,y0), (x0-1.5,y0), (x0-1.5,y1), (x1,y1)],
+          linecolor='blue', endstyle='>')
+
+
+print(p)
+\end{python}
+
+For delete, this is like search.
+When the key is found, we mark the row as \textsc{Deleted}.
+
+
+
+\begin{Verbatim}[frame=single]
+ALGORITHM: HASHTABLE-INSERT
+INPUT: hashtable of size n
+       hash - hash function
+       (key, value) - keyvalue pair to insert
+
+index = -1
+compute h = hash(key) % n
+while 1:
+    if hashtable[h].flag is DELETED:
+        index = h
+    else if hashtable[h].flag is AVAILABLE:
+        if index == -1:
+            index = h
+        put (key, value) at hashtable[h] and mark that
+        row as not available
+        return SUCCESS
+    else if hashtable[h].flag is NOT-AVAILABLE:
+        if hashtable[h].key == key:
+            return ERROR (i.e. key already exists)
+    
+    apply your probing method to compute the next h value
+    if h is a previous h value:
+        return ERROR
+\end{Verbatim}
+
+\begin{Verbatim}[frame=single]
+ALGORITHM: HASHTABLE-DELETE
+INPUT: hashtable of size n
+       key
+
+deleted = false
+compute h = hash(key) % n
+
+while 1:
+    
+    if hashtable[h].flag is NOT-AVAILABLE:
+        if hashtable[h].key is key:
+            hashtable[h].flag = DELETED
+            return SUCCESS
+    else if hashtable[h].flag is AVAILABLE:
+        return FAILURE (i.e. key is not found)
+
+    else:
+        do nothing
+
+    apply your probing method to compute the next h value
+    if h is a previous h value:
+        return FAILURE
+\end{Verbatim}
+
+
+\begin{console}
+ALGORITHM: HASHTABLE-FIND
+INPUT: hashtable of size n
+       key
+OUTPUT: index i where hashtable[h].key is key
+            -1 is returned is key is not found
+
+compute h = hash(key) % n
+
+while 1:
+
+    if hashtable[h].flag is AVAILABLE:
+        return -1 (i.e., key not found)
+
+    else if hashtable[h].flag is NOT-AVAILABLE:
+        if hashtable[h].key is key:
+            return h
+            
+    else:
+        do nothing
+        
+    apply your probing method to compute the next h value
+    if h is a previous h value:
+        return FAILURE
+\end{console}
+(Of course you can also have a find operation that returns a pointer
+to the relevant row in the table.)
+
+Note that there's since we are marking rows as \textsc{Deleted},
+a possible useful operation is to find a row that was deleted
+and undelete that row -- if it has not been already overwritten
+by an insert operation.
+
+\begin{ex}
+  In a hash table of size 8, insert the keys
+  $a$,$b$,$c$,$d$,$e$,$f$,$g$
+  assuming that they are hashed to
+  24,12,23,45,5,13,7 respectively.
+  Draw the table (leave the value column blank).
+  How many rows were read altogether?
+  Next delete c. How many rows were read to do this?
+  Insert $h$ assuming that $h$ is has a hash value of 19.
+  How many rows were
+  read?
+  For each key in the table,
+  write down the number of rows read to find
+  that key.
+  Which keys can be found with the least number of
+  rows read?
+  Which would require the most number of rows read?
+  Compute the average number of rows read for search of the keys in the table.
+  Rehash the table to another table of size 11.
+  Now compute the new
+  average number of rows read for search of the keys in the table.
+\end{ex}
+
+Use this table:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+C = RectContainer(x=1, y=1, direction='top-to-bottom', align='left')
+
+for a,b,c,d in [(0, '' , ''     , ''),
+                (1, '' , ''     , ''),
+                (2, '' , ''     , ''),
+                (3, '' , ''     , ''),
+                (4, '', ''  , ''),
+                (5, '', ''  , ''), 
+                (6, '', '', ''),
+                (7, ''      , '', ''),
+                ]:
+    h = 0.6
+    c0 = RectContainer(x=1, y=1)
+    c0 += Rect2(x0=0, y0=0, x1=0.8, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % a)
+    c0 += Rect2(x0=0, y0=0, x1=3.5, y1=h, linecolor='black',
+                linewidth=0.02,label=r'{\texttt{%s}}' % b)
+    c0 += Rect2(x0=0, y0=0, x1=3, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % c)
+    c0 += Rect2(x0=0, y0=0, x1=1.5, y1=h, 
+                linewidth=0.02,label=r'{\texttt{%s}}' % d)
+    c0.layout()
+    C += c0; c0.x = c0.x0; c0.y = c0.y0; c0.layout()
+
+C.layout()
+p += C
+
+print(p)
+\end{python}
+
+Here are the runtimes.
+In the following $n$ is the number of keys already in the table.
+Usually the keys is a fraction of the table size.
+So average space needed is $O(n)$.
+I will assume that the hash function is \lq\lq reasonable'', i.e.,
+the hash function (after modding by the size of the table)
+distributes keys uniformly.
+The following runtimes assumes no rehashing/resizing the table.
+\begin{enumerate}
+  \li Insert:
+  \begin{tightlist}
+    \li Worst runtime = $O(n)$
+    \li Best, average runtime = $O(1)$
+  \end{tightlist}
+  \li Delete:
+  \begin{tightlist}
+    \li Worst runtime = $O(n)$
+    \li Best, average runtime = $O(1)$
+  \end{tightlist}
+  \li Find:
+  \begin{tightlist}
+    \li Worst runtime = $O(n)$
+    \li Best, average runtime = $O(1)$
+  \end{tightlist}
+\end{enumerate}
+
+
+\newpage
+\section{Rehashing the table}
+
+When there are too many collisions, then either your hash table is
+too full or the hash function is bad.
+Assuming your hash function is fine, then it's time to expand your
+hash table.
+In other words, you need to have a larger array for the hash table.
+This of course implies that if you do want your hash table
+to be expandable, you have to put the table on the heap, i.e.,
+use a dynamic array.
+Another thing is that you now cannot hardcode the size to mod within
+your hash function. 
+
+Rehashing is of course easy.
+Just run through your hash table array and perform inserts into the new
+table.
+If you are using tombstones (see previous section), of course make
+sure that you do not include them when you insert into the new table.
+That's it.
+
+Note that rehashing is (obviously) time consuming if the old table
+has a large size.
+
+
+
+
+\newpage
+\section{Two types of hash tables}
+
+There are two types of hash tables.
+What I have talking about is called open address hash table.
+Later I'll talk about closed address hash tables.
+But to let you start writing some C++ code ASAP, 
+I'm going to delay explaining closed address hash tables.
+The API in the next section will apply to both open and closed
+address hash tables.
+
+
+
+
+\newpage
+\section{API}
+
+Like I said, it's not easy designing hash functions.
+Furthermore, different scenarios might require different hash functions
+even for the same type of values.
+For instance strings representing human names might
+require a hash function that is different from
+strings representing book titles.
+It might therefore be a good idea when designing a hash table 
+to have a class that allows you to specify specific hash functions.
+
+We of course want to insert, delete, search in our hashtable.
+In the following, \verb!h! is a hash table object.
+\begin{console}
+h.insert(key, value) Insert key-value into hash table. 
+                     Exception is thrown if key is 
+                     already in the hash table.
+h.erase(key)         Delete key-value from hash table of 
+                     given key.
+                     Exception is thrown if key is not 
+                     found.
+h[key]               Reference to value of given key.
+                     If not found exception is thrown.
+h.get(key, default)  Return value of given key. If not 
+                     found, default is returned.
+\end{console}
+So if \verb!height! is a hash table of name-height pairs,
+we can do this:
+\begin{console}
+height["Abe"] = 6.5;
+\end{console}
+Here are some auxiliary methods:
+\begin{console}
+h.clear()            Remove all keys.
+h.size()             Number of keys in the hash table.
+h.keys()             Returns an iterable list of keys.
+h.values()           Returns an iterable list of values.
+h.has_key(key)       Returns true if key is present.
+h.update(h1)         Update h with hash table h1.
+\end{console}
+
+
+For constructor, we want to allow users to specify initial size.
+If not specified, let's use a default that is stored as a static 
+in the class that can be modified. 
+Let's say the default is initially set to 97.
+
+
+
+
+\newpage
+\section{Implementation}
+
+Here's an abstract base class:
+{\small
+\begin{Verbatim}[frame=single]
+class Hashable
+{
+public:
+    virtual unsigned int hash(unsigned int) = 0;
+};
+\end{Verbatim}
+}
+This is just to impose a hash method on a subclass.
+So for instance you can do this:
+{\small
+\begin{Verbatim}[frame=single]
+class Name
+{
+public:
+    Name(const std::string & s)
+        : s_(s)
+    {}
+
+private:
+    std::string s_;
+};
+
+
+class HashableName: public Name, Hashable
+{
+public:
+    HashableName(const std::string & s)
+        : Name(s) 
+    {}
+    
+    unsigned int hash(unsigned int s)
+    {
+        unsigned int h = 0;
+        ... compute h using s_ ...
+        return h % s;
+    }
+};
+\end{Verbatim}
+}
+Here's the class for a row of key-value in the hash table:
+{\small
+\begin{Verbatim}[frame=single]
+template < typename Key, typename Value >
+class KeyValue
+{
+private:
+    Key key_;
+    Value value_;
+};
+\end{Verbatim}
+}
+and here's the class for a row in the hash table together with a 
+flag:
+{\small
+\begin{Verbatim}[frame=single]
+template < typename Key, typename Value >
+class HashtableRow
+{
+public:
+    enum State
+    { 
+        AVAILABLE, NOT_AVAILABLE, DELETED 
+    };
+private:
+    State state_;
+    KeyValue< Key, Value > keyvalue_;
+};
+\end{Verbatim}
+}
+And now we have the hash table:
+{\small
+\begin{Verbatim}[frame=single]
+template < typename Key, typename Value >
+class Hashtable
+{
+private:
+    unsigned int size_;
+    HashtableRow< Key, Value > * p_;
+};
+\end{Verbatim}
+}
+
+Note that the \verb!HashtableRow! class can be nested in the \verb!Hashtable!
+class.
+
+\begin{ex}
+Implement the above hash table class.
+Test it thoroughly.
+\qed
+\end{ex}
+
+
+\begin{ex}
+Read up on STL's \verb!pair!.
+\qed
+\end{ex}
+
+\begin{ex}
+Read up on STL's \verb!unordered_map!.
+\qed
+\end{ex}
+
+
+
+
+\newpage
+\section{Open and closed; separate chaining}
+
+Now that you know enough about a hash table using an array,
+like I said earlier. it's time to talk about another type of hash table.
+The above method is called \defone{open addressing}.
+Unfortunately, the above is also called \defone{closed hashing}.
+
+Now I'm going to talk about closed addressing which is sometimes called
+open hashing and sometimes called separate chaining.
+Let me put them together so that you can see everything:
+\begin{tightlist}
+\li \textsc{Method 1}: Open addressing, closed hashing
+\li \textsc{Method 2}: Closed addressing, open hashing, separate chaining.
+\end{tightlist}
+Obviously computer scientists should come up with better
+names.
+
+What I'm going to do now is to allow each bucket
+(a row in an array) to have the ability to hold more than one key.
+This is easy.
+What I'll do is that each row in the array is now replaced by 
+containers.
+You can choose any container.
+But the easiest is to use a linked list, say a singly linked list.
+
+\begin{python}
+from latextool_basic import *
+
+p = Plot()
+
+v = RectContainer(x=2, y=0, align='left', direction='top-to-bottom')
+for i in range(10):
+    r = Rect2(0, 0, 0.5, 0.5)
+    v += r
+
+v.layout()
+
+def node(x, y, key, value, null=True):
+    c0 = RectContainer(x=x, y=y)
+    c0 += Rect2(0, 0, 2, 0.5, label= r'\texttt{%s}' % key)
+    c0 += Rect2(0, 0, 1.5, 0.5, label= r'\texttt{%s}' % value)
+    c0 += Rect2(0, 0, 0.5, 0.5)
+    return c0
+
+for i in range(10):
+    if i == 4:
+        center = v[i].center()
+        (x0, y0) = center
+        (x1, y1) = (center[0] + 1, center[1] + 0.025)
+        n = node(x1, y1, "Tom", 5.5)
+        p += n
+        x1, y1 = n.left()
+        p += Line(x0=x0, y0=y0, x1=x1, y1=y1, linewidth=0.05, startstyle='dot', endstyle='>')
+        x0, y0 = n[2].topleft()
+        x1, y1 = n[2].bottomright()
+        p += Line(x0, y0, x1, y1)
+        x0, y0 = n[2].topright()
+        x1, y1 = n[2].bottomleft()
+        p += Line(x0, y0, x1, y1)
+    elif i == 5:
+        center = v[i].center()
+        (x0, y0) = center
+        (x1, y1) = (center[0] + 1, center[1] - 0.5)
+        n = node(x1, y1, "Abe", 6.5)
+        p += n
+
+        (x0, y0) = center
+        x1, y1 = n.left()
+        p += Line(x0=x0, y0=y0, x1=x1, y1=y1, linewidth=0.05, startstyle='dot', endstyle='>')
+
+        # node for annie
+        x1, y1 = n[2].bottomleft()        
+        n1 = node(x1 + 1.5, y1, "Annie", 5.9)
+        p += n1
+        # null pointer for n1
+        x0, y0 = n1[2].topleft()
+        x1, y1 = n1[2].bottomright()
+        p += Line(x0, y0, x1, y1, linewidth=0.05)
+        x0, y0 = n1[2].topright()
+        x1, y1 = n1[2].bottomleft()
+        p += Line(x0, y0, x1, y1, linewidth=0.05)
+        # next pointer arrow
+        x0, y0 = n[2].center()
+        x1, y1 = n1[0].left()
+        p += Line(x0, y0, x1, y1, linewidth=0.05, startstyle='dot', endstyle='>')
+    else:
+        topleft = v[i].topleft()
+        bottomright = v[i].bottomright()
+        (x0, y0) = topleft
+        (x1, y1) = bottomright
+        p += Line(x0=x0, y0=y0, x1=x1, y1=y1, linewidth=0.05)
+        topright = v[i].topright()
+        bottomleft = v[i].bottomleft()
+        (x0, y0) = topright
+        (x1, y1) = bottomleft
+        p += Line(x0=x0, y0=y0, x1=x1, y1=y1, linewidth=0.05)
+
+p += v
+print(p)
+\end{python}
+In the above diagram, the array is an array of pointers to singly linked list nodes
+or \verb!NULL!.
+Of course you can have linked list objects in the array, 
+whether the linked list object contain pointers or sentinel nodes.
+The linked lists are called chains.
+
+You can think of the above as 10 buckets.
+Most of the buckets have no keys.
+The bucket at index 4 has one key
+and the bucket at index 5 has two keys.
+
+Inserts, deletes, and search are obvious and easy.
+
+Clearly the worse case is measured by the length of the longest singly
+linked list in the hash table structure.
+
+When there are many linked lists of long lengths,
+of course you can rehash with a largest array.
+
+Besides using linked list, you can of course use balanced trees or even
+hash tables at each bucket.
+
+
+
+\newpage
+\section{Load factor}
+
+The \defone{load factor} of a hash table, usually denoted $\alpha$, 
+is defined to be
+\[
+\alpha = \frac{n}{m}
+\]
+where $n$ is the number of keys in the table and $m$ is the number of buckets.
+On the average, the runtime for insert, delete, search is
+\[
+1 + \alpha
+\]
+where the 1 is due to the constant time to compute the hash and accessing the array.
+All of this assume that the hash function more or less is well behaved and spread
+the keys uniformly.
+If the load factor is maintained at a constant value, this means
+that the runtimes are $O(1)$ on the average.
+
+In the \textit{worse} case 
+insert, delete and search becomes $O(n)$.
+For instance if all the keys congregate at one hash value and the 
+key you're search for is the last in the chain or last in the probe sequence,
+the runtime will be $O(n)$.
+The same reasoning applies to the case of delete and insert.
+
+In general, a hash table usually has a minimum load factor threshold
+$\alpha_{\operatorname{min}}$ (example: $0.25$)
+and a maximum load factor threshold
+$\alpha_{\operatorname{max}}$ (example: $0.75$)
+and the hash table maintain some statistics on the load factor.
+When the load factor $\alpha$ goes beyond the maximum threshold, 
+the hash table increases the table size and rehash.
+If the load factor drops below the minimum threshold, the hash table
+decreases the table size and rehash.
+
+The space requirement is $O(n)$ since 
+a good hash table requires the $\alpha$ be a reasonable
+proportion of $n$, for instance $4n$ to maintain a $0.25$ load factor.
+
+
+
+\newpage
+\section{C++ STL unordered map}
+
+The C++ STL contains the \verb!unordered_map! class template
+which is a hashtable.
+You will need to compile your code with at least C++11:
+\begin{console}
+g++ *.cpp -std=c++11
+\end{console}
+\verb!unordered_map! uses open hashing (separate chaining), i.e., 
+i.e., it's an array of linked list of key-value pairs.
+The class:
+\begin{console}
+std::unordered_map< X, Y >
+\end{console}
+assumes that type (or class) \verb!X! has
+\verb!operator==()!
+(for the obvious reason).
+Also, each (key, value) pair in the hashtable
+is a \verb!std::pair< X, Y >! object
+(you can think of such an object as a 2-tuple).
+If \verb!pair! is a
+\verb!std::pair< X, Y >! value,
+then the first value is \verb!pair.first! has type \verb!X!
+and the second value is \verb!pair.second! of type \verb!Y!.
+
+To add a key-value pair $(k,v)$ into a
+\verb!std::unordered_map< X, Y >! object \verb!h!, you do either
+\begin{console}
+h.insert({k, v}); // check if error
+\end{console}
+or
+\begin{console}
+h[k] = v;
+\end{console}
+Both methods in the above work in the same way if \verb!k! is not in \verb!h!.
+If \verb!k! is in \verb!h!, then
+\verb!h.insert({k, v})! will give you an exception
+while
+\verb!h[k] = v! will update the value of \verb!k! with \verb!v!.
+
+\verb!h.find(k)! will return an iterator.
+The iterator will equal \verb!h.end()! if \verb!k! is not found.
+Otherwise it will point to the
+\verb!std::pair! object with the given key (as first value).
+\begin{console}
+auto p = h.find(k);
+std::cout << (p == h.end() ? "not found\n" : "found\n");  
+\end{console}
+
+As mentioned above C++ unordered map is implemented using open address hashtable,
+i.e., it's an array of linked list of key-value pairs.
+Each linked list is also called a bucket.
+Besides that, the (key, value) pairs on in buckets
+where each bucket has a linked list of (key, value) pairs.
+If \verb!h! is an unordered map,
+then \verb!h.bucket(k)! is \verb!i! where
+\verb!k! is found in the \verb!i!--th bucket
+where \verb!i! = 0, ..., \verb!h.bucket_count() - 1!.
+You can get an iterator to run through a bucket (not the whole hashtable).
+The following prints all the key-value pairs in bucket $i$:
+\begin{console}
+for (typename T::const_local_iterator p = h.begin(i);
+     p != h.end(i); ++p)
+{
+    std::cout << p->first << ": " << p->second << "  ";
+}
+\end{console}
+
+You also have iterators that runs through all the buckets, i.e., the whole hashtable:
+\begin{console}[fontsize=\footnotesize]
+for (typename std::unordered_map< X, Y >::const_iterator p = h.begin();
+     p != h.end(); ++p)
+{
+    std::cout << p->first << ": " << p->second << "  ";
+}
+\end{console}
+
+Study the following program carefully.
+
+\begin{python}
+s = r'''
+#include <iostream>
+#include <string>
+#include <unordered_map>
+
+// Height is hashtable with key = std::string, value = double
+typedef std::unordered_map<std::string, double> Height;
+
+template < typename T >
+void print(const T & h)
+{
+    std::cout << "(key, value) pairs in h ...\n"; // iterating
+                                     // over all entries
+    for (typename T::const_iterator p = h.begin();
+         p != h.end(); ++p)
+    {
+        std::cout << p->first << ": " << p->second
+                  << " ... "
+                  << '\n';
+    }
+}
+
+template < typename T >
+void print_buckets(const T & h)
+{
+    std::cout << "(key, value) pairs in buckets of h ..."; 
+    for (unsigned int i = 0; i < h.bucket_count(); ++i)
+                                     // iterating over all
+                                     // buckets
+    {
+        std::cout << "bucket " << i << ": ";
+        for (typename T::const_local_iterator p = h.begin(i);
+             p != h.end(i); ++p)
+        {
+            std::cout << '['
+                      << p->first << ": " << p->second
+                      << "] ";
+        }
+        std::cout << '\n';
+    }
+}
+  
+void print_stats(Height & h)
+{
+    std::cout << "size/buckets/load factor/max load factor:"
+              << h.size() << '/'
+              << h.bucket_count() << '/'
+              << h.load_factor() << '/'
+              << h.max_load_factor() << '\n';
+}
+
+int main()
+{
+    Height h;
+    h.insert({"John", 5.7});         // insert operation
+    h.insert({"Tom", 5.8});
+    h["Mary"] = 5.9;
+    h["Sue"] = 6.0;
+    h["Jane"] = 6.1;
+    h["Priscilla"] = 6.1;
+    h["Sheila"] = 6.1;
+    h["Ashley"] = 6.1;
+    
+    h.erase("Tom");                  // delete operation
+    
+    std::cout << h["John"] << '\n';  // find key and get value
+    h["John"] = 6.2;                 // update by key with new
+                                     // value
+    std::cout << h["John"] << '\n';
+    
+    Height::iterator p = h.find("Mary"); // find by key and
+                                     // get iterator
+    std::cout << (p != h.end() ? "found" : "not found")
+              << '\n';
+    print(h);
+    print_buckets(h);
+    print_stats(h);
+
+    std::cout << "increase size to 641 ...\n"; // changing the
+                                     // size
+    h.reserve(641);
+    print_stats(h);
+
+    std::cout << "clear ...\n";           
+    h.clear();                       // clear the map
+    print_stats(h);
+
+    std::cout << "constructor with size 1000...\n";
+    Height h1(1000);                 // reserve size of
+                                     // approx 1000
+    print_stats(h);
+    
+    return 0;
+}
+'''.strip()
+f = open('main23.cpp', 'w')
+f.write(s)
+f.close()
+from latextool_basic import *
+os.system('g++ main23.cpp -std=c++11')
+os.system('./a.out > out23.txt')
+\end{python}
+\vspace{-0.1cm}
+{\small
+\VerbatimInput[frame=single]{main23.cpp}
+\VerbatimInput[frame=single]{out23.txt}
+}
+
+For convenience, I'm going to put some of the above code
+into \verb!Height.h!:
+
+\begin{python}
+s = r'''#ifndef HEIGHT_H
+#define HEIGHT_H
+
+#include <iostream>
+#include <string>
+#include <unordered_map>
+
+template < typename T >
+void print(const T & h)
+{
+    std::cout << "(key, value) pairs in h ...\n"; // iterating
+                                     // over all entries
+    for (typename T::const_iterator p = h.begin();
+         p != h.end(); ++p)
+    {
+        std::cout << p->first << ": " << p->second
+                  << " ... "
+                  << '\n';
+    }
+}
+
+template < typename T >
+void print_buckets(T & h)
+{
+    std::cout << "(key, value) pairs in buckets of h ...\n"; 
+    for (unsigned int i = 0; i < h.bucket_count(); ++i)
+                                     // iterating over all
+                                     // buckets
+    {
+        std::cout << "bucket " << i << ": ";
+        for (typename T::const_local_iterator p = h.begin(i);
+             p != h.end(i); ++p)
+        {
+            std::cout << '['
+                      << p->first << ": " << p->second
+                      << "] ";
+        }
+        std::cout << '\n';
+    }
+}
+
+template < typename T >
+void print_stats(const T & h)
+{
+    std::cout << "size/buckets/load factor/max load factor:"
+              << h.size() << '/'
+              << h.bucket_count() << '/'
+              << h.load_factor() << '/'
+              << h.max_load_factor() << '\n';
+}
+
+#endif
+
+'''
+f = open('Height.h', 'w')
+f.write(s)
+f.close()
+\end{python}
+\vspace{-0.1cm}
+{\small
+\VerbatimInput[frame=single]{Height.h}
+}
+
+Note that the \verb!reserve()! method (to change the number of
+bucket) asks for 641 buckets, but you might get a number $\geq 641$.
+
+
+
+
+
+
+{\footnotesize
+\begin{tabular}{|p{0.4\textwidth}|p{0.55\textwidth}|}
+  \hline
+  xxx  & yyy
+  \\
+  \hline \hline
+  \texttt{std::unordered\_map< K, V > h} & \texttt{h} is a hashtable of \texttt{std::pair< K, V >} \\ \hline 
+  \texttt{h.reserve(n)}                &                                                           \\ \hline 
+  \texttt{h.insert(\{k, v\})}          & Add \texttt{(k, v)} to \texttt{h}. If \verb!k! is already in \verb!h!, \verb!h! is not changed. \\ \hline
+  \texttt{h[k]} = v                    & If \verb!k! is in \verb!h!, its value is changed to \verb!v!. If \verb!k! is not found, \verb!(k,v)! is inserted. \\ \hline
+  \texttt{h.erase(k)}                  & Remove \verb!k! from \verb!h!.                            \\ \hline
+  \texttt{h.begin()}                   &                                                           \\ \hline
+  \texttt{h.end()}                     &                                                           \\ \hline
+  \texttt{h.find(k)}                   & Return \texttt{std::unordered\_map< X, Y >::iterator} \\ \hline
+  \texttt{h.bucket\_count()}           &                                                           \\ \hline
+  \texttt{h.bucket(i)}                 &                                                           \\ \hline
+  \texttt{h.begin(i)}                  &                                                           \\ \hline
+
+  \texttt{h.end(i)}                    &                                                           \\ \hline
+  \texttt{h.size()}                    & Number of key-value pairs in \verb!h!                     \\ \hline
+  \texttt{h.load\_factor()}            &                                                           \\ \hline
+  \texttt{h.max\_load\_factor()}       &                                                           \\ \hline
+\end{tabular}
+}
+
+\subsection{Hash function}
+
+Note that in the above examples, when we use \verb!std::unordered_map!,
+we don't have to say how to hash the keys.
+That's because \verb!std::unordered_map! use the built-in
+\verb!std::hash!.
+Go ahead and run this:
+\begin{python}
+s = r'''
+#include <iostream>
+#include <string>
+#include <functional> // for std::hash
+
+int main()
+{
+    std::hash< int > h0;
+    std::cout << "hash of\n";
+    std::cout << "42: " << h0(42) << '\n';
+    // or
+    std::cout << "42: " << std::hash< int >()(42) << '\n';
+
+    std::cout << "-1: " << std::hash< int >()(-1) << '\n'
+              << "3.14: " << std::hash< double >()(3.14) << '\n'
+              << "0.0: " << std::hash< double >()(2.0) << '\n'   
+              << "'a': " << std::hash< char >()('a') << '\n'
+              << "true: " << std::hash< bool >()(true) << '\n'
+              << "\"hello world\": "
+              << std::hash< std::string >()("hello world") << '\n';
+    return 0;
+}
+'''.strip()
+f = open('main.cpp', 'w'); f.write(s); f.close()
+#import os
+#os.system('rm stdout.txt; g++ main.cpp; ./a.out > stdout.txt')
+\end{python}
+{\small
+\VerbatimInput[frame=single]{main.cpp}
+}
+\begin{python}
+from latextool_basic import *
+print('{\small %s}' % shell('g++ main.cpp; ./a.out'))
+\end{python}
+The return value of \verb!std::hash! is a \verb!size_t! value,
+which is like an unsigned integer value
+that is usually takes up 32 or 64 bits.
+
+For \verb!int! and \verb!unsigned int! variable
+\verb!x!, note that \verb!std::hash(x)!
+is the same as \verb!(size_t)(x)!.
+For \verb!bool! and \verb!char! values, they are typecasted to
+\verb!size_t! values.
+For double and string
+So \verb!std::hash! knows how to has values of
+the following types:
+\verb!int!, \verb!double!, \verb!char!, \verb!std::string!.
+But what if you want to hash values of other types?
+
+You can define your own hash function for
+\verb!X! values where \verb!X! is the first
+type (the key type) of the unordered map.
+There are several ways to do this.
+
+\textsc{Method 1.}
+One way is to create a class or struct where objects are function
+objects (i.e., they have \verb!operator()!) that
+returns an \verb!size_t! or unsigned int when given a value of type \verb!X!.
+You then include this class as the third type parameter
+for \verb!unordered_map!:
+
+\begin{python}
+s = r'''
+#include <iostream>
+#include <string>
+#include <unordered_map>
+#include "Height.h"
+
+class Hash // or use a struct
+{
+public:
+    unsigned int operator()(const std::string & s) const
+    {
+        return 3; // a very bad hash function
+    }
+};
+
+typedef std::unordered_map<std::string, double, Hash> Height;
+
+int main()
+{
+    Height h;
+    h.insert({"John", 5.7});
+    h.insert({"Tom", 5.8});
+    h["Mary"] = 5.9;
+    h["Sue"] = 6.0;
+
+    print(h);
+    print_buckets(h);
+    print_stats(h);
+              
+    return 0;
+}
+'''.strip()
+f = open('main.cpp', 'w')
+f.write(s)
+f.close()
+from latextool_basic import *
+import os
+os.system('rm a.out; rm out.txt; g++ main.cpp -std=c++11; ./a.out > out.txt')
+\end{python}
+\vspace{-0.1cm}
+{\small
+\VerbatimInput[frame=single]{main.cpp}
+\VerbatimInput[frame=single]{out.txt}
+}
+
+\textsc{Method 2.}
+Here's a second method to create a hash function to be used
+by \verb!unordered_map!.
+This method is not as flexible as the above method
+and can only be used when the hashing is performed
+on a class that is not yet defined.
+Suppose you have a class \verb!vec2d!
+where \verb!operator==! is defined.
+Each \verb!vec2d! has two \verb!double! members
+that can be accessed by public methods
+\verb!vec2d::x()! and
+\verb!vec2d::y()!
+Note that \verb!std::hash< double >! is already defined.
+Basically I want to create a hash function on \verb!vec2d! objects
+using \verb!std::hash< double >!.
+
+I can do this:
+\begin{python}
+s = r'''
+#include <iostream>
+#include <functional> // for std::hash
+#include <unordered_map>
+#include "vec2d.h"
+
+template <>
+struct std::hash< vec2d >
+{
+    size_t operator()(const vec2d & v) const
+    {
+        return std::hash< double >{}(v.x() + v.y()) ; // bad hash!
+    };
+};
+
+typedef std::unordered_map< vec2d, double > temperature;
+
+int main()
+{
+    temperature h;
+    h[vec2d(1.1, 2.2)] = 5.9;
+    return 0;
+}
+'''.strip()
+f = open('main.cpp', 'w')
+f.write(s)
+f.close()
+from latextool_basic import *
+\end{python}
+\vspace{-0.1cm}
+{\small
+\VerbatimInput[frame=single]{main.cpp}
+}
+In this case, note that the class
+\verb!std::unordered_map< vec2d, double >!
+does not require us to include the hash.
+That's because we have extended \verb!std::hash!
+to be able to handle \verb!vec2d! objects,
+which is used by default.
+
+Note that this method is not as flexible as the first method.
+This is because you cannot, for instance, have two different
+\verb!std::hash< std::string >!.
+
+
+\subsection{Size}
+
+Now I'm going to resize to a smaller size:
+
+\begin{python}
+s = r'''
+#include <iostream>
+#include <string>
+#include <unordered_map>
+#include "Height.h"
+
+class Hash // or use a struct
+{
+public:
+    unsigned int operator()(const std::string & s) const
+    {
+        return 3; // a very bad hash function
+    }
+};
+
+typedef std::unordered_map<std::string, double, Hash> Height;
+
+int main()
+{
+    Height h;
+    h.insert({"John", 5.7});
+    h.insert({"Tom", 5.8});
+    h["Mary"] = 5.9;
+    h["Sue"] = 6.0;
+    h.reserve(4);
+    print(h);
+    print_buckets(h);
+    print_stats(h);
+              
+    return 0;
+}
+'''.strip()
+f = open('main.cpp', 'w')
+f.write(s)
+f.close()
+from latextool_basic import *
+import os
+os.system('rm a.out; rm out.txt; g++ main.cpp -std=c++11; ./a.out > out.txt')
+\end{python}
+\vspace{-0.1cm}
+{\small
+\VerbatimInput[frame=single]{main.cpp}
+\VerbatimInput[frame=single]{out.txt}
+}
+
+
+
+\subsection{Rehash}
+
+Now I'm going to rehash with a new bucket size $n$.
+The actually bucket size is $\geq n$ (i.e., it might not be exactly $n$).
+Note that when the load factor is $>$ the max load factor, the hash table
+will automatically rehash.
+
+\begin{python}
+s = r'''
+#include <iostream>
+#include <string>
+#include <unordered_map>
+#include "Height.h"
+
+typedef std::unordered_map<std::string, double> Height;
+
+int main()
+{
+    Height h;
+    h.insert({"John", 5.7});
+    h.insert({"Tom", 5.8});
+    h["Mary"] = 5.9;
+    h["Sue"] = 6.0;
+
+    print_buckets(h);
+    print_stats(h);
+
+    std::cout << "rehash with suggested bucket size 5\n";
+    h.rehash(5);
+    print_buckets(h);
+    print_stats(h);
+    
+    return 0;
+}
+'''.strip()
+f = open('main.cpp', 'w')
+f.write(s)
+f.close()
+from latextool_basic import *
+import os
+os.system('rm a.out; rm out.txt; g++ main.cpp -std=c++11; ./a.out > out.txt')
+\end{python}
+\vspace{-0.1cm}
+{\small
+\VerbatimInput[frame=single]{main.cpp}
+\VerbatimInput[frame=single]{out.txt}
+}
+
+\begin{ex}
+  The \verb!unordered_map! requires you to use the
+  \verb!first! and \verb!second! members of the
+  \verb!std::pair! class.
+  Write a class \verb!HashTable<X, Y>! that has
+  methods \verb!key()! and \verb!value()!.
+\end{ex}
+
+
+\begin{ex}
+Download a huge text file (example: a large book from \verb!gutenberg.net!)
+and compute the frequently of each letter in the file.
+When you're done with that, do the same for word frequency.
+Frequency counts like these occur in many areas such as
+cryptography, text analysis/mining, computational linguistics, etc.
+\end{ex}
+
+
+\begin{ex}
+We have already talked about the concept of sparse matrices and
+an implementation using linked lists.
+Another way to implement sparse matrices is to store
+((r, c), v) in a hashtable
+where at row r and column c (the key is (r, c)), the value is v.
+Implement a sparse matrix class using hashtables.
+\end{ex}
+
+
+\begin{ex}
+  Suppose you are given a collection $X$ of $n$
+  integers, say stored as a linked
+  list.
+  If given you a number $x$, how fast can you find all $a$ and $b$ in the $X$
+  such that $a + b = x$?
+  (Obviously this can be done in $O(n^2)$ -- that's not what I'm looking for.)
+\end{ex}
+
+% For each $x in X$, check if $k - x$ is in hashtable.
+
+\begin{ex} [Computing a space efficient hash function]
+  There are times when the set of keys are fixed.
+  Say there are 16 keys.
+  If you use a hashtable, you might need a size (number of buckets)
+  much larger than 16 to avoid collision.
+  Add a method to your Hashtable class called \verb!compactify!
+  that uses the default hash function followed by the unsigned int
+  multiplication of \verb!m! such that
+  the resulting hash mod size of table gives you
+  values 0, 1, 2, 3, ..., 15 which implies that
+  you only need a hashtable of size 16.
+  If 0, 1, 2, 3, ..., 15 is impossible, since a range that that is the
+  smallest possible.
+  (See exercise below as well.)
+\end{ex}
+
+
+\begin{ex}
+The assembly language code generated by a compiler sometimes will use
+hashing for switch cases when there is a large collection of
+case labels which contiguous values.
+The following is similar.
+Write a \verb!SwitchCase! class that allows you to add
+$(c, f)$ where $c$ is a switch case label (an integer) and
+$f$ is a function object that takes an integer for
+function call.
+\begin{console}
+class Function
+{
+public:
+    Function(int i) : i_(i) {}
+    int operator(int x) { std::cout << i_ + x << '\n'; }
+};
+
+int main()
+{
+    SwitchCase machine;
+    Function f(42);
+    Function g(43);
+    Function h(647);
+    
+    machine.add(1, f);
+    machine.add(6, g);
+    machine.add(1001, h);
+
+    machine(6, 1000); // Executes g(1000) which prints 1043
+    
+    return 0;
+}
+\end{console}
+\end{ex}
+  
+Note that hashtables are not good at range searches, i.e.,
+if you need a collection of iterations to entries with key
+values in a range, then a hashtable is the wrong data structure.
+
+\newpage\myinput{sha.tex}
