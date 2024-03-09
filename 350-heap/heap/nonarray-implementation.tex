@@ -1,37 +1,15 @@
 %-*-latex-*-
-\section{Implementation}
+\sectionthree{Implementation}
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
 
 Frequently heaps are implemented using arrays,
 i.e., they are array trees.
 
-\newpage
-\begin{ex}
-  Johnny is writing
-  a scheduler for his game
-  and wanted to use a balanced binary search tree (AVL)
-  to handle jobs with priority
-  (collision computation, collisiion resolution, shadow computation,
-  drawing, sound, etc.) with
-  instead of heaps.
-  What are the advantages and disadvantages?
-  Compare and contrast.
-  \qed
-\end{ex}
+\input{exercises/nonarray-implementation-0/main.tex}
 
-\newpage
-\begin{ex}
-  Analyze and implement a FIFOMinHeap.
-  This is a minheap that is FIFO on values with the
-  same priority.
-  In other words, if two values
-  of the same priority
-  are inserted into a minheap,
-  then value inserted earlier will be
-  removed before the other value.
-  (There are at least two different ways of doing
-  the above.)
-\end{ex}
-
+\input{exercises/nonarray-implementation-1/main.tex}
 
 There are 2 ways of doing the above.
 
@@ -66,43 +44,8 @@ Therefore during the extract-root operation,
 need to loop over the extract-root operation until
 the new root is a non-empty linked list.
 
-\begin{ex}
-Write a class \texttt{MaxHeap} that works like this:
-\begin{console}
-int x;
-MaxHeap< int > heap;
-x = heap.size();       // x = 0 
-heap.insert(5);        // [5]
-heap.insert(7);        // [7, 5]
-heap.insert(9);        // [9, 5, 7]
-x = heap.size();       // x = 3
-std::cout << heap;     // Prints "[9, 5, 7]".
+\input{exercises/nonarray-implementation-2/main.tex}
 
-int a = heap.delete(); // [7, 5], deleting at index 0
-                       // a = 9
-x = heap.max();        // x = 9. The root is not deleted.
-
-heap[0] = 1;           // [1, 5], heap is also like a
-                       // std::vector.
-heap.heapify_down(0);  // [5, 1]
-
-heap[1] := 10;         // [5, 10]
-heap.heapify_up(1);    // [10, 5]
-
-heap.resize(5);
-heap[0] = 5;
-heap[1] = 7;
-heap[2] = 8;
-heap[3] = 10;
-heap[4] = 2;
-std::cout << heap;     // Prints "[5, 7, 8, 10, 2]".
-heap.build();          // build-max-heap with 5 values
-                       // already in the heap.
-std::cout << heap;     // Prints "[10, 7, 8, 5, 2]".
-
-heap.clear();          // []
-\end{console}
-\end{ex}
 Clearly the following must work: copy constructor, destructor,
 \verb!operator=!, \verb!operator==!.
 The class should look like this:
@@ -116,90 +59,14 @@ private:
 };
 \end{console}
 
-
-
-\newpage
-\begin{ex}
-  It's common to implement a heap by using arrays and implement the
-  ADT using functions instead of using a class with methods.
-  For instance this would be allow one to implement heapsort easily
-  to sort an array directly.
-  Implement the heap ADT described below where an a vector is used
-  to represent the heap.
-\begin{console}
-int x;
-std::vector< int > heap;
-
-maxheap_insert(heap, 5);   // [5]
-maxheap_insert(heap, 7);   // [7, 5]
-maxheap_insert(heap, 9);   // [9, 5, 7]
-
-int a = maxheap_delete(heap); // [7, 5]
-                           // a = 9
-x = maxheap_max(heap);     // x = 9. Root is not deleted.
-
-heap[0] = 1;               // [1, 5]
-maxheap_heapify_down(heap, 0); // [5, 1]
-
-heap[1] = 10;              // [5, 10]
-maxheap_heapify_up(heap, 1); // [10, 5]
-
-heap.resize(5);
-heap[0] = 5;
-heap[1] = 7;
-heap[2] = 8;
-heap[3] = 10;
-heap[4] = 2;
-maxheap_build(heap);       // [10, 7, 8, 5, 2]
-
-heap.resize(5);
-heap[0] = 2;
-heap[1] = 6;
-heap[2] = 8;
-heap[3] = 10;
-heap[4] = 5;
-maxheap_heapsort(heap)     // [2, 5, 6, 8, 10]
-\end{console}
-The functions above should be function templates.
-\qed
-\end{ex}
-
+\input{exercises/nonarray-implementation-3/main.tex}
 
 \section{Non-array implementation}
 
 For a non-array implementation of heaps,
 consider this:
 
-\begin{python}
-from latextool_basic import *
-print(r"""
-\begin{center}
-%s
-\end{center}
-""" % graph(yscale=1, xscale=1,
-layout="""
-        A 
-    B       C 
-  D   E   F   G
- H I J K L M 
-""",
-minimum_size='8mm',
-edges='A-B,A-C,B-D,B-E,C-G,C-F,D-H,D-I,E-J,E-K,F-L,F-M',
-A=r'label=\texttt{34}',
-B=r'label=\texttt{28}',
-C=r'label=\texttt{16}',
-D=r'label=\texttt{23}',
-E=r'label=\texttt{25}',
-F=r'label=\texttt{13}',
-G=r'label=\texttt{7}',
-H=r'label=\texttt{10}',
-I=r'label=\texttt{8}',
-J=r'label=\texttt{24}',
-K=r'label=\texttt{14}',
-L=r'label=\texttt{3}',
-M=r'label=\texttt{9}',
-))
-\end{python}
+\input{stdout103.tex}
 
 Of course I need a pointer to the root.
 That's pretty obvious.
@@ -207,16 +74,7 @@ Another thing to note is that because of the way I add nodes,
 i.e., always at the lowest level and left-to-right, I should have a pointer
 to the parent where I have a new node.
 
-
-
-
-\begin{ex}
-  Write a function that takes the pointer-to-root of a
-  max heap (or more generally a complete binary
-  tree) and returns the pointer to the node that will be the parent
-  of the next insert.
-  \qed
-\end{ex}
+\input{exercises/nonarray-implementation-4/main.tex}
 
 However that takes $(\log n)$ time.
 So we might as well have a pointer that records where the
@@ -226,49 +84,7 @@ Once a level is full, we need to go to the next level.
 Therefore we need two (and not one) extra pointer.
 Like this:
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-h = graph2(yscale=1, xscale=1,
-layout="""
-        A 
-    B       C 
-  D   E   F   G
- H I J K L M N
-""",
-minimum_size='8mm',
-edges='A-B,A-C,B-D,B-E,C-G,C-F,D-H,D-I,E-J,E-K,F-L,F-M,G-N',
-A=r'label=\texttt{34}',
-B=r'label=\texttt{28}',
-C=r'label=\texttt{16}',
-D=r'label=\texttt{23}',
-E=r'label=\texttt{25}',
-F=r'label=\texttt{13}',
-G=r'label=\texttt{7}',
-H=r'label=\texttt{10}',
-I=r'label=\texttt{8}',
-J=r'label=\texttt{24}',
-K=r'label=\texttt{14}',
-L=r'label=\texttt{3}',
-M=r'label=\texttt{9}',
-N=r'label=\texttt{5}',
-)
-p += h
-
-p += r'\node (proot) at (7,0.5) {\texttt{proot}} ;'
-p += r'\path [-triangle 60] (proot) edge[] (A);'
-
-p += r'\node (p0) at (1,-4.5) {\texttt{p0}} ;'
-p += r'\path [-triangle 60] (p0) edge[] (D);'
-
-p += r'\node (p1) at (13,-4.5) {\texttt{p1}} ;'
-p += r'\path [-triangle 60] (p1) edge[] (G);'
-
-p += r'\node (p) at (13,-1.5) {\texttt{p}} ;'
-p += r'\path [-triangle 60] (p) edge[] (G);'
-
-print(p)
-\end{python}
+\input{stdout104.tex}
 
 Note that each node has not just left child and right child pointer.
 When we do delete, we might need to go to the previous level.
@@ -277,151 +93,15 @@ Of course the parent pointer is also needed when I do heapify-up, right?
 
 If I insert \texttt{4} to the above, then I get this:
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-h = graph2(yscale=1, xscale=1,
-layout="""
-        A 
-    B       C 
-  D   E   F   G
- H I J K L M N O
-""",
-minimum_size='8mm',
-edges='A-B,A-C,B-D,B-E,C-G,C-F,D-H,D-I,E-J,E-K,F-L,F-M,G-N,G-O',
-A=r'label=\texttt{34}',
-B=r'label=\texttt{28}',
-C=r'label=\texttt{16}',
-D=r'label=\texttt{23}',
-E=r'label=\texttt{25}',
-F=r'label=\texttt{13}',
-G=r'label=\texttt{7}',
-H=r'label=\texttt{10}',
-I=r'label=\texttt{8}',
-J=r'label=\texttt{24}',
-K=r'label=\texttt{14}',
-L=r'label=\texttt{3}',
-M=r'label=\texttt{9}',
-N=r'label=\texttt{5}',
-O=r'label=\texttt{4}',
-)
-p += h
-
-p += r'\node (proot) at (7,0.5) {\texttt{proot}} ;'
-p += r'\path [-triangle 60] (proot) edge[] (A);'
-
-p += r'\node (p0) at (0,-5.5) {\texttt{p0}} ;'
-p += r'\path [-triangle 60] (p0) edge[] (H);'
-
-p += r'\node (p1) at (14,-5.5) {\texttt{p1}} ;'
-p += r'\path [-triangle 60] (p1) edge[] (O);'
-
-p += r'\node (p) at (0,-2.5) {\texttt{p}} ;'
-p += r'\path [-triangle 60] (p) edge[] (H);'
-
-print(p)
-\end{python}
+\input{stdout105.tex}
 
 If I add \texttt{8}, I get this:
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-h = graph2(yscale=1, xscale=1,
-layout="""
-        A 
-    B       C 
-  D   E   F   G
- H I J K L M N O
-P
-""",
-minimum_size='8mm',
-edges='A-B,A-C,B-D,B-E,C-G,C-F,D-H,D-I,E-J,E-K,F-L,F-M,G-N,G-O,H-P',
-A=r'label=\texttt{34}',
-B=r'label=\texttt{28}',
-C=r'label=\texttt{16}',
-D=r'label=\texttt{23}',
-E=r'label=\texttt{25}',
-F=r'label=\texttt{13}',
-G=r'label=\texttt{7}',
-H=r'label=\texttt{10}',
-I=r'label=\texttt{8}',
-J=r'label=\texttt{24}',
-K=r'label=\texttt{14}',
-L=r'label=\texttt{3}',
-M=r'label=\texttt{9}',
-N=r'label=\texttt{5}',
-O=r'label=\texttt{4}',
-P=r'label=\texttt{8}',
-)
-p += h
-
-p += r'\node (proot) at (8,0.5) {\texttt{proot}} ;'
-p += r'\path [-triangle 60] (proot) edge[] (A);'
-
-p += r'\node (p0) at (1,-5.5) {\texttt{p0}} ;'
-p += r'\path [-triangle 60] (p0) edge[] (H);'
-
-p += r'\node (p1) at (15,-5.5) {\texttt{p1}} ;'
-p += r'\path [-triangle 60] (p1) edge[] (O);'
-
-p += r'\node (p) at (1,-2.5) {\texttt{p}} ;'
-p += r'\path [-triangle 60] (p) edge[] (H);'
-
-print(p)
-\end{python}
+\input{stdout106.tex}
 
 Once I add a \texttt{9}, I get this:
 
-
-\begin{python}
-from latextool_basic import *
-p = Plot()
-h = graph2(yscale=1, xscale=1,
-layout="""
-        A 
-    B       C 
-  D   E   F   G
- H I J K L M N O
-P Q
-""",
-minimum_size='8mm',
-edges='A-B,A-C,B-D,B-E,C-G,C-F,D-H,D-I,E-J,E-K,F-L,F-M,G-N,G-O,H-P,H-Q',
-A=r'label=\texttt{34}',
-B=r'label=\texttt{28}',
-C=r'label=\texttt{16}',
-D=r'label=\texttt{23}',
-E=r'label=\texttt{25}',
-F=r'label=\texttt{13}',
-G=r'label=\texttt{7}',
-H=r'label=\texttt{10}',
-I=r'label=\texttt{8}',
-J=r'label=\texttt{24}',
-K=r'label=\texttt{14}',
-L=r'label=\texttt{3}',
-M=r'label=\texttt{9}',
-N=r'label=\texttt{5}',
-O=r'label=\texttt{4}',
-P=r'label=\texttt{8}',
-Q=r'label=\texttt{9}',
-)
-p += h
-
-p += r'\node (proot) at (8,0.5) {\texttt{proot}} ;'
-p += r'\path [-triangle 60] (proot) edge[] (A);'
-
-p += r'\node (p0) at (1,-5.5) {\texttt{p0}} ;'
-p += r'\path [-triangle 60] (p0) edge[] (H);'
-
-p += r'\node (p1) at (15,-5.5) {\texttt{p1}} ;'
-p += r'\path [-triangle 60] (p1) edge[] (O);'
-
-
-p += r'\node (p1) at (3,-5.5) {\texttt{p}} ;'
-p += r'\path [-triangle 60] (p1) edge[] (I);'
-
-print(p)
-\end{python}
+\input{stdout98.tex}
 
 Get it?
 
@@ -440,15 +120,6 @@ attached as a left child.
 If the number of children is 1, then the new node should be attached
 as a right child.
 
-\begin{ex}
-  Implement a max heap using the above idea.
-  \qed
-\end{ex}
+\input{exercises/nonarray-implementation-5/main.tex}
 
-
-\begin{ex}
-  Investigate the following implementation:
- Each level is linked up as a doubly linked list.
- What are the pros and cons compared to the above?
- \qed
-\end{ex}
+\input{exercises/nonarray-implementation-6/main.tex}

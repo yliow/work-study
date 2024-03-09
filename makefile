@@ -1,0 +1,10 @@
+c:
+	g++ *.cpp
+r:
+	./a.out
+
+# for github ... 
+p:
+	git pull
+git:
+	cat ~/mytoken.txt ; git add -A ; git commit -m "sync" ; git push
