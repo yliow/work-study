@@ -1,5 +1,8 @@
 %-*-latex-*-
-\section{Hash tables}
+\sectionthree{Hash tables}
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
 
 A hash table (aka unordered associative array)
 is very easy to understand, at least for the simple case.
@@ -79,23 +82,7 @@ I can do this to convert Abe to an integer:
 \]
 where $\operatorname{int}$ means the ASCII value of the relevant character.
 The value you get is
-\begin{python}
-print(r"""\begin{console}
-%s
-\end{console}""" % (ord('A') + ord('b') * 10 + ord('e') * 100))
-\end{python}
-Now what I'm going to do is to create an array of name-height values, say that
-array has size 10.
-The index values are of course from 0 to 9.
-No problem: the above index value, I just do mod 10 and this will give me an integer
-value from 0 to 9. Right?
-This means that the name \verb!Abe! will be associated with index 
-\begin{python}
-v = ord('A') + ord('b') * 10 + ord('e') * 100
-print(r"""\begin{console}
-%s %% 10 = %s
-\end{console}""" % (v, v % 10))
-\end{python}
+\input{stdout00.tex}
 
 Such a function that takes data and produce an integer value 
 is a hash function.
@@ -117,41 +104,7 @@ First let me put Abe and his height into our array, or hash table.
 The above has hash function hashes Abe to 5.
 So the array looks like this:
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-C = RectContainer(x=1, y=1, direction='top-to-bottom', align='left')
-
-for a,b,c,d in [(0, 'true' , ''     , ''),
-                (1, 'true' , ''     , ''),
-                (2, 'true' , ''     , ''),
-                (3, 'true' , ''     , ''),
-                (4, ''     , ''     , ''),
-                (5, 'false', 'Abe'  , 6.5), 
-                (6, 'true' , ''     , ''),
-                (7, 'true' , ''     , ''),
-                (8, 'true' , ''     , ''),
-                (9, 'true' , ''     , ''),
-                ]:
-    h = 0.6
-    c0 = RectContainer(x=1, y=1)
-    c0 += Rect2(x0=0, y0=0, x1=0.8, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % a)
-    #c0 += Rect2(x0=0, y0=0, x1=3.5, y1=h, linecolor='black',
-    #            linewidth=0.02,label=r'{\texttt{%s}}' % b)
-    c0 += Rect2(x0=0, y0=0, x1=3, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % c)
-    c0 += Rect2(x0=0, y0=0, x1=1.5, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % d)
-    c0.layout()
-    C += c0; c0.x = c0.x0; c0.y = c0.y0; c0.layout()
-
-C.layout()
-p += C
-
-print(p)
-\end{python}
+\input{stdout01.tex}
 
 (The index value is included just for convenience. Of course arrays do not contain index values.)
 The C++ code would look like this:
@@ -175,48 +128,10 @@ public:
 OK. 
 Now let's put Tom into our hash table.
 The hash value of Tom is
-\begin{python}
-print(r"""\begin{console}
-%s
-\end{console}""" % (ord('T') + ord('o') * 10 + ord('m') * 100))
-\end{python}
+\input{stdout02.tex}
 and when I take mod 10, I get 4.
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-C = RectContainer(x=1, y=1, direction='top-to-bottom', align='left')
-
-for a,b,c,d in [(0, 'true' , ''     , ''),
-                (1, 'true' , ''     , ''),
-                (2, 'true' , ''     , ''),
-                (3, 'true' , ''     , ''),
-                (4, 'false', 'Tom'  , 5.5),
-                (5, 'false', 'Abe'  , 6.5), 
-                (6, 'true' , ''     , ''),
-                (7, 'true' , ''     , ''),
-                (8, 'true' , ''     , ''),
-                (9, 'true' , ''     , ''),
-                ]:
-    h = 0.6
-    c0 = RectContainer(x=1, y=1)
-    c0 += Rect2(x0=0, y0=0, x1=0.8, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % a)
-    #c0 += Rect2(x0=0, y0=0, x1=3.5, y1=h, linecolor='black',
-    #            linewidth=0.02,label=r'{\texttt{%s}}' % b)
-    c0 += Rect2(x0=0, y0=0, x1=3, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % c)
-    c0 += Rect2(x0=0, y0=0, x1=1.5, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % d)
-    c0.layout()
-    C += c0; c0.x = c0.x0; c0.y = c0.y0; c0.layout()
-
-C.layout()
-p += C
-
-print(p)
-\end{python}
+\input{stdout03.tex}
 
 Let's take a pause and see how 
 this container help us find data.
@@ -255,41 +170,7 @@ public:
 If so, the hash table now looks like this
 
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-C = RectContainer(x=1, y=1, direction='top-to-bottom', align='left')
-
-for a,b,c,d in [(0, 'true' , ''     , ''),
-                (1, 'true' , ''     , ''),
-                (2, 'true' , ''     , ''),
-                (3, 'true' , ''     , ''),
-                (4, 'false', 'Tom'  , 5.5),
-                (5, 'false', 'Abe'  , 6.5), 
-                (6, 'true' , ''     , ''),
-                (7, 'true' , ''     , ''),
-                (8, 'true' , ''     , ''),
-                (9, 'true' , ''     , ''),
-                ]:
-    h = 0.6
-    c0 = RectContainer(x=1, y=1)
-    c0 += Rect2(x0=0, y0=0, x1=0.8, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % a)
-    c0 += Rect2(x0=0, y0=0, x1=3.5, y1=h, linecolor='black',
-                linewidth=0.02,label=r'{\texttt{%s}}' % b)
-    c0 += Rect2(x0=0, y0=0, x1=3, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % c)
-    c0 += Rect2(x0=0, y0=0, x1=1.5, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % d)
-    c0.layout()
-    C += c0; c0.x = c0.x0; c0.y = c0.y0; c0.layout()
-
-C.layout()
-p += C
-
-print(p)
-\end{python}
+\input{stdout04.tex}
 
 It's also possible to have a hash table that contains
 the keys, but the 
@@ -300,55 +181,7 @@ don't forget that a huge array makes memory management
 difficult because the array of values must be contiguous.
 And this is a good thing.
 
-\begin{python}
-from latextool_basic import *
-
-p = Plot()
-
-v = RectContainer(x=0, y=0, align='left', direction='top-to-bottom')
-for i in ['', '', '', '', 'Tom', 'Abe', '', '', '', '']: 
-    v += Rect2(0, 0, 2, 0.5, label= r'\texttt{%s}' % i)
-v.layout()
-
-p += v
-v = RectContainer(x=2, y=0, align='left', direction='top-to-bottom')
-for i in range(10):
-    r = Rect2(0, 0, 0.5, 0.5)
-    v += r
-v.layout()
-
-for i in range(10):
-    if i == 4:
-        center = v[i].center()
-        (x0, y0) = center
-        (x1, y1) = (center[0] + 2, center[1] + 0.025)
-        r = Rect2(x1, y1, x1+1.5, y1+0.5, label= r'\texttt{%s}' % 5.5)
-        p += r
-        x1, y1 = r.left()
-        p += Line(x0=x0, y0=y0, x1=x1, y1=y1, linewidth=0.05, startstyle='dot', endstyle='>')
-    elif i == 5:
-        center = v[i].center()
-        (x0, y0) = center
-        (x1, y1) = (center[0] + 2, center[1] - 0.5)
-        r = Rect2(x1, y1, x1+1.5, y1+0.5, label= r'\texttt{%s}' % 6.5)
-        p += r
-        x1, y1 = r.left()
-        p += Line(x0=x0, y0=y0, x1=x1, y1=y1, linewidth=0.05, startstyle='dot', endstyle='>')
-    else:
-        topleft = v[i].topleft()
-        bottomright = v[i].bottomright()
-        (x0, y0) = topleft
-        (x1, y1) = bottomright
-        p += Line(x0=x0, y0=y0, x1=x1, y1=y1, linewidth=0.05)
-        topright = v[i].topright()
-        bottomleft = v[i].bottomleft()
-        (x0, y0) = topright
-        (x1, y1) = bottomleft
-        p += Line(x0=x0, y0=y0, x1=x1, y1=y1, linewidth=0.05)
-
-p += v
-print(p)
-\end{python}
+\input{stdout05.tex}
 In this case, we don't even need the availability flag since a
 \verb!NULL! pointer would tell us that the row is available.
 
@@ -358,56 +191,7 @@ name-pointer rows,
 but of pointers all altogether.
 Here's what I mean (in pictures):
 
-\begin{python}
-from latextool_basic import *
-
-p = Plot()
-
-v = RectContainer(x=2, y=0, align='left', direction='top-to-bottom')
-for i in range(10):
-    r = Rect2(0, 0, 0.5, 0.5)
-    v += r
-
-v.layout()
-
-def node(x, y, key, value):
-    c0 = RectContainer(x=x, y=y)
-    c0 += Rect2(0, 0, 2, 0.5, label= r'\texttt{%s}' % key)
-    c0 += Rect2(0, 0, 1.5, 0.5, label= r'\texttt{%s}' % value)
-    return c0
-
-for i in range(10):
-    if i == 4:
-        center = v[i].center()
-        (x0, y0) = center
-        (x1, y1) = (center[0] + 2, center[1] + 0.025)
-        n = node(x1, y1, "Tom", 5.5)
-        p += n
-        x1, y1 = n.left()
-        p += Line(x0=x0, y0=y0, x1=x1, y1=y1, linewidth=0.05, startstyle='dot', endstyle='>')
-    elif i == 5:
-        center = v[i].center()
-        (x0, y0) = center
-        (x1, y1) = (center[0] + 2, center[1] - 0.5)
-        n = node(x1, y1, "Abe", 6.5)
-        p += n
-        x1, y1 = n.left()
-        p += Line(x0=x0, y0=y0, x1=x1, y1=y1, linewidth=0.05, startstyle='dot', endstyle='>')
-    else:
-        topleft = v[i].topleft()
-        bottomright = v[i].bottomright()
-        (x0, y0) = topleft
-        (x1, y1) = bottomright
-        p += Line(x0=x0, y0=y0, x1=x1, y1=y1, linewidth=0.05)
-        topright = v[i].topright()
-        bottomleft = v[i].bottomleft()
-        (x0, y0) = topright
-        (x1, y1) = bottomleft
-        p += Line(x0=x0, y0=y0, x1=x1, y1=y1, linewidth=0.05)
-
-p += v
-print(p)
-\end{python}
+\input{stdout06.tex}
 
 At this point, we have two (extreme) options for our hash table:
 \begin{tightlist}
@@ -466,45 +250,7 @@ Going back to our example, if I use linear probing, since
 \verb!Annie! is hashed to \verb!5!, the row occupied by \verb!Abe!,
 I will put \verb!Annie! at index \verb!6!.
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-C = RectContainer(x=1, y=1, direction='top-to-bottom', align='left')
-
-for a,b,c,d in [(0, 'true' , ''     , ''),
-                (1, 'true' , ''     , ''),
-                (2, 'true' , ''     , ''),
-                (3, 'true' , ''     , ''),
-                (4, 'false', 'Tom'  , 5.5),
-                (5, 'false', 'Abe'  , 6.5), 
-                (6, 'false', 'Annie', 5.9),
-                (7, 'true' , ''     , ''),
-                (8, 'true' , ''     , ''),
-                (9, 'true' , ''     , ''),
-                ]:
-    h = 0.6
-    c0 = RectContainer(x=1, y=1)
-    c0 += Rect2(x0=0, y0=0, x1=0.8, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % a)
-    c0 += Rect2(x0=0, y0=0, x1=3.5, y1=h, linecolor='black',
-                linewidth=0.02,label=r'{\texttt{%s}}' % b)
-    c0 += Rect2(x0=0, y0=0, x1=3, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % c)
-    c0 += Rect2(x0=0, y0=0, x1=1.5, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % d)
-    c0.layout()
-    C += c0; c0.x = c0.x0; c0.y = c0.y0; c0.layout()
-
-C.layout()
-p += C
-
-x0,y0 = C[5][0].left(); y0 -= 0.1
-x1,y1 = C[6][0].left(); y1 += 0.1
-p += Line(points=[(x0,y0), (x0-0.5,y0), (x0-0.5,y1), (x1,y1)], endstyle='>')
-
-print(p)
-\end{python}
+\input{stdout07.tex}
 
 One step up is \textbf{quadratic probes}.
 Suppose you hash to value $h$.
@@ -698,45 +444,7 @@ your first hash value.
 Rows which are marked as \textsc{Deleted} are sometimes called tombstones.
 
 The earlier table becomes:
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-C = RectContainer(x=1, y=1, direction='top-to-bottom', align='left')
-
-for a,b,c,d in [(0, 'Available' , ''     , ''),
-                (1, 'Available' , ''     , ''),
-                (2, 'Available' , ''     , ''),
-                (3, 'Available' , ''     , ''),
-                (4, 'Not-Available', 'Tom'  , 5.5),
-                (5, 'Not-Available', 'Abe'  , 6.5), 
-                (6, 'Not-Available', 'Annie', 5.9),
-                (7, 'Available' , ''     , ''),
-                (8, 'Available' , ''     , ''),
-                (9, 'Available' , ''     , ''),
-                ]:
-    h = 0.6
-    c0 = RectContainer(x=1, y=1)
-    c0 += Rect2(x0=0, y0=0, x1=0.8, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % a)
-    c0 += Rect2(x0=0, y0=0, x1=3.5, y1=h, linecolor='black',
-                linewidth=0.02,label=r'{\texttt{%s}}' % b)
-    c0 += Rect2(x0=0, y0=0, x1=3, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % c)
-    c0 += Rect2(x0=0, y0=0, x1=1.5, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % d)
-    c0.layout()
-    C += c0; c0.x = c0.x0; c0.y = c0.y0; c0.layout()
-
-C.layout()
-p += C
-
-x0,y0 = C[5][0].left(); y0 -= 0.1
-x1,y1 = C[6][0].left(); y1 += 0.1
-p += Line(points=[(x0,y0), (x0-0.5,y0), (x0-0.5,y1), (x1,y1)], endstyle='>')
-
-print(p)
-\end{python}
+\input{stdout08.tex}
 
 \textsc{Option 2.}
 The second option is to organize the chain of collided keys by 
@@ -754,45 +462,7 @@ complete restructuring of the hash table -- see next section.
 I will stick to \textsc{Option 1}.
 
 Going back to out earlier table:
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-C = RectContainer(x=1, y=1, direction='top-to-bottom', align='left')
-
-for a,b,c,d in [(0, 'Available' , ''     , ''),
-                (1, 'Available' , ''     , ''),
-                (2, 'Available' , ''     , ''),
-                (3, 'Available' , ''     , ''),
-                (4, 'Not-Available', 'Tom'  , 5.5),
-                (5, 'Not-Available', 'Abe'  , 6.5), 
-                (6, 'Not-Available', 'Annie', 5.9),
-                (7, 'Available' , ''     , ''),
-                (8, 'Available' , ''     , ''),
-                (9, 'Available' , ''     , ''),
-                ]:
-    h = 0.6
-    c0 = RectContainer(x=1, y=1)
-    c0 += Rect2(x0=0, y0=0, x1=0.8, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % a)
-    c0 += Rect2(x0=0, y0=0, x1=3.5, y1=h, linecolor='black',
-                linewidth=0.02,label=r'{\texttt{%s}}' % b)
-    c0 += Rect2(x0=0, y0=0, x1=3, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % c)
-    c0 += Rect2(x0=0, y0=0, x1=1.5, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % d)
-    c0.layout()
-    C += c0; c0.x = c0.x0; c0.y = c0.y0; c0.layout()
-
-C.layout()
-p += C
-
-x0,y0 = C[5][0].left(); y0 -= 0.1
-x1,y1 = C[6][0].left(); y1 += 0.1
-p += Line(points=[(x0,y0), (x0-0.5,y0), (x0-0.5,y1), (x1,y1)], endstyle='>')
-
-print(p)
-\end{python}
+\input{stdout09.tex}
 
 If I add 
 \texttt{(Tammy, 6.2)}
@@ -804,122 +474,14 @@ then
 \texttt{(Tania, 6.7)},
 this is the resulting table:
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-C = RectContainer(x=1, y=1, direction='top-to-bottom', align='left')
-
-for a,b,c,d in [(0, 'Available' , ''     , ''),
-                (1, 'Available' , ''     , ''),
-                (2, 'Available' , ''     , ''),
-                (3, 'Available' , ''     , ''),
-                (4, 'Not-Available', 'Tom'  , 5.5),
-                (5, 'Not-Available', 'Abe'  , 6.5), 
-                (6, 'Not-Available', 'Annie', 5.9),
-                (7, 'Not-Available', 'Tammy', 6.2),
-                (8, 'Not-Available', 'Andrew', 5.7),
-                (9, 'Not-Available', 'Tania' , 6.7),
-                ]:
-    h = 0.6
-    c0 = RectContainer(x=1, y=1)
-    c0 += Rect2(x0=0, y0=0, x1=0.8, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % a)
-    c0 += Rect2(x0=0, y0=0, x1=3.5, y1=h, linecolor='black',
-                linewidth=0.02,label=r'{\texttt{%s}}' % b)
-    c0 += Rect2(x0=0, y0=0, x1=3, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % c)
-    c0 += Rect2(x0=0, y0=0, x1=1.5, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % d)
-    c0.layout()
-    C += c0; c0.x = c0.x0; c0.y = c0.y0; c0.layout()
-
-C.layout()
-p += C
-
-x0,y0 = C[5][0].left(); y0 -= 0.1
-x1,y1 = C[6][0].left(); y1 += 0.1
-p += Line(points=[(x0,y0), (x0-0.5,y0), (x0-0.5,y1), (x1,y1)], endstyle='>')
-
-x0,y0 = C[6][0].left(); y0 -= 0.1
-x1,y1 = C[8][0].left(); y1 += 0.1
-p += Line(points=[(x0,y0), (x0-0.5,y0), (x0-0.5,y1), (x1,y1)], endstyle='>')
-
-
-x0,y0 = C[4][0].left(); y0 -= 0.1
-x1,y1 = C[7][0].left(); y1 += 0.1
-p += Line(points=[(x0,y0), (x0-1.5,y0), (x0-1.5,y1), (x1,y1)],
-          linecolor='blue', endstyle='>')
-
-x0,y0 = C[7][0].left(); y0 -= 0.1
-x1,y1 = C[9][0].left(); y1 += 0.1
-p += Line(points=[(x0,y0), (x0-1.5,y0), (x0-1.5,y1), (x1,y1)],
-          linecolor='blue', endstyle='>')
-
-
-print(p)
-\end{python}
+\input{stdout10.tex}
 
 You can think of (Tom, Tammy, Tania) as forming a chain in the
 hashtable and
 (Abe, Annie, Andrew) forming another.
 
 Now if I delete Tammy, the table becomes
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-C = RectContainer(x=1, y=1, direction='top-to-bottom', align='left')
-
-for a,b,c,d in [(0, 'Available' , ''     , ''),
-                (1, 'Available' , ''     , ''),
-                (2, 'Available' , ''     , ''),
-                (3, 'Available' , ''     , ''),
-                (4, 'Not-Available', 'Tom'  , 5.5),
-                (5, 'Not-Available', 'Abe'  , 6.5), 
-                (6, 'Not-Available', 'Annie', 5.9),
-                (7, 'Deleted'      , 'Tammy', 6.2),
-                (8, 'Not-Available', 'Andrew', 5.7),
-                (9, 'Not-Available', 'Tania' , 6.7),
-                ]:
-    h = 0.6
-    c0 = RectContainer(x=1, y=1)
-    c0 += Rect2(x0=0, y0=0, x1=0.8, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % a)
-    c0 += Rect2(x0=0, y0=0, x1=3.5, y1=h, linecolor='black',
-                linewidth=0.02,label=r'{\texttt{%s}}' % b)
-    c0 += Rect2(x0=0, y0=0, x1=3, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % c)
-    c0 += Rect2(x0=0, y0=0, x1=1.5, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % d)
-    c0.layout()
-    C += c0; c0.x = c0.x0; c0.y = c0.y0; c0.layout()
-
-C.layout()
-p += C
-
-x0,y0 = C[5][0].left(); y0 -= 0.1
-x1,y1 = C[6][0].left(); y1 += 0.1
-p += Line(points=[(x0,y0), (x0-0.5,y0), (x0-0.5,y1), (x1,y1)], endstyle='>')
-
-x0,y0 = C[6][0].left(); y0 -= 0.1
-x1,y1 = C[8][0].left(); y1 += 0.1
-p += Line(points=[(x0,y0), (x0-0.5,y0), (x0-0.5,y1), (x1,y1)], endstyle='>')
-
-
-x0,y0 = C[4][0].left(); y0 -= 0.1
-x1,y1 = C[7][0].left(); y1 += 0.1
-p += Line(points=[(x0,y0), (x0-1.5,y0), (x0-1.5,y1), (x1,y1)],
-          linecolor='blue', endstyle='>')
-
-x0,y0 = C[7][0].left(); y0 -= 0.1
-x1,y1 = C[9][0].left(); y1 += 0.1
-p += Line(points=[(x0,y0), (x0-1.5,y0), (x0-1.5,y1), (x1,y1)],
-          linecolor='blue', endstyle='>')
-
-
-print(p)
-\end{python}
+\input{stdout11.tex}
 
 Because of the way in which chains cut into each other's way,
 during a search, you have to keep probing until you find the key you're
@@ -938,242 +500,19 @@ row that is \textsc{Available}.
 You can (and should) insert the key at the first row that is
 either \textsc{Deleted} or \textsc{Available}.
 For instance if we insert (Toby, 6.3) into the above table:
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-C = RectContainer(x=1, y=1, direction='top-to-bottom', align='left')
-
-for a,b,c,d in [(0, 'Available' , ''     , ''),
-                (1, 'Available' , ''     , ''),
-                (2, 'Available' , ''     , ''),
-                (3, 'Available' , ''     , ''),
-                (4, 'Not-Available', 'Tom'  , 5.5),
-                (5, 'Not-Available', 'Abe'  , 6.5), 
-                (6, 'Not-Available', 'Annie', 5.9),
-                (7, 'Deleted'      , 'Tammy', 6.2),
-                (8, 'Not-Available', 'Andrew', 5.7),
-                (9, 'Not-Available', 'Tania' , 6.7),
-                ]:
-    h = 0.6
-    c0 = RectContainer(x=1, y=1)
-    c0 += Rect2(x0=0, y0=0, x1=0.8, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % a)
-    c0 += Rect2(x0=0, y0=0, x1=3.5, y1=h, linecolor='black',
-                linewidth=0.02,label=r'{\texttt{%s}}' % b)
-    c0 += Rect2(x0=0, y0=0, x1=3, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % c)
-    c0 += Rect2(x0=0, y0=0, x1=1.5, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % d)
-    c0.layout()
-    C += c0; c0.x = c0.x0; c0.y = c0.y0; c0.layout()
-
-C.layout()
-p += C
-
-x0,y0 = C[5][0].left(); y0 -= 0.1
-x1,y1 = C[6][0].left(); y1 += 0.1
-p += Line(points=[(x0,y0), (x0-0.5,y0), (x0-0.5,y1), (x1,y1)], endstyle='>')
-
-x0,y0 = C[6][0].left(); y0 -= 0.1
-x1,y1 = C[8][0].left(); y1 += 0.1
-p += Line(points=[(x0,y0), (x0-0.5,y0), (x0-0.5,y1), (x1,y1)], endstyle='>')
-
-
-x0,y0 = C[4][0].left(); y0 -= 0.1
-x1,y1 = C[7][0].left(); y1 += 0.1
-p += Line(points=[(x0,y0), (x0-1.5,y0), (x0-1.5,y1), (x1,y1)],
-          linecolor='blue', endstyle='>')
-
-x0,y0 = C[7][0].left(); y0 -= 0.1
-x1,y1 = C[9][0].left(); y1 += 0.1
-p += Line(points=[(x0,y0), (x0-1.5,y0), (x0-1.5,y1), (x1,y1)],
-          linecolor='blue', endstyle='>')
-
-
-print(p)
-\end{python}
+\input{stdout12.tex}
 you would first get the first empty row at index 7 (where
 the row is \texttt{Delete}) -- you remember this index:
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-C = RectContainer(x=1, y=1, direction='top-to-bottom', align='left')
-
-for a,b,c,d in [(0, 'Available' , ''     , ''),
-                (1, 'Available' , ''     , ''),
-                (2, 'Available' , ''     , ''),
-                (3, 'Available' , ''     , ''),
-                (4, 'Not-Available', 'Tom'  , 5.5),
-                (5, 'Not-Available', 'Abe'  , 6.5), 
-                (6, 'Not-Available', 'Annie', 5.9),
-                (7, 'Deleted'      , 'Tammy', 6.2),
-                (8, 'Not-Available', 'Andrew', 5.7),
-                (9, 'Not-Available', 'Tania' , 6.7),
-                ]:
-    h = 0.6
-    c0 = RectContainer(x=1, y=1)
-    c0 += Rect2(x0=0, y0=0, x1=0.8, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % a)
-    c0 += Rect2(x0=0, y0=0, x1=3.5, y1=h, linecolor='black',
-                linewidth=0.02,label=r'{\texttt{%s}}' % b)
-    c0 += Rect2(x0=0, y0=0, x1=3, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % c)
-    c0 += Rect2(x0=0, y0=0, x1=1.5, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % d)
-    c0.layout()
-    C += c0; c0.x = c0.x0; c0.y = c0.y0; c0.layout()
-
-C.layout()
-p += C
-
-x0,y0 = C[5][0].left(); y0 -= 0.1
-x1,y1 = C[6][0].left(); y1 += 0.1
-p += Line(points=[(x0,y0), (x0-0.5,y0), (x0-0.5,y1), (x1,y1)], endstyle='>')
-
-x0,y0 = C[6][0].left(); y0 -= 0.1
-x1,y1 = C[8][0].left(); y1 += 0.1
-p += Line(points=[(x0,y0), (x0-0.5,y0), (x0-0.5,y1), (x1,y1)], endstyle='>')
-
-
-x0,y0 = C[4][0].left(); y0 -= 0.1
-x1,y1 = C[7][0].left(); y1 += 0.1
-p += Line(points=[(x0,y0), (x0-1.5,y0), (x0-1.5,y1), (x1,y1)],
-          linecolor='blue', endstyle='>')
-
-x0,y0 = C[7][0].left(); y0 -= 0.1
-x1,y1 = C[9][0].left(); y1 += 0.1
-p += Line(points=[(x0,y0), (x0-1.5,y0), (x0-1.5,y1), (x1,y1)],
-          linecolor='blue', endstyle='>')
-
-x0,y0 = C[7][3].right()
-p += Line(points=[(x0+1,y0), (x0,y0)],
-          linecolor='red', endstyle='>', linewidth=0.2)
-print(p)
-\end{python}
+\input{stdout13.tex}
 
 You would continue until you see the first row that is \textsc{Available}
 -- this is index 0:
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-C = RectContainer(x=1, y=1, direction='top-to-bottom', align='left')
-
-for a,b,c,d in [(0, 'Available' , ''     , ''),
-                (1, 'Available' , ''     , ''),
-                (2, 'Available' , ''     , ''),
-                (3, 'Available' , ''     , ''),
-                (4, 'Not-Available', 'Tom'  , 5.5),
-                (5, 'Not-Available', 'Abe'  , 6.5), 
-                (6, 'Not-Available', 'Annie', 5.9),
-                (7, 'Deleted'      , 'Tammy', 6.2),
-                (8, 'Not-Available', 'Andrew', 5.7),
-                (9, 'Not-Available', 'Tania' , 6.7),
-                ]:
-    h = 0.6
-    c0 = RectContainer(x=1, y=1)
-    c0 += Rect2(x0=0, y0=0, x1=0.8, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % a)
-    c0 += Rect2(x0=0, y0=0, x1=3.5, y1=h, linecolor='black',
-                linewidth=0.02,label=r'{\texttt{%s}}' % b)
-    c0 += Rect2(x0=0, y0=0, x1=3, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % c)
-    c0 += Rect2(x0=0, y0=0, x1=1.5, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % d)
-    c0.layout()
-    C += c0; c0.x = c0.x0; c0.y = c0.y0; c0.layout()
-
-C.layout()
-p += C
-
-x0,y0 = C[5][0].left(); y0 -= 0.1
-x1,y1 = C[6][0].left(); y1 += 0.1
-p += Line(points=[(x0,y0), (x0-0.5,y0), (x0-0.5,y1), (x1,y1)], endstyle='>')
-
-x0,y0 = C[6][0].left(); y0 -= 0.1
-x1,y1 = C[8][0].left(); y1 += 0.1
-p += Line(points=[(x0,y0), (x0-0.5,y0), (x0-0.5,y1), (x1,y1)], endstyle='>')
-
-
-x0,y0 = C[4][0].left(); y0 -= 0.1
-x1,y1 = C[7][0].left(); y1 += 0.1
-p += Line(points=[(x0,y0), (x0-1.5,y0), (x0-1.5,y1), (x1,y1)],
-          linecolor='blue', endstyle='>')
-
-x0,y0 = C[7][0].left(); y0 -= 0.1
-x1,y1 = C[9][0].left(); y1 += 0.1
-p += Line(points=[(x0,y0), (x0-1.5,y0), (x0-1.5,y1), (x1,y1)],
-          linecolor='blue', endstyle='>')
-
-x0,y0 = C[7][3].right()
-p += Line(points=[(x0+1,y0), (x0,y0)],
-          linecolor='red', endstyle='>', linewidth=0.2)
-x0,y0 = C[0][3].right()
-p += Line(points=[(x0+1,y0), (x0,y0)],
-          linecolor='red', endstyle='>', linewidth=0.2)
-print(p)
-\end{python}
+\input{stdout14.tex}
 
 Since, up to this point in time, you have not seen Toby, you know
 that you can safely add (Toby, 6.3) at index 7 and mark that row
 as \textsc{Not-Available}:
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-C = RectContainer(x=1, y=1, direction='top-to-bottom', align='left')
-
-for a,b,c,d in [(0, 'Available' , ''     , ''),
-                (1, 'Available' , ''     , ''),
-                (2, 'Available' , ''     , ''),
-                (3, 'Available' , ''     , ''),
-                (4, 'Not-Available', 'Tom'  , 5.5),
-                (5, 'Not-Available', 'Abe'  , 6.5), 
-                (6, 'Not-Available', 'Annie', 5.9),
-                (7, 'Not-Available', 'Toby', 6.3),
-                (8, 'Not-Available', 'Andrew', 5.7),
-                (9, 'Not-Available', 'Tania' , 6.7),
-                ]:
-    h = 0.6
-    c0 = RectContainer(x=1, y=1)
-    c0 += Rect2(x0=0, y0=0, x1=0.8, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % a)
-    c0 += Rect2(x0=0, y0=0, x1=3.5, y1=h, linecolor='black',
-                linewidth=0.02,label=r'{\texttt{%s}}' % b)
-    c0 += Rect2(x0=0, y0=0, x1=3, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % c)
-    c0 += Rect2(x0=0, y0=0, x1=1.5, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % d)
-    c0.layout()
-    C += c0; c0.x = c0.x0; c0.y = c0.y0; c0.layout()
-
-C.layout()
-p += C
-
-x0,y0 = C[5][0].left(); y0 -= 0.1
-x1,y1 = C[6][0].left(); y1 += 0.1
-p += Line(points=[(x0,y0), (x0-0.5,y0), (x0-0.5,y1), (x1,y1)], endstyle='>')
-
-x0,y0 = C[6][0].left(); y0 -= 0.1
-x1,y1 = C[8][0].left(); y1 += 0.1
-p += Line(points=[(x0,y0), (x0-0.5,y0), (x0-0.5,y1), (x1,y1)], endstyle='>')
-
-
-x0,y0 = C[4][0].left(); y0 -= 0.1
-x1,y1 = C[7][0].left(); y1 += 0.1
-p += Line(points=[(x0,y0), (x0-1.5,y0), (x0-1.5,y1), (x1,y1)],
-          linecolor='blue', endstyle='>')
-
-x0,y0 = C[7][0].left(); y0 -= 0.1
-x1,y1 = C[9][0].left(); y1 += 0.1
-p += Line(points=[(x0,y0), (x0-1.5,y0), (x0-1.5,y1), (x1,y1)],
-          linecolor='blue', endstyle='>')
-
-
-print(p)
-\end{python}
+\input{stdout15.tex}
 
 For delete, this is like search.
 When the key is found, we mark the row as \textsc{Deleted}.
@@ -1289,39 +628,7 @@ by an insert operation.
 \end{ex}
 
 Use this table:
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-C = RectContainer(x=1, y=1, direction='top-to-bottom', align='left')
-
-for a,b,c,d in [(0, '' , ''     , ''),
-                (1, '' , ''     , ''),
-                (2, '' , ''     , ''),
-                (3, '' , ''     , ''),
-                (4, '', ''  , ''),
-                (5, '', ''  , ''), 
-                (6, '', '', ''),
-                (7, ''      , '', ''),
-                ]:
-    h = 0.6
-    c0 = RectContainer(x=1, y=1)
-    c0 += Rect2(x0=0, y0=0, x1=0.8, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % a)
-    c0 += Rect2(x0=0, y0=0, x1=3.5, y1=h, linecolor='black',
-                linewidth=0.02,label=r'{\texttt{%s}}' % b)
-    c0 += Rect2(x0=0, y0=0, x1=3, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % c)
-    c0 += Rect2(x0=0, y0=0, x1=1.5, y1=h, 
-                linewidth=0.02,label=r'{\texttt{%s}}' % d)
-    c0.layout()
-    C += c0; c0.x = c0.x0; c0.y = c0.y0; c0.layout()
-
-C.layout()
-p += C
-
-print(p)
-\end{python}
+\input{stdout16.tex}
 
 Here are the runtimes.
 In the following $n$ is the number of keys already in the table.
@@ -1579,81 +886,7 @@ containers.
 You can choose any container.
 But the easiest is to use a linked list, say a singly linked list.
 
-\begin{python}
-from latextool_basic import *
-
-p = Plot()
-
-v = RectContainer(x=2, y=0, align='left', direction='top-to-bottom')
-for i in range(10):
-    r = Rect2(0, 0, 0.5, 0.5)
-    v += r
-
-v.layout()
-
-def node(x, y, key, value, null=True):
-    c0 = RectContainer(x=x, y=y)
-    c0 += Rect2(0, 0, 2, 0.5, label= r'\texttt{%s}' % key)
-    c0 += Rect2(0, 0, 1.5, 0.5, label= r'\texttt{%s}' % value)
-    c0 += Rect2(0, 0, 0.5, 0.5)
-    return c0
-
-for i in range(10):
-    if i == 4:
-        center = v[i].center()
-        (x0, y0) = center
-        (x1, y1) = (center[0] + 1, center[1] + 0.025)
-        n = node(x1, y1, "Tom", 5.5)
-        p += n
-        x1, y1 = n.left()
-        p += Line(x0=x0, y0=y0, x1=x1, y1=y1, linewidth=0.05, startstyle='dot', endstyle='>')
-        x0, y0 = n[2].topleft()
-        x1, y1 = n[2].bottomright()
-        p += Line(x0, y0, x1, y1)
-        x0, y0 = n[2].topright()
-        x1, y1 = n[2].bottomleft()
-        p += Line(x0, y0, x1, y1)
-    elif i == 5:
-        center = v[i].center()
-        (x0, y0) = center
-        (x1, y1) = (center[0] + 1, center[1] - 0.5)
-        n = node(x1, y1, "Abe", 6.5)
-        p += n
-
-        (x0, y0) = center
-        x1, y1 = n.left()
-        p += Line(x0=x0, y0=y0, x1=x1, y1=y1, linewidth=0.05, startstyle='dot', endstyle='>')
-
-        # node for annie
-        x1, y1 = n[2].bottomleft()        
-        n1 = node(x1 + 1.5, y1, "Annie", 5.9)
-        p += n1
-        # null pointer for n1
-        x0, y0 = n1[2].topleft()
-        x1, y1 = n1[2].bottomright()
-        p += Line(x0, y0, x1, y1, linewidth=0.05)
-        x0, y0 = n1[2].topright()
-        x1, y1 = n1[2].bottomleft()
-        p += Line(x0, y0, x1, y1, linewidth=0.05)
-        # next pointer arrow
-        x0, y0 = n[2].center()
-        x1, y1 = n1[0].left()
-        p += Line(x0, y0, x1, y1, linewidth=0.05, startstyle='dot', endstyle='>')
-    else:
-        topleft = v[i].topleft()
-        bottomright = v[i].bottomright()
-        (x0, y0) = topleft
-        (x1, y1) = bottomright
-        p += Line(x0=x0, y0=y0, x1=x1, y1=y1, linewidth=0.05)
-        topright = v[i].topright()
-        bottomleft = v[i].bottomleft()
-        (x0, y0) = topright
-        (x1, y1) = bottomleft
-        p += Line(x0=x0, y0=y0, x1=x1, y1=y1, linewidth=0.05)
-
-p += v
-print(p)
-\end{python}
+\input{stdout17.tex}
 In the above diagram, the array is an array of pointers to singly linked list nodes
 or \verb!NULL!.
 Of course you can have linked list objects in the array, 
@@ -1800,109 +1033,7 @@ for (typename std::unordered_map< X, Y >::const_iterator p = h.begin();
 
 Study the following program carefully.
 
-\begin{python}
-s = r'''
-#include <iostream>
-#include <string>
-#include <unordered_map>
-
-// Height is hashtable with key = std::string, value = double
-typedef std::unordered_map<std::string, double> Height;
-
-template < typename T >
-void print(const T & h)
-{
-    std::cout << "(key, value) pairs in h ...\n"; // iterating
-                                     // over all entries
-    for (typename T::const_iterator p = h.begin();
-         p != h.end(); ++p)
-    {
-        std::cout << p->first << ": " << p->second
-                  << " ... "
-                  << '\n';
-    }
-}
-
-template < typename T >
-void print_buckets(const T & h)
-{
-    std::cout << "(key, value) pairs in buckets of h ..."; 
-    for (unsigned int i = 0; i < h.bucket_count(); ++i)
-                                     // iterating over all
-                                     // buckets
-    {
-        std::cout << "bucket " << i << ": ";
-        for (typename T::const_local_iterator p = h.begin(i);
-             p != h.end(i); ++p)
-        {
-            std::cout << '['
-                      << p->first << ": " << p->second
-                      << "] ";
-        }
-        std::cout << '\n';
-    }
-}
-  
-void print_stats(Height & h)
-{
-    std::cout << "size/buckets/load factor/max load factor:"
-              << h.size() << '/'
-              << h.bucket_count() << '/'
-              << h.load_factor() << '/'
-              << h.max_load_factor() << '\n';
-}
-
-int main()
-{
-    Height h;
-    h.insert({"John", 5.7});         // insert operation
-    h.insert({"Tom", 5.8});
-    h["Mary"] = 5.9;
-    h["Sue"] = 6.0;
-    h["Jane"] = 6.1;
-    h["Priscilla"] = 6.1;
-    h["Sheila"] = 6.1;
-    h["Ashley"] = 6.1;
-    
-    h.erase("Tom");                  // delete operation
-    
-    std::cout << h["John"] << '\n';  // find key and get value
-    h["John"] = 6.2;                 // update by key with new
-                                     // value
-    std::cout << h["John"] << '\n';
-    
-    Height::iterator p = h.find("Mary"); // find by key and
-                                     // get iterator
-    std::cout << (p != h.end() ? "found" : "not found")
-              << '\n';
-    print(h);
-    print_buckets(h);
-    print_stats(h);
-
-    std::cout << "increase size to 641 ...\n"; // changing the
-                                     // size
-    h.reserve(641);
-    print_stats(h);
-
-    std::cout << "clear ...\n";           
-    h.clear();                       // clear the map
-    print_stats(h);
-
-    std::cout << "constructor with size 1000...\n";
-    Height h1(1000);                 // reserve size of
-                                     // approx 1000
-    print_stats(h);
-    
-    return 0;
-}
-'''.strip()
-f = open('main23.cpp', 'w')
-f.write(s)
-f.close()
-from latextool_basic import *
-os.system('g++ main23.cpp -std=c++11')
-os.system('./a.out > out23.txt')
-\end{python}
+\input{stdout18.tex}
 \vspace{-0.1cm}
 {\small
 \VerbatimInput[frame=single]{main23.cpp}
@@ -1912,65 +1043,7 @@ os.system('./a.out > out23.txt')
 For convenience, I'm going to put some of the above code
 into \verb!Height.h!:
 
-\begin{python}
-s = r'''#ifndef HEIGHT_H
-#define HEIGHT_H
-
-#include <iostream>
-#include <string>
-#include <unordered_map>
-
-template < typename T >
-void print(const T & h)
-{
-    std::cout << "(key, value) pairs in h ...\n"; // iterating
-                                     // over all entries
-    for (typename T::const_iterator p = h.begin();
-         p != h.end(); ++p)
-    {
-        std::cout << p->first << ": " << p->second
-                  << " ... "
-                  << '\n';
-    }
-}
-
-template < typename T >
-void print_buckets(T & h)
-{
-    std::cout << "(key, value) pairs in buckets of h ...\n"; 
-    for (unsigned int i = 0; i < h.bucket_count(); ++i)
-                                     // iterating over all
-                                     // buckets
-    {
-        std::cout << "bucket " << i << ": ";
-        for (typename T::const_local_iterator p = h.begin(i);
-             p != h.end(i); ++p)
-        {
-            std::cout << '['
-                      << p->first << ": " << p->second
-                      << "] ";
-        }
-        std::cout << '\n';
-    }
-}
-
-template < typename T >
-void print_stats(const T & h)
-{
-    std::cout << "size/buckets/load factor/max load factor:"
-              << h.size() << '/'
-              << h.bucket_count() << '/'
-              << h.load_factor() << '/'
-              << h.max_load_factor() << '\n';
-}
-
-#endif
-
-'''
-f = open('Height.h', 'w')
-f.write(s)
-f.close()
-\end{python}
+\input{stdout19.tex}
 \vspace{-0.1cm}
 {\small
 \VerbatimInput[frame=single]{Height.h}
@@ -2016,41 +1089,11 @@ we don't have to say how to hash the keys.
 That's because \verb!std::unordered_map! use the built-in
 \verb!std::hash!.
 Go ahead and run this:
-\begin{python}
-s = r'''
-#include <iostream>
-#include <string>
-#include <functional> // for std::hash
-
-int main()
-{
-    std::hash< int > h0;
-    std::cout << "hash of\n";
-    std::cout << "42: " << h0(42) << '\n';
-    // or
-    std::cout << "42: " << std::hash< int >()(42) << '\n';
-
-    std::cout << "-1: " << std::hash< int >()(-1) << '\n'
-              << "3.14: " << std::hash< double >()(3.14) << '\n'
-              << "0.0: " << std::hash< double >()(2.0) << '\n'   
-              << "'a': " << std::hash< char >()('a') << '\n'
-              << "true: " << std::hash< bool >()(true) << '\n'
-              << "\"hello world\": "
-              << std::hash< std::string >()("hello world") << '\n';
-    return 0;
-}
-'''.strip()
-f = open('main.cpp', 'w'); f.write(s); f.close()
-#import os
-#os.system('rm stdout.txt; g++ main.cpp; ./a.out > stdout.txt')
-\end{python}
+\input{stdout20.tex}
 {\small
 \VerbatimInput[frame=single]{main.cpp}
 }
-\begin{python}
-from latextool_basic import *
-print('{\small %s}' % shell('g++ main.cpp; ./a.out'))
-\end{python}
+\input{stdout21.tex}
 The return value of \verb!std::hash! is a \verb!size_t! value,
 which is like an unsigned integer value
 that is usually takes up 32 or 64 bits.
@@ -2078,46 +1121,7 @@ returns an \verb!size_t! or unsigned int when given a value of type \verb!X!.
 You then include this class as the third type parameter
 for \verb!unordered_map!:
 
-\begin{python}
-s = r'''
-#include <iostream>
-#include <string>
-#include <unordered_map>
-#include "Height.h"
-
-class Hash // or use a struct
-{
-public:
-    unsigned int operator()(const std::string & s) const
-    {
-        return 3; // a very bad hash function
-    }
-};
-
-typedef std::unordered_map<std::string, double, Hash> Height;
-
-int main()
-{
-    Height h;
-    h.insert({"John", 5.7});
-    h.insert({"Tom", 5.8});
-    h["Mary"] = 5.9;
-    h["Sue"] = 6.0;
-
-    print(h);
-    print_buckets(h);
-    print_stats(h);
-              
-    return 0;
-}
-'''.strip()
-f = open('main.cpp', 'w')
-f.write(s)
-f.close()
-from latextool_basic import *
-import os
-os.system('rm a.out; rm out.txt; g++ main.cpp -std=c++11; ./a.out > out.txt')
-\end{python}
+\input{stdout22.tex}
 \vspace{-0.1cm}
 {\small
 \VerbatimInput[frame=single]{main.cpp}
@@ -2141,36 +1145,7 @@ Basically I want to create a hash function on \verb!vec2d! objects
 using \verb!std::hash< double >!.
 
 I can do this:
-\begin{python}
-s = r'''
-#include <iostream>
-#include <functional> // for std::hash
-#include <unordered_map>
-#include "vec2d.h"
-
-template <>
-struct std::hash< vec2d >
-{
-    size_t operator()(const vec2d & v) const
-    {
-        return std::hash< double >{}(v.x() + v.y()) ; // bad hash!
-    };
-};
-
-typedef std::unordered_map< vec2d, double > temperature;
-
-int main()
-{
-    temperature h;
-    h[vec2d(1.1, 2.2)] = 5.9;
-    return 0;
-}
-'''.strip()
-f = open('main.cpp', 'w')
-f.write(s)
-f.close()
-from latextool_basic import *
-\end{python}
+\input{stdout23.tex}
 \vspace{-0.1cm}
 {\small
 \VerbatimInput[frame=single]{main.cpp}
@@ -2191,46 +1166,7 @@ This is because you cannot, for instance, have two different
 
 Now I'm going to resize to a smaller size:
 
-\begin{python}
-s = r'''
-#include <iostream>
-#include <string>
-#include <unordered_map>
-#include "Height.h"
-
-class Hash // or use a struct
-{
-public:
-    unsigned int operator()(const std::string & s) const
-    {
-        return 3; // a very bad hash function
-    }
-};
-
-typedef std::unordered_map<std::string, double, Hash> Height;
-
-int main()
-{
-    Height h;
-    h.insert({"John", 5.7});
-    h.insert({"Tom", 5.8});
-    h["Mary"] = 5.9;
-    h["Sue"] = 6.0;
-    h.reserve(4);
-    print(h);
-    print_buckets(h);
-    print_stats(h);
-              
-    return 0;
-}
-'''.strip()
-f = open('main.cpp', 'w')
-f.write(s)
-f.close()
-from latextool_basic import *
-import os
-os.system('rm a.out; rm out.txt; g++ main.cpp -std=c++11; ./a.out > out.txt')
-\end{python}
+\input{stdout24.tex}
 \vspace{-0.1cm}
 {\small
 \VerbatimInput[frame=single]{main.cpp}
@@ -2246,41 +1182,7 @@ The actually bucket size is $\geq n$ (i.e., it might not be exactly $n$).
 Note that when the load factor is $>$ the max load factor, the hash table
 will automatically rehash.
 
-\begin{python}
-s = r'''
-#include <iostream>
-#include <string>
-#include <unordered_map>
-#include "Height.h"
-
-typedef std::unordered_map<std::string, double> Height;
-
-int main()
-{
-    Height h;
-    h.insert({"John", 5.7});
-    h.insert({"Tom", 5.8});
-    h["Mary"] = 5.9;
-    h["Sue"] = 6.0;
-
-    print_buckets(h);
-    print_stats(h);
-
-    std::cout << "rehash with suggested bucket size 5\n";
-    h.rehash(5);
-    print_buckets(h);
-    print_stats(h);
-    
-    return 0;
-}
-'''.strip()
-f = open('main.cpp', 'w')
-f.write(s)
-f.close()
-from latextool_basic import *
-import os
-os.system('rm a.out; rm out.txt; g++ main.cpp -std=c++11; ./a.out > out.txt')
-\end{python}
+\input{stdout25.tex}
 \vspace{-0.1cm}
 {\small
 \VerbatimInput[frame=single]{main.cpp}
