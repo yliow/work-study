@@ -22,7 +22,7 @@ void print(const T & h)
 template < typename T >
 void print_buckets(const T & h)
 {
-    std::cout << "(key, value) pairs in buckets of h ...";
+    std::cout << "(key, value) pairs in buckets of h ..."; 
     for (unsigned int i = 0; i < h.bucket_count(); ++i)
                                      // iterating over all
                                      // buckets
@@ -38,7 +38,7 @@ void print_buckets(const T & h)
         std::cout << '\n';
     }
 }
-
+  
 void print_stats(Height & h)
 {
     std::cout << "size/buckets/load factor/max load factor:"
@@ -59,14 +59,14 @@ int main()
     h["Priscilla"] = 6.1;
     h["Sheila"] = 6.1;
     h["Ashley"] = 6.1;
-
+    
     h.erase("Tom");                  // delete operation
-
+    
     std::cout << h["John"] << '\n';  // find key and get value
     h["John"] = 6.2;                 // update by key with new
                                      // value
     std::cout << h["John"] << '\n';
-
+    
     Height::iterator p = h.find("Mary"); // find by key and
                                      // get iterator
     std::cout << (p != h.end() ? "found" : "not found")
@@ -80,7 +80,7 @@ int main()
     h.reserve(641);
     print_stats(h);
 
-    std::cout << "clear ...\n";
+    std::cout << "clear ...\n";           
     h.clear();                       // clear the map
     print_stats(h);
 
@@ -88,6 +88,6 @@ int main()
     Height h1(1000);                 // reserve size of
                                      // approx 1000
     print_stats(h);
-
+    
     return 0;
 }

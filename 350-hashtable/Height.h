@@ -22,7 +22,7 @@ void print(const T & h)
 template < typename T >
 void print_buckets(T & h)
 {
-    std::cout << "(key, value) pairs in buckets of h ...\n";
+    std::cout << "(key, value) pairs in buckets of h ...\n"; 
     for (unsigned int i = 0; i < h.bucket_count(); ++i)
                                      // iterating over all
                                      // buckets

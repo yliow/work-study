@@ -20,6 +20,6 @@ int main()
     h.rehash(5);
     print_buckets(h);
     print_stats(h);
-
+    
     return 0;
 }
