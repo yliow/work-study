@@ -1,7 +1,10 @@
 OPEN = xdg-open
 PDF = rm -rf solutions; touch solutions.tex; \
 	pdflatex --shell-escape -halt-on-error -interaction=nonstopmode -file-line-error $@.tex && \
-	pythontex main.tex && \
+	pdflatex --shell-escape $@.tex && \
+        pdflatex --shell-escape $@.tex && \
+        pdflatex --shell-escape $@.tex && \
+        pythontex main.tex && \
 	makeindex $@.idx && \
 	pdflatex --shell-escape $@.tex && \
         $(OPEN) $@.pdf;
