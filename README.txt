@@ -1,4 +1,4 @@
 350-heap
 350-hashtable
-cantor
-regular
+cantor          done    copied to courses/math325/n
+regular         
