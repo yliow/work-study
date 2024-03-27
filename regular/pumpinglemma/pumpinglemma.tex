@@ -1,0 +1,515 @@
+\section{Pumping Lemma}
+
+So far we have to been working 
+with regular languages.
+The question now to ask is this:
+Are there languages which are not regular?
+If the answer is no, then in a sense we know how to compute with language:
+we simply use DFAs (or NFAs or regex.)
+However if the answer is YES, then we would need to ask if there are other
+devices which are more \lq\lq powerful'' than
+DFA, NFA and regex?
+
+It turns out that there are in fact non-regular languages.
+Recall that Myhill-Nerode's theorem can tell you exactly
+when a language is not regular.
+However Myhill--Nerode is hard to use.
+It's simple to use this theorem:
+
+\begin{thm}\textbf{\defone{\textnormal{Pumping Lemma}}.}
+Let $L$ be a regular language over $\Sigma$. There is a number $n$
+such that for each $x \in L$ with $|x| \geq n$, there exists $u,v,w
+\in \Sigma^*$ such that
+\begin{tightlist}
+  \item[\textnormal{(a)}] $x = uvw$
+  \item[\textnormal{(b)}] $|uv| \leq n$
+  \item[\textnormal{(c)}] $|v| > 0$
+  \item[\textnormal{(d)}] $uv^iw \in L$ for all $i \geq 0$.
+\end{tightlist}
+\end{thm}
+
+That's quite a long theorem!
+By the way, do you realize that the conclusion of the theorem
+says something like this:
+\[
+\exists n \left( \forall x \left( \exists u,v,w (...) \right) \right)
+\]
+Yikes!
+Sure looks a little like the $\epsilon$--$\delta$ definition
+of limits in calculus:
+$\forall \epsilon ( \exists \delta (...))$
+
+\begin{cor}
+Let $L$ be a language over $\Sigma$. Then $L$ is non-regular if for
+any $n \geq 0$, there exists $x \in L$ with $|x| \geq n$ such
+that if $x=uvw$ for any $u,v,w \in \Sigma^*$
+ \begin{tightlist}
+  \item[\textnormal{(a)}] $|uv| \leq n$
+  \item[\textnormal{(b)}] $|v| > 0$
+  \item[\textnormal{(c)}] $uv^{i_0}w \notin L$ for some $i_0 \geq 0$.
+ \end{tightlist}
+\end{cor}
+
+I repeat: If you want to prove $L$ is not regular, then you need to
+show the following. For each positive integer $n \geq 0$, you must
+write down a string $x \in L$ such that
+ \begin{enumerate}[label=\textnormal{(\alph*)},itemsep=0pt,nosep,noitemsep,partopsep=0pt,topsep=0pt,parsep=0pt]
+  \item[(a)] $|x| \geq n$
+  \item[(b)]$x$ satisfied the following property: Let $u,v,w \in
+  \Sigma^*$ be any strings such that $x = uvw$, $|uv| \leq n$ and
+  $|v| > 0$, you must find some integer $i_0 \geq 0$ such that
+  $uv^{i_0}w \notin L$.
+ \end{enumerate}
+
+So here's a template of the proof that a language $L$ is not
+regular.
+
+\boxpar{ We want to show $L$ is not regular.
+\\
+
+Let $n \geq 0$ be a positive integer. Let $x = \underline{\hspace
+{1cm}}$. $x$ is in $L$ because \underline{\hspace{1cm}}
+\textsc{(explain only if not obvious)}.
+\\
+
+Let $u,v,w$ be any string in $\Sigma^*$ such that $x = uvw$
+and
+\begin{tightlist}
+  \item[(a)] $|uv| \leq n$
+  \item[(b)] $|v| > 0$
+  \item[(c)] $uv^{i_0}w \notin L$ for some $i_0 \geq 0$.
+\end{tightlist}
+
+\[
+\underline{\hspace{1cm}}\textsc{(analyze
+$u,v,w$)}\underline{\hspace{1cm}}
+\]
+
+Let $i_0 = \underline{\hspace{1cm}}$ and consider $uv^{i_0}w$.
+
+\[
+\underline{\hspace{1cm}}\textsc{(analyze
+$uv^{i_0}w$)}\underline{\hspace{1cm}}
+\]
+
+Therefore $uv^{i_0}w \notin L$.
+\\
+
+Hence by the Pumping Lemma for regular languages, $L$ is not
+regular.
+\qed
+}
+
+
+\begin{lem}
+ Let $G = (V,E)$ be a graph with $n$ nodes.
+ If $P$ is a path with $n$ node, then $P$ must contain a cycle.
+ Specifically if $P = (e_1,\ldots,e_{n-1})$ where $e_i \in E$ for
+ $1 \leq n \leq n-1$,
+ then there exists $k,\ell$ such that $1\leq k \leq \ell \leq n-2$
+ if $P_0 = (e_1,\ldots,e_k)$,
+ $P_1 = (e_{k+1},\ldots,e_\ell)$,
+ $P_2 = (e_{\ell+1},\ldots,e_{n-1})$
+ then $P_0P_1^iP_2$ is a path in $G$ for all $i \geq 0$.
+\end{lem}
+
+\begin{ex}
+Prove the above lemma.
+\end{ex}
+
+\begin{ex}
+Prove the pumping lemma.
+\end{ex}
+
+
+
+
+\newpage
+When we prove certain languages are non-regular, 
+we will frequently look at substrings within a larger strings. 
+For instance suppose $x$ is a string such that
+\[
+x = x_1 x_2 = y_1 y_2
+\]
+where $x_1, x_2, y_1, y_2$ are strings.
+Suppose further that $|x_1| = 5$ and $|y_1| = 10$,
+then $x_1$ must clearly be a substring of $y_1$.
+Right?
+
+The general (obvious) fact is this:
+If 
+\[
+x_1 x_2 = y_1 y_2
+\]
+where $x_1, x_2, y_1, y_2$ are strings and 
+\[
+|x_1| \leq |y_1|
+\]
+then $x_1$ is a substring of $y_1$.
+(In fact it's a left substring, i.e. a prefix, of $y_1$.)
+
+
+In particular, if
+\[
+x_1 x_2 = a^n b^n
+\]
+and $|x_1| \leq n$, then $x_1$ must be a substring of $a^n$.
+This means that $x_1$ can only be made up of $a$'s.
+Right?
+Since the length of $x_1$ is written $|x_1|$, we must have
+\[
+x_1 = a^{|x_1|}
+\]
+Note that since $x_1$ takes up $|x_1|$ number of 
+$a$'s, the amount of $a$'s left is $n - |x_1|$.
+Therefore the above also imply that
+\[
+x_2 = a^{n - |x_1|} b^n
+\]
+
+Here's another example.
+Let 
+\[
+x_1 x_2 = a^m b^{2m} 
+\]
+where $|x_1| < m$.
+Do you see that
+\[
+x_1 = a^{|x_1|}
+\]
+and
+\[
+x_2 = a^{m - |x_1|} b^{2m}
+\]
+
+\newpage
+\begin{eg}
+ $L = \{a^ib^i \,|\, i\geq 0 \}$ is not regular.
+
+\textbf{Solution.}
+Let $n \geq 0$. We choose $x = a^nb^n$. Note that $x \in
+L$ and $|x| = 2n \geq n \geq 0$. 
+Let $u,v,w$ be strings in $\Sigma^*$ such that
+\begin{enumerate}[label=\textnormal{(\alph*)},itemsep=0pt,nosep,noitemsep,partopsep=0pt,topsep=0pt,parsep=0pt]
+ \item[(a)] $x = uvw$
+ \item[(b)] $|uv| \leq n$
+ \item[(c)] $|v| > 0$
+\end{enumerate}
+
+Since $|uv| \leq n$, and $uv$ is a prefix of $x = a^n b^n$.
+This implies that $uv$ is made up of only $a$'s.
+Therefore 
+\[
+u = a^{|u|}, \,\,\, v = a^{|v|}
+\]
+We also have 
+\[
+w = a^{n-|u|-|v|}b^n
+\]
+
+Let $i_0 = 2$. 
+Note that
+\[
+u v^{i_0} w 
+= uv^2w 
+= a^{|u|} (a^{|v|})^2 a^{n - |u| - |v|}b^n 
+= a^{|u|+2|v| + |n| - |u|- |v|}b^n = a^{n+|v|}b^n
+\]
+Since
+$|v|>0$, we have
+\[
+n+|v| > n
+\]
+Therefore 
+\[
+uv^{i_0}w = a^{n+|v|}b^n \notin L
+\]
+
+Therefore by the Pumping Lemma for regular languages, $L$ is not
+regular.
+\qed
+\end{eg}
+
+
+
+[Informally,
+since $|uv| \leq n$, $uv$ must be a substring of $a^n$ in $x = a^nb^n$.
+Also note that since $|v| > 0$, $uv^2w$ would increase
+the number of $a$'s in in $a^nb^n$ without changing the number of
+$b$'s.]
+
+
+\newpage
+\begin{ex}
+Prove that $L = \{a^n b^{2n} \mid n\geq 0 \}$ is not regular.
+\end{ex}
+
+\textbf{Solution.}
+
+Let $n \geq 0$.
+We choose $x = a^n b^{2n}$. Note that $x \in L$.
+Furthermore $|x| = 3n \geq n$.
+Let $u,v,w$ be strings in $\Sigma^*$ such that
+\begin{enumerate}[label=\textnormal{(\alph*)},itemsep=0pt,nosep,noitemsep,partopsep=0pt,topsep=0pt,parsep=0pt]
+ \item[(a)] $x = uvw$
+ \item[(b)] $|uv| \leq n$
+ \item[(c)] $|v| > 0$
+\end{enumerate}
+ 
+Since $uv$ is a prefix of $x = a^n b^{2n}$
+and $|uv| \leq n$, $uv$ must be a substring of $a^n$.
+Hence $u,v$ are both substrings of $a^n$ and we have
+\[
+u = a^{|u|}, \,\,\, 
+v = a^{|v|}
+\]
+We also have
+\[
+w = a^{n - |u| - |v|} b^{2n}
+\]
+
+Let $i_0 = 2$. Then
+\[
+uv^{i_0}w
+= uv^2w 
+= a^{|u|} (a^{|v|})^2 a^{n - |u| - |v|} b^{2n}
+= a^{|u| + 2|v| + n - |u| - |v|} b^{2n}
+= a^{n + |v|} b^{2n}
+\]
+
+Therefore by the Pumping Lemma for regular languages, we 
+conclude that $L$ is not regular.
+
+\newpage
+\begin{ex}
+Prove that $L = \{a^n b^{2n+1} \mid n\geq 0 \}$ is not regular.
+\end{ex}
+
+\newpage
+\begin{ex}
+Prove that $L = \{a b^n c^{2n} \mid n \geq 0 \}$ is not regular.
+\end{ex}
+
+\newpage
+\begin{ex}
+Is $L = \{b^n a b^n \mid n \geq 0 \}$ regular?
+If you think it is, you must either construct a DFA/NFA/regex for $L$.
+If not, then you must prove that it's not using for instance the
+pumping lemma (for regular languages.)
+\end{ex}
+
+\newpage
+\begin{ex}
+Is $L = \{a^nba^n\,|\, n \geq 0\}$ is regular?.
+Prove your claim.
+\end{ex}
+
+\newpage
+\begin{ex}
+Is $L = \{a^m b^n\,|\, 0 \leq m \leq n \}$ is regular?.
+Prove your claim.
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Is $L = \{a^m b^n\,|\, 0 \leq m < n \}$ is regular?.
+Prove your claim.
+\end{ex}
+\vspace{0.1in}
+
+\newpage
+\begin{ex}
+Is $L = \{a^nb^na^mb^m\,|\, n \geq 0, \,\,\, m \geq 0\}$ regular?
+Prove your claim.
+\end{ex}
+
+
+\newpage
+\begin{eg}
+Prove that $L = \{a^{i^2} \,|\, i \geq 0\}$ is not regular.
+
+\textbf{Solution.} Let $n \geq 0$ and $x = a^{n^2}$. Note that $x \in
+L$ and $|x| \geq n$.
+
+Let $x = uvw$ where $u,v,w \in \Sigma^*$, $|uv| \leq n$ and $|v|>0$. We
+will show that $uv^2w \notin L$.
+
+Consider $uv^2w = a^{n^2+|v|}$. We now analyze $n^2+|v|$. Note
+that $|v| \leq |uv|\leq n$. By assumption $|v|>0$. Therefore
+altogether we have $0 < |v| \leq n$ and hence
+\[
+ n^2 < n^2 + |v| \leq n^2 + n
+\]
+Now we note that
+\[
+ n^2 + n < n^2 + 2n + 1 = (n+1)^2
+\]
+Altogether we have shown that
+\[
+ n^2 < n^2+|v| < (n+1)^2
+\]
+There are obviously no squares of integers in the interval
+$(n^2,(n+1)^2)$ (why?). Hence $n^2+|v|$ cannot be a square.
+Therefore $wv^2w = a^{n^2+|v|} \notin L$.
+
+Therefore by the Pumping Lemma for regular languages, $L$ is not
+regular.
+\\
+\end{eg}
+
+
+\newpage
+\begin{ex}
+Prove that $L = \{a^{n^2 + 1} \,|\, n \geq 0\}$ is not regular.
+\end{ex}
+
+
+
+\newpage
+\begin{ex}
+Prove that $L = \{a^{n^3} \,|\, n \geq 0\}$ is not regular.
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Is $L = \{a^{2n^3} \,|\, n \geq 0\}$ regular? 
+Prove your claim.
+\end{ex}
+
+
+\newpage
+\begin{eg}
+Prove $L = \{a^p \,|\, p \text{ is prime } \}$ is not regular.
+
+\textbf{Solution.} Let $n \geq 0$. Let $p \geq n$ be a prime; this is
+possible since there are infinitely many primes. Consider $x = a^p$.
+Note that $x \in L$ and $|x| = p \geq n$.
+
+Let $u,w,v \in \Sigma$ such that $x = uvw$. Now we consider
+$uv^{k+1}w$; we will choose $k\geq 0$ in a minute so that the
+length of $uv^{k+1}w$ is not a prime. Note that
+\[
+ |uv^{k+1}w| = |uvw| + k|v|
+\]
+Choose $k = |uvw|$ and we get
+\[
+|uv^{k+1}w| = |uvw| + |uvw||v| = |uvw|(1 + |v|)
+\]
+which is not a prime and so $uv^{1+|uvw|}w \notin L$.
+
+By the Pumping Lemma for regular languages, $L$ is not regular.
+\\
+\end{eg}
+
+\newpage
+\begin{ex}
+An integer is composite if it is not prime. Prove that $L =
+\{a^n\,|\, n \text{ is composite} \}$ is not regular.
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Is $L = \{a^p b^{p+2}\,|\, \text{$p$,$p+2$ are twin primes} \}$ regular?
+($p,p+2$ are twin primes if $p$ and $p+2$ are both primes.)
+\end{ex}
+
+
+
+\newpage
+You can also combine regular operators with PL to prove that a language
+is not regular.
+Here, a regular operators means a set operator which is closed
+for regular languages, meaning to say that regular languages remains
+closed for such operators.
+You already know that the following closed:
+\begin{enumerate}[topsep=0mm]
+\item If $L,L'$ are regular, then $L \cup L'$ is also regular
+\item If $L,L'$ are regular, then $L \cap L'$ is also regular
+\item If $L,L'$ are regular, then $LL'$ is also regular
+\item If $L$ are regular, then $L^*$ is also regular
+\item If $L$ is regular, then $\overline{L}$ is also regular
+\end{enumerate}
+
+
+\begin{eg} Let $\Sigma = \{a,b\}$.
+Is 
+\[
+L = \{ x \in \Sigma^* \,|\, x \text{ has same number of $a$'s
+and $b$'s} \}
+\]
+regular?
+\end{eg}
+
+\textbf{Solution.} Assume $L$ is regular.
+
+$L(a^*b^*) = \{a^mb^n\,|\, m\geq 0, \, n \geq 0\}$ is 
+regular since languages generates by regex's are also regular.
+Now note that
+\[
+L \cap L(a^*b^*) = \{a^nb^n \,|\, n \geq 0\}
+\]
+$L(a^*b^*)$ is regular since it is the language generated by a regex.
+Since intersection is a closed regular operator and we assumed that
+$L$ is regular, we conclude that $L \cap L(a^*b^*)$ is also regular.
+
+However we have already shown that $\{a^nb^n \,|\, n \geq 0\}$ is
+\textit{not} regular.
+
+This gives us a contradiction.
+Therefore our assumption that $L$ is regular cannot hold.
+Hence $L$ is not regular.
+\qed
+
+
+
+\newpage
+\begin{ex} Let $\Sigma = \{a,b\}$.
+Is 
+\[
+L = \{w \,|\, \text{the number of $a$'s in $w$ is a prime} \}
+\]
+regular? Prove your claim.
+\end{ex}
+
+
+
+\newpage
+\begin{ex} Let $\Sigma = \{a,b\}$.
+Is 
+\[
+L = \{w \,|\, \text{there are more $a$'s than $b$'s in $w$} \}
+\]
+regular? Prove your claim.
+\end{ex}
+
+
+
+\newpage
+\begin{ex} Let $\Sigma = \{a,b\}$.
+Is 
+\[
+L = \{w \,|\, \text{there are 3 times more $a$'s than $b$'s in $w$} \}
+\]
+regular? Prove your claim.
+\end{ex}
+\vspace{0.1in}
+
+
+
+\newpage
+\begin{ex} Let $\Sigma = \{a,b\}$.
+Is $L = \{ww \,|\, w \in \Sigma^*\}$ regular? Prove your claim.
+\end{ex}
+\vspace{0.1in}
+
+
+\newpage
+\begin{ex}
+Is the class of non-regular languages closed under union,
+intersection, complement, concatenation, Kleene star?
+For instance is it true that if $L$ and $L'$ are not regular,
+then $L \cup L'$ is also not regular.
+\end{ex}

@@ -1,0 +1,253 @@
+\section{Nondeterministic Finite Automata}
+
+Now I'll give you the formal definition of an NFA.
+Read the following
+definition \textit{very} carefully and make sure the definition models
+the above examples of NFA state diagrams.
+
+\begin{defn}
+  $N$ is a
+  \defone{nondeterministic finite automata NFA}
+  if $N =
+  (\Sigma,Q,q_0,F,\delta)$ where
+  \begin{tightlist}
+  \item $\Sigma$ is a finite set. This is called the
+    \defone{alphabets}.
+  \item $Q$ is a finite set. The elements are called
+    \defone{states}.
+  \item $q_0 \in Q$ is called the
+    \defone{initial state}
+    or
+    \tinysidebarskip\defone{start state}\sidebarskip{0pt}.
+  \item $F \subseteq Q$ and elements of $F$ are called
+    \defone{accept states}
+    or
+    \tinysidebarskip\defone{final states}\sidebarskip{0pt}.
+  \item $\delta : Q \times \Sigma_\ep \rightarrow P(Q)$.
+    This is called the \defone{transition function}
+    of this $N$.
+  \end{tightlist}
+  In the above, $\Sigma_\ep = \Sigma \cup \{\epsilon\}$
+  and $P(Q)$ is the powerset of $Q$.
+\end{defn}
+
+\newpage
+\begin{ex}
+  Here's an NFA state diagram
+  for $\emptyset$ for $\Sigma = \{a,b\}$:
+
+\begin{python}
+from latextool_basic import *
+print(automata(layout="""
+A
+""",
+edges="",
+A="initial|label=$q_0$",
+))
+\end{python}
+
+Write down the formal definition of this NFA.
+\end{ex}
+
+\SOLUTION
+
+The formal definition of this NFA is $(\Sigma, Q, q_0, \delta, F)$ where
+\begin{tightlist}
+\li $\Sigma = \{a,b\}$
+\li $Q = \{q_0\}$
+\li $\delta$ is the function
+\[
+\delta : Q \times \Sigma_\epsilon \rightarrow P(Q)
+\]
+given by
+\begin{align*}
+  \delta(q_0, \epsilon) &= \{\} \\
+  \delta(q_0, a) &= \{\} \\
+  \delta(q_0, b) &= \{\} 
+\end{align*}
+\end{tightlist}
+
+
+\newpage
+\begin{ex}
+Draw the (obvious) NFA $N$ for the words of $\{a,b\}^*$ containing $aba$.
+Write down the formal definition of $N$.
+\qed
+\end{ex}
+
+\newpage
+\begin{ex}
+Draw the (obvious) NFA $N$ for the words of $\{a,b\}^*$ containing $abab$
+or $baba$.
+Write down the formal definition of $N$.
+\end{ex}
+\qed
+
+\newpage
+\begin{ex}
+  Write down the formal definition of this NFA:
+\begin{python}
+from latextool_basic import *
+print(automata(layout="""
+A   B   D
+
+    C
+""",
+edges="A,$\epsilon$,B|A,$a$,A|A,$a$,C|C,$a,\epsilon$,B|B,$b$,D|D,$a,b$,C",
+A="initial|label=$q_0$",
+B="label=$q_1$",
+C="label=$q_2$",
+D="accept|label=$q_3$",
+))
+\end{python}
+Compute all the states reached by the following words:
+\begin{enumerate}[label=(\alph*)]
+\item $\ep$
+\item $a$
+\item $b$
+\item $aa$
+\item $ab$
+\item $ab$
+\item $ba$
+\item $bb$
+\item Can you find a \lq\lq simpler" NFA that accepts the same words as the above NFA?
+  \lq\lq Simpler" means \lq\lq fewer states".
+\end{enumerate}
+\end{ex}
+
+
+\newpage
+\begin{defn}
+Let $S \subseteq Q$ and $a \in \Sigma_\ep$. Note that we can
+define
+\[
+ \delta(S,a) := \bigcup_{q \in S} \delta(q,a)
+\]
+The following is a computation: Let $a \in \Sigma_\ep$.
+\[ (S,ax) \vdash (\overline{\delta(S,a)}, x) \]
+where the notation $\overline{\textwhite{123}}$ means the following: If $S$ is a
+set of states, then we want to include those states reachable from
+$S$ through an $\ep$--transition, i.e.,
+ \begin{tightlist}
+  \item $q \in S$ $\implies$ $q \in \overline{S}$
+  \item $q \in \overline{S}$ $\implies$ $\delta(q,\ep) \subseteq
+  \overline{S}$
+ \end{tightlist}
+\end{defn}
+Informally, you think of it this way:
+\begin{enumerate}
+\item Let $S_0$ be the set of all
+  state $S$.
+\item
+  Let $S_1$ be the set of states in $S_0$
+  as well as the states $q' \in \delta(q, \epsilon)$
+  where $q \in S_0$.
+\item
+  In general,
+  let $S_i$ be the set of states in $S_{i-1}$
+  as well as the states $q' \in \delta(q, \epsilon)$
+  where $q \in S_{i-1}$.
+\end{enumerate}
+At some point $S_i$ will stop changing, say $S_n$.
+Then $S_n$ is the set of all states that are
+\defone{reachable} from $S$, i.e.,
+viewing the state diagram as a directed graph,
+$S_n$ are the states $q'$ such that there is a path
+from some $q \in S$ to $q'$.
+In other words the computation of $\overline{S}$ is a
+\defone{reachability problem} in directed graph.
+If you remove from the graph where the transitions are
+not labeled $\ep$ (only $\epsilon$--transitions are retained), then you are
+also computing the \defone{transitive closure} of $S$.
+(This is from discrete 1.)
+
+Easy, right?
+This is sometimes called the \defone{$\epsilon$--closure} of the
+set $S$.
+
+As an algorithm, here's how you compute the $\epsilon$--closure of $S$:
+\begin{Verbatim}[frame=single, fontsize=\small]
+ALGORITHM: EPSILON-CLOSURE
+INPUT: S - a set of states
+       delta - a transition function
+
+let DONE be an empty set
+put all the states in S into BOUNDARY
+let NEW be an empty set       
+while 1:
+    for q in BOUNDARY:
+        put states in delta(q, epsilon) which are not in DONE
+        and not in BOUNDARY into NEW
+    put all the states in BOUNDARY into DONE
+    if NEW is empty:
+        break the loop
+    else:
+        put all the states in NEW into BOUNDARY
+
+return DONE
+\end{Verbatim}
+For states not in $S$, each of them is placed in NEW and then in
+BOUNDARY and then DONE.
+Assume that adding and removing from NEW, BOUNDARY, DONE
+can be done in $O(1)$.
+\newpage
+\begin{ex}
+Refer to our first NFA again:
+\begin{center}
+\begin{tikzpicture}[shorten >=1pt,node distance=2cm,auto,initial text=,
+initial where=above]
+\node[state,initial]   (q0) [shape=circle, draw] at ( 0,  0) {$q_0$};
+\node[state]           (q1) [shape=circle, draw] at (-1, -4) {$q_1$};
+\node[state]           (q3) [shape=circle, draw] at ( 1, -2) {$q_3$};
+\node[state,accepting] (q4) [shape=circle, draw] at ( 1, -4) {$q_4$};
+\node[state,accepting] (q2) [shape=circle, draw] at (-1, -6) {$q_2$};
+
+\path[->]
+(q0) edge [loop right] node {$a,b$} ()
+(q0) edge node {$b$} (q1)
+(q0) edge node {$\epsilon$} (q3)
+(q1) edge node {$b$} (q2)
+(q3) edge node {$\epsilon$} (q1)
+(q3) edge node {$a$} (q4)
+;
+\end{tikzpicture}\end{center}
+\begin{itemize}
+\item What is $\overline{\{\}}$? 
+\item What about $\overline{\{q_0\}}$?
+\item What about $\overline{\{q_1\}}$?
+\item What about $\overline{\{q_2\}}$?
+\item What about $\overline{\{q_4\}}$?
+\item What about $\overline{\{q_0, q_1\}}$?
+\item Write down $\overline{S}$ for all subsets $S$ of $\{q_0, ..., q_4\}$.
+\end{itemize}
+\qed
+\end{ex}
+
+
+
+
+\newpage
+\begin{defn}
+  Let $N$ be an NFA.
+  The definition of $\vdash^*$ from $\vdash$ is just like the case of the
+  DFA.
+  A string $x \in \Sigma^*$ is accepted by the above $N$ if
+  \[
+  (\overline{\{q_0\}}, x) \vdash^* (S, \ep)
+  \]
+  and $S \subseteq Q$ contains at least one accepting state, i.e.,
+  $S \cap F \neq \emptyset$.
+\end{defn}
+
+
+
+Here's an example to prove the power of the NFA ...
+
+
+\newpage
+\begin{ex}
+Design an NFA $N$ that accepts words in $\{a, b\}^*$ which ends in 
+either $aba$ or $aba$.
+Write down the formal definition of $N$. 
+\qed
+\end{ex}

@@ -1,0 +1,174 @@
+\section{Nondeterministic Finite Automata}
+
+Read the definition carefully and make sure the definition models
+the above example of a state diagram for the $\NFA$.
+
+\begin{defn}
+$N$ is a \defterm{nondeterministic finite automata} or NFA if $N =
+(\Sigma,Q,q_0,F,\delta)$ where
+ \begin{tightlist}
+  \item $\Sigma$ is a finite set. The elements are called
+   {\bf alphabets}.
+  \item $Q$ is a finite set. The elements are called
+   \defterm{states}.
+  \item $q_0 \in Q$ is called the \defterm{initial state}
+  \item $F \subseteq Q$ and elements of $F$ are called {\bf accept
+  state}.
+  \item $\delta : Q \times \Sigma_\ep \rightarrow P(Q)$
+ \end{tightlist}
+\end{defn}
+
+\newpage
+\begin{ex}
+Here's an NFA for $\emptyset$ for $\Sigma = \{a,b\}$:
+
+\begin{python}
+from latextool_basic import *
+print automata(layout="""
+A
+""",
+edges="",
+A="initial|label=$q_0$",
+)
+\end{python}
+
+Write down the formal definition of this NFA.
+\end{ex}
+
+\SOLUTION
+
+The formal definition of this NFA is $(\Sigma, Q, q_0, \delta, F)$ where
+\begin{tightlist}
+\li $\Sigma = \{a,b\}$
+\li $Q = \{q_0\}$
+\li $\delta$ is the function
+\[
+\delta : Q \times \Sigma_\epsilon \rightarrow P(Q)
+\]
+given by
+\begin{align*}
+\delta(a, q_0) &= \{\} \\
+\delta(b, q_0) &= \{\} \\
+\delta(\epsilon, q_0) &= \{\}
+\end{align*}
+\end{tightlist}
+
+
+\newpage
+\begin{ex}
+Draw the (obvious) NFA $N$ for the words of $\{a,b\}^*$ containing $aba$.
+Write down the formal definition of $N$.
+\qed
+\end{ex}
+
+\newpage
+\begin{ex}
+Draw the (obvious) NFA $N$ for the words of $\{a,b\}^*$ containing $abab$
+or $baba$.
+Write down the formal definition of $N$.
+\end{ex}
+\qed
+
+\newpage
+\begin{ex}
+\begin{python}
+from latextool_basic import *
+print automata(layout="""
+A   B   D
+
+    C
+""",
+edges="A,$\epsilon$,B|A,$a$,A|A,$a$,C|C,$a,\epsilon$,B|B,$b$,D|D,$a,b$,C",
+A="initial|label=$q_0$",
+B="label=$q_1$",
+C="label=$q_2$",
+D="accept|label=$q_3$",
+)
+\end{python}
+\end{ex}
+
+
+\newpage
+\begin{defn}
+Let $S \subseteq Q$ and $a \in \Sigma_\ep$. Note that we can
+define
+\[
+ \delta(S,a) := \bigcup_{q \in S} \delta(q,a)
+\]
+The following is a computation: Let $a \in \Sigma_\ep$.
+\[ (S,ax) \vdash (\overline{\delta(S,a)}, x) \]
+where the notation $\overline{\textwhite{123}}$ means the following: If $S$ is a
+set of states, then we want to include those states reachable from
+$S$ through an $\ep$--transition, i.e.,
+ \begin{tightlist}
+  \item $q \in S$ $\implies$ $q \in \overline{S}$
+  \item $q \in \overline{S}$ $\implies$ $\delta(q,\ep) \subseteq
+  \overline{S}$
+ \end{tightlist}
+\end{defn}
+Informally, you think of it this way:
+If $q$ is a state in $S$, then $q$ is also in $\overline{S}$.
+If $q$ is a state in $S$ and there is an $\epsilon$--transition
+from $q$ to $q'$, then $q'$ is also in $S$.
+Easy, right?
+This is sometimes called the \defterm{$\epsilon$--closure} of the
+set $S$.
+
+
+\newpage
+\begin{ex}
+Refer to our first NFA again:
+\begin{center}
+\begin{tikzpicture}[shorten >=1pt,node distance=2cm,auto,initial text=,
+initial where=above]
+\node[state,initial]   (q0) [shape=circle, draw] at ( 0,  0) {$q_0$};
+\node[state]           (q1) [shape=circle, draw] at (-1, -4) {$q_1$};
+\node[state]           (q3) [shape=circle, draw] at ( 1, -2) {$q_3$};
+\node[state,accepting] (q4) [shape=circle, draw] at ( 1, -4) {$q_4$};
+\node[state,accepting] (q2) [shape=circle, draw] at (-1, -6) {$q_2$};
+
+\path[->]
+(q0) edge [loop right] node {$a,b$} ()
+(q0) edge node {$b$} (q1)
+(q0) edge node {$\epsilon$} (q3)
+(q1) edge node {$b$} (q2)
+(q3) edge node {$\epsilon$} (q1)
+(q3) edge node {$a$} (q4)
+;
+\end{tikzpicture}\end{center}
+What is $\overline{\{\}}$? 
+What about $\overline{\{q_0\}}$?
+What about $\overline{\{q_1\}}$?
+What about $\overline{\{q_2\}}$?
+What about $\overline{\{q_4\}}$?
+What about $\overline{\{q_0, q_1\}}$?
+Write down $\overline{S}$ for all subsets $S$ of $\{q_0, ..., q_4\}$.
+\vspace{2in}
+\qed
+\end{ex}
+
+\begin{defn}
+The definition of $\vdash^*$ from $\vdash$ is just like the case of the
+DFA.
+A string $x \in \Sigma^*$ is accepted by the above NFA if
+\[
+ (\overline{\{q_0\}}, x) \vdash^* (S, \ep)
+\]
+and $S \subseteq Q$ contains at least one accepting state, i.e.,
+$S \cap F \neq \emptyset$.
+\end{defn}
+
+
+
+Here's an example to prove the power of the NFA ...
+
+
+\newpage
+\begin{ex}
+Design an NFA $N$ that accepts words in $\{a, b\}^*$ which ends in 
+either $aba$ or $aba$.
+Write down the formal definition of $N$. 
+\qed
+\end{ex}
+
+

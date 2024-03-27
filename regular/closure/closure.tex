@@ -1,0 +1,892 @@
+\section{Closure Rules}
+
+Now suppose if you want to show $L$ is regular, you can try to
+construct a DFA for it. That would mean that you're always starting
+from scratch. In this section we'll adopt a more sophisticated
+approach. In particular, we see how to show a language is regular by
+looking at other language(s).
+
+We fix a alphabet $\Sigma$.
+Every language over $\Sigma$ is a
+subset of $\Sigma^*$. Therefore the set of
+\textit{all} languages
+over $\Sigma$ is the powerset of $\Sigma^*$, i.e., $P(\Sigma^*)$.
+In this collection of languages is the set of regular languages
+over $\Sigma$. Let's call this set \defone{$\Reg_\Sigma$}. Therefore
+$\Reg_\Sigma \subsetneq P(\Sigma^*)$.
+
+Here's why the above are called \defone{closure rules}. Consider all
+languages over $\Sigma$. This is $P(\Sigma^*)$. Right? Remember
+powerset? You can think of $\cup$ (union) as a binary operation on
+$P(\Sigma^*)$. In other words let $L, L' \in P(\Sigma^*)$, then
+$L \cup L' \in P(\Sigma^*)$.
+This is obvious.
+
+Now suppose $L,L' \in \Reg_\Sigma$.
+We want to know if $L \cup L' \in \Reg_\Sigma$.
+This is true, but not immediate.
+If this is the case, then
+we say that $\cup$ is a \defone{closed binary operation} on $\Reg_\Sigma$.
+This is similar to saying $+$ is a closed binary operator on $\Z$: adding two integers
+will give you an integer.
+However, note that the binary operator $/$ division on $\Z$ is not closed:
+$5 / 2 = 2.5$ which is \textit{not} in $\Z$.
+Obviously working with $\Reg_\Sigma$ is harder than with $\Z$!
+
+Why are closure rules useful? Such rules will allow us to re-use previously
+known regular languages. For instance if $\cup$ is a closed
+operator on regular languages and
+you want to study
+\[
+  L'' = \{ x \in \{a,b\}^* \,|\, \text{ number of $a$ in $x$ is } \equiv 1 \pmod{5}
+  \text{ or $x$ contains $a^3$} \}
+\]
+then, assuming you see the decomposition
+\[
+L'' = L \cup L'
+\]
+where
+\begin{align*}
+ L &= \{ x \in \{a,b\}^* \,|\, \text{number of $a$ in $x$ is } \equiv 1 \pmod{5}
+ \}\\
+ L' &= \{ x \in \{a,b\}^* \,|\, x \text{ contains } a^3 \}
+\end{align*}
+are both regular, then you know immediately that $L$ is also regular.
+You can than apply all tools and techniques in regular languages to study $L$.
+In fact you can also study $L''$ by studying the components of
+its decomposition: $L$ and $L'$.
+
+The above is a general philosophy is used throughout any form of study, 
+computer science, math, sciences, etc.
+You decompose a problem and you ask which \lq\lq universe" you are in
+so that you don't use the wrong formulas or theorems.
+
+We will look at union, intersection, set difference, etc. Note that if $L$
+is a language over $\Sigma$, complementation of $L$ will be with
+respect to $\Sigma^*$, i.e., $\overline L = \Sigma^* - L$.
+Here are some more operators:
+
+\begin{defn}
+  Let $L$ and $L'$ be languages over $\Sigma$. 
+  \begin{itemize}
+  \item
+    The
+    \defone{concatenation} of $L$ and $L'$ is defined as follows:
+    \[
+    LL' = \{ z \in \Sigma^* \,|\, z = xx' \text{ for some } x\in L \text{ and } x' \in L'\}
+    \]
+  \item We can define $L^n$ for $n \geq 0$ as follows:
+    \[
+    L^n =
+    \begin{cases}
+      \{ \ep \} & \text{ if } n = 0 \\
+      L^{n-1} L  & \text{ if } n > 0 \\
+    \end{cases}
+    \]
+  \item The \defone{Kleene star} of $L$, written $L^*$ is defined by
+    \[
+    L^* = \bigcup_{n \geq 0} L^n = \{x_1\cdots x_n \,|\, x_i \in L  \text{ for } i=1,\ldots,n \}
+    \]
+  \end{itemize}
+\end{defn}
+
+You can easily make up your own operators.
+For instance here's one that you have seen before:
+If $L$ is a language $L^R$ is the reversal of $L$, i.e.,
+the words in $L^R$ are the reversed of $L$.
+For instance if $abaa \in L$, then $aaba \in L^R$.
+You can then ask this question: if $L$ is regular, is $L^R$ also regular?
+Note that ${-}^R$ is a unary operator.
+I'll give you another one:
+Let $L$ be a language. Define $\frac{1}{2}L$ be the language
+of half-words of $L$ where a half-word is just the \textit{first half} of the word.
+For instance if $w = aaba$, then $\frac{1}{2}w$ is $aa$.
+For the case when $w$ has odd length,
+$\frac{1}{2}w$ is the first $\floor{|w|/2}$ characters.
+For instance $\frac{1}{2}aabbbba = aab$.
+You can ask this question: If $L$ is regular, is $\frac{1}{2}L$ also regular?
+
+For binary language operator, here's an example:
+Suppose $L$ and $L'$ are two languages, define $\operatorname{Zip}(L,L')$
+to be the language of words $w$ such that
+\[
+w = x_1 y_1 x_2 y_2 x_3 y_3 \cdots
+\]
+where
+$x = x_1 x_2 x_3 \cdots$ is a word in $L$
+and
+$y = y_1 y_2 y_3 \cdots$ is a word in $L'$.
+(If $x$ and $y$ has different lengths, you just add $\ep$'s so that they have the same length.)
+You can then ask if 
+$\operatorname{Zip}(L,L')$ is regular
+if
+$L,L'$ are regular.
+
+
+You can create your oan unary and binary operators on languages are ask
+if your operator is closed in the collection of regular languages.
+
+ 
+We will prove the following closure rules. In the proofs you will
+see the power of NFAs.
+
+
+
+\begin{thm}
+ Let $L,L'$ be languages.
+ \begin{enumerate}[label=\textnormal{(\alph*)},itemsep=0pt,nosep,noitemsep,partopsep=0pt,topsep=0pt,parsep=0pt]
+  \item $L,L'$ regular $\implies$ $L \cup L'$ regular
+  \item $L,L'$ regular $\implies$ $L \cap L'$ regular
+  \item $L$ regular $\implies$ $\overline{L}$ regular
+  \item $L,L'$ regular $\implies$ $L - L'$ regular
+  \item $L,L'$ regular $\implies$ $LL'$ regular
+  \item $L$ regular $\implies$ $L^*$ regular
+ \end{enumerate}
+ In other words, regular languages
+ are closed under union, intersection, complement, set difference,
+ concatenation, and Kleene star.
+ \qed
+\end{thm}
+
+
+
+
+
+\newpage
+\section{Closure: Intersection}
+
+Let's prove closure of $\cap$ on $\Reg_\Sigma$.
+
+Since we assumed that $L$ and $L'$ are regular, by definition,
+there must be DFAs $M$ and $M'$ such that $L = L(M)$ and $L' =
+L(M')$. To show that $L \cap L'$ is regular, we must construct a
+DFA $M''$ such that $L(M'') = L\cap L'$. Right? This is all by
+definition.
+
+Of course $M''$ must be constructed from $M$ and $M'$. What do you
+want $M''$ to do? Suppose you're given a string $x \in \Sigma^*$. By
+definition a string $x$ is in $L''$ if and only if $x$ is in both
+$L$ and $L'$. This means that $M''$ must be a machine that will
+accept $x$ if and only if $x$ is accepted by both $M$ and $M'$. This
+means that $M''$ must be able to \lq\lq run" $M$ and $M'$ separately
+and must ``know" if $M$ and $M'$ accepted the $x$ or not. So in
+other words suppose that when you run $M$ and $M'$ with $x$, you get
+the following sequence of states:
+\begin{align*}
+M: \,\,\, &q_0 \rightarrow s_1 \rightarrow s_2 \rightarrow \cdots \rightarrow s_n \\
+M': \,\,\, &q_0' \rightarrow s'_1 \rightarrow s'_2 \rightarrow
+\cdots \rightarrow s'_n
+\end{align*}
+where $s_i$ are states in $M$ and $s_i'$ are states in $M'$. Of
+course $M''$ is a single DFA and so as you run $M''$ you should
+only see a single sequence of states, not two. How would you
+create a single sequence of states from the above? What if we do
+this:
+\[
+M'' \,\,\, (???): \,\,\, q_0,q_0' \rightarrow s_1,s_1' \rightarrow
+s_2, s'_2 \rightarrow \cdots \rightarrow s_n,s'_n
+\]
+So we want ``$q_0,q_0'$'' to be a single ``thing''. AHA!!!
+Tuples!!!
+\[
+M'': \,\,\, (q_0,q_0') \rightarrow (s_1,s_1') \rightarrow (s_2,
+s'_2) \rightarrow \cdots \rightarrow (s_n,s'_n)
+\]
+Note in particular that $(s_i,s'_i)$ is not the same as
+$(s_i',s_i)$.
+This is the first hint that the states of $M''$ must
+be
+\[
+ Q'' = Q \times Q' = \{(q,q') \,|\, q\in Q, q'\in Q'\}
+\]
+i.e., the product of $Q$ and $Q'$, the set of states of $M$ and
+$M'$.
+
+How should we initialize our $M''$ engine? Obviously $q''_0 =
+(q_0,q_0')$ where $q_0$ and $q_0'$ are the initial states of $M$
+and $M'$ respectively.
+
+When is $x$ accepted? Obviously if the final state after running
+$x$ through the $M''$ is $(q,q')$, then
+\[
+ x \in L'' \iff x \in L \text{ and } x \in L'
+\]
+forces us to say that $(q,q')$ is an accepting state exactly when
+$q \in F$ and $q'\in F'$ where $F,F'$ are sets of accepting states
+of $M$,$M'$ respectively:
+\[
+   (q,q') \in F'' \iff q \in F, \,\,\, q' \in F'
+\]
+This means that we must have
+\[
+ F'' = F \times F'
+\]
+
+Furthermore it's now clear how to define $\delta''$ the transition
+function of $M''$ in terms of $\delta, \delta'$ the transition
+functions of $M,M'$ respectively. If the symbol is $a \in \Sigma$
+and $\delta$ and $\delta'$ have the following effect:
+\begin{align*}
+ q &\mapsto r \\
+ q' &\mapsto r' \\
+\end{align*}
+for an $a$--transition, then $\delta''$, the transition function
+of $M''$ (if $M''$ exists) must have the following effect
+\[
+(q,q') \mapsto (r,r')
+\] In other words
+\[
+ \delta'' \biggl( (q,q'),a \biggr) = \biggl( \delta(q,a), \,\,\, \delta'(q',a) \biggr)
+\]
+
+The above gives the intuition on how to construct $M''$. Now to
+present the formal proof:
+
+\begin{proof}
+Let $M = (\Sigma, Q, q_0, F, \delta)$ and $M' = (\Sigma,Q', q_0',
+F', \delta')$ such that $L = L(M)$ and $L' = L(M')$.
+
+Define $M'' = (\Sigma, Q'', q_0'', F'', \delta'')$ as follows:
+ \begin{itemize}
+ \item $Q'' = Q \times Q'$
+ \item $q_0'' = (q_0,q_0')$. Note that $q_0'' \in Q''$.
+ \item $F'' = F \times F'$. Note that $F'' \subseteq Q''$. [Prove
+ this yourself.]
+ \item $\delta'' : Q'' \times \Sigma \rightarrow Q''$ by
+ \[
+   \delta''((q,q'),a) = (\delta(q,a), \delta'(q',a))
+ \]
+ where $a \in \Sigma$ and $(q,q') \in Q''$.
+ Note that $\delta''$ is well-defined since $(\delta(q,a),
+ \delta'(q',a)) \in Q''$. Recall that $\delta''$ induces the function
+ $\delta''^* : \Sigma^* \times Q'' \rightarrow Q''$
+ \end{itemize}
+By definition, $M''$ is a DFA.
+
+We now want to show that $L(M'') = L(M) \cap L(M')$. Let $x \in
+\Sigma^*$. Then
+\begin{align*}
+x \in L(M'')
+&\iff \delta''^*(q_0'',x) \in F'' \\
+&\iff \delta''^*((q_0,q'_0),x) \in F \times F' \\
+&\iff (\delta^*(q_0,x), \delta'^*(q',x)) \in F \times F' \\
+&\iff \delta^*(q_0,x) \in F, \,\,\, \delta'^*(q_0',x) \in F' \\
+&\iff x \in L(M), \,\,\, x \in L(M') \\
+&\iff x \in L(M) \cap L(M')
+\end{align*}
+Hence $L(M'') = L(M) \cap L(M')$.
+\end{proof}
+
+So the proof is complete, right? Are you sure?
+\\
+
+\begin{lem}
+Assume the notation in the above proof. Then
+\[
+ \delta''^*((q,q'),x) = (\delta^*(q,x), \delta^*(q',x))
+\]
+for any $x \in \Sigma^*$, $q \in Q$ and $q' \in Q'$.
+\end{lem}
+
+\begin{proof}
+We will prove this by Mathematical Induction on $|x|$.
+In other words let $P(n)$ be the statement that for any
+string $x \in \Sigma^*$ with $|x| = n$, we have
+\[
+ \delta''^*((q,q'),x) = (\delta^*(q,x), \delta^*(q',x))
+\]
+
+When $|x| = 0$, i.e., $x = \ep$, we have, by definition
+\begin{align*}
+ \delta''^*((q,q'),x) &= (q,q') \\
+ \delta^*(q,x) &= q \\
+ \delta^*(q',x) &= q' \\
+\end{align*}
+Hence $\delta^*((q,q'),x) = (\delta^*(q,x), \delta^*(q',x))$.
+Therefore $P(0)$ holds.
+
+Now we want to prove that for $n \geq 0$, if $P(n)$ is true,
+then $P(n+1)$ is also true.
+Now assume that
+\[
+ \delta^*((q,q'),x) = (\delta^*(q,x), \delta^*(q',x))
+\]
+for any string $x \in \Sigma^*$ with $|x| = n
+\geq 0$. Consider a string $y\in\Sigma^*$ of length $n+1$. Then $y
+= ax$ where $a \in \Sigma$ and $x \in \Sigma^*$ with $|x| = n$.
+Then by the recursive definition of $\delta''^*$
+\[
+\delta''^*((q,q'),ax)
+ = \delta''^*\biggl( \delta''((q,q'),a), \,\,\, x\biggr)
+\]
+For clarity, since $\delta''((q,q'),a) \in Q'' = Q \times Q'$, we
+can write $\delta''((q,q'),a) = (\delta(q,a), \delta(q',a)) =
+(r,r')$ for some $r \in Q$ and $r' \in Q'$. Continuing the above,
+\begin{align*}
+\delta''^*((q,q'),ax)
+ = \delta''^* ( (r,r'), x )
+ = (\delta^*(r,x), \,\,\, \delta'^*(r',x) )
+\end{align*}
+using the induction hypothesis since $|x| = n$.
+ Therefore substituting back the expression for $r$ and $r'$:
+\begin{align*}
+\delta''^*((q,q'),y)
+ &= \biggl(\delta^*(r,x), \,\,\, \delta'^*(r',x) \biggr) \\
+ &= \biggl( \delta^*(\delta(q,a),x), \,\,\, \delta'^*(\delta(q',a),x) \biggr) \\
+ &= ( \delta^*(q,ax), \delta'^*(q',ax) ) \\
+ &= ( \delta^*(q,y),\delta(q',y) )
+\end{align*}
+Therefore the statement holds for any string $y$ of length $n+1$.
+
+By Mathematical Induction, the statement holds for any string.
+\end{proof}
+
+I will call this either the \defone{product construction} 
+(because we're using cross product to form the new states) or the 
+\defone{intersection construction}.
+Note that the above theorem does not just tell you that
+if $L$ and $L'$ are regular, then $L \cap L'$ is regular.
+The theorem actually includes the recipe for constructing
+the DFA for $L \cap L'$ from the DFAs of $L$ and $L'$.
+In other words the proof is constructive.
+So the proof is very handy.
+
+
+\newpage
+\begin{ex}
+  Design a $\DFA$ that accepts strings which contains
+  \begin{itemize}
+    \li at least three $0$'s and
+    \li contains $010$.
+  \end{itemize}
+\qed
+\end{ex}
+
+
+\newpage
+\section{Closure: Union}
+
+In this section, we will prove the closure rule for union.
+The idea is actually very simple.
+Suppose you have two DFAs $N$ and $N'$ (or DFAs):
+
+\begin{center}
+\begin{tikzpicture}[shorten >=1pt,node distance=2cm,auto,initial text=,
+    initial where=left,
+    state/.style={circle, draw, minimum size=0.4cm},
+    accepting/.style={double distance=2pt}
+  ]
+\node[]                (q0) [shape=circle]       at (-0.5,    0) {$$};
+\node[state,initial]   (q1) [shape=circle, draw] at (   0,    0) {$$};
+\node[state]           (q2) [shape=circle, draw] at (   1,    1) {$$};
+\node[state]           (q3) [shape=circle, draw] at (   1,   -1) {$$};
+\node[state          ] (q4) [shape=circle, draw] at (   2, -0.8) {$$};
+\node[state          ] (q5) [shape=circle, draw] at (   2,  0.5) {$$};
+\node[state,accepting] (q6) [shape=circle, draw] at (   3,    1) {$$};
+\node[state,accepting] (q7) [shape=circle, draw] at (   3,   -1) {$$};
+\node[thick,draw=black,rounded corners=2mm] (N) [fit=(q0) (q1) (q2) (q3) (q4) (q5) (q6) (q7)] {};
+\node[above right] at (N.north west) {$N$};
+
+\node[]                (r0) [shape=circle]       at (4.5,    0) {$$};
+\node[state,initial]   (r1) [shape=circle, draw] at (  5,    0) {$$};
+\node[state]           (r2) [shape=circle, draw] at (  6,    1) {$$};
+\node[state]           (r3) [shape=circle, draw] at (5.7, -0.6) {$$};
+\node[state          ] (r4) [shape=circle, draw] at (  7,  0.7) {$$};
+\node[state          ] (r5) [shape=circle, draw] at (5.6,  0.5) {$$};
+\node[state,accepting] (r6) [shape=circle, draw] at (  8,    1) {$$};
+\node[state,accepting] (r7) [shape=circle, draw] at (7.8, -0.4) {$$};
+\node[state,accepting] (r8) [shape=circle, draw] at (  8,   -1) {$$};
+\node[thick,draw=black,rounded corners=2mm] (Np) [fit=(r0) (r1) (r2) (r3) (r4) (r5) (r6) (r7) (r8)] {};
+\node[above right] at (Np.north west) {$N'$};
+
+\end{tikzpicture}\end{center}
+
+\begin{center}
+\begin{tikzpicture}[shorten >=1pt,node distance=2cm,auto,initial text=,
+    initial where=left,
+    state/.style={circle, draw, minimum size=0.4cm},
+    accepting/.style={double distance=2pt}
+  ]
+\node[]                (q0) [shape=circle]       at (-0.5,    0) {$$}; % dummy 
+\node[state]           (q1) [shape=circle, draw] at (   0,    0) {$$};
+\node[state]           (q2) [shape=circle, draw] at (   1,    1) {$$};
+\node[state]           (q3) [shape=circle, draw] at (   1,   -1) {$$};
+\node[state          ] (q4) [shape=circle, draw] at (   2, -0.8) {$$};
+\node[state          ] (q5) [shape=circle, draw] at (   2,  0.5) {$$};
+\node[state,accepting] (q6) [shape=circle, draw] at (   3,    1) {$$};
+\node[state,accepting] (q7) [shape=circle, draw] at (   3,   -1) {$$};
+\node[thick,draw=black,rounded corners=2mm] (N) [fit=(q0) (q1) (q2) (q3) (q4) (q5) (q6) (q7)] {};
+\node[above right] (Nname) at (N.north west) {$N$};
+
+\node[]                (r0) [shape=circle]       at (4.5,    0) {$$}; % dummy
+\node[state]           (r1) [shape=circle, draw] at (  5,    0) {$$};
+\node[state]           (r2) [shape=circle, draw] at (  6,    1) {$$};
+\node[state]           (r3) [shape=circle, draw] at (5.7, -0.6) {$$};
+\node[state          ] (r4) [shape=circle, draw] at (  7,  0.7) {$$};
+\node[state          ] (r5) [shape=circle, draw] at (5.6,  0.5) {$$};
+\node[state,accepting] (r6) [shape=circle, draw] at (  8,    1) {$$};
+\node[state,accepting] (r7) [shape=circle, draw] at (7.8, -0.4) {$$};
+\node[state,accepting] (r8) [shape=circle, draw] at (  8,   -1) {$$};
+\node[thick,draw=black,rounded corners=2mm] (Np) [fit=(r0) (r1) (r2) (r3) (r4) (r5) (r6) (r7) (r8)] {};
+\node[above right] (Npname) at (Np.north west) {$N'$};
+
+% N'':
+\node[]                (s0) [shape=circle]       at (-2,     0) {$$}; % dummy
+\node[state,initial]   (s1) [shape=circle, draw] at (-1.5,   0) {$$};
+\path[->] (s1) edge node[pos=0.25] {$\epsilon$} (q1);
+\draw[->, line width=0.5pt] (s1) -- node[below right,pos=0.15]{$\epsilon$} ++(0,-1.75) -| (r1);
+\node[below = 1.25cm of s1] (dummy) [shape=circle] {}; % dummy
+\node[thick,draw=black,rounded corners=2mm] (Npp) [fit=(s0) (N) (Nname) (Np) (Npname) (dummy)] {};
+\node[above right] at (Npp.north west) {$N''$};
+
+\end{tikzpicture}\end{center}
+
+Let $L = L(N)$ and $L' = L(N')$ where $N = (\Sigma, Q, q_0, F,
+\delta)$ and $N' = (\Sigma, Q', q'_0, F', \delta')$.
+
+Define $N'' = (\Sigma, Q'', q_0'', F'', \delta'')$ as follows:
+\begin{itemize}
+\item $Q'' = Q \cup Q' \cup\{q_0''\}$. Note that technically
+  speaking $Q$ and $Q'$ are sets in different universes. We need to
+  assume that we can put them both into the same universe in such a
+  way that if $q \in Q$ and $q' \in Q'$, then $q \neq q'$ in this new
+  universe. Furthermore $q''_0$ must obviously be an element in this
+  universe distinct from any element in $Q$ and $Q'$.
+\item $q_0''$ is already explained above
+\item $F'' = F \cup F'$
+\item Define $\delta'' : \Sigma \times Q'' \rightarrow Q''$ as
+  follows: Let $q \in Q''$ and $a \in \Sigma$. Note that since $Q'' = Q \cup Q'$, either
+  $q \in Q$ or $q \in Q'$. Furthermore since $Q \cap Q' = \empty$, $q$
+  cannot be in both $Q$ and $Q'$. We define
+  \[
+  \delta''(q,a) =
+  \begin{cases}
+    \delta(q,a) & \text{ if } q \in Q \\
+    \delta'(q,a) & \text{ if } q \in Q'
+  \end{cases}
+  \]
+\end{itemize}
+Note that by definition, $N''$ is an NFA.
+
+Now prove that $L(N'') = L \cup L'$. (Exercise).
+
+I'll call this the \defone{union construction}.
+
+
+
+\newpage
+\begin{ex}
+Construct a DFA that accepts strings containing $0110$ or $1001$.
+\end{ex}
+
+
+
+\newpage
+\section{Closure: Complement}
+
+Given a DFA $M$, you can easily construct another DFA $\overline M$
+such that 
+\[
+L(\overline{M}) = \overline{L(M)}
+\]
+Here's what you do: you simply change the accept state to non--accept state
+and non--accept state to accept state.
+Diagrammatically, if this is $M$:
+\begin{center}
+\begin{tikzpicture}[shorten >=1pt,node distance=2cm,auto,initial text=,
+    initial where=left,
+    state/.style={circle, draw, minimum size=0.4cm},
+    accepting/.style={double distance=2pt}
+  ]
+\node[]                (q0) [shape=circle]       at (-0.5,    0) {$$};
+\node[state,initial]   (q1) [shape=circle, draw] at (   0,    0) {$$};
+\node[state]           (q2) [shape=circle, draw] at (   1,    1) {$$};
+\node[state]           (q3) [shape=circle, draw] at (   1,   -1) {$$};
+\node[state          ] (q4) [shape=circle, draw] at (   2, -0.8) {$$};
+\node[state          ] (q5) [shape=circle, draw] at (   2,  0.5) {$$};
+\node[state,accepting] (q6) [shape=circle, draw] at (   3,    1) {$$};
+\node[state,accepting] (q7) [shape=circle, draw] at (   3,   -1) {$$};
+\node[thick,draw=black,rounded corners=2mm] (N) [fit=(q0) (q1) (q2) (q3) (q4) (q5) (q6) (q7)] {};
+\node[above right] at (N.north west) {$M$};
+
+\end{tikzpicture}\end{center}
+
+then $M'$ is
+
+\begin{center}
+\begin{tikzpicture}[shorten >=1pt,node distance=2cm,auto,initial text=,
+    initial where=left,
+    state/.style={circle, draw, minimum size=0.4cm},
+    accepting/.style={double distance=2pt}
+  ]
+\node[]                (q0) [shape=circle]       at (-0.5,    0) {$$}; % dummy 
+\node[state,initial,accepting]   (q1) [shape=circle, draw] at (   0,    0) {$$};
+\node[state,accepting]           (q2) [shape=circle, draw] at (   1,    1) {$$};
+\node[state,accepting]           (q3) [shape=circle, draw] at (   1,   -1) {$$};
+\node[state,accepting] (q4) [shape=circle, draw] at (   2, -0.8) {$$};
+\node[state,accepting] (q5) [shape=circle, draw] at (   2,  0.5) {$$};
+\node[state] (q6) [shape=circle, draw] at (   3,    1) {$$};
+\node[state] (q7) [shape=circle, draw] at (   3,   -1) {$$};
+\node[thick,draw=black,rounded corners=2mm] (N) [fit=(q0) (q1) (q2) (q3) (q4) (q5) (q6) (q7)] {};
+\node[above right] (Nname) at (N.north west) {$M$};
+
+% N'':
+\node[below = 1.25cm of s1] (dummy) [shape=circle] {}; % dummy
+\node[thick,draw=black,rounded corners=2mm] (Npp) [fit=(N) (Nname)] {};
+\node[above right] at (Npp.north west) {$M'$};
+
+\end{tikzpicture}\end{center}
+
+
+
+
+WARNING: This method does not work when the construction is applied to an
+NFA.
+
+\begin{ex}
+Construct a DFA that does not accept strings containing $0110$.
+\end{ex}
+
+
+
+
+\newpage
+\section{Closure: Difference}
+
+This will be an exercise in the future.
+
+Let $L, L'$ be languages.
+Then
+\[
+L - L' = L \cap \overline{L'}
+\]
+In other words, you use the complement construction and the product construction.
+That's it.
+
+\begin{ex}
+Let $\Sigma = \{a, b\}$.
+Design a DFA that accepts the following languages:
+\[
+L = \{w \in \Sigma^* \mid w \text{ contains 4 $a$'s and does not contain $a^3$}\}
+\]
+\end{ex}
+
+
+
+
+\newpage
+\section{Closure: Concatenation}
+
+Let $L = L(N)$ and $L' = L(N')$ where $N, N'$ are NFAs (or DFAs).
+I'm going to construct asn NFA $N''$ that accepts $LL'$.
+(The construction also works when $N$ and $N'$ are DFAs.)
+
+\begin{center}
+\begin{tikzpicture}[shorten >=1pt,node distance=2cm,auto,initial text=,
+    initial where=left,
+    state/.style={circle, draw, minimum size=0.4cm},
+    accepting/.style={double distance=2pt}
+  ]
+\node[]                (q0) [shape=circle]       at (-0.5,    0) {$$};
+\node[state,initial]   (q1) [shape=circle, draw] at (   0,    0) {$$};
+\node[state]           (q2) [shape=circle, draw] at (   1,    1) {$$};
+\node[state]           (q3) [shape=circle, draw] at (   1,   -1) {$$};
+\node[state          ] (q4) [shape=circle, draw] at (   2, -0.8) {$$};
+\node[state          ] (q5) [shape=circle, draw] at (   2,  0.5) {$$};
+\node[state,accepting] (q6) [shape=circle, draw] at (   3,    1) {$$};
+\node[state,accepting] (q7) [shape=circle, draw] at (   3,   -1) {$$};
+\node[thick,draw=black,rounded corners=2mm] (N) [fit=(q0) (q1) (q2) (q3) (q4) (q5) (q6) (q7)] {};
+\node[above right] at (N.north west) {$N$};
+
+\node[]                (r0) [shape=circle]       at (4.5,    0) {$$};
+\node[state,initial]   (r1) [shape=circle, draw] at (  5,    0) {$$};
+\node[state]           (r2) [shape=circle, draw] at (  6,    1) {$$};
+\node[state]           (r3) [shape=circle, draw] at (5.7, -0.6) {$$};
+\node[state          ] (r4) [shape=circle, draw] at (  7,  0.7) {$$};
+\node[state          ] (r5) [shape=circle, draw] at (5.6,  0.5) {$$};
+\node[state,accepting] (r6) [shape=circle, draw] at (  8,    1) {$$};
+\node[state,accepting] (r7) [shape=circle, draw] at (7.8, -0.4) {$$};
+\node[state,accepting] (r8) [shape=circle, draw] at (  8,   -1) {$$};
+\node[thick,draw=black,rounded corners=2mm] (Np) [fit=(r0) (r1) (r2) (r3) (r4) (r5) (r6) (r7) (r8)] {};
+\node[above right] at (Np.north west) {$N'$};
+
+\end{tikzpicture}\end{center}
+
+The intuition is as follows.
+For a string $x \in \Sigma^*$, $x \in LL'$
+if and only if $x$ is accepted by $N$ and after that if
+you run it on $N'$, it is again accepted.
+
+But how do you do "\ldots after that if you run it on $N'$\ldots"?
+Easy. Join up the two machines using $\ep$-transitions.
+Just add $\epsilon$-transitions from the accepting states of $N$ to
+the starting state of $N'$.
+Of course the accept states of $N$
+are \textit{not} accept states in $N''$.
+Where do you start? At the starting state
+of $N$.
+Therefore the start state of $N''$ is the start state of $N$.
+When do you finally accept? When the string reaches the
+an accept state of $N'$.
+Therfore the accept states of $N''$ are the accept states of $N'$. 
+Here's $N''$:
+
+\begin{center}
+\begin{tikzpicture}[shorten >=1pt,node distance=2cm,auto,initial text=,
+    initial where=left,
+    state/.style={circle, draw, minimum size=0.4cm},
+    accepting/.style={double distance=2pt}
+  ]
+\node[]                (q0) [shape=circle]       at (-0.5,    0) {$$}; % dummy 
+\node[state,initial]   (q1) [shape=circle, draw] at (   0,    0) {$$};
+\node[state]           (q2) [shape=circle, draw] at (   1,    1) {$$};
+\node[state]           (q3) [shape=circle, draw] at (   1,   -1) {$$};
+\node[state          ] (q4) [shape=circle, draw] at (   2, -0.8) {$$};
+\node[state          ] (q5) [shape=circle, draw] at (   2,  0.5) {$$};
+%\node[state,accepting] (q6) [shape=circle, draw] at (   3,    1) {$$};
+\node[state] (q6) [shape=circle, draw] at (   3,    1) {$$};
+%\node[state,accepting] (q7) [shape=circle, draw] at (   3,   -1) {$$};
+\node[state] (q7) [shape=circle, draw] at (   3,   -1) {$$};
+\node[thick,draw=black,rounded corners=2mm] (N) [fit=(q0) (q1) (q2) (q3) (q4) (q5) (q6) (q7)] {};
+\node[above right] (Nname) at (N.north west) {$N$};
+
+\node[]                (r0) [shape=circle]       at (4.5,    0) {$$}; % dummy
+\node[state]           (r1) [shape=circle, draw] at (  5,    0) {$$};
+\node[state]           (r2) [shape=circle, draw] at (  6,    1) {$$};
+\node[state]           (r3) [shape=circle, draw] at (5.7, -0.6) {$$};
+\node[state          ] (r4) [shape=circle, draw] at (  7,  0.7) {$$};
+\node[state          ] (r5) [shape=circle, draw] at (5.6,  0.5) {$$};
+\node[state,accepting] (r6) [shape=circle, draw] at (  8,    1) {$$};
+\node[state,accepting] (r7) [shape=circle, draw] at (7.8, -0.4) {$$};
+\node[state,accepting] (r8) [shape=circle, draw] at (  8,   -1) {$$};
+\node[thick,draw=black,rounded corners=2mm] (Np) [fit=(r0) (r1) (r2) (r3) (r4) (r5) (r6) (r7) (r8)] {};
+\node[above right] (Npname) at (Np.north west) {$N'$};
+
+% N'':
+\node[]                (s0) [shape=circle]       at (-2,     0) {$$}; % dummy
+
+% concat:
+\path[->] (q6) edge node[pos=0.27] {$\epsilon$} (r1);
+\path[->] (q7) edge node[pos=0.5] {$\epsilon$} (r1);
+
+%\node[state,initial]   (s1) [shape=circle, draw] at (-1.5,   0) {$$};
+%\path[->] (s1) edge node[pos=0.25] {$\epsilon$} (q1);
+%\draw[->, line width=0.5pt] (s1) -- node[below right,pos=0.15]{$\epsilon$} ++(0,-1.75) -| (r1);
+\node[below = 1.25cm of s1] (dummy) [shape=circle] {}; % dummy
+%\node[thick,draw=black,rounded corners=2mm] (Npp) [fit=(s0) (N) (Nname) (Np) (Npname) (dummy)] {};
+\node[thick,draw=black,rounded corners=2mm] (Npp) [fit=(N) (Nname) (Np) (Npname)] {};
+\node[above right] at (Npp.north west) {$N''$};
+
+\end{tikzpicture}\end{center}
+
+
+It's clear that $N''$ constructed above is an NFA.
+Furthermore, it's clear that $L(N'') = LL'$.
+Since we know that any language accepted by an NFA is also accepted by a DFA,
+we're done.
+
+Don't you think NFAs are nice?
+
+I'll call this the \defone{concatenation construction}.
+
+
+\newpage
+\begin{ex}
+Construct a DFA that does not accept strings $w = w_1 w_2$
+where $w_1$ contains $aba$ and $w_2$ begins with $bbaa$.
+\end{ex}
+
+
+
+\newpage
+\section{Closure: Kleene Star}
+
+The construction of a DFA of $L^*$ given a DFA of $L$
+is simple once you have seen the
+construction of the machine for concatenation of languages.
+
+Given an NFA $N$ (or DFA)
+
+\begin{center}
+\begin{tikzpicture}[shorten >=1pt,node distance=2cm,auto,initial text=,
+    initial where=left,
+    state/.style={circle, draw, minimum size=0.4cm},
+    accepting/.style={double distance=2pt}
+  ]
+\node[]                (q0) [shape=circle]       at (-0.5,    0) {$$};
+\node[state,initial]   (q1) [shape=circle, draw] at (   0,    0) {$$};
+\node[state]           (q2) [shape=circle, draw] at (   1,    1) {$$};
+\node[state]           (q3) [shape=circle, draw] at (   1,   -1) {$$};
+\node[state          ] (q4) [shape=circle, draw] at (   2, -0.8) {$$};
+\node[state          ] (q5) [shape=circle, draw] at (   2,  0.5) {$$};
+\node[state,accepting] (q6) [shape=circle, draw] at (   3,    1) {$$};
+\node[state,accepting] (q7) [shape=circle, draw] at (   3,   -1) {$$};
+\node[thick,draw=black,rounded corners=2mm] (N) [fit=(q0) (q1) (q2) (q3) (q4) (q5) (q6) (q7)] {};
+\node[above right] at (N.north west) {$N$};
+\end{tikzpicture}\end{center}
+
+we will be constructing a new NFA $N'$ such will accept $L(N)^*$.
+
+First $N'$ contains $N$.
+Next you add a new state to $N'$ and make it the initial state of
+the new machine and you make this new state an accepting state.
+Why?
+Because, then $N'$ will accept $\ep$.
+Of course the initial state of $N$ is now not an initial state in $N'$.
+Now join the new initial state to the old initial state of $N$ with an $\epsilon$--transition.
+Next you join the accept states of $N$, if there are any, to the 
+old initial state of $N$ with
+$\ep$-transitions.
+Why? Because we are actually imitating the concatenation construction: if a string is accepted by $N$, then
+the string is still accepted by $N'$. But if the string is made up of $xx'$ where $x$ and $x'$ are both
+accepted by $N$, then the $\epsilon$--transitions we just added will allow $N'$ to test acceptance on $x'$ starting
+from the beginning of $N$. Right?
+
+\begin{center}
+\begin{tikzpicture}[shorten >=1pt,node distance=2cm,auto,initial text=,
+    initial where=left,
+    state/.style={circle, draw, minimum size=0.4cm},
+    accepting/.style={double distance=2pt}
+  ]
+\node[]                (q0) [shape=circle]       at (-0.5,    0) {$$}; % dummy 
+\node[state,initial]   (q1) [shape=circle, draw] at (   0,    0) {$$};
+\node[state]           (q2) [shape=circle, draw] at (   1,    1) {$$};
+\node[state]           (q3) [shape=circle, draw] at (   1,   -1) {$$};
+\node[state] (q4) [shape=circle, draw] at (   2, -0.8) {$$};
+\node[state] (q5) [shape=circle, draw] at (   2,  0.5) {$$};
+\node[state,accepting] (q6) [shape=circle, draw] at (   3,    1) {$$};
+\node[state,accepting] (q7) [shape=circle, draw] at (   3,   -1) {$$};
+\node[thick,draw=black,rounded corners=2mm] (N) [fit=(q0) (q1) (q2) (q3) (q4) (q5) (q6) (q7)] {};
+\node[above right] (Nname) at (N.north west) {$N$};
+
+% N'':
+\node[]                (s0) [shape=circle]       at (-2,     0) {$$}; % dummy
+\node[]                (s98) [shape=circle]       at (-2,     2) {$$}; % dummy
+\node[]                (s99) [shape=circle]       at (-2,     -2) {$$}; % dummy
+\node[state,initial,accepting]   (s1) [shape=circle, draw] at (-1.5,   0) {$$};
+\path[->] (s1) edge[] node[pos=0.25] {$\epsilon$} (q1);
+%\path[->]          (q2)  edge   [bend left=20]   node {b} (q3);
+\path[->] (q6) edge[bend right=100] node[pos=0.5, above] {$\epsilon$} (q1);
+\path[->] (q7) edge[bend left=100] node[pos=0.5] {$\epsilon$} (q1);
+
+\node[below = 1.25cm of s1] (dummy) [shape=circle] {}; % dummy
+\node[thick,draw=black,rounded corners=2mm] (Npp) [fit=(N) (Nname) (s0) (s98) (s99)] {};
+\node[above right] at (Npp.north west) {$N'$};
+
+\end{tikzpicture}\end{center}
+
+That's it. 
+I'll call this the \defone{Kleene star construction}.
+
+\begin{ex}
+  State precisely the Kleene star construction:
+  Let $N = (\Sigma, Q, q_0 F, \delta)$.
+  let $N* = (\Sigma, Q', q'_0, F', \delta')$ be the Kleene star construction using $N$.
+  Of course $q'_0$ is a new state that is not in $Q$, i.e., $q_0' \not\in Q$.
+  State $Q', F', \delta'$ precisely.
+  \qed
+\end{ex}
+
+\begin{thm}
+Let $N$ be an NFA and $N'$ be the NFA obtained by the Kleene star 
+construction.
+Then
+\[
+L(N') = L(N)^*
+\]
+\end{thm}
+
+
+
+
+\newpage
+\begin{ex}
+Construct an NFA that accepts $\{a, aba, abba\}^*$.
+\qed
+\end{ex}
+
+\newpage
+\begin{ex}
+  Is it possible to create another Kleene star construction that has only one accept state?
+\end{ex}
+
+\newpage
+\begin{ex}
+Let $\Sigma = \{a,b\}$.
+Construct an NFA that accepts 
+\[
+( 
+\{ w \in \Sigma^* \mid w \text{ ends with $bb$} \} \cdot
+\{ w \in \Sigma^* \mid w \text{ starts with $aa$} \}
+)^*
+\]
+\qed
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Let $L = \{aba, bab\}$.
+Construct a $\DFA$ that accepts $L^*$.
+\qed
+\end{ex}
+
+
+\newpage
+\section{Closure: Miscellaneous}
+
+There are a lot more closure rules/operations.
+Here one:
+
+\begin{ex}
+ Prove or disprove the following:
+ $L$ regular $\implies$ $L^R$ regular.
+\end{ex}
+
+
+
+
+\newpage
+\section{Closure: Homomorphism}
+
+WATCHOUT! The following is not in the textbook!
+
+\begin{defn}
+Let $f : \Sigma \rightarrow \Sigma'$ be a map. Note that $f$
+induces a map $f^* : \Sigma^* \rightarrow \Sigma'^*$ which is
+defined as follows: First of all for $x \in \Sigma$,
+\[
+ f^*(x) =
+ \begin{cases}
+ f(x') \cdot f(x'') & \text{ if } x = x'x'' \neq \ep \text{ where } x' \in \Sigma, x'' \in \Sigma^*\cr
+ \ep & \text{ if } x = \ep \cr
+ \end{cases}
+\]
+\end{defn}
+
+(For the math experts: $f^*$ is a semigroup homomorphism. You can
+also extend it to be group homomorphism on corresponding free
+group. The $(\cdot)^*$ is a function from sets to semigroups or to
+groups).
+
+[CHECK]
+
+\begin{ex}
+ Let $f : \{a,b,c\} \rightarrow \{0,1\}$, $f(a) = f(b) = 0$, $f(c) = 1$.
+ \itemize{
+  \item Let $L$ be the set of strings with 3 $a$'s. What is $f^*(L)$?
+  \item Let $L'$ be the set of strings with 3 1's. What is
+  ${f^*}^{-1}(L')$?
+ }
+\end{ex}
+
+\begin{ex}
+ Let $f : \Sigma \rightarrow \Sigma'$ as above.
+ \itemize{
+  \item $L  \subseteq \Sigma^*$ regular $\implies$ $f^*(L)$
+  regular
+  \item $L' \subseteq\Sigma'^*$ regular $\implies$
+  $(f^*)^{-1}(L')$ regular
+ }
+\end{ex}
+

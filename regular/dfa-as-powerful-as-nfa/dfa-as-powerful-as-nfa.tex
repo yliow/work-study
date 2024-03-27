@@ -1,0 +1,442 @@
+\section{DFAs are as Powerful as NFAs}
+
+\begin{thm} \mbox{}
+ \begin{tightlist}
+ \item[(a)] If $M$ is a $\DFA$, then there is an $\NFA$ say $N$ such
+  that $L(M) = L(N)$.
+ \item[(b)] If $N$ is an $\NFA$, then there is a $\DFA$ say $D$ such
+ that $L(N) = L(D)$.
+ \end{tightlist}
+\end{thm}
+
+I will call this the \lq\lq $\NFA = \DFA$" theorem. (I made this name up
+myself, it's not standard).
+
+So although the NFA is more flexible than the definition of a DFA
+(so that every DFA is an NFA almost by definition),
+it turns out the collection of languages described by DFAs and NFAs
+are actually the same -- you can't describe a larger collection of languages.
+Here a picture:
+
+\begin{python}
+from latextool_basic import *
+
+p = Plot()
+
+r0 = Rect(0, 0, 2, 2)
+x,y = r0.top()
+y += 0.25
+t0 = Rect(x, y, x, y, label=r'$\DFA_\Sigma$', linewidth=0)
+p += r0
+p += t0
+
+r3 = Rect(-1, 0, 2, 2.5)
+x,y = r3.top()
+y += 0.25
+t0 = Rect(x, y, x, y, label=r'$\NFA_\Sigma$', linewidth=0)
+p += r3
+p += t0
+
+r1 = Rect(4, 0, 8, 4)
+x,y = r1.top()
+y += 0.25
+t1 = Rect(x, y, x, y, label=r'$\LANG_\Sigma$', linewidth=0)
+p += r1
+p += t1
+
+r2 = Rect(4, 0, 5.5, 1.5, background='black!10')
+p += r2
+x,y = r2.top()
+y += 0.25
+t2 = Rect(x, y, x, y, label=r'$\Reg_\Sigma$', linewidth=0)
+p += t2
+
+x0,y0 = r0.right()
+x1,y1 = r1.left()
+p += Line(points=[(x0,y0), (x1,y0)], endstyle='>')
+
+x2,y2 = r3.topright(); y2 -= 0.3
+p += Line(points=[(x2,y2), (x1,y0+0.1)], endstyle='>')
+
+print(p)
+\end{python}
+
+Recall that a language is regular if it's the language
+accepted by a DFA.
+So $\Reg_\Sigma$ is the set of hits of $\DFA_\Sigma$ in the above diagram.
+The set of machines, $\NFA_\Sigma$, hits
+the same set of languages as $\Reg_\Sigma$ -- you don't get more.
+
+The proof of part (a) of the $\NFA=\DFA$ is easy and I'll leave it as an
+exercise. Make sure you do it on your own.
+
+Now to prove part (b) of $\NFA=\DFA$. Believe it or not, the proof is
+easy too. Furthermore, the prove is constructive. The point is to
+look very carefully at the definitions above especially of the
+computation and to massage the objects in the definition.
+
+Let $N = (\Sigma,Q,q_0,F,\delta)$ be an $\NFA$. 
+Don't forget that the transition function $\delta$ has the following form:
+\[
+\delta: Q \times \Sigma_\ep \rightarrow P(Q)
+\] 
+where $\Sigma_\ep = \Sigma \cup \{\epsilon\}$ and $P(Q)$ is the 
+powerset of $Q$.
+Furthermore, I'm extending the $\delta$ to accept $(S, x)$
+where $S$ is a \textit{set} of states.
+This is done in the following (obvious!) way:
+\[
+\delta(S, c) = \bigcup_{q \in S} \delta(q, c)
+\]
+where $S \subset Q$ and $c \in \Sigma_\ep$.
+
+Suppose it's possible
+to construct a $\DFA$ 
+\[
+M = (\Sigma,Q^{\DFA}, q_0^{\DFA}, F^{\DFA}, \delta^{\DFA})
+\]
+so that $L(M) = L(N)$. What would $M$ look like?
+
+Take a look at the definition of computation:
+\[
+ (S,cx) \vdash (\overline{\delta(S,c)}, x)
+\]
+where $S \subseteq Q$ and $c \in \Sigma_\ep$.
+Now look that definition of the computation of a $\DFA$
+that we would like to have:
+\[
+ (q,cx) \vdash (\delta^{\DFA}(q,c),x)
+\]
+
+Doesn't that tell you that the DFA should somehow have
+\textbf{sets}
+as states?!?! In particular, the sets are
+\textbf{subsets} of
+$Q$. See it? Just to repeat, $Q^{\DFA}$ is a set of set of states.
+Therefore $Q^{\DFA} \subseteq P(Q)$. Maybe we need $Q^{\DFA} =
+P(Q)$??? We'll see.
+
+What about $\delta^{\DFA}$ for our guess? When you compare the above
+computations symbolically, doesn't that say that for if $S \in
+Q^{\DFA}$ and $a\in \Sigma$, then
+\[
+ \delta^{\DFA}(S,c) 
+\defeq \overline{\delta(S,c)}
+= \overline{\bigcup_{q \in S} \delta(q,c)}
+\]
+In that case,
+\[
+ (S,ax) \vdash (\overline{\delta(S,c)}, x)
+\]
+does become:
+\[
+ (S,ax) \vdash (\delta^{\DFA}(S,c), x)
+\]
+Viola!!!
+
+So far we have $Q^{\DFA}$ and $\delta^{\DFA}$. Think about it. We
+start our machine with $q_0$. But our $Q^{\DFA}$ is a set of set of
+states. So the initial state is not $q_0$ but $\overline{\{q_0\}}$. 
+Therefore
+we define the initial state of our DFA as $q_0^{\DFA} \defeq
+\overline{\{q_0\}}$. 
+And of course $q_0^{\DFA} \in Q^{\DFA}$, at least if we let
+$Q^{\DFA} = P(Q)$.
+
+What about the accepting states $F^{\DFA}$? You already know that a
+string is accepted by the NFA if you have at least one computation
+leading to one accepting state. Formally our above definition says
+that $x$ is accepted if
+\[
+ (\overline{\{q_0\}}, x) \vdash^* (S, \ep), \quad S \cap F \neq \emptyset
+\]
+Well $\ldots$ obviously we define $F^{\DFA}$ to be those sets of
+state that contain at least one accepting state in $F$ of the NFA:
+\[
+ F^{\DFA} \defeq \{S \in Q^{\DFA} \,|\, S \cap F \neq \emptyset \}
+\]
+I mean, what else can it be?!?
+
+As an example of a specific state of our new $\DFA$,
+note that since the states of the new $\DFA$ are the
+subset of $Q$ (the states of the $\NFA$)
+and the emptyset
+$\emptyset$ is an element of $P(Q)$,
+our $\DFA$ has a state labeled as $\{\}$.
+Note that by our definition above
+\[
+\delta^{\DFA}(\emptyset, c)
+= \emptyset
+\]
+(Right?)
+
+So let's begin the formal proof of $\NFA=\DFA$ part (b).
+
+\begin{proof}
+Let $N = (\Sigma, Q, q_0, F, \delta)$ be an $\NFA$. 
+Given a subset $S$ of $Q$, $\overline{S}$ denotes the $\epsilon$-closure
+of $S$.
+Define $M =
+(\Sigma$, $Q^{\DFA}$, $q_0^{\DFA}$, $F^{\DFA}$, $\delta^{\DFA})$ as
+follows: 
+ \begin{itemize}
+ \item $Q^{\DFA} = P(Q)$
+ \item $q_0^{\DFA} = \overline{\{q_0\}}$
+ \item $F^{\DFA} = \{ S \in Q^{\DFA} \,|\, S \cap F \neq \emptyset \}$
+ \item $\delta^{\DFA} : Q \times \Sigma \rightarrow Q$ is defined as
+ follows: Let $S \in Q^{\DFA}$ and $c \in \Sigma$. Then
+ \[
+   \delta^{\DFA}(S,c) = \overline{\bigcup_{q \in S} \delta(q,c)}
+ \]
+ \end{itemize}
+Then 
+\[
+L(M) = L(N)
+\]
+(Details are left to the reader.)
+\end{proof}
+
+The above NFA-to-DFA construction is sometimes called the
+\defone{subset construction} or the
+\tinysidebarskip\defone{powerset construction}\sidebarskip{0pt}.
+
+
+I hope you recall that $|P(Q)| = 2^{|Q|}$. 
+That means that the
+resulting DFA is big when compared against the original NFA. 
+Here size is measured in terms of the
+number of states. We'll see later that there is an algorithm to
+simplify DFAs.
+
+Of course if there is a state that cannot be reached from the initial
+node, you can just remove it. 
+So we usually don't draw \textit{all} the subsets of $Q$ (of the $\NFA$)
+for the $\DFA$. 
+We usually start with the start state of the $\DFA$ 
+(i.e., the $\ep$--closure of the start state of the $\NFA$)
+and keep adding $\DFA$ states until the $\DFA$ is completed.
+So in your $\NFA$ has 5 states.
+The complete subset construction gives you a $\DFA$ with $2^5 = 32$ states.
+However if you only include states reachable for the start state
+of the $\DFA$, the $\DFA$ might be smaller;
+the other states cannot be reached the start state of the $\DFA$
+and hence does not take part in the computation of a string.
+(They can be included of course.)
+
+
+\newpage
+\begin{ex}
+Here's an $\NFA$ for $\emptyset$ for $\Sigma = \{a,b\}$:
+\begin{python}
+from latextool_basic import *
+print(automata(layout="""
+A
+""",
+edges="",
+A="initial|label=$q_0$",
+))
+\end{python}
+Convert it to a $\DFA$ using the subset construction.
+\end{ex}
+
+Here's the solution.
+Let $\delta$ denote the transition function of $N$.
+Note that 
+\begin{align*}
+  \delta(q_0, \epsilon) = \{\} \\
+  \delta(q_0, a) = \{\} \\
+  \delta(q_0, b) = \{\} 
+\end{align*}
+First of all the states are labeled as all the subsets of $\{q_0\}$.
+
+\begin{python}
+from latextool_basic import *
+print(automata(layout="""
+A  B
+""",
+edges="",
+A="label=$\{q_0\}$",
+B="label=$\{\}$",
+))
+\end{python}
+
+The start state is the $\epsilon$-closure of $\{q_0\}$.
+However in $N$, there are no $\epsilon$--transitions out of 
+$q_0$.
+So the $\epsilon$-closure of $\{q_0\}$ is in fact $\{q_0\}$, i.e.
+$\overline{\{q_0\}} = \{q_0\}$
+The $\DFA$ is now this:
+
+\begin{python}
+from latextool_basic import *
+print(automata(layout="""
+A  B
+""",
+edges="",
+A="initial|label=$\{q_0\}$",
+B="label=$\{\}$",
+))
+\end{python}
+
+Now I will compute the $a$--transition of the state $\{q_0\}$.
+Let $\delta^\DFA$ denote the transition function of the $\DFA$
+that we're building.
+Then
+\begin{align*}
+\delta( \{q_0, a\} ) 
+&= \overline{ \bigcup_{q \in \{q_0\}} \delta(q, a)} \\
+&= \overline{ \delta(q_0, a) } \\
+&= \overline{ \emptyset } \\
+&= \emptyset
+\end{align*}
+The (incomplete) $\DFA$ now looks like this:
+
+\begin{python}
+from latextool_basic import *
+print(automata(layout="""
+A  B
+""",
+edges="A,$a$,B",
+A="initial|label=$\{q_0\}$",
+B="label=$\{\}$",
+))
+\end{python}
+
+Using the same reasoning we have
+
+\begin{python}
+from latextool_basic import *
+print(automata(layout="""
+A  B
+""",
+edges="A,$a,b$,B",
+A="initial|label=$\{q_0\}$",
+B="label=$\{\}$",
+))
+\end{python}
+
+It's easy to see that in the DFA, the $a$--
+and $b$--transitions from the state $\{\}$ goes back to itself.
+Therefore the completed DFA is this:
+
+
+\begin{python}
+from latextool_basic import *
+print(automata(layout="""
+A  B
+""",
+edges="A,$a,b$,B|B,$a,b$,B",
+A="initial|label=$\{q_0\}$",
+B="label=$\{\}$",
+))
+\end{python}
+\qed
+
+
+Note that the above DFA does accept the same language as the 
+NFA we started with, i.e., $\{\}$.
+
+Note that the subset construction does not
+necessarily give the simplest DFA.
+Clearly the simplest DFA that accepts $\{\}$ is
+\begin{python}
+from latextool_basic import *
+print(automata(layout="""
+A  
+""",
+edges="A,$a,b$,A",
+A="initial|label="",
+))
+\end{python}
+\lq\lq Simplest" meaning \lq\lq fewest states".
+
+
+
+\newpage
+\begin{ex}
+Here's the NFA for the words in $\{a, b\}^*$ beginning with $a$: 
+
+\begin{python}
+from latextool_basic import *
+print(automata(layout="""
+A B
+""",
+edges="A,$a$,B|B,$a,b$,B",
+A="initial|label=$q_0$",
+B="accept|label=$q_1$",
+))
+\end{python}
+
+Convert it to a DFA using the powerset construction.
+\qed
+\end{ex}
+\vspace{3in}
+
+
+
+\newpage
+\begin{ex}
+Using the powerset construction, find a DFA $M$ such that
+$L(M) = L(N)$ where $N$ is the following NFA:
+
+\begin{python}
+from latextool_basic import *
+print(automata(layout="""
+A         B
+
+C    D
+""",
+edges="A,$a$,B|A,$b,\epsilon$,C|D,$\epsilon$,B|A,$a$,D|D,$b$,D|D,$a,b$,C",
+A="initial|label=$q_0$",
+B="label=$q_1$",
+C="accept|label=$q_2$",
+D="accept|label=$q_3$",
+))
+\end{python}
+\qed
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Here's the formal definition of an $\NFA$ $N = (\Sigma, Q, q_0, F,
+\delta)$ where $\Sigma=\{a,b\}$, $Q = \{q_0, q_1, q_2, q_3, q_4\}$,
+$F = \{q_4\}$ and $\delta$ is given by the following table
+(the cases where the $\delta$--value is an empty set are omitted):
+\[
+ \begin{tabular}{|c|c|c|}
+  \hline
+  $q \in Q$ & $x \in \Sigma_\ep$ & $\delta(q,x)$ \\
+  \hline
+  $q_0$ & $\epsilon$ & $\{q_0, q_1\}$ \\
+  $q_0$ & $b$ & $\{q_2\}$ \\
+  $q_1$ & $\epsilon$ & $\{q_3\}$ \\
+  $q_1$ & $\epsilon$ & $\{q_2\}$ \\
+  $q_1$ & $a$ & $\{q_0\}$ \\
+  $q_1$ & $b$ & $\{q_2, q_4\}$ \\
+  $q_2$ & $\ep$ & $\{q_4\}$ \\
+  $q_2$ & $b$ & $\{q_0,q_4\}$ \\
+  $q_3$ & $a$ & $\{q_4\}$ \\
+  $q_4$ & $\epsilon$ & $\{q_1, q_2, q_3\}$ \\
+  \hline
+ \end{tabular}
+\]
+Construct a $\DFA$ $M$ such that $L(M) = L(N)$.
+\qed
+\end{ex}
+
+
+
+\newpage
+\begin{ex}
+Design a $\DFA$ that accepts words containing $abab$ or $baba$.
+[Hint: It's easier to first design two $\NFA$s, one accepting
+words containing $abab$ and another accepting words containing
+$baba$.
+Next design an $\NFA$ accepting words containing $abab$ or $baba$.
+Finally convert this $\NFA$ to a $\DFA$ using the subset construction.
+I'll come back and talk about closure operators that will give
+you a general method for constructing DFAs and NFAs whenever
+the describe of the language contains the word \lq\lq or".]
+\qed
+\end{ex}

@@ -1,0 +1,328 @@
+\section{State Diagram}
+
+The following is a \defterm{state diagram} or the
+\textbf{transition diagram} of a
+\defterm{deterministic finite automata DFA} (or
+\defterm{deterministic finite state machine DFSM})
+
+\begin{python}
+from latextool_basic import *
+print automata(layout="""
+A  B  C
+""",
+edges="A,$a$,A|A,$b$,B|B,$a$,A|B,$b$,C|C,$a,b$,C",
+A="initial|label=$q_0$",
+B="label=$q_1$",
+C="accept|label=$q_2$",
+)
+\end{python}
+
+An edge labelled with symbol $a$ is called an
+\textbf{$a$--transition}.
+In this example, $a$ and $b$ are the symbols used to label the transitions.
+We say that the set $\{a, b\}$ is the alphabet of this DFA.
+Let's use $\Sigma$ to denote the set $\{a, b\}$.
+
+This is how you run the machine with a given input.
+The input will be a string of $a$'s and $b$'s.
+For instance the input can be $baaab$; it can even be $\ep$ the empty string.
+However $abbc$ is \textit{not} an input for this machine: $c$ does not
+appear in the transitions! 
+
+\begin{itemize}
+ \item Start at the \defterm{start state}. This is the node with an arrow
+ pointing to it from nowhere.
+ For the above example, the start state is $q_0$.
+ Look for it now. Put your finger on it.
+
+ \item Read the first character of the input string; you always read the string
+ left to right. For the above DFA with input $baaab$, the first character is
+ $b$ (the $b$ on the left).
+
+ \item Go from the node you're pointing at to the next node using
+ the edge labeled with the character you've just read.
+ For our DFA with input $baaab$, we move along the $b$--transition
+ and land in state $q_1$.
+
+ \item Repeat the above process, reading the remaining characters
+ of the input left-to-right, until you have no more characters.
+ The characters of the input are $b, a, a, a, b$ and starting with $q_0$,
+ we go through the states $q_1, q_0, q_0, q_0, q_1$.
+ The last state after reading the whole input is $q_1$.
+
+ \item A \defterm{final} or \defterm{accept} state 
+ is a node denoted with a double-circle boundary.
+ When you have finished scanning your string left to right, and
+ if you are on a final state, then
+ the string is \defterm{accepted} by the DFA, otherwise the string is
+ \textbf{not accepted}.
+
+\end{itemize}
+
+You should think of a DFA as a string recognizer in the sense that
+when you feed it a string, it will tell you whether the string is
+accepted or not.
+
+
+\begin{eg}
+Write down the list of states you pass through as you run the DFA
+with the string $ababb$. What is the last state? Is it an
+accepting state? Is the string accepted by the DFA?
+The formal way to write down the steps in the computation is as
+follows:
+\begin{align*}
+ (q_0, ababb)
+ &\vdash (q_0,babb) \cr
+ &\vdash (q_1,abb) \cr
+ &\vdash (q_0,bb) \cr
+ &\vdash (q_1,b) \cr
+ &\vdash (q_2,\ep) \cr
+\end{align*}
+\end{eg}
+
+The $(q, x)$, where $q$ is a state and $x$ is a word, is called an
+\defterm{instantaneous description}.
+
+Here's a way to
+think of the above:
+First of all do you see that instantaneous descriptions are elements of the
+set of product of set of states and set of words.
+If I write the set of states as $Q$, then the the instantaneous
+descriptions are the elements of 
+\[
+Q \times \Sigma^*
+\]
+Next, do you see that $\vdash$ is a relation on $Q \times \Sigma^*$?
+
+\begin{defn}
+Let $M$ be a DFA. The language \defterm{accepted} by $M$, denoted
+$L(M)$ is the set of
+\textbf{all} strings over $\Sigma$ accepted by
+$M$.
+\end{defn}
+
+Note that a directed graph is the state diagram of a DFA over
+$\Sigma$ if: 
+\begin{itemize}
+
+ \item There is exactly one special node called the \defterm{initial state}.
+ This is drawn with a single-line boundary with an arrow pointing to it from nowhere.
+ (Some authors use a wedge instead of an arrow.)
+
+ \item There is 0 or more nodes called the
+ \textbf{accepting states}.
+ These are drawn with a double-line boundary.
+
+ \item For each node $v$, there are exactly $|\Sigma|$ edges going
+ \textbf{out} from $v$ to other nodes. These edges are labeled with the
+ elements in $\Sigma$. Note that every alphabet in $\Sigma$ is used
+ in labeling the edges of $v$.
+
+ \item In a DFA state diagram, the nodes are called \defterm{states} and the
+ edges are called \defterm{transitions}. If a transition is labeled
+ with $a \in \Sigma$, we also call it an \defterm{$a$--transition}.
+
+\end{itemize}
+
+Note that given the state diagram of a DFA, say $M$, 
+an input can contain only the 
+characters in $\Sigma$ where $\Sigma$ is the set of symbols appearing in the
+transitions of $M$.
+
+\newpage
+\begin{ex}
+  \begin{tightlist}
+  \item What is the string of shortest length accepted by the above DFA?
+  \item  Write down the computation of the string $baba$?
+    Is this string accepted by the DFA?
+  \item Write down the computation of the string $abab$.
+    Is this string accepted by the DFA?
+  \item How many strings of length 5 are accepted by the DFA?
+  \end{tightlist}
+\qed
+\end{ex}
+
+\newpage
+\begin{ex}
+What is the language accepted by the above DFA?
+\qed
+\end{ex}
+
+
+\newpage
+So far we have seen examples where you're given a DFA (or at least the state
+diagram), and you look at the string or the full language accepted by the DFA.
+In the following diagram, $\DFA_\Sigma$ is the collection (i.e., set)
+of all DFAs over $\Sigma$.
+$\LANG_\Sigma$ is the collection of languages over $\Sigma$.
+Each DFA gives us a language.
+(You'll see that indeed, the collection of languages that is,
+in some sense, much larger than the collection of DFAs.)
+
+\begin{python}
+from latextool_basic import *
+
+p = Plot()
+r0 = Rect(0, 0, 2, 2)
+x,y = r0.top()
+y += 0.25
+t0 = Rect(x, y, x, y, label=r'$\DFA_\Sigma$', linewidth=0)
+p += r0
+p += t0
+
+r1 = Rect(4, 0, 8, 4)
+x,y = r1.top()
+y += 0.25
+t1 = Rect(x, y, x, y, label=r'$\LANG_\Sigma$', linewidth=0)
+
+p += r1
+p += t1
+
+x0,y0 = r0.right()
+x1,y1 = r1.left()
+p += Line(points=[(x0,y0), (x1,y0)], endstyle='>')
+"""
+DFAs over S                 Languages over S
++---------------+           +---------------+
+|               |           |               |
+|               | --------> |               |
+|               |           |               |
++---------------+           +---------------+
+"""
+
+print p
+\end{python}
+
+Now let's start with a language.
+
+\newpage
+\begin{ex}
+Draw a state diagram that accepts the following
+language of strings over $\Sigma =
+\{ a, b \}$ 
+\[
+L = \{\}
+\]
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Draw a state diagram that accepts the following
+language of strings over $\Sigma =
+\{ a, b \}$ 
+\[
+L = \{a\}
+\]
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Draw a state diagram that accepts the following
+language of strings over $\Sigma =
+\{ a, b \}$ 
+\[
+L = \{\ep\}
+\]
+\qed
+\end{ex}
+
+
+
+\newpage
+\begin{ex}
+Draw a state diagram that accepts the following
+language of strings over $\Sigma =
+\{ a, b \}$ 
+\[
+L = \{\ep, a\}
+\]
+\qed
+\end{ex}
+
+\newpage
+\begin{ex}
+Draw a state diagram that accepts the following
+language of strings over $\Sigma =
+\{ a, b \}$ 
+\[
+L = \{a, b\}
+\]
+\qed
+\end{ex}
+
+
+
+\newpage
+\begin{ex}
+Draw a state diagram that accepts the following
+language of strings over $\Sigma =
+\{ a, b \}$ 
+\[
+L = \{a, a^2\}
+\]
+\qed
+\end{ex}
+
+\newpage
+\begin{ex}
+Draw a state diagram that accepts the following
+language of strings over $\Sigma =
+\{ a, b \}$ 
+\[
+L = \{ab, ba\}
+\]
+\qed
+\end{ex}
+
+\newpage
+\begin{ex}
+Draw a state diagram that accepts the language of strings over $\Sigma =
+\{ a, b \}$ that contains $aaa$, i.e.
+\[
+L = \{ x \in \Sigma^* \,|\, x = ya^3 z \text{ for some } y, z \in \Sigma^*\}
+\]
+\qed
+\end{ex}
+
+\newpage
+\begin{ex}
+Draw a state diagram that accepts the language of strings over $\Sigma
+ = \{a, b\}$ that does not contain $aaa$.
+\qed
+\end{ex}
+
+\newpage
+\begin{ex}
+Draw a state diagram that accepts the language of strings over 
+$\Sigma = \{a, b\}$ that contains $abab$.
+\qed
+\end{ex}
+
+\newpage
+\begin{ex}
+Draw a state diagram that accepts the language of strings over 
+$\Sigma = \{a, b\}$ where the number of $a$'s is exactly 
+$\equiv 1 \, (\operatorname{mod} 4)$.
+So the number of $a$'s can be $1, 5, 9, \ldots$.
+\qed
+\end{ex}
+
+
+\newpage
+In the study of languages a very important question to ask is what
+is the expressivity (or power) of the devices used in describing
+languages. So for a  fixed $\Sigma$, can all languages over $\Sigma$
+be the language be accepted by some DFA defined over $\Sigma$?
+
+If so, then we only need to study DFAs.
+
+Unfortunately (or fortunately for those are masochistic or who love
+twisted plots) $\ldots$ NO! In fact there are
+\textit{many} languages
+{\it not} accepted by DFAs. Here's are a few: 
+\begin{itemize}
+ \item $\{a^nb^n \,|\, n\geq 0\}$
+ \item The palindromic strings over $\Sigma$ if $|\Sigma|>1$.
+\end{itemize}

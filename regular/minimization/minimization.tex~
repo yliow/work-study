@@ -1,0 +1,240 @@
+\newcommand\ind{\operatorname{index}}
+
+\section{Minimization}
+
+Here's the aim: Let $M$ be a DFA. Can we find another DFA $M'$ such
+that
+\begin{itemize}
+ \item $L(M') = L(M)$
+ \item $M'$ is a DFA with the smallest number of states satisfying
+ the above.
+ \end{itemize}
+
+First we'll find a smaller DFA. Later we'll prove that it's the
+smallest using Myhill-Nerode's Theorem.
+
+Throughout this section, $M = (\Sigma,Q,q_0,F,\delta)$ will be a $\DFA$
+where $Q = \{q_0,\ldots,q_{n-1}\}$
+
+The idea is to collapse states $\ldots$ EQUIVALENCE RELATION TO THE
+RESCUE!
+
+Go ahead and review equivalence relations.
+
+\begin{defn}
+Let $M$ be a DFA. Define the relation $\equiv_M$ on $\Sigma^*$ as
+follows. Let $x, y \in \Sigma^*$. Then
+\[
+x \equiv_M y \,\,\,\iff\,\,\, \delta(q_0, x) = \delta(q_0, y)
+\]
+In other words, $x \equiv_M y$ if, after running them in $M$, you end
+up at the same state.
+\end{defn}
+
+\newpage
+\begin{ex}
+  [give dfa and check equivalence for some strings. say use
+  dfa for 1 mod 8.]
+\end{ex}
+
+What is the intuition here?
+Notice that the string $\Sigma^*$ will land in the states.
+So we can think of classes of strings as being same as states.
+
+\begin{ex}
+slightly change dfa above to 1 or 5 mod 8.
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Prove that $\equiv_M$ is an equivalence relation on $\Sigma^*$.
+Therefore $\Sigma^*$ is partitioned into equivalence classes of
+strings. We will write $[x]_M$ for the equivalence class containing
+$x$, i.e.,
+\[
+ [x]_M = \{ y \in \Sigma^* \,|\, x \equiv_M y \}
+\]
+We will write $\ind(\equiv_M)$ for the number of equivalence classes
+of $\Sigma^*$ under $\equiv_M$.
+\end{ex}
+
+$\equiv_M$ is more than just an equivalence relation. Note that if
+$x \equiv_M y$, then they remain equivalence (wrt $\equiv$) even
+when you extend them ``on their right":
+
+\begin{defn}
+Let $\equiv$ be \textit{any} equivalence relation on $\Sigma^*$. We
+say that $\equiv$ is \defterm{right invariant} if for all $x, y \in
+\Sigma^*$,
+\[
+x \equiv y \implies \text{ for all $z \in \Sigma^*$}, xz \equiv yz
+\]
+\end{defn}
+
+\begin{ex}
+Let $M$ be a $\DFA$. Prove that $\equiv_M$ is right invariant.
+\qed
+\end{ex}
+
+The main idea is that the equivalence classes of $L$ under
+$\equiv_M$ will be the states. [?]
+
+Now we define an equivalence relation on \textit{any} language $L$.
+Note that $L$ need not be regular:
+
+\begin{defn}
+Let $L$ be any language.
+Define $L$ as follows: For $x,y \in
+\Sigma^*$,
+\[
+ x \equiv_L y \,\,\, \text{ if } \,\,\,\text{for all $z$, } xz \in L
+ \iff yz \in L
+\]
+
+This is the same as saying that $x \equiv_L y$ if for all $z \in
+\Sigma^*$, either
+ \begin{itemize}
+  \item $xz, yz$ both in $L$, or
+  \item $xz, yz$ both not in $L$.
+ \end{itemize}
+
+We will write $[x]_L$ for the equivalence class of $x$ under
+$\equiv_L$.
+
+\end{defn}
+
+
+
+\begin{eg}
+Let $\Sigma = \{a,b\}$. For simplicity we will write $|w|_a$ for the
+number of $a$'s in $w$ and $|w|_b$ for the number of $b$'s in $w$.
+Let $L = \{w \in \Sigma^* \,|\, |w|_a, |w|_b \text{ are even} \}$.
+
+Look at the conditions: $|w|_a$ is even and $|w|_b$ is even. Notice
+that is you define the following sets
+ \begin{itemize}
+  \item $L_{ee} = \{w \in \Sigma^* \,|\, |w|_a \text{ even}, |w|_b \text{
+  even}\}$
+ \item $L_{eo} = \{w \in \Sigma^* \,|\, |w|_a \text{ even}, |w|_b \text{
+  odd}\}$
+  \item $L_{oe} = \{w \in \Sigma^* \,|\, |w|_a \text{ odd}, |w|_b \text{
+  even}\}$
+ \item $L_{oo} = \{w \in \Sigma^* \,|\, |w|_a \text{ even}, |w|_b \text{
+  even}\}$
+ \end{itemize}
+
+Obviously $L_{ee}, L_{eo}, L_{oe}, L_{oo}$ forms a partition of $L$
+(Recall: this means they are pairwise disjoint and their union is
+$L$.)
+
+When we look the equivalence relation on $L$, we see that
+ \begin{itemize}
+  \item $L_{ee} = [\ep]$
+  \item $L_{eo} = [b]$
+  \item $L_{oe} = [aaabb]$
+  \item $L_{oo} = [baaabb]$
+ \end{itemize}
+
+Not only that, we can actually use these equivalence classes of
+strings to create a $\DFA$ in the following way. If $x \in \Sigma^*$
+and $a \in \Sigma$, we just define
+\[
+  \delta([x]_L, a) = [xa]_L
+\]
+
+This is the smallest (in terms of number of states) DFA that accepts
+$L$.
+\end{eg}
+
+\begin{eg}
+Now consider $L = \{w \in \Sigma \,|\, w \text{ does not contain aab
+}\}$ where $\Sigma = \{a,b\}$.
+ \begin{itemize}
+  \item Is $ba \equiv_L baa$?
+  \item Suppose $w,w'$ both contain $aab$. Is it true that $w \equiv
+ _L w'$?
+ \end{itemize}
+\end{eg}
+
+OK. Here's the big theorem of this section:
+
+\begin{thm} (Myhill-Nerode) \label{T:myhillnerode} Let $L$ be a language over
+$\Sigma$.
+The following are equivalent:
+ \begin{itemize}
+  \item[(a)] $L$ is regular
+  \item[(b)] There is a right invariant equivalence relation $\equiv$  on $L$
+   such that $\equiv$ has finite index and $L$ is the union of some
+   equivalence classes of $\equiv$.
+  \item[(c)] $\equiv_L$ has finite index.
+ \end{itemize}
+\end{thm}
+
+I will not give a proof. However the important thing is that the
+proof of (c) $\implies$ (a) is constructive. In particular, the DFA
+constructed uses equivalence classes of $\equiv_L$ as states.
+
+The important thing you should realize by reading this theorem is
+that this is another way of characterizing regular languages. This
+characterization does not rely on the definition of DFA. In other
+words you can now re-define what is meant by regular in terms of
+$\equiv_L$ and the finiteness of the equivalence classes of
+$\equiv_L$. Theorems like these are extremely important because they
+reveal connections between different concepts and reveal different
+points of view. Note also that if you can write down infinitely many
+strings which are not equivalent to each other, then $L$ is not
+regular.
+
+\begin{thm} (DFA Minimization) \label{T:dfaminimization}
+ If $L$ is regular and $M$ is a DFA with the minimum number of
+ states, then $M$ is the ``same" as the DFA constructed in the
+ Myhill-Nerode theorem.
+\end{thm}
+
+Here ``same" can be formalize in terms of isomorphisms of DFA. It
+means ``the same up to renaming the states". For instance if you
+take a DFA with states labeled $q_0, q_1, \ldots, q_{n-1}$ and
+relabel them as $s_0, s_1, \ldots, s_{n-1}$, then obviously the way
+they both operate is exactly the same except for the names of the
+states.
+
+The important thing for us is how do we simplify a DFA? First of all
+the simplest thing to do first is to remove states that cannot be
+reached from the initial state. For a human being, if the DFA is
+simple, then we can do it visually. In terms of an algorithm, you
+need to process the states in the following manner. First you need a
+list of states called $B$. This will be the list of states you will
+visit. You also need a list of visited states; let's call this $A$.
+You initialize $B$ with the initial state and initialize $A$ to be
+empty. Now in a while loop, take a state $q$ out of $B$, visit all
+the states you can go to from $q$ and put them into $B$, and put $q$
+into $A$. Repeat this loop as long as $B$ is not empty. When you're
+done, $A$ contains all the states that can be reached from the
+initial state.
+
+The other question is how do we merge the visited states?
+
+We will define another relation on states $\equiv$ so that states
+that should merge are equivalence to each other. Let $p,q$ be
+states. Then we say that $p$ and $q$ are indistinguishable, and we
+write
+\[
+ p \equiv q
+\]
+if there is some $z$ such that either
+\begin{itemize}
+ \item $\delta(p,z) \in F$ and $\delta(q,z) \notin F$, or
+ \item $\delta(p,z) \notin F$ and $\delta(q,z) \in F$
+ \end{itemize}
+All you need to do is to merge indistinguishable states into a new
+state.
+
+Here's a systematic way of telling if pairs of states are
+distinguishable or not:
+
+[insert]
+
+There is a more efficient algorithm (I won't do it here) that will
+build the minimum DFA with time complexity $O(n \lg n)$ where $n =
+|Q|$.

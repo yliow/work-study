@@ -1,0 +1,91 @@
+\section{Implementing a single DFA in C++}
+
+You can actually simulate the computation
+of a DFA using a programming language such as C++, Java, etc.
+Let's write a C++ program to simulate this DFA:
+
+\begin{python}
+from latextool_basic import *
+print(automata(layout="""
+A  B  C
+""",
+edges="A,$a$,A|A,$b$,B|B,$a$,A|B,$b$,C|C,$a,b$,C",
+A="initial|label=$q_0$",
+B="label=$q_1$",
+C="accept|label=$q_2$",
+))
+\end{python}
+
+Here's the program:
+\begin{Verbatim}[frame=single, fontsize=\small]
+#include <iostream>
+#include <string>
+
+int main()
+{
+    std::string x;
+    std::cin >> x;
+
+    int state = 0;
+    std::cout << 'q' << state << ", ";
+    for (int i = 0; i < x.length(); i++)
+    {
+        char c = x[i];
+        switch (state)
+        {
+            case 0:
+                if (c == 'a') state = 0;
+                else if (c == 'b') state = 1;
+                break;
+            case 1:
+                if (c == 'a') state = 0;
+                else if (c == 'b') state = 2;
+                break;
+            case 2:
+                break;
+        } 
+        std::cout << 'q' << state << ", ";
+    }
+   
+    std::cout << (state == 2 ? "" : "not ")
+              << "accepted\n";
+    return 0;
+}
+\end{Verbatim}
+Study it carefully.
+
+In the program, I'm using integer values to denote states.
+
+For this program, the states of a computation is shown as well as whether is
+is accepted or not.
+
+\begin{ex}
+Rewrite the above so that you have a $\delta$ function:
+\begin{Verbatim}[frame=single, fontsize=\small]
+int delta(int state, char c)
+{
+    ...
+}
+\end{Verbatim}
+\end{ex}
+
+(ANOTHER SECTIOH)
+
+Of course the above program hardcoded lots of information.
+This means that it's impossible to run a different DFA, you would have to
+write another program.
+It's better to have a general library for creating DFAs.
+
+To implement such as class, we have to look at the
+formal definition of a DFA.
+A DFA $M$ is made up of
+\begin{enumerate}[label=\textnormal{(\alph*)},itemsep=0pt,nosep,noitemsep,partopsep=0pt,topsep=0pt,parsep=0pt]
+  \li $\Sigma$ is a finite set
+  \li $Q$ is a finite set
+  \li $q_0$ is an element in $Q$
+  \li $F$ is a subset of $Q$
+  \li $\delta: Q \times \Sigma \rightarrow Q$ is a function 
+\end{enumerate}
+The definition makes it clear that we need to implement
+sets and functions.
+
