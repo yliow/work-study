@@ -37,24 +37,8 @@ Note: In some books the ingredients
 for a DFA is listed in this order $(Q, \Sigma, \delta, q_0, F)$
 instead where the set of states come first.
 
-\begin{ex}
-  Write down the formal definition of the DFA from the
-  state diagram in the previous section.
-
 \input{stdout11.tex}
-from latextool_basic import *
-print(automata(layout="""
-A  B  C
-""",
-edges="A,$a$,A|A,$b$,B|B,$a$,A|B,$b$,C|C,$a,b$,C",
-A="initial|label=$q_0$",
-B="label=$q_1$",
-C="accept|label=$q_2$",
-))
-\end{python}
-\qed
-\end{ex}
-
+\input{exercises/dfa0/main.tex}
 
 \newpage
 With the above formal definition of a DFA, we can now formally
@@ -98,56 +82,11 @@ Given $x \in \Sigma^*$, we say that $x$ is
 \[(q_0,x) \vdash^* (q',\ep) \quad \text{where \,} q' \in F \]
 \end{defn}
 
-
-
-\begin{eg} Consider this DFA again:
 \input{stdout12.tex}
-from latextool_basic import *
-print(automata(layout="""
-A  B  C
-""",
-edges="A,$a$,A|A,$b$,B|B,$a$,A|B,$b$,C|C,$a,b$,C",
-A="initial|label=$q_0$",
-B="label=$q_1$",
-C="accept|label=$q_2$",
-))
-  \end{python}
-  Write down the ID computation for $aba$. Is $aba$ accepted by the DFA?
+\input{exercises/dfa1/main.tex}
 
-  \SOLUTION
-  The ID computation is
-  \begin{align*}
-    (q_0, aba)
-    &\vdash (\delta(q_0, a), ba) = (q_0, ba) \\ 
-    &\vdash (\delta(q_0, b), a) = (q_1, a) \\
-    &\vdash (\delta(q_1, a), \ep) = (q_0, \ep)
-  \end{align*}
-  $q_0$ is not an accept state. Therefore $aba$ is not accepted.
-  \qed
-\end{eg}
-
-\begin{ex}
-  Draw part of $Q \times \Sigma^*$ relation as a directed graph
-  using the $\vdash$ relation for the DFA
 \input{stdout13.tex}
-from latextool_basic import *
-print(automata(layout="""
-A  B  C
-""",
-edges="A,$a$,A|A,$b$,B|B,$a$,A|B,$b$,C|C,$a,b$,C",
-A="initial|label=$q_0$",
-B="label=$q_1$",
-C="accept|label=$q_2$",
-))
-\end{python}
-Of course $Q \times \Sigma^*$ is infinite so you can't
-draw the whole graph!
-Just include $(q, x)$ for all $x$ with length $\leq 4$.
-After that draw the relation for $\vdash^*$.
-\qed
-\end{ex}
-
-
+\input{exercises/dfa2/main.tex}
 
 \newpage
 You can also define acceptance using an \lq\lq extension'' of $\delta$.
@@ -172,47 +111,9 @@ Define
 \end{defn}
 
 
-\begin{eg} Consider this DFA again:
 \input{stdout14.tex}
-from latextool_basic import *
-print(automata(layout="""
-A  B  C
-""",
-edges="A,$a$,A|A,$b$,B|B,$a$,A|B,$b$,C|C,$a,b$,C",
-A="initial|label=$q_0$",
-B="label=$q_1$",
-C="accept|label=$q_2$",
-))
-  \end{python}
-  Write down the $\delta^*$
-  computation for $aba$. Is $aba$ accepted by the DFA?
-  \end{eg}
+\input{exercises/dfa3/main.tex}
 
-  \SOLUTION
-  Teh $\delta*$ computation is
-  \begin{align*}
-    \delta^*(q_0 aba)
-    &= (\delta(q_0, a), ba) = (q_0, ba) \\
-    &= (\delta(q_0, b), a) = (q_1, a) \\
-    &= (\delta(q_1, a), \ep) = (q_0, \ep)
-  \end{align*}
-  I stop at this point since the string now is $\ep$.
-  The last state is $q_0$ which is not an accept state.
-  Therefore
-  $aba$ is not accepted by the DFA.
-
-  Comparing the above to
-    \begin{align*}
-    q_0 aba
-    \vdash \delta(q_0, a), ba) = (q_0, ba) \\ 
-    \vdash \delta(q_0, b), a) = (q_1, a) \\
-    \vdash \delta(q_1, a), \ep) = (q_0, \ep)
-  \end{align*}
-    you see that using $\vdash$ notation to relate
-    ID is mathematically the same as
-    using $\delta$.
-    \qed
-  
 Now we can define the \textit{whole} language accepted by $M$:
 
 \begin{defn} Let $M$ be a DFA. Then the \defone{language} accepted by $M$,
@@ -227,34 +128,9 @@ L(M) = \{x \in \Sigma^* \mid \delta^* (q_0, x) \in F \}
 \]
 \end{defn}
 
-\begin{ex}
-\begin{tightlist}
-\item Draw DFA $M$ over $\Sigma = \{0\}$ such that $L(M) = \{\}$.
-\item Next, define this DFA formally.
-\item Now, draw a graph where the nodes are $(q, x)$ where
-$q$ runs through all the states of your DFA and $x$
-runs through all the words $\Sigma^*$ ... wait
-that's infinite ... you can't do that.
-OK ... just draw $(q, x)$ where $q$ runs over all states
-and $x$ runs over all words of length $<= 5$.
-Draw directed edges in the graph so that
-there's an arrow from $(q,x)$ to $(q', x')$ if
-$(q, x) \vdash (q', x')$, i.e., $\delta(q, x) = \delta(q', x')$.
-\item Finally graph the graph as the above except that
-there's an arrow from $(q, x)$ to $(q', x')$
-if $(q, x) \vdash (q', x')$, i.e.,
-$\delta^*(q, x) = (q', x')$.
-\end{tightlist}
-\qed
-\end{ex}
+\input{exercises/dfa4/main.tex}
 
-\begin{ex}
-  Do the exercise but this time for this language:
-  The DFA accepts the language of strings over 
-  $\Sigma = \{a, b\}$ that contains $abab$.
-  \qed
-\end{ex}
-
+\input{exercises/dfa5/main.tex}
 
 \newpage
 Languages over $\Sigma$ of the above kind is important.
@@ -268,34 +144,3 @@ regular languages over $\Sigma$.
 \end{defn}
 
 \input{stdout15.tex}
-from latextool_basic import *
-
-p = Plot()
-r0 = Rect(0, 0, 2, 2)
-x,y = r0.top()
-y += 0.25
-t0 = Rect(x, y, x, y, label=r'$\DFA_\Sigma$', linewidth=0)
-p += r0
-p += t0
-
-r1 = Rect(4, 0, 8, 4)
-x,y = r1.top()
-y += 0.25
-t1 = Rect(x, y, x, y, label=r'$\LANG_\Sigma$', linewidth=0)
-p += r1
-p += t1
-
-r2 = Rect(4, 0, 5.5, 1.5, background='black!10')
-p += r2
-x,y = r2.top()
-y += 0.25
-t2 = Rect(x, y, x, y, label=r'$\Reg_\Sigma$', linewidth=0)
-p += t2
-
-
-x0,y0 = r0.right()
-x1,y1 = r1.left()
-p += Line(points=[(x0,y0), (x1,y0)], endstyle='>')
-
-print(p)
-\end{python}
