@@ -21,48 +21,7 @@ it turns out the collection of languages described by DFAs and NFAs
 are actually the same -- you can't describe a larger collection of languages.
 Here a picture:
 
-\begin{python}
-from latextool_basic import *
-
-p = Plot()
-
-r0 = Rect(0, 0, 2, 2)
-x,y = r0.top()
-y += 0.25
-t0 = Rect(x, y, x, y, label=r'$\DFA_\Sigma$', linewidth=0)
-p += r0
-p += t0
-
-r3 = Rect(-1, 0, 2, 2.5)
-x,y = r3.top()
-y += 0.25
-t0 = Rect(x, y, x, y, label=r'$\NFA_\Sigma$', linewidth=0)
-p += r3
-p += t0
-
-r1 = Rect(4, 0, 8, 4)
-x,y = r1.top()
-y += 0.25
-t1 = Rect(x, y, x, y, label=r'$\LANG_\Sigma$', linewidth=0)
-p += r1
-p += t1
-
-r2 = Rect(4, 0, 5.5, 1.5, background='black!10')
-p += r2
-x,y = r2.top()
-y += 0.25
-t2 = Rect(x, y, x, y, label=r'$\Reg_\Sigma$', linewidth=0)
-p += t2
-
-x0,y0 = r0.right()
-x1,y1 = r1.left()
-p += Line(points=[(x0,y0), (x1,y0)], endstyle='>')
-
-x2,y2 = r3.topright(); y2 -= 0.3
-p += Line(points=[(x2,y2), (x1,y0+0.1)], endstyle='>')
-
-print(p)
-\end{python}
+\input{stdout22.tex}
 
 Recall that a language is regular if it's the language
 accepted by a DFA.
@@ -226,115 +185,7 @@ the other states cannot be reached the start state of the $\DFA$
 and hence does not take part in the computation of a string.
 (They can be included of course.)
 
-
-\newpage
-\begin{ex}
-Here's an $\NFA$ for $\emptyset$ for $\Sigma = \{a,b\}$:
-\begin{python}
-from latextool_basic import *
-print(automata(layout="""
-A
-""",
-edges="",
-A="initial|label=$q_0$",
-))
-\end{python}
-Convert it to a $\DFA$ using the subset construction.
-\end{ex}
-
-Here's the solution.
-Let $\delta$ denote the transition function of $N$.
-Note that 
-\begin{align*}
-  \delta(q_0, \epsilon) = \{\} \\
-  \delta(q_0, a) = \{\} \\
-  \delta(q_0, b) = \{\} 
-\end{align*}
-First of all the states are labeled as all the subsets of $\{q_0\}$.
-
-\begin{python}
-from latextool_basic import *
-print(automata(layout="""
-A  B
-""",
-edges="",
-A="label=$\{q_0\}$",
-B="label=$\{\}$",
-))
-\end{python}
-
-The start state is the $\epsilon$-closure of $\{q_0\}$.
-However in $N$, there are no $\epsilon$--transitions out of 
-$q_0$.
-So the $\epsilon$-closure of $\{q_0\}$ is in fact $\{q_0\}$, i.e.
-$\overline{\{q_0\}} = \{q_0\}$
-The $\DFA$ is now this:
-
-\begin{python}
-from latextool_basic import *
-print(automata(layout="""
-A  B
-""",
-edges="",
-A="initial|label=$\{q_0\}$",
-B="label=$\{\}$",
-))
-\end{python}
-
-Now I will compute the $a$--transition of the state $\{q_0\}$.
-Let $\delta^\DFA$ denote the transition function of the $\DFA$
-that we're building.
-Then
-\begin{align*}
-\delta( \{q_0, a\} ) 
-&= \overline{ \bigcup_{q \in \{q_0\}} \delta(q, a)} \\
-&= \overline{ \delta(q_0, a) } \\
-&= \overline{ \emptyset } \\
-&= \emptyset
-\end{align*}
-The (incomplete) $\DFA$ now looks like this:
-
-\begin{python}
-from latextool_basic import *
-print(automata(layout="""
-A  B
-""",
-edges="A,$a$,B",
-A="initial|label=$\{q_0\}$",
-B="label=$\{\}$",
-))
-\end{python}
-
-Using the same reasoning we have
-
-\begin{python}
-from latextool_basic import *
-print(automata(layout="""
-A  B
-""",
-edges="A,$a,b$,B",
-A="initial|label=$\{q_0\}$",
-B="label=$\{\}$",
-))
-\end{python}
-
-It's easy to see that in the DFA, the $a$--
-and $b$--transitions from the state $\{\}$ goes back to itself.
-Therefore the completed DFA is this:
-
-
-\begin{python}
-from latextool_basic import *
-print(automata(layout="""
-A  B
-""",
-edges="A,$a,b$,B|B,$a,b$,B",
-A="initial|label=$\{q_0\}$",
-B="label=$\{\}$",
-))
-\end{python}
-\qed
-
+\input{exercises/dfa-as-powerful-as-nfa0/main.tex}
 
 Note that the above DFA does accept the same language as the 
 NFA we started with, i.e., $\{\}$.
@@ -342,104 +193,14 @@ NFA we started with, i.e., $\{\}$.
 Note that the subset construction does not
 necessarily give the simplest DFA.
 Clearly the simplest DFA that accepts $\{\}$ is
-\begin{python}
-from latextool_basic import *
-print(automata(layout="""
-A  
-""",
-edges="A,$a,b$,A",
-A="initial|label="",
-))
-\end{python}
+\input{stdout29.tex}
 \lq\lq Simplest" meaning \lq\lq fewest states".
 
-
-
-\newpage
-\begin{ex}
-Here's the NFA for the words in $\{a, b\}^*$ beginning with $a$: 
-
-\begin{python}
-from latextool_basic import *
-print(automata(layout="""
-A B
-""",
-edges="A,$a$,B|B,$a,b$,B",
-A="initial|label=$q_0$",
-B="accept|label=$q_1$",
-))
-\end{python}
-
-Convert it to a DFA using the powerset construction.
-\qed
-\end{ex}
+\input{exercises/dfa-as-powerful-as-nfa1/main.tex}
 \vspace{3in}
 
+\input{exercises/dfa-as-powerful-as-nfa2/main.tex}
 
+\input{exercises/dfa-as-powerful-as-nfa3/main.tex}
 
-\newpage
-\begin{ex}
-Using the powerset construction, find a DFA $M$ such that
-$L(M) = L(N)$ where $N$ is the following NFA:
-
-\begin{python}
-from latextool_basic import *
-print(automata(layout="""
-A         B
-
-C    D
-""",
-edges="A,$a$,B|A,$b,\epsilon$,C|D,$\epsilon$,B|A,$a$,D|D,$b$,D|D,$a,b$,C",
-A="initial|label=$q_0$",
-B="label=$q_1$",
-C="accept|label=$q_2$",
-D="accept|label=$q_3$",
-))
-\end{python}
-\qed
-\end{ex}
-
-
-\newpage
-\begin{ex}
-Here's the formal definition of an $\NFA$ $N = (\Sigma, Q, q_0, F,
-\delta)$ where $\Sigma=\{a,b\}$, $Q = \{q_0, q_1, q_2, q_3, q_4\}$,
-$F = \{q_4\}$ and $\delta$ is given by the following table
-(the cases where the $\delta$--value is an empty set are omitted):
-\[
- \begin{tabular}{|c|c|c|}
-  \hline
-  $q \in Q$ & $x \in \Sigma_\ep$ & $\delta(q,x)$ \\
-  \hline
-  $q_0$ & $\epsilon$ & $\{q_0, q_1\}$ \\
-  $q_0$ & $b$ & $\{q_2\}$ \\
-  $q_1$ & $\epsilon$ & $\{q_3\}$ \\
-  $q_1$ & $\epsilon$ & $\{q_2\}$ \\
-  $q_1$ & $a$ & $\{q_0\}$ \\
-  $q_1$ & $b$ & $\{q_2, q_4\}$ \\
-  $q_2$ & $\ep$ & $\{q_4\}$ \\
-  $q_2$ & $b$ & $\{q_0,q_4\}$ \\
-  $q_3$ & $a$ & $\{q_4\}$ \\
-  $q_4$ & $\epsilon$ & $\{q_1, q_2, q_3\}$ \\
-  \hline
- \end{tabular}
-\]
-Construct a $\DFA$ $M$ such that $L(M) = L(N)$.
-\qed
-\end{ex}
-
-
-
-\newpage
-\begin{ex}
-Design a $\DFA$ that accepts words containing $abab$ or $baba$.
-[Hint: It's easier to first design two $\NFA$s, one accepting
-words containing $abab$ and another accepting words containing
-$baba$.
-Next design an $\NFA$ accepting words containing $abab$ or $baba$.
-Finally convert this $\NFA$ to a $\DFA$ using the subset construction.
-I'll come back and talk about closure operators that will give
-you a general method for constructing DFAs and NFAs whenever
-the describe of the language contains the word \lq\lq or".]
-\qed
-\end{ex}
+\input{exercises/dfa-as-powerful-as-nfa4/main.tex}
