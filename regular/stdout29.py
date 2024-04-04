@@ -3,5 +3,5 @@ print(automata(layout="""
 A  
 """,
 edges="A,$a,b$,A",
-A="initial|label="",
+A="initial|label=",
 ))
