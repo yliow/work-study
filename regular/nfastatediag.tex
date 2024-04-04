@@ -37,11 +37,7 @@ An edge labeled with symbol $a$ is called an
 \defone{$a$--transition}.
 
 
-\begin{ex}
- Visually, what are the differences between the state diagram of an
- NFA and a DFA?
-\qed
-\end{ex}
+\input{exercises/nfastatediag0/main.tex}
 
 This is how you use the machine. It's very similar to the state
 diagram of a DFA except that you keep track of a
@@ -463,116 +459,21 @@ Whenever you spawns machine, line them up vertically like this.
 Using the above NFA as example, the initialization will result in
 this diagram:
 
-\begin{python}
-from latextool_basic import *
-d = positions(r'''
-A
-B
-C
-''')
-p = Plot()
-
-Graph.r = 0.3
-x,y = d['A']; p += Graph.node(x=x, y=y, label='$q_0$', name='A')
-x,y = d['B']; p += Graph.node(x=x, y=y, label='$q_3$', name='B')
-x,y = d['C']; p += Graph.node(x=x, y=y, label='$q_1$', name='C')
-
-p += Graph.arc(names=['A','B'], label=r'$\epsilon$', anchor='left')
-p += Graph.arc(names=['B','C'], label=r'$\epsilon$', anchor='left')
-
-print(p)
-\end{python}
+\input{stdout17.tex}
 
 In other words, after initialization, there are 3 machines.
 When they all read a character, say $a$, draw horizontal arrows:
 
-\begin{python}
-from latextool_basic import *
-d = positions(r'''
-A   D
-B   E
-C   F
-''')
-p = Plot()
-
-Graph.r = 0.3
-for name, label in [('A','$q_0$'),
-                    ('B','$q_3$'),
-                    ('C','$q_1$'),
-                    ('D','$q_0$'),
-                    ('E','$q_4$'),
-                    ('F','X')]:
-    if label != 'X':
-        x,y = d[name]; p += Graph.node(x=x, y=y, label=label, name=name)
-    else:
-        x,y = d[name]
-        p += Graph.node(x=x, y=y, label=r'{\large $\times$}', name=name,
-                        linewidth=0, background='')
-        
-
-p += Graph.arc(names=['A','B'], label=r'$\epsilon$', anchor='left')
-p += Graph.arc(names=['B','C'], label=r'$\epsilon$', anchor='left')
-p += Graph.arc(names=['A','D'], label=r'$a$', anchor='above')
-p += Graph.arc(names=['B','E'], label=r'$a$', anchor='above')
-p += Graph.arc(names=['C','F'], label=r'$a$', anchor='above')
-
-print(p)
-\end{python}
+\input{stdout18.tex}
 
 Draw an ${\large \times}$ when a machine crashes.
 Then you let the machine at $q_0$ and $q_4$
 spawn off new machines along $epsilon$--transitions, 
 drawing the $\epsilon$-arrows vertically again:
 
-\begin{python}
-from latextool_basic import *
-d = positions(r'''
-A   D
-    G
-    H
-B   E
-C   F
-''')
-p = Plot()
-
-Graph.r = 0.3
-for name, label in [('A','$q_0$'),
-                    ('B','$q_3$'),
-                    ('C','$q_1$'),
-                    ('D','$q_0$'),
-                    ('E','$q_4$'),
-                    ('F','X'),
-                    ('G','$q_3$'),
-                    ('H','$q_1$'),
-                   ]:
-    if label != 'X':
-        x,y = d[name]; p += Graph.node(x=x, y=y, label=label, name=name)
-    else:
-        x,y = d[name]
-        p += Graph.node(x=x, y=y, label=r'{\large $\times$}', name=name,
-                        linewidth=0, background='')
-        
-
-p += Graph.arc(names=['A','B'], label=r'$\epsilon$', anchor='left')
-p += Graph.arc(names=['B','C'], label=r'$\epsilon$', anchor='left')
-p += Graph.arc(names=['A','D'], label=r'$a$', anchor='above')
-p += Graph.arc(names=['B','E'], label=r'$a$', anchor='above')
-p += Graph.arc(names=['C','F'], label=r'$a$', anchor='above')
-p += Graph.arc(names=['D','G'], label=r'$\epsilon$', anchor='left')
-p += Graph.arc(names=['G','H'], label=r'$\epsilon$', anchor='left')
-
-print(p)
-\end{python}
-
-
-
+\input{stdout19.tex}
 
 Repeat. You will find this more organized and harder to miss things.
-
-
-
-
-
 
 \begin{defn}
 If the NFA is denoted $N$, then $L(N)$ is the language accepted by
@@ -580,156 +481,28 @@ $N$, in other words $L(N)$ is the set of \textbf{all} strings over
 $\Sigma$ accepted by $N$.
 \end{defn}
 
-\newpage
-\begin{ex}
-Is $b$ accepted by the above NFA? Is $ba$ accepted? Is $bab$
-accepted? What is the language accepted by the NFA with the above
-transition diagram.
-\qed
-\end{ex}
+\input{exercises/nfastatediag1/main.tex}
 
-\newpage
-\begin{ex}
-Draw an NFA diagram that accepts the following
-language of strings over $\Sigma =
-\{ a, b \}$ 
-\[
-L = \{\}
-\]
-Compare with a DFA.
-\qed
-\end{ex}
+\input{exercises/nfastatediag2/main.tex}
 
+\input{exercises/nfastatediag3/main.tex}
 
-\newpage
-\begin{ex}
-Draw an NFA diagram that accepts the following
-language of strings over $\Sigma =
-\{ a, b \}$ 
-\[
-L = \{a\}
-\]
-Compare with a DFA.
-\qed
-\end{ex}
+\input{exercises/nfastatediag4/main.tex}
 
+\input{exercises/nfastatediag5/main.tex}
 
-\newpage
-\begin{ex}
-Draw an NFA diagram that accepts the following
-language of strings over $\Sigma =
-\{ a, b \}$ 
-\[
-L = \{\ep\}
-\]
-Compare with a DFA.
-\qed
-\end{ex}
+\input{exercises/nfastatediag6/main.tex}
 
+\input{exercises/nfastatediag7/main.tex}
 
-\newpage
-\begin{ex}
-Draw an NFA diagram that accepts the following
-language of strings over $\Sigma =
-\{ a, b \}$ 
-\[
-L = \{\ep, a\}
-\]
-Compare with a DFA.
-\qed
-\end{ex}
+\input{exercises/nfastatediag8/main.tex}
 
+\input{exercises/nfastatediag9/main.tex}
 
-\newpage
-\begin{ex}
-Draw an NFA diagram that accepts the following
-language of strings over $\Sigma =
-\{ a, b \}$ 
-\[
-L = \{a, b\}
-\]
-Compare with a DFA.
-\vspace{2in}
-\qed
-\end{ex}
+\input{exercises/nfastatediag10/main.tex}
 
+\input{exercises/nfastatediag11/main.tex}
 
-\newpage
-\begin{ex}
-Draw an NFA diagram that accepts the following
-language of strings over $\Sigma =
-\{ a, b \}$ 
-\[
-L = \{a, a^2\}
-\]
-Compare with a DFA.
-\vspace{2in}
-\qed
-\end{ex}
+\input{exercises/nfastatediag12/main.tex}
 
-
-\newpage
-\begin{ex}
-Draw an NFA diagram that accepts the following
-language of strings over $\Sigma =
-\{ a, b \}$ 
-\[
-L = \{ab, ba\}
-\]
-Compare with a DFA.
-\qed
-\end{ex}
-
-
-\newpage
-\begin{ex}
-Draw a state diagram of an NFA that accepts the language of
-strings over $\Sigma = \{a,b\}$ that contains $aaa$, i.e.,
-\[
- L = \{\, x \in \Sigma^*
- \,|\, x = ya^3z \text{ \, for some \, } y,z \in \Sigma^* \,\}
-\]
-Compare with a DFA.
-\vspace{2in}
-\qed
-\end{ex}
-
-
-\newpage
-\begin{ex}
-Draw a transition diagram of an NFA that accepts the language of
-strings over $\Sigma$ that does not contain $aaa$.
-\vspace{2in}
-\qed
-\end{ex}
-
-\newpage
-\begin{ex}
-Draw a transition diagram of an NFA that accepts the language of
-strings over $\Sigma = \{a,b\}$ that contains $abab$.
-Compare with a DFA.
-\vspace{2in}
-\qed
-\end{ex}
-
-\newpage
-\begin{ex}
-Draw a transition diagram of an NFA that accepts the language of
-strings over $\Sigma = \{a,b\}$ where the number of $a$ is exactly
-$\equiv 1\pmod 4$. So the number of $a$s can be $1,5,9,\ldots$.
-Compare with a DFA.
-\vspace{2in}
-\qed
-\end{ex}
-
-\newpage
-\begin{ex}
-  Let $M$ be an DFA.
-  Is it clear that the diagram of $M$ is also a diagram
-  for an NFA, say call it $N$?
-  If is clear that $L(N) = L(M)$?
-  This is all very informal.
-  That's because we don't have a formal definition of an NFA
-  yet other than a diagram.
-  (Later you'll see that the converse is true.)
-\end{ex}
+\input{exercises/nfastatediag13/main.tex}
