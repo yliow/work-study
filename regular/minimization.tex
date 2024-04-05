@@ -30,16 +30,7 @@ I will say that two automatas are \defone{equivalent} (whether they
 are DFAs or NFAs) if they
 accept the same language.
 
-\begin{ex}
-  Create three equivalent DFAs
-  where
-  one has two states, one has 3 states, and the last has 5 states.
-  Prove that the one with two states is the minimal, i.e.,
-  you cannot find another DFA that accepts the same language
-  and has 1 state.
-  You have 2 minutes.
-  \qed
-\end{ex}
+\input{exercises/minimization0/main.tex}
 
 The main result is this:
 
@@ -128,91 +119,13 @@ Isomorphism of DFAs is stronger.
 
 \newpage
 
-\begin{ex}
-  Consider the following two DFAs:
-\input{stdout41.tex}
-from latextool_basic import *
-print(automata(layout="""
-A  B   C  D
-""",
-edges="A,$a$,B|A,$b$,D|B,$a$,B|B,$b$,C|C,$a$,A|C,$b$,B|D,$a$,B|D,$b$,C",
-A='initial|label=$0$',
-B='label=$1$',
-C='label=$2$',
-D='accept|label=$3$',
-))
-\end{python}
-and
-\begin{comment}
-\input{stdout42.tex}
-from latextool_basic import *
-print(automata(layout="""
-   D
-A     B
-   C   
-""",
-edges="A,$a$,B|A,$b$,D|B,$a$,B|B,$b$,C|C,$a$,A|C,$b$,B|D,$a$,B|D,$b$,C",
-A='initial|label=$A$',
-B='label=$C$',
-C='label=$D$',
-D='accept|label=$B$',
-))
-\end{python}
-\end{comment}
-\begin{center}
-\begin{tikzpicture}[>=triangle 60,shorten >=0.5pt,node distance=2cm,auto,initial text=]
-\node[state,accepting] (D) at (  3,  0) {$B$};
-\node[state,initial] (A) at (  0, -2) {$A$};
-\node[state] (B) at (  6, -2) {$C$};
-\node[state] (C) at (  3, -4) {$D$};
-
-\path[->]
-(A) edge [bend left=0,pos=0.25,above] node {$a$} (B)
-(A) edge [bend left=0,pos=0.5,above] node {$b$} (D)
-(B) edge [loop above] node {$a$} ()
-(B) edge [bend left=10,pos=0.5] node {$b$} (C)
-(C) edge [bend left=0,pos=0.5] node {$a$} (A)
-(C) edge [bend left=10,pos=0.5,above] node {$b$} (B)
-(D) edge [bend left=0,pos=0.5,above] node {$a$} (B)
-(D) edge [bend left=0,pos=0.25] node[pos=0.25] {$b$} (C)
-;
-\end{tikzpicture}
-\end{center}
-Are they isomorphic?
-\qed
-\end{ex}
+\input{exercises/minimization1/main.tex}
 
 \newpage
-\begin{ex}
-  \mbox{}
-  \begin{tightlist}
-  \item True or false:
-    \begin{tightlist}
-    \item If $M, M'$ are equivalent DFAs, then they are isomorphic.
-    \item If $M, M'$ are isomorphic DFAs, then they are equivalent.
-    \end{tightlist}
-  \item Is equivalence of DFAs an equivalent relation?
-  \item Is isomorphism of DFAs an equivalent relation?  
-  \end{tightlist}
-  \qed
-\end{ex}
-
+\input{exercises/minimization2/main.tex}
 
 \newpage
-\begin{ex}
-  What is the right definition of isomorphism
-  if you want to rename the symbols in alphabets as well?
-  (There's only one reasonable definition.)
-  The definition should look like this:
-  \lq\lq An isomorphism between two DFAs
-  $M = (\Sigma, Q, q_0, F, \delta)$
-  and
-  $M' = (\Sigma', Q', q'_0, F', \delta')$
-  is a pair of bijections $f: Q \rightarrow Q'$ and
-  $g: \Sigma \rightarrow \Sigma'$ such that ..."
-  Complete the definition.
-  \qed
-\end{ex}
+\input{exercises/minimization3/main.tex}
 
 
 \newpage
@@ -221,19 +134,6 @@ Let's look at this DFA:
 
 \begin{comment}
 \input{stdout43.tex}
-from latextool_basic import *
-print(automata(layout="""
-A  B
-
-C  D
-""",
-edges="A,$a$,B|A,$b$,C|B,$a$,D|B,$b$,C|C,$b$,A|C,$a$,D|D,$a$,B|D,$b$,A",
-A='initial|label=$q_0$',
-B='accept|label=$q_1$',
-C='label=$q_2$',
-D='accept|label=$q_3$', xscale=1.3,
-))
-\end{python}
 \end{comment}
 \begin{center}
 \begin{tikzpicture}[>=triangle 60,shorten >=0.5pt,node distance=2cm,auto,initial text=]
@@ -402,57 +302,7 @@ We now need to create a robust algorithm to minimize \textit{any} DFA.
 Before that, try to minimize the following DFA without looking at the theory below it.
 
 \newpage
-\begin{ex}
-  Try to minimize the following DFA (or is it already minimal?)
-
-\begin{comment}
-\input{stdout44.tex}
-from latextool_basic import *
-print(automata(layout="""
-A  B  E
-
-C  D  F
-""",
-edges="A,$a$,B|A,$b$,C|B,$a$,E|B,$b$,C|C,$b$,F|C,$a$,D|D,$a$,B|D,$b$,A|E,$a$,F|E,$b$,D|F,$a$,B|F,$b$,D",
-A='initial|label=$q_0$',
-B='label=$q_1$',
-C='accept|label=$q_3$',
-D='label=$q_4$',
-E='label=$q_2$',
-F='accept|label=$q_5$', xscale=1.3,
-))
-\end{python}
-\end{comment}
-
-\begin{center}
-\begin{tikzpicture}[>=triangle 60,shorten >=0.5pt,node distance=2cm,auto,initial text=]
-\node[state,initial] (A) at (0.0,  0) {$q_0$};
-\node[state] (B) at (3.9000000000000004,  0) {$q_1$};
-\node[state] (E) at (7.800000000000001,  0) {$q_2$};
-\node[state,accepting] (C) at (0.0, -4) {$q_3$};
-\node[state] (D) at (3.9000000000000004, -4) {$q_4$};
-\node[state,accepting] (F) at (7.800000000000001, -4) {$q_5$};
-
-\path[->]
-(A) edge [bend left=0,pos=0.5,above] node {$a$} (B)
-(A) edge [bend left=0,pos=0.5] node {$b$} (C)
-(B) edge [bend left=0,pos=0.25,above] node {$b$} (C)
-(B) edge [bend left=0,pos=0.5,above] node {$a$} (E)
-(C) edge [bend left=20,pos=0.5,above] node {$a$} (D)
-(C) edge [bend right=30,pos=0.5,below] node {$b$} (F)
-(D) edge [bend left=20,pos=0.5,above] node {$b$} (C)
-(D) edge [bend left=0,pos=0.5,right] node {$a$} (B)
-(E) edge [bend left=0,pos=0.25] node {$a$} (D)
-(E) edge [bend left=0,pos=0.5] node {$b$} (F)
-(F) edge [bend left=0,pos=0.25, above] node {$a$} (B)
-(F) edge [bend left=0,pos=0.5,above] node {$b$} (D)
-
-;
-\end{tikzpicture}
-\end{center}
-    
-\qed
-\end{ex}
+\input{exercises/minimization4/main.tex}
 
 \newpage
 Let's fix some terminology and notation.
@@ -522,27 +372,7 @@ are both not not in $L_1$.
 \qed
 \end{eg}
 
-\begin{ex}
-  Again let
-  \[
-  L_1 = \{a^n b^n \mid n \geq 0\}
-  \]
-  \begin{tightlist}
-  \item Are $\ep, a$ $L_1$--separable? $L_1$--distinguishable?
-  \item Are $aa, bb$ $L_1$--separable? $L_1$--distinguishable?
-  \item Are $ab, aabb$ $L_1$--distinguishable? $L_1$--distinguishable?
-  \item Find an example of $x,y$ such that
-    $xz, yz$ are $L_1$--separated for $z$ and
-    $xz', yz'$ are not $L_1$--separated for $z'$.
-    (So you need to find four strings $x,y,z,z'$.)
-  \item Find three strings which are pairwise $L_1$--distinguishable.
-    How about four? Five?
-  \item Is this true? Given any positive $n \geq 2$,
-    it's possible to find $n$ strings which are
-    pairwise $L_1$--distinguishable.
-  \end{tightlist}
-\end{ex}
-
+\input{exercises/minimization5/main.tex}
 
 \newpage
 \begin{eg}
@@ -612,23 +442,7 @@ Then
 and so $xz, yz$ will both have an odd number of $a$'s. Yes?
 And so again $xz,yz$ are not $L_2$--separable.
 
-\begin{ex}
-  \mbox{}
-  \begin{enumerate}[label=\textnormal{(\alph*)},itemsep=0pt,nosep,noitemsep,partopsep=0pt,topsep=0pt,parsep=0pt]
-  \item
-    Suppose $x,y$ are $L_2$--separable and $z \in \Sigma^*$.
-    What can you tell me about $xz,yz$?
-  \item
-    Suppose $x,y$ are not $L_2$--separable and $z \in \Sigma^*$.
-    What can you tell me about $xz,yz$?
-  \item
-    Suppose $x,y$ are not $L_2$--separable and $z \in \Sigma^*$.
-    What can you tell me about $L_s$--distinguishability of $xz,yz$?
-  \item
-    Suppose $x,y$ are not $L_2$--separable and $z \in \Sigma^*$.
-    What can you tell me about $L_s$--distinguishability of $xz,yz$?
-  \end{enumerate}
-\end{ex}
+\input{exercises/minimization6/main.tex}
   
 \begin{comment}
 In fact, note that
@@ -699,55 +513,13 @@ This can be achieved by the case when $x \in L_2$ by the following cases:
 \end{comment}
   
 \newpage
-\begin{ex}
-  Again let
-  \[
-  L_2 = \{w \in \Sigma^* \mid |w|_a, |w|_b \text{ both even}\}
-  \]
-  \begin{enumerate}[label=\textnormal{(\alph*)},itemsep=0pt,nosep,noitemsep,partopsep=0pt,topsep=0pt,parsep=0pt]
-  \item Describe $x,y$ if they are not $L_2$--separable.
-  \item If $x,y$ are not $L_2$--separable, what is the
-    simplest $z$ to make $x,y$ $L_2$--separable.
-  \item If $x,y$ are $L_2$--separable, what is the
-    simplest $z$ to make not $x,y$ $L_2$--separable.
-  \item Show that $\ep, a$ are $L_2$--distinguishable.
-  \item If $\ep, a, b$ pairwise $L_2$--distinguishable?
-    % Yes. 
-  \item Find a set of 4 words which are $L_2$--distinguishable.
-    % e, a, b, ab
-  \item
-    Try (if possible)
-    to find a set of 5 words which are $L_2$--distinguishable.  
-  \end{enumerate}
-  \qed
-\end{ex}
-
-
-
+\input{exercises/minimization7/main.tex}
 
 \newpage
 \begin{eg}
   Let $M$ be the following DFA:
 \begin{comment}
 \input{stdout45.tex}
-from latextool_basic import *
-print(automata(layout="""
-A  B  E  F  
-
-C  D  G  H
-""",
-edges="A,$a$,B|A,$b$,C|B,$a$,E|B,$b$,D|C,$b$,A|C,$a$,D|D,$b$,B|E,$a$,F|G,$a$,H|D,$a$,G|F,$a$,A|H,$a$,C|E,$b$,G|G,$b$,E|F,$b$,H|H,$b$,F",
-A='initial|accept|label=$q_0$',
-B='label=$q_1$',
-C='accept|label=$q_4$',
-D='label=$q_5$',
-E='accept|label=$q_2$',
-G='accept|label=$q_6$',
-H='label=$q_7$',
-F='label=$q_3$',
-xscale=1.3,
-))
-\end{python}
 \end{comment}
 \begin{center}
 \begin{tikzpicture}[>=triangle 60,shorten >=0.5pt,node distance=2cm,auto,initial text=]
@@ -840,20 +612,7 @@ cannot land in the same state.
 \qed
 
 \newpage
-\begin{ex}
-  \begin{tightlist}
-  \item Let $L_1 = \{a^n b^n \mid n \geq 0\}$.
-    Prove that $L_1$ is not a regular language.
-  \item
-    Let $L_2 = \{w \in \Sigma^* \mid |w|_a, |w|_b \text{ both even}\}$.
-    What is the size of the smallest DFA?
-    Construct a minimal DFA for $L_2$.
-    Note that the results above only tells you a lower bound
-    on the number of states of a DFA for $L_2$.
-    It does not say that the number stated is attained.
-    The results above also does not tell you how to construct a DFA.
-  \end{tightlist}
-\end{ex}
+\input{exercises/minimization8/main.tex}
 
 \newpage
 Note that the previous statements tell you when you have the smallest DFA for a language.
@@ -995,20 +754,6 @@ The above describes the DFA completely.
 Here's the diagram:
 
 \input{stdout46.tex}
-from latextool_basic import *
-print(automata(layout="""
-A  B
-
-C  D
-""",
-edges="A,$a$,B|A,$b$,C|B,$b$,D|B,$a$,A|C,$a$,D|C,$b$,A|D,$a$,C|D,$b$,B",
-A='initial|label=$[\ep]$',
-B='label=$[a]$',
-C='label=$[b]$',
-D='accept|label=$[ab]$',
-xscale=1.2
-))
-\end{python}
 
 \newpage
 
@@ -1182,27 +927,14 @@ The partitions are
 \end{tightlist}
 
 \newpage
-\begin{ex}
-Prove that $\equiv_M$ is an equivalence relation on $\Sigma^*$.
-Therefore $\Sigma^*$ is partitioned into equivalence classes of
-strings. We will write $[x]_M$ for the equivalence class containing
-$x$, i.e.,
-\[
- [x]_M = \{ y \in \Sigma^* \,|\, x \equiv_M y \}
-\]
-We will write $\ind(\equiv_M)$ for the number of equivalence classes
-of $\Sigma^*$ under $\equiv_M$.
-\end{ex}
+\input{exercises/minimization9/main.tex}
 
 $\equiv_M$ is more than just an equivalence relation. Note that if
 $x \equiv_M y$, then they remain equivalence (wrt $\equiv$) even
 when you extend them ``on their right":
 
 
-\begin{ex}
-Let $M$ be a $\DFA$. Prove that $\equiv_M$ is right invariant.
-\qed
-\end{ex}
+\input{exercises/minimization10/main.tex}
 
 The main idea is that the equivalence classes of $L$ under
 $\equiv_M$ will be the states. [?]

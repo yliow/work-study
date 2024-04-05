@@ -58,22 +58,6 @@ L(a^* \cup bba)
 \]
 can be accepted by this NFA:
 \input{stdout32.tex}
-from latextool_basic import *
-print(automata(layout="""
-   B  C
-A
-   D  E  F  G
-""",
-edges="A,$\ep$,B|B,$a$,C|C,$\ep$,B|D,$b$,E|E,$b$,F|F,$a$,G|A,$\ep$,D",
-A='initial|label=$q_0$',
-B='accept|label=$q_1$',
-C='accept|label=$q_2$',
-D='label=$q_3$',
-E='label=$q_4$',
-F='label=$q_5$',
-G='accept|label=$q_6$',
-))
-\end{python}
 This NFA accepts 
 \[
 L(a^* \cup bba)
@@ -81,22 +65,6 @@ L(a^* \cup bba)
 \]
 Now using the Kleene star construction, we get
 \input{stdout33.tex}
-from latextool_basic import *
-print(automata(layout="""
-   B  C
-A
-   D  E  F  G
-""",
-edges="A,$\ep$,B|B,$a$,C|C,$\ep$,B|D,$b$,E|E,$b$,F|F,$a$,G|A,$\ep$,D|C,$\ep$,A|G,$\ep$,A",
-A='accept|initial|label=$q_0$',
-B='accept|label=$q_1$',
-C='accept|label=$q_2$',
-D='label=$q_3$',
-E='label=$q_4$',
-F='label=$q_5$',
-G='accept|label=$q_6$',
-))
-\end{python}
 which accepts
 \[
 L((a^* \cup bba)^*) = L(a^* \cup bba)^*
@@ -104,44 +72,10 @@ L((a^* \cup bba)^*) = L(a^* \cup bba)^*
 Let me simplify this a little before we continue.
 First I do this:
 \input{stdout34.tex}
-from latextool_basic import *
-print(automata(layout="""
-A
-   D  E  F  G
-""",
-edges="A,$a$,A|D,$b$,E|E,$b$,F|F,$a$,G|A,$\ep$,D|G,$\ep$,A",
-A='accept|initial|label=$q_0$',
-D='label=$q_3$',
-E='label=$q_4$',
-F='label=$q_5$',
-G='accept|label=$q_6$',
-))
-\end{python}
 then this:
 \input{stdout35.tex}
-from latextool_basic import *
-print(automata(layout="""
-   D  E  F  G
-""",
-edges="D,$a$,D|D,$b$,E|E,$b$,F|F,$a$,G|G,$\ep$,D",
-D='initial|accept|label=$q_3$',
-E='label=$q_4$',
-F='label=$q_5$',
-G='accept|label=$q_6$',
-))
-\end{python}
 and then this:
 \input{stdout36.tex}
-from latextool_basic import *
-print(automata(layout="""
-   D  E  F
-""",
-edges="D,$a$,D|D,$b$,E|E,$b$,F|F,$a$,D",
-D='initial|accept|label=$q_3$',
-E='label=$q_4$',
-F='label=$q_5$',
-))
-\end{python}
 
 Now for 
 \[
@@ -151,92 +85,15 @@ L(bab \cup ab)^*
 \]
 An NFA accepting this language is
 \input{stdout37.tex}
-from latextool_basic import *
-print(automata(layout="""
-   B  C  D  E
-A 
-   F  G  H
-""",
-edges="A,$\ep$,B|B,$b$,C|C,$a$,D|D,$b$,E|A,$\ep$,F|E,$\ep$,A|F,$a$,G|G,$b$,H|H,$\ep$,A",
-A='initial|accept|label=$q_7$',
-B='label=$q_8$',
-C='label=$q_9$',
-D='label=$q_{10}$',
-E='accept|label=$q_{11}$',
-F='label=$q_{12}$',
-G='label=$q_{13}$',
-H='accept|label=$q_{14}$',
-))
-\end{python}
 I'm going to simplify it to
 \input{stdout38.tex}
-from latextool_basic import *
-print(automata(layout="""
-      C  D  E
-   A 
-      G  H
-""",
-edges="A,$b$,C|C,$a$,D|D,$b$,E|E,$\ep$,A|A,$a$,G|G,$b$,H|H,$\ep$,A",
-A='initial|accept|label=$q_7$',
-C='label=$q_9$',
-D='label=$q_{10}$',
-E='accept|label=$q_{11}$',
-G='label=$q_{13}$',
-H='accept|label=$q_{14}$',
-))
-\end{python}
 and then this
 \input{stdout39.tex}
-from latextool_basic import *
-print(automata(layout="""
-      C  D
-   A 
-      G
-""",
-edges="A,$b$,C|C,$a$,D|D,$b$,A|A,$a$,G|G,$b$,A",
-A='initial|accept|label=$q_7$',
-C='label=$q_9$',
-D='label=$q_{10}$',
-G='label=$q_{13}$',
-))
-\end{python}
 And finally when I concat the two machines I get
 
 \input{stdout40.tex}
-from latextool_basic import *
-print(automata(layout="""
-   D  E  F
 
-      C1 D1
-   A1 
-      G1
-""",
-edges="D,$a$,D|D,$b$,E|E,$b$,F|F,$a$,D|A1,$b$,C1|C1,$a$,D1|D1,$b$,A1|A1,$a$,G1|G1,$b$,A1|D,$\ep$,A1",
-D='initial|label=$q_3$',
-E='label=$q_4$',
-F='label=$q_5$',
-A1='accept|label=$q_7$',
-C1='label=$q_9$',
-D1='label=$q_{10}$',
-G1='label=$q_{13}$',
-))
-\end{python}
-
-
-
-\newpage
-\begin{ex}
-Construct an NFA $N$ such 
-\[
-L(N) = L(r)
-\]
-where $r$ is the regular expression
-\[
-r = a (ba \cup abb \cup (ab)^*)^*
-\]
-\qed
-\end{ex}
-
+\input{exercises/regex-to-nfa0/main.tex}
 
 \newpage
 The big picture is this:
