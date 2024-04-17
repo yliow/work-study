@@ -2,6 +2,7 @@
 350-hashtable   done    copied back to courses/ciss350/n
 cantor          done    copied back to courses/math325/n
 regular         
+cfl
 
 2024/04/11: In some latex file near the top the following
 
