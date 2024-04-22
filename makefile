@@ -7,4 +7,4 @@ r:
 p:
 	git pull
 git:
-	cat ../mykey.txt ; git add -A ; git commit -m "sync" ; git push
+	git add -A ; git commit -m "sync" ; git push
