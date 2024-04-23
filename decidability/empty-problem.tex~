@@ -1,0 +1,531 @@
+\section{The Empty Problem}
+
+Here's another problem:
+\[
+\EMPTYPROBLEM_\TM: 
+\text{Given Turing machine $M$, determine if $L(M) = \{\}$ }
+\]
+Let me give you the corresponding language:
+\[
+\EMPTY_\TM
+= \{ \langle M \rangle \mid L(M) = \emptyset \}
+\]
+I will show you that $\EMPTY_\TM$ is not decidable.
+
+Suppose $\EMPTY_\TM$ is decided by Turing decider $E$.
+I'm going to design a Turing machine $E'$ that will decide
+$\ACCEPT_\TM$.
+
+For an input of $\langle M \rangle \# \langle w \rangle$
+to $E'$, $E'$ will simulate 
+$\langle M_w \rangle$ on $E$.
+Now what is this $M_w$?!?
+This is a slight modification to $M$.
+Basically, $M_w$ first checks if an input is $w$.
+If the input is not $w$, $M_w$ rejects right away.
+If the input is $w$, $M_w$ behaves just like $M$ on the input of $w$.
+It's clear that given $\langle M \rangle$,
+you can easily modify it to become $\langle M_w \rangle$.
+The important thing is either
+\[
+M_w = \{\}
+\]
+or 
+\[
+M_w = \{w\}
+\]
+There are no other cases.
+Note that the case of 
+\[
+M_w = \{w\}
+\]
+implies that $M_w$ will of course halt (in its accept state)
+on input $w$.
+On the other hand, the case of
+\[
+M_w = \{\}
+\]
+might be the case of either 
+\[
+M_w(w) = \textred{0}
+\]
+i.e., $M_w$ halts in its reject state or 
+\[
+M_w(w) = \infty
+\]
+i.e., $M_w$ runs forever.
+Ahh .... but that's not a problem!!!
+Why? ... Because we can use $E$ to determine if 
+\[
+M_w = \{\}
+\]
+or not
+and therefore we can avoid running $M_w$ on $w$ which 
+can potentially run forever!!! 
+See it!!!
+
+So this is how I'm going to construct $E'$.
+On input $\langle M \rangle \# \langle w \rangle$,
+$E'$ will simulate 
+$E$ with input $\langle M_w \rangle$.
+(Remember that it's easy to construct 
+$\langle M_w \rangle$ from $\langle M \rangle$.)
+
+\begin{tightlist}
+
+\item If the simulation of $E$ with input 
+$\langle M_w \rangle$ results in an accept state, i.e.,
+\[
+E(\langle M_w \rangle) = 1
+\]
+then 
+\[
+M_{w} = \{\}
+\]
+and we know that $M$ does not accept $w$.
+In this case, I make $E'$ go to its reject state, 
+i.e.,
+\[
+E'(\langle M \rangle \# \langle w \rangle) = 0
+\]
+(You'll see why I have to invert 0 and 1 later.)
+
+\item On the other hand if the simulation goes into the reject state,
+\[
+E(\langle M_w \rangle) = 0
+\]
+then
+\[
+M_{w} \neq \{\}
+\]
+But if $M_w \neq \{\}$, then $M_w$ must be $\{w\}$.
+which means that $M$ must accept $w$.
+At this point, I make $E'$ goes into its accept state, 
+i.e.,
+\[
+E'(\langle M \rangle \# \langle w \rangle) = 1
+\]
+\end{tightlist}
+Note that since $E$ is a decider, the above are the only cases,
+i.e., we cannot possibly have $E(\langle M_w \rangle) = \infty$.
+By design, 
+\begin{align*}
+E(\langle M_w \rangle) = 0 
+&\implies E'(\langle M \rangle \# \langle w \rangle) = 1 \\
+E(\langle M_w \rangle) = 1 
+&\implies E'(\langle M \rangle \# \langle w \rangle) = 0
+\end{align*}
+$E$ and $E'$ cannot have $\infty$ as results.
+Therefore
+\begin{align*}
+E(\langle M_w \rangle) = 0
+&\iff E'(\langle M \rangle \# \langle w \rangle) = 1
+\end{align*}
+
+We also have the following based on the definition of $E$, 
+i.e., that it's a decider for $\EMPTY_\TM$
+and the definition of $M_w$:
+\begin{align*}
+E(\langle M_w \rangle) = 1 &\implies M_w = \{\} \implies M(w) = 0, \infty 
+\implies M \text{ does not accept } w \\
+E(\langle M_w \rangle) = 0 &\implies M_w \neq \{\} \implies M(w) = 1
+\implies M \text{ accepts } w
+\end{align*}
+(Note that we actually did not run or simulate $M$ on $w$:
+this is key because the execution of $M$ with input $w$ might go on
+forever!)
+In other words
+\begin{align*}
+E(\langle M_w \rangle) = 0
+&\iff 
+M \text{ accepts } w 
+\end{align*}
+Putting everything together we have
+\begin{align*}
+E'(\langle M \rangle \# \langle w \rangle) = 1
+\iff
+E(\langle M_w \rangle) = 0
+\iff
+M \text{ accepts } w
+\end{align*}
+
+Altogether, we have constructed a decider $E'$ which can 
+decide the acceptance problem, i.e.,
+\[
+L(E') = \ACCEPT_\TM
+\]
+But this contradicts the fact that $\ACCEPT_\TM$ is not a 
+Turing--decidable language from an earlier section.
+
+Done!
+
+\begin{thm}
+$\EMPTY_\TM$ is not a Turing--decidable language.
+\end{thm}
+
+In the above proof, I reduce the $\EMPTY_\TM$ to $\ACCEPT_\TM$:
+\[
+\ACCEPT_\TM \leq \EMPTY_\TM
+\]
+
+
+
+\newpage
+\begin{ex}
+Prove that $\EMPTY_\TM$ is not decidable by reducing it to 
+$\HALT$ instead.
+\end{ex}
+
+(Hint: Given $M$ and $w$.
+You want to know if there's an algorithmic (i.e., by a decider) way
+to tell if $M$ halts on input $w$.
+If $M$ accepts $w$, then of course it does halt.
+However if $M$ does not accept $w$, it can either 
+go to its reject state and halt or it can run forever.
+Therefore you want to prevent running $M$ on $w$
+if it runs on forever.
+Not a problem!
+We simply run $M_w$ through a purported decider for 
+$\EMPTY$.
+If $M_w$ is in $\EMPTY$, then $M$ does not accept $w$.
+If $M_w$ is not in $\EMPTY$, then $M$ accepts $w$.
+Therefore $M$ must halt on $w$.)
+
+
+
+\newpage
+\newcommand\SIZEONE{\mathsc{Size-One}}
+\begin{ex}
+Is the following language decidable:
+\[
+\SIZEONE_\TM = \{ \langle M \rangle \mid |L(M)| = 1 \}
+\]
+\end{ex}
+
+Do not peek ... the solution is on the next page.
+
+
+\newpage
+\SOLUTION
+
+We will reduce to this the acceptance problem, i.e.,
+\[
+\ACCEPT_\TM \leq \SIZEONE_\TM
+\]
+Suppose $\SIZEONE_\TM$ is decidable, say it's decided by $S$.
+Then I claim that I can construct a decider for $\ACCEPT_\TM$.
+
+Construct $A$ as follows.
+Suppose $\langle M \rangle \# \langle w \rangle$ is given
+as an input to $A$ where
+$M$ is a TM and $w$ is an input for $M$.
+(If the input is not of the form $\langle M \rangle \# \langle w \rangle$,
+$A$ rejects immediately.)
+$A$ will first construct $M_w$, a Turing machine
+that works exactly like $M$ if the input is $w$
+but if the input is not $w$, $M$ will reject after checking that the
+input is not $w$.
+In other words $L(M_w) = \{\}$ or $\{w\}$.
+$A$ then does the following:
+\begin{tightlist}
+  \li $A$ will first simulate
+  $S$ with $M_w$.
+  Note that $S$ is a decider and therefore must halt.
+  \li If while $A$ is simulating
+  $S$, $A$ sees that $S$ halts in the accept state, then
+  $A$ will enter its accept state.
+  [Note that $S$ accepts iff $M_w$
+  accept $w$ since by definition $M_w$ can only accept $w$
+  and nothing else.]
+  \li
+  If while $A$ is simulating $S$, $A$ sees that $S$
+  halts in the reject state, then $A$ will enter its reject state.
+  [Note that $S$ rejects iff $M_w$ rejects
+  which means that $M$ does not accept $w$.]
+  \li Again, note that $S$ is a decider and therefore must enter
+  the accept or reject state at some point -- i.e., $S$
+  cannot run forever.
+\end{tightlist}
+The above means that $A$ accepts $\langle M \rangle \# \langle w \rangle$
+iff $M$ accepts $w$. Furthermore $A$ is a decider.
+We have shown that
+But this means that $\ACCEPT_\TM$ is decidable (by the decider $A$)
+which is a contradiction.
+
+
+
+\newpage
+\begin{ex}
+Let $k \geq 0$ be an integer.
+Is the following language decidable:
+\[
+\{ \langle M \rangle \mid |L(M)| = k \}
+\]
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Is the following language decidable:
+\[
+\{ \langle M \rangle \mid |L(M)| \text{ is finite} \}
+\]
+\end{ex}
+
+
+
+
+\newpage
+\newcommand\INFINITE{\mathsc{Infinite}}
+\begin{ex}
+Is the following language decidable:
+\[
+\INFINITE_\TM = \{ \langle M \rangle \mid L(M) \text{ is infinite } \}
+\]
+\end{ex}
+
+
+\newpage
+\newcommand\Null{\mathsc{Null}}
+\begin{ex}
+Is the following language decidable:
+\[
+\Null_\TM = \{ \langle M \rangle \mid \ep \in L(M) \}
+\]
+\end{ex}
+
+
+\newpage
+\SOLUTION
+
+Assume that $\Null_\TM$ is decidable, say it is decided by $D$.
+
+Construct a TM $A$ that does this:
+Let $\langle M \rangle \# \langle w \rangle$ be an input for $A$.
+\begin{tightlist}
+  \item $A$ construct a TM $M'$ (which depends on $M$ and $w$)
+  which does the following:
+  When $M'$ executes, it replaced the input with $w$,
+  and then proceeds to
+  work exactly like $M$.
+  Note that if we run $M'$ on $\ep$, then it would be the
+  same as running $M$ on $w$.
+  Of course when I say $A$ \lq\lq constructs'' $M'$, I  mean $A$ write
+  the encoding, $\langle M'\rangle$ somewhere on its tape.
+  \item
+  $A$ then simulates $D$ on $\langle M' \rangle$.
+  Note that $D$ is decidable therefore $D$ must either accept or reject
+  ($D$ cannot run forever).
+  This means that as $A$ simulates $D$ one step at a time
+  $A$ will at some point in time see $D$ entering the
+  accept or the reject state.
+  \item If while $A$ is simulating $D$ running on $\langle M'\rangle$,
+  $A$ sees that $D$ accepts $\langle M' \rangle$ (i.e., 
+  $M'$ accepts $\ep$, which means that $M$ accepts $w$), then
+  $A$ enters its accept state.
+  \item If while $A$ is simulating $D$ running on $\langle M'\rangle$,
+  $A$ sees that $D$ rejects $\langle M' \rangle$ (i.e., 
+  $M'$ does not accepts $\ep$, which means that $M$ does not
+  accepts $w$), then
+  $A$ enters its reject state.
+  \end{tightlist}
+We have shown that
+\[
+\ACCEPT_\TM \leq \Null_\TM
+\]
+This means that $A$ is a decider for $\ACCEPT_\TM$ which is a contradiction.
+Therefore $\Null_\TM$ cannot be a decidable language.
+\qed
+
+As exercise, try to write a proof that shows
+\[
+\mathsc{HALT}_{\TM} \leq \Null_\TM
+\]
+
+\newpage
+\newcommand\NULL{\mathsc{Null}}
+\begin{ex}
+Is the following language decidable:
+\[
+\{ \langle M \rangle \mid M \text{ has 42 states } \}
+\]
+\end{ex}
+
+
+\newpage
+\SOLUTION
+
+Yes.
+Depending on the way TMs are encoded,
+design a TM, $D$, such that when $D$ is given $\langle M \rangle$,
+$D$ moves the
+read-write head to
+the section of $\langle M \rangle$ that encodes the set of states
+and begin counting the number of states.
+If the counting stops before 42, $D$ rejects.
+If the counting goes up to 43, $D$ rejects.
+Otherwise $D$ accepts.
+
+
+\newpage
+\newcommand\ALL{\mathsc{All}}
+\begin{ex}
+Is the following language decidable:
+\[
+\ALL_\TM = \{ \langle M \rangle  \,|\, L(M) = \Sigma^*
+\text{ where is the input alphabet of $M$} \}
+\]
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Is the following language decidable:
+\[
+\mathsc{Equal}_\TM =
+\{
+\langle M_1 \rangle
+\#
+\langle M_2 \rangle
+\,|\, L(M_1) =  L(M_2)
+\}
+\]
+\end{ex}
+
+
+
+\newpage
+\begin{ex}
+  Decision problems for DFAs.
+  It's not too surprising that DFAs can also be encoded.
+  Therefore one can ask if it's possible to construct TM or deciders
+  to accept DFA encodings (possibly also with encoded  inputs) to
+  solve certain problems.
+  Are the following problems decidable?
+  This means \lq\lq can you find a decider for the given problems.?''
+  \begin{tightlist}
+    \item Given a DFA $M$, is $L(M) = \{\}$?
+    (This is $\EMPTY_\DFA$).
+    \item Given a DFA $M$, is $L(M) = \Sigma^*$? ($\Sigma$ is the
+    input alphabet of $M$).
+    \item Given a DFA $M$, is $\ep \in L(M)$?
+    \item Given a DFA $M$, is $L(M)$ infinite?
+    \item Given a DFA $M$, is $L(M)$ finite?
+    \item Given a DFA $M$ and input $w$ (for $M$), is $w$ in $L(M)$?
+    (This is the acceptance problem for DFAs)
+    \item Given a DFA $M$ and input $w$ (for $M$), does $M$ halt when
+    it runs on input $w$?
+    (This is the halting problem for DFAs.)
+    \item Given two DFAs $M, M'$, is $L(M)$ the same as $L(M')$?
+  \end{tightlist}
+  \qed
+\end{ex}
+
+Don't peek ... some solutions on next page.
+
+\newpage
+\SOLUTION
+
+1.
+If $M$ is a DFA, then $L(M) = \{\}$ exactly when there is no
+path (in the DFA diagram) from the initial state to any of its
+accept state. Therefore we do the following:
+
+Construct a TM $D$ that accepts $\langle M \rangle$
+(where $M$ is a DFA) and does the following
+(if the input is not the encoding of a DFA, $D$ rejects right away).
+The tape for $A$ is of the form
+\[
+\$ \langle M \rangle \# x \# y
+\]
+First $A$ writes the encoding of the initial state $q_0$:
+\[
+\$ \langle M \rangle \# \# \langle q_0 \rangle
+\]
+$y$ collects the states which are \lq\lq not processed''
+while $x$ collects the states which are already \lq\lq processed''.
+$A$ will process each state $q$ by computing what states
+$q$ can go to via transitions.
+The states that $q$ can go to and which are not stored in $x$ and $y$
+and stored in $y$.
+Once a state is processed, the state is removed from $y$ and
+moved to $x$.
+If an accept state is stored in $x$, then this means that
+there's a path from the initial state of $M$ to 
+an accept state of $M$.
+Therefore if $A$ sees an accept state in $x$, $A$ enters its reject state.
+If $y$ is empty (and no accept state of $M$ appears in $x$),
+then $A$ enters its accept state.
+
+3. Construct a TM $A$ such that
+when given $\langle M \rangle$, $A$ checks if the initial state is an accept
+state. If it is so, $A$ enters its accept state.
+Otherwise $A$ enters its reject state.
+Clearly $L(A) = \{ \langle M \rangle \mid M \text{ is a DFA},
+\ep \in L(M)\}$.
+
+4. HINT:
+If $M$ is a DFA, $L(M)$ is infinite iff the DFA diagram of $M$ has a
+loop.
+
+
+6. HINT: $w$ is in $L(M)$ is $w$ is a path in the DFA diagram of $M$
+from $M$'s initial state to one of its accept states.
+
+7. Design a TM $A$ that checks that the input is valid and then
+accept. Otherwise, reject. (Right?)
+
+8. HINT: Let $L_i = L(M_i)$.
+Let $L = ((L_1 \cap \overline{L_2}) \cup (L_2 \cap \overline{L_1}))$
+(the symmetric difference of $L_1$ and $L_2$).
+Then $L_1 = L_2$ iff $L = \{\}$.
+
+
+\newpage
+\begin{ex}
+  Decision problems for CFLs.
+  Are the following problems decidable?
+  \begin{tightlist}
+    \item Given a CFG $G$, is $L(G) = \{\}$?
+    \item Given a CFG $G$, is $L(G) = \Sigma^*$? ($\Sigma$ is the
+    set of terminals of $G$).
+    \item Given a CFG $G$, is $\ep \in L(G)$?
+    \item Given a CFG $G$, is $L(G)$ infinite?
+    \item Given a CFG $G$, is $L(G)$ finite?
+    \item Given a CFG $G$ and string $w$ (of terminals of $G$),
+    is $w$ in $L(G)$?
+    \item Given two CFGs $G, G'$, is $L(G)$ the same as $L(G')$?
+  \end{tightlist}
+  \qed
+\end{ex}
+
+
+\newpage
+\begin{ex} (Tough)
+Let $n$ be a positive integer.
+Is the following problem decidable:
+Let $S$ be a set of matrices with integer entries.
+Is there a sequence of matrices in $S$ which multiplies to a
+zero matrix?
+\qed
+\end{ex}
+
+\begin{ex} (Tough)
+  Let $m,n,a,b$ be positive integers.
+  Given an $m$-by-$n$ tray
+  and a set $S$ of $a$-by-$b$ tiles, 
+  is there a collection of tiles from $S$
+  that will completely tile the tray?
+  \qed
+\end{ex}
+
+\begin{ex} (Tough)
+  Are the following problems decidable?
+  Given a collection $P$ of $n > 0$ points in a plane,
+  \begin{tightlist}
+    \item What is the largest subcollection of points $P$ that lie
+    on a single straight?
+    \item What is the least number of lines contains all points of $P$?
+  \end{tightlist}
+  \qed
+\end{ex}

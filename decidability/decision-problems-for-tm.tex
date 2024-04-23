@@ -1,0 +1,386 @@
+\section{More decision problems for TM}
+
+The acceptance problem and halting problem earlier are examples
+of what we call \defone{decision problems for Turing machines}.
+You can of course rephrase them for NFAs,
+context-free grammars (or PDAs)
+and DFAs.
+
+Here are more decision problems for TMs.
+
+\newpage
+\newcommand\SIZEONE{\mathsc{Size-One}}
+\begin{ex}
+Is the following language decidable:
+\[
+\SIZEONE_\TM = \{ \langle M \rangle \mid |L(M)| = 1 \}
+\]
+\end{ex}
+
+Do not peek ... the solution is on the next page.
+
+
+\newpage
+\SOLUTION
+
+We will reduce to this the acceptance problem, i.e.,
+\[
+\ACCEPT_\TM \leq \SIZEONE_\TM
+\]
+Suppose $\SIZEONE_\TM$ is decidable, say it's decided by $S$.
+Then I claim that I can construct a decider for $\ACCEPT_\TM$.
+
+Construct $A$ as follows.
+Suppose $\langle M \rangle \# \langle w \rangle$ is given
+as an input to $A$ where
+$M$ is a TM and $w$ is an input for $M$.
+(If the input is not of the form $\langle M \rangle \# \langle w \rangle$,
+$A$ rejects immediately.)
+$A$ will first construct $M_w$, a Turing machine
+that works exactly like $M$ if the input is $w$
+but if the input is not $w$, $M$ will reject after checking that the
+input is not $w$.
+In other words $L(M_w) = \{\}$ or $\{w\}$.
+$A$ then does the following:
+\begin{tightlist}
+  \li $A$ will first simulate
+  $S$ with $M_w$.
+  Note that $S$ is a decider and therefore must halt.
+  \li If while $A$ is simulating
+  $S$, $A$ sees that $S$ halts in the accept state, then
+  $A$ will enter its accept state.
+  [Note that $S$ accepts iff $M_w$
+  accept $w$ since by definition $M_w$ can only accept $w$
+  and nothing else.]
+  \li
+  If while $A$ is simulating $S$, $A$ sees that $S$
+  halts in the reject state, then $A$ will enter its reject state.
+  [Note that $S$ rejects iff $M_w$ rejects
+  which means that $M$ does not accept $w$.]
+  \li Again, note that $S$ is a decider and therefore must enter
+  the accept or reject state at some point -- i.e., $S$
+  cannot run forever.
+\end{tightlist}
+The above means that $A$ accepts $\langle M \rangle \# \langle w \rangle$
+iff $M$ accepts $w$. Furthermore $A$ is a decider.
+We have shown that
+But this means that $\ACCEPT_\TM$ is decidable (by the decider $A$)
+which is a contradiction.
+
+
+
+\newpage
+\begin{ex}
+Let $k \geq 0$ be an integer.
+Is the following language decidable:
+\[
+\{ \langle M \rangle \mid |L(M)| = k \}
+\]
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Is the following language decidable:
+\[
+\{ \langle M \rangle \mid |L(M)| \text{ is finite} \}
+\]
+\end{ex}
+
+
+
+
+\newpage
+\newcommand\INFINITE{\mathsc{Infinite}}
+\begin{ex}
+Is the following language decidable:
+\[
+\INFINITE_\TM = \{ \langle M \rangle \mid L(M) \text{ is infinite } \}
+\]
+\end{ex}
+
+
+\newpage
+\newcommand\Null{\mathsc{Null}}
+\begin{ex}
+Is the following language decidable:
+\[
+\Null_\TM = \{ \langle M \rangle \mid \ep \in L(M) \}
+\]
+\end{ex}
+
+
+\newpage
+\SOLUTION
+
+Assume that $\Null_\TM$ is decidable, say it is decided by $D$.
+
+Construct a TM $A$ that does this:
+Let $\langle M \rangle \# \langle w \rangle$ be an input for $A$.
+\begin{tightlist}
+  \item $A$ construct a TM $M'$ (which depends on $M$ and $w$)
+  which does the following:
+  When $M'$ executes, it replaced the input with $w$,
+  and then proceeds to
+  work exactly like $M$.
+  Note that if we run $M'$ on $\ep$, then it would be the
+  same as running $M$ on $w$.
+  Of course when I say $A$ \lq\lq constructs'' $M'$, I  mean $A$ write
+  the encoding, $\langle M'\rangle$ somewhere on its tape.
+  \item
+  $A$ then simulates $D$ on $\langle M' \rangle$.
+  Note that $D$ is decidable therefore $D$ must either accept or reject
+  ($D$ cannot run forever).
+  This means that as $A$ simulates $D$ one step at a time
+  $A$ will at some point in time see $D$ entering the
+  accept or the reject state.
+  \item If while $A$ is simulating $D$ running on $\langle M'\rangle$,
+  $A$ sees that $D$ accepts $\langle M' \rangle$ (i.e., 
+  $M'$ accepts $\ep$, which means that $M$ accepts $w$), then
+  $A$ enters its accept state.
+  \item If while $A$ is simulating $D$ running on $\langle M'\rangle$,
+  $A$ sees that $D$ rejects $\langle M' \rangle$ (i.e., 
+  $M'$ does not accepts $\ep$, which means that $M$ does not
+  accepts $w$), then
+  $A$ enters its reject state.
+  \end{tightlist}
+We have shown that
+\[
+\ACCEPT_\TM \leq \Null_\TM
+\]
+This means that $A$ is a decider for $\ACCEPT_\TM$ which is a contradiction.
+Therefore $\Null_\TM$ cannot be a decidable language.
+\qed
+
+As exercise, try to write a proof that shows
+\[
+\mathsc{HALT}_{\TM} \leq \Null_\TM
+\]
+
+\newpage
+\newcommand\NULL{\mathsc{Null}}
+\begin{ex}
+Is the following language decidable:
+\[
+\{ \langle M \rangle \mid M \text{ has 42 states } \}
+\]
+\end{ex}
+
+
+\newpage
+\SOLUTION
+
+Yes.
+Depending on the way TMs are encoded,
+design a TM, $D$, such that when $D$ is given $\langle M \rangle$,
+$D$ moves the
+read-write head to
+the section of $\langle M \rangle$ that encodes the set of states
+and begin counting the number of states.
+If the counting stops before 42, $D$ rejects.
+If the counting goes up to 43, $D$ rejects.
+Otherwise $D$ accepts.
+
+
+\newpage
+\newcommand\ALL{\mathsc{All}}
+\begin{ex}
+  Consider the following problem:
+
+  $\mathsc{AllProblem}_\TM$\tinysidebar{$\mathsc{AllProblem}_\TM$}\index{allproblem$\mathsc{AllProblem}_\TM$}:
+  Decide if a TM $M$ accepts all strings.
+  
+Is the following language decidable:
+\[
+\ALL_\TM\tinysidebar{$\mathsc{All}_\TM$}\index{all$\mathsc{All}_\TM$}
+= \{ \langle M \rangle  \,|\, L(M) = \Sigma^*
+\text{ where $\Sigma$ is the input alphabet of $M$} \}
+\]
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Is the following language decidable:
+\[
+\mathsc{Equal}_\TM
+\tinysidebar{$\mathsc{Equal}_\TM$}\index{equal$\mathsc{Equal}_\TM$}
+=
+\{
+\langle M_1 \rangle
+\#
+\langle M_2 \rangle
+\,|\, L(M_1) =  L(M_2)
+\}
+\]
+This is related to the problem of determining if
+two given TMs accept the same language.
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Is the following language decidable:
+\[
+\mathsc{Regular}_\TM
+\tinysidebar{$\mathsc{Regular}_\TM$}\index{regular$\mathsc{Regular}_\TM$}
+=
+\{
+\langle M \rangle
+\,|\, \exists DFA M' \text{ such that } L(M') =  L(M)
+\}
+\]
+This is the problem of determining if a Turing machine
+accepts the same language as a DFA, i.e., the problem of
+determining if the language of a Turing machine is regular.
+\end{ex}
+
+I'll show
+\[
+\ACCEPT_\TM \leq \mathsc{Regular}_\TM
+\]
+Suppose I'm given $\langle M\rangle\#\langle w \rangle$.
+Suppose I assume 
+$\mathsc{Regular}_\TM$
+is decided by a TM $R$.
+Basically I then need to construct (using $R$), a decider, say $A$ for
+$\ACCEPT_\TM$.
+I would expect something like this:
+\begin{align*}
+M(w) = 1 &\iff R(M) = 1 \iff A(Mw) = 1 \\
+M(w) = 0/\infty &\iff R(M) = 0 \iff A(Mw) = 0 
+\end{align*}
+Now it turns out that for $R$, I cannot use $M$ directly.
+I have to modify $M$ to say another TM say I call it $M_w$ so that the
+above desired implications become
+\begin{align*}
+M(w) = 1 &\iff R(M_w) = 1 \iff A(Mw) = 1 \\
+M(w) = 0/\infty &\iff R(M_w) = 0 \iff A(Mw) = 0 
+\end{align*}
+
+$M_w$ works as follows: on input $x$, if $x = 0^n1^n$, $M_w$ accepts.
+If $x \neq 0^n1^n$, $M_w$ runs on $w$ like $M$ on $w$.
+In other words
+\[
+M_w(x) =
+\begin{cases}
+  1 &\text{ if } x = 0^n1^n \text{ or } M(w) = 1 \\
+  ? &\text{ otherwise}
+\end{cases}
+\]
+Now the problem is that in the otherwise case, and this is
+important, you can't say it's $0$. It might be $\infty$.
+In the \lq\lq if" case, the fact that $x = 0^n1^n$ can be
+checked without running forever. But the \lq\lq $M(x) = 1$"
+if not true, might run forever, i.e., it can be
+\lq\lq $M(x) = 0$" or $\infty$.
+In other words, the complete description of $M_w(x)$ is
+\[
+M_w(x) =
+\begin{cases}
+  1 &\text{ if } x = 0^n1^n \text{ or } M(w) = 1 \\
+  ? &\text{ if } x \neq 0^n1^n \text{ and } M(w) \neq 0 \\
+\end{cases}
+\]
+i.e.,
+\[
+M_w(x) =
+\begin{cases}
+  1 &\text{ if } x = 0^n1^n \text{ or } M(w) = 1 \\
+  0 &\text{ if } x \neq 0^n1^n \text{ and } M(w) = 0 \\
+  \infty &\text{ if } x \neq 0^n1^n \text{ and } M(w) = \infty \\
+\end{cases}
+\]
+Get it? This is very important. Read the above again very carefully.
+
+If $M(w) = 1$, let $M_w$ be a TM that accepts $\Sigma^*$.
+If $M(w) = 0$ or $\infty$, let $M_w$ be a TM that accepts
+$\{0^n 1^n \mid n \geq 0\}$.
+(The pair language $\Sigma^*$ and $\{0^n 1^n \mid n \geq 0\}$
+can be replaced a pair $L, L'$ where $L$ is regular
+and $L'$ is not regular.)
+
+Basically we want
+\[
+R(M_w) = 1 \iff M(w) = 1
+\]
+
+Let $M,w$ be a turing machine and input.
+$M_w$ is defined to the TM that works this way:
+\begin{tightlist}
+\item If input $x$ is $0^n1^n$, $M_w$ accepts
+\item Otherwise, $M_w$ runs $M$ on $w$ and accepts $x$ iff $M$ accepts $w$.
+  (and
+  $M_w$ rejects $w$ iff $M$ rejects $w$ and
+  $M_w$ runs forever on $w$ iff $M$ runs forever on $w$.) 
+\end{tightlist}
+Note that
+\begin{align*}
+M(w) = 1 &\implies L(M_w) = \Sigma^* \\
+M(w) = 0 \text{ or } \infty &\implies L(M_w) = \{ 0^n1^n \mid n \geq 0 \}
+\end{align*}
+In other words
+\begin{align*}
+M(w) = 1 &\iff L(M_w) = \Sigma^* \\
+M(w) = 0 \text{ or } \infty &\iff L(M_w) = \{ 0^n1^n \mid n \geq 0 \}
+\end{align*}
+
+Why is this important?
+Suppose we have $M_w$.
+Now I run $R$ on $\langle M_w \rangle$.
+What will happen?
+Note that $R$ is a decider.
+So we have only two (not three) possibilities:
+$R(\langle M_w \rangle) = 0$ or $1$.
+But hang on ...
+$R(\langle M_w \rangle) = 0$ means that $M_w$ is regular and 
+$R(\langle M_w \rangle) = 1$ means that $M_w$ is not regular.
+The way I have it set up, it's not just that $M_w$ is not
+regular, it's not regular in the specific sense that
+$L(M_w) = \{0^n 1^n \mid n \geq 0\}$!!!
+In other words,
+I can add the following to the above:
+\begin{align*}
+M(w) = 1 &\iff L(M_w) = \Sigma^* \iff R(\langle M_w\rangle) = 1\\
+M(w) = 0 \text{ or } \infty &\iff L(M_w) = \{ 0^n1^n \mid n \geq 0 \}
+\iff R(\langle M_w\rangle) = 0
+\end{align*}
+
+What's the point of \lq\lq $x = 0^1 1^n$"?
+Nothing other than the fact that $\{0^n 1^n \mid n \geq 0\}$
+is not regular and $\Sigma^*$ is regular.
+
+Now I'm going to build a TM $A$ that does the following:
+Let $x$ be an input.
+\begin{tightlist}
+\item If $x$ is not of the form $M,w$ (NOTE: this check does not run
+  forever)
+  \begin{tightlist}
+  \item $A$ rejects.
+  \end{tightlist}
+\item Otherwise (i.e., $x = M,w$) $A$ continues as follows:
+  \begin{tightlist}
+  \item $A$ constructs $M_w$ on its input tape
+  \item $A$ runs $R$ on $M_w$
+  \item If $R(M_w) = 1$, $A$ accepts, i.e., $A(x) = A(\langle M, w\rangle) = 1$
+  \item Otherwise (i.e., $R(M_w) = 0$), $A$ rejects, i.e.,
+    $A(x) = A(\langle M, w\rangle) = 0$.
+    (NOTE: It's $0$ and not $\infty$ since
+    every step does not run forever.)
+  \end{tightlist}
+\end{tightlist}
+
+
+
+
+
+\SOLUTION.
+Suppose the above problem is decidable,
+say $D$ is a Turing decider such that $L(D) = \mathsc{Regular}_\TM$.
+Construct a TM $D'$ as follows. $D'$ takes $\langle M \rangle$ as inputs.
+$D'$ will run $D$ on $M$.
+Since $D$ is a decider, $D(\langle M \rangle)$ can only be $0$ or $1$.
+If $D(\langle M \rangle) = 1$, then $D'$ runs $M$ on $\langle M \rangle$
+and accept if $M$ accepts $\langle M \rangle$
+and rejects if $M$ rejects $\langle M \rangle$.
+If $D(\langle M \rangle) = 0$

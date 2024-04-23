@@ -1,0 +1,209 @@
+\section{More decision problems for TM}
+
+The acceptance problem and halting problem earlier are examples
+of what we call \defterm{decision problems for Turing machines}.
+You can of course rephrase them for NFAs,
+context-free grammars (or PDAs)
+and DFAs.
+
+Here are more decision problems for TMs.
+
+\newpage
+\newcommand\SIZEONE{\mathsc{Size-One}}
+\begin{ex}
+Is the following language decidable:
+\[
+\SIZEONE_\TM = \{ \langle M \rangle \mid |L(M)| = 1 \}
+\]
+\end{ex}
+
+Do not peek ... the solution is on the next page.
+
+
+\newpage
+\SOLUTION
+
+We will reduce to this the acceptance problem, i.e.,
+\[
+\ACCEPT_\TM \leq \SIZEONE_\TM
+\]
+Suppose $\SIZEONE_\TM$ is decidable, say it's decided by $S$.
+Then I claim that I can construct a decider for $\ACCEPT_\TM$.
+
+Construct $A$ as follows.
+Suppose $\langle M \rangle \# \langle w \rangle$ is given
+as an input to $A$ where
+$M$ is a TM and $w$ is an input for $M$.
+(If the input is not of the form $\langle M \rangle \# \langle w \rangle$,
+$A$ rejects immediately.)
+$A$ will first construct $M_w$, a Turing machine
+that works exactly like $M$ if the input is $w$
+but if the input is not $w$, $M$ will reject after checking that the
+input is not $w$.
+In other words $L(M_w) = \{\}$ or $\{w\}$.
+$A$ then does the following:
+\begin{tightlist}
+  \li $A$ will first simulate
+  $S$ with $M_w$.
+  Note that $S$ is a decider and therefore must halt.
+  \li If while $A$ is simulating
+  $S$, $A$ sees that $S$ halts in the accept state, then
+  $A$ will enter its accept state.
+  [Note that $S$ accepts iff $M_w$
+  accept $w$ since by definition $M_w$ can only accept $w$
+  and nothing else.]
+  \li
+  If while $A$ is simulating $S$, $A$ sees that $S$
+  halts in the reject state, then $A$ will enter its reject state.
+  [Note that $S$ rejects iff $M_w$ rejects
+  which means that $M$ does not accept $w$.]
+  \li Again, note that $S$ is a decider and therefore must enter
+  the accept or reject state at some point -- i.e., $S$
+  cannot run forever.
+\end{tightlist}
+The above means that $A$ accepts $\langle M \rangle \# \langle w \rangle$
+iff $M$ accepts $w$. Furthermore $A$ is a decider.
+We have shown that
+But this means that $\ACCEPT_\TM$ is decidable (by the decider $A$)
+which is a contradiction.
+
+
+
+\newpage
+\begin{ex}
+Let $k \geq 0$ be an integer.
+Is the following language decidable:
+\[
+\{ \langle M \rangle \mid |L(M)| = k \}
+\]
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Is the following language decidable:
+\[
+\{ \langle M \rangle \mid |L(M)| \text{ is finite} \}
+\]
+\end{ex}
+
+
+
+
+\newpage
+\newcommand\INFINITE{\mathsc{Infinite}}
+\begin{ex}
+Is the following language decidable:
+\[
+\INFINITE_\TM = \{ \langle M \rangle \mid L(M) \text{ is infinite } \}
+\]
+\end{ex}
+
+
+\newpage
+\newcommand\Null{\mathsc{Null}}
+\begin{ex}
+Is the following language decidable:
+\[
+\Null_\TM = \{ \langle M \rangle \mid \ep \in L(M) \}
+\]
+\end{ex}
+
+
+\newpage
+\SOLUTION
+
+Assume that $\Null_\TM$ is decidable, say it is decided by $D$.
+
+Construct a TM $A$ that does this:
+Let $\langle M \rangle \# \langle w \rangle$ be an input for $A$.
+\begin{tightlist}
+  \item $A$ construct a TM $M'$ (which depends on $M$ and $w$)
+  which does the following:
+  When $M'$ executes, it replaced the input with $w$,
+  and then proceeds to
+  work exactly like $M$.
+  Note that if we run $M'$ on $\ep$, then it would be the
+  same as running $M$ on $w$.
+  Of course when I say $A$ \lq\lq constructs'' $M'$, I  mean $A$ write
+  the encoding, $\langle M'\rangle$ somewhere on its tape.
+  \item
+  $A$ then simulates $D$ on $\langle M' \rangle$.
+  Note that $D$ is decidable therefore $D$ must either accept or reject
+  ($D$ cannot run forever).
+  This means that as $A$ simulates $D$ one step at a time
+  $A$ will at some point in time see $D$ entering the
+  accept or the reject state.
+  \item If while $A$ is simulating $D$ running on $\langle M'\rangle$,
+  $A$ sees that $D$ accepts $\langle M' \rangle$ (i.e., 
+  $M'$ accepts $\ep$, which means that $M$ accepts $w$), then
+  $A$ enters its accept state.
+  \item If while $A$ is simulating $D$ running on $\langle M'\rangle$,
+  $A$ sees that $D$ rejects $\langle M' \rangle$ (i.e., 
+  $M'$ does not accepts $\ep$, which means that $M$ does not
+  accepts $w$), then
+  $A$ enters its reject state.
+  \end{tightlist}
+We have shown that
+\[
+\ACCEPT_\TM \leq \Null_\TM
+\]
+This means that $A$ is a decider for $\ACCEPT_\TM$ which is a contradiction.
+Therefore $\Null_\TM$ cannot be a decidable language.
+\qed
+
+As exercise, try to write a proof that shows
+\[
+\mathsc{HALT}_{\TM} \leq \Null_\TM
+\]
+
+\newpage
+\newcommand\NULL{\mathsc{Null}}
+\begin{ex}
+Is the following language decidable:
+\[
+\{ \langle M \rangle \mid M \text{ has 42 states } \}
+\]
+\end{ex}
+
+
+\newpage
+\SOLUTION
+
+Yes.
+Depending on the way TMs are encoded,
+design a TM, $D$, such that when $D$ is given $\langle M \rangle$,
+$D$ moves the
+read-write head to
+the section of $\langle M \rangle$ that encodes the set of states
+and begin counting the number of states.
+If the counting stops before 42, $D$ rejects.
+If the counting goes up to 43, $D$ rejects.
+Otherwise $D$ accepts.
+
+
+\newpage
+\newcommand\ALL{\mathsc{All}}
+\begin{ex}
+Is the following language decidable:
+\[
+\ALL_\TM = \{ \langle M \rangle  \,|\, L(M) = \Sigma^*
+\text{ where is the input alphabet of $M$} \}
+\]
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Is the following language decidable:
+\[
+\mathsc{Equal}_\TM =
+\{
+\langle M_1 \rangle
+\#
+\langle M_2 \rangle
+\,|\, L(M_1) =  L(M_2)
+\}
+\]
+\end{ex}
+
