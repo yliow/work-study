@@ -3,6 +3,7 @@
 cantor          done    copied back to courses/math325/n
 regular         
 cfl
+languages
 tm
 decidability
 

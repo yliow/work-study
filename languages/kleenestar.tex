@@ -1,0 +1,206 @@
+\section{Concatenation of languages and Kleene Star}
+
+I already talked about exponentiation of a word, 
+i.e., $x^n$ where $x$ is a string.
+Now I want to talk about the exponentiation of a set of words (i.e.
+exponentiation of languages).
+
+\begin{defn}
+Let $L, L'$ be languages over $\Sigma$.
+The
+\defterm{concatenation}\index{concatenation}\tinysidebar{concatenation}
+of $L$ and $L'$ is defined to be
+\[
+L \cdot L' = \{x \cdot x' \mid x \in L, \, x' \in L'\}
+\index{$\cdot$}\tinysidebar{$\cdot$}
+\]
+We will usually write
+\[
+LL'
+\]
+instead of 
+\[
+L \cdot L'
+\]
+\end{defn}
+
+Let's do a quick example:
+Suppose $L_1 = \{a, ba, bab, baba\}$ 
+and $L_2 = \{b, ab, aab, aaab\}$.
+The product $L_1 L_2$ is
+\begin{align*}
+L_1L_2 
+&=   \{a\cdot b, a\cdot ab, a \cdot aab, a \cdot aaab, \\
+& \hspace{0.8cm} ba \cdot b, ba \cdot ab, ba \cdot aab, ba \cdot aaab, \\ 
+& \\
+& \\
+&=   \{ab, aab, aaab, aaaab, \\
+& \hspace{0.8cm} bab, baab, baaab, baaaab, \\ 
+& \\
+& \\
+&=   \{ab, a^2b, a^3b, a^4b, \\
+& \hspace{0.8cm} bab, ba^2b, ba^3b, ba^4b, \\ 
+& \\
+& \\
+\end{align*}
+(finish it!)
+Now check which of the following strings are in $L_1L_2$:
+\begin{tightlist}
+\item $\ep$
+\item $a$
+\item $b$
+\item $aa$
+\item $ab$
+\item $ba$
+\item $bb$
+\item $aaa$
+\item $aab$
+\item $aba$
+\item $baa$
+\item $abb$
+\item $bab$
+\item $bba$
+\item $bbb$
+\end{tightlist}
+
+
+
+\newpage
+\begin{ex} Simplify the following:
+  \begin{enumerate}
+  \item $\{a\} \cdot \{b\}$
+  \item $\{\ep\} \cdot \{b\}$
+  \item $\emptyset \cdot \{ab\}$
+  \item $\{a, aa\} \cdot \{b\}$
+  \item $\{a, aa, aaa\} \cdot \{b, ba, baa\}$
+  \end{enumerate}
+\end{ex}
+
+\newpage
+\begin{ex}
+  Is it true that if $L$ and $L'$ are finite languages,
+  then $|LL'|$ (the number of words in $LL'$)
+  must be $|L| \cdot |L'|$?
+\end{ex}
+
+%[ANSWER: No. $L = \{ \ep, a \}$, $L' = L$.]
+
+\newpage
+\begin{ex}
+  \begin{enumerate}
+
+  \item
+    Prove that 
+    if $L = \emptyset$ or $L' = \emptyset$, then
+    \[
+    L \cdot L' = \emptyset
+    \]
+    
+  \item
+    Is it true that if $LL' = \emptyset$, then either $L = \emptyset$
+    or $L' = \emptyset$?
+    
+  \end{enumerate}
+
+
+  By the way, are the following two languages the same:
+  \[
+  L = \{\}, \hspace{1cm}
+  L' = \{\ep\}
+  \]
+  
+\end{ex}
+
+\newpage
+\begin{ex}
+Let $L_1 = \{a^n \mid n \geq 0\}$ and $L_2 = \{ab^na \mid n \geq 0\}$.
+Which of the following strings are in $L_1 L_2$?
+(Note that in this case the languages are infinite.)
+\begin{tightlist}
+\item $\ep$
+\item $a$
+\item $b$
+\item $aa$
+\item $ab$
+\item $ba$
+\item $bb$
+\item $aaa$
+\item $aab$
+\item $aba$
+\item $baa$
+\item $abb$
+\item $bab$
+\item $bba$
+\item $bbb$
+\end{tightlist}
+\end{ex}
+
+
+\newpage
+It's not shocking that if I have three languages $L$, $L'$, and $L''$,
+then $LL'L''$ is defined as
+\[
+LL'L'' = (LL')L''
+\]
+This is just like for real value variables $x,y,z$, when I write
+$x + y + z$, I mean $(x + y) + z$.
+Because $(x + y) + z = x + (y + z)$, it doesn't really matter
+which + you perform first which is why we omit parentheses
+from either $(x + y) + z$ or from $x + (y + z)$.
+
+It's not too surprising that
+
+\begin{prop}
+$(LL')L'' = L(L'L'')$.
+\end{prop}
+
+\proof
+DIY.
+[Hint: The proof depends on the fact that $(xy)z = x(yz)$ if
+$x,y,z$ are words in $L,L',L''$ respectively.]
+\qed
+
+
+\newpage
+Frequently, we want to concatenate the same language.
+So let's have a shorthand for that ...
+
+We will write 
+\[
+L^2
+\]
+instead of $LL$.
+In general we define
+\begin{align*}
+L^0 &= \{\ep\} \\
+L^{n+1} &= L L^n \,\,\, \text{ for } n \geq 0
+\end{align*}
+We also define
+\begin{align*}
+L^* &= \bigcup_{n = 0}^\infty L^n = L^0 \cup L^1 \cup L^2 \cup \cdots \\
+L^+ &= \bigcup_{n = 1}^\infty L^n = L^1 \cup L^2 \cup \cdots \\
+\end{align*}
+
+
+\newpage
+\begin{ex}
+If $L = \{a\}$, what is $L^*$? What about $L^+$?
+\qed
+\end{ex}
+
+\begin{ex}
+If $L = \{ab\}$, what is $L^*$? What about $L^+$?
+\qed
+\end{ex}
+
+\begin{ex}
+If $L = \{a^nb \mid n \geq 0\}$, what is $L^*$? What about $L^+$?
+\qed
+\end{ex}
+
+\begin{ex}
+Is it true that for any language $L$, $L^2 \neq L$?
+\qed
+\end{ex}
+  
+
