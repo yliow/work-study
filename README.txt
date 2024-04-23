@@ -3,6 +3,8 @@
 cantor          done    copied back to courses/math325/n
 regular         
 cfl
+tm
+decidability
 
 2024/04/11: In some latex file near the top the following
 
