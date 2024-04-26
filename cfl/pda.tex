@@ -20,24 +20,7 @@ at the top of the stack.
 
 Here's the picture of a PDA:
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-pda(p,
-    stackvalues = ['a','\$'],
-    tape = ['a','b','a','a',r'\SPACE',r'\SPACE',r'\SPACE'],
-    state = r'$q_0$',
-    head_index = 0,
-    body_w = 3,
-    body_h = 2,
-    vsep = 1,
-    hsep = 1,
-    input_tape_str=True,
-    stack_str=True,
-    )
-print(p)
-\end{python}
+\input{stdout32.tex}
 
 Remember that the stack is infinite -- you can put any amount of data into it.
 Putting something onto the top of the stack is called \lq\lq pushing''
@@ -48,17 +31,7 @@ an NFA diagram except for some modification.
 Each edge from state $p$ to $q$ is labelled
 $(a, b \rightarrow c)$:
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-Graph.r = 0.4
-Graph.background = 'white'
-p += Graph.node(x=0, y=0, name='1', label='$p$')
-p += Graph.node(x=5, y=0, name='2', label='$q$')
-p += Graph.arc(names=['1', '2'], label=r'$\texttt{a}, \texttt{b} \rightarrow \texttt{c} $')
-print(p)
-\end{python}
-
+\input{stdout33.tex}
 
 Some books also write
 $(a,b/c)$
@@ -87,19 +60,7 @@ and
 the top of the stack is
 \verb!b!:
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-pda(p,
-    stackvalues = ['b','',''],
-    tape = ['','','a','','','',''],
-    state = r'$q_5$',
-    head_index = 2,
-    vsep=0.5,
-    )
-print(p)
-\end{python}
+\input{stdout34.tex}
 
 In your PDA state diagram,
 you look for the state $q_5$, and then 
@@ -107,47 +68,15 @@ for the relevant transitions (there might be more than one)
 where you are about to read \verb!a! and the top of stack if
 \verb!b!:
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-Graph.r = 0.4
-Graph.background = 'white'
-p += Graph.node(x=0, y=0, name='1', label='$q_5$')
-p += Graph.node(x=5, y=0, name='2', label='$$')
-p += Graph.arc(names=['1', '2'], label=r'$\texttt{a}, \texttt{b} \rightarrow \texttt{} $')
-print(p)
-\end{python}
+\input{stdout35.tex}
 
 Say one of the transitions matching the above is 
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-Graph.r = 0.4
-Graph.background = 'white'
-p += Graph.node(x=0, y=0, name='1', label='$q_5$')
-p += Graph.node(x=5, y=0, name='2', label='$q_2$')
-p += Graph.arc(names=['1', '2'], label=r'$\texttt{a}, \texttt{b} \rightarrow \texttt{\$} $')
-print(p)
-\end{python}
+\input{stdout36.tex}
 
 Then your PDA goes through this computational step:
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-pda_step(p,
-         stackvalues0 = ['b','',''],
-         tape0 = ['','','a','','','',''],
-         state0 = r'$q_5$',
-         head_index0 = 2,
-         stackvalues1 = [r'\$', '',''],
-         tape1 = ['','','a','','','',''],
-         state1 = r'$q_2$',
-         head_index1 = 3,
-        )        
-print(p)
-\end{python}
+\input{stdout37.tex}
 
 There are a few caveats.
 First, for the label
@@ -168,36 +97,12 @@ but your read head does not move
 (note: in this case it does not matter what your read head is pointing to).
 For instance if the applicable transition of your PDA is
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-Graph.r = 0.4
-Graph.background = 'white'
-p += Graph.node(x=0, y=0, name='1', label='$q_5$')
-p += Graph.node(x=5, y=0, name='2', label='$q_2$')
-p += Graph.arc(names=['1', '2'], label=r'$\texttt{$\ep$}, \texttt{b} \rightarrow \texttt{\$} $')
-print(p)
-\end{python}
+\input{stdout38.tex}
 
 (i.e., the PDA is at state $q_5$ and the top of the stack is \verb!b!)
 then the PDA will go through this computational step:
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-pda_step(p,
-         stackvalues0 = ['b','',''],
-         tape0 = ['','','a','','','',''],
-         state0 = r'$q_5$',
-         head_index0 = 2,
-         stackvalues1 = [r'\$', '',''],
-         tape1 = ['','','a','','','',''],
-         state1 = r'$q_2$',
-         head_index1 = 2,
-        )        
-print(p)
-\end{python}
-
+\input{stdout39.tex}
 
 A transition like
 \[
@@ -209,36 +114,11 @@ onto the stack.
 This means of course that you're simplying popping the stack.
 For instance if the applicable transition of your PDA is
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-Graph.r = 0.4
-Graph.background = 'white'
-p += Graph.node(x=0, y=0, name='1', label='$q_5$')
-p += Graph.node(x=5, y=0, name='2', label='$q_2$')
-p += Graph.arc(names=['1', '2'], label=r'$\texttt{a}, \texttt{b} \rightarrow \texttt{$\ep$} $')
-print(p)
-\end{python}
+\input{stdout40.tex}
 
 then the PDA will go through this computational step:
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-pda_step(p,
-         stackvalues0 = ['b','',''],
-         tape0 = ['','','a','','','',''],
-         state0 = r'$q_5$',
-         head_index0 = 2,
-         stackvalues1 = ['',''],
-         tape1 = ['','','a','','','',''],
-         state1 = r'$q_2$',
-         head_index1 = 3,
-        )        
-print(p)
-\end{python}
-
-
+\input{stdout41.tex}
 
 On the other hand
 \[
@@ -248,41 +128,13 @@ means that
 you're pushing $c$ onto the stack
 (if the character to be read is \verb!a!).
 For instance if the applicable transition of your PDA is
-\begin{python}
-from latextool_basic import *
-p = Plot()
-Graph.r = 0.4
-Graph.background = 'white'
-p += Graph.node(x=0, y=0, name='1', label='$q_5$')
-p += Graph.node(x=5, y=0, name='2', label='$q_2$')
-p += Graph.arc(names=['1', '2'], label=r'$\texttt{a}, \texttt{$\ep$} \rightarrow \texttt{\$} $')
-print(p)
-\end{python}
+\input{stdout42.tex}
 
 (your PDA is at state $q_5$ and it's reading \verb!a! --
 it doesn't matter what your top--of--stack is)
 then the PDA will go through this computational step:
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-pda_step(p,
-         stackvalues0 = ['b','',''],
-         tape0 = ['','','a','','','',''],
-         state0 = r'$q_5$',
-         head_index0 = 2,
-         stackvalues1 = ['\$', 'b','',''],
-         tape1 = ['','','a','','','',''],
-         state1 = r'$q_2$',
-         head_index1 = 3,
-        )        
-print(p)
-\end{python}
-
-
-
-
-
+\input{stdout43.tex}
 
 Also, a transition such as
 \[
@@ -293,37 +145,14 @@ or modifying the stack.
 (This does not depend on what you are reading and what's on the
 top of the stack.)
 For instance if the applicable transition of your PDA is
-\begin{python}
-from latextool_basic import *
-p = Plot()
-Graph.r = 0.4
-Graph.background = 'white'
-p += Graph.node(x=0, y=0, name='1', label='$q_5$')
-p += Graph.node(x=5, y=0, name='2', label='$q_2$')
-p += Graph.arc(names=['1', '2'], label=r'$\ep, \ep \rightarrow \ep $')
-print(p)
-\end{python}
+\input{stdout44.tex}
 
 (i.e., your PDA is at state $q_5$  --
 it doesn't matter what your PDA is about to read and it
 does not depend on what the top--of--stack is)
 then the PDA will go through this computational step:
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-pda_step(p,
-         stackvalues0 = ['b','',''],
-         tape0 = ['','','a','','','',''],
-         state0 = r'$q_5$',
-         head_index0 = 2,
-         stackvalues1 = ['b','',''],
-         tape1 = ['','','a','','','',''],
-         state1 = r'$q_2$',
-         head_index1 = 2,
-        )        
-print(p)
-\end{python}
+\input{stdout45.tex}
 
 This transition is most similar to the $\ep$--transition of an NFA.
 
@@ -412,43 +241,7 @@ Note very carefully that $a$ is pushed onto the stack!!!
 In terms of a sequence of pictures of a PDA computing with input $aabb$ up to this point,
 you have:
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-def pda0(p, x0, y0, stackvalues, tape, state, head_index):
-    return pda(p,
-           x0=x0,y0=y0,
-           stackvalues = stackvalues,
-           tape = tape,
-           state = state,
-           head_index = head_index,
-           vsep=0.5, hsep=0.25,
-           body_w=1,body_h=0.7,w=0.4,
-           )
-
-x0, y0 = 0, 0
-r = pda0(p, x0=x0, y0=y0,
-         stackvalues = [], tape = ['a','a','b','b',r'\SPACE'],
-         state = r'$q_0$', head_index = 0)
-x1,y1 = r.right()
-y1 = y0 - 1
-p += Line(points=[(x1+0.25,y1),(x1+0.75,y1)],linewidth=0.05,endstyle='>')
-
-x0 = x1 + 1
-r = pda0(p, x0=x0, y0=y0,
-        stackvalues = [r'\$'], tape = ['a','a','b','b',r'\SPACE'],
-        state = r'$q_1$', head_index = 0)
-x1,y1 = r.right()
-y1 = y0 - 1
-p += Line(points=[(x1+0.25,y1),(x1+0.75,y1)],linewidth=0.05,endstyle='>')
-
-x0 = x1 + 1
-r = pda0(p, x0=x0, y0=y0,
-    stackvalues = ['a', r'\$'], tape = ['a','a','b','b',r'\SPACE'],
-    state = r'$q_1$', head_index = 1)
-print(p)
-\end{python}
+\input{stdout46.tex}
 
 Get it?
 The next step gives us this (I've removed (top) and (bottom)
@@ -464,41 +257,7 @@ $aa\rhd bb$    & $q_1$ & $ aa\$ $ \\ \hline
 \end{tabular}
 \end{center}
 In terms of PDA pictures, we have this:
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-def pda0(p, x0, y0, stackvalues, tape, state, head_index):
-    return pda(p,
-           x0=x0,y0=y0,
-           stackvalues = stackvalues,
-           tape = tape,
-           state = state,
-           head_index = head_index,
-           vsep=0.5, hsep=0.25,
-           body_w=1,body_h=0.7,w=0.4,
-           )
-
-r = pda0(p, x0=0, y0=0,
-         stackvalues = [], tape = ['a','a','b','b',r'\SPACE'],
-         state = r'$q_0$', head_index = 0)
-x0,y0 = r.right()
-p += Line(points=[(x0+0.25,y0),(x0+0.75,y0)],linewidth=0.05,endstyle='>')
-r = pda0(p, x0=x0+1, y0=0,
-        stackvalues = [r'\$'], tape = ['a','a','b','b',r'\SPACE'],
-        state = r'$q_1$', head_index = 0)
-x0,y0 = r.right()
-p += Line(points=[(x0+0.25,y0),(x0+0.75,y0)],linewidth=0.05,endstyle='>')
-r = pda0(p, x0=x0+1, y0=0,
-    stackvalues = ['a', r'\$'], tape = ['a','a','b','b',r'\SPACE'],
-    state = r'$q_1$', head_index = 1)
-x0,y0 = r.right()
-p += Line(points=[(x0+0.25,y0),(x0+0.75,y0)],linewidth=0.05,endstyle='>')
-r = pda0(p, x0=x0+1, y0=0,
-    stackvalues = ['a', 'a', r'\$'], tape = ['a','a','b','b',r'\SPACE'],
-    state = r'$q_1$', head_index = 2)
-print(p)
-\end{python}
+\input{stdout47.tex}
 
 Note that the next character to be read is $b$;
 the top of the stack is $a$.
@@ -520,55 +279,7 @@ $aab\rhd b$    & $q_2$ & $ a\$ $ \\ \hline
 Look at the table carefully!
 In terms of a picture, we have
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-def pda0(p, x0, y0, stackvalues, tape, state, head_index):
-    return pda(p,
-           x0=x0,y0=y0,
-           stackvalues = stackvalues,
-           tape = tape,
-           state = state,
-           head_index = head_index,
-           vsep=0.5, hsep=0.25,
-           body_w=1,body_h=0.7,w=0.4,
-           )
-
-r = r0 = pda0(p, x0=0, y0=0,
-         stackvalues = [], tape = ['a','a','b','b',r'\SPACE'],
-         state = r'$q_0$', head_index = 0)
-x0,y0 = r.right()
-p += Line(points=[(x0+0.25,y0),(x0+0.75,y0)],linewidth=0.05,endstyle='>')
-r = pda0(p, x0=x0+1, y0=0,
-        stackvalues = [r'\$'], tape = ['a','a','b','b',r'\SPACE'],
-        state = r'$q_1$', head_index = 0)
-x0,y0 = r.right()
-p += Line(points=[(x0+0.25,y0),(x0+0.75,y0)],linewidth=0.05,endstyle='>')
-r = pda0(p, x0=x0+1, y0=0,
-    stackvalues = ['a', r'\$'], tape = ['a','a','b','b',r'\SPACE'],
-    state = r'$q_1$', head_index = 1)
-x0,y0 = r.right()
-p += Line(points=[(x0+0.25,y0),(x0+0.75,y0)],linewidth=0.05,endstyle='>')
-r = pda0(p, x0=x0+1, y0=0,
-    stackvalues = ['a', 'a', r'\$'], tape = ['a','a','b','b',r'\SPACE'],
-    state = r'$q_1$', head_index = 2)
-
-x0,y0 = r.bottomleft()
-x1,y1 = r.bottom()
-x2,y2 = r0.bottom(); y2 -= 1
-p += Line(points=[(x1,y1-0.25),
-                  (x1,y1-0.50),
-                  (x2,y1-0.50),
-                  (x2,y2-0.85)],linewidth=0.05,endstyle='>')
-r = pda0(p, x0=0, y0=y2-1.5,
-    stackvalues = ['a', r'\$'], tape = ['a','a','b','b',r'\SPACE'],
-    state = r'$q_2$', head_index = 2) # 3 problems
-
-
-print(p)
-\end{python}
-
+\input{stdout48.tex}
 
 The next step gives us this:
 \begin{center}
@@ -585,64 +296,7 @@ $aabb\rhd$    & $q_2$ & $ \$ $  \\ \hline
 \end{center}
 In terms of a picture of PDAs, we have
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-def pda0(p, x0, y0, stackvalues, tape, state, head_index):
-    return pda(p,
-           x0=x0,y0=y0,
-           stackvalues = stackvalues,
-           tape = tape,
-           state = state,
-           head_index = head_index,
-           vsep=0.5, hsep=0.25,
-           body_w=1,body_h=0.7,w=0.4,
-           )
-
-r = r0 = pda0(p, x0=0, y0=0,
-         stackvalues = [], tape = ['a','a','b','b',r'\SPACE'],
-         state = r'$q_0$', head_index = 0)
-x0,y0 = r.right()
-p += Line(points=[(x0+0.25,y0),(x0+0.75,y0)],linewidth=0.05,endstyle='>')
-r = pda0(p, x0=x0+1, y0=0,
-        stackvalues = [r'\$'], tape = ['a','a','b','b',r'\SPACE'],
-        state = r'$q_1$', head_index = 0)
-x0,y0 = r.right()
-p += Line(points=[(x0+0.25,y0),(x0+0.75,y0)],linewidth=0.05,endstyle='>')
-r = pda0(p, x0=x0+1, y0=0,
-    stackvalues = ['a', r'\$'], tape = ['a','a','b','b',r'\SPACE'],
-    state = r'$q_1$', head_index = 1)
-x0,y0 = r.right()
-p += Line(points=[(x0+0.25,y0),(x0+0.75,y0)],linewidth=0.05,endstyle='>')
-r = pda0(p, x0=x0+1, y0=0,
-    stackvalues = ['a', 'a', r'\$'], tape = ['a','a','b','b',r'\SPACE'],
-    state = r'$q_1$', head_index = 2)
-
-x0,y0 = r.bottomleft()
-x1,y1 = r.bottom()
-x2,y2 = r0.bottom(); y2 -= 1
-p += Line(points=[(x1,y1-0.25),
-                  (x1,y1-0.50),
-                  (x2,y1-0.50),
-                  (x2,y2-0.85)],linewidth=0.05,endstyle='>')
-
-y0 = y2-1.5
-r = pda0(p, x0=0, y0=y0,
-    stackvalues = ['a', r'\$'], tape = ['a','a','b','b',r'\SPACE'],
-    state = r'$q_2$', head_index = 3)
-
-x0,_ = r.right()
-p += Line(points=[(x0+0.25,y0),(x0+0.75,y0)],linewidth=0.05,endstyle='>')
-r = pda0(p, x0=x0+1, y0=y0,
-    stackvalues = [r'\$'], tape = ['a','a','b','b',r'\SPACE'],
-    state = r'$q_2$', head_index = 4)
-
-
-print(p)
-\end{python}
-
-
+\input{stdout49.tex}
 
 One more step is applicable ... so we get ...
 \begin{center}
@@ -661,68 +315,7 @@ $aabb\rhd $    & $q_3$ & $  $ \\ \hline
 
 or a terms of a picture:
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-def pda0(p, x0, y0, stackvalues, tape, state, head_index):
-    return pda(p,
-           x0=x0,y0=y0,
-           stackvalues = stackvalues,
-           tape = tape,
-           state = state,
-           head_index = head_index,
-           vsep=0.5, hsep=0.25,
-           body_w=1,body_h=0.7,w=0.4,
-           )
-
-r = r0 = pda0(p, x0=0, y0=0,
-         stackvalues = [], tape = ['a','a','b','b',r'\SPACE'],
-         state = r'$q_0$', head_index = 0)
-x0,y0 = r.right()
-p += Line(points=[(x0+0.25,y0),(x0+0.75,y0)],linewidth=0.05,endstyle='>')
-r = pda0(p, x0=x0+1, y0=0,
-        stackvalues = [r'\$'], tape = ['a','a','b','b',r'\SPACE'],
-        state = r'$q_1$', head_index = 0)
-x0,y0 = r.right()
-p += Line(points=[(x0+0.25,y0),(x0+0.75,y0)],linewidth=0.05,endstyle='>')
-r = pda0(p, x0=x0+1, y0=0,
-    stackvalues = ['a', r'\$'], tape = ['a','a','b','b',r'\SPACE'],
-    state = r'$q_1$', head_index = 1)
-x0,y0 = r.right()
-p += Line(points=[(x0+0.25,y0),(x0+0.75,y0)],linewidth=0.05,endstyle='>')
-r = pda0(p, x0=x0+1, y0=0,
-    stackvalues = ['a', 'a', r'\$'], tape = ['a','a','b','b',r'\SPACE'],
-    state = r'$q_1$', head_index = 2)
-
-x0,y0 = r.bottomleft()
-x1,y1 = r.bottom()
-x2,y2 = r0.bottom(); y2 -= 1
-p += Line(points=[(x1,y1-0.25),
-                  (x1,y1-0.50),
-                  (x2,y1-0.50),
-                  (x2,y2-0.85)],linewidth=0.05,endstyle='>')
-
-y0 = y2-1.5
-r = pda0(p, x0=0, y0=y0,
-    stackvalues = ['a', r'\$'], tape = ['a','a','b','b',r'\SPACE'],
-    state = r'$q_2$', head_index = 3)
-
-x0,_ = r.right()
-p += Line(points=[(x0+0.25,y0),(x0+0.75,y0)],linewidth=0.05,endstyle='>')
-r = pda0(p, x0=x0+1, y0=y0,
-    stackvalues = [r'\$'], tape = ['a','a','b','b',r'\SPACE'],
-    state = r'$q_2$', head_index = 4)
-
-x0,_ = r.right()
-p += Line(points=[(x0+0.25,y0),(x0+0.75,y0)],linewidth=0.05,endstyle='>')
-r = pda0(p, x0=x0+1, y0=y0,
-    stackvalues = [], tape = ['a','a','b','b',r'\SPACE'],
-    state = r'$q_3$', head_index = 4)
-
-
-print(p)
-\end{python}
+\input{stdout50.tex}
 
 Since we land in an accept state at the end of reading the input,
 $aabb$ is accepted by the above PDA.
@@ -782,57 +375,11 @@ For instance in the case of $\ep$ input,
 there's one PDA with this computation (actually this has
 no computation at all):
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-def pda0(p, x0, y0, stackvalues, tape, state, head_index):
-    return pda(p,
-           x0=x0,y0=y0,
-           stackvalues = stackvalues,
-           tape = tape,
-           state = state,
-           head_index = head_index,
-           vsep=0.5, hsep=0.25,
-           body_w=1,body_h=0.7,w=0.4,
-           )
-
-r = r0 = pda0(p, x0=0, y0=0,
-         stackvalues = [], tape = [r'\SPACE' for i in range(5)],
-         state = r'$q_0$', head_index = 0)
-
-print(p)
-\end{python}
+\input{stdout51.tex}
 
 and this one:
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-def pda0(p, x0, y0, stackvalues, tape, state, head_index):
-    return pda(p,
-           x0=x0,y0=y0,
-           stackvalues = stackvalues,
-           tape = tape,
-           state = state,
-           head_index = head_index,
-           vsep=0.5, hsep=0.25,
-           body_w=1,body_h=0.7,w=0.4,
-           )
-
-r = r0 = pda0(p, x0=0, y0=0,
-         stackvalues = [], tape = [r'\SPACE' for i in range(5)],
-         state = r'$q_0$', head_index = 0)
-x0,y0 = r.right()
-
-p += Line(points=[(x0+0.25,y0),(x0+0.75,y0)],linewidth=0.05,endstyle='>')
-
-r = pda0(p, x0=x0+1, y0=0,
-        stackvalues = [r'\$'], tape = [r'\SPACE' for i in range(5)],
-        state = r'$q_1$', head_index = 0)
-print(p)
-\end{python}
+\input{stdout52.tex}
 
 The first one reaches an accept state while the second does not.
 Therefore $\ep$ in accepted by the PDA.
@@ -916,74 +463,7 @@ Here's another PDA:
 Let's try it with $aabb$.
 Here's the picture of a computation:
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-def pda0(p, x0, y0, stackvalues, tape, state, head_index):
-    return pda(p,
-           x0=x0,y0=y0,
-           stackvalues = stackvalues,
-           tape = tape,
-           state = state,
-           head_index = head_index,
-           vsep=0.5, hsep=0.25,
-           body_w=1,body_h=0.7,w=0.4,
-           )
-
-r = r0 = pda0(p, x0=0, y0=0,
-         stackvalues = [], tape = ['a','a','b','b',r'\SPACE'],
-         state = r'$q_0$', head_index = 0)
-x0,y0 = r.right()
-p += Line(points=[(x0+0.25,y0),(x0+0.75,y0)],linewidth=0.05,endstyle='>')
-r = pda0(p, x0=x0+1, y0=0,
-        stackvalues = [r'\$'], tape = ['a','a','b','b',r'\SPACE'],
-        state = r'$q_1$', head_index = 0)
-x0,y0 = r.right()
-p += Line(points=[(x0+0.25,y0),(x0+0.75,y0)],linewidth=0.05,endstyle='>')
-r = pda0(p, x0=x0+1, y0=0,
-    stackvalues = ['a', r'\$'], tape = ['a','a','b','b',r'\SPACE'],
-    state = r'$q_1$', head_index = 1)
-x0,y0 = r.right()
-p += Line(points=[(x0+0.25,y0),(x0+0.75,y0)],linewidth=0.05,endstyle='>')
-r = pda0(p, x0=x0+1, y0=0,
-    stackvalues = ['a', 'a', r'\$'], tape = ['a','a','b','b',r'\SPACE'],
-    state = r'$q_1$', head_index = 2)
-
-x0,y0 = r.bottomleft()
-x1,y1 = r.bottom()
-x2,y2 = r0.bottom(); y2 -= 1
-p += Line(points=[(x1,y1-0.25),
-                  (x1,y1-0.50),
-                  (x2,y1-0.50),
-                  (x2,y2-0.85)],linewidth=0.05,endstyle='>')
-
-y0 = y2-1.5
-r = pda0(p, x0=0, y0=y0,
-    stackvalues = ['a', 'a', r'\$'], tape = ['a','a','b','b',r'\SPACE'],
-    state = r'$q_2$', head_index = 2)
-
-x0,_ = r.right()
-p += Line(points=[(x0+0.25,y0),(x0+0.75,y0)],linewidth=0.05,endstyle='>')
-r = pda0(p, x0=x0+1, y0=y0,
-    stackvalues = ['a', r'\$'], tape = ['a','a','b','b',r'\SPACE'],
-    state = r'$q_2$', head_index = 3)
-
-x0,_ = r.right()
-p += Line(points=[(x0+0.25,y0),(x0+0.75,y0)],linewidth=0.05,endstyle='>')
-r = pda0(p, x0=x0+1, y0=y0,
-    stackvalues = [r'\$'], tape = ['a','a','b','b',r'\SPACE'],
-    state = r'$q_2$', head_index = 4)
-
-x0,_ = r.right()
-p += Line(points=[(x0+0.25,y0),(x0+0.75,y0)],linewidth=0.05,endstyle='>')
-r = pda0(p, x0=x0+1, y0=y0,
-    stackvalues = [], tape = ['a','a','b','b',r'\SPACE'],
-    state = r'$q_3$', head_index = 4)
-
-
-print(p)
-\end{python}
+\input{stdout53.tex}
 
 Formally, I would write
 \begin{align*}
@@ -1002,46 +482,7 @@ nondeterministically going from \lq\lq remembering $a$'s'' (using the stack)
 and \lq\lq matching $b$'s with $a$'s''.
 Another execution might go like this:
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-def pda0(p, x0, y0, stackvalues, tape, state, head_index):
-    return pda(p,
-           x0=x0,y0=y0,
-           stackvalues = stackvalues,
-           tape = tape,
-           state = state,
-           head_index = head_index,
-           vsep=0.5, hsep=0.25,
-           body_w=1,body_h=0.7,w=0.4,
-           )
-
-r = r0 = pda0(p, x0=0, y0=0,
-         stackvalues = [], tape = ['a','a','b','b',r'\SPACE'],
-         state = r'$q_0$', head_index = 0)
-x0,y0 = r.right()
-p += Line(points=[(x0+0.25,y0),(x0+0.75,y0)],linewidth=0.05,endstyle='>')
-r = pda0(p, x0=x0+1, y0=0,
-        stackvalues = [r'\$'], tape = ['a','a','b','b',r'\SPACE'],
-        state = r'$q_1$', head_index = 0)
-x0,y0 = r.right()
-p += Line(points=[(x0+0.25,y0),(x0+0.75,y0)],linewidth=0.05,endstyle='>')
-
-r = pda0(p, x0=x0+1, y0=0,
-    stackvalues = ['a', r'\$'], tape = ['a','a','b','b',r'\SPACE'],
-    state = r'$q_1$', head_index = 1)
-
-x0,y0 = r.right()
-p += Line(points=[(x0+0.25,y0),(x0+0.75,y0)],linewidth=0.05,endstyle='>')
-
-r = pda0(p, x0=x0+1, y0=0,
-    stackvalues = ['a', r'\$'], tape = ['a','a','b','b',r'\SPACE'],
-    state = r'$q_2$', head_index = 1)
-
-
-print(p)
-\end{python}
+\input{stdout54.tex}
 
 The derivation is
 \begin{align*}
@@ -1063,45 +504,10 @@ An even short derivation that does not accept is
 
 Here's the picture:
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-def pda0(p, x0, y0, stackvalues, tape, state, head_index):
-    return pda(p,
-           x0=x0,y0=y0,
-           stackvalues = stackvalues,
-           tape = tape,
-           state = state,
-           head_index = head_index,
-           vsep=0.5, hsep=0.25,
-           body_w=1,body_h=0.7,w=0.4,
-           )
-
-r = r0 = pda0(p, x0=0, y0=0,
-         stackvalues = [], tape = ['a','a','b','b',r'\SPACE'],
-         state = r'$q_0$', head_index = 0)
-x0,y0 = r.right()
-
-p += Line(points=[(x0+0.25,y0),(x0+0.75,y0)],linewidth=0.05,endstyle='>')
-
-r = pda0(p, x0=x0+1, y0=0,
-    stackvalues = [r'\$'], tape = ['a','a','b','b',r'\SPACE'],
-    state = r'$q_1$', head_index = 0)
-x0,y0 = r.right()
-
-p += Line(points=[(x0+0.25,y0),(x0+0.75,y0)],linewidth=0.05,endstyle='>')
-
-r = pda0(p, x0=x0+1, y0=0,
-    stackvalues = [r'\$'], tape = ['a','a','b','b',r'\SPACE'],
-    state = r'$q_2$', head_index = 0)
-
-print(p)
-\end{python}
+\input{stdout55.tex}
 
 At this point, this PDA dies because at state $q_2$, there is no
 transition for \lq\lq read $a$ on the input tape and the top of stack is $a$.''
-
 
 In the above, there are three computations of $aabb$:
 \begin{align*}
