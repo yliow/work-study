@@ -4,7 +4,7 @@
 cantor          done    copied back to courses/math325/n
 regular         done
 cfl             done
-languages
+languages       done
 tm
 decidability
 
