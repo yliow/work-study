@@ -1,7 +1,6 @@
 OPEN = xdg-open
 PDF = pdflatex --shell-escape $@.tex; \
         makeindex $@.idx; \
-        makeindex $@.idx; \
         pdflatex --shell-escape $@.tex; \
         $(OPEN) $@.pdf; 
 LATEXRM = rm -f \
