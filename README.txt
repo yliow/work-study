@@ -3,7 +3,7 @@
 350-hashtable   done    copied back to courses/ciss350/n
 cantor          done    copied back to courses/math325/n
 regular         done    copied back to courses/ciss362/n
-cfl             done    
+cfl             done    copied back to courses/ciss362/n
 languages
 tm
 decidability
