@@ -9,6 +9,10 @@ tm
 decidability
 containers
 
+================================================================================
+
+Dr. Liow's notes:
+
 2024/04/11: In some latex file near the top the following
 
 \begin{python0}
