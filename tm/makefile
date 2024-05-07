@@ -14,3 +14,6 @@ view:
 	$(OPEN) main.pdf
 v:
 	$(OPEN) main.pdf
+
+c:
+	$(LATEXRM)
