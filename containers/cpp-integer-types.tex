@@ -1,0 +1,289 @@
+%-*-latex-*-
+% -*-latex-*-
+\sectionthree{\cpp\ integer types, size type, and midpoints}
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+
+\subsection{Integer types}
+
+You should already know (from CISS240, CISS245) that there
+are several integer types.
+\begin{myenum}
+  \li \verb!int!
+  \li \verb!long int!
+  \li \verb!long long int!
+  \li \verb!unsigned int!
+  \li \verb!unsigned long int!
+  \li \verb!unsigned long long int!
+\end{myenum}
+\verb!char! is actually also an integer type,
+which is why \verb!char! values can be case labels.
+There's also \verb!unsigned char! type.
+\verb!bool! is also an integer type.
+
+The problem with the \verb!int!, \verb!long int!,
+\verb!long long int! is that the
+number of bits used by them is not standardized.
+For me (\cpp\ code compiled with \gpp\ on F31 vm),
+\verb!int! is 32 bits and an \verb!int!
+value lies in the range $-2^{31}, ..., 2^{31} - 1$
+and \verb!unsigned int! is 32 bits and an \verb!unsigned int!
+value lies in the range $0, ..., 2^{32} - 1$.
+On such systems, the \verb!long long int! is 64 bits
+and the \verb!long int! can be either 32 bits or 64 bits.
+In the future, an \verb!int! might be 64 bits wide.
+(When I was in high school, my PC had an
+Intel 80286 CPU which had a 16-bit
+architecture, i.e., an \verb!int! then had 16 bits.)
+This can be a problem:
+if you bring your \cpp\ code from a machine where an \verb!int!
+is 32 bits in length and recompile it on another machine where
+the \verb!int! is 16 bits in length,
+your program might not work correctly when it processes
+an integer such as $2^{16}$.
+(Why?)
+
+To make your program portable (i.e., can be compiled and
+run on any machine that has a C/\cpp\ compiler),
+C/\cpp\ provides integer types with fixed bit lengths.
+\begin{myenum}
+\li \verb!int8_t!, \verb!uint8_t!
+\li \verb!int16_t!, \verb!uint16_t!
+\li \verb!int32_t!, \verb!uint32_t!
+\li \verb!int64_t!, \verb!uint64_t!
+\end{myenum}
+The \lq\lq \verb!_t"! in the above means \lq\lq type".
+There are constants for the limits of the above types.
+For instance:
+\begin{myenum}
+\li 
+  For \verb!int32_t!,
+  the minimum is \verb!INT32_MIN! and
+  the maximum is \verb!INT32_MAX!.
+\li
+  For \verb!uint32_t!,
+  the minimum is \verb!0! and
+  the maximum is \verb!UINT32_MAX!.
+\end{myenum}
+Professionally written \cpp\ code tends to use these types.
+If you want to use the above, you need to \lq\lq\verb!#include <cstdint>!".
+
+
+\subsection{Size type}
+
+Another thing to know is that
+for containers (including \verb!std::vector!),
+we have the concept of the size of a container.
+Recall that if \verb!v! is a \verb!std::vector< int >! object,
+the size of \verb!v! is
+\[
+\texttt{v.size()}
+\]
+The type of \verb!v.size()! and \verb!v.capacity()!
+is \verb!size_t! (\lq\lq size type").
+\verb!size_t! is an unsigned integer type and is
+either \verb!uint32_t! or \verb!uint64_t!,
+depending on the platform.
+This makes sense since you don't expect a size to be negative!!!
+(It doesn't make sense to say a vector has -5 values.)
+
+When you write something like this:
+\begin{console}[fontsize=\footnotesize]
+for (int i = 0; i < v.size(); ++i)
+{
+    ...  
+}
+\end{console}
+you'll get a warning since \verb!i! is an \verb!int!
+and \verb!v.size()! is an \verb!unsigned int!:
+\begin{console}[fontsize=\footnotesize]
+main.cpp:5:23: warning: comparison of integer expressions of different
+signedness: ‘int’ and ‘std::vector<int>::size_type’ {aka ‘long unsigned
+int’} [-Wsign-compare]
+    5 |     for (int i = 0; i < v.size(); ++i)
+      |                     ~~^~~~~~~~~~
+\end{console}
+To be absolutely correct, one would write
+\begin{console}[fontsize=\footnotesize]
+for (unsigned int i = 0; i < v.size(); ++i)
+{
+    ...  
+}
+\end{console}
+or even better
+\begin{console}[fontsize=\footnotesize]
+for (size_t i = 0; i < v.size(); ++i)
+{
+    ...  
+}
+\end{console}
+If you want to use \verb!size_t!
+you might have to do \lq\lq\verb!#include <cstddef>!":
+\begin{console}[fontsize=\footnotesize]
+#include <cstddef> // remove this and you'll get an error
+int main()
+{
+    size_t i = 0;
+    return 0;
+}
+\end{console}
+However if you are already using any \cpp\ STL container classes such as
+\verb!std::vector!, the container class has already done
+\lq\lq\verb!#include <stddef>!" since \verb!std::vector! class uses
+\verb!size_t!.
+
+In some cases,
+it won't make a difference whether you are using \verb!int! values
+or \verb!unsigned int! values.
+In particular for 32-bit \verb!int! and 32-bit \verb!unsigned int!,
+their overlap is $0,...,2^{31}-1$.
+Because of the math of binary representations of integers and
+unsigned integers (see CISS360),
+it doesn't matter if you are using \verb!int! or \verb!unsigned int!
+if you stay in $0,...,2^{31}-1$.
+So it's perfectly OK to write
+\begin{console}[fontsize=\footnotesize]
+for (int i = 0; i < v.size(); ++i)
+{
+    std::cout << x[i] << '\n';
+}
+\end{console}
+if your computations involving \verb!i! and \verb!v.size()! stays
+in $0,...,2^{31}-1$, except that you might get compiler warnings.
+
+One final point about working with size type and type for index values.
+Recall from CISS240 when we use \verb!int! for index type,
+we frequently use \verb!-1! to indicate \lq\lq invalid index value".
+For instance during a search (linear search or binary search) when a
+target value is not found in an array, we return \verb!-1!.
+What will happen if you want to handle such scenarios and you are
+using \verb!size_t! or \verb!unsigned int! for your index type?
+
+When I run this:
+\begin{console}
+#include <iostream>
+
+int main()
+{
+    std::cout << sizeof(size_t) << '\n';
+    size_t x = -1;
+    std::cout << x << '\n';
+    return 0;
+}
+\end{console}
+I get
+\begin{console}
+8
+18446744073709551615
+\end{console}
+(This is on our f31 vm).
+What's happening?
+The above tells me that a \verb!size_t! value consumes 8 bytes, i.e., 64 bits.
+That huge positive integer \verb!18446744073709551615! is of course
+then $2^{64} - 1$. (Check this yourself).
+The \verb!-1! (as an \verb!int!) value is the same as
+\verb!18446744073709551615! (as a \verb!size_t! value).
+This is due to \lq\lq clock arithmetic", the way math
+works in our CPU.
+I already talked about this in CISS240 when I talked about
+the \lq\lq clock arithmetic" of the \verb!int! type.
+And \lq\lq clock arithmetic" is the informal term for
+\lq\lq modular arithmetic"
+(discrete math, CISS360, CISS451) which is the mathematical model used in
+designing CPUs.
+
+This means that if you have a really huge array \verb!x!
+and \verb!x[18446744073709551615]! is actually a value in the array
+and some search algorithm returns \verb!-1!
+to a \verb!size_t! variable, you'll have a problem:
+does the algorithm mean that value is not found
+or does it mean the value is found at index \verb!18446744073709551615!?
+
+These are things (among others) that a serious computer scientist
+have to be aware of.
+
+By the way since the \cpp\ string class has a definition
+of the constant \verb!std::string::npos! which is \verb!size_t (-1)!.
+The name of this constant \verb!npos! reads
+\lq\lq not a position", \lq\lq no position", \lq\lq non-position".
+
+\subsection{Midpoints}
+
+Frequently you need to compute the midpoint of two indices.
+We saw that in binary search in CISS240.
+You will see a lot more of that.
+Given two index values say \verb!left! and \verb!right!,
+the midpoint index value can be computed as
+\[
+\verb!mid = (left + right) / 2!
+\]
+However there's problem with this if \verb!left! and \verb!right! are
+huge -- \verb!left + right! will give you an arithmetic overflow.
+If \verb!left! and \verb!right! are unsigned int of 32-bits,
+then \verb!left + right! overflows if
+\verb!left!
+and
+\verb!right! are both slightly smaller than $2^{32} - 1$.
+A better mid point calculation is
+\[
+\verb!mid = left + (right - left) / 2!
+\]
+Make sure you run this program:
+\begin{console}[fontsize=\footnotesize]
+#include <iostream>
+
+int main()
+{
+    unsigned int left = 0 - 3;  // 2^32 - 3
+    unsigned int right = 0 - 1; // 2^32 - 1
+    unsigned int mid = 0 - 2;                                // correct
+    std::cout << left << ' ' << mid << ' ' << right << '\n';
+    mid = (left + right) / 2;                                // wrong
+    std::cout << left << ' ' << mid << ' ' << right << '\n';
+    mid = left + (right - left) / 2;                         // correct
+    std::cout << left << ' ' << mid << ' ' << right << '\n';
+    return 0;
+}
+\end{console}
+
+We also need to compute the midpoint between two addresses.
+Here's how you do it (similar to the above):
+\begin{console}[fontsize=\footnotesize]
+#include <iostream>
+
+int main()
+{
+    int x[8] = {2, 3, 5, 7};
+    int * left = &x[0];
+    int * right = &x[4];
+    int * mid = left + (right - left) / 2; // ERROR: (left + right) / 2 !!!
+    std::cout << sizeof(int) << '\n';
+    std::cout << left << ' ' << mid << ' ' << right << '\n';
+    std::cout << (unsigned long long) left << ' '
+              << (unsigned long long) mid << ' '
+              << (unsigned long long) right << '\n'; 
+    std::cout << *left << ' ' << *mid << ' ' << *right << '\n';
+    return 0;
+}
+\end{console}
+Note that for pointers, you cannot compute
+\lq\lq\verb!(left + right) / 2!" because you cannot add addresses.
+Try it out yourself and read the error message.
+
+In case you want to store the difference of addresses,
+the type for difference of addresses is \verb!std::ptrdiff_t!
+and if you want to use it do \lq\lq\verb!#include <cstddef>!":
+\begin{console}[fontsize=\footnotesize]
+#include <iostream>
+#include <cstddef>
+  
+int main()
+{
+    int x[8] = {2, 3, 5, 7};
+    int * left = &x[0];
+    int * right = &x[4];
+    std::ptrdiff_t diff = right - left;
+    return 0;
+}
+\end{console}

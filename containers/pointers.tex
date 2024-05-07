@@ -1,0 +1,142 @@
+%-*-latex-*-
+\sectionthree{Accessing values in a container: pointers}
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+
+You usually want to traverse a container, i.e.,
+\lq\lq travel through'' a container.
+In the case of an array, you can traverse the container
+by running through the index values of the array.
+(Like I said in the previous section, think of the index
+as a mechanism for accessing a value in the array.)
+For instance:
+\begin{console}[frame=single,fontsize=\footnotesize]
+for (int i = 0; i < n; ++i)
+{
+    std::cout << student[i] << std::endl;
+}
+\end{console}
+Note that when you're doing a search, you are in fact doing
+a traversal.
+When doing a search in an array, when the target key value
+is found, an index value is returned (with -1 indicating search failure).
+Then index value is then used to access the value in the array
+for some work (such as printing, modification, etc.)
+
+In any case, an index value can be used to access a value in an array.
+
+Note that there's another way to locate a particular student
+in the \verb!student! array: by using pointers.
+So instead of
+\begin{console}[frame=single,fontsize=\footnotesize]
+...
+
+int find(const Student & student[], const std::string & id)
+{
+     ...
+}
+
+int main()
+{
+    ...
+    std::string id;
+    std::cin >> id;
+    int index = find(student, id);
+    std::cout << student[index] << std::endl;
+    ...
+}
+\end{console}
+we can do this:
+\begin{console}[frame=single,fontsize=\footnotesize]
+...
+
+Student * find(Student student[], std::string id)
+{
+     ...
+}
+
+int main()
+{
+    ...    
+    std::string id;
+    std::cin >> id;
+    Student * p = find(student, id);
+    std::cout << (*p) << std::endl;
+    ...
+}
+\end{console}
+
+
+Compare the following traversal (using index values):
+\begin{console}[frame=single,fontsize=\footnotesize]
+for (int i = 0; i < n; ++i)
+{
+    std::cout << student[i] << std::endl;
+}
+\end{console}
+with this (using pointers):
+\begin{console}[frame=single,fontsize=\footnotesize]
+for (const Student * p = &student[0]; p != &student[n]; ++p)
+{
+    std::cout << (*p) << std::endl;
+}
+\end{console}
+Note that \verb!&student[n]! is the address
+\textit{just past} the \textit{last} address occupied by the last student value
+\verb!&student[n - 1]!.
+Think about the above very carefully.
+Drawing a picture of the computer's memory helps.
+
+So what exactly is the difference between the two?!?
+And which is better?
+Note that the index version looks like this
+\begin{console}[frame=single,fontsize=\footnotesize]
+...
+    std::cout << student[i] << std::endl;
+...
+\end{console}
+and it uses \verb!student! and \verb!i!
+whereas the pointer version
+\begin{console}[frame=single,fontsize=\footnotesize]
+...
+    std::cout << (*p) << std::endl;
+...
+\end{console}
+uses \verb!p!.
+Without going into assembly/machine code,
+it should already be clear that the index version
+is slower since it requires memory access to more
+variables (if nothing else), i.e., two variables
+\texttt{student} and \texttt{i}
+compared against one variable \texttt{p} for the pointer version.
+In fact that \textit{is} the case at the assembly code level:
+compilers actually translate array traversal by index
+into array traversal by pointer.
+
+Another reason why the pointer version is better is
+because, if you think about the meaning of
+\verb!student[i]!, you see that you start at the
+memory location of
+\verb!student[0]! and go to the
+memory address of the $i$--th value in order to get to the
+$i$--value in \verb!student!.
+In the case of the array, this can be done rather quickly.
+You will see later that there are other containers where
+the computation to get to the
+$i$--th value from the first value is very slow.
+For some containers, it's a lot easier to compute the location
+of the $i$--th value from the $(i-1)$--st value.
+In other words the method of using index values is not
+appropriate in some cases.
+I'll give you specific examples later.
+For now just remember that index values might
+not make sense for some containers.
+
+Note that the pointer method requires us to know the
+beginning address of the container and the
+\lq\lq end of address'' of the container or rather
+the address that is just outside the address space occupied
+by the container's values.
+Nonetheless I'm going to call this \lq\lq outside end of address''
+the end address.

@@ -1,0 +1,243 @@
+%-*-latex-*-
+\sectionthree{\cpp : Range-based loops}
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+
+Here's an example of
+\defone{range-based for-loop}
+where \verb!x! is a
+\verb!std::vector< int >! object:
+\begin{console}[fontsize=\footnotesize]
+for (int i: x)
+{
+    std::cout << i << '\n';
+}
+\end{console}
+This is frequently used together with automatic type deduction:
+\index{auto@\texttt{auto}}\tinysidebar{\texttt{auto}}
+\begin{console}[fontsize=\footnotesize]
+for (auto i: x)
+{
+    std::cout << i << '\n';
+}
+\end{console}
+
+Here's an example:
+\begin{python}
+s = r'''
+#include <iostream>
+#include <string>
+#include <vector>
+
+template< typename T >
+std::ostream & operator<<(std::ostream & cout,
+                          const std::vector< T > & x)
+{
+    std::string delim = "";                            
+    cout << '{';                            
+    for (auto i: x)
+    {
+        cout << delim << i;
+        delim = ", ";
+    }
+    cout << '}';
+    return cout;
+}
+
+int main()
+{
+    int w[] = {1,2,3};
+    for (int i: w)
+    {
+        std::cout << i << ' ';
+    }
+    std::vector< int > v = {2, 3, 5, 7, 11, 13};
+    std::cout << v << '\n';
+
+    auto p = v.begin();
+    ++p;
+    std::cout << (*p) << '\n';
+    auto q = v.end();
+    --q;
+    v.erase(p, q);
+    std::cout << v << '\n';
+    
+    return 0;
+}
+'''.strip()
+f = open('main.cpp', 'w')
+f.write(s)
+f.close()
+\end{python}
+\VerbatimInput[frame=single, fontsize=\footnotesize]{main.cpp}
+\begin{python}
+from latextool_basic import *
+print(r'{\footnotesize %s}' % shell('g++ main.cpp; ./a.out'))
+import os; os.system('rm main.cpp a.out')
+\end{python}
+If you want to modify a value in a container, you should use this in
+the declaration of \verb!v!:
+\begin{console}[fontsize=\footnotesize]
+for (auto & v: x)
+{
+    v = 0;
+}
+\end{console}
+so that \verb!v! is a reference to a value in \verb!x!.
+Of course you cannot change the values of \verb!x! if \verb!x! is
+constant.
+So in the above I'm assuming \verb!x! is not constant.
+That's because for
+\begin{console}[fontsize=\footnotesize]
+for (auto v: x)
+{
+    v = 0;
+}
+\end{console}
+a separate local copy of a value in \verb!x! is created for \verb!v!
+and changing \verb!v! to \verb!0! will not
+change the corresponding value in \verb!x!.
+And of course it's
+slow especially if the values in container \verb!x! are complex
+and time consuming to construct.
+There are some cases where you have to do \textit{this} instead\index{&&@\texttt{\&\&}}\tinysidebar{\texttt{\&\&}}
+\begin{console}[fontsize=\footnotesize]
+for (auto && v: x)
+{
+    v = 0;
+}
+\end{console}
+if you want to change the values in \verb!x!.
+So I suggest you use this \verb!&&! method anyway
+if you want to change the values in \verb!x!.
+
+Usually you should make \verb!v! a reference to a value in \verb!x!
+and not make copies all the time.
+If \verb!x! is constant and your loop does not change the values in \verb!x!,
+you can do this when the values in \verb!x! are complex (example: objects):
+\begin{console}[fontsize=\footnotesize]
+for (const auto & v: x)
+{
+    ...
+}
+\end{console}
+Note that if your \verb!x! is constant and you do
+\begin{console}[fontsize=\footnotesize]
+for (auto & v: x)
+{
+    ...
+}
+\end{console}
+the type deduction will be smart
+enough to make the \verb!v! a constant reference.
+There are many other variations.
+
+In summary if you do not want to change the values in \verb!x!
+and the values are simple and you don't mind copying
+the values of \verb!x! to \verb!v!, do this:
+\begin{console}[fontsize=\footnotesize]
+for (auto v: x)
+{
+    ...
+}
+\end{console}
+If you do not want to change the values in \verb!x!
+and you want \verb!v! to reference values in \verb!x!, you should do this:
+\begin{console}[fontsize=\footnotesize]
+for (const auto & v: x)
+{
+    ...
+}
+\end{console}
+(the \verb!const! is redundant if \verb!x! is constant).
+If \verb!x! is not constant and you want to change the
+values in \verb!x!, you can do
+\begin{console}[fontsize=\footnotesize]
+for (auto & v: x)
+{
+    ...
+}
+\end{console}
+or
+\begin{console}[fontsize=\footnotesize]
+for (auto && v: x)
+{
+    ...
+}
+\end{console}
+where the second version is probably better.
+
+The following is an example involving \verb!std::vector!:
+\begin{python}
+s = r'''
+#include <iostream>
+#include <string>
+#include <vector>
+
+template< typename T >
+std::ostream & operator<<(std::ostream & cout,
+                          const std::vector< T > & x)
+{
+    std::string delim = "";
+    cout << '{';
+    for (auto & v: x)
+    {
+        cout << delim << v;
+        delim = ", ";
+    }
+    cout << '}';
+    return cout;
+}
+
+int main()
+{
+    std::vector< int > v = {2, 3, 5, 7, 11, 13};
+    std::cout << v << '\n';
+
+    for (auto x: v)
+    {
+        x = 0;
+    }
+    std::cout << v << '\n';
+    
+    for (auto & x: v)
+    {
+        x = 1;
+    }
+    std::cout << v << '\n';
+    
+    for (auto && x: v)
+    {
+        x = 2;
+    }
+    std::cout << v << '\n';
+    
+    return 0;
+}
+'''.strip()
+f = open('main.cpp', 'w'); f.write(s); f.close()
+\end{python}
+\VerbatimInput[frame=single,fontsize=\footnotesize]{main.cpp}
+\begin{python}
+from latextool_basic import *
+print(r'{\footnotesize %s}' % shell('g++ main.cpp; ./a.out'))
+import os; os.system('rm main.cpp')
+\end{python}
+And again these are not the only possibilities.
+And if the compiler does not deduce the right type
+or your code does not allow a suitable type deduction,
+I suggest you go back to basics and type in the actual type you really want.
+
+In some STL containers, the values cannot be changed. 
+For instance the
+values in a \verb!std::set! object cannot be changed -- they are immutable.
+Of course you know that
+values in a \verb!std::vector! can be changed if it's not constant.
+
+Again be aware of the above syntax.
+Try out the above examples.
+But avoid using it in assignments
+until you really know your iterators without using shortcuts
+like \verb!auto! and range-based for-loops.
+

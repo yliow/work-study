@@ -1,0 +1,131 @@
+%-*-latex-*-
+\sectionthree{\cpp\ STL: \texttt{std::vector} operations/methods using iterators}
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+
+Here are some examples of \verb!std::vector! methods that uses
+iterators. Let \verb!v! be a \verb!std::vector< T >! object.
+Let
+\verb!p!,
+\verb!q!,
+\verb!r! be iterators.
+{\footnotesize
+  \begin{longtable}{|l|l|}
+    \hline
+\texttt{v.begin()} & returns iterator pointing to first value of \verb!v! \\
+\texttt{v.end()} & returns iterator pointing to just beyond last value of \verb!v! \\
+\texttt{v.insert(p, x)}\tinysidebar{\texttt{std::vector::insert}}\index{std::vector::insert@\texttt{std::vector::insert}} & insert \verb!x! at \verb!p! \\
+\texttt{v.insert(p, q, r)} & insert values at \verb!q!, ..., \verb!r - 1! into \verb!v! at \verb!p! \\
+\texttt{v.erase(p)}\tinysidebar{\texttt{std::vector::erase}}\index{std::vector::erase@\texttt{std::vector::erase}} & erase \verb!v! at \verb!p! \\
+\texttt{v.erase(p, q)} & erase \verb!v! at \verb!p!, ..., \verb!q-1! \\
+\texttt{std::find(p, q, t)}\tinysidebar{std::find}\index{std::find@\texttt{std::find}} & find \verb!t! at \verb!p!, ..., \verb!q-1!. If not found, \verb!v.end()! is returned. \\
+\texttt{std::sort(p, q)}\tinysidebar{std::sort}\index{std::sort@\texttt{std::sort}} & sort values at \verb!p!, ..., \verb!q-1! \\
+\texttt{std::distance(p, q)}\tinysidebar{std::distance}\index{std::distance@\texttt{std::distance}} & number of values at \verb!p!, ..., \verb!q-1! \\
+\hline
+\end{longtable}
+}
+Make sure you study the code below carefully.
+\begin{python}
+s = r'''
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm> // for std::find, std::sort, std::distance
+
+template< typename T >
+std::ostream & operator<<(std::ostream & cout,
+                          const std::vector< T > & x)
+{
+    std::string delim = "";
+    cout << '{';
+    for (typename std::vector< T >::const_iterator p = x.begin();
+         p != x.end(); ++p)
+    {
+        cout << delim << (*p);
+        delim = ", ";
+    }
+    cout << '}';
+    return cout;
+}
+
+int main()
+{
+    std::vector< int > v = {13, 4, 5, 10, 57, 23, 52, 12, 7};
+    std::cout << "v: " << v << '\n';
+    
+    typename std::vector< int >::iterator p = v.begin();
+    std::cout << (*p) << ' ';
+    ++p;
+    std::cout << (*p) << ' ';
+    p++;
+    std::cout << (*p) << ' ';
+    p += 2;
+    std::cout << (*p) << ' ';
+    p -= 3;
+    std::cout << (*p) << '\n';
+
+    p = v.begin() + 3;
+    v.insert(p, -1);                          // insert value
+    std::cout << "v: " << v << '\n';
+
+    std::vector< int > u = {-1, -2, -3, -4, -5, -6};
+    p = v.begin() + 1;
+    v.insert(p, u.begin() + 1, u.end() - 2);  // insert range 
+    std::cout << "v: " << v << '\n';
+
+    p = v.begin();
+    v.erase(p + 5);                           // delete value
+    std::cout << "v: " << v << '\n';
+    
+    p = v.begin();
+    v.erase(p, p + 3);                        // delete range
+    std::cout << "v: " << v << '\n';
+
+    std::sort(v.begin(), v.end() - 2);        // sort range
+    std::cout << "v: " << v << '\n';
+
+    p = std::find(v.begin(), v.end(), 10);    // find in a range
+    if (p != v.end())                         // (success case)
+    {
+        std::cout << "10 found\n";
+    }
+    p = std::find(v.begin(), v.end(), 9999);  // find in a range
+    if (p == v.end())                         // (failure case)
+    {
+        std::cout << "9999 not found\n";
+    }
+
+    std::cout << "v: " << v << '\n';
+    p = v.begin() + 2;
+    typename std::vector< int >::iterator q = v.end() - 1;
+    std::cout << (*p) << ' ' << (*q) << ' '
+              << std::distance(p, q) // number of values in range
+              << '\n';               // (value at q not included)
+    
+    std::cout << std::vector< int >{2, 3, 5, 7, 11, 13} << '\n';
+    
+    return 0;
+}
+'''.strip()
+f = open('main.cpp', 'w'); f.write(s); f.close()
+\end{python}
+\VerbatimInput[frame=single,fontsize=\small]{main.cpp}
+Here's the output:
+%\vspace{-24pt}
+\begin{python}
+from latextool_basic import *
+print(r"{\small %s}" % shell('g++ main.cpp; ./a.out'))
+import os; os.system('rm main.cpp')
+\end{python}
+
+In the above example,
+note that the initializer list for \verb!std::vector! initialization
+(i.e., constructor)
+\begin{console}[fontsize=\small]
+std::vector< int > u = {-1, -2, -3, -4, -5, -6};
+std::cout << std::vector< int >{2, 3, 5, 7, 11, 13} << '\n';
+\end{console}
+is available in \gpp\ (as per the \cpp 11 standard) of our current
+fedora virtual machine.
+(For more information, see section on initializer lists.)

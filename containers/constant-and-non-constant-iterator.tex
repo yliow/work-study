@@ -1,0 +1,131 @@
+%-*-latex-*-
+\sectionthree{\cpp\ STL: iterators and constant iterators}
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+
+Implementing an iterator class is easy: refer to CISS245 if you need help.
+In particular, look at the notes on the \verb!IntPointer! class.
+Specifically, your personal vector class should look like this:
+\begin{console}[frame=single,fontsize=\footnotesize]
+template < typename T >
+class vector
+{
+public:
+    class iterator
+    {
+    private:
+        T * q_; // points to a T value in the array that p_
+                // points to
+    };
+private:
+    T * p_; // points to an array in the free store
+};
+\end{console}
+
+In the case of
+\begin{console}[fontsize=\footnotesize]
+for (typename std::vector< int >::iterator p = v.begin();
+     p != v.end(); ++p)
+{
+     ... do something with (*p) ...
+}
+\end{console}
+The iterator \verb!p! can modify the value that it points to:
+\begin{console}[fontsize=\footnotesize]
+for (std::vector< int >::iterator p = v.begin();
+     p != v.end(); ++p)
+{
+     (*p) = 0;
+}
+\end{console}
+In case you do \textit{not} want that to happen, or that you cannot do this
+(for instance \verb!v! is a constant and therefore you cannot
+change the values in \verb!v!), you do this:
+\begin{console}[fontsize=\footnotesize]
+for (typename std::vector< int >::const_iterator p = v.begin();
+     p != v.end(); ++p)
+{
+     ... only read access to (*p), not write access ...
+}
+\end{console}
+i.e., \verb!p! is a \defone{constant iterator}.
+
+
+
+\newpage
+\begin{ex}
+Rewrite the following using iterators:
+\begin{console}[fontsize=\footnotesize]
+template< typename T >
+std::ostream & operator<<(std::ostream & cout,
+                          const std::vector< T > & v)
+{
+    std::string delim = "";                            
+    cout << '{';
+    for (size_t i = 0; i < v.size(); ++i)
+    {
+        cout << delim << v[i];
+        delim = ", ";
+    }
+    cout << '}';
+    return cout
+}  
+\end{console}
+Test it.
+\qed
+\end{ex}
+
+
+
+
+\newpage
+\begin{ex}
+Add a \verb!const_iterator! class inside your
+\verb!vector! class.
+Note that if \verb!p! is a constant iterator to (say)
+a \cpp\ STL vector object, then
+\verb!*p! refers to a value in that vector object.
+\verb!*p! has read access but not write access, i.e.,:
+\begin{console}[frame=single]
+int a = *p; // OK
+*p = 42;    // BAD!!!
+\end{console}
+This means that in your constant iterator class inside your vector class
+you have
+\begin{console}[frame=single,fontsize=\footnotesize]
+template < typename T >
+class vector
+{
+    class const_iterator
+    {
+    public:
+        T operator*() const
+        { ... }
+    };
+};
+\end{console}
+It's true that the actual value in the vector is not changed since
+you're returning a copy of that value.
+But this might be misleading to the person using your constant iterator class
+(including yourself if you're not careful).
+It's better to do this:
+\begin{console}[frame=single,fontsize=\footnotesize]
+template < typename T >
+class vector
+{
+    class const_iterator
+    {
+    public:
+        const T & operator*() const
+        { ... }
+    };
+};
+\end{console}
+Why? (You ought to know.)
+\qed
+\end{ex}
+
+You \textit{should} write a complete
+template vector class that has supporting
+iterators (constant and nonconstant).

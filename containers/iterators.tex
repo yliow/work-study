@@ -1,0 +1,201 @@
+%-*-latex-*-
+\sectionthree{Accessing values in a container: iterators}
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+
+In general, lots of \cpp\ STL containers come with
+features to access values in the containers using
+iterators (which are more or less pointers).
+For instance in the case of \verb!std::vector! class (see CISS245),
+you can do the following to traverse a vector of integers \verb!v!:
+\begin{console}[fontsize=\footnotesize]
+for (typename std::vector< int >::iterator p = v.begin();
+     p != v.end(); ++p)
+{
+     ... do something with (*p) ...
+}
+\end{console}
+In the above
+\[
+\texttt{std::vector< int >::iterator}
+\]
+is a class:
+it's a class inside the \verb!std::vector! class.
+(Yes you can put a class inside a class.)
+So you would expect the \verb!std::vector! class to look like this:
+\begin{console}[frame=single,fontsize=\footnotesize]
+template < typename T >
+class vector
+{
+public:
+    class iterator
+    {
+    };
+};
+\end{console}
+Objects of this class, \verb!iterator!, are iterators to
+for instance \verb!std::vector< int >! objects
+(and
+remember that iterators are like pointers).
+
+\verb!v.begin()! will \lq\lq essentially''
+return a pointer to \verb!v[0]!.
+OK ... it's not a pointer ... it's an iterator, i.e.,
+an object \textit{containing
+a pointer} that points to \verb!v[0]!.
+\verb!v.end()! also returns an iterator that contains
+a pointer that points to \verb!&v[n]! where
+\verb!n! is \verb!v.size()!.
+Again, \verb!v.end()! does not return a pointer value,
+but rather an \textit{iterator} that \textit{contains a pointer} that points to \verb!&v[n]!.
+And remember that \verb!&v[n]! is not an address of one of the values of
+\verb!v! -- it's an address that is \textit{just beyond} or
+\textit{just outside} of \verb!v!.
+Here's a picture that represents these two iterators:
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+
+p = Plot()
+c = RectContainer(x=0, y=0)
+for i,x in enumerate('2357'):
+        c += Rect2(x0=0, y0=0, x1=0.6, y1=0.6, label=r'{\texttt{%s}}' % x)
+                 
+p += c
+
+x,y = c[0].bottomleft(); y = y + 2
+s = Rect2(x0=x, y0=y, x1=x+0.6, y1=y+0.6, label='')
+p += s
+p += Line(points=[s.center(), c[0].top()], endstyle='>')
+x,y = s.left()
+X = POINT(x=x, y=y, r=0, label=r'\texttt{v.begin()}')
+p += str(X)
+
+x,y = c[-1].bottomright(); y = y + 2
+s = Rect2(x0=x, y0=y, x1=x+0.6, y1=y+0.6, label='')
+p += s
+x, y = c[-1].top(); x += 0.6
+p += Line(points=[s.center(), (x,y)], endstyle='>')
+x,y = s.right()
+X = POINT(x=x, y=y, r=0, anchor='west', label=r'\texttt{v.end()}')
+p += str(X)
+
+x,y = c[0].left()
+X = POINT(x=x, y=y, r=0, label=r'\texttt{v}')
+p += str(X)
+
+print(p)
+\end{python}
+
+\cpp\ STL has a container called the \verb!std::list!.
+If \verb!x! is a list (i.e., STL list) of integers,
+then you can do this:
+\begin{console}[fontsize=\footnotesize]
+for (typename std::list< int >::iterator p = x.begin();
+     p != x.end(); ++p)
+{
+     ... do something with (*p) ...
+}
+\end{console}
+A list is a kind of container that I will talk about soon: it's a
+doubly-linked list.
+There's another \cpp\ STL contains called the \verb!std::set!.
+If \verb!x! is a set of integers, then you can do this:
+\begin{console}[fontsize=\footnotesize]
+for (typename std::set< int >::iterator p = x.begin();
+     p != x.end(); ++p)
+{
+     ... do something with (*p) ...
+}
+\end{console}
+As you can see, the code to run through the values in the
+above three containers look almost exactly the same.
+
+Get it? This is why knowing iterators is useful, because of the
+fact that they unify the access to values in \cpp\ STL containers.
+
+By the way, as I said above, the code
+\begin{console}[fontsize=\footnotesize]
+... typename std::vector< int >::iterator p ...
+\end{console}
+tells you that \textit{inside} the class \texttt{std::vector< int >},
+there's a class called \texttt{iterator}.
+In other words the \texttt{std::vector} class looks like this:
+\begin{console}[frame=single, fontsize=\footnotesize]
+template < typename T >
+class vector
+{
+public:
+    class iterator
+    {
+    };
+private:
+};
+\end{console}
+Now you might ask ... what's this \verb!typename! keyword thing for:
+\begin{console}[frame=single,commandchars=\\\{\},fontsize=\footnotesize]
+... \underline{typename} std::vector< int >::iterator p ...
+\end{console}
+The \verb!typename! tells your compiler that
+\verb!std::vector< int >::iterator! is a type.
+Why must you do this?
+Because remember that from CISS245, when \cpp\ sees \verb![class]::[something]!,
+it could mean that \verb![something]! is a static instance member.
+The default is static instance member.
+The \verb!typename! tells your \cpp\ compiler that it's a class,
+not a static member.
+
+Note that for the case of \verb!std::vector!, you do have
+\verb!operator[]! so that you can do this:
+\begin{console}[fontsize=\footnotesize]
+for (size_t i = 0; i < v.size(); ++i)
+{
+     ... v[i] ...
+}
+\end{console}
+i.e., you can run through a vector container using index values
+instead of iterators.
+The \verb!size_t!\index{sizet@\texttt{size\_t}}, \lq\lq size type", is basically \verb!unsigned int!
+and is always $\geq 0$.
+
+The problem is that \verb!std::list! does \textit{not} have
+\verb!operator[]!.
+So the index method of traversal does \textit{not} apply to
+STL lists.
+And why doesn't STL list have \verb!operator[]!?
+Because the list container has a certain structure that makes
+this operator, i.e. \verb!operator[]!,
+very slow if this was ever implemented.
+In other words, you shouldn't ever want or think
+about getting the $i$--th value
+of a list using \verb!operator[]!.
+That's why it's not included in the list library.
+
+However arrays can go to the $i$--th value
+extremely fast.
+(This will be explained in CISS360.)
+That's why arrays (and \verb!std::vector! objects)
+have \verb!operator[]!.
+
+Wrapping a pointer inside an object (an iterator)
+is more flexible simply because there are times
+when the \lq\lq move pointer to the next object in the container''
+is very complex and needs extra data.
+For instance suppose for some bizarre reason you
+have a vector \verb!v! of 10 values and you want to access the
+values in this order:
+\[
+\texttt{v[1], v[2], v[2], v[3], v[3], v[3], v[4], v[4], ...}
+\]
+i.e., you want to process \verb!v[i]! \verb!i! times.
+If you do this frequently, you might want to create an iterator
+class that does that so that doing \verb!++p! moves
+the iterator like the above.
+The iterator object must then remember the index value
+ and the number of times it has processes the value at the index value.
+ Right?
+Get it??
+If you put all that information into the iterator object,
+it will simplify your (crazy) algorithm.
