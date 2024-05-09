@@ -1,0 +1,83 @@
+\section{Sparse long integer}
+
+\begin{ex}
+What if there are lots of zeroes in your integer?
+Say the integer is
+\[
+\text{\texttt{50000061000200004}}
+\]
+Assume that an \verb!int! 4 bytes (i.e., 32 bits),
+\sidebar{ANSWER. $17 \cdot 4. n \cdot 4$.}
+how many bytes are used when you model the above integer (with 17 digits)
+an array of \verb!int!s? What if there are $n$ digits?
+
+Now the above integer is the same as
+\[
+5 \cdot 10^{16} + 6 \cdot 10^{10} + 1 \cdot 10^9 + 2 \cdot 10^5
+    + 4 \cdot 10^0
+\]
+So we can have (doubly linked) nodes where each nonzero term corresponds to
+one node, storing the
+exponent (of 10) and the digit of the term in the node:
+
+\begin{python}
+from latextool_basic import *
+
+def node(x, y, s):
+    c = RectContainer(x=x, y=y)
+    c += Rect2(x0=0, y0=0, x1=1.5, y1=0.7, label=r'{\texttt{%s}}' % s)
+    return c
+
+p = Plot()
+n2 = node(0, 0, '(0,4)')
+n6 = node(2, 0, '(5,2)')
+n4 = node(4, 0, '(9,1)')
+n5 = node(6, 0, '(10,6)')
+n9 = node(8, 0, '(16,5)')
+
+p += n2
+p += n6
+p += n4
+p += n5
+p += n9
+
+p += Line(points=[n2[0].right(), n6[0].left()], endstyle='>', startstyle='>')
+p += Line(points=[n6[0].right(), n4[0].left()], endstyle='>', startstyle='>')
+p += Line(points=[n4[0].right(), n5[0].left()], endstyle='>', startstyle='>')
+p += Line(points=[n5[0].right(), n9[0].left()], endstyle='>', startstyle='>')
+
+print p
+\end{python}
+\qed
+\end{ex}
+Assume that an \verb!int! and a pointer uses 4 bytes (i.e., 32 bits),
+\sidebar{ANSWER: $5 \cdot 4 \cdot 4$. $rn \cdot 4 \cdot 4$.}
+how many bytes are used when you model the above integer (with 17 digits)
+with this new method? What if there are $n$ digits bit but only $rn$
+($r < 1$) are nonzero?
+
+Therefore if $r$ is the fraction of nonzero terms in a long integer
+with $n$ digits, then the second method uses less memory if
+\[
+rn \cdot 4 \cdot 4 < n \cdot 4
+\]
+i.e.,
+\[
+r < 1/4
+\]
+In particular if you want to store
+\[
+1 \times 10^{100}
+\]
+The second method uses 16 bytes while the
+first method uses ... $101 \cdot 4 = 404$ bytes ... ouch.
+The second method is way better.
+
+\begin{ex}
+Implement a polynomial class using the above idea.
+In the case of polynomials used in cryptography,
+you \textit{do} see a lot of cases where most of the coefficients are
+zero.
+\qed
+\end{ex}
+  

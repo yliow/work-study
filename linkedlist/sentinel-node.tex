@@ -1,0 +1,63 @@
+%-*-latex-*-
+\sectionthree{Sentinel node}
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+
+A \defone{sentinel node} is a dummy node.
+It does not hold data.
+Let me show you what I mean.
+Look at this singly linked list:
+
+\input{stdout22.tex}
+
+Suppose I add a dummy node like this:
+
+\input{stdout23.tex}
+
+Note that that key value of the sentinel node is not used.
+I'm using the next pointer of the sentinel node like the pointer to
+the head node.
+
+This dummy node is sometimes called the \defone{head sentinel}.
+You can think of the head sentinel node as a fake node.
+
+Sentinel nodes can simplify your code.
+In the case of insert head, if you use a \verb!phead! pointer, the
+code looks like:
+\begin{console}
+phead = new Node(key, phead)
+\end{console}
+which is nice and clean an simple.
+For delete head, the code looks like
+\begin{console}
+if phead is NULL:
+    throw an exception
+else:
+    q = phead->next_
+    delete phead
+    phead = q
+\end{console}
+Note that in the case of using pointer to head node,
+I cannot execute \verb!phead->next_! if \verb!phead! is \verb!NULL!.
+That's why the first version of insert head has an if-else.
+You don't have this issue if you use a head sentinel --
+the head sentinel node is a node.
+
+Instead of using a head sentinel node,
+another implemnetation is to use a pointer to a head sentinel node
+where the head sentinel node is in the heap.
+
+You can also attach a tail sentinel to the end of the
+singly linked list.
+Why is this useful?
+The tail sentinel can then be used as an end-of-singly-linked-list node.
+This helps in writing code that iterates over a singly-linked list:
+\begin{console}
+p = pheadsentinel->next_
+while p is not ptailsentinel
+{
+    do something with node (*p)
+    p = p->next_
+}
+\end{console}

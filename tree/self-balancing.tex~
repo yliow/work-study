@@ -1,0 +1,2319 @@
+\section{Rotations; Self-Balancing AVL BST}
+
+\subsection{Left and right rotations}
+
+As I said in previous sections, we want to use search trees to store data
+and we want to search for a particular data very quickly.
+The number of iterations that must be carried out is at
+worse the height of the tree.
+So we want the height to be as small as possible.
+Which is the same as saying, for the case of a binary search tree,
+the height of the left subtree
+is roughly the same as the height of the right subtree.
+
+The sense of being height balanced is a definition not just at the root
+of the BST, but at every node.
+Why?
+Because if the tree is not height balanced, then there are two leaves
+that will meet at a common ancentor $c$ and the lengths of their
+path are significantly different.
+The way to \lq\lq repair'' the the tree is to repair the subtree with
+root $c$ first.
+The operation is more or less to more some nodes from the taller
+subtree of $c$ to the shorter subtree.
+This is achieved through two operators:
+the left rotation and right rotation about a node.
+
+You can define left and right rotations about any node.
+So first I'll describe the left and right rotations and then talk about
+AVL trees, i.e., height balanced BST.
+
+The following describes the left rotation operation about 
+$\alpha$:
+\begin{python}
+from latextool_basic import graph
+print r"""\begin{center}
+%s
+\end{center}""" % graph(yscale=0.8, layout='''
+       Z
+     A
+   C   B
+      D E 
+''',
+minimum_size='8mm',
+edges='Z-A,A-B,A-C,B-D,B-E',
+A=r'label=$\alpha$',
+B=r'label=$\beta$',
+C=r'shape=tree, minimum height=2cm, label=$T_1$',
+D=r'shape=tree, minimum height=2cm, label=$T_2$',
+E=r'shape=tree, minimum height=2cm, label=$T_3$',
+Z=r'shape=None, label=$$',
+)
+\end{python}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Line(points=[(0,0),(0,-1)], linewidth=0.2,endstyle='>')
+print p
+\end{python}
+\begin{python}
+from latextool_basic import graph
+print r"""\begin{center}
+%s
+\end{center}""" % graph(yscale=0.8, layout='''
+         Z
+       B
+     A   E
+    C D  
+''',
+minimum_size='8mm',
+edges='Z-B,B-A,A-D,A-C,B-E',
+A=r'label=$\alpha$',
+B=r'label=$\beta$',
+C=r'shape=tree, minimum height=2cm, label=$T_1$',
+D=r'shape=tree, minimum height=2cm, label=$T_2$',
+E=r'shape=tree, minimum height=2cm, label=$T_3$',
+Z=r'shape=None, label=$$',
+)
+\end{python}
+
+Note that the trees $T_1, T_2$, and $T_3$ can be empty.
+
+
+Right rotation is similar.
+Here's the right rotation about $\alpha$:
+
+\begin{python}
+from latextool_basic import graph
+print r"""
+\begin{center}
+%s
+\end{center}""" % graph(yscale=0.8, layout='''
+         Z
+       B
+     A   E
+    C D  
+''',
+minimum_size='8mm',
+edges='Z-B,B-A,A-D,A-C,B-E',
+A=r'label=$\beta$',
+B=r'label=$\alpha$',
+C=r'shape=tree, minimum height=2cm, label=$T_1$',
+D=r'shape=tree, minimum height=2cm, label=$T_2$',
+E=r'shape=tree, minimum height=2cm, label=$T_3$',
+Z=r'shape=None, label=$$',
+)
+\end{python}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Line(points=[(0,0),(0,-1)], linewidth=0.2,endstyle='>')
+print p
+\end{python}
+\begin{python}
+from latextool_basic import graph
+print r"""
+\begin{center}
+%s
+\end{center}""" % graph(yscale=0.8, layout='''    
+       Z
+     A
+   C   B
+      D E 
+''',
+minimum_size='8mm',
+edges='Z-A,A-B,A-C,B-D,B-E',
+A=r'label=$\beta$',
+B=r'label=$\alpha$',
+C=r'shape=tree, minimum height=2cm, label=$T_1$',
+D=r'shape=tree, minimum height=2cm, label=$T_2$',
+E=r'shape=tree, minimum height=2cm, label=$T_3$',
+Z=r'shape=None, label=$$',
+)
+\end{python}
+
+It's clear that the above
+left and right rotations required constant time.
+
+Here are some examples on left and right rotations.
+At this point, don't worry about the balance of the tree yet.
+We'll come to that after you understand the left and right rotations.
+
+\newpage
+\begin{eg}
+  Suppose I have this BST $T$:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+d = positions(r'''
+     X     a     Y
+         b   p
+        e   f d   
+       k l   h m
+             n o
+        ''')
+
+Graph.r = 0.3
+Graph.background = 'white'
+def n(name, d, v):
+    x,y = d[name]
+    return Graph.node(x=x, y=y, name=name, label=r'\texttt{%s}' % v)
+def blank(name, d):
+    x,y = d[name]
+    return Graph.node(x=x, y=y, name=name, linewidth=0)
+
+p += blank('X', d)
+p += blank('Y', d)
+      
+p += n('a', d, 10)
+p += n('b', d, 4)
+p += n('d', d, 20)
+p += n('e', d, 2)
+p += n('f', d, 17)
+p += n('k', d, 0)
+p += n('l', d, 3)
+p += n('p', d, 18)
+p += n('h', d, 19)
+p += n('m', d, 26)
+
+for a,b in ['pf','pd',"ap", "ab", "be", "ek", "el", 'dh', 'dm']:
+    p += Graph.arc(names=[a,b])
+
+print p
+\end{python}
+
+(a):
+When I perform a left rotation on $T$ about node \verb!10! I get:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+d = positions(r'''
+     X     a     Y
+         b   p
+        e q f d   
+       l    
+      n k      
+        ''')
+
+Graph.r = 0.3
+Graph.background = 'white'
+def n(name, d, v):
+    x,y = d[name]
+    return Graph.node(x=x, y=y, name=name, label=r'\texttt{%s}' % v)
+def blank(name, d):
+    x,y = d[name]
+    return Graph.node(x=x, y=y, name=name, linewidth=0)
+
+p += blank('X', d)
+p += blank('Y', d)
+p += n('a', d, 18)
+p += n('b', d, 10)
+p += n('d', d, 20)
+p += n('e', d, 4)
+p += n('f', d, 19)
+p += n('k', d, 3)
+p += n('l', d, 2)
+p += n('p', d, 26)
+p += n('n', d, 0)
+p += n('q', d, 17)
+
+for a,b in ['el','pd','bq','ln', 'lk', 'pf',"ap", "ab", "be",]:
+    p += Graph.arc(names=[a,b])
+
+print p
+\end{python}
+
+(b):
+When I perform a right rotation on $T$ about node \verb!10! I get:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+d = positions(r'''
+     X     b     Y
+         e   a
+        k l   p    
+             f d
+              h m
+             n o
+        ''')
+
+Graph.r = 0.3
+Graph.background = 'white'
+def n(name, d, v):
+    x,y = d[name]
+    return Graph.node(x=x, y=y, name=name, label=r'\texttt{%s}' % v)
+def blank(name, d):
+    x,y = d[name]
+    return Graph.node(x=x, y=y, name=name, linewidth=0)
+
+p += blank('X', d)
+p += blank('Y', d)
+      
+p += n('a', d, 10)
+p += n('b', d, 4)
+p += n('d', d, 20)
+p += n('e', d, 2)
+p += n('f', d, 17)
+p += n('k', d, 0)
+p += n('l', d, 3)
+p += n('p', d, 18)
+p += n('h', d, 19)
+p += n('m', d, 26)
+
+for a,b in ['ba','pf','pd',"ap", "be", "ek", "el", 'dh', 'dm']:
+    p += Graph.arc(names=[a,b])
+
+print p
+\end{python}
+
+(c): I cannot perform a left rotation on $T$ about
+node 4 because 4 does not have a right child.
+
+(d):
+When I perform a right rotation on $T$ about node \verb!4! I get:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+d = positions(r'''
+     X     a     Y
+         b   p
+        e l f d   
+         k   h m
+             n o
+        ''')
+
+Graph.r = 0.3
+Graph.background = 'white'
+def n(name, d, v):
+    x,y = d[name]
+    return Graph.node(x=x, y=y, name=name, label=r'\texttt{%s}' % v)
+def blank(name, d):
+    x,y = d[name]
+    return Graph.node(x=x, y=y, name=name, linewidth=0)
+p += n('h', d, 19)
+p += n('m', d, 26)
+p += blank('X', d)
+p += blank('Y', d)
+p += n('a', d, 10)
+p += n('b', d, 2)
+p += n('d', d, 20)
+p += n('e', d, 0)
+p += n('f', d, 17)
+p += n('k', d, 3)
+p += n('l', d, 4)
+p += n('p', d, 18)
+
+for a,b in ['lk', 'pf','pd',"ap", "ab", "be",'bl','dh','dm']:
+    p += Graph.arc(names=[a,b])
+
+print p
+\end{python}
+
+(e): Perform a left rotation at 18.
+
+(f): Perform a right rotation at 18.
+
+(g): Perform a left rotation at 2.
+
+(h): Perform a right rotation at 2.
+
+(i): Why can't you perform a left rotation at 17?
+
+(j): Why can't you perform a right rotation at 17?
+
+(k): Perform a left rotation at 20.
+
+(l): Perform a right rotation at 20.
+
+\end{eg}
+
+\newpage
+\begin{eg}
+  You are given the following BST $T$:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+Graph.r = 0.3
+Graph.background = 'white'
+
+edges = {'14':['9','18'],
+         '9':['5','13'],
+         '18':['15','22'],
+         '5':['0','8'],
+         '13':['10'],
+         '22':['21','31'],
+         '8':['7'],
+         '10':['','11'],
+         '21':['19']
+  }
+pos = bintreepositions(edges=edges,
+                       node_width=0.6)
+for k,v in pos.items():
+    x,y = v
+    p += Graph.node(x=x, y=y, name=k, label=r'\texttt{%s}' % k)
+      
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        p += Graph.arc(names=[k,x])
+
+print p
+\end{python}
+
+Perform left and right rotation at every node of $T$ whenever possible.
+\end{eg}
+
+
+
+\newpage
+\subsection{Algorithms for left and right rotations}
+
+Here are the algorithms for the left and right rotations.
+
+{\small
+\begin{console}
+ALGORITHM: LEFT ROTATION
+INPUT    : p
+
+/* We want to perform left rotation about node (a). p points
+to (a). From
+                   ...
+                    |
+            p----> (a)
+                   / \
+                 T1  (b) <-----q
+                     / \
+                   T2   T3
+we want to obtain this:
+                    ...
+                     |
+                    (b) <-----q
+                    / \
+           p----> (a)  T3
+                  / \
+                 T1  T2
+Note that we assume p and q are not NULL.
+*/
+
+    Node * q = p->right()
+
+    // Move (a) down and (b) up
+    q->parent_ = p->parent_  
+    p->parent_ = q           
+
+    // Move T2 from (b) to (a)
+    p->right_ = q->left_    
+    q->left_ = p
+\end{console}
+}
+
+{\small
+\begin{console}
+ALGORITHM: RIGHT-ROTATION
+INPUT    : p
+
+/* We want to perform right rotation about node (a). p points
+to (a). From
+                   ...
+                    |
+                   (a) <----p
+                   / \
+          q----> (b)  T3 
+                 / \
+               T1   T2
+
+we want to obtain
+                    ...
+                     |
+              q---> (b)
+                    / \
+                  T1  (a) <----p
+                      / \   
+                    T2   T3
+
+Note that we assume p and q are not NULL.
+*/
+
+    Node * q = p->left_;
+
+    // Move (a) down and (b) up
+    q->parent_ = p->parent_;  
+    p->parent_ = q;           
+
+    // Move T2 from (b) to (a)
+    p->left_ = q->right_;   
+    q->right_ = p;
+\end{console}
+}
+
+\newpage
+\subsection{Using rotations to balance BST}
+
+Suppose I have this BST:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+Graph.r = 0.3
+Graph.background = 'white'
+
+edges = {'10':['4','18'],
+         '4':['2'],
+         '18':['17','20'],
+         '2':['0','3'],
+        }
+  
+pos = bintreepositions(edges=edges,
+                       node_hsep=0.7)
+                       
+for k,v in pos.items():
+    x,y = v
+    p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+      
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        p += Graph.arc(names=[k,x])
+
+print p
+\end{python}
+
+The tree is clearly not balanced at \verb!4!: the left height us 1
+and the right height is -1.
+I'm going to perform a left rotation about \verb!4!:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+Graph.r = 0.3
+Graph.background = 'white'
+
+edges = {'10':['2','18'],
+         '4':['2'],
+         '2':['0','4'],
+         '4':['3'],
+         '18':['17','20'],
+        }
+  
+pos = bintreepositions(edges=edges,
+                       node_hsep=0.7)
+                       
+for k,v in pos.items():
+    x,y = v
+    p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+      
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        p += Graph.arc(names=[k,x])
+
+print p
+\end{python}
+
+
+Note that the tree is now height--balanced.
+
+
+\newpage
+\subsection{Height changes due to rotations}
+
+Now let's analyze the general case.
+
+Let $T$ be the subtree tree with root $\alpha$
+before the rotation and $\operatorname{LEFT}(T)$
+be this subtree after.
+The following are the relevant heights before and after
+left rotation about node $\alpha$:
+\begin{align*}
+  \operatorname{height}(T) &=
+  1 +
+  \max(\operatorname{height}(T_1),
+  1 + \max(\operatorname{height}(T_2), \operatorname{height}(T_3)))
+  \\
+  \operatorname{height}(\operatorname{LEFT}(T)) &=
+  1 + \max(1+\max(\operatorname{height}(T_1),\operatorname{height}(T_2)),
+  \operatorname{height}(T_3)))
+\end{align*}
+or, to make it easier to read, if I write $h_i$ for
+$\operatorname{height}(T_i)$, then
+\begin{align*}
+  \operatorname{height}(T) &=
+  1 +
+  \max(h_1,
+  1 + \max(h_2, h_3))
+  \\
+  \operatorname{height}(\operatorname{LEFT}(T)) &=
+  1 + \max(1+\max(h_1,h_2),h_3)
+\end{align*}
+So it the heights are $h_1=2, h_2=1, h_3=3$, then
+\begin{align*}
+  \operatorname{height}(T) &=
+  1 +
+  \max(2,
+  1 + \max(1, 3)) = 1 + \max(2, 4)
+  \\
+  \operatorname{height}(\operatorname{LEFT}(T)) &=
+  1 + \max(1+\max(2,1),3)
+  = 1 + \max(3, 3)
+\end{align*}
+For the pre-left-rotation case, you see that the two subtrees of $\alpha$
+have
+heights 2 and 4 and is therefore unbalanced.
+After rotation, the two subtrees of $\beta$ has heights $3$ and $3$ is
+balanced.
+
+
+Suppose you have added a node with value $k$ into a BST
+and it become unbalanced.
+It should be clear unbalanced nodes (if any)
+must be along the path that $k$ takes within the tree
+as it finds its place of insertion.
+When you go from the inserted new node back to the root,
+suppose the first node that is unbalanced is $\alpha$:
+\begin{python}
+from latextool_basic import *
+print r"""
+\begin{center}
+%s
+\end{center}
+""" % graph(yscale=0.8, layout='''
+      E
+        
+     A
+   C   B
+''',
+minimum_size='8mm',
+edges='A-B,A-C,E-A',
+A=r'label=$\alpha$',
+B=r'shape=tree, minimum height=2cm, label=$T_2$',
+C=r'shape=tree, minimum height=2cm, label=$T_1$',
+E=r'shape=None, label=$$',
+)
+\end{python}
+
+\underline{CASE LEFT: 
+$k$ is inserted into the left subtree of $\alpha$.}
+\begin{python}
+from latextool_basic import *
+print r"""
+\begin{center}
+%s
+\end{center}
+""" % graph(yscale=0.8, layout='''
+      E
+        
+     A
+   C   B
+''',
+minimum_size='8mm',
+edges='A-B,A-C,E-A',
+A=r'label=$\alpha$',
+B=r'shape=tree, minimum height=2cm, label=$T_2$',
+C=r'shape=tree, minimum height=2cm, label=$T_1+k$',
+E=r'shape=None, label=$$',
+)
+\end{python}
+Of course before adding $k$, $\alpha$ is balanced:
+\[
+h(T_1) = h(T_2) + \ep
+\]
+where $\ep = -1, 0, 1$.
+Since $\alpha$ is unbalanced  after adding $k$, we must have
+\[
+h(T_1 + k) = h(T_2) + 2
+\]
+(the 2 on the right can't be more than 2, right?)
+and 
+\[
+h(T_1) = h(T_2) + 1
+\]
+This implies that $T_1$ must have at least one node.
+So let me draw the tree, before inserting $k$, at $\alpha$ like this:
+\begin{python}
+from latextool_basic import *
+print r"""
+\begin{center}
+%s
+\end{center}
+""" % graph(yscale=0.8, layout='''
+      E
+        
+     A
+   C   B
+  D F
+''',
+minimum_size='8mm',
+edges='A-B,A-C,E-A,C-D,C-F',
+A=r'label=$\alpha$',
+B=r"shape=tree, label=$T'_3$",
+C=r'label=$\beta$',
+E=r'shape=None, label=$$',
+F=r"shape=tree, label=$T'_2$",
+D=r"shape=tree, label=$T'_1$",
+)
+\end{python}
+Tying this to the previous diagram, 
+we have
+\[
+1 + \max(h(T'_1), h(T'_2)) = h(T'_3) + 1
+\]
+i.e., 
+\[
+\max(h(T'_1), h(T'_2)) = h(T'_3)
+\]
+
+\underline{CASE LEFT-LEFT: $k$ is inserted into the 
+left subtree of the left subtree of $\alpha$.}
+Here's the picture:
+\begin{python}
+from latextool_basic import *
+print r"""
+\begin{center}
+%s
+\end{center}
+""" % graph(yscale=0.8, layout='''
+      E
+        
+     A
+   C   B
+  D F
+''',
+minimum_size='8mm',
+edges='A-B,A-C,E-A,C-D,C-F',
+A=r'label=$\alpha$',
+B=r"shape=tree, label=$T'_3$",
+C=r'label=$\beta$',
+E=r'shape=None, label=$$',
+F=r"shape=tree, label=$T'_2$",
+D=r"shape=tree, label=$T'_1+k$",
+)
+\end{python}
+I claim that
+\[
+h(T'_1) = h(T'_2) = h(T'_3) 
+\]
+
+
+By our assumption, this makes the tree unbalanced by $\alpha$.
+We had this before adding $k$:
+\[
+\max(h(T'_1), h(T'_2)) = h(T'_3)
+\]
+On adding $k$ for this case, i.e., to $T_1'$, 
+$\alpha$ becomes unbalanced.
+Therefore
+\[
+h(T'_1 + k) = h(T'_1) + 1,
+\,\,\,\,\,
+h(T'_1) \geq h(T'_2)
+\]
+That means that 
+\[
+h(T'_1) = h(T'_3)
+\]
+Note also that if $h(T'_1) > h(T'_2)$,
+then when $k$ is added to $T'_1$, the resulting
+tree is unbalanced at $\beta$
+which contradicts out assumption that 
+the resulting tree is unbalanced at $\alpha$.
+Hence we must have $h(T'_1) = h(T'_2)$.
+Altogether we have 
+\[
+h(T'_1) = h(T'_2) = h(T'_3)
+\] 
+
+I right--rotate at $\alpha$ to get this:
+\begin{python}
+from latextool_basic import *
+print r"""
+\begin{center}
+%s
+\end{center}
+""" % graph(yscale=0.8, layout='''
+      E
+        
+     C
+   D   A
+     F   B
+''',
+minimum_size='8mm',
+edges='C-D,C-A,A-F,A-B,E-C',
+A=r'label=$\alpha$',
+B=r"shape=tree, label=$T'_3$",
+C=r'label=$\beta$',
+E=r'shape=None, label=$$',
+F=r"shape=tree, label=$T'_2$",
+D=r"shape=tree, label=$T'_1+k$",
+)
+\end{python}
+The height of the left subtree of $\beta$ is $h(T'_1) + 1$
+and the height of the right subtree at 
+$\beta$ is $1 + \max(h(T'_2), h(T'_3)) = 1 + h(T'_1)$.
+Therefore this resulting tree is balanced at $\beta$.
+
+Note for the original tree, before inserting $k$
+and when the tree was balanced,
+\begin{python}
+from latextool_basic import *
+print r"""
+\begin{center}
+%s
+\end{center}
+""" % graph(yscale=0.8, layout='''
+      E
+        
+     A
+   C   B
+  D F
+''',
+minimum_size='8mm',
+edges='A-B,A-C,E-A,C-D,C-F',
+A=r'label=$\alpha$',
+B=r"shape=tree, label=$T'_3$",
+C=r'label=$\beta$',
+E=r'shape=None, label=$$',
+F=r"shape=tree, label=$T'_2$",
+D=r"shape=tree, label=$T'_1$",
+)
+\end{python}
+the height at $\alpha$ is $h(T_1') + 2$.
+After inserting $k$ and the right rotation:
+\begin{python}
+from latextool_basic import *
+print r"""
+\begin{center}
+%s
+\end{center}
+""" % graph(yscale=0.8, layout='''
+      E
+        
+     C
+   D   A
+     F   B
+''',
+minimum_size='8mm',
+edges='C-D,C-A,A-F,A-B,E-C',
+A=r'label=$\alpha$',
+B=r"shape=tree, label=$T'_3$",
+C=r'label=$\beta$',
+E=r'shape=None, label=$$',
+F=r"shape=tree, label=$T'_2$",
+D=r"shape=tree, label=$T'_1+k$",
+)
+\end{python}
+the height at $\beta$ is also $h(T'_1)+2$.
+This means that the whole tree must be balanced.
+
+
+
+\underline{CASE LEFT-RIGHT: $k$ is inserted into the 
+right subtree of the left subtree of $\alpha$.}
+\begin{python}
+from latextool_basic import *
+print r"""
+\begin{center}
+%s
+\end{center}
+""" % graph(yscale=0.8, layout='''
+      E
+        
+     A
+   C   B
+  D F
+''',
+minimum_size='8mm',
+edges='A-B,A-C,E-A,C-D,C-F',
+A=r'label=$\alpha$',
+B=r"shape=tree, label=$T'_3$",
+C=r'label=$\beta$',
+E=r'shape=None, label=$$',
+F=r"shape=tree, label=$T'_2+k$",
+D=r"shape=tree, label=$T'_1$",
+)
+\end{python}
+Let's look at $h(T'_1)$ and $h(T'_2)$.
+Since $\beta$ is balanced, they are at most one away.
+So $h(T'_2) = h(T'_1) + \ep$, $\ep = -1, 0, 1$.
+If $\ep = -1$, then $T'_2$ is one shorter than
+$T'_1$. In that case inserting $k$ into $T_2$
+will mean that the height of $T_2$ will either
+remain the same or increase by 1
+which implies that the height at $\beta$
+is unchanged.
+This means that $\alpha$ cannot become unbalanced
+after the insertion of $k$.
+Also, $\ep$ cannot be 1 otherwise
+after inserting $k$, $\beta$ becomes unbalanced
+which contradicts the fact that the $\alpha$
+is the lowest node to be unbalanced when $k$ is inserted.
+Therefore $\ep$ must be $0$:
+$h(T'_1) = h(T'_2)$.
+
+Since adding $k$ to $T'_2$ unbalances $\alpha$, 
+the lowest node of $T'_3$ must be 2 away from $k$ after it's inserted into 
+$T'_2$.
+Since $T'_2$ is one below $\beta$,
+we must have $h(T'_2) = h(T'_3)$.
+
+Therefore altogether $h(T'_1) = h(T'_2) = h(T'_3)$.
+
+Look at this:
+\begin{python}
+from latextool_basic import *
+print r"""
+\begin{center}
+%s
+\end{center}
+""" % graph(yscale=0.8, layout='''
+      E
+        
+     C
+   D   A
+     F   B
+''',
+minimum_size='8mm',
+edges='E-C,C-D,C-A,A-F,A-B',
+A=r'label=$\alpha$',
+B=r"shape=tree, label=$T'_3$",
+C=r'label=$\beta$',
+E=r'shape=None, label=$$',
+F=r"shape=tree, label=$T'_2+k$",
+D=r"shape=tree, label=$T'_1$",
+)
+\end{python}
+This is NOT the right \lq\lq rotation".
+(Find an example on your own to prove what I just said.)
+
+The right thing to do is to do a \textit{left} rotation
+at $\beta$ so that $\beta$ is \lq\lq heavier"
+on the left and then then do a right rotation at $\alpha$.
+Let me show you.
+We start here where $k$ is now in $T''_2$ or $T''_3$:
+\begin{python}
+from latextool_basic import *
+print r"""
+\begin{center}
+%s
+\end{center}
+""" % graph(yscale=0.8, layout='''
+      E
+        
+     A
+   C   B
+ D  F
+   G H
+''',
+minimum_size='8mm',
+edges='A-B,A-C,E-A,C-D,C-F,F-G,F-H',
+A=r'label=$\alpha$',
+B=r"shape=tree, label=$T''_4$",
+C=r'label=$\beta$',
+E=r'shape=None, label=$$',
+F=r"label=$\gamma$",
+G=r"shape=tree, label=$T''_2$",
+H=r"shape=tree, label=$T''_3$",
+D=r"shape=tree, label=$T''_1$",
+)
+\end{python}
+After a left rotation at $\beta$, I get this:
+\begin{python}
+from latextool_basic import *
+print r"""
+\begin{center}
+%s
+\end{center}
+""" % graph(yscale=0.8, layout='''
+       E
+        
+     A
+   F   B
+ C  H
+D G 
+''',
+minimum_size='8mm',
+edges='E-A,A-F,A-B,F-C,F-H,C-D,C-G,A-B',
+A=r'label=$\alpha$',
+B=r"shape=tree, label=$T''_4$",
+C=r'label=$\beta$',
+E=r'shape=None, label=$$',
+F=r"label=$\gamma$",
+G=r"shape=tree, label=$T''_2$",
+H=r"shape=tree, label=$T''_3$",
+D=r"shape=tree, label=$T''_1$",
+)
+\end{python}
+Now I right rotation at $\alpha$ to get this:
+\begin{python}
+from latextool_basic import *
+print r"""
+\begin{center}
+%s
+\end{center}
+""" % graph(yscale=0.8, layout='''
+       E
+        
+     F
+   C   A
+  D G H B
+''',
+minimum_size='8mm',
+edges='E-F,F-C,F-A,C-D,C-G,A-H,A-B',
+A=r'label=$\alpha$',
+B=r"shape=tree, label=$T''_4$",
+C=r'label=$\beta$',
+E=r'shape=None, label=$$',
+F=r"label=$\gamma$",
+G=r"shape=tree, label=$T''_2$",
+H=r"shape=tree, label=$T''_3$",
+D=r"shape=tree, label=$T''_1$",
+)
+\end{python}
+
+Let me summarize.
+Suppose after inserting a node $k$ into a BST,
+$\alpha$ is the lower node that is unbalanced.
+\begin{tightlist}
+\li LEFT-LEFT CASE: If $k$ took a left-left direction from $\alpha$,
+then you should do a right rotation.
+\li LEFT-RIGHT: If $k$ took at left-right direction from $\alpha$,
+then you should a left rotation on the left child $\beta$ of $\alpha$
+followed by a right rotation at $\beta$ which occupies the original 
+position of $\alpha$.
+\end{tightlist}
+
+If should not be too surprising that the mirror image of
+the above is true:
+Suppose after inserting a node $k$ into a BST,
+$\alpha$ is the lower node that is unbalanced.
+\begin{tightlist}
+\li RIGHT-RIGHT CASE: If $k$ took a right-right direction from $\alpha$,
+then you should do a left rotation.
+\li RIGHT-LEFT: If $k$ took at right-left direction from $\alpha$,
+then you should a right rotation on the right child $\beta$ of $\alpha$
+followed by a left rotation at $\beta$ which occupies the original 
+position of $\alpha$.
+\end{tightlist}
+Draw a picture similar to the above to see what's happening.
+
+\newpage
+\subsection{AVL trees}
+
+An AVL tree $T$ is a tree that is self-balancing BST in the sense that
+the insert and delete operations include self-balancing operations
+(using left and right rotations) so that the tree is balanced after each
+insert or delete operation.
+
+\newpage
+\subsection{AVL insert}
+Suppose a node $n$ is inserted into $T$.
+Suppose the new tree is $T'$.
+There's a path from the root of $T'$ to $n$.
+You go up along this path and when you are at a node $m$
+that is unbalanced (i.e., the subtree with $m$ as root
+is unbalanced), we balance at $m$:
+\begin{tightlist}
+  \li CASE: left-left. If the path from $m$ along $P$ going down to the new node is
+  left-left,
+  you perform a right rotation at $m$.
+  \li CASE: left-right. If the path from $m$ along $P$ going down to the new node is
+  left-right,
+  you perform a left rotation one step below $m$ and then a right rotation at $m$.
+  \li CASE: right-right. If the path from $m$ along $P$ going down to the new node is
+  right-right,
+  you perform a left rotation at $m$.
+  \li CASE: right-left. If the path from $m$ along $P$ going down to the new node is
+  right-left,
+  you perform a right rotation one step below $m$ and then a left rotation at $m$.
+\end{tightlist}
+
+For instance suppose I start off with this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+Graph.r = 0.3
+Graph.background = 'white'
+
+edges = {'10':['5','18'],
+        }
+  
+pos = bintreepositions(edges=edges,
+                       node_hsep=0.7)
+                       
+for k,v in pos.items():
+    x,y = v
+    p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+      
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        p += Graph.arc(names=[k,x])
+
+print p
+\end{python}
+
+This is height balanced.
+After I insert 2, I get:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+Graph.r = 0.3
+Graph.background = 'white'
+
+edges = {'10':['5','18'],
+         '5':['2'],
+        }
+  
+pos = bintreepositions(edges=edges,
+                       node_hsep=0.7)
+                       
+for k,v in pos.items():
+    x,y = v
+    p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+      
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        p += Graph.arc(names=[k,x])
+
+print p
+\end{python}
+
+Checking all the nodes along the insertion path,
+I see that they are all balanced.
+(Make sure you check that.)
+Now if I insert a 0, I get this:
+
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+Graph.r = 0.3
+Graph.background = 'white'
+
+edges = {'10':['5','18'],
+         '5':['2'],
+         '2':['0'],
+        }
+  
+pos = bintreepositions(edges=edges,
+                       node_hsep=0.7)
+                       
+for k,v in pos.items():
+    x,y = v
+    p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+      
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        if (k,x) in [('10','5'), ('5','2'), ('2','0')]:
+            p += Graph.arc(names=[k,x], linewidth=0.1, linecolor='red')
+        else:
+            p += Graph.arc(names=[k,x])
+
+print p
+\end{python}
+
+The path of insertion is in red.
+
+When I go back up the tree from the new node, I see that
+the first node that is not balanced is 5:
+
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+Graph.r = 0.3
+Graph.background = 'white'
+
+edges = {'10':['5','18'],
+         '5':['2'],
+         '2':['0'],
+        }
+  
+pos = bintreepositions(edges=edges,
+                       node_hsep=0.7)
+                       
+for k,v in pos.items():
+    x,y = v
+    if k == '5':
+        p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k,
+                                linecolor='red', linewidth=0.1,r=0.35)
+    else:
+        p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+      
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        if (k,x) in [('5','2'), ('2','0')]:
+            p += Graph.arc(names=[k,x], linewidth=0.1, linecolor='red')
+        else:
+            p += Graph.arc(names=[k,x])
+
+
+print p
+\end{python}
+
+Along this path, at 5, I took two lefts down -- we are in the left-left case.
+Therefore I will perform a right rotation at 5 to get:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+Graph.r = 0.3
+Graph.background = 'white'
+
+edges = {'10':['2','18'],
+         '2':['0','5'],
+        }
+  
+pos = bintreepositions(edges=edges,
+                       node_hsep=0.7)
+                       
+for k,v in pos.items():
+    x,y = v
+    if k == '2':
+        p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k,
+                                linecolor='red', linewidth=0.1,r=0.35)
+    else:
+        p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+      
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        #if (k,x) in [('10','2'), ('2','0')]:
+        #    p += Graph.arc(names=[k,x], linewidth=0.1, linecolor='red')
+        #else:
+        if 1:
+            p += Graph.arc(names=[k,x])
+
+
+print p
+\end{python}
+
+The tree is now balanced at 2 (the previous location of 5).
+it's also balanced at 10.
+
+If I insert a 3, I get this:
+
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+Graph.r = 0.3
+Graph.background = 'white'
+
+edges = {'10':['2','18'],
+         '2':['0','5'],
+         '5':['3'],
+        }
+  
+pos = bintreepositions(edges=edges,
+                       node_hsep=0.7)
+                       
+for k,v in pos.items():
+    x,y = v
+    p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+      
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        if (k,x) in [('10','2'), ('2','5'), ('5','3')]:
+            p += Graph.arc(names=[k,x], linewidth=0.1, linecolor='red')
+        else:
+            p += Graph.arc(names=[k,x])
+
+
+print p
+\end{python}
+
+The part of insertion is shown in red.
+Going up along the path of insertion, the first node that is unbalanced
+is 10.
+At 10, going down, I take a left (at 10) then a right (at 2).
+Therefore, I will first make a left rotation at 2, and then a right rotation at 10.
+The left rotation at 2 gives me this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+Graph.r = 0.3
+Graph.background = 'white'
+
+edges = {'10':['5','18'],
+         '5':['2'],
+         '2':['0', '3'],
+        }
+  
+pos = bintreepositions(edges=edges,
+                       node_hsep=0.7)
+                       
+for k,v in pos.items():
+    x,y = v
+    p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+      
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        if (k,x) in [('10','2'), ('2','5'), ('5','3')]:
+            p += Graph.arc(names=[k,x], linewidth=0.1, linecolor='red')
+        else:
+            p += Graph.arc(names=[k,x])
+
+
+print p
+\end{python}
+
+and then I do a right rotation at 10:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+Graph.r = 0.3
+Graph.background = 'white'
+
+edges = {'5':['2','10'],
+         '10':['','18'],
+         '2':['0', '3'],
+        }
+  
+pos = bintreepositions(edges=edges,
+                       node_hsep=0.7)
+                       
+for k,v in pos.items():
+    x,y = v
+    p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+      
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        if (k,x) in [('10','2'), ('2','5'), ('5','3')]:
+            p += Graph.arc(names=[k,x], linewidth=0.1, linecolor='red')
+        else:
+            p += Graph.arc(names=[k,x])
+
+
+print p
+\end{python}
+
+The tree is now balanced.
+
+If I insert a 15, I get this:
+
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+Graph.r = 0.3
+Graph.background = 'white'
+
+edges = {'5':['2','10'],
+         '10':['','18'],
+         '2':['0', '3'],
+         '18':['15'],
+        }
+  
+pos = bintreepositions(edges=edges,
+                       node_hsep=0.7)
+                       
+for k,v in pos.items():
+    x,y = v
+    p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+      
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        if (k,x) in [('10','2'), ('2','5'), ('5','3')]:
+            p += Graph.arc(names=[k,x], linewidth=0.1, linecolor='red')
+        else:
+            p += Graph.arc(names=[k,x])
+
+
+print p
+\end{python}
+
+Going from 15 back to the root, the first node that is not balanced is 10.
+At 10, going down, I have to take a right (at 10) and then left (at 18).
+This is the right-left case.
+So I have to do a right rotation (at 18) and then a left rotation (at 10).
+On doing a right rotation at 18, I get
+
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+Graph.r = 0.3
+Graph.background = 'white'
+
+edges = {'5':['2','10'],
+         '10':['','15'],
+         '2':['0', '3'],
+         '15':['', '18'],
+        }
+  
+pos = bintreepositions(edges=edges,
+                       node_hsep=0.7)
+                       
+for k,v in pos.items():
+    x,y = v
+    p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+      
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        if (k,x) in [('10','2'), ('2','5'), ('5','3')]:
+            p += Graph.arc(names=[k,x], linewidth=0.1, linecolor='red')
+        else:
+            p += Graph.arc(names=[k,x])
+
+
+print p
+\end{python}
+
+and after a left rotation at 10, voila, I get
+
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+Graph.r = 0.3
+Graph.background = 'white'
+
+edges = {'5':['2','15'],
+         '15':['10','18'],
+         '2':['0', '3'],
+         '0':[],
+        }
+  
+pos = bintreepositions(edges=edges,
+                       node_hsep=0.7)
+                       
+for k,v in pos.items():
+    x,y = v
+    p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+      
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        if (k,x) in [('10','2'), ('2','5'), ('5','3')]:
+            p += Graph.arc(names=[k,x], linewidth=0.1, linecolor='red')
+        else:
+            p += Graph.arc(names=[k,x])
+
+
+print p
+\end{python}
+
+Note for AVL insertion, once you have found an unbalanced node,
+you just need to work on that location (doing left or right or left-right or
+right-left rotation) once.
+The resulting tree is balanced again.
+This assumes that you start out with an AVL tree.
+
+The runtime is inserting into AVL is
+\[
+T(n) = O(\lg n)
+\]
+Why?
+We know that worst runtime of BST insert is based on the height of the
+tree.
+Since the tree is balanced, the height is $O(\lg n)$.
+After the insertion, we have to walk up the tree, which takes $O(\lg n)$ steps
+and then perform one or two rotations, which takes $O(1)$ time.
+Therefore altogether, AVL insertion has a worst runtime of $O(\lg n + \lg n + 1) =
+O(\lg n)$.
+
+
+\newpage
+\subsection{Balance factor}
+
+You notice that we need to compute the left height and right height
+(i.e., height of
+left subtree and height of right subtree) of nodes and compare which is larger.
+It's convenient to store height information of a node
+in the node.
+I'll leave it to you to figure out how to update the heights of nodes in an
+AVL tree when a node is inserted into it.
+
+\begin{ex}
+Draw some AVL trees and label heights on the right of the all nodes.
+Next, some inserts and recompute the heights of all nodes.
+Do you see how to update the heights in general?
+\end{ex}
+
+But there's another analogous method ... 
+
+Note is that since we're always comparing which
+of left or right height is greater, we can simply store
+\[
+\text{(height of right subtree) $-$ (height of left subtree)}
+\]
+(or \lq\lq left minus right'') in a node.
+This is frequently called the \defterm{balance factor} of the tree.
+So if the balance factor is +1, then the right subtree has a greater height,
+if the balance factor is -1, then the left subtree has a greater height,
+and if the balance factor is 0, then the left and right subtrees have the
+same height.
+
+\begin{ex}
+  Draw an AVL tree and compute the balance factor for each node.
+  Next, perform an insert and see how to balance factors change.
+  Can you figure out how to update balance factors in general?
+  (Draw more pictures if necessary.)
+\end{ex}
+
+[HINT:
+Leaf nodes have balance factor of 0 (duh).
+During an insert, a node acquires a new child.
+Suppose this is the node (value 10) with balance factor $b$
+and the new child is going to be a left child:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+Graph.r = 0.3
+Graph.background = 'white'
+
+edges = {'10':['',],
+        }
+  
+pos = bintreepositions(edges=edges,
+                       node_hsep=0.7)
+                       
+for k,v in pos.items():
+    x,y = v
+    p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+    p += Graph.node(x=x+0.6, y=y, label=r'$b$',linewidth=0)
+
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        #if (k,x) in [('10','2'), ('2','5'), ('5','3')]:
+        #    p += Graph.arc(names=[k,x], linewidth=0.1, linecolor='red')
+        #else:
+        if 1:
+            p += Graph.arc(names=[k,x])
+
+
+print p
+\end{python}
+
+The number $b$ on the right of 10 is the balance factor.
+The $b$ is either 0 or 1 (it can't be -1 since the new node
+is going to be attached to 10 as a left child).
+If $b$ is 0, then 10 does not have a
+right child and if $b$ is 1, then 10 has a right child.
+The balance factor of 10 decrements by 1:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+Graph.r = 0.3
+Graph.background = 'white'
+
+edges = {'10':['5',],
+        }
+  
+pos = bintreepositions(edges=edges,
+                       node_hsep=0.7)
+                       
+for k,v in pos.items():
+    x,y = v
+    p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+    if k == '10':
+        p += Rect(x0=x+1.3,x1=x+1.3,y0=y,y1=y, label=r'$b \rightarrow b - 1$', linewidth=0)
+    else:
+        p += Graph.node(x=x+0.6,y=y, label='0', linewidth=0)
+    
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        #if (k,x) in [('10','2'), ('2','5'), ('5','3')]:
+        #    p += Graph.arc(names=[k,x], linewidth=0.1, linecolor='red')
+        #else:
+        if 1:
+            p += Graph.arc(names=[k,x])
+
+
+print p
+\end{python}
+
+If the new node is attached to 10 as a right child, then we have
+this update instead:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+Graph.r = 0.3
+Graph.background = 'white'
+
+edges = {'10':['','5'],
+        }
+  
+pos = bintreepositions(edges=edges,
+                       node_hsep=0.7)
+                       
+for k,v in pos.items():
+    x,y = v
+    p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+    if k == '10':
+        p += Graph.node(x=x+1.4,y=y, label=r'$b \rightarrow b + 1$', linewidth=0)
+    else:
+        p += Graph.node(x=x+0.6,y=y, label='0', linewidth=0)
+    
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        #if (k,x) in [('10','2'), ('2','5'), ('5','3')]:
+        #    p += Graph.arc(names=[k,x], linewidth=0.1, linecolor='red')
+        #else:
+        if 1:
+            p += Graph.arc(names=[k,x])
+
+
+print p
+\end{python}
+
+Of course we update the balance factors on the path from the new node
+to the root of the AVL tree.
+So what do we do to the balance factor of the parent of 10?
+Suppose 10 is a left child of 25
+and their balance factors before the insert operation
+are $b$ and  $b'$ respectively:
+
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+Graph.r = 0.3
+Graph.background = 'white'
+
+edges = {'25':['10'],
+         '10':['',],
+        }
+  
+pos = bintreepositions(edges=edges,
+                       node_hsep=0.7)
+                       
+for k,v in pos.items():
+    x,y = v
+    p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+    if k == '10':
+        p += Graph.node(x=x+0.6,y=y, label='$b$', linewidth=0)
+    elif k == '25':
+        p += Graph.node(x=x+0.6,y=y, label="$b'$", linewidth=0)
+    
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        #if (k,x) in [('10','2'), ('2','5'), ('5','3')]:
+        #    p += Graph.arc(names=[k,x], linewidth=0.1, linecolor='red')
+        #else:
+        if 1:
+            p += Graph.arc(names=[k,x])
+
+
+print p
+\end{python}
+
+The update on the balance factors of 10 and 25 is going to be:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+Graph.r = 0.3
+Graph.background = 'white'
+
+edges = {'25':['10'],
+         '10':['',],
+        }
+  
+pos = bintreepositions(edges=edges,
+                       node_hsep=0.7)
+                       
+for k,v in pos.items():
+    x,y = v
+    p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+    if k == '10':
+        p += Graph.node(x=x+1.5,y=y, label=r'$b \rightarrow b - 1$', linewidth=0)
+    elif k == '25':
+        p += Graph.node(x=x+1.5,y=y, label=r"$b' \rightarrow b' - 1$", linewidth=0)    
+    else:
+        p += Graph.node(x=x+0.6,y=y, label='0', linewidth=0)
+    
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        #if (k,x) in [('10','2'), ('2','5'), ('5','3')]:
+        #    p += Graph.arc(names=[k,x], linewidth=0.1, linecolor='red')
+        #else:
+        if 1:
+            p += Graph.arc(names=[k,x])
+
+
+print p
+\end{python}
+
+In other words, if 10 is a left child and the balance factor of 10 decrements,
+then the balance factor for the parent also decrements by 1.
+
+All the above is saying is that if the height of the
+left subtree at a node  grows by one, then the left subtree at its
+parent also grows by one.
+There's a similar update when the node is a right child:
+If the node's balance factor increments by 1 and it's a right child,
+then the parent's balance factor increments by 1.
+
+Now what will happen if a new node is attached to node $n$ on the left,
+but $n$ is a right child?
+
+By drawing more pictures of AVL tree,
+you should be able to figure out all the cases for the
+balance factor updates. 
+Of course once a balance factor hits -2 or 2, you balance at that node
+and update the balance factors of nodes affected.]
+
+
+\newpage
+\section{AVL delete}
+
+AVL deletion is just BST deletion followed by rebalancing, just like AVL insertion.
+The main difference is that, whereas for insert when one rebalancing act is enough
+(left or right or left-right or right-left), for delete, you might need to rebalance
+more than once.
+
+Suppose I have this AVL tree:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+Graph.r = 0.3
+Graph.background = 'white'
+
+edges = {'10':['5', '15'],
+         '15':['12', '18'],
+         '5':['0', '7'],
+         '7':['6', '8'],
+        }
+  
+pos = bintreepositions(edges=edges,
+                       node_hsep=0.7)
+                       
+for k,v in pos.items():
+    x,y = v
+    p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+      
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        #if (k,x) in [('10','2'), ('2','5'), ('5','3')]:
+        #    p += Graph.arc(names=[k,x], linewidth=0.1, linecolor='red')
+        #else:
+        if 1:
+            p += Graph.arc(names=[k,x])
+
+
+print p
+\end{python}
+
+(This is balanced.)
+If I delete 12, I get this:
+
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+Graph.r = 0.3
+Graph.background = 'white'
+
+edges = {'10':['5', '15'],
+         '15':['', '18'],
+         '5':['0', '7'],
+         '7':['6', '8'],
+        }
+  
+pos = bintreepositions(edges=edges,
+                       node_hsep=0.7)
+                       
+for k,v in pos.items():
+    x,y = v
+    p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+      
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        if (k,x) in [('10','2'), ('2','5'), ('5','3')]:
+            p += Graph.arc(names=[k,x], linewidth=0.1, linecolor='red')
+        else:
+            p += Graph.arc(names=[k,x])
+
+
+print p
+\end{python}
+
+which is again balanced -- I just need to check along the deletion path, from the root to the
+parent of 10.
+
+If I delete 15, I get this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+Graph.r = 0.3
+Graph.background = 'white'
+
+edges = {'10':['5', '18'],
+         '5':['0', '7'],
+         '7':['6', '8'],
+        }
+  
+pos = bintreepositions(edges=edges,
+                       node_hsep=0.7)
+                       
+for k,v in pos.items():
+    x,y = v
+    p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+      
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        if (k,x) in [('10','2'), ('2','5'), ('5','3')]:
+            p += Graph.arc(names=[k,x], linewidth=0.1, linecolor='red')
+        else:
+            p += Graph.arc(names=[k,x])
+
+
+print p
+\end{python}
+
+Going from 18 back to the root, I see that 10 is not balanced. 
+Clearly the left subtree of 10 has a height that is too large.
+Now, if I perform a right rotation at 10, I get
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+Graph.r = 0.3
+Graph.background = 'white'
+
+edges = {'10':['7', '18'],
+         '5':['0', '10'],
+         '7':['6', '8'],
+        }
+  
+pos = bintreepositions(edges=edges,
+                       node_hsep=0.7)
+                       
+for k,v in pos.items():
+    x,y = v
+    p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+      
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        #if (k,x) in [('10','2'), ('2','5'), ('5','3')]:
+        #    p += Graph.arc(names=[k,x], linewidth=0.1, linecolor='red')
+        #else:
+        if 1:
+            p += Graph.arc(names=[k,x])
+
+print p
+\end{python}
+
+This does not work!
+The same location
+(where 10 was and is now occupied by 5) is still unbalanced!!!
+The reason is because the path $10\rightarrow 5\rightarrow 7\rightarrow 6$ (or $8$)
+is the one that is causing the unbalancedness at 10:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+Graph.r = 0.3
+Graph.background = 'white'
+
+edges = {'10':['5', '18'],
+         '5':['0', '7'],
+         '7':['6', '8'],
+        }
+  
+pos = bintreepositions(edges=edges,
+                       node_hsep=0.7)
+                       
+for k,v in pos.items():
+    x,y = v
+    p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+      
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        if (k,x) in [('10','5'), ('5','7')]:
+            p += Graph.arc(names=[k,x], linewidth=0.1, linecolor='red')
+        else:
+            p += Graph.arc(names=[k,x])
+
+
+print p
+\end{python}
+
+Since $10\rightarrow 5 \rightarrow 7$ is a left-right, we use the same idea from AVL
+insert
+and perform a left rotation at 5 and then a right rotation at 10.
+After a left rotation at 5, we get
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+Graph.r = 0.3
+Graph.background = 'white'
+
+edges = {'10':['7', '18'],
+         '5':['0', '6'],
+         '7':['5', '8'],
+        }
+  
+pos = bintreepositions(edges=edges,
+                       node_hsep=0.7)
+                       
+for k,v in pos.items():
+    x,y = v
+    p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+      
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        if (k,x) in [('10','2'), ('2','5'), ('5','3')]:
+            p += Graph.arc(names=[k,x], linewidth=0.1, linecolor='red')
+        else:
+            p += Graph.arc(names=[k,x])
+
+
+print p
+\end{python}
+
+And after a right rotation at 10, we get
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+Graph.r = 0.3
+Graph.background = 'white'
+
+edges = {'10':['8', '18'],
+         '5':['0', '6'],
+         '7':['5', '10'],
+         '0':['']
+        }
+  
+pos = bintreepositions(edges=edges,
+                       node_hsep=0.7)
+                       
+for k,v in pos.items():
+    x,y = v
+    p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+      
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        if (k,x) in [('10','2'), ('2','5'), ('5','3')]:
+            p += Graph.arc(names=[k,x], linewidth=0.1, linecolor='red')
+        else:
+            p += Graph.arc(names=[k,x])
+
+
+print p
+\end{python}
+
+Now node 7, the previous location of 10, balanced.
+Since 7 is now the root, we stop.
+If 7 is not the root, we have to keep going up and checking for
+unbalanced nodes.
+In general, you want to work your way up, starting with the
+parent node of the node that was \textit{physically removed}.
+This is \textit{not} necessarily the node you are deleting.
+For instance recall that in some cases,
+you need to delete the predecessor or successor of a node.
+So in these cases, you start at the parent of the predecessor or successor
+of the node and go up to the root.
+
+Here's an example where after a delete, we need to rebalance at
+two points.
+
+Suppose you want to delete 8 from this tree,
+using the move-predecessor-up:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+Graph.r = 0.3
+Graph.background = 'white'
+
+edges = {'8':['5', '15'],
+         '5':['3', '6'],
+         '15':['10','22'],
+         '3':['','7'],
+         '10':['9','12'],
+         '22':['18','28'],
+         '18':['17','19'],
+        }
+  
+pos = bintreepositions(edges=edges,
+                       node_hsep=0.1, node_width=0.6)
+                       
+for k,v in pos.items():
+    x,y = v
+    p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+      
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        #if (k,x) in [('10','2'), ('2','5'), ('5','3')]:
+        #    p += Graph.arc(names=[k,x], linewidth=0.1, linecolor='red')
+        #else:
+        if 1:
+            p += Graph.arc(names=[k,x])
+
+
+print p
+\end{python}
+we get
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+Graph.r = 0.3
+Graph.background = 'white'
+
+edges = {'6':['5', '15'],
+         '5':['3'],
+         '15':['10','22'],
+         '3':['','7'],
+         '10':['9','12'],
+         '22':['18','28'],
+         '18':['17','19'],
+        }
+  
+pos = bintreepositions(edges=edges,
+                       node_hsep=0.1, node_width=0.6)
+                       
+for k,v in pos.items():
+    x,y = v
+    if k == 'x':
+        p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+    else:
+        p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+      
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        #if (k,x) in [('10','2'), ('2','5'), ('5','3')]:
+        #    p += Graph.arc(names=[k,x], linewidth=0.1, linecolor='red')
+        #else:
+        if 1:
+            p += Graph.arc(names=[k,x])
+
+print p
+\end{python}
+Now for the balancing.
+We do \textit{not} start at the node with value 6 -- where 8 was.
+Rather, \textit{we start at 5}, i.e., the parent of the predecessor of 8
+that was removed (or moved)
+in the case of move-predecessor-up
+or the parent of the sucessor of 8
+that was removed (or moved), depending on which one was moved.
+
+We see that 5 is not balanced.
+The left subtree of 5 has a larger height than the right.
+Following two steps of the longest path in the left subtree
+(in this case the only path), we see that the steps are left-right.
+So we perform a left rotation at 3:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+Graph.r = 0.3
+Graph.background = 'white'
+
+edges = {'6':['5', '15'],
+         '5':['7'],
+         '15':['10','22'],
+         '7':['3'],
+         '10':['9','12'],
+         '22':['18','28'],
+         '18':['17','19'],
+        }
+  
+pos = bintreepositions(edges=edges,
+                       node_hsep=0.1, node_width=0.6)
+                       
+for k,v in pos.items():
+    x,y = v
+    if k == 'x':
+        p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+    else:
+        p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+      
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        #if (k,x) in [('10','2'), ('2','5'), ('5','3')]:
+        #    p += Graph.arc(names=[k,x], linewidth=0.1, linecolor='red')
+        #else:
+        if 1:
+            p += Graph.arc(names=[k,x])
+
+print p
+\end{python}
+and then a right rotation at 5 to get:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+Graph.r = 0.3
+Graph.background = 'white'
+
+edges = {'6':['7', '15'],
+         '7':['3', '5'],
+         '15':['10','22'],
+         '10':['9','12'],
+         '22':['18','28'],
+         '18':['17','19'],
+        }
+  
+pos = bintreepositions(edges=edges,
+                       node_hsep=0.1, node_width=0.6)
+                       
+for k,v in pos.items():
+    x,y = v
+    if k == 'x':
+        p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+    else:
+        p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+      
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        #if (k,x) in [('10','2'), ('2','5'), ('5','3')]:
+        #    p += Graph.arc(names=[k,x], linewidth=0.1, linecolor='red')
+        #else:
+        if 1:
+            p += Graph.arc(names=[k,x])
+
+print p
+\end{python}
+The location we were balancing now has value 7 (it was previously 5).
+Now we move up to 6.
+6 is not balanced.
+Following two steps of the longest path into the right, i.e.,
+$6 \rightarrow 15 \rightarrow 22$, which is the right-right case,
+we perform a left rotation at 6 to get:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+Graph.r = 0.3
+Graph.background = 'white'
+
+edges = {'6':['7', '10'],
+         '7':['3', '5'],
+         '15':['6','22'],
+         '10':['9','12'],
+         '22':['18','28'],
+         '18':['17','19'],
+         '3':[''], # fake note to increase height
+        }
+  
+pos = bintreepositions(edges=edges,
+                       node_hsep=0.1, node_width=0.6)
+                       
+for k,v in pos.items():
+    x,y = v
+    if k == 'x':
+        p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+    else:
+        p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+      
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        #if (k,x) in [('10','2'), ('2','5'), ('5','3')]:
+        #    p += Graph.arc(names=[k,x], linewidth=0.1, linecolor='red')
+        #else:
+        if 1:
+            p += Graph.arc(names=[k,x])
+
+print p
+\end{python}
+If we followed right-left at 6 (which is incorrect because this
+follows the shorter subtree!!! ),
+then we would have performed
+two rotations, first a right rotation at 15 to get:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+Graph.r = 0.3
+Graph.background = 'white'
+
+edges = {'6':['7', '10'],
+         '7':['3', '5'],
+         '15':['12','22'],
+         '10':['9','15'],
+         '22':['18','28'],
+         '18':['17','19'],
+        }
+  
+pos = bintreepositions(edges=edges,
+                       node_hsep=0.05, node_width=0.6)
+                       
+for k,v in pos.items():
+    x,y = v
+    if k == 'x':
+        p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+    else:
+        if k == '3':
+            x += 1.5 + 4
+        elif k == '5':
+            x += -1.5 + 4
+        elif k == '7':
+            x += 4
+        elif k == '6':
+            x += 2
+        p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+      
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        #if (k,x) in [('10','2'), ('2','5'), ('5','3')]:
+        #    p += Graph.arc(names=[k,x], linewidth=0.1, linecolor='red')
+        #else:
+        if 1:
+            p += Graph.arc(names=[k,x])
+
+print p
+\end{python}
+and then a left rotation at 6 to get:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+Graph.r = 0.3
+Graph.background = 'white'
+
+edges = {'6':['7', '9'],
+         '7':['3', '5'],
+         '15':['12','22'],
+         '10':['6','15'],
+         '22':['18','28'],
+         '18':['17','19'],
+        }
+  
+pos = bintreepositions(edges=edges,
+                       node_hsep=0.1, node_width=0.6)
+                       
+for k,v in pos.items():
+    x,y = v
+    if k == 'x':
+        p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+    else:
+        p += Graph.node(x=x, y=y, name='%s' % k, label=r'\texttt{%s}' % k)
+      
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        #if (k,x) in [('10','2'), ('2','5'), ('5','3')]:
+        #    p += Graph.arc(names=[k,x], linewidth=0.1, linecolor='red')
+        #else:
+        if 1:
+            p += Graph.arc(names=[k,x])
+
+print p
+\end{python}
+This results in an unbalanced node at 15.
+So in general, you want to follow the node which is unbalanced (as much as possible)
+to determine which of the left-left, left-right, right-left, right-right
+case for balancing you want to execute.
+In term of balance factor, you want to choose +1 (right is taller - go right)
+or -1 (left is taller - go left) whenever possible.
+
+\newpage
+\begin{ex}
+  Starting with an empty AVL tree, perform the following:
+  \begin{tightlist}
+    \li AVL-insert 6
+    \li AVL-insert 5
+    \li AVL-insert 4
+    \li AVL-insert 3
+    \li AVL-insert 2
+    \li AVL-insert 1
+    \li AVL-insert 7
+    \li AVL-insert 8
+    \li AVL-insert 9
+    \li AVL-insert 10
+    \li AVL-insert 11
+    \li AVL-insert 12
+    \li AVL-delete 4
+    \li AVL-delete 3
+    \li AVL-delete 2
+    \li AVL-delete 1
+    \li AVL-delete 5
+    \li AVL-delete 7
+    \li AVL-delete 6
+    \li AVL-delete 8
+    \li AVL-delete 11
+    \li AVL-delete 12
+    \li AVL-delete 9
+    \li AVL-delete 10
+  \end{tightlist}
+\end{ex}
+
+\begin{ex}
+  Draw all BSTs with values 0, 1, 2, 3, 4.
+  How many are AVLs?
+\end{ex}
+  
+\begin{ex}
+  A $k$-AVL tree is basically an AVL where
+   nodes are allowed to have the
+  absolute value of their height balance factor
+  $\leq k$ without balancing.
+  Once the factor is $> k$, it is balanced.
+  So a $1$--AVL is our regular AVL.
+  Study this type of trees. Start with $2$--AVL trees.
+  \qed
+\end{ex}
+
+\begin{ex}
+  Study the following BST.
+  When a node is initially create, it have a counter of 10.
+  Whenever a node is visited during a search, insert, delete,
+  the counter drops by 1.
+  Accessing a node durng balancing does not decrement the count.
+  A node is balanced is its counter reached 0.
+  \qed
+\end{ex}

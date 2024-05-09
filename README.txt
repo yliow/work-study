@@ -8,7 +8,11 @@ languages
 tm
 decidability
 containers
-
+distribution-sort
+linkedlist                                                (this is mostly done)
+tree                                                      (this is mostly done)
+hashtable                                                 (this is mostly done)
+===============================================================================
 2024/04/11: In some latex file near the top the following
 
 \begin{python0}

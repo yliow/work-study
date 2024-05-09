@@ -1,0 +1,44 @@
+OPEN = xdg-open
+PDF = pdflatex --shell-escape $@.tex; \
+	makeindex $@.idx; \
+	pdflatex --shell-escape $@.tex; \
+	$(OPEN) $@.pdf; \
+	echo ""; \
+	ls -la $@.pdf; \
+	echo ""
+
+# chapter 11, page 11000
+main:
+	$(PDF)
+
+cleantmp:
+	rm -rf abc.outut
+	rm -rf '*.log' 
+	rm -rf '*.aux'
+	rm -rf '*.toc'
+	rm -rf '*.out'
+	rm -rf '*.idx'
+	rm -rf '*.ilg'
+	rm -rf '*.log'
+	rm -rf 'shEsc.tmp'
+	rm -rf '*.vrb'
+	rm -rf '*.snm'
+	rm -rf '*.nav'
+	rm -rf '*.err'
+	rm -rf '*.idx'
+	rm -rf 'abc.output'
+
+
+clean:
+	rm -rf 'main.pdf'
+	make cleantmp
+
+c:
+	rm -rf 'main.pdf'
+	make cleantmp
+
+mail:
+	sendgmail --attach=*.pdf
+
+v:
+	$(OPEN) main.pdf

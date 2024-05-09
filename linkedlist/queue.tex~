@@ -1,0 +1,132 @@
+\section{Queue}
+
+A queue (see CISS240/245) is an ADT where you can put things into the container
+and you can take things out of it.
+The operation of putting a value into a queue is called enqueue
+and the operation of taking a value out of a queue is called dequeue.
+Like the stack, it's self-organizing: you don't have to tell the
+queue where to put a value and you don't have to tell the queue
+which one to remove.
+
+Suppose this is a queue:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+c = RectContainer(x=1, y=1, align='bottom', direction='left-to-right')
+for i, x in enumerate([1,6,3]):
+    c += Rect2(x0=0, y0=0, x1=1, y1=0.7,
+         label=r'{\texttt{%s}}' % x)
+
+p += c
+
+# boundary of container
+p += Rect2(x0=c.x0, y0=c.y0, x1=c.x1, y1=c.y1, linewidth=0.1)
+
+#p += Grid()
+print p
+\end{python}
+
+A queue has a front and a back.
+Let's say for the above diagram the value 1 is the front and the 3 is the back.
+If I enqueue with 7, the queue becomes:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+c = RectContainer(x=1, y=1, align='bottom', direction='left-to-right')
+for i, x in enumerate([1,6,3,7]):
+    c += Rect2(x0=0, y0=0, x1=1, y1=0.7,
+         label=r'{\texttt{%s}}' % x)
+
+p += c
+
+# boundary of container
+p += Rect2(x0=c.x0, y0=c.y0, x1=c.x1, y1=c.y1, linewidth=0.1)
+
+#p += Grid()
+print p
+\end{python}
+
+If I dequeue, the 1 is removed (frequently returned) and the queue
+becomes
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+c = RectContainer(x=1, y=1, align='bottom', direction='left-to-right')
+for i, x in enumerate([6,3,7]):
+    c += Rect2(x0=0, y0=0, x1=1, y1=0.7,
+         label=r'{\texttt{%s}}' % x)
+
+p += c
+
+# boundary of container
+p += Rect2(x0=c.x0, y0=c.y0, x1=c.x1, y1=c.y1, linewidth=0.1)
+
+#p += Grid()
+print p
+\end{python}
+
+Note that the value removed is the value that was in the queue the
+longest.
+So we say that a queue is a last-in-first-out, LIFO, data structure.
+
+You see queues everywhere:
+a network router processes messages that are stored in a queue.
+A webserver processes requests that are stored in a queue.
+The OS running your laptop will run processes that are stored in a queue.
+I/O requests are also stored in queues.
+Etc.
+
+Note that since you have to operate a queue on both ends,
+you should use a doubly linked list and not a singly linked list.
+(A array implementation is possible if the maximum length of the
+queue is small and fixed.)
+
+Frequently, jobs entering a queue has a priority number
+that allows the job to jump ahead.
+For instance the following is a queue of jobs and the
+numbers are the priority numbers where low means high priority:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+c = RectContainer(x=1, y=1, align='bottom', direction='left-to-right')
+for i, x in enumerate([3,5,6,7]):
+    c += Rect2(x0=0, y0=0, x1=1, y1=0.7,
+         label=r'{\texttt{%s}}' % x)
+
+p += c
+
+# boundary of container
+p += Rect2(x0=c.x0, y0=c.y0, x1=c.x1, y1=c.y1, linewidth=0.1)
+
+#p += Grid()
+print p
+\end{python}
+
+So if I enqueue 5, the 5 will enter the queue at the end
+but will jump ahead of the job with priority 7,
+jump ovrer the jobn with priority 6, but will not jump ahead of the
+job with priorityt 5 that was already there:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+c = RectContainer(x=1, y=1, align='bottom', direction='left-to-right')
+for i, x in enumerate([3,5,5,6,7]):
+    c += Rect2(x0=0, y0=0, x1=1, y1=0.7,
+         label=r'{\texttt{%s}}' % x)
+
+p += c
+
+# boundary of container
+p += Rect2(x0=c.x0, y0=c.y0, x1=c.x1, y1=c.y1, linewidth=0.1)
+
+#p += Grid()
+print p
+\end{python}
+
+Such things are called priority queues.
+We'll come back to this later when we look at heaps.

@@ -1,0 +1,190 @@
+%-*-latex-*-
+\section{Distribution sort: counting sort}
+
+Beside sorting an array using a comparison-based sorting
+algorithm, i.e., using $\leq$ or $<$ or $\geq$ or $>$ to compare values in the array,
+there's
+another class of sorting algorithms that work in a difference way.
+Distribution sorting algoroithms sort by \textit{distributing}
+the values in an array.
+Sometimes distribution sort will use a comparison-based sort.
+
+The simplest distribution sort is the counting sort.
+
+Suppose you have an array \verb!x! of integers with values
+from 0 to 4 (inclusive):
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+def arr(x=0, y=0, xs=[]):
+    return Array2d(x, y, [xs], width=0.7, height=0.7)
+def string(x=0, y=0, label=''):
+    label = r'\text{\texttt{%s}}' % label
+    return Rect2(x, y, x, y, label=label, linewidth=0)
+a = arr(xs=[3,2,0,2,3,4,0,3,2,4])
+p += a
+x, y = a[0][0].left()
+p += string(x-0.3, y, 'x')
+print(p)
+\end{python}
+
+You scan the array and count the number of times each value
+from 0 to 4 occurs in \verb!x!.
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+def arr(x=0, y=0, xs=[]):
+    return Array2d(x, y, [xs], width=0.7, height=0.7)
+def string(x=0, y=0, label=''):
+    label = r'\text{\texttt{%s}}' % label
+    return Rect2(x, y, x, y, label=label, linewidth=0)
+a = arr(xs=[2,0,3,3,2])
+p += a
+x, y = a[0][0].left()
+p += string(x-0.8, y, 'count')
+print(p)
+\end{python}
+
+For instance \verb!count[2]! is the number of times \verb!2!
+occurs in array \verb!x!.
+
+Now the final thing to do is to fill \verb!x! using
+information in \verb!count!.
+For instance \verb!count[0]! is \verb!2!, 
+so I would put two \verb!0!'s into \verb!x!:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+def arr(x=0, y=0, xs=[]):
+    return Array2d(x, y, [xs], width=0.7, height=0.7)
+def string(x=0, y=0, label=''):
+    label = r'\text{\texttt{%s}}' % label
+    return Rect2(x, y, x, y, label=label, linewidth=0)
+a = arr(xs=[0,0,'','','','','','','',''])
+p += a
+x, y = a[0][0].left()
+p += string(x-0.3, y, 'x')
+print(p)
+\end{python}
+
+Next, since \verb!count[1]! is \verb!0!, \verb!1! does not appear in 
+\verb!x!.
+So the re-organized \verb!x! looks like this (i.e., no change):
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+def arr(x=0, y=0, xs=[]):
+    return Array2d(x, y, [xs], width=0.7, height=0.7)
+def string(x=0, y=0, label=''):
+    label = r'\text{\texttt{%s}}' % label
+    return Rect2(x, y, x, y, label=label, linewidth=0)
+a = arr(xs=[0,0,'','','','','','','',''])
+p += a
+x, y = a[0][0].left()
+p += string(x-0.3, y, 'x')
+print(p)
+\end{python}
+
+However note that \verb!count[2]! is \verb!3!, which means that
+\verb!2! appears \verb!3! times.
+Therefore my \verb!x! now look like this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+def arr(x=0, y=0, xs=[]):
+    return Array2d(x, y, [xs], width=0.7, height=0.7)
+def string(x=0, y=0, label=''):
+    label = r'\text{\texttt{%s}}' % label
+    return Rect2(x, y, x, y, label=label, linewidth=0)
+a = arr(xs=[0,0,'2','2','2','','','','',''])
+p += a
+x, y = a[0][0].left()
+p += string(x-0.3, y, 'x')
+print(p)
+\end{python}
+
+You get the point.
+
+The pseudocode looks like this.
+I assume that the values in \verb!x! are from 0 to \verb!M!.
+\begin{console}
+ALGORITHM: counting_sort
+INPUT: array x of size n
+
+    count = int array of size M + 1, initialized with 0s
+    for i = 0, 1, 2, ..., n - 1:
+        count[x[i]] = count[x[i]] + 1
+    j = 0
+    for i = 0, 1, 2, ..., M:
+        for k = 1, ..., count[i]:
+            x[j] = i
+            j = j + 1
+\end{console}
+
+If \verb!M! is not 
+known, you have to run through \verb!x! to figure that out.
+
+
+Here's the runtime analysis.
+The time to create \verb!count!, if it's in the heap,
+might very well be $O(1)$ (or the memory allocation might fail because of lack of
+available memory). So that's hard to say.
+So let's just assume memory allocation for \verb!count! is negligible.
+First you have to set the \verb!count! array to zeroes:
+that takes $A(M + 1)$ ($A$ is a constant).
+You need to run through \verb!x! to fill \verb!count! with
+values: that takes a time of $Bn$.
+You will to put values back into \verb!x! using \verb!count!.
+That requires touching each cell in \verb!x!.
+So for this part, the runtime is $Cn$.
+Altogether, the runtime is
+\[
+O(n + M)
+\]
+Of course the space requirement is
+\[
+O(M + 1) = O(M)
+\]
+
+\newpage
+
+\begin{ex}
+  How would you sort a huge array if the values are integer in the interval $[-10, 10]$?
+  \qed
+\end{ex}
+
+
+\begin{ex}
+  How would you sort a huge array if the values are
+  1000000, 1100000, 1200000, 1300000, ..., 1900000.
+  \qed
+\end{ex}
+
+
+\begin{ex}
+  Modify the counting sort algorithm to sort a huge array of \verb!double!s
+  where there is a (known) small number of distinct \verb!double! values in the 
+  array.
+  Say the size of the array is $10^6$ and there are at most $1000$ distinct
+  \verb!double!s in the array.
+  What if the values are not known ahead of time?
+  (The idea should also work for other types.)
+  \qed
+\end{ex}
+
+
+\begin{ex}
+Take a look at the sieve of Eratosthenes and you'll see that it's related to 
+the counting sort.
+\qed
+\end{ex}

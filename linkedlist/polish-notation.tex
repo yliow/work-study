@@ -1,0 +1,268 @@
+%-*-latex-*-
+\sectionthree{Polish notation}
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+
+The common mathematical language of arithmetic expression contains
+a \lq\lq sentence'' of this form:
+\[
+\text{\texttt{1 + 2 - 3 * 5}} 
+\]
+The above way of writing arithmetic expression is called
+\defone{infix notation}: a binary operator is placed \textit{in the middle}.
+When given the above, I am interested in evaluating it.
+Of course I want the algorithm to obey standard precedence rules.
+You have been using this algorithm since elementary school.
+
+Infix notation requires parentheses.
+For instance if you look at the following in infix notation
+\[
+\texttt{1 + 2 * 3}
+\]
+it means \verb!1 + (2 * 3)!: the multiplication goes first.
+If you wanted to perform the \verb!+! first, you are forced to 
+write 
+\verb!(1 + 2) * 3!.
+Let me repeat the above: if I
+say to you \lq\lq Compute this \texttt{1 + 2 * 3} but make sure
+you do multiplication first'', then mathematically
+(without all the above words), I have to write
+\[
+\texttt{1 + (2 * 3)}
+\]
+but if I say
+\lq\lq Compute this \texttt{1 + 2 * 3} but make sure
+you do addition first'', then mathematically
+(without all the above words), I have to write
+\[
+\texttt{(1 + 2) * 3}
+\]
+The infix notation requires parenthesis.
+
+Another way to write down an operator with two parameters is to put the
+operator \textit{in front}.
+This is called
+\defterm{prefix notation}\index{prefix notation}\tinysidebar{prefix notation \\ Polish notation} or
+\defterm{Polish notation}\index{Polish notation}
+(the Polish mathematician
+\href{https://en.wikipedia.org/wiki/Jan_%C5%81ukasiewicz}{Jan \L{}ukasiewicz}
+invented this notation).
+For instance instead of writing \texttt{3 + 5}, in prefix notation
+I would write
+\[
+\texttt{+ 3 5}
+\]
+The prefix notation does \textit{not} require parenthesis.
+
+In the prefix notation (or Polish notation),
+if you want \verb!1 + (2 * 3)! (usual infix) in the prefix/Polish notation,
+you
+write
+\[
+\texttt{+ 1 * 2 3}
+\]
+because you evaluate it like this:
+\[
+\texttt{\underline{+ 1 \underline{* 2 3}}}
+\]
+i.e., (let me do it slowly):
+\begin{align*}
+&\text{\textwhite{=}} \hspace{0.2cm} \texttt{+ 1 * 2 3} \\
+&= \texttt{\underline{+ 1 \underline{* 2 3}}} \\
+&= \texttt{\underline{+ 1 6}} \\
+&= \texttt{7} \\
+\end{align*}
+If you really want \verb!(1 + 2) * 3!, then you write this in prefix
+notation
+\[
+\texttt{* + 1 2 3}
+\]
+i.e.,
+\begin{align*}
+&\text{\textwhite{=}} \hspace{0.2cm} \texttt{* + 1 2 3} \\
+&= \texttt{\underline{* \underline{+ 1 2} 3}} \\
+&= \texttt{\underline{* 3 3}} \\
+&= \texttt{9} 
+\end{align*}
+
+To evaluate an expression in infix notation, 
+note that you can simplify the expression if it's of the form
+\verb![operator] [num1] [num2]!.
+So if you're given a longer expression such as
+\[
+\texttt{* 1 + 2 - 3 5 4}
+\]
+you scan left-to-right, and once you see \verb![operator] [num1] [num2]!,
+you simplify.
+Here's an example where I'm using \verb!|! as my finger
+and it moves left-to-right, and you can only see the data on the 
+left of \verb!|!:
+\begin{console}
+ |* 1 - + 2 - 3 5 4
+= *|1 - + 2 - 3 5 4
+= * 1|- + 2 - 3 5 4
+= * 1 -|+ 2 - 3 5 4
+= * 1 - +|2 - 3 5 4
+= * 1 - + 2|- 3 5 4
+= * 1 - + 2 -|3 5 4
+= * 1 - + 2 - 3|5 4
+= * 1 - + 2 - 3 5|4
+= * 1 - + 2 -2|4       by - 3 5 = -2
+= * 1 - 0|4            by + 2 -2 = 0
+= * 1 - 0 4|
+= * 1 -4|              by - 0 4 = -4
+= -4|                  by * 1 -4 = -4
+\end{console}
+The above method is kind of messy as an algorithm.
+For instance if you look this line:
+\begin{console}
+= * 1 - + 2 - 3 5|4
+= * 1 - + 2 -2|4       by - 3 5 = -2
+\end{console}
+The only reason we can simplify is because there's a \texttt{-}
+and then two numbers.
+However your finger is at \texttt{5} and you need to
+know that two steps to the left is an operation.
+Now \textit{if} we scan \textit{right-to-left},
+remembering numbers
+\begin{console}
+  * 1 - + 2 - 3 5 4
+                  ^
+            
+  * 1 - + 2 - 3 5 4
+                ^
+                
+  * 1 - + 2 - 3 5 4
+              ^
+                            
+  * 1 - + 2 - 3 5 4
+            ^
+\end{console}
+then on reaching the \texttt{-}, we take the last two numbers
+from our bag and perform subtraction.
+Of course we the result (i.e., \texttt{-2}) back into our bag
+and continue.
+The bag contains only numbers if I use this method.
+
+Clearly the bag is organized like this:
+I need to be able to put numbers into the bag
+and I need the bag to give me the \textit{last} two numbers.
+So ... what type of container should we use for this bag of integers?
+Look at the last sentence again:
+\[
+\text{... I need the bag to give me the \textit{last} two numbers.}
+\]
+
+So ...
+you can perform polish notation evaluation
+you scan right to left
+and if you use a stack.
+Note that if we do it this way, the stack only contains integers.
+For the previous method, the stack contains integers and operators.
+Here's the computation but using the new method:
+\begin{console} 
+                       stack (top on left)
+  * 1 - + 2 - 3 5 4    []
+  * 1 - + 2 - 3 5      [4] 
+  * 1 - + 2 - 3        [5,  4]
+  * 1 - + 2 -          [3,  5, 4]             
+  * 1 - + 2            [-2, 4]       because - 3 5 is -2
+  * 1 - +              [2, -2, 4]
+  * 1 -                [0,  4]       because + 2 -2 is 0
+  * 1                  [-4]          because - 0 4  is -4
+  *                    [1, -4]
+                       [-4]          because * 1 -4 is -4 
+\end{console}
+In other words, as you scan right to left:
+\begin{tightlist}
+\li If the data read is a number, push it on to the stack.
+\li If the data read is an operator \verb!op!, 
+    pop \verb!num1! from stack,
+    pop \verb!num2! from stack, compute 
+    \verb!num3 = op num1 num2! and push \verb!num3! onto the stack.
+\li If there's no more data, the result is the top of the stack
+(the stack should have only one value).
+\end{tightlist}
+Of course there's an error in the prefix expression if you have the
+following situations:
+\begin{tightlist}
+\li When the expression is completely processed, the stack has more than 
+one value
+\li When you read an operator, you cannot pop two values from the
+stack.
+\end{tightlist}
+
+Note that two main ingredients of the above algorithms is
+\begin{tightlist}
+  \item You have a stack (for holding numbers).
+  \item You can perform \texttt{op num1 num2}, i.e., the simplest polish notation
+  operation. The \texttt{op} is what you see from the input and
+  the \texttt{num1} and \texttt{num2} are the top two values on the stack.
+\end{tightlist}
+
+\begin{ex}
+What is the runtime in the above algorithm
+(in terms of the length of the expression)?
+\qed
+\end{ex}
+
+\begin{ex}
+Evaluate the following expressions written in
+prefix/Polish notation or write ERROR if the expression
+is invalid.
+\begin{tightlist}
+  \item \texttt{* + 3 5 - 7 2}
+  \item \texttt{+ / 8 2 - 4 * 7 2}
+  \item \texttt{* 8 * 2 + 3 - 2 / 7 2}
+  \item \texttt{/ + - * 2 3 7 4 2}
+\end{tightlist}
+\qed
+\end{ex}
+
+
+\begin{ex}
+  Convert the following expression in infix notation to
+  prefix/Polish notation. (Do not simplify - just convert).
+  \begin{tightlist}
+    \item \texttt{4 + 2 * 3 - 8 / 7}
+    \item \texttt{4 + 2 * (3 - 8) / 7}
+    \item \texttt{(4 + 2 * 3) - 8 / 7}
+    \item \texttt{(4 + 2 * (3 - 8)) / 7}    
+  \end{tightlist}
+  \qed
+\end{ex}
+
+
+\begin{ex}
+\begin{tightlist}
+  \item Write a wrong expression in polish notation that will
+  result in a stack with 2 numbers at the end of the algorithm.
+  \item Write a wrong expression in polish notation that will
+  result in a stack with 1 number when an operator is read.
+\end{tightlist}
+\qed
+\end{ex}
+
+
+\begin{ex}
+Implement a polish notation calculator.
+The input is a vector of strings where the strings represent integers (example
+\texttt{"123"}, \texttt{"-321"})
+or binary integer operators, i.e.
+\verb!"+"!,
+\verb!"-"!,
+\verb!"*"!,
+\verb!"/"!,
+\verb!"%"!.
+The return value is an integer.
+(Besides the algorithm above, clearly you will
+need to be able to convert a numeric string to an integer.
+Check your CISS240 notes.)
+If you do not have enough values in the stack, throw the exception
+\texttt{StackUnderflowError}.
+If you have too many values in the stack, throw the exception
+\texttt{StackOverflowError}.
+\qed
+\end{ex}
+

@@ -1,0 +1,103 @@
+%-*-latex-*-
+\sectionthree{Stack machine}
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+
+In the previous section, you notice that there's a common
+method of computation where you operator on the top two
+values of a stack and then put the result back to the stack.
+This type of computation appears frequently in computer science.
+Because of that, if such a computation is needed in what you're
+tryng to computation, you might want to
+add this feature to your stack, so that you
+stack becomes what is known as a \defone{stack machine}.
+
+A \defone{stack machine} is a stack that has the usual
+\texttt{stack.push(v)} and
+\texttt{v = stack.pop()} operation, but it also has
+\texttt{stack.add()},
+\texttt{stack.subtract()},
+\texttt{stack.mult()},
+\texttt{stack.div()},
+\texttt{stack.mod()},
+etc.
+In the case of an integer stack machine, those
+are some of the common operation.
+But of course you can add more to your stack machine if you like.
+For instance you can add the exponentiation operation
+or a bit shift operation.
+
+The above operation (\texttt{add()}, etc.)
+  will apply the relevant operator to the top two
+values on the stack (these two values are removed from the stack)
+and the result is pushed back onto the stack.
+
+Such a computational model is implemented in software or in hardware.
+In software, such a computation model is present in compilers
+and virtual machines.
+
+If you prefer, instead of the above, you can have
+\verb!stack.op('+')!,
+\verb!stack.op('-')!,
+\verb!stack.op('*')!,
+\verb!stack.op('/')!,
+\verb!stack.op('%')!, etc.
+
+\begin{ex}
+Write a \texttt{IntStackMachine} class.
+Use it to compute \texttt{1 + 2 - 3 * 4 + 5} by doing this:
+\begin{Verbatim}[frame=single]
+IntStackMachine s;
+s.push(1);
+std::cout << s << std::endl; // prints [1]
+s.push(2);
+std::cout << s << std::endl; // prints [1, 2]
+s.add();
+std::cout << s << std::endl; // prints [3]
+s.push(3);
+std::cout << s << std::endl; // prints [3, 3]
+s.push(4);
+std::cout << s << std::endl; // prints [3, 3, 4]
+s.mult();
+std::cout << s << std::endl; // prints [3, 12]
+s.subtract();
+std::cout << s << std::endl; // prints [-9]
+s.push(5);
+std::cout << s << std::endl; // prints [-9, 5]
+s.add();
+std::cout << s << std::endl; // prints [-4]
+\end{Verbatim}
+\qed
+\end{ex}
+
+Note that a stack machine evaluates one operator at a time --
+it's not that smart.
+The responsibility to
+take an expression, break up into
+steps and feed the operations one at a time to
+stack machine lies somewhere else.
+
+\begin{ex}
+Add exponentiation to your stack machine: \texttt{stack.pow()}.
+\qed
+\end{ex}
+
+\begin{ex}
+Using \texttt{0} for false and non--zero for true,
+add \texttt{stack.ifelse()} to your stack machine.
+This is a ternary operator.
+The top of the stack is an integer value that represents
+true/false and is followed by two integer values \texttt{a} and \texttt{b}.
+If the top of stack is true, the the computation pushes \texttt{a}
+onto the stack; otherwise \texttt{b} is pushed onto the stack.
+\qed
+\end{ex}
+
+\begin{ex}
+Clean up your infix evaluation using a stack machine.
+\qed
+\end{ex}
+
+%\begin{ex} [TODO: two-stack machines]
+%\end{ex}

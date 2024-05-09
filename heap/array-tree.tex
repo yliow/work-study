@@ -1,0 +1,140 @@
+%-*-latex-*-
+\sectionthree{Array trees}
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+
+You have already seen trees using nodes which are dynamically
+allocated in the memory heap.
+Actually, it's possible to build trees using array!
+I'll just explain how to do this for the case of binary trees.
+
+\input{stdout00.tex}
+
+I can lay it out in an array like this:
+
+\input{stdout04.tex}
+
+In other words, traverse the tree using breadth-first left-to-right
+and put a value into the array as you see visit the value in the tree.
+
+The above tree is complete.
+What if it's not?
+
+One option is to use a sentinel to denote the
+fact that an array element is not filled with a node value.
+For instance, say I have this tree:
+
+\input{stdout01.tex}
+
+\input{stdout02.tex}
+
+Another option is to include a delete flag
+for each value in the array.
+If the element of the array represents a node,
+the delete flag is false.
+However if the element of the array does not hold a node,
+then the delete flag is set to true.
+
+
+
+Of course a tree is not just a collection of data.
+It's a graph.
+You have to describe edges, i.e., you must
+connect the values.
+How can we do that?
+Well note that the left child of node with value \verb!5! is 
+the node with value \verb!2!:
+
+\input{stdout03.tex}
+
+You notice that the index of \verb!5! is 0 and the index of 
+\verb!2! is 1.
+Also, note that the left child of \verb!2! is \verb!6!
+which is at index 3.
+The left child of \verb!0!, which is at index 2, is \verb!8!,
+which is at index 5.
+For all the above cases,
+you notice the the left child of the value at index $i$
+is at index $2i + 1$.
+Correct?
+
+Do you also notice that the value at index $i$, the
+right child is at index $2i + 2$?
+
+Going to the parent is easy.
+If you look at the value at index $j$,
+then you have the followning fact:
+\begin{tightlist}
+\li If $j$ is odd, then the parent is at index $(j - 1) / 2$.
+Why? Because in this case $j = 2i + 1$ and I want $i$.
+This is just $i = (j - 1) / 2$.
+\li If $j$ is even, then the parent is at index $(j - 2)/ 2$.
+Why? Because in this case $j = 2i + 2$ and I want $i$.
+Of course $i = (j - 2) / 2$.
+Note that using integer division, this is the same as
+$(j - 1) / 2$.
+Correct?
+\end{tightlist}
+
+Let me summarize:
+\begin{tightlist}
+\li The left child of the node at index $i$ is at index $2i+1$.
+\li The right child of the node at index $i$ is at index $2i+2$.
+\li The parent of the node at index $j$ is at index $(j - 1)/2$
+    where the division above is integer division.
+\end{tightlist}
+
+
+\begin{Verbatim}[frame=single]
+ALGORITHM: left
+INPUT:     i - an index in an array say x
+OUTPUT:    index where x[index] is the left child of x[i]
+
+return 2 * i + 1
+\end{Verbatim}
+\begin{Verbatim}[frame=single]
+ALGORITHM: right
+INPUT:     i - an index in an array say x
+OUTPUT:    index where x[index] is the right child of x[i]
+
+return 2 * i + 2
+\end{Verbatim}
+\begin{Verbatim}[frame=single]
+ALGORITHM: parent
+INPUT:     j - an index in an array say x
+OUTPUT:    index where x[parent(i)] is the parent of x[i]
+
+return (j - 1) / 2
+\end{Verbatim}
+
+So if I have a complete binary tree where
+the missing nodes are all on the right of the last level,
+I can use an array to represent the tree
+and the \verb!left!, \verb!right!, and \verb!parent!
+functions
+can be used to form parent-child
+between the values of the array.
+
+Sometimes when you read books on array trees, you will see that
+usually first element of the array, i.e., the element at
+index 0 is not used.
+In that case you have the following:
+\begin{tightlist}
+\li The left child of the node at index $i$ is at index $2i$.
+\li The right child of the node at index $i$ is at index $2i+1$.
+\li The parent of the node at index $j$ is at index $j / 2$
+    where the division above is integer division, i.e., 
+    mathematically it should be 
+    $\floor{j / 2}$
+\end{tightlist}
+So be careful!
+
+Whereas in the case of trees built with nodes in the heap
+and therefore we need pointers hold address values to the nodes,
+in the case of array trees, I will be using integer variables
+containing index values.
+
+\input{exercises/array-tree-0/main.tex}
+
+\input{exercises/array-tree-1/main.tex}

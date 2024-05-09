@@ -1,0 +1,209 @@
+\section{Stack}
+
+Recall (see CISS240/245) that a stack is an ADT that looks like
+the container for plates at a buffet.
+Here's a stack with three values:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+c = RectContainer(x=1, y=1, align='left', direction='top-to-bottom')
+for i, x in enumerate([1,6,3]):
+    c += Rect2(x0=0, y0=0, x1=1, y1=0.7,
+         label=r'{\texttt{%s}}' % x)
+
+p += c
+
+# boundary of container
+p += Rect2(x0=c.x0, y0=c.y0, x1=c.x1, y1=c.y1, linewidth=0.1)
+
+#p += Grid()
+print p
+\end{python}
+
+If I put a 5 into the stack, it looks like this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+c = RectContainer(x=1, y=1, align='left', direction='top-to-bottom')
+for i, x in enumerate([5,1,6,3]):
+    c += Rect2(x0=0, y0=0, x1=1, y1=0.7,
+         label=r'{\texttt{%s}}' % x)
+
+p += c
+
+# boundary of container
+p += Rect2(x0=c.x0, y0=c.y0, x1=c.x1, y1=c.y1, linewidth=0.1)
+
+#p += Grid()
+print p
+\end{python}
+
+If I put a 4 into the stack, then it looks like this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+c = RectContainer(x=1, y=1, align='left', direction='top-to-bottom')
+for i, x in enumerate([4, 5,1,6,3]):
+    c += Rect2(x0=0, y0=0, x1=1, y1=0.7,
+         label=r'{\texttt{%s}}' % x)
+
+p += c
+
+# boundary of container
+p += Rect2(x0=c.x0, y0=c.y0, x1=c.x1, y1=c.y1, linewidth=0.1)
+
+#p += Grid()
+print p
+\end{python}
+
+If I take a value out of the stack I would get 4 and the stack would look like this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+c = RectContainer(x=1, y=1, align='left', direction='top-to-bottom')
+for i, x in enumerate([5,1,6,3]):
+    c += Rect2(x0=0, y0=0, x1=1, y1=0.7,
+         label=r'{\texttt{%s}}' % x)
+
+p += c
+
+# boundary of container
+p += Rect2(x0=c.x0, y0=c.y0, x1=c.x1, y1=c.y1, linewidth=0.1)
+
+#p += Grid()
+print p
+\end{python}
+
+Note that the value at the top of the stack is the one removed.
+Now if I remove a value again, the stack would look like this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+c = RectContainer(x=1, y=1, align='left', direction='top-to-bottom')
+for i, x in enumerate([1,6,3]):
+    c += Rect2(x0=0, y0=0, x1=1, y1=0.7,
+         label=r'{\texttt{%s}}' % x)
+
+p += c
+
+# boundary of container
+p += Rect2(x0=c.x0, y0=c.y0, x1=c.x1, y1=c.y1, linewidth=0.1)
+
+#p += Grid()
+print p
+\end{python}
+
+
+A stack is self-organizing in the sense that you can put values
+into the stack, but you do not tell the stack \textit{where} to put the value.
+The stack will decide where to put it.
+Also, you can retrieve a value from the stack, but you don't say which value.
+The ordering of the values is such that
+the value taken out from the stack is the last value put into the stack.
+This is just like a stack of plates:
+the plate to take off the stack is the one on top and is
+the last plate placed into the stack.
+
+Putting a value into the stack is called \textbf{pushing} a value onto the stack.
+The value that a user can see when he's looking at a stack is the
+value on top of the stack.
+This is a technical term: the value on top of the stack is called
+the \defterm{top} of the stack.
+Removing a value out of the stack is called \defterm{popping} the stack.
+Frequently, the value popped off the stack is returned.
+
+What else can you do with a stack?
+\begin{tightlist}
+  \li Asking for the size of the stack
+  \li Asking if the stack is empty
+  \li Clearing the stack
+\end{tightlist}
+Etc.
+If you pop an empty stack, you should probably thrown an exception.
+
+
+You can (and should) think of a stack as a memory device.
+When you push something onto the stack,
+you're saying to the stack \lq\lq Hang on to this please. I'll want it back later.''
+When you take something out of a stack, you're basically
+saying to the stack \lq\lq Give me the last thing I handed to you.''
+
+\subsection{Implementations}
+
+Note that the stack is very \lq\lq linear''. 
+So it's not too surprising that you can implement it using arrays (dynamic or static)
+and linked list.
+Now note that the operation on a stack is at \lq\lq one end'' of the stack.
+
+\begin{ex}
+If you implement a stack using an array, which end of the array should be
+used (the slot at index 0 of the opposite) for the top of the stack?
+Why?
+What is the runtime for push and pop?
+(If the maximum size of the stack is small, then an array will do.)
+\qed
+\end{ex}
+
+\begin{ex}
+If the stack is huge, then a linked list can be used.
+Should we use a singly or a doubly linked list?
+Why?
+What is the runtime for push and pop?
+\qed
+\end{ex}
+
+
+\begin{ex}
+Implement the stack (to contain integers) so that you can do this:
+{\small
+\begin{Verbatim}[frame=single]
+Stack stack;
+std::cout << stack.size() << '\n';     // prints 0
+stack.push(3);                      
+std::cout << stack << '\n';            // prints [3]
+stack.push(6);
+std::cout << stack << '\n';            // prints [6, 3] 
+stack.push(1);
+std::cout << stack << '\n';            // prints [1, 6, 3]
+std::cout << stack.top() << '\n';      // prints [1, 6, 3]
+std::cout << stack.is_empty() << '\n'; // prints 0 
+int t = stack.pop();
+std::cout << t << '\n';                // prints 1
+std::cout << stack << '\n';            // prints [1, 6]
+\end{Verbatim}
+}
+\end{ex}
+
+\begin{ex}
+Once you're done with the above, change it to a class template so that the above
+code becomes:
+{\small
+\begin{Verbatim}[frame=single]
+Stack< int > stack;
+...
+\end{Verbatim}
+}
+You can also have a stack of doubles:
+{\small
+\begin{Verbatim}[frame=single]
+Stack< double > stack;
+...
+\end{Verbatim}
+}
+\end{ex}
+
+
+\begin{ex}
+Of course there are standard class operations you want:
+\begin{Verbatim}[frame=single]
+Stack< int > stack0;
+Stack< int > stack1(stack0);
+std::cout << (stack0 == stack1) << std::endl;
+stack1 = stack0;
+\end{Verbatim}
+\end{ex}

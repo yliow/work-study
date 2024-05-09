@@ -1,0 +1,336 @@
+%-*-latex-*-
+\section{LSD radix sort}
+
+There are two basic variants of radix sort.
+First I'll talk about the LSD (least significant digit) radix sort.
+
+
+Suppose you have the following array (I'm going to draw it vertically):
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+def arr(x=0, y=0, xs=[]):
+    xs = [[_] for _ in xs]
+    return Array2d(x, y, xs, width=0.7, height=0.7)
+
+def string(x=0, y=0, label=''):
+    label = r'\text{\texttt{%s}}' % label
+    return Rect2(x, y, x, y, label=label, linewidth=0)
+
+a = arr(xs=[31,22,'02',25,34,41,'09'])
+p += a
+x, y = a[0][0].left()
+p += string(x-0.3, y, 'x')
+print(p)
+\end{python}
+First we sort the array \textit{by the ones digit} using a 
+\textit{stable} sorting algorithm (example: mergesort).
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+def arr(x=0, y=0, xs=[]):
+    xs = [[_] for _ in xs]
+    return Array2d(x, y, xs, width=0.7, height=0.7)
+
+def string(x=0, y=0, label=''):
+    label = r'\text{\texttt{%s}}' % label
+    return Rect2(x, y, x, y, label=label, linewidth=0)
+
+def bubble(xs, f):
+    n = len(xs)
+    #print "xs:", xs
+    for i in range(n - 2, -1, -1):
+        for j in range(0, i + 1):
+            if f(xs[j]) > f(xs[j + 1]):
+                xs[j], xs[j + 1] = xs[j + 1], xs[j]
+        #print "xs:", xs
+
+a = ['31','22','02','25','34','41','09']
+a = [(_[-1],_) for _ in a]
+bubble(a, lambda x:x[0])
+a = [_ for __,_ in a] 
+a = arr(xs=a)
+p += a
+x, y = a[0][0].left()
+p += string(x-0.3, y, 'x')
+print(p)
+\end{python}
+Because the sorting is stable, note for instance that 
+\verb!22! appear before \verb!02! before and after the sort.
+
+Next I'm going to perform a stable sort on the tens digit:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+def arr(x=0, y=0, xs=[]):
+    xs = [[_] for _ in xs]
+    return Array2d(x, y, xs, width=0.7, height=0.7)
+
+def string(x=0, y=0, label=''):
+    label = r'\text{\texttt{%s}}' % label
+    return Rect2(x, y, x, y, label=label, linewidth=0)
+
+def bubble(xs, f):
+    n = len(xs)
+    #print "xs:", xs
+    for i in range(n - 2, -1, -1):
+        for j in range(0, i + 1):
+            if f(xs[j]) > f(xs[j + 1]):
+                xs[j], xs[j + 1] = xs[j + 1], xs[j]
+        #print "xs:", xs
+
+a = ['31','22','02','25','34','41','09']
+a = [(_[-1],_) for _ in a]
+bubble(a, lambda x:x[0])
+bubble(a, lambda x:x[1])
+a = [_ for __,_ in a] 
+a = arr(xs=a)
+p += a
+x, y = a[0][0].left()
+p += string(x-0.3, y, 'x')
+print(p)
+\end{python}
+
+Note for each pass of the radix sort, you can use any stable sort.
+You want to pick the fastest (of course): so of course mergesort is better than bubblesort!
+If you are using mergesort to sort the ones and then the tens, then the
+runtime is
+\[
+  O(2 n \lg n) = O(n \lg n)
+\]
+If there are $d$ digits (instead of $2$), then the runtime is
+\[
+  O(d n \lg n)
+\]
+If most cases, the $d$ might be a constant (i.e., does not change).
+For instance if your array is an array of integers in a 32-bit
+computer, then $d = 10$.
+In this case the runtime is
+\[
+  O(d n \lg n) = O(n \ln n)
+\]
+
+For radix sort, when you look at the key \verb!31! (the first value of the
+original array) and you are sorting based on the first digit of \verb!31!,
+i.e., \verb!1!, we say that \verb!1! is the \defone{subkey}.
+If there's no digit there, for instance look at the key \verb!02! which is
+actually \verb!2!, then the second digit subkey of \verb!2! = \verb!02! is
+\verb!0!, i.e., the smallest possible subkey value (if you sorting in
+ascending order). 
+
+For implementation, you might want to have a \verb!subkey! function.
+\verb!subkey(key, i)! returns the $i$--th digit of \verb!key! where
+$i$ starts with $0$ (the leftmost digit).
+If you call \verb!subkey(31, 0)!, you get \verb!1!.
+If you call \verb!subkey(31, 1)!, you get \verb!3!.
+Remember that since \verb!2! has only one digit,
+if you call \verb!subkey(2, 1)!, you get \verb!0!.
+
+There's another way to do this with a better runtime.
+
+Recall the concept of a queue, a data structure there data enters at
+the tail of the data structure and leave through the head of the data structure:
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+p = Plot()
+r = Rect(x0=0, y0=0, x1=5, y1=0.8)
+p += r
+
+x,y = r.right()
+p += Line(points=[(x+2,y), (x+0.2,y)], endstyle='>', linewidth=0.1)
+
+x,y = r.left()
+p += Line(points=[(x-0.2,y), (x - 2,y)], endstyle='>', linewidth=0.1)
+
+x,y = r.bottomleft()
+X = POINT(x=x, y=y, r=0, label='head', anchor='north west')
+p += str(X)
+
+x,y = r.bottomright()
+X = POINT(x=x, y=y, r=0, label='tail', anchor='north east')
+p += str(X)
+
+print(p)
+\end{python}
+
+We saw the queue in CISS245 where we implemented it using an array
+(say dynamic arrays in the heap).
+The worst runtimes are insert and delete are
+\begin{tightlist}
+\item entering the queue: $T(n) = O(n)$  
+\item leaving the queue: $T(n) = O(n)$ 
+\end{tightlist}
+where $n$ is the size of the queue.
+
+There's a better way to implement a queue ...
+
+After we study linked list, you will see that you can implement a queue using
+linked lists.
+The operations 
+on a queue implemented using a linked list has the following runtimes:
+\begin{tightlist}
+\item entering the queue: $T(n) = O(1)$ 
+\item leaving the queue: $T(n) = O(1)$ 
+\end{tightlist}
+where $n$ is the size of the queue.
+
+We then sort based on the digit value in the following way:
+First we create an array \verb!q! of 10 queues.
+\verb!q[0]! is a queue that will hold values with digit value of \verb!0!,
+\verb!q[1]! is a queue that will hold values with digit value of \verb!1!, etc.
+For each value of \verb!x!, we place the value into the appropriate queue
+based on the digit of that value.
+When we're done, we remove all the values in \verb!q[0]! and place them
+in order into \verb!x!.
+We then repeat with \verb!q[1]!, etc.
+Because the operations on the queue all have runtime of $O(1)$,
+the total runtime is $O(n)$.
+
+We then repeat the process, but now determine which queue a value of \verb!x!
+should go into by the tens digit of that value.
+Altogether the runtime is $O(2n)$.
+
+In our example above, the numbers have 2 digits.
+If the numbers have $d$ digits, then the runtime is $O(dn)$.
+If the number of digits $d$ is fixed (i.e., is a constant),
+then the runtime is $O(n)$.
+
+For space, the total amount of memory used by the queues 
+adds up to 
+$O(n)$.
+So although the queue-based version of radix sort is faster,
+it's at the expense of memory.
+Remember that.
+Nothing is for free.
+
+Note that by using queues, 
+the sorting process is stable:
+a number that has joined a queue will always be ahead of another
+that joined the queue later.
+After each pass, the values of a queues are dequeued and put back 
+into the original array, of course starting with 
+the queue corresonding to \verb!0!.
+
+Note that when we use queues for distribution, a value
+enters the queue without being compared when other values.
+Therefore in this context radix sort is a distribution (non-comparison) sorting
+algorithm.
+
+Another thing to note is that we are assuming all the numbers
+we are sorting have the same number of digits.
+What if the number of digits are different?
+As mentioned above, if you call \verb!subkey(key, i)!
+and \verb!key! has no digit at \verb!i!,
+\verb!subkey(key, i)! returns the smallest possible digit value, i.e., \verb!0!.
+
+The above starts with the \lq\lq smallest" digit (i.e., the ones digit).
+That's why it's called \defone{least signicant digit (LSD) radix sort}.
+
+\newpage
+
+\begin{ex}
+  Perform LSD radix sort on the following values, showing the
+  values of the array after each pass:
+  \[
+    121, 23, 231, 89, 123, 536, 697, 457, 355, 243, 657, 345, 174, 248, 346, 376
+  \]
+  \qed
+\end{ex}
+
+\begin{ex}
+What happens when you sort not by single digit for each pass, but
+\textit{two} digits?
+\qed
+\end{ex}
+
+
+
+\newpage
+\section{MSD radix sort}
+
+Instead of sorting numbers by sorting on their digits from right to left, i.e.,
+starting with the least significant digit,
+you can do the same thing but going left to right.
+That's \defone{MSD radix sort} (MSD = most significant digit).
+If you
+sort numbers using MSD
+radix sort on
+\[
+22, 19, 31, 91, 90, 10, 45
+\]
+after the first pass (i.e., after stable sorting on the tens), you 
+you will see this:
+\[
+19, 10, 22, 31, 45, 91, 90
+\]
+Now we (stable) sort by the ones:
+\[
+10, 90, 31, 91, 22, 45, 19
+\]
+
+
+
+
+For numbers with different lengths, you can
+pad on the right with an extra \lq\lq digit'' that is infinitely small.
+For instance, say you pad the above on the right with \verb!?!
+and assume that $? < 0 < 1 < 2 < 3 < 4 < 5 < 6 < 7 < 8 < 9$ to get
+\[
+2?, 1?, 3?, 91, 9?, 19, 45
+\]
+Then after performing a stable sorting on the leftmost digit, I get
+\[
+1?, 19, 2?, 3?, 45, 91, 9?, 
+\]
+and on after the second pass of stable sorting on the second digit, I get
+\[
+1?, 19, 2?, 3?, 45, 9?, 91  
+\]
+After the array is sorted, you can remove this extra data \verb!?! to get
+\[
+1, 19, 2, 3, 45, 9, 91  
+\]
+
+If you think that's bizarre, then think again -- you have
+seen this before.
+Let's look at strings.
+Suppose you have an array of string
+\verb!"apple"!,
+\verb!"abe"!,
+\verb!"cat"!,
+\verb!"ab"!,
+\verb!"bee"!,
+\verb!"cap"!.
+Using MSD radix sort, you would get
+\[
+\texttt{"ab",
+"abe",
+"apple",
+"bee",
+"cap".
+"cat"}
+\]
+where the order of each character is determined by its ASCII code.
+
+The above ordering is called \defterm{dictionary order}. Duh.
+
+Note that you  don't really need to \lq\lq pad on the right''.
+For instance when comparing strings using the dictionary ordering
+on C-strings $x$ and $y$ to compute the boolean value of
+$x < y$,
+you run a loop comparing \verb!x[i]! and \verb!y[i]!.
+If \verb!i! is less than the length of \verb!x! but $\geq$ the length of
+\verb!y!,
+you return true.
+If \verb!i! is less than the length of \verb!y! but $\geq$ the length of
+\verb!x!,
+you return false.
+If \verb!x[i]! $<$ \verb!y[i]!, you return true.
+If \verb!x[i]! $>$ \verb!y[i]!, you return false.
+If \verb!x[i]! \verb!==! \verb!y[i]!, you increment \verb!i! and
+continue on to the next iteration of the loop.

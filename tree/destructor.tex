@@ -1,0 +1,114 @@
+%-*-latex-*-
+\sectionthree{Destructor/deallocation}
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+
+Suppose you have a tree $T$ in the heap.
+Say a pointer \verb!p! points to the root of the tree (with
+value $\alpha$ in the diagram):
+
+\input{stdout29.tex}
+
+The memory used by the node (with value $\alpha$) and the
+subtrees ($T_1$ and $T_2$) must all be returned to the heap.
+Suppose the function is called \verb!deallocate! and the
+parameter the a pointer to the root.
+{\small
+\begin{Verbatim}
+    deallocate(p);
+\end{Verbatim}
+}
+Of course this would result in
+{\small
+\begin{Verbatim}
+    delete p;
+    deallocate(q);
+    deallocate(r);
+\end{Verbatim}
+}
+where \verb!q! and \verb!r! are pointers to the left and right
+subtrees of node with value $\alpha$.
+Therefore the code would look like:
+{\small
+\begin{Verbatim}[frame=single]
+void deallocate(Node * p)
+{
+    if (p != NULL)
+    {
+        deallocate(p->left_);
+        deallocate(p->right_);
+        delete p;
+    }
+}
+\end{Verbatim}
+}
+Of course you \textit{cannot} do this:
+{\small
+\begin{Verbatim}[frame=single]
+void deallocate(Node * p)
+{
+    if (p != NULL)
+    {
+        delete p;
+        deallocate(p->left_);
+        deallocate(p->right_);
+    }
+}
+\end{Verbatim}
+}
+Do you see why?
+
+
+The above is for the case where the tree is a binary tree.
+It's clear what you need to do for a general tree.
+
+Notice that the above uses the postorder traveral on the tree, i.e.,
+we perform a postorder traveral of the tree and
+perform deallocate the memory
+used by each node.
+
+Note that if you have a tree class (for instance a binary tree class):
+{\small
+\begin{Verbatim}[frame=single]
+class Tree
+{
+private:
+    Node * proot_;
+};
+\end{Verbatim}
+}
+the destructor can then be
+{\small
+\begin{Verbatim}[frame=single]
+class Tree
+{
+public:
+    ...
+    ~Tree()
+    {
+        deallocate(proot_);
+    }
+...
+};
+\end{Verbatim}
+}
+You should probably also have a method to clear the tree:
+{\small
+\begin{Verbatim}[frame=single]
+class Tree
+{
+public:
+    ...
+    void clear()
+    {
+        deallocate(proot_);
+        proot_ = NULL;
+    }
+...
+};
+\end{Verbatim}
+}
+This is sort of like the destructor except that the tree object does not go out of
+scope and you are in control of calling this method.
+

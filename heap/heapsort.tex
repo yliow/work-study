@@ -1,0 +1,193 @@
+%-*-latex-*-
+% https://en.wikipedia.org/wiki/Heapsort#Variations
+
+\sectionthree{Heapsort}
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+
+\textsc{Heapsort given a maxheap.}
+Now we delete the root from the heap.
+Because this is a maxheap, the root, is the 
+maximum value of \verb!x[0..9]!.
+We swap \verb!x[0]! and \verb!x[9]!
+and re-heapify to get a heap \verb!x[0..8]!.
+In other words we're essentially doing a delete of the value at \verb!x[0]!
+(the extract-max operation), putting this value at \texttt{x[9]}.
+
+We repeat the above to get a heap \verb!x[0..7]!.
+At this point the largest value of the array is at \verb!x[9]!
+and the second largest is at \verb!x[8]!.
+
+We repeat until the heap has only one value, i.e., the heap is \verb!x[0]!.
+The whole array must be sorted in ascending order.
+
+The runtime is, informally, $\log_2 n + \log_2 (n - 1) + \cdots$
+which is $\log_2 n! \leq \log_2 n^n = n \log_2 n$.
+
+So the total time for the above process,
+creating the heap and then removing roots from the 
+heap is roughly $2 n \log_2 n$ and therefore
+the runtime for heapsort is $O(n \log_2 n)$.
+
+Note that the heapsort has a worse runtime of $n \log_2 n$
+whereas quicksort can have a worse runtime of $n^2$
+although
+on the average quicksort is $O(n \log n)$ and 
+typically quicksort is faster than heapsort by a constant
+factor.
+Although mergesort does achieve $n \log_2 n$ for worse runtime,
+remember that mergesort needs $O(n)$ space.
+However heapsort is not stable whereas mergesort is stable.
+
+\input{exercises/heapsort-0/main.tex}
+
+\newpage
+Here is a maxheap say constructed
+using build-maxheap:
+
+\input{stdout62.tex}
+
+Let's perform heapsort on this maxheap.
+Recall that extract-root will throw away the root by replacing
+the value at the root with the last value in the tree (i.e.,
+the rightmost value at the last level of the tree).
+Instead of replacing the root with the last value,
+I will \textit{swap} the root value and last value.
+Otherwise it's the same extract-root operation.
+Let's do it.
+
+
+\textsc{Step 1}.
+First I swap the root value and the last value:
+
+\input{stdout63.tex}
+
+
+I color \texttt{9} in red to remind myself
+that the \texttt{9} should not be considered part of the maxheap,
+but of course it's in the array.
+In terms of an array the above diagram would correspond to this array:
+
+\input{stdout64.tex}
+
+I still need to heapify-down the \texttt{6} to get this:
+
+\input{stdout65.tex}
+\input{stdout66.tex}
+
+Because I started with a maxheap, \verb!9!, the value I get from extract-root,
+is the largest value in the array.
+Since it moved to the last index position in the array,
+this means that \verb!9! has found its right place.
+
+
+\textsc{Step 2}.
+Now I repeat the above process:
+first I swap the root (i.e., \texttt{8}) and
+the last value of the tree (i.e., \texttt{0}) to get this:
+
+
+\input{stdout67.tex}
+\input{stdout68.tex}
+
+(at this point \verb!9! and \verb!8! are not part of the heap)
+then I heapify-down \texttt{0} to get this:
+
+\input{stdout69.tex}
+
+The array is
+
+\input{stdout70.tex}
+
+This is the second extract-max.
+This means that \verb!8! is the second largest value in the array.
+Note also that it's in its right place.
+
+
+\textsc{Step 3}.
+Next I swap the root value (i.e., \texttt{7}) and the last value
+of the tree (i.e., \texttt{1})
+
+\input{stdout71.tex}
+
+and heapify at \texttt{1} to get this:
+
+\input{stdout72.tex}
+\input{stdout73.tex}
+
+\textsc{Step 4}.
+I swap \texttt{6} and \texttt{2}:
+
+\input{stdout74.tex}
+
+and heapify-down at \texttt{2} to get:
+
+\input{stdout75.tex}
+\input{stdout76.tex}
+
+
+\textsc{Step 5}.
+I swap \texttt{4} and \texttt{1}:
+
+\input{stdout77.tex}
+
+and heapify-down at \texttt{1} to get this:
+
+\input{stdout78.tex}
+\input{stdout79.tex}
+
+
+\textsc{Step 6}.
+I swap \texttt{3} and \texttt{0}:
+
+\input{stdout80.tex}
+
+heapify-down at \texttt{0}:
+
+\input{stdout81.tex}
+\input{stdout82.tex}
+
+
+\textsc{Step 7}.
+Swap \texttt{2} and \texttt{0}:
+
+\input{stdout83.tex}
+
+heapify-down at \texttt{0}:
+
+\input{stdout84.tex}
+\input{stdout85.tex}
+
+
+\textsc{Step 8}.
+I swap \texttt{1} and \texttt{0}
+
+\input{stdout86.tex}
+
+Clearly there's no need to heapify-down since the tree now has size 1.
+At this point, the array is
+\input{stdout87.tex}
+It's sorted!
+
+Here's the algorithm:
+\begin{console}
+ALGORITHM: heapsort
+INPUT:     x - array
+           n - length of x
+
+Perform build_maxheap on x[0..n - 1]
+for i = n - 1, n - 2, ..., 1: 
+    swap x[0] and x[i]
+    perform heapify_down on x[0..i - 1] at index 0
+\end{console}
+
+\input{exercises/heapsort-1/main.tex}
+
+\input{exercises/heapsort-2/main.tex}
+
+\input{exercises/heapsort-3/main.tex}
+% The minimum must be a leave. Look at $n/2, ..., n - 1$.
+% n-1 - n/2 + 1 = n - n / 2 accesses.
+
+\input{exercises/heapsort-4/main.tex}

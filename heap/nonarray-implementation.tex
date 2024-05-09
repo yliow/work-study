@@ -1,0 +1,125 @@
+%-*-latex-*-
+\sectionthree{Implementation}
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+
+Frequently heaps are implemented using arrays,
+i.e., they are array trees.
+
+\input{exercises/nonarray-implementation-0/main.tex}
+
+\input{exercises/nonarray-implementation-1/main.tex}
+
+There are 2 ways of doing the above.
+
+Method 1:
+For object $x$, instead of using $x.priority$,
+use $(priority, time)$ where the minheap maintains
+a time that is incremented every time
+an insert occurs. The ordering of $(priority, time)$
+is dictionary.
+For the case of maxheap, decrement the time counter.
+
+Disadvantage: If the heap runs for a very long time,
+the time might overflow.
+
+Method 2:
+The heap is made up of linked list of values.
+Each linked list contains values of the same priority.
+When a value $x$ is inserted, if $x.priority$ occurs in
+the minheap, insert $x$ into the correct linked list.
+If x's priority is new, create a new linked list and
+insert into heap.
+Note that we need to know if a linked list of the
+correct priority exists in the heap.
+We can have a hash table of (priority, heap index).
+During heap operations (heapify-up and -down), the
+hash table must be updated during the swaps.
+If the root linked list is empty, it is removed from the heap.
+If the heap allows priority modification, then
+a non-root linked list can become empty -- this should not be
+delete.
+Therefore during the extract-root operation,
+need to loop over the extract-root operation until
+the new root is a non-empty linked list.
+
+\input{exercises/nonarray-implementation-2/main.tex}
+
+Clearly the following must work: copy constructor, destructor,
+\verb!operator=!, \verb!operator==!.
+The class should look like this:
+\begin{console}
+template < typename T >
+class MaxHeap
+{
+public:
+private:
+    std::vector < T > x;
+};
+\end{console}
+
+\input{exercises/nonarray-implementation-3/main.tex}
+
+\section{Non-array implementation}
+
+For a non-array implementation of heaps,
+consider this:
+
+\input{stdout103.tex}
+
+Of course I need a pointer to the root.
+That's pretty obvious.
+Another thing to note is that because of the way I add nodes,
+i.e., always at the lowest level and left-to-right, I should have a pointer
+to the parent where I have a new node.
+
+\input{exercises/nonarray-implementation-4/main.tex}
+
+However that takes $(\log n)$ time.
+So we might as well have a pointer that records where the
+insert should go.
+But that's not enough.
+Once a level is full, we need to go to the next level.
+Therefore we need two (and not one) extra pointer.
+Like this:
+
+\input{stdout104.tex}
+
+Note that each node has not just left child and right child pointer.
+When we do delete, we might need to go to the previous level.
+That means that each node must have a parent pointer too.
+Of course the parent pointer is also needed when I do heapify-up, right?
+
+If I insert \texttt{4} to the above, then I get this:
+
+\input{stdout105.tex}
+
+If I add \texttt{8}, I get this:
+
+\input{stdout106.tex}
+
+Once I add a \texttt{9}, I get this:
+
+\input{stdout98.tex}
+
+Get it?
+
+  
+Clearly the above idea works for complete trees where
+nodes are added left-to-right at the last level.
+
+Note that \verb!p! points to the parent where new nodes should be
+attached but does not have information on whether it should be
+as a left or as a right child.
+You can also include an integer variable \texttt{num\_children}
+to tell you how many children
+there are.
+If the number of children is 0, then the new node should be
+attached as a left child.
+If the number of children is 1, then the new node should be attached
+as a right child.
+
+\input{exercises/nonarray-implementation-5/main.tex}
+
+\input{exercises/nonarray-implementation-6/main.tex}

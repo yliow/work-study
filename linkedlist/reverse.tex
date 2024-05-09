@@ -1,0 +1,99 @@
+%-*-latex-*-
+\sectionthree{Reverse}
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+
+The reverse of a string is just writing the string in the reverse order.
+For instance the reverse of
+\[
+\text{\texttt{helloworld}}
+\]
+is
+\[
+\text{\texttt{dlrowolleh}}
+\]
+In the case of a string, if the string is stored in \verb!x!, and you want to reverse
+in \text{y}, you just do this:
+\begin{console}
+for (int i = 0; i < len(s); i++)
+{
+    y[len(s) - 1 - i] = x[i];
+}
+y[len(s)] = '\0';
+\end{console}
+In this case the reverse is stored in another array.
+If you want to store the reverse in the same string, you can copy \verb!y! back to
+\verb!x!.
+But if you want to put the reverse back into \verb!x!,
+you might as well swap the first and last character of \verb!x!,
+swap the second and second last, etc.
+\begin{console}
+int len = strlen(s)
+for (int i = 0; i < len / 2; ++i)
+{
+    x[len - 1 - i] = x[i];
+}
+\end{console}
+
+However there's another way to do this:
+you put the characters in the string into a stack, and then pop off the values
+and put is back in the string (or into another if the original shouldn't be
+destroyed).
+Here's the code:
+\begin{console}
+stack.clear();
+for (int i = 0; i < strlen(s); ++i)
+{
+    stack.push(x[i]);
+}
+for (int i = 0; i < strlen(s); ++i)
+{
+    x[i] = stack.top();
+    stack.pop();
+}
+\end{console}
+
+So what?
+Notice that in this new algorithm, you always traverse the string (container of
+characters) in the same direction, from index 0 to the highest index.
+In the algorithm above, you (basically) traverse \verb!x! in one direction
+and \verb!y! in the opposite direction.
+You're using the fact that a string can be efficiently traversed in the forward
+and the backward direction.
+
+\begin{ex}
+  Singly linked list reversal.
+  \begin{enumerate}[nosep]
+
+  \item Given a singly linked list,
+    replace it with its reverse.
+    Assume the singly linked list is the plain singly linked list,
+    i.e., no sentinel nodes.
+    Assume you have a stack available -- this will make it easier.
+    This means that is the singly linked list
+    has values 5, 3, 1, 7 (from head to tail), then
+    after your reverse, the singly linked list
+    has values 7, 1, 5, 3 (from head to tail).
+
+  \item Now ... given a singly linked list,
+    reverse the values in the list without using
+    any other container (so not use a stack, array, etc.)
+    Use the least number of extra variables
+    and make sure your runtime is $O(n)$.
+    (This exercise already appear in the section on singly linked list.)
+  \end{enumerate}
+\qed
+\end{ex}
+
+\begin{ex}
+Suppose you have a singly linked list and I want you
+to put the values in the reverse order into another
+singly linked list.
+Assume you don't have any other container.
+Of course you can use a constant number of variables.
+How would you do it?
+What is the runtime?
+\qed
+\end{ex}
+

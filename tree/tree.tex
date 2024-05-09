@@ -1,0 +1,200 @@
+%-*-latex-*-
+\sectionthree{Tree}
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+
+A tree is just a connected graph without cycles.
+In this case, I'm talking about a tree as an undirected
+graph.
+You have to be careful, sometimes, a tree can also 
+refer to a tree as a directed graph and acyclic.
+
+Sometimes a special node is selected.
+In this case, such a tree is sometimes called a rooted tree
+(or a tree with a root).
+
+Here's a tree (directed version):
+
+\input{stdout00.tex}
+
+\begin{myenum}
+
+  \li
+  $a$ is the \defone{root} of the tree.
+
+  \li
+  $a$ has 3 \defone{children}, i.e., $b,c,d$; 
+  $a$ has a
+  \sidebarskip{8pt}
+  \defone{branching factor} 
+  of 3.
+  Sometimes, it's convenient to number the children.
+  I'll call $b$ child $0$ of $a$; $d$ is child $2$ of $a$.
+
+  \li
+  $a$ is the \defone{parent} of $b$.
+
+  \li
+  $k$,$l$,$f$,$g$,$m$,$i$,$j$ are called
+  \sidebarskip{-2pt}
+  \defone{leaves}
+  or
+  \sidebarskip{12pt}\defone{non-internal} nodes because
+  they don't have children.
+
+  \li
+  $a,b,c,d,e,h$ are called
+  \sidebarskip{-2pt}
+  \defone{non-leaf} nodes or 
+  \sidebarskip{12pt}\defone{internal} nodes because 
+  each have at least one child.
+
+  \li
+  $b$ has a \defone{depth} of $1$, i.e., 
+  the length of the path from the root to $b$
+  is 1. I will also say that $b$ is at level $1$.
+  A root (see $a$ above) has depth 0.
+
+  \li
+  $b$ has a \defone{height} of $2$, i.e., 
+  the length of the longest path from 
+  $b$ to a leaf is 2.
+  A leaf (see $k$ above) has height 0.
+
+  \li
+  The \defone{height} of a tree is the height of the root of the tree.
+  The above tree has a height of 3.
+  The height of an empty tree is -1.
+
+  \li
+  The root is at level 0. $b,c,d$ are at level 1.
+  $e,f,g,h,i,j$ are at level 2. $k,l,m$ are at level 3.
+  
+  \li
+  Two nodes $u$ and $v$ are \defone{siblings} if they have
+  the same parent.
+  For instance $b,c,d$ are siblings.
+  
+  \li
+  $u$ has \defone{descendent} $v$ if there is a sequence of nodes 
+  $u = v_0$, $v_1$, ..., $v_n = v$ where $v_i$ is the parent of $v_{i+1}$.
+  $v$ is the \defone{ancestor} of $u$ if $u$ is a descendent of $v$.
+  For instance in the above tree $b$ is an ancestor of $i$ and
+  $i$ is a descendent of $l$.
+
+\end{myenum}
+Note that the above tree is a directed graph.
+The following is also a tree (as in an \textit{undirected} tree).
+
+\input{stdout01.tex}
+
+In the case of implementation, you can think of the directed version
+as having pointers from a parent to the children.
+In the case of the undirected version, you can think of
+each edge as allowing you to go both up and down -- 
+nodes having pointers going to their children or parent.
+Of course exceptions being that roots have no parents and leaves have no
+children.
+
+For each node of a tree $T$, if you consider all the descendents of the node, 
+you have a tree. This is called a \defone{subtree} of $T$.
+For instance
+
+\input{stdout02.tex}
+
+is a subtree of 
+
+\input{stdout03.tex}
+
+I will say that this is the subtree at $b$.
+
+In the case of a node with two child, 
+there are two subtrees, the subtree on the left is called the 
+\defone{left subtree} and the one on the right is called the 
+\defone{right subtree}.
+(Duh.)
+Look at the subtree at $b$:
+
+\input{stdout04.tex}
+
+The nodes $e,k,l$ form the left subtree of $b$
+and the single node $f$ form the right subtree of $b$.
+
+
+A tree is said to be \defone{$k$--ary} if every node has at most $k$ children;
+that's the same as saying that every node has a maximum branching factor of
+$k$.
+In particular, a \defone{binary} tree is a tree with at most 2 children.
+
+\input{exercises/tree-1/main.tex}
+
+We include the empty graph as a tree, except of course such trees
+don't have roots.
+Consider a $k$--ary tree $T$.
+\begin{myenum}
+
+\li $T$ is \defone{full} if every node has exactly $k$ children, except for 
+the leaves, i.e., if every node has
+either $k$ or $0$ children.
+Here's a full binary tree:
+
+\input{stdout05.tex}
+
+Here's another:
+
+\input{stdout06.tex}
+
+\li $T$ is \defone{perfect} if $T$ is full and the leaves are 
+at the same level.
+Here's a perfect binary tree:
+
+\input{stdout07.tex}
+ 
+\li $T$ is \defone{complete} if it's \lq\lq almost full'' 
+except that the last level 
+might not have all the nodes. 
+Here's a complete binary tree that is not full:
+
+\input{stdout08.tex}
+      
+\li $T$ is \defone{balanced} if at each node,
+every pair of children have heights differ by 0 or 1.
+\end{myenum}
+
+\begin{ex}
+If $T$ is a balanced tree, does it mean that $T$ is complete?
+If $T$ is complete, does it mean that $T$ is balanced?
+\qed
+\end{ex}
+
+Let $T$ be a $k$--ary tree with height $h$ and the total 
+number of nodes is $n$.
+At level $\ell$,
+there are at most $k^\ell$ nodes.
+(Don't forget that the first level that contains only the root
+is called level $0$.)
+In particular for a binary tree, at level $\ell$, 
+there are $2^\ell$ nodes.
+
+Therefore if the height is $h$, $T$ can have at most
+\[
+k^0 + k^1 + \cdots + k^h = \frac{k^{h+1} - 1}{k-1}
+\]
+nodes.
+(Remember your geometric sum formula?)
+In particular, for a binary tree, $T$ can have at most
+\[
+2^{h+1} - 1
+\]
+nodes.
+Since $T$ has $n$ nodes, we must have the following relation
+between $n$ and $h$ for a $k$--ary tree:
+\[
+h + 1 \leq n \leq \frac{k^{h+1} - 1}{k-1}
+\]
+And for the case of binary tree, we have
+\[
+h + 1 \leq n \leq 2^{h+1}
+\]
+
