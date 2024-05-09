@@ -4,7 +4,7 @@
 cantor          done    copied back to courses/math325/n
 regular         done    copied back to courses/ciss362/n
 cfl             done    copied back to courses/ciss362/n
-languages
+languages       done    
 tm
 decidability
 containers
@@ -13,6 +13,10 @@ linkedlist                                                (this is mostly done)
 tree                                                      (this is mostly done)
 hashtable                                                 (this is mostly done)
 ===============================================================================
+
+Dr. Liow's notes:
+
+>>>>>>> 5cb20ccddfb7216e32c9f4bbc0b9b11bf6774b71
 2024/04/11: In some latex file near the top the following
 
 \begin{python0}

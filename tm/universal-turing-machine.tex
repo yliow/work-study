@@ -1,4 +1,7 @@
-\section{Universal Turing machine}
+\sectionthree{Universal Turing machine}
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
 
 The universal Turing machine, frequently denoted by
 $M_U$ or $U$, is a Turing machine that
@@ -16,14 +19,14 @@ Suppose you're given a Turing machine $M = (\Sigma, \Gamma, Q, q_0, q_\accept, q
 \delta)$.
 First of all $\Gamma$ is finite, say (for simplicity),
 \[
-\Gamma = \{ \$, \sqcup, a, b, c, d\}
+\Gamma = \{ \$, \sqcup, a, b\}
 \]
-Let me encode $ \$ $, $\sqcup$, $a$, $b$, $c$, $d$ as
+Let me encode $ \$ $, $\sqcup$, $a$, $b$ as
 \begin{align*}
   \langle \$ \rangle  &= 1^1 \\
   \langle \sqcup \rangle  &= 1^2 \\
   \langle a \rangle  &= 1^3 \\
-  \langle b \rangle  &= 1^4 \\
+  \langle b \rangle  &= 1^4 
 \end{align*}
 and then encode $\Gamma$ as
 \[
@@ -474,17 +477,23 @@ iff $M$ accepts $w$
 and 
 $U$ rejects $\langle M \rangle \# \langle w \rangle$
 iff $M$ rejects $w$.
+\textred{Specifically:
+  If $M$ rejects $w$ by entering its reject state, then
+  $U$ will also enter its reject state;
+  if $M$ rejects $w$ by never halting, then $U$ also
+  never halt while executing on the input
+  $\langle M \rangle \# \langle w \rangle$.}
 \qed
 \end{thm}
 
-There's something that's really really really important (but obvious)
-that, if you're
-not careful, you might not realize ...
+There's something that's really really really important (but obvious),
+but if you're
+not careful you might not realize ...
 
-Do you see that although $U$ has finitely many states, \textit{BUT}
+Do you see that although $U$ has finitely many states, \textit{but}
 the TM that $U$ simulates can have an arbitrary number of states.
 What I mean is that, say our $U$ has 100 states.
-$U$ can simulate a TM with 1,000 states,
+$U$ can simulate a TM with 1000 states,
 and it can simulate a TM with $1,000,000$ states,
 and it can simulate a TM with $1,000,000,000,000$ states.
 
@@ -677,5 +686,44 @@ that the TM $M$ can run with.
   Using the TM software given in this class,
   build a universal TM that according to the \lq\lq more flexible''
   specification of the universal TM above.}
+  \qed
+\end{ex}
+
+\newpage
+\begin{ex}
+  A TM can potentially run forever.
+  Describe a universal TM $U'$
+  that allows you to specify how long to
+  simulate $M$ on input $w$.
+  Note that this $U'$ will always halt:
+  if $M$ accepts/rejects $w$ in $n$ steps, then $U'$ halts in the
+  accept/reject state.
+  If $M$ does not enter its accept/reject state in $n$ steps,
+  then $U'$ enters its reject state and halt.
+  [HINT: For the input, you need the encoding of the
+  TM, encoding of the input, and encoding of \lq\lq time''.]
+  \qed
+\end{ex}
+
+\newpage
+\begin{ex}
+  Design a universal TM $U''$ that simulates two machines,
+  running the pair in a fair manner, i.e., run one transition
+  on one of the TM and then run one transition on the other
+  and then repeat.
+  If any of the two accepts, $U'$ accepts.
+  If both rejects, $U'$ rejects.  
+  %If anyone of the two halts, just continuing simulating the remaining.
+  %Of course if both halts, $U''$ halts too.
+  \qed
+\end{ex}
+
+\newpage
+\begin{ex}
+  Design a universal TM $U'''$ that simulates a TM $M$ running on $w$
+  and keeps a history of its computation, i.e., it record of all the IDs.
+  If $U'''$ sees a two completed IDs which are the same,
+  $U'''$ halts in the reject state.
+  Otherwise it halts in the same halt state of $M$ running on $w$.
   \qed
 \end{ex}
