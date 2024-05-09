@@ -16,7 +16,6 @@ hashtable                                                 (this is mostly done)
 
 Dr. Liow's notes:
 
->>>>>>> 5cb20ccddfb7216e32c9f4bbc0b9b11bf6774b71
 2024/04/11: In some latex file near the top the following
 
 \begin{python0}
