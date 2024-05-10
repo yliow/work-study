@@ -15,7 +15,7 @@ tree                                                      (this is mostly done)
 hashtable                                                 (this is mostly done)
 
 LATEX FOR QUIZZES
-The goal is to clean up the latex libraries for quizzes.
+The goal is to clean up my latex libraries for quizzes.
 First thing is to clean up the libraries for quizzes of ciss240 and ciss245.
 Look at
 -- quiz-template/
