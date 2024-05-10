@@ -1,6 +1,7 @@
 OPEN = xdg-open
 PDF = pdflatex --shell-escape $@.tex; \
         makeindex $@.idx; \
+        makeindex $@.idx; \
         pdflatex --shell-escape $@.tex; \
         $(OPEN) $@.pdf; 
 LATEXRM = rm -f \
@@ -12,7 +13,6 @@ LATEXRM = rm -f \
 main: 
 	$(PDF)
 	$(LATEXRM)
-	cp -r * /home/student/yliow/Documents/work/projects/work-study/languages/
 view:
 	$(OPEN) main.pdf
 v:
