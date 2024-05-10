@@ -6,7 +6,7 @@ cantor          done    copied back to courses/math325/n
 regular         done    copied back to courses/ciss362/n
 cfl             done    copied back to courses/ciss362/n
 languages       done    
-tm
+tm              done    
 decidability
 containers
 distribution-sort
