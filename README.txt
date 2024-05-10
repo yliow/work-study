@@ -1,3 +1,4 @@
+NOTES
                 ryan    liow
 350-heap        done    copied back to courses/ciss350/n
 350-hashtable   done    copied back to courses/ciss350/n
@@ -12,8 +13,19 @@ distribution-sort
 linkedlist                                                (this is mostly done)
 tree                                                      (this is mostly done)
 hashtable                                                 (this is mostly done)
-===============================================================================
 
+LATEX FOR QUIZZES
+The goal is to clean up the latex libraries for quizzes.
+First thing is to clean up the libraries for quizzes of ciss240 and ciss245.
+Look at
+-- quiz-template/
+-- ciss240-q0101/
+-- ciss245-q2101/
+Ideally ciss240-q0101/ and ciss240-q2101/ should be copied from quiz-template/.
+
+
+
+===============================================================================
 Dr. Liow's notes:
 
 2024/04/11: In some latex file near the top the following
