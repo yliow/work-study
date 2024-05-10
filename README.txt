@@ -14,7 +14,7 @@ linkedlist                                                (this is mostly done)
 tree                                                      (this is mostly done)
 hashtable                                                 (this is mostly done)
 
-LATEX FOR QUIZZES
+PROJECT: LATEX FOR QUIZZES
 The goal is to clean up my latex libraries for quizzes.
 First thing is to clean up the libraries for quizzes of ciss240 and ciss245.
 Look at
@@ -23,8 +23,24 @@ Look at
 -- ciss245-q2101/
 Ideally ciss240-q0101/ and ciss240-q2101/ should be copied from quiz-template/.
 
+PROJECT: update for vm
 
+PROJECT: f36
+-- f36 (and further vm) must have the update_vm program in home/student/.
 
+student's vm                      github.com/yliow/update_vm/            yliow/projects/update_vm/
+/home/student/update_vm.py                                               |           
+                                                                         +-- 0/
+                                                                             |
+                                                                             +-- build/
+                                                                             |   |
+                                                                             |   +-- build.py (build ../extras/*)
+                                                                             |
+                                                                             +-- extras/ (data files to be used by update.py
+                                                                             |
+                                                                             +-- update/
+                                                                             |   |
+                                                                             |   +-- update.py
 ===============================================================================
 Dr. Liow's notes:
 
