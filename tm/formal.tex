@@ -82,31 +82,9 @@ As always, if we will use $\derive^*$ to note ``the same or at
 least one derivation''.
 \end{defn}
 
-\begin{ex}
-Prove that
-\begin{tightlist}
-  \item $\derive^*$ is reflexive
-  \item $\derive^*$ is transitive
-\end{tightlist}
-\qed
-\end{ex}
+\input{exercises/formal0/main.tex}
 
-\begin{ex}
-  Implementation note:
-  Of course instead of using
-\[
- w q w'
-\]
-to describe an instantaneous description
-(where $w,w'$ are words and $q$ is a state),
-one can also use
-\[
- (w, q, w')
-\]
-In terms of implementation, this is clearly better.
-Otherwise in your program, you would have to continually search for
-the state within $wqw'$ ... which is annoying.
-\end{ex}
+\input{exercises/formal1/main.tex}
  
 \begin{defn}
 $x \in \Sigma^*$ is \defone{accepted} by $M$ is there is some $p
@@ -216,15 +194,7 @@ It' easy to design a TM that accepts all strings with
 characters from $\{a, b\}$:
 
 
-\begin{python}
-from latextool_basic import *
-print(automata(layout="""
-A
-""",
-edges=r"A,$(a\rightarrow a, S), (b\rightarrow a, S),(\SPACE\rightarrow \SPACE, S), $,A",
-A="initial|accept|label=$q_0$",
-))
-\end{python}
+\input{stdout10.tex}
 
 \end{eg}
   
@@ -319,12 +289,7 @@ there's exactly one accept state.
 When there's one accept state, it's conventional to denote this
 state as $q_\accept$.
 
-\begin{ex}
-Let $M$ be a TM with a set of accept states $F$.
-Design another TM $M'$ with exactly one accept state such that
-$L(M) = L(M')$.
-\qed
-\end{ex}
+\input{exercises/formal2/main.tex}
 
 \newpage
 \subsection{Single reject state}
@@ -335,23 +300,9 @@ there's exactly one reject state.
 When there's one accept state, it's conventional to denote this
 state as $q_\accept$.
 
-\begin{ex}
-Let $M$ be a TM with a set of accept states $F$.
-Design another TM $M'$ with exactly one reject state such that
-$L(M) = L(M')$.
-\qed
-\end{ex}
+\input{exercises/formal3/main.tex}
 
-\begin{ex}
-Let $M$ be a TM with a set of accept states and a set of reject states.
-Design another TM $M'$ with
-exactly one accept state and exactly reject
-such that
-$L(M) = L(M')$.
-\qed
-  \end{ex}
-
-
+\input{exercises/formal4/main.tex}
   
 \newpage
 \subsection{Read/write head that does not stay put}
@@ -363,12 +314,7 @@ stay (put).
 It seems that our TM has more power.
 But in fact:
 
-\begin{ex}
-Let $M$ be a TM whose read/write head can move left, right, or stay.
-Design another TM $M'$ such that that read/write head only move left or right
-and furthermore $L(M') = L(M)$.
-\qed
-\end{ex}
+\input{exercises/formal5/main.tex}
 
 \newpage
 \subsection{Moving off the left-end of the tape: begin-of-tape marker}
@@ -388,15 +334,7 @@ and let $\TM'$ be the class of TMs from Sipser's book
 in the sense that the read/write head will bounce back when it attempts
 move to the left from the first cell.
 
-\begin{ex}
-  \begin{tightlist}
-    \item Let $M$ in $\TM$. Design a $M'$ in $\TM'$ such that $L(M') = L(M)$.
-    \item Let $M'$ be in $\TM'$.
-    Design a $M$ in $\TM$ such that $L(M) = L(M')$.
-  \end{tightlist}
-  \qed
-\end{ex}
-
+\input{exercises/formal6/main.tex}
 
 \begin{eg} Here's a trick. To prevent the case where the TM moves
 left while it's already at the leftmost position, you need to
@@ -438,21 +376,7 @@ If you use the end-of-tape character $\EOT$
 to mark the end of output, $\EOT$ is not considered part of the output.
 For instance if the TM halts with this on the input tape:
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-h = RectContainer(x=0, y=0, align='bottom', direction='left-to-right')
-for i in [r'\DOLLAR', 'a','b','a','a','$\sqcup$','$\sqcup$','a', '$\sqcup$',r'$\EOT$','$\sqcup$','$\sqcup$']:
-    h += Rect2(0,0,1,1, label= r'\texttt{%s}' % i,
-               linewidth=0.01)
-    p += h
-p += Line(x0=h[-1].x1, y0=h[-1].y1, x1=h[-1].x1+0.5, y1=h[-1].y1,
-     linewidth=0.01)
-p += Line(x0=h[-1].x1, y0=h[-1].y0, x1=h[-1].x1+0.5, y1=h[-1].y0,
-     linewidth=0.01)
-print(p)
-\end{python}
+\input{stdout11.tex}
 
 then the ouptut is
 \[
@@ -467,21 +391,7 @@ In this case, the output will be all the characters up to but not including
 the first space.
 For instance
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-h = RectContainer(x=0, y=0, align='bottom', direction='left-to-right')
-for i in [r'$\DOLLAR$', 'a','b','a','a','$\sqcup$','$\sqcup$','$\sqcup$','$\sqcup$']:
-    h += Rect2(0,0,1,1, label= r'\texttt{%s}' % i,
-               linewidth=0.01)
-    p += h
-p += Line(x0=h[-1].x1, y0=h[-1].y1, x1=h[-1].x1+0.5, y1=h[-1].y1,
-     linewidth=0.01)
-p += Line(x0=h[-1].x1, y0=h[-1].y0, x1=h[-1].x1+0.5, y1=h[-1].y0,
-     linewidth=0.01)
-print(p)
-\end{python}
+\input{stdout12.tex}
 
 then the ouptut is
 \[
@@ -496,21 +406,7 @@ For instance in the input tape above, after shifting left by one and
 replacing the $\EOT$ by a space,
 we get
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-h = RectContainer(x=0, y=0, align='bottom', direction='left-to-right')
-for i in ['a','b','a','a','$\sqcup$','$\sqcup$','$\sqcup$','$\sqcup$','$\sqcup$']:
-    h += Rect2(0,0,1,1, label= r'\texttt{%s}' % i,
-               linewidth=0.01)
-    p += h
-p += Line(x0=h[-1].x1, y0=h[-1].y1, x1=h[-1].x1+0.5, y1=h[-1].y1,
-     linewidth=0.01)
-p += Line(x0=h[-1].x1, y0=h[-1].y0, x1=h[-1].x1+0.5, y1=h[-1].y0,
-     linewidth=0.01)
-print(p)
-\end{python}
+\input{stdout13.tex}
 
 and then the transducer halts.
 The output is then, again, the following:
@@ -616,62 +512,15 @@ $1^{10}0101^{15}$;
 to compute $10 - 5$, you use $1^{10}01101^{5}$;
 to compute $10 * 15$, you use $1^{10}011101^{15}$.
 
-\begin{ex}
-Now use $1111$ to denote the integer quotient
-and $11111$ to denote remainder.
-Add these features to your TM for operations on $\N$.
-\qed
-\end{ex}
+\input{exercises/formal7/main.tex}
 
-\begin{ex}
-Add exponentiation to your TM.
-\qed
-\end{ex}
-  
+\input{exercises/formal8/main.tex}
 
-\begin{ex}
-The natural thing to do next is $\Z$.
-We can encode value of $\Z$ if we have a \lq\lq sign''.
-For instance for $5$, we can use the encoding $11^5$.
-For $-5$, we can use encoding $01^5$.
-In other words we use $1$ for \lq\lq positive'' and $0$ for \lq\lq negative''.
-Build an TM that works like an integer calculator that
-supports the obvious operators.
-\qed
-\end{ex}
+\input{exercises/formal9/main.tex}
 
-\begin{ex} (Binary representation)
-If we allow our $\Sigma$ to have more characters, we can
-use a different encoding.
-For instance, say $\Sigma = \{0,1,\#\}$.
-Then we can use $\#$ as a \lq\lq separator''.
-For instance to encode $5+7$, I can use
-\[
-1^5 \# 1 \# 1^7
-\]
-This frees up $0$.
-Therefore I can use binary number representation.
-For instance $5$ now can be encoded as $101$ (i.e., $101_2$).
-In that case $5 + 7$ becomes
-\[
-\langle 5 \rangle \# \langle + \rangle \# \langle 7 \rangle
-= 101 \# 1 \# 111
-\]
-Using this encoding to design a TM that computes $\Z$.
-\qed
-\end{ex}
+\input{exercises/formal10/main.tex}
 
-\begin{ex}
-Of course you can also compute rationals. For instance you
- can encode the fraction $-3/4$ by
- \[
- \langle -3 \rangle 0 \langle +4 \rangle
- = \langle - \rangle \langle 3 \rangle 0 \langle + \rangle \langle 4 \rangle
- = 01^3011^4
- \]
- Can you design a TM to add rationals?
- \qed
-\end{ex}
+\input{exercises/formal11/main.tex}
 
 \begin{eg}
 Design a TM that accepts $\{a^nb^nc^n \,|\, n \equiv 1
@@ -719,23 +568,7 @@ Sipser's TM by adding this transition:
 \]
 for all $q \in Q$.
 
-
-\begin{ex}
-Let $M$ be a DTM with no $\DOLLAR$ provided automatically as
-beginning-of-tape marker.
-Construct a new DTM from $M$, say $M'$,
-so that at the beginning (that means at the start state),
-the $M'$ \lq\lq shifts'' the input to the right by one square,
-inserts $\DOLLAR$ as the first character, this new $M'$ has
-the transition
-\[
-\delta(q, \DOLLAR) = (q, \DOLLAR, R)
-\]
-for all $q \in Q$
-and otherwise $M'$ \lq\lq work the same as'' $M$.
-\qed
-\end{ex}
-
+\input{exercises/formal12/main.tex}
 
 \newpage
 \subsection{End-of-tape}
@@ -748,57 +581,17 @@ It does not mean that the tape is finite.
 For instance, say you have the following input tape (with beginning-of
 tape marker):
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-h = RectContainer(x=0, y=0, align='bottom', direction='left-to-right')
-for i in [r'$\BOT$', 'a','b','a','a','$\sqcup$','$\sqcup$','a', '$\sqcup$','$\sqcup$',]:
-    h += Rect2(0,0,1,1, label= r'\texttt{%s}' % i,
-               linewidth=0.01)
-    p += h
-p += Line(x0=h[-1].x1, y0=h[-1].y1, x1=h[-1].x1+0.5, y1=h[-1].y1,
-     linewidth=0.01)
-p += Line(x0=h[-1].x1, y0=h[-1].y0, x1=h[-1].x1+0.5, y1=h[-1].y0,
-     linewidth=0.01)
-print(p)
-\end{python}
+\input{stdout14.tex}
 
 and the read-write head actually reached the space after
 the \texttt{a} furthest from the $\BOT$, then
 this is what the input tape looks like when it has an end-of-tape marker:
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-h = RectContainer(x=0, y=0, align='bottom', direction='left-to-right')
-for i in [r'$\BOT$', 'a','b','a','a','$\sqcup$','$\sqcup$','a',
-    '$\sqcup$',r'$\EOT$', '$\sqcup$',]:
-    h += Rect2(0,0,1,1, label= r'\texttt{%s}' % i,
-               linewidth=0.01)
-    p += h
-p += Line(x0=h[-1].x1, y0=h[-1].y1, x1=h[-1].x1+0.5, y1=h[-1].y1,
-     linewidth=0.01)
-p += Line(x0=h[-1].x1, y0=h[-1].y0, x1=h[-1].x1+0.5, y1=h[-1].y0,
-     linewidth=0.01)
-print(p)
-\end{python}
+\input{stdout15.tex}
 
 The end-of-tape marker is useful if I want to move the chunk of 
 characters that is processed so far to the right by say one square.
 
-\begin{ex}
-Check that if $M$ is a DTM with beginning-of-tape marker,
-then it can be converted to a DTM with beginning--and--end--tape
-marker.
-\qed
-\end{ex}
+\input{exercises/formal13/main.tex}
 
-
-\begin{ex}
-Given a deciding TM $M$, construct a DTM $M'$ such that
-$L(M) = L(M')$ and for each $w \notin L(M')$, $M'$ does not halt.
-\qed
-\end{ex}
-  
+\input{exercises/formal14/main.tex}
