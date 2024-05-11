@@ -27,14 +27,14 @@ PROJECT: LATEX FOR QUIZZES
 The goal is to clean up my latex libraries for quizzes.
 We'll start off with ciss240 and ciss245.
 Look at
--- quiz-template/
--- ciss240/q/q0101/
--- ciss245/q/q2101/
+-- ciss240/q/q0101/questions/
+-- ciss245/q/q2101/questions/
+-- projects/latex-templates/quiz/template/questions/
 -- /usr/share/texlive/texmf-local/tex/latex/yliow/
 
 Ideally
 -- ciss240/q/q0101/question/ and ciss245/q/q2101/questions/ should be copied
-   from quiz-template/ with minimal change.
+   from projects/latex-templates/quiz/template/questions/ with minimal change.
 -- this means that most of the extra stuff in ciss240/q/q0101/questions should
    be placed in the yliow latex library.
 
