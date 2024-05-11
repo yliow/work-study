@@ -15,13 +15,12 @@ courses/ciss350/n/linkedlist/         linkedlist/                        (this i
 courses/ciss350/n/tree/                                                  (this is mostly done)
 
 projects/latex-templates/             projects/latex-templates/        
-courses/ciss240/q/q01*/
-courses/ciss245/q/q21*/
-courses/ciss245/q/q22*/
-courses/ciss245/q/q23*/
+courses/ciss240/q/q01*/               courses/ciss240/q/q01*/
+courses/ciss245/q/q21*/               courses/ciss245/q/q21*/
+courses/ciss245/q/q22*/               courses/ciss245/q/q22*/
+courses/ciss245/q/q23*/               courses/ciss245/q/q23*/
 
-
-hashtable                                                 (this is mostly done)
+hashtable                                                                (this is mostly done -- CHECK
 
 -------------------------------------------------------------------------------
 PROJECT: LATEX FOR QUIZZES
