@@ -1,11 +1,11 @@
 PROJECT: NOTES
-yliow home dir    work study dir ryan    liow
---------------    -------------- ------- ------
-courses/ciss350/n 350-heap       done    copied back to courses/ciss350/n
-                350-hashtable   done    copied back to courses/ciss350/n
-cantor          done    copied back to courses/math325/n
-regular         done    copied back to courses/ciss362/n
-cfl             done    copied back to courses/ciss362/n
+yliow home dir                work study dir  ryan    liow
+--------------                --------------  ------- ------
+courses/ciss350/n/heap/       350-heap/       done    copied back to courses/ciss350/n/heap/
+courses/ciss350/n/hashtable/  350-hashtable/  done    copied back to courses/ciss350/n/hashtable/
+courses/math325/n/cantor/     cantor/         done    copied back to courses/math325/n/cantor/
+courses/ciss362/n/regular/    regular/        done    copied back to courses/ciss362/n/regular/
+courses/ciss362/n/cfl         cfl/            done    copied back to courses/ciss362/n/cfl/
 languages       done    
 tm              done    
 decidability
