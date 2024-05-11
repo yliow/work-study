@@ -5,9 +5,9 @@ courses/ciss350/n/heap/       350-heap/       done    copied back to courses/cis
 courses/ciss350/n/hashtable/  350-hashtable/  done    copied back to courses/ciss350/n/hashtable/
 courses/math325/n/cantor/     cantor/         done    copied back to courses/math325/n/cantor/
 courses/ciss362/n/regular/    regular/        done    copied back to courses/ciss362/n/regular/
-courses/ciss362/n/cfl         cfl/            done    copied back to courses/ciss362/n/cfl/
-languages       done    
-tm              done    
+courses/ciss362/n/cfl/        cfl/            done    copied back to courses/ciss362/n/cfl/
+courses/ciss362/n/languages/  languages/      done    
+courses/ciss362/n/tm/         tm/             done    
 decidability
 containers
 distribution-sort
