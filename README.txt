@@ -32,11 +32,15 @@ Look at
 -- projects/latex-templates/quiz/template/questions/
 -- /usr/share/texlive/texmf-local/tex/latex/yliow/
 
+ciss240/q/q0101/questions/* are mainly copyed from projects/latex-templates/quiz/template/questions/*
+Later extra information where added to the this* files in ciss240/q/q0101/questions/*.
+This is the same for all other questions/ in all courses.
+
 Ideally
--- ciss240/q/q0101/question/ and ciss245/q/q2101/questions/ should be copied
+-- ciss240/q/q0101/question/* should be copied
    from projects/latex-templates/quiz/template/questions/ with minimal change.
--- this means that most of the extra stuff in ciss240/q/q0101/questions should
-   be placed in the yliow latex library.
+-- This means that most of the extra stuff (macros) in ciss240/q/q0101/questions should
+   be moved to somewhere in /usr/share/texlive/texmf-local/tex/latex/yliow/
 
 -------------------------------------------------------------------------------
 PROJECT: update for vm
