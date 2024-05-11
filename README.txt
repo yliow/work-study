@@ -30,11 +30,13 @@ Look at
 -- quiz-template/
 -- ciss240/q/q0101/
 -- ciss245/q/q2101/
+-- /usr/share/texlive/texmf-local/tex/latex/yliow/
+
 Ideally
 -- ciss240/q/q0101/question/ and ciss245/q/q2101/questions/ should be copied
    from quiz-template/ with minimal change.
 -- this means that most of the extra stuff in ciss240/q/q0101/questions should
-   be placed in the yliow latex librrary.
+   be placed in the yliow latex library.
 
 -------------------------------------------------------------------------------
 PROJECT: update for vm
