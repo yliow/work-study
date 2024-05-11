@@ -1,0 +1,124 @@
+%-*-latex-*-
+\input{thispreamble.tex}
+
+%\usepackage[T1]{fontenc}
+%\usepackage{upquote}
+
+\usepackage[T1]{fontenc}  % access \textquotedbl
+\usepackage{textcomp}     % access \textquotesingle
+\usepackage{mathptmx}     % load "Times New Roman" text font 
+                          % (note: the "times" package is obsolete!)
+                          
+\renewcommand\AUTHOR{jdoe5@cougars.ccis.edu} % CHANGE TO YOURS
+
+\begin{document}
+\topmattertwo
+
+This is a closed-book, no compiler, 2 minute quiz.
+
+First trace the following program and write down the
+The console window output of the following program
+\begin{console}[fontsize=\small]
+#include <iostream>
+
+int main()
+{
+    std::cout << 'I' << 't' << "was a" << '\n' << "dark\n" 
+              << std::endl << std::endl << "and  \"stormy\"" << ' ' << " " 
+              << "night\n";
+    
+    return 0;
+}
+\end{console} 
+is (use one square for each printed character):
+
+\begin{python}
+import string
+#def ph(c):
+#    s = string.ascii_letters + string.digits + string.punctuation
+#    return r'{\vphantom{%s}\texttt{%s}}' % (s, c)
+        
+from latextool_basic import *
+m = [['I','t','w','a','s','','a'] + ['' for i in range(21-7)],
+     ['d','a','r','k'] + ['' for i in range(21-4)],
+     ['' for i in range(21)],
+     ['' for i in range(21)],
+     list('and  "stormy"  night '),
+     ['' for _ in range(21)],
+]
+
+# replace with spaces
+#m = [[' ' for c in row] for row in m]
+#m[0][0] = 'I'
+
+p = Plot()
+C = table2(p, m, rowlabel='x', collabel='y',
+           do_not_plot=True,rownames=[], colnames=[])
+
+import string
+def f(r, c, ch, background='blue!20', vphantom=string.printable):
+    x0,y0 = C[r][c].bottomleft()
+    x1,y1 = C[r][c].topright()
+    return Rect(x0=x0, y0=y0, x1=x1, y1=y1,
+                background=background,
+                label=ph(ch),
+                linewidth=0)
+
+x0,y0 = C[0][2].bottomleft()
+x1,y1 = C[0][2].topright()
+p += Rect(x0=x0, y0=y0, x1=x1, y1=y1,
+          background='blue!20',label=r'\texttt{ }', linewidth=0)
+
+#x0,y0 = C[0][6].bottomleft()
+#x1,y1 = C[0][6].topright()
+#p += Rect(x0=x0, y0=y0, x1=x1, y1=y1,
+#          background='blue!20',label=r'\texttt{ }', linewidth=0)
+
+x0,y0 = C[1][0].bottomleft()
+x1,y1 = C[1][0].topright()
+p += Rect(x0=x0, y0=y0, x1=x1, y1=y1,
+          background='blue!20',label=r'\texttt{ }', linewidth=0)
+
+x0,y0 = C[3][1].bottomleft()
+x1,y1 = C[3][1].topright()
+p += Rect(x0=x0, y0=y0, x1=x1, y1=y1,
+          background='blue!20',label='', linewidth=0)
+
+x0,y0 = C[4][5].bottomleft()
+x1,y1 = C[4][5].topright()
+p += Rect(x0=x0, y0=y0, x1=x1, y1=y1,
+          background='blue!20', label=r'\texttt{ }', linewidth=0)
+
+x0,y0 = C[4][15].bottomleft()
+x1,y1 = C[4][15].topright()
+p += Rect(x0=x0, y0=y0, x1=x1, y1=y1,
+          background='blue!20',label=r'\texttt{ }', linewidth=0)
+
+# Draw table one more time to get border of C[1][4] correct
+table2(p, m, rowlabel=None, collabel=None,
+rownames=[r'\texttt{%s}' % r for r in range(0, 6)],
+colnames=[r'\texttt{%s}' % r for r in range(0, 21)])
+print(p)
+\end{python}
+The first output character \verb!'I'! has already been filled for you.
+
+Characters graded are in the shaded cells.
+Now write down the character (remember your single quotes!)
+printed at the row number and column number.
+The row and column numbering starts with 0.
+
+\nextq Character at row 0, column 2: \answerbox{\textquotesingle\texttt{w}\textquotesingle}\\
+\nextq Character at row 1, column 0: \answerbox{\textquotesingle\texttt{d}\textquotesingle}\\
+\nextq Character at row 3, column 1: \answerbox{\textquotesingle\texttt{\ }\textquotesingle}\\
+\nextq Character at row 4, column 5: \answerbox{\textquotesingle\textquotedbl\textquotesingle}\\
+\nextq Character at row 4, column 15: \answerbox{\textquotesingle n\textquotesingle}\\
+
+\begin{python}
+from latextool_basic import *
+print consolegrid(numrows=7)
+\end{python}
+
+%------------------------------------------------------------------------------
+\newpage
+\input{instructions.tex}
+\end{document}

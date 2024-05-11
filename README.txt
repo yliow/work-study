@@ -1,8 +1,8 @@
 PROJECT: NOTES
-home dir
-                ryan    liow
-350-heap        done    copied back to courses/ciss350/n
-350-hashtable   done    copied back to courses/ciss350/n
+yliow home dir    work study dir ryan    liow
+--------------    -------------- ------- ------
+courses/ciss350/n 350-heap       done    copied back to courses/ciss350/n
+                350-hashtable   done    copied back to courses/ciss350/n
 cantor          done    copied back to courses/math325/n
 regular         done    copied back to courses/ciss362/n
 cfl             done    copied back to courses/ciss362/n
