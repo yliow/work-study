@@ -1,18 +1,26 @@
 PROJECT: NOTES
-yliow home dir                work study dir  ryan    liow
---------------                --------------  ------- ------
-courses/ciss350/n/heap/       350-heap/       done    copied back to courses/ciss350/n/heap/
-courses/ciss350/n/hashtable/  350-hashtable/  done    copied back to courses/ciss350/n/hashtable/
-courses/math325/n/cantor/     cantor/         done    copied back to courses/math325/n/cantor/
-courses/ciss362/n/regular/    regular/        done    copied back to courses/ciss362/n/regular/
-courses/ciss362/n/cfl/        cfl/            done    copied back to courses/ciss362/n/cfl/
-courses/ciss362/n/languages/  languages/      done    
-courses/ciss362/n/tm/         tm/             done    
-decidability
-containers
-distribution-sort
-linkedlist                                                (this is mostly done)
-tree                                                      (this is mostly done)
+yliow home dir                        work study dir             ryan    liow
+--------------                        --------------             ------- ------
+courses/ciss350/n/heap/               350-heap/                  done    copied back to courses/ciss350/n/heap/
+courses/ciss350/n/hashtable/          350-hashtable/             done    copied back to courses/ciss350/n/hashtable/
+courses/math325/n/cantor/             cantor/                    done    copied back to courses/math325/n/cantor/
+courses/ciss362/n/regular/            regular/                   done    copied back to courses/ciss362/n/regular/
+courses/ciss362/n/cfl/                cfl/                       done    copied back to courses/ciss362/n/cfl/
+courses/ciss362/n/languages/          languages/                 done    
+courses/ciss362/n/tm/                 tm/                        done    
+courses/ciss362/n/decidability/      
+courses/ciss350/n/containers/         containers/
+courses/ciss350/n/distribution-sort/  distribution-sort/  
+courses/ciss350/n/linkedlist/         linkedlist/                        (this is mostly done)
+courses/ciss350/n/tree/                                                  (this is mostly done)
+
+projects/latex-templates/             projects/latex-templates/        
+courses/ciss240/q/q01*/
+courses/ciss245/q/q21*/
+courses/ciss245/q/q22*/
+courses/ciss245/q/q23*/
+
+
 hashtable                                                 (this is mostly done)
 
 -------------------------------------------------------------------------------
