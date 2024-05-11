@@ -6,8 +6,8 @@ courses/ciss350/n/hashtable/          350-hashtable/             done    copied 
 courses/math325/n/cantor/             cantor/                    done    copied back to courses/math325/n/cantor/
 courses/ciss362/n/regular/            regular/                   done    copied back to courses/ciss362/n/regular/
 courses/ciss362/n/cfl/                cfl/                       done    copied back to courses/ciss362/n/cfl/
-courses/ciss362/n/languages/          languages/                 done    
-courses/ciss362/n/tm/                 tm/                        done    
+courses/ciss362/n/languages/          languages/                 done    copied back to courses/ciss362/n/languages/
+courses/ciss362/n/tm/                 tm/                        done    copied back to courses/ciss362/n/tm/
 courses/ciss362/n/decidability/      
 courses/ciss350/n/containers/         containers/
 courses/ciss350/n/distribution-sort/  distribution-sort/  
@@ -32,7 +32,7 @@ Look at
 -- projects/latex-templates/quiz/template/questions/
 -- /usr/share/texlive/texmf-local/tex/latex/yliow/
 
-ciss240/q/q0101/questions/* are mainly copyed from projects/latex-templates/quiz/template/questions/*
+ciss240/q/q0101/questions/* are mainly copied from projects/latex-templates/quiz/template/questions/*
 Later extra information where added to the this* files in ciss240/q/q0101/questions/*.
 This is the same for all other questions/ in all courses.
 
