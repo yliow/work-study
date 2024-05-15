@@ -20,8 +20,6 @@ courses/ciss245/q/q21*/               courses/ciss245/q/q21*/
 courses/ciss245/q/q22*/               courses/ciss245/q/q22*/
 courses/ciss245/q/q23*/               courses/ciss245/q/q23*/
 
-hashtable                                                                (this is mostly done -- CHECK
-
 -------------------------------------------------------------------------------
 PROJECT: LATEX FOR QUIZZES
 The goal is to clean up my latex libraries for quizzes.
