@@ -8,7 +8,7 @@ courses/ciss362/n/regular/            regular/                   done    copied 
 courses/ciss362/n/cfl/                cfl/                       done    copied back to courses/ciss362/n/cfl/
 courses/ciss362/n/languages/          languages/                 done    copied back to courses/ciss362/n/languages/
 courses/ciss362/n/tm/                 tm/                        done    copied back to courses/ciss362/n/tm/
-courses/ciss362/n/decidability/       decidability/
+courses/ciss362/n/decidability/       decidability/              done
 courses/ciss350/n/containers/         containers/
 courses/ciss350/n/distribution-sort/  distribution-sort/  
 courses/ciss350/n/linkedlist/         linkedlist/                        (this is mostly done)
