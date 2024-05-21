@@ -1,4 +1,38 @@
 \tinysidebar{\debug{exercises/{decision-tm4/answer.tex}}}
+Assume that $\Null_\TM$ is decidable, say it is decided by $D$.
 
-    Solution not provided.
-    
+Construct a TM $A$ that does this:
+Let $\langle M \rangle \# \langle w \rangle$ be an input for $A$.
+\begin{tightlist}
+  \item $A$ construct a TM $M'$ (which depends on $M$ and $w$)
+  which does the following:
+  When $M'$ executes, it replaced the input with $w$,
+  and then proceeds to
+  work exactly like $M$.
+  Note that if we run $M'$ on $\ep$, then it would be the
+  same as running $M$ on $w$.
+  Of course when I say $A$ \lq\lq constructs'' $M'$, I  mean $A$ write
+  the encoding, $\langle M'\rangle$ somewhere on its tape.
+  \item
+  $A$ then simulates $D$ on $\langle M' \rangle$.
+  Note that $D$ is decidable therefore $D$ must either accept or reject
+  ($D$ cannot run forever).
+  This means that as $A$ simulates $D$ one step at a time
+  $A$ will at some point in time see $D$ entering the
+  accept or the reject state.
+  \item If while $A$ is simulating $D$ running on $\langle M'\rangle$,
+  $A$ sees that $D$ accepts $\langle M' \rangle$ (i.e., 
+  $M'$ accepts $\ep$, which means that $M$ accepts $w$), then
+  $A$ enters its accept state.
+  \item If while $A$ is simulating $D$ running on $\langle M'\rangle$,
+  $A$ sees that $D$ rejects $\langle M' \rangle$ (i.e., 
+  $M'$ does not accepts $\ep$, which means that $M$ does not
+  accepts $w$), then
+  $A$ enters its reject state.
+  \end{tightlist}
+We have shown that
+\[
+\ACCEPT_\TM \leq \Null_\TM
+\]
+This means that $A$ is a decider for $\ACCEPT_\TM$ which is a contradiction.
+Therefore $\Null_\TM$ cannot be a decidable language.

@@ -1,4 +1,44 @@
 \tinysidebar{\debug{exercises/{decision-tm0/answer.tex}}}
+We will reduce to this the acceptance problem, i.e.,
+\[
+\ACCEPT_\TM \leq \SIZEONE_\TM
+\]
+Suppose $\SIZEONE_\TM$ is decidable, say it's decided by $S$.
+Then I claim that I can construct a decider for $\ACCEPT_\TM$.
 
-    Solution not provided.
-    
+Construct $A$ as follows.
+Suppose $\langle M \rangle \# \langle w \rangle$ is given
+as an input to $A$ where
+$M$ is a TM and $w$ is an input for $M$.
+(If the input is not of the form $\langle M \rangle \# \langle w \rangle$,
+$A$ rejects immediately.)
+$A$ will first construct $M_w$, a Turing machine
+that works exactly like $M$ if the input is $w$
+but if the input is not $w$, $M$ will reject after checking that the
+input is not $w$.
+In other words $L(M_w) = \{\}$ or $\{w\}$.
+$A$ then does the following:
+\begin{tightlist}
+  \li $A$ will first simulate
+  $S$ with $M_w$.
+  Note that $S$ is a decider and therefore must halt.
+  \li If while $A$ is simulating
+  $S$, $A$ sees that $S$ halts in the accept state, then
+  $A$ will enter its accept state.
+  [Note that $S$ accepts iff $M_w$
+  accept $w$ since by definition $M_w$ can only accept $w$
+  and nothing else.]
+  \li
+  If while $A$ is simulating $S$, $A$ sees that $S$
+  halts in the reject state, then $A$ will enter its reject state.
+  [Note that $S$ rejects iff $M_w$ rejects
+  which means that $M$ does not accept $w$.]
+  \li Again, note that $S$ is a decider and therefore must enter
+  the accept or reject state at some point -- i.e., $S$
+  cannot run forever.
+\end{tightlist}
+The above means that $A$ accepts $\langle M \rangle \# \langle w \rangle$
+iff $M$ accepts $w$. Furthermore $A$ is a decider.
+We have shown that
+But this means that $\ACCEPT_\TM$ is decidable (by the decider $A$)
+which is a contradiction.
