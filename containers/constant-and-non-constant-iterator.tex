@@ -51,80 +51,9 @@ for (typename std::vector< int >::const_iterator p = v.begin();
 \end{console}
 i.e., \verb!p! is a \defone{constant iterator}.
 
+\input{exercises/nonconstconst0/main.tex}
 
-
-\newpage
-\begin{ex}
-Rewrite the following using iterators:
-\begin{console}[fontsize=\footnotesize]
-template< typename T >
-std::ostream & operator<<(std::ostream & cout,
-                          const std::vector< T > & v)
-{
-    std::string delim = "";                            
-    cout << '{';
-    for (size_t i = 0; i < v.size(); ++i)
-    {
-        cout << delim << v[i];
-        delim = ", ";
-    }
-    cout << '}';
-    return cout
-}  
-\end{console}
-Test it.
-\qed
-\end{ex}
-
-
-
-
-\newpage
-\begin{ex}
-Add a \verb!const_iterator! class inside your
-\verb!vector! class.
-Note that if \verb!p! is a constant iterator to (say)
-a \cpp\ STL vector object, then
-\verb!*p! refers to a value in that vector object.
-\verb!*p! has read access but not write access, i.e.,:
-\begin{console}[frame=single]
-int a = *p; // OK
-*p = 42;    // BAD!!!
-\end{console}
-This means that in your constant iterator class inside your vector class
-you have
-\begin{console}[frame=single,fontsize=\footnotesize]
-template < typename T >
-class vector
-{
-    class const_iterator
-    {
-    public:
-        T operator*() const
-        { ... }
-    };
-};
-\end{console}
-It's true that the actual value in the vector is not changed since
-you're returning a copy of that value.
-But this might be misleading to the person using your constant iterator class
-(including yourself if you're not careful).
-It's better to do this:
-\begin{console}[frame=single,fontsize=\footnotesize]
-template < typename T >
-class vector
-{
-    class const_iterator
-    {
-    public:
-        const T & operator*() const
-        { ... }
-    };
-};
-\end{console}
-Why? (You ought to know.)
-\qed
-\end{ex}
+\input{exercises/nonconstconst1/main.tex}
 
 You \textit{should} write a complete
 template vector class that has supporting
