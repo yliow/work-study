@@ -1,7 +1,5 @@
 OPEN = xdg-open
 PDF = pdflatex --shell-escape $@.tex; \
-      pdflatex --shell-escape $@.tex; \
-      pdflatex --shell-escape $@.tex; \
         makeindex $@.idx; \
         pdflatex --shell-escape $@.tex; \
         $(OPEN) $@.pdf; 
