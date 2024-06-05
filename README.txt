@@ -11,7 +11,7 @@ courses/ciss362/n/tm/                 tm/                        done    copied 
 courses/ciss362/n/decidability/       decidability/              done
 courses/ciss350/n/containers/         containers/                done
 courses/ciss350/n/distribution-sort/  distribution-sort/         done
-courses/ciss350/n/linkedlist/         linkedlist/                        (this is mostly done)
+courses/ciss350/n/linkedlist/         linkedlist/                done
 courses/ciss350/n/tree/                                                  (this is mostly done)
 
 projects/latex-templates/             projects/latex-templates/        
