@@ -10,8 +10,8 @@ courses/ciss362/n/languages/          languages/                 done    copied 
 courses/ciss362/n/tm/                 tm/                        done    copied back to courses/ciss362/n/tm/
 courses/ciss362/n/decidability/       decidability/              done
 courses/ciss350/n/containers/         containers/                done
-courses/ciss350/n/distribution-sort/  distribution-sort/         done
-courses/ciss350/n/linkedlist/         linkedlist/                done
+courses/ciss350/n/distribution-sort/  distribution-sort/         done    copied back to courses/ciss350/n/distribution-sort/
+courses/ciss350/n/linkedlist/         linkedlist/                done    copied back to courses/ciss350/n/linkedlist/
 courses/ciss350/n/tree/                                                  (this is mostly done)
 
 projects/latex-templates/             projects/latex-templates/        
