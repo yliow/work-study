@@ -10,7 +10,7 @@ and at every node you can go to the next node (except
 when the pointer is NULL).
 For a doubly linked list, you can start at the head or tail
 and at every node you can go forward and backward.
-A
+Here's an example:
 \input{stdout24.tex}
 
 \begin{Verbatim}[frame=single,fontsize=\footnotesize]
@@ -18,7 +18,7 @@ class DLNode
 {
 public:
     DLNode(DLNode * prev = NULL, DLNode * next = NULL)
-    : key_(key), prev_(prev), next_(next)
+    : prev_(prev), next_(next)
     {}
     DLNode(int key, DLNode * prev = NULL, DLNode * next = NULL)
     : key_(key), prev_(prev), next_(next)
@@ -69,11 +69,28 @@ Note the symmetry in the last two statements -- think of \verb!p! as the
 center of attraction so the node before and after \verb!*p! are linked up
 with \verb!*p!.
 Also, note that it's because of the sentinel nodes that you get
-such a clean implementation. If you implement a DLList without
-sentinel nodes, you'll have more if-else statements.
-If you write the last two lines of code to link \verb!*p! the rest like this
-it would be a lot uglier (in my opinion)
-and you lose the sense of simplicity and symmetry:
+such a clean implementation.
+For instance if your doubly-linked class has \verb!phead!
+(instead of \verb!pheadsentinel!), you would probably have the following:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+void DLList::insert_head(int v)
+{
+    DLNode * p = new DLNode(v, NULL, phead_);
+    if (phead_ != NULL)
+    {
+        phead_->prev_ = p;
+    }
+    phead_ = p;
+}
+\end{Verbatim}
+For our implementation of the doubly-linked list class, I will be
+using sentinel nodes.
+I'll leave it to you to write the version without sentinel nodes so that you
+see the difference.
+
+There are other ways to implement the above insert head.
+Here's another way that is not as simple and symmetric as the above
+(and is a lot uglier, in my opinion)
 \begin{Verbatim}[frame=single,fontsize=\footnotesize]
 void DLList::insert_head(int v)
 {
@@ -84,7 +101,9 @@ void DLList::insert_head(int v)
 \end{Verbatim}
 There's also a dependency on \verb!pheadsentinel->next_! in the second
 statement.
+
 So what?
+
 Well you might write this:
 \begin{Verbatim}[frame=single,fontsize=\footnotesize]
 void DLList::insert_head(int v)
@@ -94,7 +113,7 @@ void DLList::insert_head(int v)
     pheadsentinel->next_ = p;
 }
 \end{Verbatim}
-and or this:
+or this:
 \begin{Verbatim}[frame=single,fontsize=\footnotesize]
 void DLList::insert_head(int v)
 {
@@ -103,7 +122,8 @@ void DLList::insert_head(int v)
     pheadsentinel->next_->prev_ = p; // oops 
 }
 \end{Verbatim}
-This second of these two is incorrect. (See it?)
+The second of these two is incorrect. (See it?)
+
 However the second and third statements of the first
 insert head can be swapped:
 \begin{Verbatim}[frame=single,fontsize=\footnotesize]
@@ -154,9 +174,15 @@ void DLList::insert_after(DLNode * q, int v)
     p->next_->prev_ = p;
 }
 \end{Verbatim}
-(However see exercise?)
+where \verb!InsertAfterTailError! is some exception class.
 Note that the boolean check is redundant if \verb!insert_after!
 is never called with \verb!q! $=$ \verb!psentineltail_!.
+Linked list classes are meant to work extremely fast.
+So like arrays where out-of-bound checks are not executed,
+it's also reasonable for a linked list class not to check
+if an insert is performed after the tail sentinel.
+If so, this should be documented in the linked list class.
+%(However see exercise?) 
 
 The mirror image of insert head is
 \begin{Verbatim}[frame=single,fontsize=\footnotesize]
@@ -168,6 +194,7 @@ void DLList::insert_tail(int v)
 }
 \end{Verbatim}
 See the beauty and the symmetry?
+
 Note that this can be generalized to
 \begin{Verbatim}[frame=single,fontsize=\footnotesize]
 void DLList::insert_before(DLNode * q, int v)
@@ -177,7 +204,7 @@ void DLList::insert_before(DLNode * q, int v)
         throw InsertBeforeHeadError();
     }
     DLNode * p = new DLNode(v, q->prev_, q);
-    p->prev_-->next_ = p;
+    p->prev_->next_ = p;
     p->next_->prev_ = p;
 }
 \end{Verbatim}
@@ -213,7 +240,7 @@ void DLList::delete_at(DLNode * p)
     {
         throw DeleteSentinelError();
     }
-    p->prev_-->next_ = p->next_;
+    p->prev_->next_ = p->next_;
     p->next_->prev_ = p->prev_;
     delete p;
 }
