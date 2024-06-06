@@ -1,0 +1,418 @@
+%\section{Partial Fraction}
+\begin{python0}
+from solutions import *; clear() 
+\end{python0}
+
+In the previous section, I rewrote the product of two power series into one
+power series.
+Here's a summary from the previous section:
+
+{\footnotesize
+\begin{align*}
+&\tmpAA \\ 
+&\xlongequal{(a)} \tmpBB & & \text{convert power series to rational expression} \\
+&\xlongequal{(b)} \tmpCC & & \text{multiply rational expressions (instead of power series)}\\
+&\xlongequal{(c)} \tmpDD & & \text{write rational expression as linear sum of rational expressions}\\
+&\xlongequal{(d)} \tmpEE & & \text{convert rational expressions to power series} \\
+&\xlongequal{(d)} \tmpFF & & \text{tidy up to one power series}
+\end{align*}
+}
+
+The basic machinery is the theory of partial fractions.
+In the previous section, I showed you some techniques for
+converting some power series to rational functions.
+
+Once we're done with that we want to express the rational function
+into a sum of simpler rational functions.
+In an earlier section I mentioned that you can always find constants
+$A$ and $B$ so that
+\[
+\frac{1}{(4-x)(3-2x)}
+\]
+is broken up into
+\[
+\frac{1}{(4-x)(3-2x)}
+=
+\frac{A}{4-x} +
+\frac{B}{3-2x}
+\]
+
+What other rational functions can be broken up this way?
+
+Suppose you're given a rational function:
+\[
+\frac{P(x)}{Q(x)}
+\]
+where $P(x)$ and $Q(x)$ are polynomials.
+The first thing you need to do is to check the degree of $P(x)$
+and $Q(x)$.
+If the degree of $P(x)$ is at least the degree of $Q(x)$,
+you perform long division to get
+\[
+\frac{P(x)}{Q(x)} = p(x) + \frac{R(x)}{Q(x)}
+\]
+The point: the theory of partial fractions can only apply when
+the numerator has degree less than the degree of the denominator.
+Long division of polynomials is taught in earlier classes
+so I will not talk about it.
+Once you're done with that you focus on
+\[
+\frac{R(x)}{Q(x)}
+\]
+The quotient
+\[
+p(x)
+\]
+is a polynomial and is easy to handle when it comes to collecting the 
+coefficient of $x^n$.
+
+So let's assume that the rational function
+\[
+\frac{P(x)}{Q(x)}
+\]
+has degree of $P(x)$ less than the degree of $Q(x)$.
+
+The first thing you do is to factorize $Q(x)$.
+You know that over the real numbers polynomials factorize into powers
+of linear polynomials:
+\[
+(ax + b)^k
+\]
+and powers of quadratic ones:
+\[
+(ax^2 + bx + c)^k
+\]
+($a, b, c$ are real numbers).
+Once this is done the product can be broken up into
+a sum of simpler rational functions based on the
+factors.
+
+Instead of giving you the general theory,
+I'll give you some examples.
+
+Say for instance you have the following
+\[
+\frac{x^3 + 10x^2 + 3x + 36}{x^5 - x^4 + 8x^3 - 8x^2 + 16x - 16}
+\]
+Note that the degree of the numerator is 3 and the degree of the
+denominator is 5.
+Therefore we do not need to perform long division.
+
+The denominator can be factorized as:
+\begin{align*}
+x^5 - x^4 + 8x^3 - 8x^2 + 16x - 16
+&= x^4(x - 1) + 8x^2(x - 1) + 16(x - 1) \\
+&= (x^4 + 8x^2 + 16)(x - 1) \\
+&= (x^2 + 4)^2(x - 1) 
+\end{align*}
+
+As you can see you get a product of powers of linear and quadratic 
+polynomials.
+
+The general form of the sum depends only on the denominator.
+For our example the theory of partial fractions
+guarantees that
+\begin{align*}
+\frac{x^3 + 10x^2  3x + 36}{(x - 1)(x^2 + 4)^2}
+&=
+\frac{A}{x - 1} +
+\frac{Bx + C}{x^2 + 4} + \frac{Dx + E}{(x^2 + 4)^2}
+\end{align*}
+for some constants $A, B, C, D, E$.
+Again the form on the left does not depend on the
+numerator $x^3 + 10x^2  3x + 36$ so let's 
+just forget about that for the time being:
+\begin{align*}
+\frac{BLAH}{(x - 1)(x^2 + 4)^2}
+&=
+\frac{A}{x - 1} +
+\frac{Bx + C}{x^2 + 4} + \frac{Dx + E}{(x^2 + 4)^2}
+\end{align*}
+This is what you do:
+
+First you make sure that same factors in the denominator
+are grouped up together into a single power.
+For instance note that we have two factors $(x^2+4)$
+collected together to a power of 2:
+\[
+\frac{BLAH}{(x - 1)(x^2 + 4)^2}
+\]
+The other factors occurs with power 1.
+Do \textit{not} write
+\[
+\frac{BLAH}{(x - 1)(x^2 + 4)(x^2 + 4)}
+\]
+You will confuse yourself.
+
+Next for each power factor in the denominator
+of your rational function, you write rational
+functions with denominators
+starting from power 1 up to the power of that factor:
+\begin{align*}
+\frac{BLAH}{(x - 1)(x^2 + 4)^2}
+&=
+\frac{?}{x - 1} + \\
+&\hskip 0.5cm \frac{?}{x^2 + 4} + \frac{?}{(x^2 + 4)^2} 
+\end{align*}
+
+Note for instance that the factor $x - 1$
+has power 1.
+You only have one rational function for that factor so you write down
+\[
+\frac{?}{x - 1}
+\]
+on the right.
+For the factor $(x^2 + 4)^2$ the power is 2.
+Therefore you write down two rational functions on the left,
+one for power 1 and another for power 2;
+you stop at 2.
+Therefore for this factor you write down
+\[
+\frac{?}{x^2 + 4} + \frac{?}{(x^2 + 4)^2}
+\]
+on the right.
+
+So at this point you have this:
+\begin{align*}
+\frac{BLAH}{(x - 1)(x^2 + 4)^2}
+&=
+\frac{?}{x - 1} + \\
+&\hskip 0.5cm \frac{?}{x^2 + 4} + \frac{?}{(x^2 + 4)^2} 
+\end{align*}
+Now for the numerators on the right.
+You always write a polynomial that is one degree
+less than the corresonding denominator factor.
+
+For instance for the factor $x - 1$,
+the degree is 1.
+So you write a polynomial of degree 0, i.e. a constant:
+\[
+\frac{A}{x - 1}
+\]
+
+For the factor $x^2 + 4$, the degree is two.
+So you write down polynomials of degree one:
+\[
+\frac{Bx + C}{x^2 + 4} + \frac{Dx + E}{(x^2 + 4)^2} 
+\]
+(in this case you need two numerator polynomials since
+there are two fractions to complete.)
+
+Therefore altogether you have this:
+\begin{align*}
+\frac{BLAH}{(x - 1)(x^2 + 4)^2}
+&=
+\frac{A}{x - 1} + \\
+&\hskip 0.5cm \frac{Bx + C}{x^2 + 4} + \frac{Dx + E}{(x^2 + 4)^2} 
+\end{align*}
+The important thing to note is that the form of the 
+sum of rational functions on the right
+depends only on the denominator of the rational function
+that you started with.
+
+Now we put in the numerator of our rational function to get
+\begin{align*}
+\frac{x^3 + 10x^2  3x + 36}{(x - 1)(x^2 + 4)^2}
+&=
+\frac{A}{x - 1} +
+\frac{Bx + C}{x^2 + 4} + \frac{Dx + E}{(x^2 + 4)^2}
+\end{align*}
+Now all you need to do is to solve for $A, B, C, D, E$.
+
+Again one of the simplest methods is to clear denominators,
+select values of $x$ to get equations for $A, B, C, D, E$ 
+(you need 5 equations in this case), and solve
+the linear equations on the unknown quantities $A, B, C, D, E$.
+That's it.
+This is pretty much just basic polynomial and solving
+linear equations from college algebra.
+
+I will show you only the just the first few steps.
+
+First on multiplying the equation
+\begin{align*}
+\frac{x^3 + 10x^2  3x + 36}{(x - 1)(x^2 + 4)^2}
+&=
+\frac{A}{x - 1} +
+\frac{Bx + C}{x^2 + 4} + \frac{Dx + E}{(x^2 + 4)^2}
+\end{align*}
+by $(x - 1)(x^2 + 4)^2$ we get
+\begin{align*}
+x^3 + 10x^2 + 3x + 36
+&=
+A(x^2 + 4)^2 +
+(Bx + C)(x^2 + 4)(x - 1) +
+(Dx + E)(x-1)
+\end{align*}
+
+If I let $x = 1$, the above identity becomes the equation
+\begin{align*}
+1 + 10 + 3 + 36 &= A(1 + 4)^2 + 0 + 0 \\
+\THEREFORE 50 &= 25A \\
+\THEREFORE A &= 2
+\end{align*}
+(Note that as in a previous example, I try to choose
+simple values for $x$. The best are those that knock out lots
+of terms.)
+We manage to solve $A$ completely.
+So now we need 4 equations for the rest.
+
+Next I choose $x = 0$ to get
+\[
+36 = A(4)^2 + (0 + C)(4)(-1) + E(-1)
+\]
+and simplifying and substituting $A = 2$, I get
+\[
+36 =  32 - 4C - E
+\]
+i.e.
+\[
+4C + E = -4
+\]
+Now I choose $x = -1$ to get
+\[
+-1 + 10 - 3 + 36 = A(5)^2 + (-B+C)(-2)(5) + (-D+E)(-2)
+\]
+i.e,
+\[
+42 = 50 -10(C - B) -2(E - D)
+\]
+which gives me
+\[
+10(C - B) + 2(E - D) = 8
+\]
+i.e.
+\[
+5(C - B) + (E - D) = 4
+\]
+On choosing two more values for $x$ you will get
+altogether 4 equations in $B, C, D, E$
+and solving them you get
+\[
+B = -2, \,\,\,
+C = -1, \,\,\,
+D = 1, \,\,\,
+E = 0
+\]
+
+This implies that
+\[
+\frac{x^3 + 10x^2  3x + 36}{x^5 - x^4 + 8x^3 - 8x^2 + 16x - 16}
+=
+\frac{2}{x - 1} +
+\frac{-2x -1}{x^2 + 4} + \frac{x}{(x^2 + 4)^2} 
+\]
+
+And now you can apply all you know from the previous sections
+to rewrite the three sums into power series and then
+collect them together into a single power series so that
+the coefficient can be read off easily.
+
+Of course it's easy to check if your work is correct if you have
+a calculator or by writing a simple program.
+You simply evaluate the two functions (the left and right hand side of the
+above for instance) for several values of $x$.
+
+
+
+\newpage
+\begin{ex}
+Solve for $A$ and $B$  where
+\[
+\frac{x}{(2 + 3x)(5 + 7x)} = \frac{A}{2 + 3x} + \frac{B}{5 + 7x}
+\]
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Solve for $A$, $B$ and $C$ where
+\[
+\frac{x+1}{(2 + 3x^2)(5 + 7x)} 
+= 
+\frac{Ax + B}{2 + 3x^2} + \frac{C}{5 + 7x}
+\]
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Solve for $A$, $B$ and $C$ where
+\[
+\frac{1}{(2 + 3x)^2(5 + 7x)} 
+= 
+\frac{A}{2 + 3x} + \frac{B}{(2 + 3x)^2} + \frac{C}{5 + 7x}
+\]
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Solve for $A$, $B$, $C$, $D$ and $E$ where
+\[
+\frac{1}{(2 + 3x)^2(5 + 7x)^3} 
+= 
+\frac{A}{2 + 3x} + \frac{B}{(2 + 3x)^2} + 
+\frac{C}{5 + 7x} + 
+\frac{D}{(5 + 7x)^2} +
+\frac{E}{(5 + 7x)^3}
+\]
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Rewrite
+\[
+\frac{1}{(1 - x)(2 - 3x)}
+\]
+as a power series. What is the coefficient of $x^n$?
+\end{ex}
+
+\newpage
+\begin{ex}
+Rewrite
+\[
+\frac{1}{(1 - x)(2 + 3x^2)}
+\]
+as a power series. What is the coefficient of $x^n$?
+\end{ex}
+
+
+
+\newpage
+\begin{ex}
+Prove your own theorem:
+Rewrite
+\[
+\frac{1}{(a - bx)(c - dx)}
+\]
+as a power series where $(a,b) \neq (c,d)$.
+What is the coefficient of $x^n$?
+\end{ex}
+
+
+
+\newpage
+\begin{ex}
+What is the coefficient of $x^n$ in the power series
+of the following function 
+\[
+(1 + x + x^2 + x^3 + x^4 + \cdots)
+(1 + x^2 + x^4 + x^6 + x^8 + \cdots)
+\]
+\end{ex}
+
+\newpage
+\begin{ex}
+What is the coefficient of $x^n$ in the power series
+of the following function 
+\[
+(1 + x + x^2 + x^3 + x^4 + \cdots)^2
+(1 + x^2 + x^4 + x^6 + x^8 + \cdots)
+\]
+\end{ex}
+
+\newpage
+\subsection*{Solutions}
+\input{solutions.tex}

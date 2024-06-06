@@ -1,0 +1,524 @@
+%\section{Power series}{power-series.tex}
+\begin{python0}
+from solutions import *; clear() 
+\end{python0}
+
+A \defone{power series} is an expression of the form
+\[
+\sum_{n=0}^\infty a_n x^n
+\]
+where $a_n$ is an expression in $n$. 
+$\sum_{n=0}^\infty a_n x^n$ is just a short-hand notation:
+\[
+\sum_{n=0}^\infty a_n x^n
+= a_0 x^0 + a_1 x^1 + a_2 x^2 + \cdots
+\]
+
+Here's an example:
+\[
+\sum_{n=0}^\infty \frac{1}{2^n} x^n
+\]
+In this example, 
+\[
+a_n = \frac{1}{2^n}
+\]
+
+If you like, you can think of a power series as a polynomial that 
+\lq\lq goes on forever'',
+i.e. a polynomial with infinite degree.
+
+A series need not start with $n = 0$.
+For instance this is a perfectly good series:
+\[
+\sum_{n=5}^\infty \frac{1}{2^n} x^n
+\]
+And it doesn't have to go on forever.
+This is OK too:
+\[
+\sum_{n=5}^{1000000} \frac{1}{2^n} x^n
+\]
+Of course this means
+\[
+\sum_{n=5}^{1000000} \frac{1}{2^n} x^n
+= 
+\frac{1}{2^5} x^5 +
+\frac{1}{2^6} x^6 +
+\frac{1}{2^7} x^7 +
+\cdots +
+\frac{1}{2^{999999}} x^{999999} +
+\frac{1}{2^{1000000}} x^{1000000}
+\]
+Of course this \textit{is} a polynomial (of degree 1000000).
+
+
+More generally, power series are examples of series of functions:
+\[
+\sum_{n = 0}^\infty A_n(x)
+\]
+where each $A_n(x)$ is a function of $x$.
+One can also talk about $\sum_{n=0}^\infty c_n$ where
+each $c_n$ are constants
+and of course when you substitute a value for $x$ in
+\[
+\sum_{n = 0}^\infty A_n(x)
+\]
+say $x = 3.1415$, you \textit{do} get a series of constants:
+\[
+\sum_{n = 0}^\infty A_n(3.1415)
+\]
+At this point, of course you have to think about the serious
+consequence of adding infinitely many numbers.
+For instance when you substitute $x = 1$ into
+\[
+\sum_{n=0}^\infty x^n
+\]
+you get
+\[
+\sum_{n=0}^\infty 1^n = \sum_{n=0}^\infty 1 = 1 + 1 + 1 + \cdots
+\]
+which is infinite!
+There are however cases where the sum is not infinite:
+When $x = 1/2$,
+\[
+\sum_{n=0}^\infty (1/2)^n
+\]
+\textit{is} finite.
+If you run this program
+\begin{console}
+s = 0.0
+term = 1.0
+while 1:
+    s = s + term
+    print(s)
+    term = term / 2.0 
+\end{console}
+(rewritten in your favorite programming lang) 
+you will see that \verb!s! seems to stop growing after some time.
+In fact from your Pre-calc you already know that
+\[
+\sum_{n=0}^\infty x^n = \frac{1}{1 - x}
+\]
+This is the famous \defone{geometric series}.
+When you substitute $x = 1/2$ into the above, you get
+\[
+\sum_{n=0}^\infty (1/2)^n = \frac{1}{1 - 1/2} = 2
+\]
+I already mentioned that if you substitute $x = 1$,
+the above series explodes in your face.
+In fact for the geometric series identity to be correct,
+you can only substitute $x$ when $|x| < 1$.
+Only then will the series \textit{converge}.
+For us however, we frequently
+do not substitute values for 
+$x$ in a power series. You can think of the powers of $x$
+as place holders for values (i.e. coefficients).
+
+
+Here are some basic facts about series.
+The following facts are easy since they mirror the same facts for
+polynomials:
+
+\begin{prop}
+Let $\sum_{n \in I} A_n$, $\sum_{n \in I} B_n$ be two series;
+here $\sum_{n \in I}$ means \lq\lq sum over all $i$ in index set $I$''
+and the $A_i$ and $B_i$ can be functions of $x$.
+$c$ can be a constant, a polynomial, or a power series.
+\begin{enumerate}
+\item[\textnormal{(a)}] $c \sum_{n \in I} A_n$ = $\sum_{n \in I} cA_n$
+\item[\textnormal{(b)}] $\sum_{n \in I} A_n + \sum_{n \in I} B_n$ = 
+$\sum_{n \in I} (A_n + B_n)$
+\end{enumerate}
+\end{prop}
+
+Note that the above applies only when the index sets are all the same.
+In terms of power series we have the following:
+
+\begin{prop}
+Let $\sum_{n \in I} a_n x^n$, $\sum_{n \in I} b_n x^n$ be two series.
+\begin{enumerate}
+\item[\textnormal{(a)}] $c \sum_{n \in I} a_n x^n$ = $\sum_{n \in I} ca_n x^n$
+\item[\textnormal{(b)}] $\sum_{n \in I} a_nx^n+ \sum_{n \in I} b_nx^n$ = 
+$\sum_{n \in I} (a_n + b_n) x^n$
+\end{enumerate}
+\end{prop}
+
+For instance
+\[
+3 \sum_{n = 0}^\infty \frac{1}{2^n}x^n
+= \sum_{n = 0}^\infty 3 \cdot \frac{1}{2^n}x^n
+= \sum_{n = 0}^\infty \frac{3}{2^n}x^n
+\]
+and 
+\[
+(3 + 2x + x^2) \sum_{n = 0}^\infty \frac{1}{2^n}x^n
+= \sum_{n = 0}^\infty (3 + 2x + x^2) \frac{1}{2^n}x^n
+\]
+
+Note that when working with power series, we are usually interested
+in extracting the coefficient of $x^n$ from a power series.
+In the case of 
+\[
+3 \sum_{n = 0}^\infty \frac{1}{2^n}x^n
+= \sum_{n = 0}^\infty \frac{3}{2^n}x^n
+\]
+we see that the coefficient of $x^n$ is
+\[
+\frac{3}{2^n}
+\]
+However for the case of 
+\[
+(3 + 2x + x^2) \sum_{n = 0}^\infty \frac{1}{2^n}x^n
+= \sum_{n = 0}^\infty (3 + 2x + x^2) \frac{1}{2^n}x^n
+\]
+the coefficient of $x^n$ is not obvious.
+In fact we have to do this:
+\begin{align*}
+(3 + 2x + x^2) \sum_{n = 0}^\infty \frac{1}{2^n}x^n
+&= 3 \sum_{n = 0}^\infty \frac{1}{2^n}x^n
++ 2x \sum_{n = 0}^\infty \frac{1}{2^n}x^n
++ x^2 \sum_{n = 0}^\infty \frac{1}{2^n}x^n \\
+&= \sum_{n = 0}^\infty 3 \frac{1}{2^n}x^n
++ \sum_{n = 0}^\infty 2x \frac{1}{2^n}x^n
++ \sum_{n = 0}^\infty x^2 \frac{1}{2^n}x^n \\
+&= \sum_{n = 0}^\infty \frac{3}{2^n}x^n
++ \sum_{n = 0}^\infty \frac{2}{2^n}x^{n+1}
++ \sum_{n = 0}^\infty \frac{1}{2^n}x^{n+2} \\
+\end{align*}
+
+If you stare at the above carefully you should be able to
+see the coefficient of $x^n$.
+If you don't see it you can write down a few terms:
+
+\begin{align*}
+(3 + 2x + x^2) \sum_{n = 0}^\infty \frac{1}{2^n}x^n
+&= \sum_{n = 0}^\infty \frac{3}{2^n}x^n
++ \sum_{n = 0}^\infty \frac{2}{2^n}x^{n+1}
++ \sum_{n = 0}^\infty \frac{1}{2^n}x^{n+2} \\
+&=
+\biggl( \frac{3}{2^0}x^0 + \frac{3}{2^1}x^1 + \frac{3}{2^2}x^2 + \cdots \biggr) \\ 
+&\hskip 1.4cm + \biggl( \frac{2}{2^0}x^1 + \frac{2}{2^1}x^2 + \frac{2}{2^2}x^3 + \cdots \biggr) \\
+&\hskip 2.7cm + \biggl( \frac{1}{2^0}x^2 + \frac{1}{2^1}x^3 + \frac{1}{2^2}x^4 + \cdots \biggr)
+\end{align*}
+
+Do you see that when $n \geq 2$, the coefficient is
+\[
+\frac{3}{2^n} + \frac{2}{2^{n-1}} + \frac{1}{2^{n-2}}
+\]
+For the remaining coefficients (i.e. for $x^0$ and $x^1$) we have to 
+handle them separately. They are respectively
+\[
+\frac{3}{2^0}, \,\,\,\,\, \frac{3}{2^1} + \frac{2}{2^0}
+\] 
+In order not to rely on all the above term-by-term expansion, we
+can formalize the computations as follows.
+
+Let's go back to our series:
+\[
+(3 + 2x + x^2) \sum_{n = 0}^\infty \frac{1}{2^n}x^n
+= \sum_{n = 0}^\infty \frac{3}{2^n}x^n
++ \sum_{n = 0}^\infty \frac{2}{2^n}x^{n+1}
++ \sum_{n = 0}^\infty \frac{1}{2^n}x^{n+2}
+\]
+For the second term of the sum of three series:
+\[
+\sum_{n = 0}^\infty \frac{2}{2^n}x^{n+1}
+\]
+we really want $x^n$ and not $x^{n+1}$.
+Again by expanding out a few terms you can see what it should be.
+Another way to do this is to do a substitution to replace the
+index variable $n$.
+Let
+\[
+p = n + 1
+\]
+Note that the sum is from $n = 0$ to $\infty$.
+In terms of $p$, this means the sum is from $p = 0 + 1$ to $\infty$.
+Therefore we have
+\[
+\sum_{n = 0}^\infty \frac{2}{2^n}x^{n+1}
+=
+\sum_{p = 1}^\infty \frac{2}{2^{p-1}}x^{p}
+\]
+Of course $p$ is just a \lq\lq dummy'' variable; you can replace it with $n$:
+\[
+\sum_{n = 0}^\infty \frac{2}{2^n}x^{n+1}
+=
+\sum_{p = 1}^\infty \frac{2}{2^{p-1}}x^{p}
+= 
+\sum_{n = 1}^\infty \frac{2}{2^{n-1}}x^{n}
+\]
+
+Now for the third term:
+\[
+\sum_{n = 0}^\infty \frac{1}{2^n}x^{n+2}
+\]
+Let
+\[
+q = n + 2
+\]
+Then
+\[
+\sum_{n = 0}^\infty \frac{1}{2^n}x^{n+2}
+=
+\sum_{q = 2}^\infty \frac{1}{2^{q-2}}x^{q}
+\]
+
+Therefore
+\begin{align*}
+(3 + 2x + x^2) \sum_{n = 0}^\infty \frac{1}{2^n}x^n
+&= \sum_{n = 0}^\infty \frac{3}{2^n}x^n
++ \sum_{n = 0}^\infty \frac{2}{2^n}x^{n+1}
++ \sum_{n = 0}^\infty \frac{1}{2^n}x^{n+2} \\
+&=
+\sum_{n = 0}^\infty \frac{3}{2^n}x^n
++ \sum_{n = 1}^\infty \frac{2}{2^{n-1}}x^{n}
++ \sum_{n = 2}^\infty \frac{1}{2^{n-2}}x^{n} \\
+\end{align*}
+
+You see that all the power series have the same power of $x$ for each of their
+terms.
+We are now ready to combine the three power series into one.
+But note that their index values run over different values.
+Note that if $I$ and $J$ are two disjoint index sets, 
+\[
+\sum_{i \in I \cup J} A_i
+=
+\sum_{i \in I} A_i
++
+\sum_{i \in J} A_i
+\]
+This implies for instance that
+\[
+\sum_{n = 0}^\infty A_i = 
+A_0 + \sum_{n = 1}^\infty A_i 
+\]
+and 
+\[
+\sum_{n = 0}^\infty A_i = 
+A_0 + A_1 + \sum_{n = 2}^\infty A_i 
+\]
+
+In other words you can split up your series
+into parts.
+This is useful for instance when you have the 
+sum of two series and their indices run over different values.
+You simply split out the values not common to both.
+For instance 
+\begin{align*}
+\sum_{n = 1}^\infty A_n + \sum_{n = 3}^\infty B_n
+= A_1 + A_2 + \sum_{n = 3}^\infty A_n + \sum_{n = 3}^\infty B_n \\
+= A_1 + A_2 + \sum_{n = 3}^\infty (A_n + B_n)
+\end{align*}
+
+Now let's go back to our series:
+\begin{align*}
+(3 + 2x + x^2) \sum_{n = 0}^\infty \frac{1}{2^n}x^n
+&= \sum_{n = 0}^\infty \frac{3}{2^n}x^n
++ \sum_{n = 0}^\infty \frac{2}{2^n}x^{n+1}
++ \sum_{n = 0}^\infty \frac{1}{2^n}x^{n+2} \\
+&=
+\sum_{n = 0}^\infty \frac{3}{2^n}x^n
++ \sum_{n = 1}^\infty \frac{2}{2^{n-1}}x^{n}
++ \sum_{n = 2}^\infty \frac{1}{2^{n-2}}x^{n}
+\end{align*}
+The common index values for all three series are $n \geq 2$. 
+Therefore
+\begin{align*}
+(3 + 2x + x^2) \sum_{n = 0}^\infty \frac{1}{2^n}x^n
+&= \sum_{n = 0}^\infty \frac{3}{2^n}x^n
++ \sum_{n = 0}^\infty \frac{2}{2^n}x^{n+1}
++ \sum_{n = 0}^\infty \frac{1}{2^n}x^{n+2} \\
+&=
+\sum_{n = 0}^\infty \frac{3}{2^n}x^n
++ \sum_{n = 1}^\infty \frac{2}{2^{n-1}}x^{n}
++ \sum_{n = 2}^\infty \frac{1}{2^{n-2}}x^{n} \\
+&=
+\frac{3}{2^0}x^0 +
+\frac{3}{2^1}x^1 +
+\sum_{n = 2}^\infty \frac{3}{2^n}x^n
++ \frac{2}{2^{1-1}}x^{1} + \sum_{n = 2}^\infty \frac{2}{2^{n-1}}x^{n}
++ \sum_{n = 2}^\infty \frac{1}{2^{n-2}}x^{n}
+\end{align*}
+
+Note that from the first series, I split off two terms ($n=0, 1$)
+and from the second I split off one term ($n = 1$).
+Continuing the computation we have
+\begin{align*}
+(3 + 2x + x^2) \sum_{n = 0}^\infty \frac{1}{2^n}x^n
+&= \sum_{n = 0}^\infty \frac{3}{2^n}x^n
++ \sum_{n = 0}^\infty \frac{2}{2^n}x^{n+1}
++ \sum_{n = 0}^\infty \frac{1}{2^n}x^{n+2} \\
+&=
+\frac{3}{2^0}x^0 +
+\frac{3}{2^1}x^1 +
+\sum_{n = 2}^\infty \frac{3}{2^n}x^n \\
+& \hskip 1cm + \frac{2}{2^{1-1}}x^{1} + \sum_{n = 2}^\infty \frac{2}{2^{n-1}}x^{n} \\
+& \hskip 2.7cm + \sum_{n = 2}^\infty \frac{1}{2^{n-2}}x^{n} \\
+&=
+\frac{3}{2^0} 
++ \biggl( \frac{3}{2^1} +  \frac{2}{2^{0}} \biggr) x
++ 
+\sum_{n = 2}^\infty  
+\biggl( 
+\frac{3}{2^n} +
+\frac{2}{2^{n-1}} +
+\frac{1}{2^{n-2}}
+\biggr) 
+x^n
+\end{align*}
+And we're done! You can read off the coefficients very quickly from the above:
+the coefficient of $x^n$ is
+\[
+\begin{cases}
+3  & \text{if $n = 0$} \\
+\frac{7}{2} & \text{if $n = 1$} \\
+\displaystyle \frac{3}{2^n} +
+\displaystyle \frac{2}{2^{n-1}} +
+\displaystyle \frac{1}{2^{n-2}} & \text{if $n \geq 2$} \\
+\end{cases}
+\]
+
+We see that for a constant $c$ (and $k$ any positive integer):
+\[
+c \sum_{n = k}^\infty a_n x^n
+= \sum_{n = k}^\infty ca_n x^n
+\]
+which does not change the power of the $x$ in the general term
+of the power series.
+However 
+\[
+x \sum_{n = k}^\infty a_n x^n
+= \sum_{n = k}^\infty a_n x^{n+1}
+\]
+In general
+\[
+x^\ell \sum_{n = k}^\infty a_n x^n
+= \sum_{n = k}^\infty a_n x^{n+\ell}
+\]
+This results in a change of the power of $x$ in the general term of the power
+series.
+A change of index variable
+\[
+p = n + \ell
+\]
+will allow you to change the power of $x$ so that the power is the 
+same as the index variable of the summation.
+
+If you list the the coefficient of a power series $\sum_{n=0}^\infty a_nx^n$
+as an infinite-dimensional vector:
+\[
+(a_0, a_1, a_2, a_3, \ldots)
+\]
+for every $x^n$ and you do likewise for the coefficients for 
+$x^2 \sum_{n=0}^\infty a_nx^n$:
+\[
+(0, 0, a_0, a_1, a_2, a_3, \ldots)
+\]
+you see that \lq\lq multiplication-by-$x^2$'' acts like a \lq\lq shift-by-2'' 
+operator.
+In general \lq\lq multiplication-by-$x^\ell$'' acts like a 
+\lq\lq shift-by-$\ell$'' operator.
+The multiplication-by-$c$ is like a scalar multiplication: the 
+coefficients of $c \sum_{n=0}^\infty a_nx^n$ is
+\[
+(ca_0, ca_1, ca_2, ca_3, \ldots)
+\]
+
+\newpage\input{exercises/power-series-0/main.tex}
+
+\newpage
+\begin{ex}
+Rewrite 
+\[
+(1 - 3x^2 + 5x^7) \sum_{n = 1}^\infty \frac{2^n}{3^n}x^n
++ \sum_{n=100}^\infty \frac{1}{5^n}x^n 
+\]
+as a
+power series.
+What is the coefficient of $x^n$?
+\end{ex}
+
+\newpage
+\begin{ex}
+Rewrite 
+\[
+(1 - 3x^{110} + 5x^{200}) \sum_{n = 1}^\infty \frac{2^n}{3^n}x^n
++ \sum_{n=100}^\infty \frac{1}{11^n - 1}x^n
+\] as a
+power series.
+What is the coefficient of $x^n$?
+\end{ex}
+
+\newpage
+\begin{ex}
+Rewrite 
+\[
+(1 - 3x^{110} + 5x^{200}) \sum_{n = 1}^\infty \frac{2^n}{3^n}x^n
++ \sum_{n=100}^\infty \frac{1}{5^n}x^n
++ \sum_{n=5}^{90} \frac{1}{5^n}x^n 
+\] as a
+power series.
+What is the coefficient of $x^n$?
+\end{ex}
+
+\newpage
+Now that you have a couple of warmups you can prove
+a couple of little theorems of your own.
+
+\begin{ex}
+Rewrite 
+\[
+x^\ell \sum_{n = 0}^\infty a_n x^n
+\] 
+as a
+power series.
+What is the coefficient of $x^n$?
+\end{ex}
+
+\newpage
+\begin{ex}
+Rewrite 
+\[
+cx^\ell \sum_{n = 0}^\infty a_n x^n
+\] 
+as a
+power series.
+What is the coefficient of $x^n$?
+\end{ex}
+
+\newpage
+\begin{ex}
+Rewrite 
+\[
+(c_0 + c_1x + c_2 x^2) \cdot \sum_{n = 0}^\infty a_n x^n
+\] 
+as a
+power series.
+What is the coefficient of $x^n$?
+\end{ex}
+
+\newpage
+\begin{ex}
+Rewrite 
+\[
+(c_0 + c_1x + c_2 x^2 + \cdots + c_d x^d) \cdot \sum_{n = 0}^\infty a_n x^n
+\] 
+as a
+power series.
+What is the coefficient of $x^n$?
+\end{ex}
+
+
+\newpage
+One last fact about power series:
+
+\[
+\sum_{n = 0}^\infty a_nx^n =
+\sum_{n = 0}^\infty b_nx^n
+\text{ iff }
+a_n = b_n \text{ for } n \geq 
+\]
+
+\newpage
+\subsection*{Solutions}
+\input{solutions.tex}

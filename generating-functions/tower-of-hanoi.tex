@@ -1,0 +1,397 @@
+\subsection{Tower of Hanoi}
+
+Can the above method be used for a degree one recurrence relation?
+Remember the Tower of Hanoi problem?
+Let $t_n$ be the number of steps to solve the problem.
+Recall that we solve the problem by providing
+a recursive procedure.
+Here's the problem again.
+You have $n$ disks that you want to move from A to C.
+
+\begin{python}
+from latextool_basic import *
+
+p = Plot()
+As = [3 - x/3.0 for x in range(0, 8)][::-1]
+Bs = []
+Cs = []
+    
+hanoi(p, diskss=[As, Bs, Cs])
+print(p)
+\end{python}
+
+We think of the $n$-disk problem in terms of the
+$n-1$ disk problem:
+
+\begin{python}
+from latextool_basic import *
+
+p = Plot()
+As = [3 - x/3.0 for x in range(0, 8)][::-1]
+Bs = []
+Cs = []
+
+def color(w):
+    if w<3: return "blue!20"
+    else: return "red!20"
+hanoi(p, diskss=[As, Bs, Cs], color=color)
+print(p)
+\end{python}
+
+We ignore disk $n$ for the time being
+and apply our procedure to move the top $n-1$ disks from A to B:
+
+\begin{python}
+from latextool_basic import *
+
+p = Plot()
+As = [3 - x/3.0 for x in range(0, 8)][::-1]
+Bs = As[:-1]
+As = [As[-1]]
+Cs = []
+
+def color(w):
+    if w<3: return "blue!20"
+    else: return "red!20"
+hanoi(p, diskss=[As, Bs, Cs], color=color)
+print(p)
+\end{python}
+
+This should take $t_{n-1}$ steps.
+Now we move disk $n$ from A to C:
+
+\begin{python}
+from latextool_basic import *
+
+p = Plot()
+As = [3 - x/3.0 for x in range(0, 8)][::-1]
+Bs = As[:-1]
+As = [As[-1]]
+Cs = []
+
+def color(w):
+    if w<3: return "blue!20"
+    else: return "red!20"
+hanoi(p, diskss=[Cs, Bs, As], color=color)
+print(p)
+\end{python}
+
+That takes 1 step.
+And finally we apply our procedure to move
+the $n-1$ disks from $B$ to $C$:
+
+\begin{python}
+from latextool_basic import *
+
+p = Plot()
+As = [3 - x/3.0 for x in range(0, 8)][::-1]
+Bs = []
+Cs = []
+
+def color(w):
+    if w<3: return "blue!20"
+    else: return "red!20"
+hanoi(p, diskss=[Cs, Bs, As], color=color)
+print(p)
+\end{python}
+
+That takes $t_{n-1}$ steps.
+Altogther we took $t_{n-1} + 1 + t_{n-1}$ steps.
+Hence
+\begin{align*}
+t_n 
+&= t_{n-1} + 1 + t_{n-1} \\
+&= 2 t_{n-1} + 1
+\end{align*}
+We need a base condition.
+So what's $t_0$?
+That's the problem with $0$ disks.
+It should probably be 0 step: $t_0 = 0$.
+But vacuous problems are sometimes dangeourous.
+So let's consider $t_1$.
+Clearly $t_1 = 1$.
+Now since we want $t_1 = 2t_0 + 1$, we have
+\[
+1 = 2 t_0 + 1
+\]
+and, yes, we do get $t_0 = 0$.
+Altogether we have
+\[
+t_n = 
+\begin{cases}
+0 &\text{ if } n = 0 \\
+2 t_{n-1} + 1 &\text{ if } n > 0
+\end{cases}
+\]
+Furthermore note that the recurrence relation is not just defined
+in terms of a linear combination of $t_n$'s for small $n$:
+There's a \lq\lq + 1'' in the recurrence relation:
+\[
+t_n = 2 t_{n-1} \underline{ + 1 }
+\]
+This is a degree 1 nonhomogeneous recurrence relation.
+
+For this recurrence relation, it's so simple that you can
+actually find a closed form quickly, using \lq\lq substitutions".
+Here's how you would do it.
+\begin{align*}
+t_n
+&= 2 t_{n-1} + 1 \\ 
+&= 2 ( 2t_{n-2} + 1) + 1 = 4t_{n-2} + 2 + 1 \\ 
+&= 4 (2 t_{n-3} + 1 ) + 2 + 1 = 8 t_{n-3} + 4 + 2 + 1
+\end{align*}
+All the above assume that $n \geq 3$.
+At this point you see a pattern:
+\begin{align*}
+t_n
+&= 2^3 t_{n-3} + 2^2 + 2^1 + 2^0
+\end{align*}
+To check on the pattern, you do one more step (assuming $n \geq 4$):
+\begin{align*}
+t_n
+&= 2^3 t_{n-3} + 2^2 + 2^1 + 2^0 \\ 
+&= 2^3 (2t_{n-4} + 1) + 2^2 + 2^1 + 2^0 = 2^4t_{n-4} + 2^3 + 2^2 + 2^1 + 2^0
+\end{align*}
+i.e.,
+\begin{align*}
+t_n
+&= 2^3 t_{n-3} + 2^2 + 2^1 + 2^0 \\ 
+&= 2^4t_{n-4} + 2^3 + 2^2 + 2^1 + 2^0 \\
+&= ... \\
+&= 2^kt_{n-k} + 2^{k-1} + 2^{k-2} + \cdots + 2^3 + 2^2 + 2^1 + 2^0
+\end{align*}
+At some point you'd reach the base case, i.e., when $n - k = 1$,
+\begin{align*}
+t_n
+&= 2^{n-1}t_{1} + 2^{n-2} + 2^{n-3} + \cdots + 2^3 + 2^2 + 2^1 + 2^0 \\
+&= 2^{n-1} + 2^{n-2} + 2^{n-3} + \cdots + 2^3 + 2^2 + 2^1 + 2^0 \\
+&= 2^n - 1
+\end{align*}
+by the geometric sum formula.
+TADA!
+
+So immediately, you know that to solve the tower of hanoi problem
+you need to make $2^{32} - 1 = 4294967295$ move.
+
+Now to be absolutely mathematically correct, the following
+from the above:
+\begin{align*}
+t_n
+&= 2^3 t_{n-3} + 2^2 + 2^1 + 2^0 \\ 
+&= 2^4t_{n-4} + 2^3 + 2^2 + 2^1 + 2^0 \\
+&= ... \\
+&= 2^kt_{n-k} + 2^{k-1} + 2^{k-2} + \cdots + 2^3 + 2^2 + 2^1 + 2^0
+\end{align*}
+is not absolutely rigorous.
+Why? Because it this:
+\begin{align*}
+t_n
+&= ... (\leftarrow \text{look at the missing steps described by \lq\lq ..."}) \\ 
+&= 2^kt_{n-k} + 2^{k-1} + 2^{k-2} + \cdots + 2^3 + 2^2 + 2^1 + 2^0
+\end{align*}
+The above leads to
+\[
+t_n = 2^n - 1
+\]
+Generally, this is what will happen in the mathematical derivation
+of 
+$t_n = 2^n - 1$.
+The above is OK, as long as it is to derive a plausible closed form for $t_n$.
+After that you prove $t_n = 2^n - 1$ is indeed true by induction, using the recurrence relation.
+
+\newpage
+\begin{ex}
+  Prove $t_n = 2^n - 1$ by induction.
+\end{ex}
+
+
+\newpage
+Another thing to note is this very importact fact:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Rect(x0=0, y0=0, x1=8, y1=2,
+linewidth=0.05,
+     radius=0.25, innersep=0.25,
+    s = r'a recursive procedure gives rise to a \\ recurrence relation on the runtime of the procedure')
+print(p)
+\end{python}
+
+\newpage
+\begin{ex}
+  The above proves that the recursive procedure I used
+  will take up $2^n - 1$ moves.
+  But how do you know that the procedure is the \textit{best}
+  strategy?
+  Is there another strategy that moves with fewer steps?
+  Our strategy is in fact the best as in it uses the least
+  number of moves, so prove that our strategy is optimal.
+\end{ex}
+
+INCOMING SPOILER ALERT ... SOLUTION ON NEXT PAGE
+
+\newpage
+\textsc{Solution.}
+
+Let our original procedure be $P(n, A, B, C)$. I have already proved
+that the number of moves made by $P(n, A, B, C)$ is $T(n) = 2^n - 1$.
+Now suppose there's another procedure $P'(n, A, B, C)$ that uses
+$T'(n)$ moves. I will prove by induction that $T'(n) = T(n)$.
+(Yes, it's that \lq\lq induction" thing again.)
+
+First of all if you have one disk (i.e., $n = 1$), then of course
+$P'(1, A, B, C)$, being optimal, will execute $A \rightarrow C$.
+That means $T'(1) = 1 = T(1)$.
+
+Now suppose $T'(k) = T(k)$ for $k = 1, 2, 3, ..., n - 1$
+and we consider the moves made by $P'(n, A, B, C)$.
+Disk $n$ (the largest) has to move from $A$ to either $B$ or $C$.
+Note that this is the first move made by disk $n$.
+(Of course in the end it will land in $C$, but I'm not even assuming that yet.
+I'm just saying this disk has to move.
+If this disk does not move, there's no way it's going to land in C!)
+So $P'$ at this point will either execute $A \rightarrow B$
+or $A \rightarrow C$.
+Remember that $P'$ is optimal.
+
+\textsc{Case: The move is $A\rightarrow C$.}
+This costs 1 step.
+After this, I use the optimal strategy to move the first $n - 1$ disks
+from $B$ to $C$ and I'm done.
+But by induction, the optimal strategy takes
+$T'(n-1) = 2^{n - 1} + 1$ moves.
+Therefore altogether the number of numbers is
+$T'(n - 1) + 1 + T'(n-1) = 2^n - 1 = T(n)$.
+
+\textsc{Case: The move is $A\rightarrow B$.}
+At this point, $T'(n-1) + 1$ moves has been made.
+Consider what will happen next.
+At some point (in the future), after $\alpha \geq 0$ moves, 
+disk $n$ has to land in $C$ -- that cost at least one step.
+This move for disk $n$ is either $A \rightarrow C$ or $B \rightarrow C$.
+If it's $A \rightarrow C$, then the first $n - 1$ disks must be at $B$.
+If it's $B \rightarrow C$, then the first $n - 1$ disks must be at $A$.
+This means that the first $n - 1$ disks has to be moved (in the future)
+to $B$ or $A$.
+But the number of moves has to be $\geq T'(n-1)$.
+So for this case, the total number of moves is
+$\geq T'(n-1) + 1 + \alpha + T'(n-1) + 1 = 2T'(n-1) + 2 + \alpha$ where
+$\alpha \geq 0$.
+By inductive hypothesis $T'(n-1) = 2^{n-1} - 1$ which means that 
+the number of moves is at least
+\[
+2T'(n - 1) + 2 + \alpha = 2(2^{n-1} - 1) + 2 + \alpha = 2^n + \alpha
+\]
+But this is greater than the first case.
+And since we are using the optimal strategy $P'$, only the first case occurs
+-- the second case does
+not happen.
+
+We conclude that $T'(n) = 2^n - 1 = T(n)$.
+
+By inductive hypothesis, we have shown that any optimal strategy will
+make $2^n - 1$ moves.
+In particular, our earlier strategy is the optimal strategy.
+\qed
+
+
+\newpage\myinput{tower-of-hanoi-variations.tex}
+
+
+\newpage
+\begin{ex}
+Let $a_n$ ($n=0, 1, 2, \ldots$) satisfy
+\[
+a_n = 
+\begin{cases}
+1 &\text{ if } n = 0 \\
+2 &\text{ if } n = 1 \\
+a_{n-1} + a_{n-2} + 3 &\text{ if } n > 1
+\end{cases}
+\]
+Let $a(x) = \sum_{n=0}^\infty a_n x^n$.
+Find a rational function for $a(x)$.
+Find a closed form for $a_n$.
+\qed
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Let $a_n$ ($n=0, 1, 2, \ldots$) satisfy
+\[
+a_n = 
+\begin{cases}
+1 &\text{ if } n = 0 \\
+2 &\text{ if } n = 1 \\
+a_{n-1} + a_{n-2} + n &\text{ if } n > 1
+\end{cases}
+\]
+Let $a(x) = \sum_{n=0}^\infty a_n x^n$.
+Find a rational function for $a(x)$.
+Find a closed form for $a_n$.
+\qed
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Do the same for:
+\[
+a_n = 
+\begin{cases}
+1 &\text{ if } n = 0 \\
+2 &\text{ if } n = 1 \\
+3a_{n-2} + n^2 + 6n + 1 &\text{ if } n > 1
+\end{cases}
+\]
+\qed
+\end{ex}
+
+
+\newpage
+\begin{ex}
+It's time to prove your own theorem:
+Can you find a rational expression for the generating
+function of $a_n$ where
+\[
+a_n = 
+\begin{cases}
+a &\text{ if } n = 0 \\
+b &\text{ if } n = 1 \\
+ca_{n-1} + da_{n-2} & \text{ if } n > 1
+\end{cases}
+\]
+\qed
+\end{ex}
+
+
+\newpage
+\begin{ex}
+What is $a_n$ where
+\[
+a_n = 
+\begin{cases}
+1 &\text{ if } n = 0 \\
+na_{n-1} & \text{ if } n > 1
+\end{cases}
+\]
+\qed
+\end{ex}
+
+
+\newpage
+\begin{ex}
+What can you tell me about $a_n$ ($n=0, 1, 2, \ldots$) where
+\[
+a_n = 
+\begin{cases}
+1 &\text{ if } n = 0 \\
+2 &\text{ if } n = 1 \\
+na_{n-1} + a_{n-2} & \text{ if } n > 1
+\end{cases}
+\]
+\qed
+\end{ex}
+
+\myinput{tower-of-hanoi-generating-function.tex}

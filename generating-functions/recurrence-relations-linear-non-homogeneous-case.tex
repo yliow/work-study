@@ -1,0 +1,242 @@
+%\section{Recurrence Relations: Linear Non-homogeneous Case}
+\begin{python0}
+from solutions import *; clear() 
+\end{python0}
+
+The general linear non-homogeneous case looks like this:
+\[
+a_n = c_1 a_{n-1} + \cdots c_d a_{n-d} + f(n)
+\]
+where $f(n)$ is a nonzero function in $n$.
+Here's one example:
+\[
+a_n = 2a_{n-1} + n
+\]
+and here's another:
+\[
+a_n = a_{n-1} + 3a_{n-2} + 2n^3 + 1
+\]
+and yet another:
+\[
+a_n = a_{n-1} + 3a_{n-2} + \lfloor n \log n \rfloor
+\]
+
+Let's consider the a degree 2 nonhomogeneous recurrence relation:
+\[
+a_n = c_1 a_{n-1} + c_2 a_{n-2} + f(n), \,\,\,\,\, n \geq 2
+\]
+Of course using our method of generating functions,
+in order to compute a closed form for $a_n$, we do this:
+We let $a(x) = \sum_{n=0}^\infty a_n x^n$.
+From 
+\[
+a_n = c_1 a_{n-1} + c_2 a_{n-2} + f(n), \,\,\,\,\, n \geq 2
+\]
+we get
+\begin{align*}
+a(x)
+&= \sum_{n=0}^\infty a_n x^n \\
+&= a_0 + a_1x + \sum_{n=0}^\infty a_n x^n \\
+&= a_0 + a_1x + \sum_{n=2}^\infty (c_1 a_{n-1} + c_2 a_{n-2} + f(n))x^n \\
+&= a_0 + a_1x + \sum_{n=2}^\infty (c_1 a_{n-1} + c_2 a_{n-2})x^n + 
+\sum_{n=2}^\infty f(n)x^n \\
+\end{align*}
+Without going into details, we know that had the recurrence been this:
+\[
+a_n = c_1 a_{n-1} + c_2 a_{n-2}, \,\,\,\,\, n \geq 2
+\]
+we would have a rational function:
+\[
+a(x) = \frac{P(x)}{Q(x)}
+\]
+With the nonhomogeneous factor $f(n)$ in the recurrence relation we
+get this:
+\[
+a(x) = \frac{P(x) + \sum_{n=2}^\infty f(n)x^n}{Q(x)}
+\]
+Therefore as long as we can express
+\[
+\sum_{n=2}^\infty f(n)x^n
+\]
+as a rational function then there is hope of getting the coefficient 
+of $x^n$ of the power series of $a(x)$.
+
+Let's try an example:
+\[
+a_n = 2a_{n-1} + n
+\]
+for $n \geq 1$.
+Of course we let $a(x) = \sum_{n=0}^\infty a_n x^n$.
+Then
+\begin{align*}
+a(x) 
+&= \sum_{n=0} a_nx^n \\
+&= a_0 + \sum_{n = 1}^\infty a_n x^n \\
+&= a_0 + \sum_{n = 1}^\infty (2a_{n-1} + n) x^n \\
+&= a_0 + 2\sum_{n = 1}^\infty a_{n-1}x^n + \sum_{n=1}^\infty n x^n \\
+&= a_0 + 2x\sum_{n = 1}^\infty a_{n-1}x^{n-1} + \sum_{n=0}^\infty n x^n \\
+\end{align*}
+Notice that I've secretly actually added $0x^0$.
+Continuing the computation we have
+\begin{align*}
+a(x) 
+&= a_0 + 2x\sum_{n = 0}^\infty a_{n}x^{n} + \sum_{n=0}^\infty n x^n \\
+&= a_0 + 2x a(x) + \sum_{n=0}^\infty n x^n \\
+\therefore\,\,\,\,\, (1-2x) a(x) 
+&= a_0 + \sum_{n=0}^\infty n x^n \\
+\therefore\,\,\,\,\, a(x) 
+&= \frac{a_0 + \sum_{n=0}^\infty n x^n}{1-2x} \\
+\end{align*}
+And by the way ... we can rewrite $\sum_{n=0}^\infty nx^n$ as a
+rational function! It's just
+\[
+x\frac{d}{dx} \sum_{n=0}^\infty x^n
+\]
+remember?
+Since
+\begin{align*}
+x\frac{d}{dx} \sum_{n=0}^\infty x^n
+&= x \frac{d}{dx}\frac{1}{1-x} \\
+x\frac{d}{dx} \sum_{n=0}^\infty x^n
+&= x \frac{d}{dx} \frac{1}{1-x} \\
+&= x \frac{1}{(1-x)^2} \\
+\end{align*}
+Hence
+\begin{align*}
+a(x) 
+&= \frac{a_0 + \sum_{n=0}^\infty n x^n}{1-2x} \\
+&= \frac{a_0 + \frac{x}{(1-x)^2}}{1-2x} \\
+&= \frac{a_0(1-x)^2 + x}{(1-2x)(1-x)^2} \\
+\end{align*}
+Now we use the theory of partial fractions:
+There are constants $A, B, C$ such that
+\[
+\frac{1}{(1-2x)(1-x)^2}
+= 
+\frac{A}{1-2x}
++
+\frac{B}{1-x}
++
+\frac{C}{(1-x)^2}
+\]
+We have
+\[
+1
+= 
+A(1-x)^2
++
+B(1-x)(1-2x)
++
+C(1-2x)
+\]
+When $x = 1$, we get $C = -1$.
+When $x = 1/2$, we obtain $A = 4$.
+Finally when $x = 0$, $1 = A + B + C$, and hence
+$B = 1 - 4 + 1 = -2$.
+Hence
+\[
+\frac{1}{(1-2x)(1-x)^2}
+= 
+\frac{4}{1-2x}
++
+\frac{-2}{1-x}
++
+\frac{-1}{(1-x)^2}
+\]
+Hence
+\begin{align*}
+a(x) 
+&= 
+(a_0(1-x)^2 + x) 
+\biggl(
+\frac{4}{1-2x}
++
+\frac{-2}{1-x}
++
+\frac{-1}{(1-x)^2}
+\biggr) \\
+&= 
+(a_0 + (1-2a_0)x + a_0 x^2) 
+\biggl(
+4 \sum_{n=0}^\infty 2^n x^n
+-2 \sum_{n=0}^\infty x^n
+- \sum_{n=0}^\infty (n+1) x^n
+\biggr) \\
+&= 
+(a_0 + (1-2a_0)x + a_0 x^2) 
+\sum_{n=0}^\infty (4 \cdot 2^n - 2 - (n+1))x^n
+\end{align*}
+Hence 
+\[
+a_n = 
+\begin{cases}
+a_0 &\text{ if } n = 0 \\
+%
+a_0(4 \cdot 2 - 2 - (1+1)) + (1-2a_0)(4 - 2 - (0+1)) &\text{ if } n = 1 \\
+%
+a_0(4 \cdot 2^n - 2 - (n+1)) + (1-2a_0)(4 \cdot 2^{n-1} - 2 - n) +
+a_0(4 \cdot 2^{n-2} - 2 - (n-1))
+& \text{ if } n \geq 2 \\
+\end{cases}
+\]
+Simplifying the above horrendous closed forms we get:
+\[
+a_n = 
+\begin{cases}
+a_0 &\text{ if } n = 0 \\
+%
+1 + 2a_0 &\text{ if } n = 1 \\
+%
+(2 + a_0)2^n - n  -2 & \text{ if } n \geq 2 \\
+\end{cases}
+\]
+
+Let's check that the first few terms are correct.
+First of all, $a_n = a_0$ for $n = 0$.
+That's good.
+For $n = 1$, from the closed form we have $a_1 = 1 + 2a_0$.
+Now the recurrence we started with is
+\[
+a_n = 2a_{n-1} + n
+\]
+Therefore from the recurrence relation, $a_1 = 2a_0 + 1$.
+That's also good.
+One last check: Let's look at $n = 2$.
+From the recurrence relation we have
+\begin{align*}
+a_2 &= 2a_1 + 2 \\
+a_1 &= 2a_0 + 1
+\end{align*}
+Hence
+\begin{align*}
+a_2 = 2(2a_0 + 1) + 2 = 4a_0 + 4
+\end{align*}
+From the derived closed form we have
+\[
+(2 + a_0)2^2 - 2 - 2 = 8 + 4a_0 - 4 = 4a_0 + 4
+\]
+
+
+
+\newpage
+\begin{ex}
+Find a closed form for $a_n$ where
+\[
+a_n = 2a_{n-1} + a_{n-2} + n^2 + 1
+\]
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Solve completely the degree 2 linear nonhomogenous case
+where the nonhomogenous factor is a polynomial of degree 1:
+Find a closed form for $a_n$ where
+\[
+a_n = c_1 a_{n-1} + c_2 a_{n-2} + d_1x + d_2 x^2
+\]
+\end{ex}
+
+\newpage
+\subsection*{Solutions}
+\input{solutions.tex} % input solutions.tex
