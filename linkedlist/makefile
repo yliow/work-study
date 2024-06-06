@@ -69,7 +69,9 @@ main: stdout00.tex\
 	stdout45.tex\
 	stdout46.tex\
 	stdout47.tex\
-	stdout48.tex
+	stdout48.tex\
+	stdout49.tex\
+	stdout50.tex
 	$(PDF)		
 stdout00.tex: stdout00.py
 	python stdout00.py > stdout00.tex
