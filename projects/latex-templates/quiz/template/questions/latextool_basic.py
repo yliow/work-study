@@ -2208,7 +2208,7 @@ class vector(Line):
 # ends at (x-r*cos(start)+r*cos(stop), y-r*sin(start)+r*sin(stop))
 #
 # To draw an angle: starting at (0,0) and going anti-clockwise
-#                  ---
+#                  -^-
 #                     \            angle t
 #                  t   \     
 #   --------------*-----|----------
