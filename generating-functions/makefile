@@ -5,9 +5,7 @@
 OPEN = xdg-open
 PDF = pdflatex --shell-escape $@.tex; \
 	pythontex $@.tex \
-	pdflatex --shell-escape $@.tex; \
 	makeindex $@.idx; \
-	pdflatex --shell-escape $@.tex; \
 	$(OPEN) $@.pdf; \
 	echo ""; \
 	ls -la $@.pdf; \
