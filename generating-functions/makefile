@@ -76,7 +76,7 @@ main: plot0.tex \
 	stdout31.tex \
 	stdout32.tex \
 	stdout33.tex \
-	stdout34.tex \
+	stdout34.tex
 	$(PDF)
 
 plot0.tex: plot0.py
