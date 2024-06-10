@@ -112,20 +112,20 @@ exercises-power-series-9:
 
 cleantmp:
 	rm -rf abc.outut
-	rm -rf '*.log' 
-	rm -rf '*.aux'
-	rm -rf '*.toc'
-	rm -rf '*.out'
-	rm -rf '*.idx'
-	rm -rf '*.ilg'
-	rm -rf '*.log'
-	rm -rf 'shEsc.tmp'
-	rm -rf '*.vrb'
-	rm -rf '*.snm'
-	rm -rf '*.nav'
-	rm -rf '*.err'
-	rm -rf '*.idx'
-	rm -rf 'abc.output'
+	rm -rf *.log
+	rm -rf *.aux
+	rm -rf *.toc
+	rm -rf *.out
+	rm -rf *.idx
+	rm -rf *.ilg
+	rm -rf *.log
+	rm -rf shEsc.tmp
+	rm -rf *.vrb
+	rm -rf *.snm
+	rm -rf *.nav
+	rm -rf *.err
+	rm -rf *.idx
+	rm -rf abc.output
 
 
 clean:
