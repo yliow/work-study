@@ -5,7 +5,7 @@ L = POLY_LINEWIDTH
 p = Plot()
 V = regularpoly(6)
 for i in [0]:
-V1 = V[:]
+    V1 = V[:]
 V1 = [(x+i*3.25, y) for (x,y) in V1]
 p += polygon(points=V1, 
 fill=False,
