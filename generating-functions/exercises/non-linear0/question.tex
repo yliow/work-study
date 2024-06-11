@@ -1,1 +1,74 @@
 \tinysidebar{\debug{exercises/{non-linear0/question.tex}}}
+Note that the above recurrence looks like this:
+\[
+a_n = \frac{1}{n} a_{n-1} + n
+\]
+In particular, the multiple in front of $a_{n-1}$ is $\frac{1}{n}$
+which is not constant (and therefore the recurrence is
+not linear) and more importantly it's not a polynomial ...
+that's the whole point of this section.
+The appearance of $\frac{1}{n}$ can appear in cases where
+there's an \lq\lq average'' computation.
+This happens, for instance,
+when $a_n$ is the average runtime of quicksort.
+What do I mean by \lq\lq average'' here?
+Let's look at quicksort (see section on quicksort algorithms).
+
+Suppose the array to be sorted is \verb!x[0..(n-1)]!.
+The pivot can be at \verb!x[0]! or it can be at \verb!x[1]! or ...
+In any case the array is re--organized using the pivot.
+Specifically,
+the array is partitioned into two parts using the pivot
+so that the array is re-organized into
+\lq\lq left-hand-side array, pivot, right-hand-side array''.
+There are several cases.
+The left-hand-side array of values $\leq$ the pivot can have 0 elements.
+This is followed by the pivot.
+The right-hand-side array of values $>$ the pivot can have $n - 1$ values.
+That's one case.
+For this case, the time taken (recursively) is
+\[
+An + B + T(0) + T(n - 1)
+\]
+where $T(n)$ is the time taken to quicksort an array of size $n$.
+The $An + B$ is time to scan the array
+and place the values of the array into the structure
+of 
+\lq\lq left-hand side array, pivot, right-hand side array''.
+Another case is when the left-hand-side array has 1 value.
+This is followed by the pivot and then followed by the right-hand-side
+array which has $n - 2$ values.
+In this case, the time taken (recursively) is
+\[
+An + B + T(1) + T(n - 2)
+\]
+The time taken when the left-hand-side array has 2 values is
+\[
+An + B + T(2) + T(n - 3)
+\]
+Etc.
+When we take the average over all $n$ cases, we get
+\begin{align*}
+T(n)
+&= An + B \\
+&\textwhite{= \ }
++ \frac{1}{n} 
+\biggl(
+  \left( T(0) + T(n-1) \right)
+  + \left( T(1) + T(n-2) \right)
+  + \cdots
+  + \left( T(n - 1) + T(0) \right)
+\biggr) \\
+&= An + B + \frac{1}{n}\sum_{i=0}^{n-1} \left( T(i) + T(n - 1 - i) \right)
+\end{align*}
+Of course $T(0) = T(1) = C$ where $C$ is a constant.
+Note that, if you're sharp, you realized that I'm assuming that the
+values in the array \verb!x! are unique.
+Furthermore, I'm assuming all the above cases are equally likely.
+
+In the above, you can see that each $T(i)$ appears twice.
+So I can simplify it a little like this:
+\begin{align*}
+T(n)
+&= An + B + \frac{2}{n}\sum_{i=0}^{n-1} T(i)
+\end{align*}
