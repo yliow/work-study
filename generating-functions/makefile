@@ -4,12 +4,15 @@
 
 OPEN = xdg-open
 PDF = pdflatex --shell-escape $@.tex; \
-	pythontex $@.tex \
-	makeindex $@.idx; \
-	$(OPEN) $@.pdf; \
-	echo ""; \
-	ls -la $@.pdf; \
-	echo ""
+      pythontex $@.tex \
+      pdflatex --shell-escape $@.tex; \
+      makeindex $@.idx; \
+      makeindex $@.idx; \
+      pdflatex --shell-escape $@.tex; \
+      $(OPEN) $@.pdf; \
+      echo ""; \
+      ls -la $@.pdf; \
+      echo ""
 
 # chapter 11, page 11000
 main: plot0.tex \
@@ -81,31 +84,31 @@ main: plot0.tex \
 
 plot0.tex: plot0.py
 	python plot0.py > plot0.tex
-plot1.tex: plot1.py
+	plot1.tex: plot1.py
 	python plot1.py > plot1.tex
-plot2.tex: plot2.py
+	plot2.tex: plot2.py
 	python plot2.py > plot2.tex
-plot3.tex: plot3.py
+	plot3.tex: plot3.py
 	python plot3.py > plot3.tex
-plot4.tex: plot4.py
+	plot4.tex: plot4.py
 	python plot4.py > plot4.tex
-plot5.tex: plot5.py
+	plot5.tex: plot5.py
 	python plot5.py > plot5.tex
-plot6.tex: plot6.py
+	plot6.tex: plot6.py
 	python plot6.py > plot6.tex
-plot7.tex: plot7.py
+	plot7.tex: plot7.py
 	python plot7.py > plot7.tex
-plot8.tex: plot8.py
+	plot8.tex: plot8.py
 	python plot8.py > plot8.tex
-plot9.tex: plot9.py
+	plot9.tex: plot9.py
 	python plot9.py > plot9.tex
-plot10.tex: plot10.py
+	plot10.tex: plot10.py
 	python plot10.py > plot10.tex
-plot11.tex: plot11.py
+	plot11.tex: plot11.py
 	python plot11.py > plot11.tex
-plot12.tex: plot12.py
+	plot12.tex: plot12.py
 	python plot12.py > plot12.tex
-plot14.tex: plot14.py
+	plot14.tex: plot14.py
 	python plot14.py > plot14.tex
 
 test0.txt: test0.py
