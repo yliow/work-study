@@ -1,1 +1,128 @@
 \tinysidebar{\debug{exercises/{fibonacci0/question.tex}}}
+You may skip this exercise.
+The above expression for $F_n$ is
+\[
+F_n = 
+\frac{1}{\sqrt{5}} 
+\left( 
+\left( \frac{1 + \sqrt{5}}{2} \right)^n
+-
+\left( \frac{1 - \sqrt{5}}{2} \right)^n
+\right)
+\]
+and it involves $\sqrt{5}$. 
+Of course we know that $F_n$ is an integer.
+So the $\sqrt{5}$ must some how disappear.
+Let's expand the terms of the $n$--th powers
+using binomial theorem and
+verify that \textit{all} the $\sqrt{5}$ disappears.
+(There's also the mysterious division
+by a very high power of 2.)
+\begin{align*}
+F_n 
+&= 
+\frac{1}{\sqrt{5}} 
+\left( 
+\left( \frac{1 + \sqrt{5}}{2} \right)^n
+-
+\left( \frac{1 - \sqrt{5}}{2} \right)^n
+\right) \\
+&=
+\frac{1}{2^n\sqrt{5}} 
+\left( 
+\bigl(
+1 + \sqrt{5}
+\bigr)^n
+-
+\bigl(
+1 - \sqrt{5}
+\bigr)^n
+\right) \\
+&=
+\frac{1}{2^n\sqrt{5}} 
+\left(
+\sum_{i=0}^n \binom{n}{i}\sqrt{5}^i
+- 
+\sum_{i=0}^n (-1)^i\binom{n}{i}\sqrt{5}^i
+\right) \\
+&=
+\frac{1}{2^n\sqrt{5}} 
+\sum_{i=0}^n 
+\left(
+\binom{n}{i}
+- 
+(-1)^i\binom{n}{i}
+\right)
+\sqrt{5}^i \\
+&=
+\frac{1}{2^n\sqrt{5}} 
+\sum_{i=0}^n 
+(1
+- 
+(-1)^i)
+\binom{n}{i}
+\sqrt{5}^i
+\end{align*}
+Of course $1 - (-1)^i$ is 0 when $i$ is even.
+Therefore
+\begin{align*}
+F_n 
+&=
+\frac{1}{2^n\sqrt{5}} 
+\sum_{\substack{i=0 \\ i \text{ odd}}}^n 
+2
+\binom{n}{i}
+\sqrt{5}^i \\
+&=
+\frac{2}{2^n} 
+\sum_{\substack{i=0 \\ i \text{ odd}}}^n 
+\binom{n}{i}
+\sqrt{5}^{i-1} \\
+&=
+\frac{1}{2^{n-1}} 
+\sum_{\substack{i=0 \\ i \text{ odd}}}^n 
+\binom{n}{i}
+5^{\frac{i-1}{2}}
+\end{align*}
+Note that since $i$ is odd, $i-1$ is even and 
+hence $(i-1)/2$ is an integer.
+Therefore we know now
+that the expression of $F_n$ in fact does not involve the
+mysterious $\sqrt{5}$.
+
+In particular for the case of $n = 10$ we have
+\begin{align*}
+F_{10}
+= \frac{1}{2^{9}} 
+\left(
+\binom{10}{1} 5^{0} +
+\binom{10}{3} 5^{1} +
+\binom{10}{5} 5^{2} +
+\binom{10}{7} 5^{3} +
+\binom{10}{9} 5^{4}
+\right)
+\end{align*}
+which can be \lq\lq folded'':
+\begin{align*}
+F_{10}
+= \frac{1}{2^{9}} 
+\left(
+2\binom{10}{1} 5^{0} +
+2\binom{10}{3} 5^{1} +
+\binom{10}{5} 5^{2}
+\right)
+\end{align*}
+Likewise for odd $n$, say $n = 9$, 
+\begin{align*}
+F_{9}
+= \frac{1}{2^{8}} 
+\left(
+2\binom{9}{1} 5^{0} +
+2\binom{9}{3} 5^{1}
+\right)
+\end{align*}
+
+Note however that the closed form will evaluate faster
+than the form that uses a summation.
+Furthermore it's also easier to see the big-O of $F_n$
+using the closed form.
