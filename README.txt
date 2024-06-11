@@ -13,7 +13,7 @@ courses/ciss350/n/containers/           containers/                done    copie
 courses/ciss350/n/distribution-sort/    distribution-sort/         done    copied back to courses/ciss350/n/distribution-sort/
 courses/ciss350/n/linkedlist/           linkedlist/                done    copied back to courses/ciss350/n/linkedlist/
 courses/ciss350/n/tree/                                                  (this is mostly done)
-courses/math325/n/generating-functions/ generating-functions/
+courses/math325/n/generating-functions/ generating-functions/      done
 
 projects/latex-templates/             projects/latex-templates/        
 courses/ciss240/q/q01*/               courses/ciss240/q/q01*/
