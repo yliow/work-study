@@ -22,7 +22,7 @@ courses/ciss145/n                       ciss145/n/cover
                                         ciss145/n/04_contents
                                         ciss145/n/05_integers
                                         ciss145/n/06_branch
-                                        ciss145/n/06_strings
+                                        ciss145/n/06_strings <-- to renumber
                                         
 
 
