@@ -14,7 +14,8 @@ courses/ciss350/n/distribution-sort/    distribution-sort/         done    copie
 courses/ciss350/n/linkedlist/           linkedlist/                done    copied back to courses/ciss350/n/linkedlist/
 courses/ciss350/n/tree/                                                  (this is mostly done)
 courses/math325/n/generating-functions/ generating-functions/      done    copied back to courses/math325/n/generating-functions/
-courses/ciss145/n                       ciss145/n/cover
+
+courses/ciss145/n                       STEP 1 - update to py3
                                         ciss145/n/00_cover
                                         ciss145/n/01_preface
                                         ciss145/n/02_welcome
@@ -22,9 +23,13 @@ courses/ciss145/n                       ciss145/n/cover
                                         ciss145/n/04_contents
                                         ciss145/n/05_integers
                                         ciss145/n/06_branch
-                                        ciss145/n/06_strings <-- to renumber
+                                        ciss145/n/06_strings
                                         ciss145/n/07_loop
                                         ciss145/n/07_loop_while
+                                        ciss145/n/08_pygame1
+                                        ciss145/n/09_pygame2
+                                        ciss145/n/09_pygame3
+                                        ciss145/n/09_pygame4
 
 
 projects/latex-templates/             projects/latex-templates/        
