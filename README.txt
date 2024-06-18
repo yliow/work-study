@@ -23,7 +23,8 @@ courses/ciss145/n                       ciss145/n/cover
                                         ciss145/n/05_integers
                                         ciss145/n/06_branch
                                         ciss145/n/06_strings <-- to renumber
-                                        
+                                        ciss145/n/07_loop
+                                        ciss145/n/07_loop_while
 
 
 projects/latex-templates/             projects/latex-templates/        
