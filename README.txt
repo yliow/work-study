@@ -15,10 +15,11 @@ courses/ciss350/n/linkedlist/           linkedlist/                done    copie
 courses/ciss350/n/tree/                                                  (this is mostly done)
 courses/math325/n/generating-functions/ generating-functions/      done    copied back to courses/math325/n/generating-functions/
 
-courses/ciss145/n                       STEP 1 - update to py3 using f31.
-                                        ciss145/n/00_cover
-                                        ciss145/n/01_preface
-                                        ciss145/n/02_welcome
+                                                                                  ryan       liow
+courses/ciss145/n                       STEP 1 - update to py3 using f31.         --------   -------
+                                        ciss145/n/00_cover                        done
+                                        ciss145/n/01_preface                      done
+                                        ciss145/n/02_welcome                      done
                                         ciss145/n/03_installation
                                         ciss145/n/04_contents
                                         ciss145/n/05_integers
