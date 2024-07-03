@@ -21,8 +21,8 @@ courses/ciss145/n                       STEP 1 - update to py3 using f31.       
                                         ciss145/n/01_preface                      done       slight update. done.
                                         ciss145/n/02_welcome                      done
                                         ciss145/n/03_installation                 done
-                                        ciss145/n/04_contents
-                                        ciss145/n/05_integers
+                                        ciss145/n/04_contents                     done
+                                        ciss145/n/05_integers                     halfway
                                         ciss145/n/06_branch
                                         ciss145/n/06_strings
                                         ciss145/n/07_loop
