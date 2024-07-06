@@ -17,7 +17,7 @@ courses/math325/n/generating-functions/ generating-functions/      done    copie
 
 
 Comments for ciss145:
-* At top of documents, change "Python Programming Part 1 v0.2" to "Python Programming Part 1 v0.3"
+* At top of documents, change "Python Programming Part 1 v0.2" to "Python Programming Part 1 v0.3" 👍
                                                                                   ryan       liow
 courses/ciss145/n                       STEP 1 - update to py3 using f31.         --------   -------
                                         ciss145/n/00_cover                        done       slight update. done.
