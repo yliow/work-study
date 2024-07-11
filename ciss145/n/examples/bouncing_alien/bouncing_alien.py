@@ -8,7 +8,7 @@ WIDTH = 640
 HEIGHT = 480
 SIZE = (WIDTH, HEIGHT)
 surface = pygame.display.set_mode(SIZE)
-BLACK = (100, 200, 10)
+BLACK = (0, 0, 0)
 
 # Set speed of alien to [1,2]
 XSPEED = 4
@@ -16,7 +16,7 @@ YSPEED = 1
 speed = [XSPEED, YSPEED]
 
 # Load alien image and get image rect
-alien = pygame.image.load("GalaxianFlagship.gif")
+alien = pygame.image.load("GalaxianAquaAlien.gif")
 alienrect = alien.get_rect()
 
 print(alienrect)
