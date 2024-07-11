@@ -19,7 +19,7 @@ speed = [XSPEED, YSPEED]
 alien = pygame.image.load("GalaxianFlagship.gif")
 alienrect = alien.get_rect()
 
-print alienrect
+print(alienrect)
 
 # Load sound
 tag = pygame.mixer.Sound("ChatTag.wav")
@@ -32,7 +32,7 @@ while 1:
 
     # Move alien
     alienrect = alienrect.move(speed)
-    print alienrect
+    print(alienrect)
     
     # Deflect along left and right walls
     if alienrect.left < 0 or alienrect.right > WIDTH:
