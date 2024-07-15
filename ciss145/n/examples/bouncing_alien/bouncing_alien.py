@@ -19,8 +19,6 @@ speed = [XSPEED, YSPEED]
 alien = pygame.image.load("GalaxianAquaAlien.gif")
 alienrect = alien.get_rect()
 
-print(alienrect)
-
 # Load sound
 tag = pygame.mixer.Sound("ChatTag.wav")
 
