@@ -46,5 +46,3 @@ while 1:
     surface.fill(BLACK)
     surface.blit(alien, alienrect)
     pygame.display.flip()
-
-    pygame.time.delay(10)

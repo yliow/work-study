@@ -19,7 +19,7 @@ speed = [XSPEED, YSPEED]
 alien0 = pygame.image.load("GalaxianAquaAlien.gif")
 alien1 = pygame.image.load("GalaxianFlagship.gif")
 alienrect = alien0.get_rect()
-print alienrect
+print(alienrect)
 i = 0
 
 # Load sound
@@ -33,11 +33,11 @@ while 1:
 
     # Move alien
     alienrect = alienrect.move(speed)
-    print alienrect
+    print(alienrect)
 
     # Deflect along left and right walls
     if alienrect.left < 0 or alienrect.right > WIDTH:
-        print "left or right", alienrect.left, alienrect.right
+        print("left or right", alienrect.left, alienrect.right)
         speed[0] = -speed[0]
         if i == 0:
             i = 1
@@ -47,7 +47,7 @@ while 1:
 
     # Deflect along top and bottom walls
     if alienrect.top < 0 or alienrect.bottom > HEIGHT:
-        print "top or bottom", alienrect.top, alienrect.bottom
+        print("top or bottom", alienrect.top, alienrect.bottom)
         if i == 0:
             i = 1
         else:
