@@ -26,7 +26,7 @@ courses/ciss145/n                       STEP 1 - update to py3 using f31.       
                                         ciss145/n/03_installation                 done       change: pygame install. Added linux.
                                         ciss145/n/04_contents                     done
                                         ciss145/n/05_integers                     done       done
-                                        ciss145/n/06_branch                       done
+                                        ciss145/n/06_branch                       done       done
                                         ciss145/n/06_strings                      done       working on it now
                                         ciss145/n/07_loop                         done
                                         ciss145/n/07_loop_while                   done
