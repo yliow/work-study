@@ -37,7 +37,7 @@ courses/ciss145/n                       STEP 1 - update to py3 using f31.       
                                         ciss145/n/07_loop_while                   done
                                         ciss145/n/08_pygame1                      done
                                         ciss145/n/09_pygame2                      done
-                                        ciss145/n/09_pygame3
+                                        ciss145/n/09_pygame3                      done
                                         ciss145/n/09_pygame4
 
 
