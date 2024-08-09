@@ -23,7 +23,7 @@ Comments for ciss145:
 
 >>>> RESTRUCTURE TO MATCH 240: watch out ... renumber of some files to match number of 240 notes.
 
-                                                                                  ryan       liow
+                                                                                       ryan       liow
 courses/ciss145/n                       STEP 1 - update to py3 using f31.         --------   -------
                                         ciss145/n/00-frontmatter                  done       done.
                                         ciss145/n/01-print-string                            done
@@ -33,14 +33,17 @@ courses/ciss145/n                       STEP 1 - update to py3 using f31.       
 
                                         ciss145/n/04-floating-point-numbers
 
-                                        ciss145/n/06_branch                       done       
+                                        ciss145/n/06_branch                       done
+                                        ciss145/n/08-if-part2                     progressing (8/7/24)
+                                        
                                         ciss145/n/06_strings                      done       
                                         ciss145/n/07_loop                         done
+
+                                        ciss145/n/10-for-loops-part1.odt
+                                        ciss145/n/11-for-loops-part2.odt
                                         
                                         ciss145/n/07_loop_while                   done       | TO COMBINE
                                         ciss145/n/12-while-loops                             |
-
-                                        ciss145/n/08-if-part2                     progressing (8/7/24)
                                         
                                         ciss145/n/08_pygame1                      done
                                         ciss145/n/09_pygame2                      done
