@@ -34,7 +34,7 @@ courses/ciss145/n                       STEP 1 - update to py3 using f31.       
                                         ciss145/n/04-floating-point-numbers
 
                                         ciss145/n/06_branch                       done
-                                        ciss145/n/08-if-part2                     progressing (8/7/24)
+                                        ciss145/n/08-if-part2                     done
                                         
                                         ciss145/n/06_strings                      done       
                                         ciss145/n/07_loop                         done
