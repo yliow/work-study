@@ -8,7 +8,7 @@ view:
 	gnome-open main.pdf
 
 v:
-	gnome-open main.pdf
+	open main.pdf
         
 plain:
 	python ../setstyle.py main.tex --style=plain
