@@ -1,7 +1,20 @@
 PROJECT: NOTES
-yliow home dir                          work study dir             ryan    liow
---------------                          --------------             ------- ------
-courses/ciss350/n/tree/                                                  (this is mostly done)
+                                                                   (Put "work" or "done")
+yliow home dir                          work study dir             ryan  robert  nasser      liow
+--------------                          --------------             ----  ------  ------      ----
+courses/ciss350/a/a01                   courses/ciss350/a/a01                                               
+courses/ciss350/a/a02                   courses/ciss350/a/a02                                               
+courses/ciss350/a/a03                   courses/ciss350/a/a03                                               
+
+courses/ciss240/a/a01                   courses/ciss240/a/a01                                               
+courses/ciss240/a/a02                   courses/ciss240/a/a02
+courses/ciss240/a/a03                   courses/ciss240/a/a03
+courses/ciss240/a/a04                   courses/ciss240/a/a04
+
+
+
+
+
 
 Comments for ciss145:
 * At top of documents, change "Python Programming Part 1 v0.2" to "Python Programming Part 1 v0.3"
