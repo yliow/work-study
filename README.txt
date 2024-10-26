@@ -11,6 +11,7 @@ courses/ciss240/a/a02                   courses/ciss240/a/a02
 courses/ciss240/a/a03                   courses/ciss240/a/a03
 courses/ciss240/a/a04                   courses/ciss240/a/a04
 
+courses/ciss358/a/a02                   courses/ciss358/a/a02
 
 
 
