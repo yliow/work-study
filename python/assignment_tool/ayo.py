@@ -1,4 +1,5 @@
 import funct
+import config
 import os
 
 def main():
@@ -12,17 +13,16 @@ def main():
     s = s + "\\input{thispostamble.tex}\n"
     return "main.tex", s
 
-
 funct.write(main())
 
 if not(os.path.exists("makefile")):
     funct.write(funct.makefile())
 
 if not(os.path.exists("thismacros")):
-    funct.write(funct.thismacros())
+    funct.write(config.thismacros())
 
 if not(os.path.exists("thispackages")):
-    funct.write(funct.thispackages())
+    funct.write(config.thispackages())
 
 if not(os.path.exists("thispostamble")):
     funct.write(funct.thispostamble())

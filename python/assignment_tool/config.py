@@ -1,7 +1,8 @@
 # depends on file structure
 courses = "ciss350"
-assignments = "a01"
+assignment = "a01"
 dir = ["a01q01/question/main.tex", "a01q02/question/main.tex", "a01q03/question/main.tex"]
+
 
 def thismacros():
     tex = ""
