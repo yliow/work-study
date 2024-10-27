@@ -13,13 +13,6 @@ def makefile():
     ================================================================\"\n\t@echo \"\"'''
     return "makefile", make
 
-def thismacros():
-    tex = ""
-    return "thismacros.tex", tex
-
-def thispackages():
-    tex = ""
-    return "thispackages.tex", tex
 
 def thispostamble():
     tex = "\\printindex\n\\end{document}"
