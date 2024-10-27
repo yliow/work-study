@@ -69,12 +69,6 @@ def thistitle():
     '''
     return "thistitle.tex", tex
 
-def write(x):
-    name, s = x
-    f = open(name, "w")
-    f.write(s)
-    f.close()
-
 def is_latex(path):
     x = path[len(path) - 4:len(path)]
     return x == '.tex'

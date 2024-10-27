@@ -2,6 +2,12 @@ import funct
 import config
 import os
 
+def write(x):
+    name, s = x
+    f = open(name, "w")
+    f.write(s)
+    f.close()
+
 def main():
     s = r'''
 \input{thispreamble.tex}
@@ -33,22 +39,22 @@ def main():
     '''
     return "main.tex", s
 
-funct.write(main())
+write(main())
 
 if not os.path.exists("makefile"):
-    funct.write(funct.makefile())
+    write(funct.makefile())
 
 if not os.path.exists("thismacros"):
-    funct.write(config.thismacros())
+    write(config.thismacros())
 
 if not os.path.exists("thispackages"):
-    funct.write(config.thispackages())
+    write(config.thispackages())
 
 if not os.path.exists("thispostamble"):
-    funct.write(funct.thispostamble())
+    write(funct.thispostamble())
 
 if not os.path.exists("thispreamble"):
-    funct.write(funct.thispreamble())
+    write(funct.thispreamble())
 
 if not os.path.exists("thistitle"):
-    funct.write(funct.thistitle())
+    write(funct.thistitle())
