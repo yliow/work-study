@@ -3,15 +3,34 @@ import config
 import os
 
 def main():
-    s = '''\\input{thispreamble.tex}\n\n\\newcommand\\myincludetex[1]{
-    \\textbox{{\\scriptsize \\texttt{#1}}}\n\n\\input{#1}\n\n}\n\n
-    \\newcommand\\myincludesrc[1]{\\textbox{{\\scriptsize \\texttt{#1}}}\n\n
-    \\VerbatimInput[fontsize=\\footnotesize,frame=single]{#1}\n\n}\n'''
+    s = r'''
+\input{thispreamble.tex}
 
-    for i in config.dir:
-        s = s + "\\newpage\n\\input{" + i + '}\n\n'
+\newcommand\myincludetex[1]{\textbox{{\scriptsize \texttt{#1}}}
 
-    s = s + "\\input{thispostamble.tex}\n"
+
+    \input{#1}
+
+}
+
+\newcommand\myincludesrc[1]{\textbox{{\scriptsize \texttt{#1}}}
+
+
+    \VerbatimInput[fontsize=\footnotesize,frame=single]{#1}
+
+}
+    '''
+
+    for path in config.dir:
+        x = funct.include_(path)
+        s += r'''
+\newpage
+%(x)s
+        
+        '''  % {'x':x}
+    s += r'''
+\input{thispostamble.tex}
+    '''
     return "main.tex", s
 
 funct.write(main())

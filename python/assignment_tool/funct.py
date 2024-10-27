@@ -2,16 +2,35 @@ from math import *
 import config
 
 def makefile():
-    make = '''pdf:\n\t-python /home/student/.alex/alexrunner.py replaceemail\n\tpdflatex --shell-escape main.tex
-    \n\txdg-open main.pdf\nview:\n\txdg-open main.pdf\nv:\n\txdg-open main.pdf\ncleantmp:\n\trm
-    -rf \'__pycache__\' \'auto\' \'desktop.ini\' \\\n\t\'abc.output\' \'texput.log\' \'shEsc.tmp\'\\ \n
-    \t\'main.log\' \'main.aux\' \'main.toc\' \'main.out\' \'main.idx\' \'main.ilg\' \'main.vrb\' \'main.snm\'
-    \'main.nav\' \\ \n\t\'main.py.err\' \'main.py.out\' \'main.py\' \'latex.py\' \'main.pytxcode\' \\ \n\t
-    \'makefile.old\' \'missfont.log\' \'traceback.txt\'\nc:\n\tmake cleantmp\ns:\n\tmake cleantmp\n\n\t
-    rm -rf submit; rm -f submit.tar.gz; mkdir submit; rsync -av . submit --exclude submit; tar -cvf submit.tar
-    submit; gzip submit.tar || true\n\t@echo \"================================================================
-    \"\n\t@echo \"done ... submit.tar.gz is created:\"\n\t@ls -la submit.tar.gz\n\t@echo \"
-    ================================================================\"\n\t@echo \"\"'''
+    make = '''
+pdf:
+	-python /home/student/.alex/alexrunner.py replaceemail
+	pdflatex --shell-escape main.tex
+	xdg-open main.pdf
+view:
+	xdg-open main.pdf
+v:
+	xdg-open main.pdf
+cleantmp:
+	rm
+	-rf '__pycache__' 'auto' 'desktop.ini' \
+	'abc.output' 'texput.log' 'shEsc.tmp'\
+	'main.log' 'main.aux' 'main.toc' 'main.out' 'main.idx' 'main.ilg' 'main.vrb' 'main.snm' 'main.nav' \
+	'main.py.err' 'main.py.out' 'main.py' 'latex.py' 'main.pytxcode' \
+	'makefile.old' 'missfont.log' 'traceback.txt'
+c:
+	make cleantmp
+s:
+	make cleantmp
+	rm -rf submit; rm -f submit.tar.gz; mkdir submit; rsync -av . submit --exclude submit; tar -cvf submit.tar
+	submit; gzip submit.tar || true
+	@echo "================================================================"
+	@echo "done ... submit.tar.gz is created:"
+	@ls -la submit.tar.gz
+	@echo "================================================================"
+	@echo ""
+
+    '''
     return "makefile", make
 
 
@@ -20,17 +39,34 @@ def thispostamble():
     return "thispostamble.tex", tex
 
 def thispreamble():
-    tex = "\\newcommand\\COURSE{"
-    tex = tex + config.courses
-    tex = tex + "}\n\\newcommand\\ASSESSMENT{"
-    tex = tex + config.assignment
-    tex = tex + '''}\n\\newcommand\\ASSESSMENTTYPE{Assignment}\n\\newcommand\\POINTS{\textwhite{xxx/xxx}}\n\n\\input{myquizpreamble}
-    \n\\input{yliow}\n\\input{thistitle}\n\\renewcommand\\EMAIL{}\n\\input{\\COURSE}\n\\textwidth=6in\n\n\\input{thispackages}\n
-    \\input{thismacros}\n\n\\makeindex\n\\begin{document}\n\\topmatter\n'''
+    tex = r'''\newcommand\COURSE{%(courses)s}
+\newcommand\ASSESSMENT{%(assignment)s}
+\newcommand\ASSESSMENTTYPE{Assignment}
+\newcommand\POINTS{	extwhite{xxx/xxx}}
+
+\input{myquizpreamble}
+    
+\input{%(name)s}
+\input{thistitle}
+\renewcommand\EMAIL{}
+\input{\COURSE}
+\textwidth=6in
+
+\input{thispackages}
+    
+    \input{thismacros}
+
+\makeindex
+\begin{document}
+\topmatter
+    ''' % {'assignment': config.assignment,
+        'courses': config.courses,
+        'name':config.name}
     return "thispreamble.tex", tex
 
 def thistitle():
-    tex = "\\renewcommand\\TITLE{\\ASSESSMENTTYPE \\ \\ASSESSMENT}\n"
+    tex = r'''\renewcommand\TITLE{\ASSESSMENTTYPE \ \ASSESSMENT}
+    '''
     return "thistitle.tex", tex
 
 def write(x):
@@ -38,3 +74,24 @@ def write(x):
     f = open(name, "w")
     f.write(s)
     f.close()
+
+def is_latex(path):
+    x = path[len(path) - 4:len(path)]
+    return x == '.tex'
+   
+def include_latex(path):
+    tex = r'''\input{%(path)s}''' %{'path':path}
+    return tex
+
+def include_src(path, frame='single', fontsize='\\footnotesize'):
+    src = r'''\VerbatimInput[frame=%(frame)s,font=%(fontsize)s]{%(path)s}
+    ''' % {'path':path, 'frame':frame, 'fontsize':fontsize}
+    return src
+
+def include_(path):
+    if is_latex(path):
+        return include_latex(path)
+    else:
+        return include_src(path)
+     
+    
