@@ -3,8 +3,9 @@ import config
 import os
 
 def main():
-    s = '''\\input{thispreamble.tex}\n\n\\newcommand\\myincludetex[1]{\\textbox{{\\scriptsize \\texttt{#1}}}\n\n
-    \\input{#1}\n\n}\n\n\\newcommand\\myincludesrc[1]{\\textbox{{\\scriptsize \\texttt{#1}}}\n\n
+    s = '''\\input{thispreamble.tex}\n\n\\newcommand\\myincludetex[1]{
+    \\textbox{{\\scriptsize \\texttt{#1}}}\n\n\\input{#1}\n\n}\n\n
+    \\newcommand\\myincludesrc[1]{\\textbox{{\\scriptsize \\texttt{#1}}}\n\n
     \\VerbatimInput[fontsize=\\footnotesize,frame=single]{#1}\n\n}\n'''
 
     for i in config.dir:
@@ -15,20 +16,20 @@ def main():
 
 funct.write(main())
 
-if not(os.path.exists("makefile")):
+if not os.path.exists("makefile"):
     funct.write(funct.makefile())
 
-if not(os.path.exists("thismacros")):
+if not os.path.exists("thismacros"):
     funct.write(config.thismacros())
 
-if not(os.path.exists("thispackages")):
+if not os.path.exists("thispackages"):
     funct.write(config.thispackages())
 
-if not(os.path.exists("thispostamble")):
+if not os.path.exists("thispostamble"):
     funct.write(funct.thispostamble())
 
-if not(os.path.exists("thispreamble")):
+if not os.path.exists("thispreamble"):
     funct.write(funct.thispreamble())
 
-if not(os.path.exists("thistitle")):
+if not os.path.exists("thistitle"):
     funct.write(funct.thistitle())
