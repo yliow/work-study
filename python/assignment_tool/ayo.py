@@ -1,4 +1,4 @@
-import config
+import funct
 import os
 
 def main():
@@ -13,22 +13,22 @@ def main():
     return "main.tex", s
 
 
-config.write(main())
+funct.write(main())
 
 if not(os.path.exists("makefile")):
-    config.write(config.makefile())
+    funct.write(funct.makefile())
 
 if not(os.path.exists("thismacros")):
-    config.write(config.thismacros())
+    funct.write(funct.thismacros())
 
 if not(os.path.exists("thispackages")):
-    config.write(config.thispackages())
+    funct.write(funct.thispackages())
 
 if not(os.path.exists("thispostamble")):
-    config.write(config.thispostamble())
+    funct.write(funct.thispostamble())
 
 if not(os.path.exists("thispreamble")):
-    config.write(config.thispreamble())
+    funct.write(funct.thispreamble())
 
 if not(os.path.exists("thistitle")):
-    config.write(config.thistitle())
+    funct.write(funct.thistitle())
