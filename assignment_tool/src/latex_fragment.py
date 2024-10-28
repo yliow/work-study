@@ -1,9 +1,8 @@
 from math import *
 import config
 
-
 def is_latex(path):
-    x = path[len(path) - 4:len(path)]
+    x = path[len(path) - 4:]
     return x == '.tex'
 
 def include_latex(path):
@@ -23,8 +22,10 @@ def include_(path):
 
 def solution(path):
     if path == 'sln':
-        return 'SOLUTION'
-    return 'newpage'
+        return r'\SOLUTION'
+    elif path == 'nln':
+        return r'\newpage'
+    return ''
     
 def main():
     s = r'''
@@ -49,7 +50,7 @@ def main():
         x = include_(path[0])
         sol = solution(path[1])
         s += r'''
-\%(solution)s
+%(solution)s
 %(x)s
         
         '''  % {'x':x, 'solution': sol}

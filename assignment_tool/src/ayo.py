@@ -11,20 +11,14 @@ def write(x):
 
 write(latex.main())
 
-if not os.path.exists("makefile"):
-    write(make.makefile())
+write(make.makefile())
 
-if not os.path.exists("thismacros"):
-    write(latex.thismacros())
+write(latex.thismacros())
 
-if not os.path.exists("thispackages"):
-    write(latex.thispackages())
+write(latex.thispackages())
 
-if not os.path.exists("thispostamble"):
-    write(latex.thispostamble())
+write(latex.thispostamble())
 
-if not os.path.exists("thispreamble"):
-    write(latex.thispreamble())
+write(latex.thispreamble())
 
-if not os.path.exists("thistitle"):
-    write(latex.thistitle())
+write(latex.thistitle())
