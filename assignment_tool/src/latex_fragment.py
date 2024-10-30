@@ -1,12 +1,24 @@
 from math import *
 import config
 
+question_iterator = 1
+
+def is_question(path):
+    a = path[0] == 'a'
+    b = path[3] == 'q'
+    c = path[1:3].isdigit() and path[4:6].isdigit()
+    return a and b and c
+
 def is_latex(path):
     x = path[len(path) - 4:]
     return x == '.tex'
 
 def include_latex(path):
-    tex = r'''\input{%(path)s}''' %{'path':path}
+    tex = ""
+    if (is_question(path)):
+        tex += r"Q{question_iterator}"
+        question_iterator += 1
+    tex += r'''\input{%(path)s}''' %{'path':path}
     return tex
 
 def include_src(path, frame='single', fontsize='\\footnotesize'):
