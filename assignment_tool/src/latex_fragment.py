@@ -1,6 +1,7 @@
 from math import *
 import config
 
+# global variable to iterate for each question
 question_iterator = 1
 
 def is_question(path):
