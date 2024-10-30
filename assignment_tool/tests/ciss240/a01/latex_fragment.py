@@ -17,7 +17,7 @@ def include_latex(path):
     tex = ""
     global question_iterator
     if (is_question(path)):
-        tex += r"{Q{question_iterator}} "
+        tex += r"{Q%(question_iterator)} "
         question_iterator += 1
     tex += r'''\input{%(path)s}''' %{'path':path}
     return tex
