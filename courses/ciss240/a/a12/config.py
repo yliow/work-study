@@ -7,10 +7,11 @@ assignment = "5"
 # or a solution
 
 dir = [("other/objective.tex", ''),
-       ("a05q01/question/main.tex", 'nln'),
-       ("a05q02/question/main.tex", 'nln'),
-       ("a05q03/question/main.tex", 'nln'),
-       ("a05q04/question/main.tex", 'nln'),
-       ("a05q05/question/main.tex", 'nln'),
-       ("a05q06/question/main.tex", 'nln')]
+       ("other/instruction.tex", ''),
+       ("a12q01/question/main.tex", 'nln'),
+       ("a12q02/question/main.tex", 'nln'),
+       ("a12q03/question/main.tex", 'nln'),
+       ("a12q04/question/main.tex", 'nln'),
+       ("a12q05/question/main.tex", 'nln'),
+       ("a12q06/question/main.tex", 'nln')]
 
