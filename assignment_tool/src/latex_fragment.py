@@ -1,5 +1,5 @@
 from math import *
-import config
+import config as con
 
 # global variable to iterate for each question
 question_iterator = 1
@@ -60,7 +60,7 @@ def main():
 }
     '''
 
-    for path in config.dir:
+    for path in con.dir:
         x = include_(path[0])
         sol = solution(path[1])
         s += r'''
@@ -71,13 +71,13 @@ def main():
     s += r'''
 \input{thispostamble.tex}
     '''
-    return "main.tex", s
+    return r"%(assignment)s/main.tex"%{'assignment':con.assignment}, s
 
 def thispostamble():
     tex = r'''\printindex
 \end{document}
     '''
-    return "thispostamble.tex", tex
+    return r"%(assignment)s/thispostamble.tex"%{'assignment':con.assignment}, tex
 
 def thispreamble():
     tex = r'''\newcommand\COURSE{%(courses)s}
@@ -100,23 +100,23 @@ def thispreamble():
 \makeindex
 \begin{document}
 \topmatter
-    ''' % {'assignment': config.assignment,
-        'courses': config.courses,
-        'name':config.name}
-    return "thispreamble.tex", tex
+    ''' % {'assignment': con.assignment,
+        'courses': con.courses,
+        'name':con.name}
+    return r"%(assignment)s/thispreamble.tex"%{'assignment':con.assignment}, tex
 
 def thistitle():
     tex = r'''\renewcommand\TITLE{\ASSESSMENTTYPE \ \ASSESSMENT}
     '''
-    return "thistitle.tex", tex
+    return r"%(assignment)s/thistitle.tex"%{'assignment':con.assignment}, tex
 
 def thismacros():
     tex = ""
-    return "thismacros.tex", tex
+    return r"%(assignment)s/thismacros.tex"%{'assignment':con.assignment}, tex
 
 def thispackages():
     tex = ""
-    return "thispackages.tex", tex
+    return r"%(assignment)s/thispackages.tex"%{'assignment':con.assignment}, tex
 
      
     

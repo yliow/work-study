@@ -1,4 +1,3 @@
-import file_structure as f
 import latex_fragment as latex
 import makefile as make
 import config
@@ -10,7 +9,6 @@ def write(x):
     f.write(s)
     f.close()
 
-f.file_struct();
 write(latex.main())
 
 write(make.makefile())

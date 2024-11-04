@@ -1,3 +1,6 @@
+
+
+###########################################################################
 #              THIS IS A TEMPLATE FOR THE "config.py" file!!
 #              LOOK AT PDF TO DETERMINE THE STRUCTURE OF "config.py"
 ###########################################################################
@@ -5,7 +8,9 @@
 # depends on file structure
 name = "yliow"
 courses = "ciss350"
-assignment = "a01"
+assignment = "a02"
+
+num = 3
 
 # nln or sln is to determine whether to put a new page at the begining or
 # or a solution

@@ -1,5 +1,7 @@
 # file: makefile.py
 
+import config as con
+
 def makefile():
     make = '''
 pdf:
@@ -30,4 +32,4 @@ s:
 	@echo ""
 
     '''
-    return "makefile", make
+    return r"%(assignment)s/makefile"%{'assignment':con.assignment}, make
