@@ -1,4 +1,5 @@
 from math import *
+import shutil
 import config as con
 
 # global variable to iterate for each question
@@ -40,7 +41,28 @@ def solution(path):
     elif path == 'nln':
         return r'\newpage'
     return ''
+
+def copy_path(path, i):
     
+    s = r"%(a)s/%(a)sq%(i)s/doc/" %{'a': con.assignment, 'i': i}
+    
+    if path[0] == "QUESTION":
+        s += r"q0%(i)s.tex" %{'i':i}
+        shutil.copy(path[1], s)
+        
+    elif path[0] == "question":
+        shutil.copy(path[1], s)
+        s += r"/q0%(i)ss.tex" %{'i':i}
+        f = open(name, )
+        
+        f.write("")
+        f.close()
+    elif path[0] == "latex string":
+        return path[1], i
+        
+    
+    return s, i + 1
+
 def main():
     s = r'''
 \input{thispreamble.tex}
@@ -59,9 +81,9 @@ def main():
 
 }
     '''
-
-    for path in con.dir:
-        x = include_(path[0])
+    i = 1
+    for path in con.contents:
+        x, i = copy_path(path, i)
         sol = solution(path[1])
         s += r'''
 %(solution)s

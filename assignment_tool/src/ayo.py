@@ -10,7 +10,10 @@ def write(x):
     f.write(s)
     f.close()
 
-f.file_struct();
+# makes the file structure
+f.file_struct();    
+        
+
 write(latex.main())
 
 write(make.makefile())
