@@ -1,4 +1,3 @@
-
 pdf:
 	-python /home/student/.alex/alexrunner.py replaceemail
 	pdflatex --shell-escape main.tex

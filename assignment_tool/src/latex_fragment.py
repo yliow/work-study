@@ -48,11 +48,11 @@ def copy_path(path, i):
     
     if path[0] == "QUESTION":
         s += rf"q{i:0>2}.tex"
-        shutil.copy(path[1], con.assignment + '/' + s)
+        shutil.copy(path[1], con.newpath + con.assignment + '/' + s)
     elif path[0] == "question":
-        shutil.copy(path[1], con.assignment + '/' + s)
+        shutil.copy(path[1], con.newpath + con.assignment + '/' + s)
         s += rf"q{i:0>2}s.tex"
-        f = open(name, con.assignment +  '/' +s)
+        f = open(name, con.newpath + con.assignment +  '/' +s)
         
         f.write("")
         f.close()
@@ -94,13 +94,13 @@ def main():
     s += r'''
 \input{thispostamble.tex}
     '''
-    return r"%(assignment)s/main.tex"%{'assignment':con.assignment}, s
+    return r"%(path)s%(assignment)s/main.tex"%{'path': con.newpath, 'assignment':con.assignment}, s
 
 def thispostamble():
     tex = r'''\printindex
 \end{document}
     '''
-    return r"%(assignment)s/thispostamble.tex"%{'assignment':con.assignment}, tex
+    return r"%(path)s%(assignment)s/thispostamble.tex"%{'path' : con.newpath, 'assignment' :con.assignment}, tex
 
 def thispreamble():
     tex = r'''\newcommand\COURSE{%(courses)s}
@@ -126,20 +126,20 @@ def thispreamble():
     ''' % {'assignment': con.assignment,
         'courses': con.courses,
         'name':con.name}
-    return r"%(assignment)s/thispreamble.tex"%{'assignment':con.assignment}, tex
+    return r"%(path)s%(assignment)s/thispreamble.tex"%{'path' : con.newpath, 'assignment' :con.assignment}, tex
 
 def thistitle():
     tex = r'''\renewcommand\TITLE{\ASSESSMENTTYPE \ \ASSESSMENT}
     '''
-    return r"%(assignment)s/thistitle.tex"%{'assignment':con.assignment}, tex
+    return r"%(path)s%(assignment)s/thistitle.tex"%{'path' : con.newpath, 'assignment' :con.assignment}, tex
 
 def thismacros():
     tex = ""
-    return r"%(assignment)s/thismacros.tex"%{'assignment':con.assignment}, tex
+    return r"%(path)s%(assignment)s/thismacros.tex"%{'path' : con.newpath, 'assignment' :con.assignment}, tex
 
 def thispackages():
     tex = ""
-    return r"%(assignment)s/thispackages.tex"%{'assignment':con.assignment}, tex
+    return r"%(path)s%(assignment)s/thispackages.tex"%{'path' : con.newpath, 'assignment' :con.assignment}, tex
 
      
     
