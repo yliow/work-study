@@ -3,13 +3,10 @@ import shutil
 import config as con
 
 def get_num():
-    num = 1
+    num = 0
     for i in con.contents:
-        for j in range(1, len(i[1])):
-            if i[1][j].isdigit() and i[1][j - 1] == 'q':
-                t = int(i[1][j:j + 2])
-                if (t > num):
-                    num = t
+        if i[0] == 'question' or i[0] == 'QUESTION':
+            num += 1
     return num
 
 def file_struct():
