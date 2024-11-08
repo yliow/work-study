@@ -44,18 +44,14 @@ def solution(path):
 
 def copy_path(path, i):
     
-    s = r"%(a)sq%(i)s/doc/" %{'a': con.assignment, 'i': i}
+    s = rf"{con.assignment}q{i:0>2}/doc/"
     
     if path[0] == "QUESTION":
-        if i > 9:
-            s += r"q%(i)s.tex" %{'i':i}
-        else:
-            s += r"q0%(i)s.tex" %{'i':i}
+        s += rf"q{i:0>2}.tex"
         shutil.copy(path[1], con.assignment + '/' + s)
-        
     elif path[0] == "question":
         shutil.copy(path[1], con.assignment + '/' + s)
-        s += r"q0%(i)ss.tex" %{'i':i}
+        s += rf"q{i:0>2}s.tex"
         f = open(name, con.assignment +  '/' +s)
         
         f.write("")

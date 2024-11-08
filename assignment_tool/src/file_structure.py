@@ -2,10 +2,21 @@ import os
 import shutil
 import config as con
 
+def get_num():
+    num = 1
+    for i in con.contents:
+        for j in range(1, i[1]):
+            if i[1][j].isdigit() and i[1][j - 1] == 'q':
+                t = int(i[1][j:j + 2])
+                if (t > num):
+                    num = t
+    return num
+
 def file_struct():
-    if os.path.exists(con.assignment):
-        shutil.rmtree(con.assignment)
-    for i in range(1, con.num + 1):
-        s = r"%(a)s/%(a)sq%(i)s/doc/" %{'a': con.assignment, 'i': i}
+    if os.path.exists(con.newpath + con.assignment):
+        shutil.rmtree(con.newpath + con.assignment)
+    num = get_num()
+    for i in range(1, num + 1):
+        s = r"%(path)s%(a)s/%(a)sq%(i)s/doc/" %{'path': con.newpath, 'a': con.assignment, 'i': i}
         os.makedirs(s + 'src')
         os.makedirs(s + 'skel')

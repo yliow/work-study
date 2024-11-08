@@ -9,12 +9,13 @@
 name = "yliow"
 courses = "ciss350"
 
+newpath = "../" # insert path for new directory (you are able to go back)
 assignment = "a04"
 
-num = 4
-
 #TODO
-#co
+# 1) fix formatting for question numbering
+# 2) find a way to get the amount of questions
+# 3) allow for backtracking through directories
 
 # nln or sln is to determine whether to put a new page at the begining or
 # or a solution
