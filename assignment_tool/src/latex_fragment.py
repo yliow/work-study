@@ -44,23 +44,28 @@ def solution(path):
 
 def copy_path(path, i):
     
-    s = r"%(a)s/%(a)sq%(i)s/doc/" %{'a': con.assignment, 'i': i}
+    s = r"%(a)sq%(i)s/doc/" %{'a': con.assignment, 'i': i}
     
     if path[0] == "QUESTION":
-        s += r"q0%(i)s.tex" %{'i':i}
-        shutil.copy(path[1], s)
+        if i > 9:
+            s += r"q%(i)s.tex" %{'i':i}
+        else:
+            s += r"q0%(i)s.tex" %{'i':i}
+        shutil.copy(path[1], con.assignment + '/' + s)
         
     elif path[0] == "question":
-        shutil.copy(path[1], s)
-        s += r"/q0%(i)ss.tex" %{'i':i}
-        f = open(name, )
+        shutil.copy(path[1], con.assignment + '/' + s)
+        s += r"q0%(i)ss.tex" %{'i':i}
+        f = open(name, con.assignment +  '/' +s)
         
         f.write("")
         f.close()
     elif path[0] == "latex string":
         return path[1], i
-        
-    
+    else:
+        s = r"%(a)s/name" %{'a': con.assignment, "name": path[0]}
+        return s, i
+    s = include_(s);
     return s, i + 1
 
 def main():
