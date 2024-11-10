@@ -7,10 +7,10 @@
 
 # depends on file structure
 name = "yliow"
-courses = "ciss350"
+courses = "ciss240"
 
-newpath = "../" # insert path for new directory (you are able to go back)
-assignment = "a04"
+newpath = "test/" # insert path for new directory (you are able to go back)
+assignment = "a06"
 
 #TODO
 # 1) fix formatting for question numbering
@@ -29,10 +29,13 @@ file_of_others = ['']
 # - question is a math question that needs a lates answer file
 # - other is any other latex files that needs to be included
 # - name of file
-contents = [("latex string", r"\newpage"),
-            ("QUESTION", "../tests/ciss240/a01/a01q01/question/main.tex"),
+contents = [("other", "../../courses/ciss240/a/a05/other/objective.tex"),
             ("latex string", r"\newpage"),
-            ("QUESTION", "../tests/ciss240/a01/a01q02/question/main.tex"),
+            ("QUESTION", "../tests/ciss240/a05/a05q01/question/main.tex"),
             ("latex string", r"\newpage"),
-            ("QUESTION", "../tests/ciss240/a01/a01q03/question/main.tex")]
+            ("QUESTION", "../tests/ciss240/a05/a05q02/question/main.tex"),
+            ("latex string", r"\newpage"),
+            ("QUESTION", "../tests/ciss240/a05/a05q03/question/main.tex"),
+            ("latex string", r"\newpage"),
+            ("QUESTION", "../tests/ciss240/a05/a05q04/question/main.tex")]
 ###########################################################################

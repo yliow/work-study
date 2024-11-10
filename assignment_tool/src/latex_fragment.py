@@ -42,6 +42,16 @@ def solution(path):
         return r'\newpage'
     return ''
 
+def file_getter(path):
+    end = len(path)
+    start = end - 1
+    
+    while start != 0:
+        if path[start] == '/':
+            return path[start + 1: end]
+        start -= 1
+    return path[start + 1: end]
+
 def copy_path(path, i):
     
     s = rf"{con.assignment}q{i:0>2}/doc/"
@@ -50,17 +60,18 @@ def copy_path(path, i):
         s += rf"q{i:0>2}.tex"
         shutil.copy(path[1], con.newpath + con.assignment + '/' + s)
     elif path[0] == "question":
-        shutil.copy(path[1], con.newpath + con.assignment + '/' + s)
+        q = s + rf"q{i:0>2}.tex"
+        shutil.copy(path[1], con.newpath + con.assignment + '/' + q)
         s += rf"q{i:0>2}s.tex"
-        f = open(name, con.newpath + con.assignment +  '/' +s)
+        shutil.copy(path[1], con.newpath + con.assignment +  '/' +s)
         
-        f.write("")
-        f.close()
     elif path[0] == "latex string":
         return path[1], i
-    else:
-        s = r"%(a)s/name" %{'a': con.assignment, "name": path[0]}
-        return s, i
+    elif path[0] == "other":
+        file_ = file_getter(path[1])
+        print(file_)
+        s = r"%(a)s/name" %{'a': con.assignment, "name": file_}
+        i -= 1
     s = include_(s);
     return s, i + 1
 

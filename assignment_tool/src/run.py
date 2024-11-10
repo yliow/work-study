@@ -11,19 +11,20 @@ def write(x):
     f.close()
 
 # makes the file structure
-f.file_struct();    
-        
-
-write(latex.main())
-
-write(make.makefile())
-
-write(latex.thismacros())
-
-write(latex.thispackages())
-
-write(latex.thispostamble())
-
-write(latex.thispreamble())
-
-write(latex.thistitle())
+if f.file_struct():
+    
+    
+    write(latex.main())
+    
+    write(make.makefile())
+    
+    write(latex.thismacros())
+    
+    write(latex.thispackages())
+    
+    write(latex.thispostamble())
+    
+    write(latex.thispreamble())
+    
+    write(latex.thistitle())
+    
