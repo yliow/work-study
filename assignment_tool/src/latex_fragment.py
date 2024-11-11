@@ -65,11 +65,13 @@ def copy_path(path, i):
         s += rf"q{i:0>2}s.tex"
         shutil.copy(path[1], con.newpath + con.assignment +  '/' +s)
         l = r'''
-\%(q)s
+%(q)s
+        
 \SOLUTION
-\%(s)s
-        ''' %{'q': q, 's': s}
-        return l, i - 1 
+        
+%(s)s
+        ''' %{'q': include_(q), 's': include_(s)}
+        return l, i + 1 
         
     elif path[0] == "latex string":
         return path[1], i
@@ -78,6 +80,7 @@ def copy_path(path, i):
         print(file_)
         s = r"%(a)s/%(name)s" %{'a': con.assignment, "name": file_}
         shutil.copy(path[1], con.newpath + s)
+        s = file_
         i -= 1
     s = include_(s);
     return s, i + 1
