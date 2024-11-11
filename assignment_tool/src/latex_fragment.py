@@ -55,7 +55,7 @@ def file_getter(path):
 def copy_path(path, i):
     
     s = rf"{con.assignment}q{i:0>2}/doc/"
-    
+    p = rf"{con.assignment}q{i:0>2}/doc/"
     if path[0] == "QUESTION":
         s += rf"q{i:0>2}.tex"
         shutil.copy(path[1], con.newpath + con.assignment + '/' + s)
@@ -64,13 +64,20 @@ def copy_path(path, i):
         shutil.copy(path[1], con.newpath + con.assignment + '/' + q)
         s += rf"q{i:0>2}s.tex"
         shutil.copy(path[1], con.newpath + con.assignment +  '/' +s)
+        l = r'''
+\%(q)s
+\SOLUTION
+\%(s)s
+        ''' %{'q': q, 's': s}
+        return l, i - 1 
         
     elif path[0] == "latex string":
         return path[1], i
     elif path[0] == "other":
         file_ = file_getter(path[1])
         print(file_)
-        s = r"%(a)s/name" %{'a': con.assignment, "name": file_}
+        s = r"%(a)s/%(name)s" %{'a': con.assignment, "name": file_}
+        shutil.copy(path[1], con.newpath + s)
         i -= 1
     s = include_(s);
     return s, i + 1
