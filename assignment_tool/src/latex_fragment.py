@@ -18,9 +18,9 @@ def is_latex(path):
 def include_latex(path):
     tex = ""
     global question_iterator
-    if (is_question(path)):
-        tex += r"{Q%(q)s}. " % {'q': question_iterator}
-        question_iterator += 1
+    # if (is_question(path)):
+    #     tex += r"{Q%(q)s}. " % {'q': question_iterator}
+    #     question_iterator += 1
     tex += r'''\input{%(path)s}''' %{'path':path}
     return tex
 
@@ -55,29 +55,28 @@ def file_getter(path):
 def copy_path(path, i):
     
     s = rf"{con.assignment}q{i:0>2}/doc/"
-    p = rf"{con.assignment}q{i:0>2}/doc/"
-    if path[0] == "QUESTION":
-        s += rf"q{i:0>2}.tex"
-        shutil.copy(path[1], con.newpath + con.assignment + '/' + s)
-    elif path[0] == "question":
-        q = s + rf"q{i:0>2}.tex"
-        shutil.copy(path[1], con.newpath + con.assignment + '/' + q)
-        s += rf"q{i:0>2}s.tex"
-        shutil.copy(path[1], con.newpath + con.assignment +  '/' +s)
-        l = r'''
-%(q)s
+    skel = rf"{con.assignment}q{i:0>2}/skel/"
+    
+    if path[0] == "QUESTION" or path[0] == "question":
+        new_p = s + rf"q{i:0>2}.tex"
+        shutil.copy(path[1], con.newpath + con.assignment + '/' + new_p)
         
+        wr = r'''
+{Q%(num)s}. %(q)s''' %{'num':i, 'q': include_(new_p)}
+        
+        if path[0] == "question":
+            new_p = s + rf"q{i:0>2}s.tex"
+            shutil.copy(path[1], con.newpath + con.assignment + '/' + new_p)
+            wr += r'''
 \SOLUTION
         
-%(s)s
-        ''' %{'q': include_(q), 's': include_(s)}
-        return l, i + 1 
-        
+%(s)s''' %{'s': include_(new_p)}
+        return wr, i + 1
     elif path[0] == "latex string":
         return path[1], i
     elif path[0] == "other":
         file_ = file_getter(path[1])
-        print(file_)
+        
         s = r"%(a)s/%(name)s" %{'a': con.assignment, "name": file_}
         shutil.copy(path[1], con.newpath + s)
         s = file_
@@ -162,5 +161,22 @@ def thispackages():
     tex = ""
     return r"%(path)s%(assignment)s/thispackages.tex"%{'path' : con.newpath, 'assignment' :con.assignment}, tex
 
-     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     

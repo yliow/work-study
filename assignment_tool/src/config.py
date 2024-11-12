@@ -27,6 +27,7 @@ file_of_others = ['']
 # contents[i][0] is the type of documents we are copying
 # - QUESTION is a coding question
 # - question is a math question that needs a lates answer file
+# - skel is the skelenton code that needs to be in the 
 # - other is any other latex files that needs to be included
 # - name of file
 contents = [("other", "../tests/ciss358/a02/objective.tex"),
