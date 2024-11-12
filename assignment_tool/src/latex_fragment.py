@@ -1,15 +1,9 @@
 from math import *
 import shutil
 import config as con
+import os
 
 # global variable to iterate for each question
-question_iterator = 1
-
-def is_question(path):
-    a = path[0] == 'a'
-    b = path[3] == 'q'
-    c = path[1:3].isdigit() and path[4:6].isdigit()
-    return a and b and c
 
 def is_latex(path):
     x = path[len(path) - 4:]
@@ -17,10 +11,6 @@ def is_latex(path):
 
 def include_latex(path):
     tex = ""
-    global question_iterator
-    # if (is_question(path)):
-    #     tex += r"{Q%(q)s}. " % {'q': question_iterator}
-    #     question_iterator += 1
     tex += r'''\input{%(path)s}''' %{'path':path}
     return tex
 
@@ -65,9 +55,16 @@ def copy_path(path, i):
 {Q%(num)s}. %(q)s''' %{'num':i, 'q': include_(new_p)}
         
         if path[0] == "question":
-            new_p = s + rf"q{i:0>2}s.tex"
-            shutil.copy(path[1], con.newpath + con.assignment + '/' + new_p)
+            q = 'q' + str(i).zfill(2)
+            #file_ = rf"q{i:0>2}s.tex"
+            new_p = r"%(s)s%(q)ss.tex"\
+                %{'s':s, 'q':q}
+            f = open(con.newpath + con.assignment + '/' + new_p, 'w')
+            f.write("")
+            f.close()
+            #shutil.copy(path[1], con.newpath + con.assignment + '/' + new_p)
             wr += r'''
+
 \SOLUTION
         
 %(s)s''' %{'s': include_(new_p)}

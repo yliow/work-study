@@ -7,10 +7,12 @@
 
 # depends on file structure
 name = "yliow"
-courses = "ciss240"
+courses = "ciss358"
 
 newpath = "test/ciss358/" # insert path for new directory (you are able to go back)
 assignment = "a02"
+# basepath = 
+# go to basepath, write, then go back to cwd
 
 #TODO
 # 1) fix formatting for question numbering
@@ -23,6 +25,13 @@ assignment = "a02"
 file_of_question = ['']
 file_of_others = ['']
 
+OTHER = 'other'
+LATEXSTR = 'latex string'
+QUEST_CODE = 'QUESTION'
+QUEST_MATH = 'question'
+
+
+
 #latex
 # contents[i][0] is the type of documents we are copying
 # - QUESTION is a coding question
@@ -30,15 +39,17 @@ file_of_others = ['']
 # - skel is the skelenton code that needs to be in the 
 # - other is any other latex files that needs to be included
 # - name of file
-contents = [("other", "../tests/ciss358/a02/objective.tex"),
-            ("latex string", r"\newpage"),
-            ("other", "../tests/ciss358/a02/induction.tex"),
-            ("latex string", r"\newpage"),
-            ("question", "../tests/ciss358/a02/q01.tex"),
-            ("latex string", r"\newpage"),
-            ("other", "../tests/ciss358/a02/primes.tex"),
-            ("latex string", r"\newpage"),
-            ("QUESTION", "../tests/ciss358/a02/q02.tex"),
-            ("latex string", r"\newpage"),
-            ("QUESTION", "../tests/ciss358/a02/q03.tex")]
+#TODO   
+# change question/QUESTION to something else
+contents = [(OTHER, "../../courses/ciss358/a/a02/objective.tex"),
+            (LATEXSTR, r"\newpage"),
+            (OTHER, "../../courses/ciss358/a/a02/induction.tex"),
+            (LATEXSTR, r"\newpage"),
+            (QUEST_MATH, "../../courses/ciss358/a/a02/q01.tex"),
+            (LATEXSTR, r"\newpage"),
+            (OTHER, "../../courses/ciss358/a/a02/primes.tex"),
+            (LATEXSTR, r"\newpage"),
+            (QUEST_MATH, "../../courses/ciss358/a/a02/q02.tex"),
+            (LATEXSTR, r"\newpage"),
+            (QUEST_MATH, "../../courses/ciss358/a/a02/q03.tex")]
 ###########################################################################

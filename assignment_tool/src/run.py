@@ -4,27 +4,20 @@ import makefile as make
 import config
 import os
 
-def write(x):
-    name, s = x
-    f = open(name, "w")
+def writefile(path, s):
+    f = open(path, "w")
     f.write(s)
     f.close()
 
 # makes the file structure
 if f.file_struct():
-    
-    
-    write(latex.main())
-    
-    write(make.makefile())
-    
-    write(latex.thismacros())
-    
-    write(latex.thispackages())
-    
-    write(latex.thispostamble())
-    
-    write(latex.thispreamble())
-    
-    write(latex.thistitle())
-    
+    # create a variable called basepath to
+    # be where all files are to be written
+    for path, s in [latex.main(),
+                    make.makefile(),
+                    latex.thismacros(),
+                    latex.thispackages(),
+                    latex.thispostamble(),
+                    latex.thispreamble(),
+                    latex.thistitle()]:
+        writefile(path, s)
