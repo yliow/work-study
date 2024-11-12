@@ -1,5 +1,6 @@
 from math import *
-import config
+import shutil
+import config as con
 
 # global variable to iterate for each question
 question_iterator = 1
@@ -40,7 +41,50 @@ def solution(path):
     elif path == 'nln':
         return r'\newpage'
     return ''
+
+def file_getter(path):
+    end = len(path)
+    start = end - 1
     
+    while start != 0:
+        if path[start] == '/':
+            return path[start + 1: end]
+        start -= 1
+    return path[start + 1: end]
+
+def copy_path(path, i):
+    
+    s = rf"{con.assignment}q{i:0>2}/doc/"
+    p = rf"{con.assignment}q{i:0>2}/doc/"
+    if path[0] == "QUESTION":
+        s += rf"q{i:0>2}.tex"
+        shutil.copy(path[1], con.newpath + con.assignment + '/' + s)
+    elif path[0] == "question":
+        q = s + rf"q{i:0>2}.tex"
+        shutil.copy(path[1], con.newpath + con.assignment + '/' + q)
+        s += rf"q{i:0>2}s.tex"
+        shutil.copy(path[1], con.newpath + con.assignment +  '/' +s)
+        l = r'''
+%(q)s
+        
+\SOLUTION
+        
+%(s)s
+        ''' %{'q': include_(q), 's': include_(s)}
+        return l, i + 1 
+        
+    elif path[0] == "latex string":
+        return path[1], i
+    elif path[0] == "other":
+        file_ = file_getter(path[1])
+        print(file_)
+        s = r"%(a)s/%(name)s" %{'a': con.assignment, "name": file_}
+        shutil.copy(path[1], con.newpath + s)
+        s = file_
+        i -= 1
+    s = include_(s);
+    return s, i + 1
+
 def main():
     s = r'''
 \input{thispreamble.tex}
@@ -59,9 +103,9 @@ def main():
 
 }
     '''
-
-    for path in config.dir:
-        x = include_(path[0])
+    i = 1
+    for path in con.contents:
+        x, i = copy_path(path, i)
         sol = solution(path[1])
         s += r'''
 %(solution)s
@@ -71,13 +115,13 @@ def main():
     s += r'''
 \input{thispostamble.tex}
     '''
-    return "main.tex", s
+    return r"%(path)s%(assignment)s/main.tex"%{'path': con.newpath, 'assignment':con.assignment}, s
 
 def thispostamble():
     tex = r'''\printindex
 \end{document}
     '''
-    return "thispostamble.tex", tex
+    return r"%(path)s%(assignment)s/thispostamble.tex"%{'path' : con.newpath, 'assignment' :con.assignment}, tex
 
 def thispreamble():
     tex = r'''\newcommand\COURSE{%(courses)s}
@@ -100,23 +144,23 @@ def thispreamble():
 \makeindex
 \begin{document}
 \topmatter
-    ''' % {'assignment': config.assignment,
-        'courses': config.courses,
-        'name':config.name}
-    return "thispreamble.tex", tex
+    ''' % {'assignment': con.assignment,
+        'courses': con.courses,
+        'name':con.name}
+    return r"%(path)s%(assignment)s/thispreamble.tex"%{'path' : con.newpath, 'assignment' :con.assignment}, tex
 
 def thistitle():
     tex = r'''\renewcommand\TITLE{\ASSESSMENTTYPE \ \ASSESSMENT}
     '''
-    return "thistitle.tex", tex
+    return r"%(path)s%(assignment)s/thistitle.tex"%{'path' : con.newpath, 'assignment' :con.assignment}, tex
 
 def thismacros():
     tex = ""
-    return "thismacros.tex", tex
+    return r"%(path)s%(assignment)s/thismacros.tex"%{'path' : con.newpath, 'assignment' :con.assignment}, tex
 
 def thispackages():
     tex = ""
-    return "thispackages.tex", tex
+    return r"%(path)s%(assignment)s/thispackages.tex"%{'path' : con.newpath, 'assignment' :con.assignment}, tex
 
      
     

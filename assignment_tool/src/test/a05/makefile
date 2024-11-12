@@ -1,9 +1,4 @@
-# file: makefile.py
 
-import config as con
-
-def makefile():
-    make = '''
 pdf:
 	-python /home/student/.alex/alexrunner.py replaceemail
 	pdflatex --shell-escape main.tex
@@ -14,11 +9,7 @@ v:
 	xdg-open main.pdf
 cleantmp:
 	rm
-	-rf '__pycache__' 'auto' 'desktop.ini' \
-	'abc.output' 'texput.log' 'shEsc.tmp'\
-	'main.log' 'main.aux' 'main.toc' 'main.out' 'main.idx' 'main.ilg' 'main.vrb' 'main.snm' 'main.nav' \
-	'main.py.err' 'main.py.out' 'main.py' 'latex.py' 'main.pytxcode' \
-	'makefile.old' 'missfont.log' 'traceback.txt'
+	-rf '__pycache__' 'auto' 'desktop.ini' 	'abc.output' 'texput.log' 'shEsc.tmp'	'main.log' 'main.aux' 'main.toc' 'main.out' 'main.idx' 'main.ilg' 'main.vrb' 'main.snm' 'main.nav' 	'main.py.err' 'main.py.out' 'main.py' 'latex.py' 'main.pytxcode' 	'makefile.old' 'missfont.log' 'traceback.txt'
 c:
 	make cleantmp
 s:
@@ -31,5 +22,4 @@ s:
 	@echo "================================================================"
 	@echo ""
 
-    '''
-    return r"%(path)s%(assignment)s/makefile"%{'path': con.newpath,'assignment':con.assignment}, make
+    
