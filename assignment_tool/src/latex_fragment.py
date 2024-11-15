@@ -44,42 +44,81 @@ def file_getter(path):
 
 def copy_path(path, i):
     
-    s = rf"{con.assignment}q{i:0>2}/doc/"
-    skel = rf"{con.assignment}q{i:0>2}/skel/"
+    if (con.FIRST_FILE_STRUCTURE):
+        s = rf"{con.assignment}q{i:0>2}/doc/"
+        skel = rf"{con.assignment}q{i:0>2}/skel/"
     
-    if path[0] == "QUESTION" or path[0] == "question":
-        new_p = s + rf"q{i:0>2}.tex"
-        shutil.copy(path[1], con.newpath + con.assignment + '/' + new_p)
+        if path[0] == "QUESTION" or path[0] == "question":
+            new_p = s + rf"q{i:0>2}.tex"
+            shutil.copy(path[1], con.newpath + con.assignment + '/' + new_p)
         
-        wr = r'''
-{Q%(num)s}. %(q)s''' %{'num':i, 'q': include_(new_p)}
+            wr = r'''
+{    Q%(num)s}. %(q)s''' %{'num':i, 'q': include_(new_p)}
         
-        if path[0] == "question":
-            q = 'q' + str(i).zfill(2)
-            #file_ = rf"q{i:0>2}s.tex"
-            new_p = r"%(s)s%(q)ss.tex"\
-                %{'s':s, 'q':q}
-            f = open(con.newpath + con.assignment + '/' + new_p, 'w')
-            f.write("")
-            f.close()
-            #shutil.copy(path[1], con.newpath + con.assignment + '/' + new_p)
-            wr += r'''
+            if path[0] == "question":
+                q = 'q' + str(i).zfill(2)
+                #file_ = rf"q{i:0>2}s.tex"
+                new_p = r"%(s)s%(q)ss.tex"\
+                    %{'s':s, 'q':q}
+                f = open(con.newpath + con.assignment + '/' + new_p, 'w')
+                f.write("")
+                f.close()
+                #shutil.copy(path[1], con.newpath + con.assignment + '/' + new_p)
+                wr += r'''
 
-\SOLUTION
+    \SOLUTION
         
-%(s)s''' %{'s': include_(new_p)}
-        return wr, i + 1
-    elif path[0] == "latex string":
-        return path[1], i
-    elif path[0] == "other":
-        file_ = file_getter(path[1])
+    %(s)s''' %{'s': include_(new_p)}
+            return wr, i + 1
+        elif path[0] == "latex string":
+            return path[1], i
+        elif path[0] == "other":
+            file_ = file_getter(path[1])
         
-        s = r"%(a)s/%(name)s" %{'a': con.assignment, "name": file_}
-        shutil.copy(path[1], con.newpath + s)
-        s = file_
-        i -= 1
-    s = include_(s);
-    return s, i + 1
+            s = r"%(a)s/%(name)s" %{'a': con.assignment, "name": file_}
+            shutil.copy(path[1], con.newpath + s)
+            s = file_
+            i -= 1
+        s = include_(s);
+        return s, i + 1
+    else:
+        s = rf"{con.assignment}q{i:0>2}/"
+        skel = rf"{con.assignment}q{i:0>2}/"
+    
+        if path[0] == "QUESTION" or path[0] == "question":
+            new_p = s + rf"question/doc/q{i:0>2}.tex"
+            shutil.copy(path[1], con.newpath + con.assignment + '/' + new_p)
+        
+            wr = r'''
+{    Q%(num)s}. %(q)s''' %{'num':i, 'q': include_(new_p)}
+        
+            if path[0] == "question":
+                q = 'q' + str(i).zfill(2)
+                #file_ = rf"q{i:0>2}s.tex"
+                new_p = r"%(s)s/answer/doc/%(q)ss.tex"\
+                    %{'s':s, 'q':q}
+                f = open(con.newpath + con.assignment + '/' + new_p, 'w')
+                f.write("")
+                f.close()
+                #shutil.copy(path[1], con.newpath + con.assignment + '/' + new_p)
+                wr += r'''
+
+    \SOLUTION
+        
+    %(s)s''' %{'s': include_(new_p)}
+            return wr, i + 1
+        elif path[0] == "latex string":
+            return path[1], i
+        elif path[0] == "other":
+            file_ = file_getter(path[1])
+        
+            s = r"%(a)s/%(name)s" %{'a': con.assignment, "name": file_}
+            shutil.copy(path[1], con.newpath + s)
+            s = file_
+            i -= 1
+        s = include_(s);
+        return s, i + 1
+    return 0, 0 # failed operation, this should never happen
 
 def main():
     s = r'''

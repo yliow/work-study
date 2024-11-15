@@ -20,13 +20,21 @@ def file_struct():
             return False
     
     num = get_num()
-    for i in range(1, num + 1):
-        s = rf"{con.newpath}{con.assignment}/{con.assignment}q{i:0>2}/"
-        os.makedirs(s + 'doc')
-        os.makedirs(s + 'src')
-        os.makedirs(s + 'skel')
+    if (con.FIRST_FILE_STRUCTURE):
+        for i in range(1, num + 1):
+            s = rf"{con.newpath}{con.assignment}/{con.assignment}q{i:0>2}/"
+            os.makedirs(s + 'doc')
+            os.makedirs(s + 'src')
+            os.makedirs(s + 'skel')
+    else:
+        for i in range(1, num + 1):
+            s = rf"{con.newpath}{con.assignment}/{con.assignment}q{i:0>2}/"
+            os.makedirs(s + 'question')
+            os.makedirs(s + 'answer')
+            os.makedirs(s + 'question' + '/doc')
+            os.makedirs(s + 'question' + '/src')
+            os.makedirs(s + 'question' + '/skel')
+            os.makedirs(s + 'answer' + '/doc')
+            os.makedirs(s + 'answer' + '/src')
+            os.makedirs(s + 'answer' + '/skel')
     return True
-        # s = rf"{con.newpath}{con.assignment}/{con.assignment}q{i:0>2}/doc/"
-        # os.makedirs(s + 'src')
-        # os.makedirs(s + 'skel')
-        

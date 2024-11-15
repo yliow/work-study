@@ -7,6 +7,7 @@
 name = "yliow"
 courses = "ciss358"
 
+FIRST_FILE_STRUCTURE = False # do the initial file structure, false if we want to do the other one
 newpath = "test/ciss358/" # insert path for new directory (you are able to go back)
 assignment = "a02"
 # basepath = 
