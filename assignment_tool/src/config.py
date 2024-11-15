@@ -15,15 +15,10 @@ assignment = "a02"
 # nln or sln is to determine whether to put a new page at the begining or
 # or a solution
 
-file_of_question = ['']
-file_of_others = ['']
-
 OTHER = 'other'
 LATEXSTR = 'latex string'
 QUEST_CODE = 'QUESTION'
 QUEST_MATH = 'question'
-
-
 
 #latex
 # contents[i][0] is the type of documents we are copying
