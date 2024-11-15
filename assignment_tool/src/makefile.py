@@ -32,4 +32,4 @@ s:
 	@echo ""
 
     '''
-    return r"%(path)s%(assignment)s/makefile"%{'path': con.newpath,'assignment':con.assignment}, make
+    return "makefile", make

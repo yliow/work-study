@@ -117,7 +117,7 @@ def thispostamble():
     tex = r'''\printindex
 \end{document}
     '''
-    return r"%(assignment)s/thispostamble.tex"%{'assignment' :con.assignment}, tex
+    return "thispostamble.tex", tex
 
 def thispreamble():
     tex = r'''\newcommand\COURSE{%(courses)s}
@@ -152,7 +152,7 @@ def thistitle():
 
 def thismacros():
     tex = ""
-    return r"thismacros.tex", tex
+    return "thismacros.tex", tex
 
 def thispackages():
     tex = ""
