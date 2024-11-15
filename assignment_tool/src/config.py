@@ -1,5 +1,3 @@
-
-
 ###########################################################################
 #              THIS IS A TEMPLATE FOR THE "config.py" file!!
 #              LOOK AT PDF TO DETERMINE THE STRUCTURE OF "config.py"
@@ -13,11 +11,6 @@ newpath = "test/ciss358/" # insert path for new directory (you are able to go ba
 assignment = "a02"
 # basepath = 
 # go to basepath, write, then go back to cwd
-
-#TODO
-# 1) fix formatting for question numbering
-# 2) find a way to get the amount of questions
-# 3) allow for backtracking through directories
 
 # nln or sln is to determine whether to put a new page at the begining or
 # or a solution
@@ -39,8 +32,6 @@ QUEST_MATH = 'question'
 # - skel is the skelenton code that needs to be in the 
 # - other is any other latex files that needs to be included
 # - name of file
-#TODO   
-# change question/QUESTION to something else
 contents = [(OTHER, "../../courses/ciss358/a/a02/objective.tex"),
             (LATEXSTR, r"\newpage"),
             (OTHER, "../../courses/ciss358/a/a02/induction.tex"),
