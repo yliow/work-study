@@ -5,7 +5,7 @@ import config
 import os
 
 def writefile(path, s):
-    f = open(path, "w")
+    f = open(config.newpath + config.assignment + '/' + path, "w")
     f.write(s)
     f.close()
 

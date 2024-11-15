@@ -111,13 +111,13 @@ def main():
     s += r'''
 \input{thispostamble.tex}
     '''
-    return r"%(path)s%(assignment)s/main.tex"%{'path': con.newpath, 'assignment':con.assignment}, s
+    return "main.tex", s
 
 def thispostamble():
     tex = r'''\printindex
 \end{document}
     '''
-    return r"%(path)s%(assignment)s/thispostamble.tex"%{'path' : con.newpath, 'assignment' :con.assignment}, tex
+    return r"%(assignment)s/thispostamble.tex"%{'assignment' :con.assignment}, tex
 
 def thispreamble():
     tex = r'''\newcommand\COURSE{%(courses)s}
@@ -143,20 +143,20 @@ def thispreamble():
     ''' % {'assignment': con.assignment,
         'courses': con.courses,
         'name':con.name}
-    return r"%(path)s%(assignment)s/thispreamble.tex"%{'path' : con.newpath, 'assignment' :con.assignment}, tex
+    return "thispreamble.tex", tex
 
 def thistitle():
     tex = r'''\renewcommand\TITLE{\ASSESSMENTTYPE \ \ASSESSMENT}
     '''
-    return r"%(path)s%(assignment)s/thistitle.tex"%{'path' : con.newpath, 'assignment' :con.assignment}, tex
+    return "thistitle.tex", tex
 
 def thismacros():
     tex = ""
-    return r"%(path)s%(assignment)s/thismacros.tex"%{'path' : con.newpath, 'assignment' :con.assignment}, tex
+    return r"thismacros.tex", tex
 
 def thispackages():
     tex = ""
-    return r"%(path)s%(assignment)s/thispackages.tex"%{'path' : con.newpath, 'assignment' :con.assignment}, tex
+    return "thispackages.tex", tex
 
 
 
