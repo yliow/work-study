@@ -16,10 +16,6 @@ courses/ciss240/a/a07                   courses/ciss240/a/a07             work
 
 courses/ciss358/a/a02                   courses/ciss358/a/a02
 
-
-
-
-
 Comments for ciss145:
 * At top of documents, change "Python Programming Part 1 v0.2" to "Python Programming Part 1 v0.3"
 
