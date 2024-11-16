@@ -6,13 +6,13 @@ courses/ciss350/a/a01                   courses/ciss350/a/a01
 courses/ciss350/a/a02                   courses/ciss350/a/a02                                               
 courses/ciss350/a/a03                   courses/ciss350/a/a03                                               
 
-courses/ciss240/a/a01                   courses/ciss240/a/a01                                               
-courses/ciss240/a/a02                   courses/ciss240/a/a02
+courses/ciss240/a/a01                   courses/ciss240/a/a01             work                               
+courses/ciss240/a/a02                   courses/ciss240/a/a02             work
 courses/ciss240/a/a03                   courses/ciss240/a/a03
-courses/ciss240/a/a04                   courses/ciss240/a/a04
-courses/ciss240/a/a05                   courses/ciss240/a/a05
-courses/ciss240/a/a06                   courses/ciss240/a/a06
-courses/ciss240/a/a07                   courses/ciss240/a/a07
+courses/ciss240/a/a04                   courses/ciss240/a/a04             work
+courses/ciss240/a/a05                   courses/ciss240/a/a05             work
+courses/ciss240/a/a06                   courses/ciss240/a/a06             work
+courses/ciss240/a/a07                   courses/ciss240/a/a07             work
 courses/ciss240/a/a08                   courses/ciss240/a/a08
 courses/ciss240/a/a09                   courses/ciss240/a/a09
 courses/ciss240/a/a10                   courses/ciss240/a/a10
@@ -20,10 +20,6 @@ courses/ciss240/a/a11                   courses/ciss240/a/a11
 courses/ciss240/a/a12                   courses/ciss240/a/a12
 
 courses/ciss358/a/a02                   courses/ciss358/a/a02
-
-
-
-
 
 Comments for ciss145:
 * At top of documents, change "Python Programming Part 1 v0.2" to "Python Programming Part 1 v0.3"

@@ -1,0 +1,316 @@
+The following is a method for generating primes up to a given upper bound.
+For our first example, suppose we want to compute the primes up to 99.
+First, we write down the integers from $0$ to $99$:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+c = RectContainer(x=1, y=1, align='bottom', direction='top-to-bottom')
+for row in range(10):
+    c0 = RectContainer(x=1, y=1, align='bottom', direction='left-to-right')
+    for col in range(10):
+        c0 += Rect2(x0=0, y0=0, x1 = 1.6, y1 = 0.6, linewidth=0.02,
+                    label = r'$%s$' % (10 * row + col))
+    c += c0
+    c0.x = c0.x0; c0.y = c0.y0; c0.layout()
+
+p += c
+print p
+\end{python}
+
+First of all $0$ and $1$ are not primes: By definition a prime is at least
+$2$. So first cross out $0$ and $1$:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+c = RectContainer(x=1, y=1, align='bottom', direction='top-to-bottom')
+for row in range(10):
+    c0 = RectContainer(x=1, y=1, align='bottom', direction='left-to-right')
+    for col in range(10):
+        if row == 0 and col < 2:
+            c0 += Rect2(x0=0, y0=0, x1 = 1.6, y1 = 0.6, linewidth=0.02,
+                        background='black!20!white', 
+                        label = r'$%s$' % (10 * row + col))
+        else:
+            c0 += Rect2(x0=0, y0=0, x1 = 1.6, y1 = 0.6, linewidth=0.02, 
+                        label = r'$%s$' % (10 * row + col))
+    c += c0
+    c0.x = c0.x0; c0.y = c0.y0; c0.layout()
+
+p += c
+print p
+\end{python}
+
+Now we begin the actual algorithm. The first number that is not crossed
+out is $2$. Cross out all the multiples of $2$ in the above table except
+for $2$ itself. That means crossing out $4, 6, 8, 10, \dots$ in the list.
+Think of $2$ as a prime that kills off numbers which are not primes because
+they are divisible by $2$; $2$ is a killer prime.
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+c = RectContainer(x=1, y=1, align='bottom', direction='top-to-bottom')
+for row in range(10):
+    c0 = RectContainer(x=1, y=1, align='bottom', direction='left-to-right')
+    for col in range(10):
+        val = 10 * row + col
+        if (row == 0 and col < 2) or (val % 2 == 0 and val != 2):
+            c0 += Rect2(x0=0, y0=0, x1 = 1.6, y1 = 0.6, linewidth=0.02,
+                        background='black!20!white', 
+                        label = r'$%s$' % val)
+        else:
+            c0 += Rect2(x0=0, y0=0, x1 = 1.6, y1 = 0.6, linewidth=0.02, 
+                        label = r'$%s$' % val)
+    c += c0
+    c0.x = c0.x0; c0.y = c0.y0; c0.layout()
+
+p += c
+print p
+\end{python}
+
+Now we move from $2$ to the next number that is not crossed out. From the
+table you see that it is $3$: $3$ is the next killer prime. We now cross
+out numbers which are multiples of $3$ except for $3$ itself. Therefore we
+cross out $6, 9, 12, 15, \dots$ . (Note that $6$ is crossed out twice but
+that's fine. This basically means that $6$ is not prime because both $2$
+and $3$ divide $6$.) We get the following:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+c = RectContainer(x=1, y=1, align='bottom', direction='top-to-bottom')
+for row in range(10):
+    c0 = RectContainer(x=1, y=1, align='bottom', direction='left-to-right')
+    for col in range(10):
+        val = 10 * row + col
+        if (row == 0 and col < 2) or (val % 2 == 0 and val != 2) or \
+           (val % 3 == 0 and val != 3):
+            c0 += Rect2(x0=0, y0=0, x1 = 1.6, y1 = 0.6, linewidth=0.02,
+                        background='black!20!white', 
+                        label = r'$%s$' % val)
+        else:
+            c0 += Rect2(x0=0, y0=0, x1 = 1.6, y1 = 0.6, linewidth=0.02, 
+                        label = r'$%s$' % val)
+    c += c0
+    c0.x = c0.x0; c0.y = c0.y0; c0.layout()
+
+p += c
+print p
+\end{python}
+
+We now move from $3$ to the next number that is not crossed out. Note that
+in this case $4$ is already crossed out. The number after that is $5$: $5$
+is the next killer prime. We now cross out all the multiples of $5$ except
+for $5$ itself, i.e., we cross out $10, 15, 20, \dots$ and we get this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+c = RectContainer(x=1, y=1, align='bottom', direction='top-to-bottom')
+for row in range(10):
+    c0 = RectContainer(x=1, y=1, align='bottom', direction='left-to-right')
+    for col in range(10):
+        val = 10 * row + col
+        if (row == 0 and col < 2) or (val % 2 == 0 and val != 2) or \
+           (val % 3 == 0 and val != 3) or (val % 5 == 0 and val != 5):
+            c0 += Rect2(x0=0, y0=0, x1 = 1.6, y1 = 0.6, linewidth=0.02,
+                        background='black!20!white', 
+                        label = r'$%s$' % val)
+        else:
+            c0 += Rect2(x0=0, y0=0, x1 = 1.6, y1 = 0.6, linewidth=0.02, 
+                        label = r'$%s$' % val)
+    c += c0
+    c0.x = c0.x0; c0.y = c0.y0; c0.layout()
+
+p += c
+print p
+\end{python}
+
+We move on to the first number after $5$ that is not crossed out. In this
+case the next killer prime is $7$. We cross out all the multiples of $7$
+except for $7$ itself to obtain:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+c = RectContainer(x=1, y=1, align='bottom', direction='top-to-bottom')
+for row in range(10):
+    c0 = RectContainer(x=1, y=1, align='bottom', direction='left-to-right')
+    for col in range(10):
+        val = 10 * row + col
+        if (row == 0 and col < 2) or (val % 2 == 0 and val != 2) or \
+           (val % 3 == 0 and val != 3) or (val % 5 == 0 and val != 5) or \
+           (val % 7 == 0 and val != 7):
+            c0 += Rect2(x0=0, y0=0, x1 = 1.6, y1 = 0.6, linewidth=0.02,
+                        background='black!20!white', 
+                        label = r'$%s$' % val)
+        else:
+            c0 += Rect2(x0=0, y0=0, x1 = 1.6, y1 = 0.6, linewidth=0.02, 
+                        label = r'$%s$' % val)
+    c += c0
+    c0.x = c0.x0; c0.y = c0.y0; c0.layout()
+
+p += c
+print p
+\end{python}
+
+The first number after $7$ that is not crossed out is $11$. Note that this
+algorithm terminates when you reach a killer prime that is greater than the
+square root of the upper bound which in this case is $99$. The square root
+of $99$ is approximately $9.9489\dots$ . At this point, the number we're
+looking at is $11$ which is greater than $9.9489\dots$ . Hence the algorithm
+stops. Why? If you look at killer prime $11$, you notice that the multiples
+it crosses out are $22, 33, 44, 55, \dots, 99$. They are already crossed out
+by primes less than $11$. The fact that in this algorithm the primes larger
+than the square root of $99$ will only cross out numbers which are already
+crossed out can be proven mathematically (although I won't do it here.)
+
+The numbers in the table that are not crossed out must be primes. From the
+table we see that these numbers are:
+\[
+2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71,
+73, 79, 83, 89, 97
+\]
+There are $25$ primes less than $100$.
+
+This method works for any upper bound $n$. For instance, to compute all the
+primes upto $n = 250$,  you write down a table of integers from $0$ to $250$,
+cross out $0$ and $1$, cross out all the multiples of $2$ except for $2$,
+cross out the multiples of $3$ except for $3, \dots$ . In general, after each
+crossing out, you move on to the next number that is not crossed out and
+repeat the process. This algorithm terminates when the killer prime is larger
+than the square root of the upper bound, i.e., $250$.
+
+Write a function
+\begin{Verbatim}
+void es(int n, int prime[], int & len);
+\end{Verbatim}
+that prints the list of remaining integers at the end of each crossing out
+stage. For instance, on calling \verb!es(99, prime, len)!, the function goes
+through the above algorithm, and prints the following:
+
+\texttt{2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99} \\
+\texttt{2:\,\,2 3 5 7 9 11 13 15 17 19 21 23 25 27 29 31 33 35 37 39 41 43 45 47 49 51 53 55 57 59 61 63 65 67 69 71 73 75 77 79 81 83 85 87 89 91 93 95 97 99} \\
+\texttt{3:\,\,2 3 5 7 11 13 17 19 23 25 29 31 35 37 41 43 47 49 53 55 59 65 67 71 73 77 79 83 85 89 91 95 97} \\
+\texttt{5:\,\,2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 49 53 59 67 71 73 77 79 83 85 89 91 97} \\
+\texttt{7:\,\,2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97}
+
+
+Note that you must first print all the number from $2$ to the upper bound,
+then for each \lq\lq killer prime", print the killer prime and the resulting
+array after the killer prime has removed the relevant integers, and, at the
+end of the algorithm, the array \verb!prime! is set to contain the following
+values:
+
+\verb!    2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97!
+
+and \verb!len! is set to $25$. The \verb!main()! that tests the function
+\verb!es()! is
+
+\begin{Verbatim}[frame=single]
+int main()
+{
+    int n, len;
+    int prime[1000];
+    std::cin >> n;
+    
+    es(n, prime, len);
+    std::cout << "\nprimes from 2 to " << n << ':\n'; 
+    for (int i = 0; i < len; i++)
+    {
+        std::cout << prime[i] << ' ';
+    }
+    std::cout << "len:" << len << std::endl;
+
+    return 0;    
+}
+\end{Verbatim}
+
+\textbf{Test 1:}
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\underline{10}
+2 3 4 5 6 7 8 9 10
+2: 2 3 5 7 9
+3: 2 3 5 7
+
+primes from 2 to 10:
+2 3 5 7
+len: 4
+\end{Verbatim}
+
+\textbf{Test 2:}
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\underline{20}
+2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+2: 2 3 5 7 9 11 13 15 17 19
+3: 2 3 5 7 11 13 17 19
+
+primes from 2 to 20:
+2 3 5 7 11 13 17 19
+len: 8
+\end{Verbatim}
+
+\textbf{Test 3:}
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\underline{50}
+2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29
+30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50
+2: 2 3 5 7 9 11 13 15 17 19 21 23 25 27 29 31 33 35 37 39 41 43 45 47 49
+3: 2 3 5 7 11 13 17 19 23 25 29 31 35 37 41 43 47 49
+5: 2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 49
+7: 2 3 5 7 11 13 17 19 23 29 31 37 41 43 47
+
+primes from 2 to 50:
+2 3 5 7 11 13 17 19 23 29 31 37 41 43 47
+len: 15
+\end{Verbatim}
+
+\textbf{Test 4:}
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\underline{99}
+2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29
+30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54
+55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79
+80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99
+2: 2 3 5 7 9 11 13 15 17 19 21 23 25 27 29 31 33 35 37 39 41 43 45 47 49 51
+53 55 57 59 61 63 65 67 69 71 73 75 77 79 81 83 85 87 89 91 93 95 97 99
+3: 2 3 5 7 11 13 17 19 23 25 29 31 35 37 41 43 47 49 53 55 59 65 67 71 73
+77 79 83 85 89 91 95 97
+5: 2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 49 53 59 67 71 73 77 79 83 85
+89 91 97
+7: 2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97
+
+primes from 2 to 99:
+2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97
+len: 25
+\end{Verbatim}
+
+Note: The important thing about this function is that it computes and
+stores primes in an array. The printing of the work done is not that
+important. The only reason why I'm requiring the printing is to verify
+that you are coding the algorithm correctly.
+
+\newpage
+
+\textbf{\large SPOILER WARNING \dots HINTS AHEAD!!! WATCHOUT!!!}
+
+\textbf{HERE IT COMES \dots}
+
+HINT:
+ 
+Use an array \verb!x! of integers. Set all the values of \verb!x! to $0$.
+Crossing out the number \verb!5! corresponds to the action of setting
+\verb!x[5]! to $1$. In this case I'm using $0$ to mean
+\lq\lq not crossed out" and $1$ to mean \lq\lq crossed out". You can switch
+the meaning of $0$ and $1$. The only reason why I'm using $0$ to mean not
+crossed out is because it's easier to initialize all values to $0$ rather
+than $1$. (An array of boolean values can also be used since we only need to
+store $2$ possible values in the array.)

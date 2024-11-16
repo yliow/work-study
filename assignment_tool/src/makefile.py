@@ -1,5 +1,7 @@
 # file: makefile.py
 
+import config as con
+
 def makefile():
     make = '''
 pdf:

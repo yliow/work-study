@@ -1,0 +1,365 @@
+You are working for a 
+game company and you have
+been asked to 
+write the logic for a smart tic-tac-toe AI agent.
+(I assume you know the tic-tac-toe game ... 
+otherwise ... hmmm ...)
+
+Here's the game board:
+\begin{python}
+from latextool_basic import *
+print consolegrid(numrows=3, numcols=3)
+\end{python}
+and here's what we call a game state (i.e., a snapshot 
+of the game in progress):
+\begin{python}
+from latextool_basic import *
+print consolegrid(numrows=3, numcols=3, s='XO-\nX--\nO-X')
+\end{python}
+I use \verb!-! to denote the fact that a square is available.
+
+We can model the game state with 9 variables.
+I'll call them 
+\verb!board00!,
+\verb!board01!,
+\verb!board02!,
+\verb!board10!,
+\verb!board11!,
+\verb!board12!,
+\verb!board20!,
+\verb!board21!, and
+\verb!board22!.
+The variables will hold character values, i.e., they are \verb!char!
+variables.
+For instance for the game state above
+\begin{python}
+from latextool_basic import *
+print consolegrid(numrows=3, numcols=3, s='XO-\nX--\nO-X')
+\end{python}
+the variables have the following values:
+\begin{console}[frame=none]
+
+        board00 = 'X',  board01 = 'O',  board02 = '-'
+        board10 = 'X',  board11 = '-',  board12 = '-'
+        board20 = 'O',  board21 = '-',  board22 = 'X'
+
+\end{console}
+For memory aid, the variables are named according to this
+format: \verb!board! is followed by two numbers, the row number and the
+column number where rows and columns are numbered starting from 0.
+For instance \verb!board12! refers to the character at row 1 and column 2.
+Run this program
+{\small
+\begin{console}
+#include <iostream>
+
+int main()
+{
+    char board00, board01, board02;
+    char board10, board11, board12;
+    char board20, board21, board22;
+    std::cin >> board00 >> board01 >> board02
+             >> board10 >> board11 >> board12
+             >> board20 >> board21 >> board22;
+
+    std::cout << "+-+-+-+\n"
+              << '|' << board00 << '|' << board01 << '|' << board02 << "|\n"
+              << "+-+-+-+\n"
+              << '|' << board10 << '|' << board11 << '|' << board12 << "|\n"
+              << "+-+-+-+\n"
+              << '|' << board20 << '|' << board21 << '|' << board22 << "|\n"
+              << "+-+-+-+\n";
+
+    return 0;
+}
+\end{console}
+}
+Run it with input
+{\small
+\begin{console}[commandchars=\\\{\}]
+X O - \redtext{-} - - O - X
+\end{console}
+}
+and you will get this output
+{\small
+\begin{console}[commandchars=\\\{\}]
++-+-+-+
+|X|O|-|
++-+-+-+
+|\redtext{-}|-|-|
++-+-+-+
+|O|-|X|
++-+-+-+
+\end{console}
+}
+Your goal is to write a program that prompts for a game state
+and decide on a good move for the player playing \verb!X! by 
+printing a suggested row and column.
+{\small
+\begin{console}[commandchars=\\\{\}]
+X O - \redtext{-} - - O - X
+\end{console}
+}
+and you will get this output
+{\small
+\begin{console}
++-+-+-+
+|X|O|-|
++-+-+-+
+|-|-|-|
++-+-+-+
+|O|-|X|
++-+-+-+
+1 1
+\end{console}
+}
+since in this case is \verb!X! is placed at row 1 and column 1, 
+the player playing \verb!X! will have a winning diagonal.
+
+The strategy is as follows.
+The following is a list of actions to take.
+You should use the one listed earlier if it's possible to execute that
+action.
+For instance if you can either have winning row (see item 1)
+or a winning column (see item 2),
+then your strategy is to take the winning row (item 1).
+\begin{tightlist}
+\item[1.] 
+If there's a winning row, take the winning row, 
+preferring the topmost when there is more than one.
+\item[2.]
+If there's a winning column, take the winning column,
+preferring the leftmost when there is more than one.
+\item[3.]
+If there's a winning diagonal that goes from
+top-left to bottom-right, take the diagonal.
+\item[4.]
+If there's a winning reverse diagonal that goes from top-right
+to bottom-left, take the winning reverse diagonal.
+\item[5.]
+Block player \verb!O! from making a winning
+row, column, diagonal, or reverse diagonal
+in the same order of preference as above.
+(In other words, if you can block a top row and bottom row,
+then you should block a top row.)
+\item[6.] Take the center.
+\item[7.] 
+Take a corner,
+looking for an available corner going top-to-bottom, left-to-right.
+\item[8.]
+If none of the above works, take one of the remaining positions,
+looking for an available position going top-to-bottom, left-to-right.
+\end{tightlist}
+For this question, I will only test your code for scenarios
+corresponding to items 1--4.
+You are of course more than welcome to code up all the items if you like.
+
+[Note: The above strategy considers the current game state
+and not future game ststes, i.e., it does not consider
+all the possible moves by the opponent. 
+A strategy that does not consider all cases and in particular
+only considers the current data is called 
+a \textit{greedy} algorithm.
+A smarter AI strategy would consider possible future scenarios
+as well.
+However when a game complex, you usually cannot consider
+all scenarios.
+For instance the total number of chess games can be as large as 
+$10^{120}$; 
+the number of atoms in the observable universe is approximately
+$10^{80}$.
+If your program considers all possible scenarios, then
+it's called a \textit{brute force} algorithm.
+You can learn more about algorithms for solving 
+computationally intensive problems in the AI class CISS450.
+For such cases, one would need to use \textit{heuristic}
+algorithms, otherwise you would need trillions and trillions
+of years to 
+compute a single chess move!]
+
+You only need to know that you can compare character values.
+Try this on your own:
+{\footnotesize
+\begin{console}
+char a = '!', b = '@', c = '!';
+std::cout << (a == b) << '\n';
+std::cout << (a == c) << '\n';
+std::cout << (a != b) << '\n';
+std::cout << (a != c) << '\n';
+\end{console}
+}
+You can of course also perform input/output for \verb!char! variables:
+{\footnotesize
+\begin{console}
+char a = ' ', b = ' ', c = ' ';
+std::cin >> a >> b >> c;
+std::cout << a << ' ' << b << ' ' << c << '\n';
+\end{console}
+}
+
+You should use the following skeleton code.
+[Note: Skeleton code is definitely incomplete and might
+contain errors.]
+{\footnotesize
+\begin{console}
+#include <iostream>
+
+int main()
+{
+    const char PLAYER = 'X';
+    const char ENEMY = 'O';
+    const char SPACE = '-';
+
+    char board00, board01, board02;
+    char board10, board11, board12;
+    char board20, board21, board22;
+    std::cin >> board00 >> board01 >> board02
+             >> board10 >> board11 >> board12
+             >> board20 >> board21 >> board22;
+
+    std::cout << "+-+-+-+\n"
+              << '|' << board00 << '|' << board01 << '|' << board02 << "|\n"
+              << "+-+-+-+\n"
+              << '|' << board10 << '|' << board11 << '|' << board12 << "|\n"
+              << "+-+-+-+\n"
+              << '|' << board20 << '|' << board21 << '|' << board22 << "|\n"
+              << "+-+-+-+\n";
+
+    int row = -1, col = -1;
+
+    if (board00 == SPACE && board01 == PLAYER && board02 == PLAYER)
+    {
+        // Take (0, 0) for a winning row 0
+        row = 0;
+        col = 1;
+    }
+    else
+    {
+        if (board00 == PLAYER && board01 == SPACE && board02 == PLAYER)
+        {
+            // Take (0, 1) for a winning row 0
+            row = 0;
+            col = 2;
+        }
+        // MORE CODE HERE
+    }
+
+    std::cout << row << ' ' << col << std::endl;
+
+    return 0;
+}
+\end{console}
+}
+
+\newpage
+\textbf{Preventing indentation in a stack of if-else}.
+
+Note that if you have code like this where 
+in the \verb!else! block you only have an 
+\verb!if! statement or an 
+\verb!if-else! statement:
+{\footnotesize
+\begin{console}
+if (bool1)
+{
+   ...
+}
+else
+{
+    if (bool2)
+    {
+        ...
+    }
+    else
+    {
+        if (bool3)
+        {
+            ...
+        }
+        else
+        {
+            ...
+        }
+    }
+}
+\end{console}
+}
+then, it's the same as the following 
+(the \verb!else! has only one \verb!if-else! statement
+so the block is redundant -- check your notes):
+{\footnotesize
+\begin{console}
+if (bool1)
+{
+   ...
+}
+else
+    if (bool2)
+    {
+        ...
+    }
+    else
+        if (bool3)
+        {
+            ...
+        }
+        else
+        {
+            ...
+        }
+\end{console}
+}
+which is the same as the following (because
+ C++ ignores whitespaces -- check your notes):
+{\footnotesize
+\begin{console}
+if (bool1)
+{
+   ...
+}
+else if (bool2)
+{
+    ...
+}
+else if (bool3)
+{
+    ...
+}
+else
+{
+    ...
+}
+\end{console}
+}
+In other words, we join an \verb!if! with the preceding \verb!else!.
+
+Writing it this way will prevent too much indentation toward the 
+right and make your program look like a table.
+This is one of the very few cases where we ignore the standard
+indentation rules in order not to over--indent.
+
+Note that this won't work if the \verb!else! contains more than
+just an \verb!if-else!, for instance
+{\footnotesize
+\begin{console}[commandchars=\~\!\@]
+if (bool1)
+{
+   ...
+}
+else
+{
+    ~underline!x = 1;@
+    if (bool2)
+    {
+        ...
+    }
+    else
+    {
+        ...
+    }
+}
+\end{console}
+}
+In this case, since the outermost \verb!else! has two statements,
+you cannot get rid of the block symbols \verb!{}! to join up the 
+inner \verb!if! with the outer \verb!else!.
