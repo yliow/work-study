@@ -10,6 +10,14 @@ courses/ciss240/a/a01                   courses/ciss240/a/a01
 courses/ciss240/a/a02                   courses/ciss240/a/a02
 courses/ciss240/a/a03                   courses/ciss240/a/a03
 courses/ciss240/a/a04                   courses/ciss240/a/a04
+courses/ciss240/a/a05                   courses/ciss240/a/a05
+courses/ciss240/a/a06                   courses/ciss240/a/a06
+courses/ciss240/a/a07                   courses/ciss240/a/a07
+courses/ciss240/a/a08                   courses/ciss240/a/a08
+courses/ciss240/a/a09                   courses/ciss240/a/a09
+courses/ciss240/a/a10                   courses/ciss240/a/a10
+courses/ciss240/a/a11                   courses/ciss240/a/a11
+courses/ciss240/a/a12                   courses/ciss240/a/a12
 
 courses/ciss358/a/a02                   courses/ciss358/a/a02
 
