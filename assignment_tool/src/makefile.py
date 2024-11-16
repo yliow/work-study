@@ -41,4 +41,4 @@ s:
 	@echo "================================================================"
 	@echo ""
 %(tree)s'''%{'tree':maketree()}
-    return r"%(path)s%(assignment)s/makefile"%{'path': con.newpath,'assignment':con.assignment}, make
+    return "%(path)s%(assignment)s/makefile"%{'path' : con.newpath, 'assignment' :con.assignment}, make
