@@ -1,7 +1,7 @@
 import file_structure as f
 import latex_fragment as latex
 import makefile as make
-import config
+import config #config should be imported from a general "a0X" structure
 import os
 
 def writefile(path, s):

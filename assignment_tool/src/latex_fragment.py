@@ -53,7 +53,8 @@ def copy_path(path, i):
     
     if (con.FIRST_FILE_STRUCTURE):
         s = rf"{con.assignment}q{i:0>2}/doc/"
-        skel = rf"{con.assignment}q{i:0>2}/"
+        y =rf"{con.assignment}q{i:0>2}/"
+        skel = rf"{con.assignment}q{i-1:0>2}/"
     
         if path[0] == "QUESTION" or path[0] == "question":
             new_p = s + rf"q{i:0>2}.tex"
@@ -62,6 +63,20 @@ def copy_path(path, i):
             os.system("chmod a=r " + con.newpath + con.assignment + "/" + new_p)
             wr = r'''
 {    Q%(num)s}. %(q)s''' %{'num':i, 'q': include_(new_p)}
+
+            
+            if path[0] == "QUESTION":
+                new_p = r"%(s)ssrc/main.cpp"\
+                    %{'s':y}
+                f = open(con.newpath + con.assignment + '/' + new_p, 'w')
+                f.write("")
+                f.close()
+                #shutil.copy(path[1], con.newpath + con.assignment + '/' + new_p)
+                wr += r'''
+
+    \SOLUTION
+        
+    %(s)s''' %{'s': include_(new_p)}
             if path[0] == "question":
                 q = 'q' + str(i).zfill(2)
                 #file_ = rf"q{i:0>2}s.tex"
@@ -73,13 +88,14 @@ def copy_path(path, i):
                 #shutil.copy(path[1], con.newpath + con.assignment + '/' + new_p)
                 wr += r'''
 
-    \SOLUTION
+                \SOLUTION
         
     %(s)s''' %{'s': include_(new_p)}
             return wr, i + 1
         elif path[0] == "skeleton":
-            shutil.copy(path[1], con.newpath + con.assignment + '/' + skel + "skel/skeleton.cpp")
-            return r"\myincludesrc{%(skel)sskel/skeleton.cpp}" %{'skel' : skel}, i
+            name_of_skel = file_getter(path[1])
+            shutil.copy(path[1], con.newpath + con.assignment + '/' + skel + "skel/%(n)s" %{'n' : name_of_skel})
+            return r"\myincludesrc{%(skel)sskel/%(n)s}" %{'skel' : skel, 'n' : name_of_skel}, i
         elif path[0] == "latex string":
             return path[1], i
         elif path[0] == "other":
@@ -93,7 +109,7 @@ def copy_path(path, i):
         return s, i + 1
     else:
         s = rf"{con.assignment}q{i:0>2}/"
-        skel = rf"{con.assignment}q{i:0>2}/"
+        skel = rf"{con.assignment}q{i-1:0>2}/"
     
         if path[0] == "QUESTION" or path[0] == "question":
             new_p = s + rf"question/doc/q{i:0>2}.tex"
@@ -132,8 +148,9 @@ def copy_path(path, i):
     %(s)s''' %{'s': include_(new_p)}
             return wr, i + 1
         elif path[0] == "skeleton":
-            shutil.copy(path[1], con.newpath + con.assignment + '/' + skel + "question/skel/skeleton.cpp")
-            return r"\myincludesrc{%(skel)squestion/skel/skeleton.cpp}" %{'skel' : skel}, i
+            n = file_getter(path[1])
+            shutil.copy(path[1], con.newpath + con.assignment + '/' + skel + "question/skel/%(n)s"%{'n':n})
+            return r"\myincludesrc{%(skel)squestion/skel/%(n)s}" %{'skel' : skel, 'n':n}, i
         elif path[0] == "latex string":
             return path[1], i
         elif path[0] == "other":
