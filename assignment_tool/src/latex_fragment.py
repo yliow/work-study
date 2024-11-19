@@ -53,7 +53,6 @@ def copy_path(path, i):
             shutil.copy(path[1], con.newpath + con.assignment + '/' + new_p)
             
             os.system("chmod a=r " + con.newpath + con.assignment + "/" + new_p)
-            print("PRINTOUT!!!!!!!!!1 chmod  a=r" + con.newpath + con.assignment + "/" + new_p)
             wr = r'''
 {    Q%(num)s}. %(q)s''' %{'num':i, 'q': include_(new_p)}
             
