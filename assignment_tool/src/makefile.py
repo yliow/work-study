@@ -1,6 +1,16 @@
 # file: makefile.py
 
 import config as con
+import file_structure as f
+
+def maketree():
+    num = f.get_num()
+    s = '''
+t tree :
+	tree'''
+    for i in range(1, num + 1):
+        s += rf" {con.assignment}q{i:0>2}/"
+    return s
 
 def makefile():
     make = '''
@@ -30,6 +40,5 @@ s:
 	@ls -la submit.tar.gz
 	@echo "================================================================"
 	@echo ""
-
-    '''
-    return "makefile", make
+%(tree)s'''%{'tree':maketree()}
+    return "%(path)s%(assignment)s/makefile"%{'path' : con.newpath, 'assignment' :con.assignment}, make
