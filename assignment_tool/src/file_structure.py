@@ -36,5 +36,4 @@ def file_struct():
             os.makedirs(s + 'question' + '/skel')
             os.makedirs(s + 'answer' + '/doc')
             os.makedirs(s + 'answer' + '/src')
-            os.makedirs(s + 'answer' + '/skel')
     return True

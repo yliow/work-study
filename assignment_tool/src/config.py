@@ -20,6 +20,7 @@ OTHER = 'other'
 LATEXSTR = 'latex string'
 QUEST_CODE = 'QUESTION'
 QUEST_MATH = 'question'
+SKELETON = 'skeleton'
 
 #latex
 # contents[i][0] is the type of documents we are copying
@@ -33,10 +34,11 @@ contents = [(OTHER, "../../courses/ciss358/a/a02/objective.tex"),
             (OTHER, "../../courses/ciss358/a/a02/induction.tex"),
             (LATEXSTR, r"\newpage"),
             (QUEST_MATH, "../../courses/ciss358/a/a02/q01.tex"),
+            (SKELETON, "../../courses/ciss358/a/a02/main.cpp"),
             (LATEXSTR, r"\newpage"),
             (OTHER, "../../courses/ciss358/a/a02/primes.tex"),
             (LATEXSTR, r"\newpage"),
             (QUEST_MATH, "../../courses/ciss358/a/a02/q02.tex"),
             (LATEXSTR, r"\newpage"),
-            (QUEST_MATH, "../../courses/ciss358/a/a02/q03.tex")]
+            (QUEST_CODE, "../../courses/ciss358/a/a02/q03.tex")]
 ###########################################################################

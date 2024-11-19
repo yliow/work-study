@@ -9,14 +9,21 @@ def is_latex(path):
     x = path[len(path) - 4:]
     return x == '.tex'
 
+def is_answer(path):
+    x = path[len(path) - 5:]
+    return x == 's.tex'
+
 def include_latex(path):
-    tex = ""
-    tex += r'''\input{%(path)s}''' %{'path':path}
-    return tex
+    if (is_answer(path)):
+        return r'''\myincludetex{%(path)s}''' %{'path':path}
+    else:
+        return r'''\input{%(path)s}''' %{'path':path}
+    return ""
 
 def include_src(path, frame='single', fontsize='\\footnotesize'):
-    src = r'''\VerbatimInput[frame=%(frame)s,font=%(fontsize)s]{%(path)s}
-    ''' % {'path':path, 'frame':frame, 'fontsize':fontsize}
+    #src = r'''\VerbatimInput[frame=%(frame)s,font=%(fontsize)s]{%(path)s}
+    #''' % {'path':path, 'frame':frame, 'fontsize':fontsize}
+    src = r"\myincludesrc{%(path)s}" % {'path':path}
     return src
 
 def include_(path):
@@ -55,7 +62,21 @@ def copy_path(path, i):
             wr = r'''
 {    Q%(num)s}. %(q)s''' %{'num':i, 'q': include_(new_p)}
         
-            if path[0] == "question":
+            if path[0] == "QUESTION":
+                q = 'q' + str(i).zfill(2)
+                #file_ = rf"q{i:0>2}s.tex"
+                new_p = r"%(s)smain.cpp"\
+                    %{'s':s}
+                f = open(con.newpath + con.assignment + '/' + new_p, 'w')
+                f.write("")
+                f.close()
+                #shutil.copy(path[1], con.newpath + con.assignment + '/' + new_p)
+                wr += r'''
+
+    \SOLUTION
+        
+    %(s)s''' %{'s': include_(new_p)}
+            elif path[0] == "question":
                 q = 'q' + str(i).zfill(2)
                 #file_ = rf"q{i:0>2}s.tex"
                 new_p = r"%(s)s%(q)ss.tex"\
@@ -70,6 +91,9 @@ def copy_path(path, i):
         
     %(s)s''' %{'s': include_(new_p)}
             return wr, i + 1
+        elif path[0] == "skeleton":
+            shutil.copy(path[1], con.newpath + con.assignment + '/' + skel + "skeleton.cpp")
+            return r"\myincludesrc{%(skel)sskel/skeleton.cpp}" %{'skel' : skel}, i
         elif path[0] == "latex string":
             return path[1], i
         elif path[0] == "other":
@@ -92,10 +116,22 @@ def copy_path(path, i):
             wr = r'''
 {    Q%(num)s}. %(q)s''' %{'num':i, 'q': include_(new_p)}
         
+            if path[0] == "QUESTION":
+                new_p = r"%(s)sanswer/src/main.cpp"\
+                    %{'s':s}
+                f = open(con.newpath + con.assignment + '/' + new_p, 'w')
+                f.write("")
+                f.close()
+                #shutil.copy(path[1], con.newpath + con.assignment + '/' + new_p)
+                wr += r'''
+
+    \SOLUTION
+        
+    %(s)s''' %{'s': include_(new_p)}
             if path[0] == "question":
                 q = 'q' + str(i).zfill(2)
                 #file_ = rf"q{i:0>2}s.tex"
-                new_p = r"%(s)s/answer/doc/%(q)ss.tex"\
+                new_p = r"%(s)sanswer/doc/%(q)ss.tex"\
                     %{'s':s, 'q':q}
                 f = open(con.newpath + con.assignment + '/' + new_p, 'w')
                 f.write("")
@@ -107,6 +143,9 @@ def copy_path(path, i):
         
     %(s)s''' %{'s': include_(new_p)}
             return wr, i + 1
+        elif path[0] == "skeleton":
+            shutil.copy(path[1], con.newpath + con.assignment + '/' + skel + "question/skel/skeleton.cpp")
+            return r"\myincludesrc{%(skel)squestion/skel/skeleton.cpp}" %{'skel' : skel}, i
         elif path[0] == "latex string":
             return path[1], i
         elif path[0] == "other":
