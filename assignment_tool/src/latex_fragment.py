@@ -51,10 +51,11 @@ def copy_path(path, i):
         if path[0] == "QUESTION" or path[0] == "question":
             new_p = s + rf"q{i:0>2}.tex"
             shutil.copy(path[1], con.newpath + con.assignment + '/' + new_p)
-        
+            
+            os.system("chmod a=r " + con.newpath + con.assignment + "/" + new_p)
             wr = r'''
 {    Q%(num)s}. %(q)s''' %{'num':i, 'q': include_(new_p)}
-        
+            
             if path[0] == "question":
                 q = 'q' + str(i).zfill(2)
                 #file_ = rf"q{i:0>2}s.tex"
