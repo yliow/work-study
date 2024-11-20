@@ -1,0 +1,400 @@
+\input{myassignmentpreamble}
+\input{ciss245}
+\input{yliow}
+\renewcommand\TITLE{Assignment 3}
+
+\begin{document}
+\topmatter
+
+\objectives{
+ \begin{enumerate}
+ \item Compute with C-strings
+ \item Implement C-string functions
+ \item Write cpp and header file for a C-string library
+ \item Introduction to basic language processing
+ \end{enumerate}
+}
+
+This assignment really leads to one program.
+Therefore once you're done with Q1, copy your Q1 folder to another folder for Q2 and
+continue work. Etc.
+
+
+\newpage
+\textsc{Skeleton}
+
+You will begin with the following skeleton files:
+{\small
+\begin{Verbatim}[frame=single]
+// Author: smaug
+// File  : mystring.h
+
+#ifndef MYSTRING_H
+#define MYSTRING_H
+
+int str_len(char []);
+void str_cat(char [], char []);
+
+#endif
+
+\end{Verbatim}
+}
+
+{\small
+\begin{Verbatim}[frame=single]
+// Author: smaug
+// File  : mystring.cpp
+
+#include "mystring.h"
+
+
+int str_len(char x[])
+{
+    int len = 0;
+    while (x[len] != '\0')
+    {
+        ++len;
+    }
+
+    return len;
+}
+
+
+void str_cat(char x[], char y[])
+{
+    int xlen = str_len(x);
+    int ylen = str_len(y);
+
+    for (int i = 0; i <= ylen; ++i)
+    {
+        x[xlen + i] = y[i];
+    }
+
+    return;
+}
+\end{Verbatim}
+}
+
+{\small
+\begin{Verbatim}[frame=single]
+// Author: smaug
+// File  : main.cpp
+
+int main()
+{
+    return 0;
+}  
+\end{Verbatim}
+}
+
+You will continually add code to the above for
+the first few questions
+as you develop your string library.
+(I.e, start with the above for Q1, after you're done,
+copy the files to Q2, etc.)
+The string library (\verb!mystring.h! and \verb!mystring.cpp!)
+is then used for the last question.
+
+\newpage
+\textsc{Stream I/O}
+
+The input processing done like this:
+\begin{console}
+int x;
+double y;
+char z[1024];
+
+std::cin >> x >> y >> z;
+\end{console}
+works fine.
+But note that for C-string input, whitespaces ends the input.
+For instance if you run this:
+{\small
+\begin{console}
+char z[1024];
+
+std::cin >> z;
+std::cout << z << std::endl;
+\end{console}
+}
+and you attempt to enter two words as input into \verb!z! you will see this:
+{\small
+\begin{console}[commandchars=\\\{\}]
+\underline{hello world}
+hello
+\end{console}
+}
+In other words \verb!z! contains only \verb!"hello"!.
+\verb!world! is actually still in the \verb!"input stream"! -- it's not
+transferred to your program.
+You can of course get the second word \verb!world! like this:
+{\small
+\begin{console}
+char z[1024];
+char w[1024];
+
+std::cin >> z >> w;
+std::cout << z << std::endl;
+std::cout << w << std::endl;
+\end{console}
+Then you will get this when you execute the program:
+\begin{console}[commandchars=\\\{\}]
+\underline{hello world}
+hello
+world
+\end{console}
+}
+
+What if you want to have the whole line of input into a C-string
+variable where the string contains whitespaces?
+
+Run the following program:
+{\small
+\begin{console}
+#include <iostream> 
+#include <limits> 
+
+const int MAX_BUF = 1024; 
+
+int main() 
+{ 
+    char s[MAX_BUF]; 
+    std::cin.getline(s, MAX_BUF); 
+    std::cout << '[' << s << "]\n"; 
+
+    return 0;
+} 
+\end{console}
+}
+and enter a string with spaces.
+
+If you want to writing a program that continually gets a string from the user,
+try the following program:
+{\small
+\begin{console}
+#include <iostream> 
+#include <limits> 
+
+const int MAX_BUF = 1024; 
+
+int main() 
+{ 
+    while (1) 
+    { 
+        char s[MAX_BUF]; 
+        std::cin.getline(s, MAX_BUF); 
+        if (std::cin.eof()) break; 
+        if (std::cin.fail() || std::cin.bad()) 
+        { 
+            std::cin.clear(); 
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+        else
+        {
+            std::cout << '[' << s << "]\n";
+        }
+    }
+
+    return 0;
+} 
+\end{console}
+}
+Note in particular that your program must terminate when an EOF
+(i.e., end-of-file) is reached:
+{\small
+\begin{console}
+if (std::cin.eof()) break;
+\end{console}
+}
+On the MS windows console window, if you do Ctrl-Z and then
+press the enter key, you will get an EOF condition.
+On the Linux/Unix environment, you would do Ctrl-D.
+
+
+
+
+To make your program robust and platform independent,
+you have to know that the string read from a stream might
+have non-visible characters at the end of the string.
+For instance on some systems,
+when a user press the enter key, the character
+\verb!'\r'! in placed in the stream.
+This means that a string read from the stream (up to \verb!'\n'!)
+might end with \verb!'\r'!.
+You are strongly advised to remove all such right-trailing characters from
+your strings which are read from a stream.
+
+
+
+
+To analyze all the characters in your C-string \verb!s!, you can
+of course you can print the ASCII code of the characters
+in \verb!s! and have an ASCII table in front of you:
+{\small
+\begin{Verbatim}[frame=single]
+#include <iostream> 
+#include <limits> 
+#include "mystring.h"
+
+const int MAX_BUF = 1024; 
+
+int main() 
+{ 
+    while (1) 
+    { 
+        char s[MAX_BUF]; 
+        std::cin.getline(s, MAX_BUF); 
+        if (std::cin.eof()) break; 
+        if (std::cin.fail() || std::cin.bad()) 
+        { 
+            std::cin.clear(); 
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+        else
+        {
+            std::cout << '[' << s << "]\n";
+            for (int i = 0; i < str_len(s); ++i)
+            {
+                std::cout << i << ' ' << s[i] << ' ' << int(s[i]) << std::endl;
+            }
+        }
+    return 0;
+} 
+\end{Verbatim}
+}
+
+
+
+\newpage
+\textsc{Some details about input}
+
+What happens during input?
+You should think of your \verb!std::cin! as
+getting from a data stream, like an array of characters.
+When you type something on your keyboard, the characters
+are placed in the stream at the end.
+\verb!std::cin! works by extracting characters
+from the front of the stream.
+(It's more like a queue.)
+
+If you execute
+\verb!std::cin.getline(s, 1024)!,
+\verb!std::cin! will keep extracting
+characters until it sees a newline character.
+Character extracted from the input stream is 
+placed in \verb!s!.
+A \verb!'\0'! is then added to \verb!s!.
+Note that the newline character is extracted from the
+input stream but not placed in \verb!s!.
+Note also that the \verb!1024! in
+\verb!std::cin.getline(s, 1024)!
+means that
+\verb!std::cin!
+will only write
+at most 1023 characters into \verb!s!, reserving
+one spot for \verb!'\0'!.
+If \verb!std::cin! reads more than 1023 characters,
+an error will occur.
+
+A couple of things can go wrong ...
+
+First, if
+\verb!std::cin! reads more than 1023 characters without reading
+a newline character, you'll get an error.
+
+Second,
+\verb!std::cin!
+might read beyond the input stream, , i.e.,
+it has reached the
+EOF.
+
+Third,
+something catastrophic might occur such as some
+hardware failure or something went wrong with the OS.
+
+Fourth, instead of using \verb!getline!,
+when you use
+\verb!std::cin! to read an input
+for an integer,
+but
+what is read cannot be converted to an integer.
+For instance if you try to \verb!std::cin >> i! where
+\verb!i! is an \verb!int!, but you enter \verb!abc!.
+
+\verb!std::cin! maintains information on
+\lq\lq eof'', \lq\lq fail'', \lq\lq bad'' status
+using 3 bits
+(the eofbit, failbit, and badbit.)
+\lq\lq eof'' means you've reached the end of data.
+\lq\lq bad'' is the extreme case such as hardware or OS failure.
+\lq\lq fail'' is the other types mentioned above.
+So for instance if your program attempts to read data for an integer and
+the input is \verb!"abc"!,
+then the fail bit is turn on, i.e., to 1.
+Once you've processed this error and you're ready to
+get the next input (if that's what you want to do),
+you need to set the fail bit to 0.
+
+You use
+\verb!std::cin.eof()!,
+\verb!std::cin.fail()!, and
+\verb!std::cin.bad()!
+to check if the eofbit, failbit, badbit is turned on.
+To set all these flags to 0, you do
+\verb!std::cin.clear()!,
+
+There are times when your want your
+\verb!std::cin! to ignore some characters.
+For instance say you have input lines where
+each line has 3 data (say separated by spaces).
+If an error occurs, you might want your
+\verb!std::cin! to throw away all input characters
+until the newline.
+In that case you do
+\verb!std::cin.ignore(100, '\n')!
+which means ignore at most 100 characters or until the newline character.
+
+
+{\small
+\begin{Verbatim}[frame=single]
+#include <iostream> 
+#include <limits> 
+
+const int MAX_BUF = 1024; 
+
+int main() 
+{ 
+    while (1) 
+    { 
+        char s[MAX_BUF]; 
+        std::cin.getline(s, MAX_BUF);
+        if (std::cin.eof()) break;         
+        if (std::cin.fail() || std::cin.bad()) 
+        {
+            // CASE: Error in input
+            // Do whatevere can be done with s
+            std::cin.clear(); 
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+        else
+        {
+            // CASE: No error in input
+            // Do something with s
+        }
+    }
+
+    return 0;
+} 
+\end{Verbatim}
+}
+
+
+\newpage Q1. \input{../a02q01/question/main.tex}
+\newpage Q2. \input{../a02q02/question/main.tex}
+\newpage Q3. \input{../a02q03/question/main.tex}
+\newpage Q4. \input{../a02q04/question/main.tex}
+\newpage Q5. \input{../a02q05/question/main.tex}
+\newpage Q6. \input{../a02q06/question/main.tex}
+\newpage Q7. \input{../a02q07/question/main.tex}
+
+\end{document}
