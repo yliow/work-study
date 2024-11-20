@@ -1,0 +1,625 @@
+%-*-latex-*-
+\input{../common/preamble.tex}
+
+\begin{document}
+\topmatter
+
+\textsc{Objectives}
+\begin{tightlist}
+  \li Write constructors. 
+  \li Use default values for parameters. 
+  \li Use initializer list for constructor. 
+  \li Write get and set methods. 
+  \li Overloaded operators. 
+  \li Pass objects to methods by reference. 
+  \li Pass objects to methods by constant reference.
+  \li Write constant methods. 
+  \li Use \texttt{this} pointer to return a copy of an object. 
+  \li Write functions with object parameters.
+\end{tightlist}
+
+
+\newpage
+Q1.
+You are given the following (possibly incomplete files):
+\begin{tightlist}
+  \li \texttt{vec2d.h}
+  \li \texttt{vec2d.cpp}
+  \li \texttt{main.cpp} (the test code)
+\end{tightlist}
+\textsc{Important Warning:}
+Again, the files are meant to be skeleton file and might not be
+complete and might have deliberate missing details or even errors.
+
+Create directory
+\texttt{ciss245/a/a08/a08q01}.
+Keep all your files in this directory.
+
+If you're doing a copy-and-paste of the given code,
+note that some character might be changed by PDF to other characters.
+In particular the - character might actually not be the dash character.
+Looking at the compiler error message will help you find these minor
+annoying issues so that you can correct them.
+
+Study the given test code.
+Add tests if necessary to test all methods and functions.
+Such low level function/method tests are called \defterm{unit tests}.
+
+Observe the following very carefully:
+\begin{tightlist}
+\li All methods must be constant whenever possible. 
+\li All parameters which are objects (or struct variables)
+must be pass by reference or pass by constant reference as much as possible.
+\li Reuse code as much as possible.
+For instance \verb@operator!=()@ should use \verb!operator==()!. 
+\end{tightlist}
+
+Let me know ASAP if you see a typo.
+
+\newpage
+Q1. \textsc{Vectors}
+
+Here's a quick note about vectors.
+A 2-dimensional vector is sort of like a point.
+For instance you know
+(from MATH106 elementary algebra) that the following is a point:
+\[
+	(1.1, 3.5)
+\]
+Here's another point:
+\[
+	(0, 0)
+\]
+A 2-dimensional vector is similar but they are frequently written like this:
+\[
+	\langle 1.1, 3.5 \rangle
+\]
+The $1.1$ is called the $x$-component of the above vector and $3.5$ is
+the $y$-component of the vector. You can add vectors. Here's an example:
+\[
+	\langle 1.1, \,\,\, 3.5 \rangle
+        +
+        \langle 2.2, \,\,\, 4.1 \rangle
+        =
+        \langle 1.1 + 2.2, \,\,\, 3.5 + 4.1 \rangle
+        =
+        \langle 3.3, \,\,\, 7.6 \rangle
+\]
+In other words you just add their corresponding components to get a new vector.
+In general
+\[
+	\langle a, \,\,\, b \rangle
+        +
+        \langle c, \,\,\, d \rangle
+        =
+        \langle a + c, \,\,\, b + d \rangle
+\]
+
+You can multiply vector with a \verb!double!:
+\[
+	2.0 \cdot  \langle 1.1, \,\,\, 3.5 \rangle =
+        \langle 2 \cdot 1.1, \,\,\, 2 \cdot 3.5 \rangle
+        =
+        \langle 2.2, 7.0 \rangle
+\]
+In general
+\[
+	c \cdot \langle a, \,\,\, b \rangle
+        =
+        \langle ca, \,\,\, cb \rangle
+\]
+Of course you can multiply the \verb!double! on the right of the vector:
+\[
+	\langle 1.1, 3.5 \rangle  \cdot  2.0 = 
+        \langle 2.2, 7.0 \rangle
+\]
+This product is called the scalar product.
+Not too surprising, you can divide vectors with a \texttt{double}:
+\[
+	\langle 1.1, 3.5 \rangle / 2.0 =
+        \langle 1.1 / 2.0, 3.5 / 2.0 \rangle =  \langle 0.55, 1.75 \rangle
+\]
+In general
+\[
+	\cdot \langle a, \,\,\, b \rangle / c
+        =
+        \langle a/c, \,\,\, b/c \rangle
+\]
+There's another product for vectors called the dot product.
+Mathematically, it is written like this:
+\[
+	\langle 1.1, \,\,\, 3.5 \rangle \cdot \langle 2.2, \,\,\, 4.1 \rangle
+\]
+This is defined to be the sum of the product of the components, i.e.,
+\[
+	\langle 1.1, \,\,\, 3.5 \rangle \cdot
+        \langle 2.2, \,\,\, 4.1 \rangle
+        =
+        (1.1)(2.2) + (3.5)(4.1)
+        = 2.42 + 14.35 = 16.77
+\]
+In general
+\[
+	\langle a, \,\,\, b \rangle \cdot
+        \langle c, \,\,\, d \rangle
+        =
+        ac + bd
+\]
+Of course the dot product is a real number and not a vector.
+
+The length of a vector $\langle x, y \rangle$ is defined by Pythagorus formula:
+\[
+\operatorname{len}( \langle x, \,\,\, y \rangle ) = \sqrt{x^2 + y^2}
+\]
+The normalization of a vector is the vector divided by its length.
+Therefore the normalization of
+$\langle 1.1, 3.5 \rangle$ is
+\begin{align*}
+\langle 1.1, \,\,\, 3.5 \rangle / \sqrt{1.1^2 + 3.5^2}
+&= \langle 1.1, \,\,\, 3.5 \rangle / \sqrt{13.46} \\
+&= \langle 1.1, \,\,\, 3.5 \rangle / 3.6687\cdots \\
+&= \langle 1.1/3.6687\ldots, \,\,\, 3.5/3.6687\ldots \rangle \\
+&= \langle 1.1/3.6687\ldots, \,\,\, 3.5/3.6687\ldots \rangle \\
+&= \langle 0.2998\ldots, \,\,\, 0.9539\ldots \rangle 
+\end{align*}
+
+So what are vectors good for?
+While points are just points in space, vectors represent motion. The vector
+\[
+	\langle 1.1, -3.5 \rangle
+\]
+represents the fact that something is moving in the $x$--axis direction by
+$1.1$ and in the $y$--axis direction by $-3.5$.
+Vectors are used extensive in modeling motion in the
+real world.
+Therefore it is extremely
+important in physics and therefore extremely important in engineering
+and computer
+science. For instance, in scientific computation/simulation
+and computer games,
+frequently, you're modeling some physical entities in the real world. You need
+vectors to describe their motion. To simulate water waves, you need vectors.
+
+\begin{center}
+  \includegraphics[width=4in]{vec2d.JPG}
+\end{center}
+
+(Yes, the above is really generated by a program – it's not a photo.)
+Vectors are really everywhere.
+
+The purpose of this assignment is to build a vector library.
+This will only be for
+2-dimensional vectors and therefore will be useful for 2D games.
+But once you have
+done 2-dimensional vectors, it's not too difficult to build a library for
+3-dimentional vectors or even for n-dimensional vectors.
+You do not need to know how to use
+vectors to solve problems and you do not know about fluid
+dynamics for simulating sea
+waves.
+You only need to know how to interpret basic numeric computations and the
+language of \cpp\ object-oriented programming.
+
+
+
+
+
+\newpage
+\texttt{vec2d} \textsc{header file}
+
+Note that the header file contains both methods and functions.
+The prototypes for the
+functions are given. All others must be methods in the class.
+
+{\small
+\VerbatimInput[frame=single]{vec2d.h}
+}
+
+\newpage
+\texttt{vec2d} \textsc{Implementation File}
+
+
+\textsc{Warning:}
+Note that the functions in the header file are outside the class,
+Therefore
+they do not have direct access to the private instance variables
+\verb!x_! and \verb!y_! of the
+object.
+
+{\small
+\VerbatimInput[frame=single]{vec2d.cpp}
+}
+
+\newpage
+\textsc{Test File}
+
+The following is only a skeleton test code.
+Complete it and test your library thoroughly.
+
+{\small
+\VerbatimInput[frame=single]{main.cpp}
+}
+
+Here are the test option numbering. First here are the input and output
+operators
+(i.e., \verb!operator<<! and
+\verb!operator>>!) and class methods (i.e. member functions and
+operators) in the class:
+\begin{itemize}
+  \item[ 1.] Constructor \verb!vec2d::vec2d(double, double)! and printing
+  \item[ 2.] \textred{There's no case 2.}
+  \item[ 3.] Constructor \verb!vec2d::vec2d()! (the default) and print
+  \item[ 4.] Input (i.e. \verb!operator>>!)
+  \item[ 5.] \verb!bool vec2d::operator==(const vec2d &) const!
+  \item[ 6.] \texttt{bool vec2d::operator!=(const vec2d \&) const}
+  \item[ 7.] \verb!double vec2d::get_x() const!
+  \item[ 8.] \verb!double vec2d::get_y() const!
+  \item[ 9.] \verb!void vec2d::set_x(double)!
+  \item[10.] \verb!void vec2d::set_y(double)!
+  \item[11.] \verb!double vec2d::operator[](int) const!
+  \item[12.] \verb!double & vec2d::operator[](int)!
+  \item[13.] \verb!vec2d vec2d::operator+() const!
+  \item[14.] \verb!vec2d & vec2d::operator+=(const vec2d &)!
+  \item[15.] \verb!vec2d vec2d::operator+(const vec2d &) const!
+  \item[16.] \verb!vec2d vec2d::operator-() const!
+  \item[17.] \verb!vec2d & vec2d::operator-=(const vec2d &)!
+  \item[18.] \verb!vec2d vec2d::operator-(const vec2d &) const!
+  \item[19.] \verb!vec2d & vec2d::operator*=(double)!
+  \item[20.] \verb!vec2d vec2d::operator*(double) const!
+  \item[21.] \verb!vec2d & vec2d::operator/=(double)!
+  \item[22.] \verb!vec2d vec2d::operator/(double) const!
+  \item[23.] \verb!double len() const!
+\end{itemize}
+And here are the test options for non-member functions:
+\begin{itemize}
+  \item[24.] \verb!vec2d operator*(double, const vec2d &)!
+  \item[25.] \verb!double len(const vec2d &)!
+  \item[26.] \verb!double dotprod(const vec2d &, const vec2d &)!
+  \item[27.] \verb!vec2d norm(const vec2d &)!
+\end{itemize}
+
+
+\newpage
+\textsc{Notes}
+
+Be efficient when you code.
+For instance \verb!operator!=! is the opposite of \verb!operator==!.
+So get \verb!operator==! to work correctly and then code
+\texttt{operator!=} using \verb!operator==!.
+
+Likewise the binary
+\verb!operator+! should be coded in terms of
+\verb!operator+=!, etc.
+It's really a very simple idea.
+Here's a hint for you.
+Suppose you look at integers.
+How do you define \verb!+! in terms of \verb!+=!?
+Suppose \verb!x!, \verb!y!, \verb!z! are integers and
+you want to do the following:
+{\small
+\begin{console}
+int x, y = 2, z = 3;
+x = y + z;
+\end{console}
+}
+
+
+Well, \verb!y + z! is really the value of \verb!y! incremented by \verb!z!.
+Right? So the above statement can be written as:
+{\small
+\begin{console}
+int x, y = 2, z = 3;
+x = y;
+x += z;
+\end{console}
+}
+
+Notice now that \verb!+! does not appear in the two statements,
+only \verb!=! and \verb!+=!.
+On the other hand, it's easy to see that you can also write
+\verb!+=! using \verb!+!.
+However it's generally expected that \verb!+=! should be faster than
+\verb!+!.
+That means that \verb!+! should be implemented in terms of
+\verb!+=! and not the other way round.
+
+You know if an argument of a function is not changed,
+you should declare it constant.
+For instance void
+\verb!f(const vec2d & a)! would imply that the body/implementation of the
+function \verb!f! cannot change the value(s) of \verb!a!.
+However for a class, the object invoking the method does not appear
+in the parameter list:
+{\small
+\begin{console}
+  class C
+{
+public:
+    void f();
+    ...
+};
+\end{console}
+}
+
+So what if you have
+{\small
+\begin{console}
+int main()
+{
+    C obj;
+    obj.f();
+}
+\end{console}
+}
+and what if you want to insist that
+\verb!f()! does not change \verb!obj!?
+You can make the object invoking the call constant within \verb!f()!.
+Here's how you do it:
+{\small
+\begin{console}[commandchars=\~\!\@]
+class C
+{
+public:
+    void f() ~textbox!const@;
+    ...
+};
+\end{console}
+}
+You've just made method \verb!f()! \defterm{constant}.
+We say that f() is a \defterm{constant method}.
+
+Note that so far the object invoking a method does not have a
+\lq\lq name''
+since it does not appear as a parameter in the method's prototype.
+So what if we need to return the object itself?
+For instance what if I want to write a \verb!clone()! method that returns a
+copy of the object:
+{\small
+\begin{console}
+// Robot.h
+#ifndef ROBOT_H
+#define
+
+class Robot
+{
+public:
+    ...
+    Robot clone() const;
+    ...
+};
+
+#endif
+\end{console}
+}
+
+Actually there \textit{is} a parameter for the object invoking the
+call to \verb!clone()!.
+It's called \verb!this! in the implementation of the
+\verb!clone()! method.
+However it's not a \verb!Robot! object.
+It's a pointer to the \verb!Robot! object invoking the call to \verb!clone()!.
+{\small
+\begin{console}
+// Robot.cpp
+...
+Robot Robot::clone() const
+{
+    return *this; // need to dereference the "this" pointer
+}
+...
+\end{console}
+}
+
+If \verb!u! and \verb!v! are \verb!vec2d! objects and you have a
+method \verb!operator+=!:
+{\small
+\begin{console}
+class vec2d
+{
+public:
+    ...
+    vec2d & operator+=(const vec2d &);
+};
+\end{console}
+}
+Then the statement
+\[
+	\texttt{u += v;}
+\]
+is \lq\lq translated'' to 
+\[
+	\texttt{u.operator+=(v);}
+\]
+Suppose \verb!u!, \verb!v!, \verb!w! are \verb!vec2d! objects. The statement:
+\[
+	\texttt{w = u + v} ;
+\]
+can be \lq\lq translated'' in two different ways:
+\[
+	\texttt{w = operator+(u, v);}
+\]
+or
+\[
+	\texttt{w = u.operator+(v);}
+\]
+which will call either the \textit{nonmember function}
+\[
+	\texttt{vec2d operator+(const vec2d \&, const vec2d \&);}
+\]
+or the \textit{method} (in the \verb!vec2d! class)
+\[
+	\texttt{vec2d vec2d::operator+(const  vec2d \&) const}
+\]
+This means that you cannot have both the method
+\texttt{operator+(const vec2d \&) const} and the function
+\texttt{operator+(const vec2d \&, const vec2d \&)}:
+{\small
+\begin{console}
+class vec2d
+{
+public:
+    ...
+    vec2d operator+(const vec2d &) const;
+    ...
+};
+
+...
+vec2d operator+(const vec2d &, const vec2d &); // WRONG
+...
+\end{console}
+}
+This will cause an error during compiling.
+
+
+This will result in an \textit{ambiguous declaration}.
+For the \verb!vec2d! class, we want \verb!operator+! to be a method,
+not a function.
+
+As for the bracket operator, when you do
+\[
+	\texttt{std::cout << v[0];}
+\]
+you're really do this:
+\[
+	\texttt{std::cout << v.operator[](0);}
+\]
+This requires you to retrieve the value of \verb!v.x_!.
+However if you do this:
+\[
+	\texttt{v[0] = 4.2;}
+\]
+then you're retrieve the value of \verb!v.x_!.
+Instead you want to put \verb!4.2! at \verb!v.x_!.
+That's why there are two \verb!operator[]! in your
+\verb!vec2d! class.
+(Check your notes on returning references to instance variables.)
+
+\newpage
+\textsc{Reminder: Giving access to instance variable by returning a reference
+  to an instance variable}
+
+If you want to set the value of an instance variable, you can do something
+like this:
+{\small
+\begin{console}
+#include <iostream>
+
+class X
+{
+public:
+    void set_i(int newi)
+    {
+        i = newi;
+    }
+
+    int i; // make this public for this experiment
+};
+
+int main()
+{
+    X x;
+    x.set_i(5);
+    std::cout << x.i << '\n'; // you should get 5
+    return 0;
+}
+\end{console}
+}
+Another way to achieve the same thing is to give the client using your
+class (in this
+case client = main) access to the instance variable directly. You do that by
+returning a reference to the instance variable:
+{\small
+\begin{console}[commandchars=\~\!\@]
+#include <iostream>
+
+class X
+{
+public:
+    void set_i(int newi)
+    {
+        i = newi;
+    }
+    ~textbox!int &@ iref() // obviously this method cannot be const
+    {
+        return i;
+    }
+
+    int i; // make this public for this experiment
+};
+
+int main()
+{
+    X x;
+    x.set_i(5);
+    std::cout << x.i << '\n'; // you should get 5
+    x.iref() = 6;             // lefthand side of = is a reference to x.i
+    std::cout << x.i << '\n'; // you should get 6
+    return 0;
+}
+\end{console}
+}
+
+Make sure you see the difference between \verb!X::set_i(int)! and
+\verb!X::iref()!.
+The former sets the value of \verb!i! for you.
+The client has an indirect write access to \verb!i!.
+For \verb!X::iref()!, the client has direct access to \verb!i!.
+
+If an instance variable is an array say \verb!a!
+and you want to give a client access \verb!a[0]!,
+then you give the client a public method that returns a reference to
+\verb!a[0]!, not the value of \verb!a[0]!.
+
+Make sure you review notes on references and pointers.
+
+The above is enough information for this assignment.
+Read on if you want  to know a bit more ...
+
+If you have the following in \cpp\ (actually for most languages):
+\[
+	\texttt{x = a + b + c;}
+\]
+
+Notice that there's a difference between the way you use the names
+on the right (i.e., \verb!a!, \verb!b!, and \verb!c!)
+and the name on the left (i.e., \verb!x!). Of course \verb!a!,
+\verb!b!, \verb!c!, \verb!x! all refer to a \lq\lq boxes''
+containing some value (more accurately, they refer to some part of your
+computer's memorry).
+However note that for \verb!a!, \verb!b!, \verb!c!,
+you RETRIEVE (read access) the values at \verb!a!, \verb!b!, and \verb!c!.
+For \verb!x!, you PUT A VALUE INTO (write access) the box corresponding to
+\verb!x!. What actually happens is this: you read the values for
+\verb!a!, \verb!b!, \verb!c! and say
+\verb!a!,\verb!b!,\verb!c! have value \verb!1!,\verb!2!,\verb!3!,
+then the expression
+\verb!a+b+c! generates \verb!6!.
+Now, \verb!a!, \verb!b!, \verb!c!
+themselves have values which are of course at some fixed memory location.
+However the value \verb!6! does not have a fixed location - it's temporary.
+So we say that \verb!6! is an \defterm{rvalue}.
+On the other hand the \verb!x! on the left of the assignment,
+since it refers to the box of \verb!x!,
+or more precisely to a chunk of memory, is an \defterm{lvalue}.
+
+Informally, you can think of lvalue as \lq\lq something that can be
+assigned a value and appears on the left of an assignment operator''
+while an rvalue is \lq\lq something that cannot be assigned, is a value,
+and appears on the right of the assignment operator''.
+That's enough for right now. The real picture is slightly more complicated.
+
+Knowing the above is important because some compilers will use the above terminology
+(lvalue and rvalue) for error messages. For instance try to compile this program and
+then read the error message:
+{\small
+\begin{console}
+int main()
+{
+    2 = 5;
+    return 0;
+}
+\end{console}
+}
+If you're using \gpp, it will give you an error message that basically says that the lefthand side of the assignment generates the value 2 which is not an lvalue: it cannot be assigned a value. 
+
+\end{document}

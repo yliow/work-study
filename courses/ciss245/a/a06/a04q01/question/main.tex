@@ -1,0 +1,155 @@
+%-*-latex-*-
+\verb!operator<<!
+
+Modify \verb!operator<<! to satisfy the following software requirements. I've
+deliberately not attempted to list the requirements in the most organized and
+efficient way so that you have to think through it yourself.
+
+Negative signs are printed correctly, i.e., either not at all or once and never
+twice. For instance, if the \verb!Fraction! variable \verb!x! has
+\verb!x.n = -2! and \verb!x.d = -4!,
+\begin{console}
+Fraction x = {-2, -4};
+std::cout << x << std::endl;
+\end{console}
+will display
+\begin{console}
+2/4
+\end{console}
+instead of
+\begin{console}
+-2/-4
+\end{console}
+
+There should not be any negative sign for the printout of the
+denominator. For instance, if the \verb!Fraction! variable \verb!x! has
+\verb!x.n = 5! and \verb!x.d = -2!, 
+\begin{console}
+Fraction x = {5, -2};
+std::cout << x << std::endl;
+\end{console}
+will display
+\begin{console}
+-5/2
+\end{console}
+instead of
+\begin{console}
+5/-2
+\end{console}
+
+If the denominator is $1$ or $-1$, only an integer value is printed. For
+instance, if the \verb!Fraction! variable \verb!x! has \verb!x.n = -3!
+and \verb!x.d = -1!,
+\begin{console}
+Fraction x = {-3, -1};
+std::cout << x << std::endl;
+\end{console}
+will display
+\begin{console}
+3
+\end{console}
+instead of
+\begin{console}
+-3/-1
+\end{console}
+
+If the numerator is $0$ (there is one exception: see below), then
+\verb!0! is printed. In other words
+\begin{console}
+Fraction x = {0, -5000};
+std::cout << x << std::endl;
+\end{console}
+will display
+\begin{console}
+0
+\end{console}
+
+If the denominator is $0$, then \verb!undefined! is printed. In other
+words
+\begin{console}
+Fraction x = {123, 0};
+std::cout << x << std::endl;
+\end{console}
+will display
+\begin{console}
+undefined
+\end{console}
+
+Note that if the numerator and denominator are both $0$, then
+\verb!undefined! is printed. 
+
+Your \verb!main()! should look like this:
+{\small
+\begin{Verbatim}[frame=single]
+#include <iostream>
+#include "Fraction.h"
+
+
+void test_print()
+{
+    int n = 0, d = 0;
+    std::cin >> n >> d;
+    Fraction f = {n, d};
+    std::cout << f << std::endl;
+}
+
+
+int main()
+{
+    int option;
+    std::cin >> option;
+    
+    switch (option)
+    {
+        case 1:
+            test_print();
+            break;
+    }
+
+    return 0; 
+}
+\end{Verbatim}
+}
+
+Here are some test cases for you:
+
+\resett
+\nextt
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\userinput{1 1 3}
+1/3
+\end{Verbatim}
+
+\nextt
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\userinput{1 -1 3}
+-1/3
+\end{Verbatim}
+
+\nextt
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\userinput{1 1 -3}
+-1/3
+\end{Verbatim}
+
+\nextt
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\userinput{1 -12 -16}
+3/4
+\end{Verbatim}
+
+\nextt
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\userinput{1 0 3}
+0
+\end{Verbatim}
+
+\nextt
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\userinput{1 10 0}
+undefined
+\end{Verbatim}
+
+Add more test cases to your \verb!stdin.txt! to go through all the above cases.
+I very strongly advise you to add as many test cases as you can and test your
+code as thoroughly as possible.
