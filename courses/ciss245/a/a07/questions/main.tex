@@ -1,0 +1,895 @@
+%-*-latex-*-
+%
+% Change n and d to n_ and d_
+% Return type of operator=, +=, etc.: Change to const Rational & 
+%
+
+\input{../common/preamble.tex}
+
+\begin{document}
+\topmatter
+\textsc{Objectives}
+\begin{tightlist}
+    \li Write constructors. 
+    \li Use default values for parameters. 
+    \li Use initializer list for constructor. 
+    \li Write get and set methods. 
+    \li Overloaded operators. 
+    \li Pass objects to methods by reference. 
+    \li Pass objects to methods by constant reference.
+    \li Write constant methods. 
+    \li Use \texttt{this} pointer to return a copy of an object. 
+    \li Write functions with object parameters.
+\end{tightlist}
+
+
+
+You are given the following (possibly incomplete files):
+\begin{tightlist}
+  \li \texttt{Rational.h}
+  \li \texttt{Rational.cpp}
+  \li \texttt{main.cpp} (the test code)
+\end{tightlist}
+\textsc{Important Warning:}
+Again, the files are meant to be skeleton file and might not be
+complete and might have deliberate missing details or even errors.
+
+Create directory
+\texttt{ciss245/a/a07/a07q01}.
+Keep all your files in this directory.
+
+If you're doing a copy-and-paste of the given code,
+note that some character might be changed by PDF to other characters.
+In particular the - character might actually not be the dash character.
+Looking at the compiler error message will help you find these minor
+annoying issues so that you can correct them.
+
+Study the given test code.
+Add tests if necessary to test all methods and functions.
+Such low level function/method tests are called \defterm{unit tests}.
+
+Observe the following very carefully:
+\begin{tightlist}
+\li All methods must be constant whenever possible. 
+\li All parameters which are objects (or struct variables)
+must be pass by reference or pass by constant reference as much as possible.
+\li Reuse code as much as possible.
+For instance \verb@operator!=()@ should use \verb!operator==()!. 
+\end{tightlist}
+Let me know ASAP if you see a typo.
+
+\newpage
+Q1.
+This assignment builds a complete library for working with fractions.
+Refer to your work on \verb!Fraction! struct.
+We'll be using a class (and not a struct).
+Also, instead of call the class \verb!Fraction!, I will call it
+\verb!Rational!.
+In Computer Science and Math, a rational number is the same as a fraction --
+they mean the same thing.
+
+You will need to write three files:
+\begin{tightlist}
+  \li \verb!main.cpp!: This program tests the
+  \verb!Rational! class and it's supporting functions and operators. 
+  \li \verb!Rational.h!: This is the header function containing the
+  \verb!Rational! class.
+  \li \verb!Rational.cpp!:
+  This file contains the definitions for the methods in \verb!Rational.h!.
+\end{tightlist}
+
+Read the following carefully before diving into coding.
+
+The following is \verb!Rational.h!:
+{\small
+\VerbatimInput[frame=single]{Rational.h}
+}
+
+The following is \verb!Rational.cpp!:
+{\small
+\VerbatimInput[frame=single]{Rational.cpp}
+}
+(Note that a constructor, copy constructor, \verb!get_n()!, and
+\verb!set_n()! have already been completed for you in \texttt{Rational.h}.
+The rest of the methods/functions should be implemented in
+\texttt{Rational.cpp})
+
+For \verb!main.cpp!, see the section on \textsc{Test Code} below.
+
+You must implement all the functions/operators defined in the header file.
+The implementation should be kept in \verb!Rational.cpp!.
+You must also include test cases for all functions/operators/methods in your
+\verb!main()!.
+
+See notes below.
+
+
+
+
+\newpage
+\textsc{Advice}. 
+
+Read the whole document carefully before diving into the code.
+As you read, don't worry about the whole program and don't worry about the
+details in the sections on notes.
+After reading the whole pdf, look at the section on \textsc{Test Code}
+again and work on one function/method at a time.
+This means building and testing one
+method/function at a time.
+You can't run the given skeleton code since some of the methods/functions
+are not completed yet.
+So when you create the source files from the skeleton code, you
+want to comment out most of the code first.
+After that you want to slowly
+uncomment and add more test code in \verb!main.cpp! as you implement one
+method/function as a time 
+in the \verb!Rational!
+class.
+
+Again develop and test in tiny steps -- \textit{one} method/function at a time.
+
+\begin{tightlist}
+  \item Read the whole pdf quickly and carefully. Understand as much as
+  you can. Don't worry if you don't remember everything you read
+  because you can re-read it again later when you need to.
+  \item Create \verb!main.cpp!, \verb!Rational.h!, and \verb!Rational.cpp!
+  from the provided skeleton code.
+  \item Comment out the methods/functions which are
+  not completed yet in
+  \verb!main.cpp!, \verb!Rational.h!, and \verb!Rational.cpp!.
+  \item Look at the section on \textsc{Test Code} and implement
+    one method/function at at time, uncommenting and adding test code
+    as you go along. Re-read the notes in this pdf when you need to.
+\end{tightlist}
+
+
+
+\newpage
+\textsc{The} \texttt{Rational} \textsc{class}
+
+It should be clear what the methods and the functions should compute.
+The following
+is a short explanation. Let me know if you have questions.
+
+The class must support the following:
+
+\begin{itemize}
+  
+\item[1.]
+The constructor allows calls of the form
+\verb!Rational(a,b)! or \verb!Rational(a)! or \verb!Rational()!.
+For instance \verb!Rational(5)! will construct a \verb!Rational! object
+that models \verb!5/1!. \verb!Rational()! will construct a
+\verb!Rational! object that models \verb!0/1!.
+
+\item[2.]
+Arithmetic operators
+\texttt{+=},
+\texttt{-=},
+\texttt{*=},
+\texttt{+},
+\texttt{-},
+\texttt{*}.
+These operators do the obvious things with one caveat.
+The assignment operators besides modifying the object invoking the operator
+will also return a copy of the object. So for instance:
+{\small
+\begin{Verbatim}[frame=single]
+Rational a(1, 2);  // a models 1/2
+Rational b(1, 4);  // b models 1/4
+Rational c;        // c models 0/1
+c = (a += b);      // a becomes 3/4 and c becomes 3/4
+\end{Verbatim}
+}
+This means that the prototype for \texttt{+=} in the
+\texttt{Rational} class can be
+\[
+\texttt{Rational operator+=(const Rational \&);}
+\]
+but it wouldn't work for
+{\small
+\begin{Verbatim}[frame=single]
+Rational a(1, 2);  // a models 1/2
+Rational b(1, 4);  // b models 1/4
+(a += b) += b;     // a should model 1/2 + 1/4 + 1/4 = 1/1
+\end{Verbatim}
+}
+So \verb!+=! should return a reference to the object
+invoking the method:
+\\
+\texttt{Rational::operator+=} should look like this:
+\begin{Verbatim}[frame=single]
+Rational & Rational::operator+=(const Rational & b)
+{
+    // modify *this;
+    return *this;
+}
+\end{Verbatim}
+Note that you must implement both the binary \texttt{–} and the unary
+\texttt{–}  as well as the binary \texttt{+} and the unary \texttt{+}.
+In other words you can do
+\texttt{a - b}, \texttt{-b}, \texttt{a + b},
+\texttt{+a} if \texttt{a} and \texttt{b} are \texttt{Rational} objects.
+Once you are done with the above, then
+\verb!-=!,
+\verb!-!, etc. are similar and will be very easy.
+
+
+\item[3.]
+Boolean operators
+\texttt{==},
+\texttt{!=},
+\texttt{<},
+\texttt{<=},
+\texttt{>},
+\texttt{>=}.
+Note that \texttt{a/b} is the same as \texttt{c/d} exactly
+when \texttt{a*d} is \texttt{b*c}.
+Your code should be minimal. For instance \texttt{!=} should be in terms of
+\texttt{==}, i.e., \texttt{operator!=} should call \texttt{operator==}.
+If \texttt{a}, \texttt{b}, \texttt{c}, \texttt{d} are all positive integers,
+then \texttt{a/b} is less then (i.e., \texttt{<}) \texttt{c/d}
+exactly when \texttt{a*d} is less than \texttt{b*c}. Note that \texttt{<=}
+must be implemented in terms of \texttt{<} and \texttt{==}. Etc.
+
+\item[4.]
+\texttt{reduce()}:
+This will reduce the rational so that it's in the simplest form.
+For instance if the fraction modeled by your object is \texttt{2/4} and the
+object calls \texttt{reduce()}, then the fraction modeled by your object
+becomes $1/2$.
+Note that if the object modeled is \texttt{1/-2}, on calling \texttt{reduce()},
+it becomes \texttt{-1/2}.
+In other words, not only does calling \texttt{reduce()} will remove common
+divisors from the numerator and denominator,
+it must make sure that the denominator becomes positive.
+
+\item[5.]
+If \texttt{r} is a \texttt{Rational} object, then \texttt{r.get\_d()}
+returns the denominator of \texttt{r} (as an integer).
+
+\item[6.]
+If \texttt{r} is a \texttt{Rational} object, then \texttt{r.get\_n()}
+returns the numerator of \texttt{r} (as an integer).
+
+\item[7.]
+The method \texttt{get\_int()} will return the integer part of the fraction.
+In other words
+if \texttt{Rational} object \texttt{r} models \texttt{5/3},
+then \texttt{get\_int(r)} returns integer $1$.
+Note that
+\texttt{get\_int()} does not round up.
+[The \texttt{int()} conversion operator
+does the same thing but is commented out. You
+need not implement it. See comments below.]
+
+\item[8.]
+The method \verb!get_double()! will return the double of the fraction.
+In other words if \texttt{Rational} object \texttt{r} models \texttt{5/3},
+then \texttt{r.get\_double()} return the double \texttt{5.0/3.0}.
+[The \texttt{double()} conversion operator is commented out.
+You need not implement it. See comments below.]
+
+
+\item[9.]
+\texttt{operator<<}.
+If your object models \texttt{2/4},
+then \texttt{operator<<} prints \texttt{"2/4"}.(without the double quotes).
+If your object models \texttt{2/1}, the print method prints \texttt{"2"}
+(note: there is no 1).
+If the object
+modeled is \texttt{2/-4}, then \texttt{operator<<} prints
+\texttt{"-2/4"}.
+If the object modeled is \verb!0/4!, then
+\texttt{operator<<} prints \texttt{0}.
+If the object modeled is \verb!0/-4!, then
+\texttt{operator<<} prints $0$.
+
+\item[10.]
+\texttt{operator>>}.
+If your object is \texttt{r} then executing
+\texttt{std::cin >> r} and you enter \texttt{"2 4"}
+(without double quotes) and press the enter key,
+then \texttt{r} models \texttt{2/4}.
+
+\item[11.]
+The \texttt{abs()} method and the \texttt{abs()} function returns the
+absolute value of the \texttt{Rational}.
+Note that there is an \texttt{abs()} method and an \texttt{abs()} function.
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+Rational r(-2, 3);
+Rational x = r.abs(); // calls the method 
+Rational y = abs(r);  // calls the (non-method) function
+\end{Verbatim}
+The \texttt{abs()} method performs the computation.
+To avoid code duplication, the \texttt{abs()} function calls the
+\texttt{abs()} method. See notes below.
+
+\item[12.]
+The \texttt{pow()} method and the
+\texttt{pow()} function returns the power of the \texttt{Rational}
+for the given integer exponent.
+Note that there is an \texttt{pow()} method and a \texttt{pow()} function.
+The \texttt{pow()} method performs the computation.
+To avoid code duplication, \texttt{pow()} function calls the
+\texttt{pow()} method. See notes below.
+
+Write several tests for every method/function to ensure that your code is
+working correctly.
+
+More details are below.
+
+\end{itemize}
+
+
+
+\newpage
+\textsc{Notes on} {\texttt{reduce()}}
+
+The \texttt{reduce()} method will reduce your fraction
+(in the usual sense of arithmetic from your pre-college days).
+Recall that the correct way to reduce \texttt{a/b} is to divide \texttt{a}
+and \texttt{b} by the greatest common divisor of \texttt{a}, \texttt{b}.
+In other words, if the greatest common divisor of \texttt{a}
+and \texttt{b} is \texttt{g}, then \texttt{a/b} becomes
+\texttt{(a/g)/(b/g)}.
+For instance \texttt{18/24 = (18/6)/(24/6) = 3/4}
+because the greatest common divisor of \texttt{18} and \texttt{24} is
+\texttt{6}.
+The greatest common divisor function can be found in
+my notes on \textsc{Recursive functions}.
+
+What about the case where the numerator and/or the denominator is not positive?
+
+Besides dividing out by the greatest common divisor,
+your method must also remove redundant negative signs and ensure the
+that denominator is positive.
+For instance is the \texttt{Rational} object \texttt{r} models
+\texttt{-2/-3}, then after calling \texttt{r.reduce()},
+\texttt{r} models \texttt{2/3}.
+If \texttt{r} models \texttt{2/-3}, after calling
+\texttt{r.reduce()}, \texttt{r} models \texttt{-2/3}.
+
+Finally, for the case of \texttt{0}.
+If your \texttt{Rational} object \texttt{r} models \texttt{0/5},
+after calling \texttt{r.reduce()}, \texttt{r} models \texttt{0/1}.
+If \texttt{r} models \texttt{0/-5}, after calling \texttt{r.reduce()},
+\texttt{r} models \texttt{0/1}.
+In other words if the \texttt{Rational} object models the real world
+concept of \texttt{0} (such as \texttt{0/1}, \texttt{0/5}, \texttt{0/-1000}),
+then after calling \texttt{r.reduce()}, r will always model \texttt{0/1}.
+
+Note that there is a \texttt{reduce()} method in \texttt{Rational} and
+there is also a \texttt{reduce()}
+non-member function. If \texttt{r} is a \texttt{Rational} object,
+\[
+\texttt{r.reduce();}
+\]
+has the same effect as
+\[
+\texttt{reduce(r);}
+\]
+
+
+
+
+\newpage
+\textsc{Computations Involving Rationals and Integers}
+
+You also must have the additional functions (outside the class,
+also known as nonmember functions).
+Note that, as mentioned in class, an
+expression like \texttt{1+x} where \texttt{x} is a
+\texttt{Rational} object is translated to either  
+\begin{itemize}
+\item[(a)] \texttt{1.operator+(x)},  or 
+\item[(b)] \texttt{operator+(1,x)}. 
+\end{itemize}
+
+Now obviously (a) is not possible since that implies that
+\texttt{1} is an object.
+So (b) is
+the only possibility.
+Therefore you need to implement a function (not a method).
+It's probably best to bundle this function with the
+\texttt{Rational} class (i.e. the function's prototype is in
+\texttt{Rational.h} and the definition of the function should be in
+\texttt{Rational.cpp}). In other words you need function
+\[
+\texttt{Rational operator+(int a, const Rational \& b);}
+\]
+that returns a \texttt{Rational} object modeling the sum of
+\texttt{a} and \texttt{b}.
+For instance if \texttt{a}=\texttt{1} and \texttt{b} models the \texttt{1/2},
+then \texttt{operator+(a, b)}
+must return a \texttt{Rational} object modeling \texttt{3/2}.
+Note that your class already knows how to add two
+\texttt{Rational} objects.
+To avoid code duplication, your \texttt{operator+(a, b)}
+should call the \texttt{operator+} in the class.
+
+To be concrete let me repeat myself with some examples.
+
+The \texttt{Rational} header,
+once implemented, must be able to work with
+\texttt{Rational} objects and integers in the same expression.
+For instance
+\begin{console}
+std::cout << Rational(1, 2) + 1 << std::endl;
+std::cout << 2 + Rational(1, 3) << std::endl;
+\end{console}
+should produce this output:
+\begin{console}
+3/2
+7/3
+\end{console}
+In general we want to be able to evaluate
+\begin{console}
+a [op] b
+\end{console}
+where \texttt{a},\texttt{b} are either \texttt{Rational} objects or
+integers and \texttt{[op]} is any operator in the header file. 
+
+Note that in fact you don't have to do much to make 
+\begin{console}
+Rational(1, 2) + 1
+\end{console}
+work ... C++ will convert \texttt{1} to \texttt{Rational(1)} for you!!!
+This is automatic type conversion.
+You have actually seen that before. Recall that in CISS240 when you do
+\begin{console}
+1.234 + 1
+\end{console}
+C++ will convert \texttt{1} to \texttt{1.0} (as a \texttt{double}) for you
+\begin{console}
+1.234 + 1.0
+\end{console}
+and then use \texttt{double} addition to carry out the computation.
+It's the same situation for 	
+\begin{console}
+Rational(1, 2) + 1
+\end{console}
+C++ will attempt to convert \texttt{1} to a \texttt{Rational} object.
+This can be done with the constructor, i.e. \texttt{Rational(1)}.
+And C++ will do it for you automatically, i.e., C++ will execute
+\begin{console}
+Rational(1, 2).operator+(Rational(1))
+\end{console}
+when it sees
+\begin{console}
+Rational(1, 2) + 1
+\end{console}
+
+So there's nothing to do at all!
+(Of course C++ will also try to match
+\texttt{Rational(1, 2) + 1}
+with other \texttt{+} operators.
+For instance there's the usual \texttt{+} for (int, int)
+from CISS240.
+But that does not apply since there's no way to automatically convert
+\texttt{Rational(1, 2)} to an \texttt{int} value.)
+
+However for the expression 
+\begin{console}
+2 + Rational(1, 3)
+\end{console}
+we will need to define
+\begin{console}
+Rational operator+(int, const Rational &)
+\end{console}
+This is the function that C++ will use for the evaluation of 
+\begin{console}
+2 + Rational(1, 3)
+\end{console}
+
+Likewise you need to implement the following in \texttt{Rational.h}:
+\begin{Verbatim}[frame=single]
+bool operator==(int, const Rational &);
+bool operator!=(int, const Rational &);
+bool operator> (int, const Rational &);
+bool operator>=(int, const Rational &);
+bool operator< (int, const Rational &);
+bool operator<=(int, const Rational &);
+
+int & operator+=(int &, const Rational &);
+int & operator-=(int &, const Rational &);
+int & operator*=(int &, const Rational &);
+int & operator/=(int &, const Rational &);
+
+Rational operator+(int, const Rational &);
+Rational operator-(int, const Rational &);
+Rational operator*(int, const Rational &);
+Rational operator/(int, const Rational &);
+\end{Verbatim}
+
+Note that these prototypes are non-member function prototypes outside the
+\texttt{Rational} class definition, i.e.,
+these are not methods of the class.
+
+You must have the least amount of code duplication in your implementation.
+[HINT: For instance
+\texttt{1 + Rational(1, 2)} is the same as \texttt{Rational(1, 2) + 1}.]
+
+\textsc{\textred{Note added:}}
+Here's an important note on binary operators involving
+values of different types.
+Look at for instance an expression of the form
+\begin{console}[fontsize=\small]
+int i = 5;
+Rational r(3, 2); // i.e., r = 3/2
+i /= r;
+\end{console}
+The intended effect is to set \verb!i! to the value of \verb!i / r!.
+But how do you compute \verb!i / r!?
+Note that \verb!i! is an integer while \verb!r! is a fraction.
+Should \verb!i / r! be \verb!(5/1) / (3/2)! which would give you \verb!10/3!
+and then you give \verb!3! to \verb!i!, or 
+should \verb!i / r! be \verb!5/1! which would give \verb!5! to \verb!i!.
+The first \textit{promotes} \verb!5! to \verb!5/1! while the second
+\textit{demotes} \verb!3/2! to \verb!1!.
+You should adopt the \lq\lq automatic type promotion" approach from CISS240
+because for C++ that's the general expectation.
+For instance try this:
+\begin{console}[fontsize=\small]
+int i = 5;
+double r = 3.0 / 2; 
+i /= r;
+std::cout << i << '\n';
+\end{console}
+and you'll see that the output is \verb!3! (and not \verb!1!).
+
+Besides the binary operators, you need to also implement the unary operators:
+{\small
+\begin{console}
+Rational Rational::operator+() const; // positive operator (not addition)
+Rational Rational::operator-() const; // negative operator (not subtraction)
+\end{console}
+}
+For instance
+{\small
+\begin{console}
+Rational a(1, 2);
+Rational b = -a; // same as a.operator-(), so b models -1/2
+Rational c = +a; // same as a.operator+(), so c models 1/2
+\end{console}
+}
+Make sure you see the difference between the following:
+{\small
+\begin{console}[commandchars=\\\{\}]
+    a - b   \textrm{same as}    a.operator-(b)
+    -a      \textrm{same as}    a.operator-()
+    a + b   \textrm{same as}    a.operator+(b)
+    +a      \textrm{same as}    a.operator+()
+\end{console}
+}
+
+
+
+\newpage
+{\texttt{Rational::pow()}, \texttt{Rational::abs()}
+  \textsc{and Related Functions}
+
+In addition to basic operators there is another method, \texttt{pow()},
+which returns the power of the \texttt{Rational} object invoking the call to
+the power of the integer passed in.
+You only need to handle the case of positive integer powers. For instance 
+\begin{console}
+std::cout << Rational(-2, 3).pow(0) << std::endl;
+std::cout << Rational(-2, 3).pow(3) << std::endl;
+std::cout << Rational(-2, 3).pow(-3) << std::endl;
+\end{console}
+produce the following output:
+\begin{console}
+1
+-8/27
+-27/8
+\end{console}
+because mathematically
+\begin{align*}
+  (-2/3)^0 &= 1 \\
+  (-2/3)^3 &= (-2/3)(-2/3)(-2/3) = -8/27 \\
+  (-2/3)^{-3} &= ((-2/3)3 )^{-1} = ((-2/3)(-2/3)(-2/3))^{-1}
+  = (-8/27)^{-1} = (-27/8)
+\end{align*}
+
+Instead of calling methods, you can achieve the same thing using the
+\texttt{pow()} function:
+\begin{console}
+std::cout << pow(Rational(-2, 3), 0) << std::endl;
+std::cout << pow(Rational(-2, 3), 3) << std::endl;
+std::cout << pow(Rational(-2, 3), -3) << std::endl;
+\end{console}
+
+[You should know from MATH104 that
+$a^0 = 1$ (if $a$ is not zero) and $(a/b)^{-1}  = b/a$.] 
+
+A function (this is not a method -- see the header file) that you need to
+implement is \texttt{abs()} which returns the absolute value
+(as a \texttt{Rational} object) of the \texttt{Rational}
+object passed in. For instance 
+\begin{console}
+std::cout << abs(Rational(-15, 7)) << std::endl;
+\end{console}
+produces the following output:
+\begin{console}
+15/7
+\end{console}
+Besides the above, your \texttt{Rational} library also allows you
+to do this:
+\begin{console}
+std::cout << Rational(-15, 7).abs() << std::endl;
+\end{console}
+
+
+\newpage
+\textsc{Type Conversion Operators}
+
+There are two methods that act as type conversion.
+Note in particular that
+\begin{itemize}
+\li \texttt{get\_int()} returns the integer value of the \texttt{Rational}
+object. For instance if \texttt{x = Rational(7,2)}, i.e. \texttt{x}
+models the (real-world) fraction \texttt{7/2} which is 3.5,
+then \texttt{x.get\_int()} return \texttt{3}, i.e., the integer part of 3.5.
+\li \texttt{get\_double()} returns the \texttt{double} value of the
+\texttt{Rational} object. For instance if \texttt{x = Rational(7,2)},
+i.e. \texttt{x} models the fraction 7/2 which is 3.5,
+then \texttt{x.get\_\textred{double}()} return 3.5 as a \texttt{double}.
+\end{itemize}
+
+
+Note that I've included (but commented out) the following prototypes
+\begin{console}
+//operator int() const;
+//operator double() const;
+\end{console}
+
+These operators are called type conversion operators.
+Their prototypes look like this:
+\[
+	\texttt{operator [type name]() const;}
+\]
+(No return type.)
+If these were implemented you can do the following:
+\begin{console}
+Rational r(7, 2);
+int i = (int) r;       // or i = int(r)
+double d = (double) r; // or d = double(r)
+\end{console}
+i.e.,
+\begin{console}[commandchars=\\\{\}]
+    (int) r       \textrm{is the same as}    r.operator int()
+    (double) r    \textrm{is the same as}    r.operator double()
+\end{console}
+
+
+Of course \texttt{operator int()} should do the same thing as
+\texttt{get\_int()} and
+\texttt{operator double()} should do the same thing as
+\texttt{get\_double()}.
+However there's a vital difference between
+\texttt{operator int()} and \texttt{get\_int()}.
+C++ will automatically use type conversion operators when
+trying to find a suitable function/method.
+For instance if you have \texttt{operator int()} implemented the following
+\begin{console}
+Rational(1, 2) + 1
+\end{console}
+will become one of the following:
+\begin{console}
+Rational(1, 2) + Rational(1)       -- 1 is auto converted to Rational(1)
+(int) Rational(1, 2) + 1           -- Rational(1,2) is auto converted to 0
+(int) Rational(1, 2) + Rational(1) -- both are auto converted
+\end{console}
+which are all valid since we have the following prototypes:
+\begin{console}
+Rational::operator+(const Rational &) const
+operator+(int, int)
+operator+(int, const Rational &);
+\end{console}
+
+At this point C++ will have problems compiling your program
+because C++ does not know
+which function/method to call!!!
+This situation is called \defterm{ambiguous invocation}.
+In fact it's even worse if you have
+\texttt{operator double()} implemented since C++ will include
+\begin{console}
+(double) Rational(1, 2) + 1
+\end{console}
+Note that C++ will only apply an automatic type conversion
+\textit{once for each parameter}.
+So for instance C++ will \textit{not} type convert the above to this:
+\begin{console}[commandchars=\\\{\}]
+Rational(1, 2) + \textbf{(double) Rational(1)}
+\end{console}
+(It's possible to prevent certain cases of ambiguous invocation by
+preventing automatic type conversion.)
+
+That's why the \texttt{int()} and \texttt{double()} type conversion
+operators have been commented out.
+It \textit{is} possible to implement \texttt{int()} and \texttt{double()}
+operators in such a way as to
+avoid ambiguous invocation but it will be too much work.
+
+By the way
+\[
+	\texttt{Rational(1)}
+\]
+is also considered a type conversion, from \texttt{int} to \texttt{Rational}. 
+
+
+
+
+\newpage
+\textsc{Test Code}
+
+The following test code is incomplete. Add tests to ensure that your Rational library
+is sufficiently tested.
+{\small
+\VerbatimInput[frame=single]{main.cpp}
+}
+
+
+Here's the test plan. The numbering refers to the test option.
+\begin{tightlist}
+\item[1.] Test input
+\item[2.] Test output
+\item[3.] Test reduce method
+\item[4.] Test reduce nonmember function
+\item[5.] Test abs method
+\item[6.] Test abs nonmember function
+\item[7.] Test \texttt{==}
+\item[8.] Test \texttt{!=}
+\item[9.] Test \texttt{>}
+\item[10.] Test \texttt{>=}
+\item[11.] Test \texttt{<}
+\item[12.] Test \texttt{<=}
+\item[13.] Test \texttt{+=}
+\item[14.] Test \texttt{-=}
+\item[15.] Test \texttt{*=}
+\item[16.] Test \texttt{/=}
+\item[17.] Test \texttt{+} (unary)
+\item[18.] Test \texttt{-} (unary)
+\item[19.] Test \texttt{+} (binary)
+\item[20.] Test \texttt{-} (binary)
+\item[21.] Test \texttt{*}
+\item[22.] Test \texttt{/}
+\item[23.] Test \texttt{get\_int}
+\item[24.] Test \texttt{get\_double}
+\item[25.] Test \texttt{int == Rational}
+\item[26.] Test \texttt{int != Rational}
+\item[27.] Test \texttt{int > Rational}
+\item[28.] Test \texttt{int >= Rational}
+\item[29.] Test \texttt{int < Rational}
+\item[30.] Test \texttt{int <= Rational}
+\item[31.] Test \texttt{int += Rational}
+\item[32.] Test \texttt{int -= Rational}
+\item[33.] Test \texttt{int *= Rational}
+\item[34.] Test \texttt{int /= Rational}
+\item[35.] Test \texttt{int + Rational}
+\item[36.] Test \texttt{int - Rational}
+\item[37.] Test \texttt{int * Rational}
+\item[38.] Test \texttt{int / Rational}
+\item[39.] Test \texttt{pow} non-member function
+\item[40.] Test \texttt{pow} member function of \texttt{Rational}
+\end{tightlist}
+
+
+\textsc{Asides}
+
+With the \texttt{Rational} class,
+you can of course perform computations involving fractions.
+
+For instance you know how to find integer solutions to say
+$x^2 - 4y^2 = 1$ in some range range (say $-10..10$ for both $x$ and $y$):
+\begin{console}
+for x = -10, -9, ..., 9, 10:
+    for y = -10, -9, ..., 9, 10:
+        if x * x - 4 * y * y == 1, then print x, y
+\end{console}
+For fractions, you can do this:
+\begin{console}[commandchars=\\\{\}]
+for n0 = -10, -9, ..., 9, 10:
+    for d0 = -10, -9, ..., 9, 10:
+        for n1 in -10, ..., 10:
+            for d1 in -10, ..., 10:
+                r = Rational(n0,d0)
+                s = Rational(n1,d1)
+                if r * r - 4 * s * s == 1, then print r, s
+\end{console}
+In this case, you'll only find solutions with the numerators and
+denominators in the given range.
+Note that there is an infinite number of fractions
+in any closed interval with more than one point.
+For instance in [0,1],
+you have 1/2 and 1/3 and 1/4 and ...
+Another thing to note is that there are many repeats
+in the above example.
+For instance the loops will run
+through 1/2 several times because 3/6, 4/8, 5/10 are all the same as 1/2.
+
+You probably know that
+\[
+	1 + 1/2 + 1/4 + 1/8 + 1/16 + 1/32 + \cdots = 1 / (1 - 1/2) = 2
+\]
+Now you can use your \texttt{Rational} class like the following and see
+what happens when you compute the left-hand side up to $1/1024$:
+\[
+1 + 1/2 + 1/4 + 1/8 + 1/16 + 1/32 + \cdots + 1/1024
+\]
+
+You can also use your \texttt{Rational} to give an approximation to
+$\pi$ using this \lq\lq stack'' of fractions expression for $\pi$:
+\[
+\pi
+=
+\frac{4}
+{
+  1 + 
+  \frac{1^2}
+  {
+    2 +
+    \frac{3^2}
+    {
+      2 +
+      \frac{5^2}
+      {
+        2 +
+        \frac{7^2}
+        {
+          2 +
+          \frac{9^2}
+          {
+            2 + \frac{11^2}{\ddots}
+          }
+        }
+      }
+    }
+  }
+}
+\]
+Obviously if you want to do this, you have to stop at some point, say up to
+$1001^2$. (The expression on the right is called a
+\lq\lq continued fraction''.)
+
+
+\newpage
+\textsc{*** SPOILER ON INEQUALITIES ***}
+
+Note that if $a,b,c,d$ are integers, then
+\[
+\frac{a}{b} < \frac{c}{d}
+\]
+is the same as
+\[
+a d < c b
+\]
+if $b > 0$ and $d > 0$.
+You have to switch the direction of inequality if $b$ is negative,
+and you have to switch it twice if both $b$ and $d$ are negative.
+This is from your elementary algebra course (MATH104).
+This means that
+\[
+\frac{a}{b} < \frac{c}{d}
+\text{ is the same as }
+\begin{cases}
+  ad < bc  \text{ if $b > 0$, $d > 0$} \\
+  ad > bc  \text{ if $b > 0$, $d < 0$} \\
+  ad > bc  \text{ if $b < 0$, $d > 0$} \\
+  ad < bc  \text{ if $b < 0$, $d < 0$} 
+\end{cases}
+\]
+Likewise
+\[
+\frac{a}{b} \leq \frac{c}{d}
+\text{ is the same as }
+\begin{cases}
+  ad \leq bc  \text{ if $b > 0$, $d > 0$} \\
+  ad \geq bc  \text{ if $b > 0$, $d < 0$} \\
+  ad \geq bc  \text{ if $b < 0$, $d > 0$} \\
+  ad \leq bc  \text{ if $b < 0$, $d < 0$} 
+\end{cases}
+\]
+
+\end{document}

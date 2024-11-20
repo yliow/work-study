@@ -1,0 +1,160 @@
+%-*-latex-*-
+\textsc{Stream I/O}
+
+The input processing done like this:
+\begin{console}[fontsize=\small]
+int x;
+double y;
+char z[1024];
+
+std::cin >> x >> y >> z;
+\end{console}
+works fine.
+But note that for C-string input, whitespaces ends the input.
+For instance if you run this:
+\begin{console}[fontsize=\small]
+char z[1024];
+
+std::cin >> z;
+std::cout << z << std::endl;
+\end{console}
+and you attempt to enter two words as input into \verb!z! you will see this:
+\begin{console}[fontsize=\small,commandchars=\\\{\}]
+\userinput{hello world}
+hello
+\end{console}
+In other words \verb!z! contains only \verb!"hello"!.
+\verb!world! is actually still in the \lq\lq input stream" -- it's not
+transferred to your program.
+You can of course get the second word \verb!world! like this:
+\begin{console}[fontsize=\small]
+char z[1024];
+char w[1024];
+
+std::cin >> z >> w;
+std::cout << z << std::endl;
+std::cout << w << std::endl;
+\end{console}
+Then you will get this when you execute the program:
+\begin{console}[fontsize=\small, commandchars=\\\{\}]
+\userinput{hello world}
+hello
+world
+\end{console}
+
+What if you want to have the whole line of input into a C-string
+variable where the string contains whitespaces?
+
+Run the following program:
+\begin{console}[fontsize=\small]
+#include <iostream> 
+#include <limits> 
+
+const int MAX_BUF = 1024; 
+
+int main() 
+{ 
+    char s[MAX_BUF]; 
+    std::cin.getline(s, MAX_BUF); 
+    std::cout << '[' << s << "]\n"; 
+
+    return 0;
+} 
+\end{console}
+and enter a string with spaces.
+
+If you want to writing a program that continually gets a string from the user,
+try the following program:
+\begin{console}[fontsize=\small]
+#include <iostream> 
+#include <limits> 
+
+const int MAX_BUF = 1024; 
+
+int main() 
+{ 
+    while (1) 
+    { 
+        char s[MAX_BUF]; 
+        std::cin.getline(s, MAX_BUF); 
+        if (std::cin.eof()) break; 
+        if (std::cin.fail() || std::cin.bad()) 
+        { 
+            std::cin.clear(); 
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+        else
+        {
+            std::cout << '[' << s << "]\n";
+        }
+    }
+
+    return 0;
+} 
+\end{console}
+Note in particular that your program must terminate when an EOF
+(i.e., end-of-file) is reached:
+\begin{console}[fontsize=\small]
+if (std::cin.eof()) break;
+\end{console}
+On the MS windows console window, if you do Ctrl-Z and then
+press the enter key, you will get an EOF condition.
+On the Linux/Unix environment, you would do Ctrl-D.
+
+To make your program robust and platform independent,
+you have to know that the string read from a stream might
+have non-visible characters at the end of the string.
+For instance on some systems,
+when a user press the enter key, the character
+\verb!'\r'! is placed in the stream.
+The system might also placed \verb!'\n'! in the string stream as well.
+This means that a string read from the stream (up to \verb!'\n'!)
+might end with \verb!'\r'! (and possibly also contain \verb!'\n'!).
+You are strongly advised to remove all such right-trailing characters from
+your strings which are read from a stream.
+In other words after a string input process, say with the input
+going into character array variable \verb!s!,
+you should look at the characters just before \verb!'\0'!
+and see if there is \verb!\r! or \verb!\n! or both.
+For instance after an input, say \verb!s! is
+\verb!"hello world\r\n\0..."!
+you should make it
+\verb!"hello world\0..."!
+
+
+To analyze all the characters in your C-string \verb!s!, you can
+of course print the ASCII code of the characters
+in \verb!s! and have an ASCII table in front of you:
+{\small
+\begin{Verbatim}[frame=single]
+#include <iostream> 
+#include <limits> 
+#include "mystring.h"
+
+const int MAX_BUF = 1024; 
+
+int main() 
+{ 
+    while (1) 
+    { 
+        char s[MAX_BUF]; 
+        std::cin.getline(s, MAX_BUF); 
+        if (std::cin.eof()) break; 
+        if (std::cin.fail() || std::cin.bad()) 
+        { 
+            std::cin.clear(); 
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+        else
+        {
+            std::cout << '[' << s << "]\n";
+            for (int i = 0; i < str_len(s); ++i)
+            {
+                std::cout << i << ' ' << s[i] << ' ' << int(s[i]) << std::endl;
+            }
+        }
+    }
+    return 0;
+} 
+\end{Verbatim}
+}
