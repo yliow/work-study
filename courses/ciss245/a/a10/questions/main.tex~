@@ -1,0 +1,989 @@
+\input{myassignmentpreamble}
+\input{ciss245}
+\input{yliow}
+
+\renewcommand\TITLE{Assignment 10}
+
+\begin{document}
+\topmatter
+
+\objectives
+{
+    \begin{enumerate}
+    \item Declare objects
+    \item Access member variables of an object
+    \item Write member functions/operators
+    \item Work with classes containing pointer members
+    \item Overwrite default methods (constructors, destructors)
+    \item Overload operators
+    \end{enumerate}
+}
+
+\newpage
+
+\textbf{Q1.} The objective is to write a class, \verb!IntDynArr!, that 
+models a dynamic array of integers. In particular, the class to 
+be implemented uses system resources (i.e. memory) and hence several
+default operators (example: the destructor, copy constructor and operator=) 
+must be overwritten. 
+
+You will need to write three files:
+\begin{tightlist}
+\li \verb!testIntDynArr.cpp!: This contains a program to test the \verb!IntDynArr! class 
+and it's supporting functions and operators.
+\li \verb!IntDynArr.h!: This is the header function containing the \verb!IntDynArr! class.
+\li \verb!IntDynArr.cpp!: This file contains the definitions for the methods in 
+\verb!IntDynArr.h!.
+\end{tightlist}
+
+As before all methods/functions implemented should be tested carefully in the 
+test code. 
+
+Read the following carefully before you dive straight into coding. As before, 
+you should minimize code duplication, provide reasonable access control 
+(i.e., \verb!const! a reference parameter whenever possible), code with proper 
+indentation, etc. 
+
+Such a class is extremely important because in the real world, we want to 
+work with arrays with different sizes during runtime. In fact it's so important 
+that C++ actually has a library call the Standard Template Library (STL) that 
+includes a class similar to the class in this assignment. 
+
+With this class written, you can do the following easily:
+\begin{Verbatim}[frame=single]
+// Work with x which simulates an array of 5 integers
+IntDynArr x(5);
+for (int i = 0; i < 5; i++)
+{
+    x[i] = 2 * i + 1;
+}
+std::cout << x << std::endl; // prints [1, 3, 5, 7, 9]
+
+x.insert(0, -100); // put -100 at index 0
+std::cout << x << std::endl; // prints [-100, 1, 3, 5, 7, 9]
+// Note that now x simulates an array of size 6, not 5.
+// Therefore your array class actually allows x to change its
+// size auto-magically!
+
+x.insert(0, -100); // put -100 at index 0
+std::cout << x << std::endl; // prints [-100, 1, 3, 5, 7, 9]
+// Note that now x simulates an array of size 6, not 5.
+// Therefore your array class actually allows x to change its
+// size auto-magically!
+
+x.remove(3); // remove value at index 3
+std::cout << x << std::endl; // prints [-100, 1, 3, 7, 9]
+// Note that now x simulates an array of size 5.
+
+x.remove(3); // remove value at index 3
+std::cout << x << std::endl; // prints [-100, 1, 3, 9]
+// Note that now x simulates an array of size 4.
+\end{Verbatim}
+Other methods and operators are described more fully in 
+the next section. 
+
+Once this class is completed, you can easily modify for 
+different values such as a dynamic array of strings, of 
+doubles, of alien spaceships, etc.
+
+
+\newpage
+\textsc{Requirements}
+
+You know that C/C++ arrays have constant sizes if the 
+arrays are in your local blocks scope. One way to 
+\lq\lq make" an array dynamic is to use pointers to point 
+to arrays in the heap. Hence it makes sense to create a 
+class that models a \lq\lq dynamic" array and hide all 
+the complexities in this class. 
+
+The private members of IntDynArr includes 
+\begin{tightlist}
+\li \verb!size! (an \verb!int!), 
+\li \verb!capacity! (an \verb!int!), and
+\li \verb!x! (an \verb!int *!)
+\end{tightlist}
+
+What is the purpose of the \verb!capacity! instance variable? 
+(I've talked about this in CISS240. Also, refer to the notes 
+in CISS245.)
+
+Suppose you construct an \verb!IntDynArr! object that models 
+an array with \verb!size! 100. At a later point in time, you might 
+want the object to model an array of \verb!size! 90 instead. You 
+can for instance allocate new memory of 90 integers for this 
+object to refer, copy the contents of the old array to the 
+new, and deallocate the original 100 integers. But the 
+problem is, suppose you later want to model an array of 100 
+integers again. You have to do the memory deallocation and 
+allocation again. A better scheme in this case is to allocate 
+memory for 100 integers and set the \verb!size! to 100. When you need 
+the array size to be 90, just set the \verb!size! to 90; you still have 
+100 integers available, it's just that 10 of them should not be 
+accessed. When you need 100 integers again, just set the \verb!size! to 
+100. See notes below for details on \verb!size! and \verb!capacity!.
+
+Recall that since each \verb!IntDynArr! object has a pointer member that 
+points to an array of integers (i.e. it uses system resource that is not 
+automatically released), you need to overwrite the 
+\begin{tightlist}
+\li Default destructor \verb!~IntDynArr()! to release the memory x is 
+pointing to
+\li Default copy constructor \verb!IntDynArr(const IntDynArr &)!
+\li Default \verb!IntDynArr & operator=(const IntDynArr &)!
+\end{tightlist}
+
+The reason for overwriting the above default methods are already 
+mentioned in class.
+
+\begin{enumerate}
+\item \verb!IntDynArr(int size0)!: Constructs an object so that 
+\verb!size! is set to \verb!size0! and \verb!x! points to an 
+integer array in the heap with \verb!size0! integers.
+
+\item \verb!IntDynArr(int size0, int a[])!: Similar to \verb!IntDynArr(size0)!
+except that a is an array of integers and the contents of a are copied over 
+to the integer array \verb!x! is pointing to.
+
+\item \verb!IntDynArr(const IntDynArr &)!: This is the obvious copy 
+constructor. 
+
+\item \verb!~IntDynArr()!: The destructor must release all resources held by 
+an object.
+
+\item \verb!int get_size() const!: returns the value of the \verb!size!.
+\item \verb!int get_capacity() const!: returns the value of the 
+\verb!capacity!.
+
+\item \verb!bool operator==(const IntDynArr & arr) const!: Returns true if 
+the array object \verb!*this! and \verb!arr! are the same in the sense that 
+their sizes and “contents” are the same. Here, \lq\lq contents” mean the 
+values in the array from index 0 to \verb!size - 1!. 
+
+\item \verb@bool operator!=(const IntDynArr & arr) const@: The opposite of 
+\verb!operator==!.
+
+\item \verb!IntDynArr & operator=(const IntDynArr & arr)!: After assignment, 
+\verb!*this==arr! would return \verb!true!. See notes below.
+
+\item \verb!std::ostream & operator<<(std::ostream &, const IntDynArr & a)!: 
+Prints the contents of the array \verb!a.x! is pointing to. Integers are 
+separated by spaces. For instance if \verb!a.x! points to the array 
+4, 5, 8, 9,2 and \verb!a.size! is 3, then \lq\lq [4, 5, 8]” is printed 
+(without the quotes of course). Note that this is a function outside the 
+class, i.e., it's a nonmember function.
+
+\item \verb!std::istream & operator>>(std::istream &, IntDynArr & a)!: 
+Read in a list of integers from the keyboard until you see a -1 and 
+fill in the dynamic array with the integers you just read. You must clear 
+the existing values in the array and adjust its size and capacity as 
+appropriate. As you should know by now, this is also a nonmember function. 
+
+\item \verb!void resize(const int size0)!: This method \lq\lq resizes" the 
+array \verb!x! is pointing to. This is what it does: Suppose a is an 
+\verb!IntDynArr! object that models an array of \verb!size! 10. After 
+calling \verb!a.resize(15)!, the a models an array of size 15. The 
+contents of the original array of 10 integers are copied over to the 
+new array of size 15 starting at index 0. This means that 5 elements of 
+the new array can contain arbitrary values. Note that there should not be 
+any memory leaks after the call. For the above example, the array of 10 
+integers a.x was pointing to must be released back to the heap. See notes 
+below for details.
+
+\item \verb!int operator[](int i) const! and \verb!int & operator[](int i)!:
+Note that there are two operators here. They returns \verb!x[i]! either as an 
+integer value or an integer reference. The first allows us to do this:
+
+\begin{Verbatim}[frame=single]
+IntDynArr arr(5);
+std::cout << arr[0] << std::endl;  // arr[0] is arr.operator[](0)
+\end{Verbatim}
+
+Now you might wonder why are we need a version \verb!operator[]! that 
+returns a reference (\verb!int &!) instead of just an integer. If 
+\verb!operator[]! returns an integer, then the return value is an 
+integer value and in that case
+
+\begin{Verbatim}[frame=single]
+std::cout << arr[0] << std::endl;  // arr[0] is arr.operator[](0)
+\end{Verbatim}
+
+works. But
+
+\begin{Verbatim}[frame=single]
+arr[0] = 3;
+\end{Verbatim}
+
+does not work. If \verb!arr.x[0]! is 5 and we returned an \verb!int! 
+(instead of an integer reference), then \lq\lq \verb!arr[0] = 3!" would 
+be the same as saying \lq\lq \verb!5 = 3;!" which is of course nonsense. 
+However if \verb!operator[]! returns a reference, in that case what is 
+returned in not an integer but a reference to \verb!arr.x[0]!, an integer 
+“variable”. (Refer to your lecture notes on references.) Therefore for the 
+statement
+
+\begin{Verbatim}[frame=single]
+arr[0] = 3;
+\end{Verbatim}
+
+the second \verb!operator[]! (the one that returns a reference) is called. 
+This was already mentioned in class several times when I talked about 
+returning references.
+
+\item \verb!IntDynArr & operator+=(const IntDynArr & a)!: This operator will 
+\lq\lq append” (or concatenate) the contents of a to the object invoking this 
+operator. For instance if object \verb!x! models the array 1, 2, 3, and object 
+a models the array 7, 8, 9, then \verb!x += a! will modify \verb!x! so that it 
+models the array 1, 2, 3, 7, 8, 9.
+
+\item \verb!IntDynArr operator+(const IntDynArr & a) const!: This operator will 
+return a copy of the object which is the concatenation of the contents of the 
+object invoking the call with the contents of \verb!a!. For instance of object 
+\verb!x! models the array 1, 2, 3, and object a models the array 7, 8, 9, then 
+\verb!x + a! will return an object that models the array 1, 2, 3, 7, 8, 9.
+
+\item \verb!IntDynArr & insert(int index, int val)!: This will modify the 
+object invoking this method by inserting value val at index \verb!index!. 
+For instance if the object \verb!x! models the array 1, 2, 3, after the 
+method call \verb!x.insert(9, 1)!, \verb!x! will model 
+the array 1, 9, 2, 3.
+
+\item \verb!IntDynArr & remove(int index)!: This will modify the object 
+invoking this method by removing value at index \verb!ind!. For instance 
+if the object \verb!x! models the array 1, 2, 3, after the method call 
+\verb!x.remove(1)!, \verb!x! will model the array 1, 3.
+
+\item \verb!IntDynArr subarray(int index, int length = -1) const!: This 
+will return an \\ \verb!IntDynArr! object which is \lq\lq part of” the object 
+invoking the method. For instance if the object \verb!x! models the 
+array 90, 91, 92, 93, 94, 95, 96, then \verb!x.subarray(3, 2)! will 
+return an \verb!IntDynArr! object that models the array 93, 94. If the 
+length argument is not specified, then all the values from the specified 
+index to the end of object are used in creating the new object. For 
+instance, with the above object \verb!x!, calling  \verb!x.subarray(3)! 
+will return an \verb!IntDynArr! object that models the array 93, 94, 95, 95.
+
+\item \verb!void print() const!: This is the \\
+\verb!std::ostream & operator<<(std::ostream &, IntDynArr & a)! except that 
+it prints the \verb!size! and \verb!capacity! as well. It also prints a newline. 
+This can be used for debugging purposes. For instance if \verb!a.x! \\ points to 
+the array 4, 5, 8, 9,2 and \verb!a.size! is 3, then \\ 
+\lq\lq \verb![4, 5, 8], size:3, capacity:5\n!" is printed (without the quotes of 
+course).
+
+\end{enumerate}
+
+Note that you will see many actions taken by methods are similar. For instance 
+arrays are copied in both the copy constructor and \verb!operator=!. You must 
+avoid code duplication. You can create \lq\lq helper" functions used by methods in 
+your class. These can be either functions or methods. For example:
+\begin{Verbatim}[frame=single]
+// C.h
+void helper(...);
+class C
+{
+    ...
+};
+
+// C.h
+class C
+{
+    ...
+    void helper(...);
+    ...
+};
+\end{Verbatim}
+
+Note that if declared as a method, you can \lq\lq hide” the helper method 
+from outsiders by placing it under the \verb!private! section of the class:
+
+\begin{Verbatim}[frame=single]
+// C.h
+class C
+{
+    ...
+private:
+    ...
+    void helper(...);
+    ...
+};
+\end{Verbatim}
+
+\newpage
+\textsc{Error on Allocating Memory}
+
+It is a good practice (and you must follow it) to check your pointer after a 
+memory allocation.  Failure of memory allocation can be checked by comparing 
+the pointer's value. If memory is not allocated, the pointer is set to 
+\verb!NULL!. The following is an example:
+
+\begin{Verbatim}[frame=single]
+int * p = new int;
+if (p == NULL)
+{
+    std::cout << "ERROR!!! You ran out of member!!!"
+}
+else // memory is allocated
+{
+    ...
+}
+\end{Verbatim}
+
+If a pointer is not allocated memory after a new operator call, your program 
+must print the string \lq\lq ERROR: memory allocation returns NULL".
+
+This is the only action you have to take when there is a memory allocation 
+error. In a real software, it's likely that the program will print a message 
+and then completely halt the program. 
+
+(Actually there are two possible ways to check for memory allocation errors 
+and both should be used if possible. We won't be able to talk about the other 
+method because it involves the concept of “exceptions” which we will be talk 
+about later.)
+
+
+\newpage 
+\textsc{\textnormal{\texttt{operator=}} and copying}
+
+[This section is included for your benefit. We already talked about the 
+problems of direct member-wise copying for pointer members in class.]
+
+The following notes involves some form of copying between objects in the 
+context where pointers are involved. Suppose we first look at a very simple 
+situation:
+
+\begin{Verbatim}[frame=single]
+class Dummy
+{
+private:
+    int x;
+    double y;
+    char z;
+};
+\end{Verbatim}
+
+If you execute the following code:
+
+\begin{Verbatim}[frame=single]
+Dummy a, b;
+b = a;  // b invokes operator= with a as argument
+Dummy c = a;    // c invokes copy constructor with a as argument
+\end{Verbatim}
+
+In both cases, the values of instance variables of \verb!a! are copied to 
+corresponding instance variables of \verb!b! and \verb!c!. In other words, 
+\verb!a.x! is copied over to \verb!b.x!, etc.
+
+This is not always appropriate. For instance in the case where an instance 
+variable points to an array. The following discussion on copying the contents 
+from an object to another there a pointer to an array is involved is relevant 
+to any copying behavior in an object, including \verb!operator=! and the copy 
+constructor. 
+
+Suppose \verb!a! is an object where the \verb!x! member is a pointer to an 
+array of 4 integers in the heap:
+
+\begin{center}
+\verb!a: x -----------------> 1, 3, 2, 5!
+\end{center}
+
+(I'm only writing down the \verb!x! instance variable of \verb!a!. There 
+might be others. But for this discussion they are irrelevent.) Now suppose 
+you have another object from the same class:
+
+\begin{center}
+\verb!b: x -----------------> 6, 3, 2!
+\end{center}
+
+After the statement \lq\lq \verb!b = a;!", you want this:
+
+\begin{center}
+\verb!a: x -----------------> 1, 3, 2, 5! \\
+\verb!b: x -----------------> 1, 3, 2, 5!
+\end{center}
+
+This is obvious different from just executing the 
+statement \lq\lq \verb!b.x = a.x;!" which will give this 
+picture instead:
+
+\begin{center}
+
+\begin{BVerbatim}
+a: x -------------+---> 1, 3, 2, 5
+                 /
+   x -----------/
+\end{BVerbatim}
+
+\end{center}
+
+where \verb!b.x! will point to what \verb!a.x! is pointing 
+to. As mentioned in class, when a calls the destructor, the
+memory \verb!a.x! is pointing will be released and \verb!b.x! 
+will be pointing to an invalid memory location in the heap.
+
+\begin{BVerbatim}
+                       +---> ? (memory not allocated)! 
+                      /
+    b: x ------------/
+\end{BVerbatim}
+
+so that when \verb!b! called the destructor an error will occur 
+when we try to do a \verb!delete []! on \verb!x!. (We already 
+talked about this in class.) 
+
+The correct sequence of events is depicted below:
+\begin{Verbatim}
+            a: x -----------------> 1, 3, 2, 5
+            b: x -----------------> 6, 3, 2
+\end{Verbatim}
+
+\qquad First release the memory \verb!b.x! is pointing to: 
+\begin{Verbatim}
+            a: x -----------------> 1, 3, 2, 5
+            b: x -----------------> ?, ?, ? (memory not allocated)
+\end{Verbatim}
+
+\qquad Allocate enough memory for \verb!b.x! to point to  
+\begin{Verbatim}
+            a: x -----------------> 1, 3, 2, 5
+            b: x -----------------> ?, ?, ?, ? (memory allocated)
+\end{Verbatim}
+
+\qquad Copy values \verb!a.x! is pointing to array b.x is pointing to: 
+\begin{Verbatim}
+            a: x -----------------> 1, 3, 2, 5
+            b: x -----------------> 1, 3, 2, 5
+\end{Verbatim}
+
+TADA! That's it. But there's a problem. This is a very subtle problem. 
+Suppose the above is the sequence of events in \verb!operator=! when 
+we execute \lq\lq \verb!a = b;!". If \verb!a! and \verb!b! are distinct 
+objects, then the above operations, then the above is in fact correct. 
+But what if a and b are actually the same objects?? This can happen when 
+for instance we have this:
+
+\begin{Verbatim}[frame=single]
+IntDynArr a(5);
+IntDynArr & b = a; // b is a reference to a
+\end{Verbatim}
+
+Now let's track the above sequence of events:
+
+\begin{Verbatim}
+            a: x -----------------> 1, 3, 2, 5
+            b (reference to a)
+\end{Verbatim}
+
+\qquad First release the memory \verb!b.x! is pointing to (same as released
+\verb!a.x!):
+\begin{Verbatim}
+            a: x -----------------> ?, ?, ?, ? (memory not allocated)
+            b (reference to a)
+\end{Verbatim}
+
+\qquad Allocate enough memory for \verb!b.x! to point to (same as allocating 
+memory for \verb!a.x!) 
+\begin{Verbatim}
+            a: x -----------------> ?, ?, ?, ? (memory allocated)
+            b: (reference to a)
+\end{Verbatim}
+
+\qquad Copy values \verb!a.x! is pointing to array \verb!b.x! is pointing to 
+(same as copying \verb!a.x! to \verb!a.x!!!!) 
+\begin{Verbatim}
+            a: x -----------------> ?, ?, ?, ? (memory allocated)
+            b: (reference to a)
+\end{Verbatim}
+
+Now what?? Well, if \verb!a! and \verb!b! are the same objects (as in 
+\verb!b! is a reference to \verb!a! or \verb!a! is a reference to \verb!b!), 
+then we don't even want to perform anything at all since ... well they are 
+the same. This means that before you perform the above \verb!delete []!, 
+new, copy values operations, you need to check if the objects are the same 
+and you can check if the objects are the same by looking at their memory 
+addresses. Here's then the beginning of \verb!operator=! (the same idea 
+applies to the copy constructor):
+
+\begin{Verbatim}[frame=single]
+IntDynArr & IntDynArr::operator=(const IntDynArr & b) 
+{
+    if (this == &b) return; // don't do anything if b and *this 
+                            // are the same objects
+
+    ...
+}
+\end{Verbatim}
+
+This is a very subtle error so make sure you remember it.
+
+Since the copy constructor and \verb!operator=! are very similar, parts 
+of their code will be the same. Do not duplicate code. You can create a 
+function that both the copy constructor and
+\verb!operotor=! can both use.
+
+
+
+\newpage
+\textsc{Size and Capacity}
+
+The size of the array the \verb!x! instance variable is pointing 
+to is \verb!capacity!. The instance variable \verb!size! actually 
+indicates the number of elements in the array that are valid. When 
+you call the constructor
+
+\begin{Verbatim}[frame=single]
+IntDynArr a(5);
+for (int i = 0; i < 5; i++) a[i] = i;
+\end{Verbatim}
+
+\verb!a.x! points to an array of 5 integers. Both size and capacity 
+are set to 5.
+
+\begin{Verbatim}
+            a: size = 5
+               capacity = 5
+               x ----------------------------> 0,1,2,3,4
+\end{Verbatim}
+
+Now when we call
+
+\begin{Verbatim}[frame=single]
+a.resize(3);
+\end{Verbatim}
+
+we get the following picture:
+
+\begin{Verbatim}
+            a: size = 3
+               capacity = 5
+               x ----------------------------> 0,1,2,3,4
+\end{Verbatim}
+
+Although \verb!a.x! still points to an array of 5 integers, only 
+the first three make up the array \verb!a! is modeling. \verb!a.x[3]!
+and \verb!a.x[4]! are are not considered part of the array. Accessing 
+them should be considered an incorrect operation. We are not enforcing 
+the check now but later I will show you how to generate an error 
+(called an \lq\lq exception" object which can cause a program to halt). 
+Now suppose we call
+
+\begin{Verbatim}[frame=single]
+a.resize(4);
+\end{Verbatim}
+
+we get this picture:
+
+\begin{Verbatim}
+            a:  size = 4
+                capacity = 5
+                x ----------------------------> 0,1,2,3,4
+\end{Verbatim}
+
+and when we call
+
+\begin{Verbatim}[frame=single]
+a.resize(5);
+\end{Verbatim}
+
+we get the original picture:
+
+\begin{Verbatim}
+            a: size = 5
+               capacity = 5
+               x ----------------------------> 0,1,2,3,4
+\end{Verbatim}
+
+But what if we request for more memory such as:
+
+\begin{Verbatim}[frame=single]
+a.resize(6);
+\end{Verbatim}
+
+The end result of this call can be described by this picture:
+
+\begin{Verbatim}
+            a: size = 6
+               capacity = 12
+               x ----------------------------> 0,1,2,3,4,?,?,?,?,?,?,?
+\end{Verbatim}
+
+(where ? denotes garbage value).
+
+Note that the \verb!capacity! is 12, i.e., twice of \verb!size!. First of all 
+let me tell you how to achieve this. Next I will explain why you try to grab 
+so much memory, i.e., 12 and not just 6.
+
+The above \verb!resize! operation can be achieved by doing this:
+
+\begin{Verbatim}
+            a: size = 5
+               capacity = 5
+               x ----------------------------> 0,1,2,3,4
+\end{Verbatim}
+
+\qquad Declare a local int pointer to point to an array with 2*6 integers and set 
+\verb!capacity!=12: 
+\begin{Verbatim}
+            a: size = 5
+               capacity = 12
+               x -------------------------------> 0,1,2,3,4
+               p -------------------------------> ?,?,?,?,?,?,?,?,?,?,?,?
+\end{Verbatim}
+
+\qquad Copy old values to array \verb!p! is pointing to: 
+\begin{Verbatim}
+            a: size = 5
+               capacity = 12
+               x -------------------------------> 0,1,2,3,4
+               p -------------------------------> 0,1,2,3,4,?,?,?,?,?,?,?
+\end{Verbatim}
+
+\qquad Deallocate memory \verb!a.x! is pointing to (in order to avoid memory leak): 
+\begin{Verbatim}
+            a: size = 5
+               capacity = 12
+               x ------------------------------->
+               p -------------------------------> 0,1,2,3,4,?,?,?,?,?,?,?
+\end{Verbatim}
+
+\qquad Point \verb!a.x! to memory \verb!p! is pointing to (i.e., \verb!x! and \verb!p! 
+have the same address): 
+\begin{Verbatim}
+            a: size = 5
+               capacity = 12
+\end{Verbatim}
+\begin{Verbatim}
+            x -------------------\
+                                  \
+            p ---------------------+---> 0,1,2,3,4,?,?,?,?,?,?,?
+\end{Verbatim}
+
+\qquad Set the size to 6:
+\begin{Verbatim}
+            a: size = 6
+               capacity = 12
+\end{Verbatim}
+\begin{Verbatim}
+            x -------------------\
+                                  \
+            p ---------------------+---> 0,1,2,3,4,?,?,?,?,?,?,?
+\end{Verbatim}
+
+\qquad When you return from the resize method p is destroyed (since it's a local variable):
+\begin{Verbatim}
+            a: size = 6
+               capacity = 12
+\end{Verbatim}
+\begin{Verbatim}
+            x -------------------\
+                                  +----> 0,1,2,3,4,?,?,?,?,?,?,?
+\end{Verbatim}
+
+Note that when you \verb!resize!, values in the array are preserved whenever 
+possible.
+
+The above refers to \verb!resize! in the context of a new larger size which 
+is larger than the \verb!capacity!.  You always allocate memory for twice the new size.
+
+Now why do you want to do something like that? Why not just allocate memory for the 
+exact size? Suppose you are in a situation where you \verb!resize! by 1 more each time. 
+For instance you want to execute \verb!a.resize(6), a.resize(7), a.resize(8),! etc. 
+Then the memory deallocation and allocation will be too costly. The above method of 
+grabbing more memory than needed is to save on CPU time for allocation and deallocation. 
+After the resize operation, if you need more memory for the array, you must have twice 
+as much as you need.
+
+What happens when you \verb!resize! to a \underline{\textbf{\textit{smaller}}} size? If 
+the new \verb!size! is smaller than 1/3 of the \verb!capacity!, you have to deallocate 
+so that the new \verb!capacity! is again twice the actual size needed. Let's do an example.
+
+\begin{Verbatim}[frame=single]
+IntDynArr a(12);
+for (int i = 0; i < 12; i++) a[i] = i;
+\end{Verbatim}
+
+The picture at this point is
+
+\begin{Verbatim}
+            a: size = 12
+               capacity = 12
+               x -------------------------> 0,1,2,3,4,5,6,7,8,9,10,11
+\end{Verbatim}
+
+Now we execute:
+
+\begin{Verbatim}[frame=single]
+a.resize(3);
+\end{Verbatim}
+
+Note that 3 is less than 1/3 of 12 (which is 4). The end result should be
+
+\begin{Verbatim}
+            a: size = 3
+               capacity = 6
+               x -------------------------> 0,1,2,?,?,?
+\end{Verbatim}
+
+If instead of the above we execute this:
+
+\begin{Verbatim}[frame=single]
+a.resize(5);
+\end{Verbatim}
+
+we get the following picture instead:
+
+\begin{Verbatim}
+            a: size = 5
+               capacity = 12
+               x -------------------------> 0,1,2,3,4,5,6,7,8,9,10,11
+\end{Verbatim}
+
+[Note for those who want to know more: Note that, for us, when a resize 
+resulted in a change to the capacity, the capacity is 
+\underline{\textbf{\textit{twice}}} the new size. 
+Some dynamic array classes use 1.5 times instead of 2 times.]
+
+The methods in your class must follow the following rules on size and capacity:
+\begin{tightlist}
+\li The amount of memory (i.e. the capacity) allocated by constructors is the 
+same as the size. 
+\li Except for \verb!operator[]!, all other relevant methods and operators 
+must change the capacity of the object according to the above rule. In 
+other words, there is no change in the memory allocation when the 
+new size is between capacity/3 and capacity; but when the size is \textless
+\, capacity/3 or \textgreater \, capacity, memory is re-allocated so that the new capacity 
+is twice the new size. This applies to \verb!resize()!, \verb!operator+=!, 
+\verb!operator=!, \verb!insert()!, and \verb!remove()!.
+\end{tightlist}
+
+\newpage
+\textsc{A Common Error}
+
+A very common error I see is that students simply change the value of 
+\verb!capacity! assuming that the the point x will point to an array of 
+different size. If your object has point x pointing to an array of 100 
+integers (and capacity is set to 100), obviously simply by changing 
+\verb!capacity! 1000 does not mean that x has valid access to 1000 
+integers in the heap!!!
+
+That's like saying if you have a bathtub labeled 50 gallons and you 
+simply took black paint and change the label to 500 gallons that your 
+bathtub will hold 500 gallons. That obviously is not true. You have 
+to change the bathtub to actually achieve a new capacity.
+
+Likewise if you want your x (in the object) to point to an array of 
+with 1000 integers instead of 100, you have to request for 1000 from 
+the heap and point your x to that new array in the heap (and of course 
+making sure that the memory for the original 100 was deallocated properly.)
+
+
+\newpage
+\textsc{\lq\lq Default" Value}
+
+Take note of the following cases:
+\begin{tightlist}
+\li There is no check on array bound when \verb!operator[]()! is called. 
+(In other words in such cases, the program can cause an error.) You can 
+however choose your own default value for testing purposes.
+\li If an array is resized, your class need not assign values to the extra 
+elements, i.e., their values can be random. You can however choose your own 
+default value for testing purposes.
+\end{tightlist}
+
+
+\newpage
+\textsc{Problems with Heap Usage}
+
+There are several tools for debugging programs with incorrect memory (or heap) 
+usage. For instance you might want to google “c++ debug memory leak” or more 
+specifically “c++ g++ debug memory leak” or “c++ .net studio debug memory leak”. 
+
+But the most important thing for you is to analyze carefully what your code 
+should do and write your code carefully rather than dive in without careful 
+thought and then hope that memory debugging tools will save you. You will find 
+that memory debugging a badly written piece of code can take a lot more time than 
+just simply writing better and correct code to begin with.
+
+If you have to debug (and you will) your best friend when it comes to debugging 
+and tracing code is the print statement. (For more complex systems, debugging tools 
+are frequently more useful than printing.)
+
+To trace where a statement crashes your program, all you need to do is to insert 
+print statements. 
+\begin{Verbatim}[frame=single]
+... some code ...
+
+std::cout << "here ... 0" << std::endl;
+
+... some code ...
+
+std::cout << "here ... 1" << std::endl;
+
+... some code ...
+\end{Verbatim}
+
+If you don't see the second print statement when your program crashes, then of 
+course the bug is between the two print statements. You then insert another print 
+statement in the middle:
+\begin{Verbatim}[frame=single]
+... some code ...
+
+std::cout << "here ... 0" << std::endl;
+
+... some code ...
+
+std::cout << "here ... 0.5" << std::endl;
+
+... some code ...
+
+std::cout << "here ... 1" << std::endl;
+
+... some code ...
+\end{Verbatim}
+
+This will allow you to \lq\lq squeeze" the bug to find out it's exact location 
+very quickly using the above \lq\lq binary search" method.
+
+One very important thing to note is that your program might crash before the 
+print content printed arrived on your console window or terminal shell. To 
+ensure that the printed content arrives before your program shuts down, you 
+must print \verb!std::endl!:
+\begin{Verbatim}[frame=single]
+std::cout << "here ... 0" << std::endl; // GOOD FOR DEBUGGING!!!
+\end{Verbatim}
+
+and not this:
+\begin{Verbatim}[frame=single]
+std::cout << "here ... 0" << '\n'; // BAD FOR DEBUGGING!!!
+\end{Verbatim}
+
+
+\newpage
+\textsc{Test File}
+
+The following is only a skeleton test code. Complete it and test your library thorougly.
+
+{\small
+\begin{Verbatim}[frame=single]
+/************************************************************************************
+ *
+ * File  : main.cpp
+ * Author:
+ * Date  :
+ *
+ * Description: This is the test program for the IntDynArr class.
+ ***********************************************************************************/
+
+#include <iostream>
+#include "IntDynArr.h"
+
+#define SIZE(x) (sizeof(x)/sizeof(int))
+
+
+void test_IntDynArr()
+{
+    IntDynArr a;
+    std::cin >> a;
+    std::cout << a << std::endl;
+}
+
+
+void test_IntDynArr_size()
+{
+    int size;
+    std::cin >> size;
+    IntDynArr a(size);
+    std::cout << a << std::endl;
+}
+
+
+void test_IntDynArr_array()
+{
+    int x[] = {1, 2, -4, 0};
+    IntDynArr a(SIZE(x), x);
+    std::cout << a << std::endl;
+}
+
+
+void test_print()
+{
+    int x[] = {1, 2, -4, 0};
+    IntDynArr a(SIZE(x), x);
+    std::cout << a << std::endl;
+}
+
+
+void test_size()
+{
+    IntDynArr a;
+    std::cin >> a;
+    std::cout << a.get_size() << std::endl;
+}
+
+
+void test_get_capacity()
+{
+    IntDynArr a;
+    std::cin >> a;
+    std::cout << a.get_capacity() << std::endl;
+}
+
+void test_eq()
+{
+    IntDynArr a, b;
+    std::cin >> a >> b;
+    std::cout << (a == b) << std::endl;
+}
+
+void test_plus_eq()
+{
+    IntDynArr a, b;
+    std::cin >> a >> b;
+    std::cout << (a += b) << ' ';
+    std::cout << a << ' ';
+    std::cout << ((a += b) += b) << std::endl;
+}
+
+void test_remove()
+{
+    IntDynArr a;
+    int i;
+    std::cin >> a >> i;
+    std::cout << a << ' ' << a.remove(i) << std::endl;
+}
+
+int main()
+{
+    int option;
+    std::cin >> option;
+    switch (option)
+    {
+        case 1:
+            test_IntDynArr();
+            break;
+        case 2:
+            test_IntDynArr_size();
+            break;
+        case 3:
+            test_IntDynArr_array();
+            break;
+        case 7:
+            test_eq();
+            break;
+        case 17:
+            test_remove();
+            break;
+        case 19:
+            test_print();
+            break;
+    }
+
+    return 0;            
+}
+\end{Verbatim}
+}
+
+
+The test option numbering follows the same numbering as in the explanation earlier.
+
+\end{document}
