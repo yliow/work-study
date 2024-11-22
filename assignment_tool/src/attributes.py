@@ -130,12 +130,14 @@ def include(path):
         copy_path(path[1], dest + question + '.tex')
         os.system("chmod a=r " + dest + question + '.tex')
         textpath = dest[len(con.destination) + 1:] + question 
-        s += '''        
+        s += '''
         %(textpath)s''' %{'textpath':include_(textpath + '.tex')}
         if path[0] == QUEST_MATH:
-            writefile(question + 's.tex', '')
+            writefile(textpath + 's.tex', '')
             s += r'''
-            \SOLUTION            
+            
+            \SOLUTION
+            
             %(textpath)s''' %{'textpath': include_(textpath + 's.tex')}
     elif path[0] == LATEXSTR:
         s = path[1]
