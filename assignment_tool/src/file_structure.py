@@ -1,6 +1,7 @@
 import os
 import shutil
 import config as con
+import attributes as at
 
 def get_num():
     num = 0
@@ -11,29 +12,16 @@ def get_num():
     return num
 
 def file_struct():
-    if os.path.exists(con.newpath + con.assignment):
-        print(con.newpath + con.assignment)
+    if os.path.exists(at.destination):
+        print(at.destination)
         answer = input("^ this path already exist are you sure you want to overwrite it? enter [y/n] ")
         if answer == "y" or answer == "yes" or answer == "yeah":
-            shutil.rmtree(con.newpath + con.assignment)
+            shutil.rmtree(at.destination)
         else:
             return False
     
     num = get_num()
-    if (con.FIRST_FILE_STRUCTURE):
-        for i in range(1, num + 1):
-            s = rf"{con.newpath}{con.assignment}/{con.assignment}q{i:0>2}/"
-            os.makedirs(s + 'doc')
-            os.makedirs(s + 'src')
-            os.makedirs(s + 'skel')
-    else:
-        for i in range(1, num + 1):
-            s = rf"{con.newpath}{con.assignment}/{con.assignment}q{i:0>2}/"
-            os.makedirs(s + 'question')
-            os.makedirs(s + 'answer')
-            os.makedirs(s + 'question' + '/doc')
-            os.makedirs(s + 'question' + '/src')
-            os.makedirs(s + 'question' + '/skel')
-            os.makedirs(s + 'answer' + '/doc')
-            os.makedirs(s + 'answer' + '/src')
+    path = rf"{at.destination}/{at.assignment}"
+    
+    at.FILE_VERSION(path, num)
     return True

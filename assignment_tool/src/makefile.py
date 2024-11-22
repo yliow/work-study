@@ -1,5 +1,6 @@
 # file: makefile.py
 
+import attributes as at
 import config as con
 import file_structure as f
 
@@ -9,7 +10,7 @@ def maketree():
 t tree :
 	tree'''
     for i in range(1, num + 1):
-        s += rf" {con.assignment}q{i:0>2}/"
+        s += rf" {at.assignment}q{i:0>2}/"
     return s
 
 def makefile():
