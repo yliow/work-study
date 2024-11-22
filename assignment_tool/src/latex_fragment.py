@@ -5,7 +5,6 @@ import attributes as at
 import os
 
 
-
 def main():
     s = r'''
 \input{thispreamble.tex}
@@ -61,9 +60,9 @@ def thispreamble():
 \makeindex
 \begin{document}
 \topmatter
-    ''' % {'assignment': at.assignment_it,
-        'courses': at.courses,
-        'name':at.name}
+    ''' % {'assignment': con.assignment_it,
+        'courses': con.courses,
+        'name':con.name}
     return "thispreamble.tex", tex
 
 def thistitle():

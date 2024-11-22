@@ -8,7 +8,12 @@ import attributes as at
 #rename config to reflect assignment that has been generated using run.py
 ##################################################################
 # depends on file structure
-
+courses = "ciss358"
+name = "yliow"
+assignment = "a02"
+assignment_it = "2";
+basepath = "test/ciss358/" # insert path for new directory (you are able to go back)
+destination = basepath + assignment
 # basepath = 
 # go to basepath, write, then go back to cwd
 

@@ -10,7 +10,7 @@ def maketree():
 t tree :
 	tree'''
     for i in range(1, num + 1):
-        s += rf" {at.assignment}q{i:0>2}/"
+        s += rf" {con.assignment}q{i:0>2}/"
     return s
 
 def makefile():
@@ -42,8 +42,4 @@ s:
 	@echo "================================================================"
 	@echo ""
 %(tree)s'''%{'tree':maketree()}
-<<<<<<< HEAD
     return "makefile", make
-=======
-    return "%(path)s%(assignment)s/makefile"%{'path' : con.newpath, 'assignment' :con.assignment}, make
->>>>>>> 5c977cf1d9f3afe3337cff8c108050a6162c6147

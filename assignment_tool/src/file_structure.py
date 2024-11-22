@@ -12,16 +12,16 @@ def get_num():
     return num
 
 def file_struct():
-    if os.path.exists(at.destination):
-        print(at.destination)
+    if os.path.exists(con.destination):
+        print(con.destination)
         answer = input("^ this path already exist are you sure you want to overwrite it? enter [y/n] ")
         if answer == "y" or answer == "yes" or answer == "yeah":
-            shutil.rmtree(at.destination)
+            shutil.rmtree(con.destination)
         else:
             return False
     
     num = get_num()
-    path = rf"{at.destination}/{at.assignment}"
+    path = rf"{con.destination}/{con.assignment}"
     
     at.FILE_VERSION(path, num)
     return True
