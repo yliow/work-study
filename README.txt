@@ -21,6 +21,9 @@ courses/ciss240/a/a12                   courses/ciss240/a/a12
 
 courses/ciss358/a/a02                   courses/ciss358/a/a02
 
+IMPORTANT ASSIGNMENT_TOOL INFO:
+All files under "..\assignment_tool" should go under a directory in "/usr/lib/python3.12/site-packages"
+
 Comments for ciss145:
 * At top of documents, change "Python Programming Part 1 v0.2" to "Python Programming Part 1 v0.3"
 
