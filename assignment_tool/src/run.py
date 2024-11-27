@@ -2,12 +2,9 @@ import file_structure as f
 import latex_fragment as latex
 import makefile as make
 import config #config should be imported from a general "a0X" structure
-import os
+import attributes as at
 
-def writefile(path, s):
-    f = open(config.newpath + config.assignment + '/' + path, "w")
-    f.write(s)
-    f.close()
+
 
 # makes the file structure
 if f.file_struct():
@@ -20,4 +17,4 @@ if f.file_struct():
                     latex.thispostamble(),
                     latex.thispreamble(),
                     latex.thistitle()]:
-        writefile(path, s)
+        at.writefile(path, s)
