@@ -1,4 +1,5 @@
 import os
+import config as con
 import shutil
 
 struct = {}
@@ -36,17 +37,15 @@ def file_struct2(path, num):
 
 File_type = [file_struct1, file_struct2]
 
-VERS = 0
+VERS = 1
 FILE_VERSION = File_type[VERS] # do the initial file structure, false if we want to do the other one
 
-name = "yliow"
-courses = "ciss358"
+
 
 #rename "newpath" to a more descriptive name, target, dest, base etc.
-basepath = "test/ciss358/" # insert path for new directory (you are able to go back)
-assignment = "a02"
-assignment_it = "2";
-destination = basepath + assignment
+
+
+
 
 #store these constants in a different file
 OTHER = 'other'
@@ -57,7 +56,7 @@ SKELETON = 'skeleton'
 
 
 def writefile(path, s):
-    f = open(destination + '/' + path, "w")
+    f = open(con.destination + '/' + path, "w")
     f.write(s)
     f.close()
 
@@ -114,10 +113,10 @@ QUESTION_ITERATOR = 0
 def include(path):
     s = ''
     global QUESTION_ITERATOR
-    global basepath
-    global assignment
-    global assignment_it
-    global destination
+    # global basepath
+    # global assignment
+    # global assignment_it
+    # global destination
     global OTHER
     global LATEXSTR
     global QUEST_CODE
@@ -130,13 +129,15 @@ def include(path):
         question = '/q' + str(i).zfill(2)
         copy_path(path[1], dest + question + '.tex')
         os.system("chmod a=r " + dest + question + '.tex')
-        textpath = dest[len(destination) + 1:] + question 
-        s += '''        
+        textpath = dest[len(con.destination) + 1:] + question 
+        s += '''
         %(textpath)s''' %{'textpath':include_(textpath + '.tex')}
         if path[0] == QUEST_MATH:
-            writefile(question + 's.tex', '')
+            writefile(textpath + 's.tex', '')
             s += r'''
-            \SOLUTION            
+            
+            \SOLUTION
+            
             %(textpath)s''' %{'textpath': include_(textpath + 's.tex')}
     elif path[0] == LATEXSTR:
         s = path[1]
@@ -144,12 +145,12 @@ def include(path):
         file_ = file_getter(path[1])
         dest = struct['skel%(i)s'%{'i': str(i)}]
         copy_path(path[1], dest + '/' + file_)
-        textpath = dest[len(destination) + 1:] + '/' + file_
+        textpath = dest[len(con.destination) + 1:] + '/' + file_
         s += '''
         %(textpath)s'''%{'textpath': include_(textpath)}
     elif path[0] == OTHER:
         file_ = file_getter(path[1])
-        dest = destination
+        dest = con.destination
         copy_path(path[1], dest + '/' + file_)
         s += '''
         %(textpath)s'''%{'textpath': include_(file_)}
