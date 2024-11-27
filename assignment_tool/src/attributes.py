@@ -37,7 +37,7 @@ def file_struct2(path, num):
 
 File_type = [file_struct1, file_struct2]
 
-VERS = 0
+VERS = 1
 FILE_VERSION = File_type[VERS] # do the initial file structure, false if we want to do the other one
 
 

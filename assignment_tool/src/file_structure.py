@@ -14,7 +14,7 @@ def get_num():
 def file_struct():
     if os.path.exists(con.destination):
         print(con.destination)
-        answer = input("^ this path already exist are you sure you want to overwrite it? enter [y/n] ")
+        answer = input("^ this path already exist are you sure you want to overwrite it? enter [y/n]: ")
         if answer == "y" or answer == "yes" or answer == "yeah":
             shutil.rmtree(con.destination)
         else:

@@ -10,8 +10,8 @@ import attributes as at
 # depends on file structure
 courses = "ciss240"
 name = "yliow"
-assignment = "a01"
-assignment_it = "1";
+assignment = "a05"
+assignment_it = "5";
 basepath = "test/ciss240/" # insert path for new directory (you are able to go back)
 destination = basepath + assignment
 # basepath = 
@@ -27,19 +27,21 @@ destination = basepath + assignment
 # - skel is the skelenton code that needs to be in the 
 # - other is any other latex files that needs to be included
 # - name of file
-contents = [(at.OTHER, "../../courses/ciss240/a/a01/objectives.tex"),
+contents = [(at.OTHER, "../../courses/ciss240/a/a05/objective.tex"),
             (at.LATEXSTR, r"\newpage"),
-            (at.OTHER, "../../courses/ciss240/a/a01/instructions.tex"),
+            (at.OTHER, "../../courses/ciss240/a/a05/instructions.tex"),
             (at.LATEXSTR, r"\newpage"),
-            (at.QUEST_CODE, "../../courses/ciss240/a/a01/a01q01/question/main.tex"),
+            (at.QUEST_CODE, "../../courses/ciss240/a/a05/a05q01/question/main.tex"),
             (at.LATEXSTR, r"\newpage"),
-            (at.QUEST_CODE, "../../courses/ciss240/a/a01/a01q02/question/main.tex"),
+            (at.QUEST_CODE, "../../courses/ciss240/a/a05/a05q02/question/main.tex"),
             (at.LATEXSTR, r"\newpage"),
-            (at.QUEST_CODE, "../../courses/ciss240/a/a01/a01q03/question/main.tex"),
+            (at.QUEST_CODE, "../../courses/ciss240/a/a05/a05q03/question/main.tex"),
             (at.LATEXSTR, r"\newpage"),
-            (at.QUEST_CODE, "../../courses/ciss240/a/a01/a01q04/question/main.tex"),
+            (at.QUEST_CODE, "../../courses/ciss240/a/a05/a05q04/question/main.tex"),
             (at.LATEXSTR, r"\newpage"),
-            (at.QUEST_CODE, "../../courses/ciss240/a/a01/a01q05/question/main.tex"),
+            (at.QUEST_CODE, "../../courses/ciss240/a/a05/a05q05/question/main.tex"),
+            (at.LATEXSTR, r"\newpage"),
+            (at.QUEST_CODE, "../../courses/ciss240/a/a05/a05q06/question/main.tex"),
             (at.LATEXSTR, r"\newpage")
             ]
 ###########################################################################
