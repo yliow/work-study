@@ -1,0 +1,65 @@
+#include <iostream>
+#include <list>
+
+int main()
+{
+    std::list< int > list;
+    std::cout << list.empty() << ' ' << list.size() << '\n';
+
+    list.push_front(1);
+    list.push_back(5);
+    list.push_front(0);
+    std::cout << list.front() << ' ' << list.back() << '\n';
+    std::cout << list.empty() << ' ' << list.size() << '\n';
+
+    list.front() = 1000;
+    list.back() = 9000;
+    std::cout << list.front() << ' ' << list.back() << '\n';
+    std::cout << list.empty() << ' ' << list.size() << '\n';
+
+    std::cout << "iterator ...\n";
+    std::list< int >::iterator p = list.begin();
+    std::cout << *p << '\n';
+    ++p;
+    std::cout << *p << '\n';
+    ++p;
+    std::cout << *p << '\n';
+    --p;
+    std::cout << *p << '\n';
+
+    std::cout << "loop using an iterator ... ";
+    for (typename std::list< int >::iterator p = list.begin();
+         p != list.end();
+         ++p)
+    {
+        std::cout << (*p) << ' ';
+    }
+    std::cout << '\n';
+
+    std::cout << "loop using a constant iterator (if list is a constant) ... ";
+    for (typename std::list< int >::const_iterator p = list.begin();
+         p != list.end();
+         ++p)
+    {
+        std::cout << (*p) << ' ';
+    }
+    std::cout << '\n';
+
+    std::cout << "erase() ...\n";
+    list.erase(p);
+    std::cout << list.front() << ' ' << list.back() << '\n';
+    std::cout << list.empty() << ' ' << list.size() << '\n';
+
+    std::cout << "copy constructor, operator=, operator== ...\n";
+    std::list< int > list2 = list;
+    std::cout << (list2 == list) << '\n';
+    list2 = list;
+    std::cout << (list2 == list) << '\n';
+    
+    std::cout << "clear() ...\n";
+    list.clear();
+    std::cout << list.front() << ' ' << list.back() << '\n';
+    std::cout << list.empty() << ' ' << list.size() << '\n';
+    
+    return 0;
+}

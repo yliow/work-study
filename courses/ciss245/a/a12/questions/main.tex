@@ -1,0 +1,953 @@
+%-*-latex-*-
+
+\input{../common/preamble.tex}
+\usepackage{fancyvrb}
+\newcommand\mybold[1]{\textbf{#1}}
+
+\begin{document}
+\topmatter
+
+\textsc{Objectives}
+  \begin{enumerate}[nosep]
+    \li Overload and use \texttt{operator()}; function objects. 
+    \li Write and use static instance variables (i.e., static member variables).
+    \li Write and use static methods (i.e., static member functions).
+    \li Prevent object construction by clients by making constructors private.
+    \li Include objects as instance variables.
+    \li Create names with external linkages; \verb!extern!.
+  \end{enumerate}
+
+This assignment involves several major ideas: \texttt{operator()},
+static members and methods, and
+objects as instance variables.
+You will also prevent clients from constructing objects by
+making constructors private (this might seem bizarre, but you'll
+see why you want to do this by the end of this assignment).
+
+\newpage
+\textsc{Function objects and function call operator}
+
+A \textbf{function object} is simply an object that looks like a function, i.e.,
+if \verb!a! is a function object, then \verb!a! is an object
+(so it's constructed from a class) and you can execute for instance
+\verb!a(42)!, i.e.,
+you can execute \verb!a.operator()(42)!, i.e., \verb!a! has a method
+of the form \verb!operator()(int)!.
+
+You can also choose to make the \verb!operator()! accept two integers, i.e.,
+\verb!operator()(int, int)!.
+In that case you can execute \verb!a(42, 0)! which will result in
+the invocation of \verb!a.operator()(42, 0)!.
+
+In general you can 
+\texttt{a.operator()(\textnormal[some prototype])}.
+The operator \verb!operator()! is sometimes called the
+\textbf{function call operator}.
+
+Of course if your \verb!a! is simply a function (as in a regular
+CISS240 function),
+then there's no reason to make it an object.
+You want to create \verb!a! to be a function object only when \verb!a!
+behaves like a function ... and more.
+
+For instance what if you want \verb!a! to return the last value it computed?
+Suppose the last function call operator executed was \verb!a(42)! and the
+value returned was \verb!999!, and you want to know what was the last computed
+value. Then you need to store that \verb!999! in object \verb!a!,
+and maybe have a method called \verb!last_result!, so that
+you can call \verb!a.last_result()! to return \verb!999!.
+Maybe you also want \verb!a.last_input()! which will return \verb!42!.
+
+And what if you want to compute the most frequently returned result?
+Then you probably want to keep as many values computed by \verb!a!
+as you can, and allow the execution of \verb!a.most_common_result()!.
+
+One common use of function objects is to store computations
+to \textit{avoid re-computations}.
+This is a very common theme in computer science, especially
+when certain computations are expensive (time-wise or memory-wise)
+and can result in dramatic computational performance improvement.
+The storing of expensive computations to avoid re-computation
+is called \textbf{memoization} -- i.e., create a 
+\textit{memorandum} or \textit{memo} of
+results.
+The memorandum is called the \textbf{memo table}
+or informally the \textbf{lookup table}.
+
+\newpage
+\textsc{CISS240 Review: Recursive Functions}
+
+The Fibonacci sequence is the sequence of integers 1,1,2,3,5,8,13,...
+It starts with 1,1
+and from there on, a term in the sequence is the sum of the previous two terms.
+Mathematically you can think of this as a function \verb!fib()!:
+
+\begin{tightlist}
+  \li \verb!fib(0)! = 1 \verb!    ! (this is by definition)
+  \li \verb!fib(1)! = 1 \verb!    ! (this is by definition)
+  \li \verb!fib(2)! = 2 \verb!    ! (i.e. \verb!fib(1)! + \verb!fib(0)!)
+  \li \verb!fib(3)! = 3 \verb!    ! (i.e. \verb!fib(2)! + \verb!fib(1)!)
+  \li \verb!fib(4)! = 5 \verb!    ! (i.e. \verb!fib(3)! + \verb!fib(2)!)
+  \li \verb!fib(5)! = 8 \verb!    ! (i.e. \verb!fib(4)! + \verb!fib(3)!)
+  \li \verb!fib(6)! = 13 \verb!   ! (i.e. \verb!fib(5)! + \verb!fib(4)!)
+\end{tightlist}
+
+\defterm {Self-Exercise:}
+Complete the following table. You will need the table for your test code:
+
+\begin{python}
+from latextool_basic import table
+print table([('$0\ $', '$1\ \ \ \ \ \ $'),
+             ('$1\ $', '$1\ \ \ \ \ \ $'),
+             ('$2\ $', '$2\ \ \ \ \ \ $'),
+             ('$3\ $', '$3\ \ \ \ \ \ $'),
+             ('$4\ $', '$5\ \ \ \ \ \ $'),
+             ('$5\ $', '$8\ \ \ \ \ \ $'),
+             ('$6\ $', '$13\ \ \ \ \ $'),
+             ('$7\ $', '$21\ \ \ \ \ $'),
+             ('$8\ $', '$34\ \ \ \ \ $'),
+             ('$9\ $', '$55\ \ \ \ \ $'),
+             (10, '$89\ \ \ \ \ $'),
+             (11, ''),
+             (12, ''),
+             (13, ''),
+             (14, ''),
+             (15, ''),
+             (16, ''),
+             (17, ''),
+             (18, ''),
+             (19, ''),
+             (20, '')
+            ],
+            col_headings = ['$n$', '$\ \ \ fib(n)\ \ \ $'])
+\end{python}
+
+
+
+
+\newpage
+\begin{python}
+from latextool_basic import table
+print(table([(21, ''),
+             (22, ''),
+             (23, ''),
+             (24, ''),
+             (25, ''),
+             (26, ''),
+             (27, ''),
+             (28, ''),
+             (29, ''),
+             (30, ''),
+             (31, ''),
+             (32, ''),
+             (33, ''),
+             (34, ''),
+             (35, ''),
+             (36, ''),
+             (37, ''),
+             (38, ''),
+             (39, '')
+            ],
+            col_headings = ['$n$', '$\ \ \ fib(n)\ \ \ $']))
+\end{python}
+
+The following function \verb!fib(n)! will return the n-th value of the Fibonacci sequence:
+
+
+\begin{Verbatim}[frame=single]
+int fib(int n)
+{
+    if (n <= 1)
+        return 1;
+    else
+        return fib(n - 1) + fib(n - 2);
+}
+\end{Verbatim}
+
+(For simplicity, we will return 1 whenever the argument is negative.)
+
+Test this function by printing out \verb!fib(n)! for a few values of n.
+Compare against the table.
+
+
+
+\newpage
+\textsc{CISS240 Review: Tracing a Recursive Function}
+
+How does our C/C++ function work? Let's do an example. Suppose you call \verb!fib(3)!:
+
+\verb!    std::cout << fib(3);!
+
+The execution of \verb!fib(3)! will call \verb!fib(3 - 1)! i.e. \verb!fib(2)! because of
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+    running fib(3):
+        ...
+        returning \mybold{fib(n - 1)} + fib(n - 2);
+\end{Verbatim}
+
+Now the execution of \verb!fib(2)! will call \verb!fib(2 - 1)! i.e. \verb!fib(1)! because of
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+    running fib(2):
+        ...
+        returning \mybold{fib(n - 1)} + fib(n - 2);
+\end{Verbatim}
+
+The execution of \verb!fib(1)! will execute this:
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+    running fib(1):
+        ...
+        \mybold{return 1};
+\end{Verbatim}
+
+On returning to \verb!fib(2)! we have the value of \verb!fib(n - 1)!, i.e. 1, and we still
+have to call \verb!fib(n - 2)! i.e. \verb!fib(0)!
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+    running fib(2):
+        ...
+        returning fib(n - 1) + \mybold{fib(n - 2)};
+\end{Verbatim}
+
+This call will execute this:
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+    running fib(0):
+        ...
+        \mybold{return 1};
+\end{Verbatim}
+
+
+
+\newpage
+Returning to the execution of \verb!fib(2)! with \verb!fib(n - 1)! = 1 and \verb!fib(n - 2)! = 1
+we can now execute the addition in
+
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+    running fib(2):
+        ... 
+        returning \mybold{fib(n - 1) + fib(n - 2)};
+      \end{Verbatim}
+      
+which will return 2 for the call for \verb!fib(n - 1)! during the execution of \verb!fib(3)! (did
+you even remember where that was??)
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+     running fib(3):
+        ...
+        returning fib(n - 1) + \mybold{fib(n - 2)};
+\end{Verbatim}
+
+which will result in the call to
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+    running fib(1):
+        ...
+        \mybold{return 1};
+\end{Verbatim}
+
+which returns 1 to \verb!fib(n - 2)! in the execution of \verb!fib(3)!. Now that all calls have
+returned (\verb!fib(n - 1)! returned 2 and \verb!fib(n - 2)! returned 1), we can execute the addition in
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+    running fib(3):
+        ...
+        return \mybold{fib(n - 1) + fib(n - 2)};
+\end{Verbatim}
+
+which will return 3.
+
+
+\textbf{Phew!!} Basically you can see the calls if you use mathematical equations:
+{\small
+\begin{Verbatim}
+fib(3):
+  
+= fib(2) + fib(1)           fib(3) calls fib(2) and fib(1)
+= fib(1) + fib(0) + fib(1)  fib(2) calls fib(1) and fib(0)
+= 1 + 1 + fib(1)            fib(1) returns 1 to fib(2), fib(0) returns 1 to fib(2)
+= 2 + fib(1)                fib(2) returns 2 to fib(3), fib(3) calls fib(1)
+= 2 + 1                     fib(1) returns 1 to fib(2)
+= 3                         fib(3) returns 3
+      \end{Verbatim}
+      }
+
+
+
+\newpage
+Of course if I'm not interested in keeping track of the number of function
+calls and I'm only interested in
+the result I can write
+
+\begin{Verbatim}
+fib(3)    = fib(2) + fib(1)
+          = fib(1) + fib(0) + 1
+          = 1 + 1 + 1
+          = 3
+\end{Verbatim}
+        
+There ... I've explained it twice. Now I want to do it \textbf{again} with a different picture. The arrows denote
+function calls. The number above the arrows show you the value returned:
+
+\begin{Verbatim}
+             2                1
+fib(3) ----+---> fib(2) ----+---> fib(1)
+           |                | 1
+           | 1              +---> fib(0)
+           +---> fib(1)
+\end{Verbatim}
+         
+There you go ... three explanations. Note that there were two (repeated) function calls of \verb!fib(1)!:
+
+\begin{Verbatim}
+             3                2                1
+fib(4) ----+---> fib(3) ----+---> fib(2) ----+---> fib(1)
+           |                |                | 1
+           |                | 1              +---> fib(0)
+           |                +---> fib(1)
+           |
+           | 2                1
+           +---> fib(2) ----+---> fib(1)
+                            | 1
+                            +---> fib(0)
+\end{Verbatim}
+
+Obviously \verb!fib(4)! returns 3 + 2 = 5. Now in this case note that \verb!fib(4)! makes the following calls
+(directly or indirectly):
+
+\begin{tightlist}
+    \li \verb!fib(3)! -- 1 call
+    \li \verb!fib(2)! -- 2 calls
+    \li \verb!fib(1)! -- 3 calls
+    \li \verb!fib(0)! -- 2 calls
+\end{tightlist}
+
+
+
+\newpage
+Hey this is fun! (For me ...). Let's do \verb!fib(5)!. I know that
+\verb!fib(5)! will call
+
+\begin{Verbatim}
+             3                2                1
+fib(4) ----+---> fib(3) ----+---> fib(2) ----+---> fib(1)
+           |                |                | 1
+           |                | 1              +---> fib(0)
+           |                +---> fib(1)
+           |
+           | 2                1
+           +---> fib(2) ----+---> fib(1)
+                            | 1
+                            +---> fib(0)
+\end{Verbatim}           
+and
+\begin{Verbatim}
+             2                1
+fib(3) ----+---> fib(2) ----+---> fib(1)
+           |                | 1
+           | 1              +---> fib(0)
+           +---> fib(1)
+\end{Verbatim}
+
+So putting them together I get:
+
+\begin{Verbatim}
+         4               3                2              1
+fib(5)-+--->fib(4) ----+---> fib(3) ----+---> fib(2)---+---> fib(1)
+       |               |                |              | 1
+       |               |                | 1            +---> fib(0)
+       |               |                +---> fib(1)
+       |               |
+       |               | 2                1
+       |               +---> fib(2) ----+---> fib(1)
+       |                                | 1
+       |                                +---> fib(0)
+       |   
+       | 3               2                1
+       +--->fib(3) ----+---> fib(2) ----+---> fib(1)
+                       |                | 1
+                       | 1              +---> fib(0)
+                       +---> fib(1)
+\end{Verbatim}
+(Such a diagram is called a function call tree.)
+
+
+\newpage
+The calls from \verb!fib(5)! are:
+\begin{tightlist}
+  \li \verb!fib(4)! -- 1 call
+  \li \verb!fib(3)! -- 2 calls
+  \li \verb!fib(2)! -- 3 calls
+  \li \verb!fib(1)! -- 5 calls
+  \li \verb!fib(0)! -- 3 calls
+\end{tightlist}
+
+Obviously there is a lot of repeated calls and it will grow as you increase
+with larger \verb!n! for \verb!fib(n)!. These
+are small numbers. But how fast do they grow?? Well you can do the math, but
+let's get the program
+to tell us:
+
+\begin{Verbatim}[frame=single]
+int fib(int n)
+{
+    std::cout << "fib(" << n << ") ...\n";
+    if (n <= 1)
+        return 1;
+    else
+        return fib(n - 1) + fib(n - 2);
+}
+\end{Verbatim}      
+
+Now call \verb!fib(10)!. Since I'm too lazy (or too smart) to count, I'll get
+the program to count for me:
+
+\begin{Verbatim}[frame=single]
+int count[10]; // global variable, accessible to all functions in this file
+
+void reset()
+{
+    for (int i = 0; i < 10; ++i)
+    {
+        count[i] = 0;
+    }  
+}
+  
+void print()
+{
+    for (int i = 0; i < 10; ++i)
+    {
+        std::cout << count[i] << " ";
+    }
+}
+  
+int sum()
+{
+    int s = 0;
+    for (int i = 0; i < 10; ++i)
+    {
+        s += count[i];
+    }
+}
+
+int fib(int n)
+{
+    // std::cout << "fib(" << n << ") ...\n";
+    count[n]++;
+    if (n <= 1)
+    {
+        return 1;
+    }
+    else
+    {
+        return fib(n-1) + fib(n-2);
+    }
+}
+\end{Verbatim}
+
+with \verb!main()! as:
+
+\begin{Verbatim}[frame=single]
+for (int i = 0; i < 10; ++i)
+{
+    reset();
+    fib(i);
+    print();
+    std::cout << "sum:" << sum() << std::endl;
+}
+\end{Verbatim}
+
+You see that the number of calls grow very quickly and many of the calls are
+actually repeated calls.
+How does \verb!fib! perform
+\lq\lq in the long run"? Try this for your \verb!main()!:
+
+\begin{Verbatim}[frame=single]
+for (int i = 0; i < 100; ++i)
+{
+    std::cout << fib(i) << "\n";
+}
+\end{Verbatim}
+
+Are you convinced that the implementation of \verb!fib! is really bad?
+
+
+
+\newpage
+Q1.
+\textsc{The Fib1 Class: \textnormal{\texttt{operator()}} and Fibonacci
+Computations}
+
+The aim is to create a class whose objects behave like functions. In particular when we run the
+following program:
+
+\begin{Verbatim}[frame=single]
+#include <iostream>
+#include "Fib1.h"
+
+int main()
+{
+    Fib1 fib1;
+    for (int i = 0; i < 6; ++i)
+    {
+        std::cout << fib1(i) << std::endl;
+    }
+
+    return 0;
+}
+\end{Verbatim}
+we have the same output as before.
+
+Check your notes and textbook on \verb!operator()!. If \verb! obj ! is an
+object, then
+
+\verb!            obj(x)      ! is the same as \verb!    obj.operator()(x)!
+\\
+\verb!            obj(x,y)    ! is the same as \verb!    obj.operator()(x,y)!
+\\
+\verb!            obj(x,y,z)  ! is the same as \verb!    obj.operator()(x,y,z)!
+
+
+The following test code must be included:
+
+\begin{Verbatim}[frame=single]
+#include <iostream>
+#include "Fib1.h"
+
+int main()
+{
+    int correct[] = {1, 1, 2, 3, 5, 8, 13, 21, 34, 55};
+    std::cout << "Testing Fib1:" << std::endl;
+    Fib1 fib1;
+
+    for (int i = 0; i < 10; ++i)
+    {
+        std::cout << "Test " << i + 1
+                  << (fib1(i) == correct[i] ? "pass" : "FAIL")
+                  << std::endl;
+    }
+      
+    return 0;
+}
+\end{Verbatim}
+
+Test the speed of your \texttt{Fib1} class by printing out the Fibonacci numbers for i = 49. Is it fast???
+(Yeah ... ) How much time did it take? (No, don't answer). By the way, since an int is probably 32-bit,
+you will have an overflow and get a negative integer. Don't worry about that.
+
+
+
+\newpage
+Q2.
+\textsc{The Fib2 Class: Fibonacci Computations with Table Lookup}
+
+In this question you will develop another class for Fibonacci computation. The name of the class is
+\texttt{Fib2}.
+
+If a function is used frequently, it makes sense to keep previously computed values. In your next
+Fibonacci computation class \texttt{Fib2}, each object should have an array,
+called \verb!table!, of 20 integers to
+keep computed Fibonacci numbers. You should initialize all the integers in the array to -1, except for
+
+\verb!                 table[0] = 1, table[1] = 1!
+
+Suppose you call \verb!fib2(0)! where \verb!fib2! is a \texttt{Fib2} object.
+Then \verb!table! should be used.
+(You can also initialize \verb!table! with \verb!0! since the
+fibonacci numbers are all at least \verb!1!.)
+
+However suppose you call \verb!fib2(2)!. You check that \verb!table[2]! is -1 which means that this is the
+first time \verb!fib2(2)! is being computed. So you use the formula \verb!fib2(1) + fib2(2)!. This will call
+\verb!fib2(1)! which will return 1 and \verb!fib2(0)! which will return 1. So you get 2 for \verb!fib2(1) +!
+\verb!fib2(0)!. Before you return this value, you should set \verb!table[2]! to 2.
+
+In general each time \verb!fib2(n)! is executed, the table should be used as a lookup table for previously
+computed values. Once \verb!fib2(n)! is known, it should be kept in the object at \verb!table[n]!, if \verb!table[n]!
+is still -1.
+
+So the pseudocode looks like this:
+
+\begin{Verbatim}[frame=single]
+if n is negative return 1
+if table[n] is -1, set table[n] to fib(n-1) + fib(n-2)
+return table[n]
+\end{Verbatim}
+
+But wait. Note that the \verb!table!
+has maximum size of 20 (so the maximum lookup is \verb!table[19]!, i.e.,
+\verb!fib(19)!). So for the computation of \verb!fib(25)! for instance you should not refer to the table when you
+need \verb!fib(24)! and \verb!fib(23)!. You should compute using the above formula, i.e. compute \verb!fib(24)!
+\verb!+ fib(23)!. The pseudocode looks like this:
+
+\begin{Verbatim}[frame=single]
+if n is negative return 1
+else if n < 20
+    // use the table
+    if table[n] is -1
+        set table[n] to fib(n - 1) + fib(n - 2)
+    return table[n]
+else
+    // do not use the table
+    return fib(n - 1) + fib(n - 2)
+\end{Verbatim}
+
+For testing purposes, you must also include \texttt{operator[]} so that if \verb!fib2! is a \texttt{Fib2} object, then \verb!fib2[4]!
+returns the value of \verb!fib2.table[4]!.
+
+Test your new and improved \texttt{Fib2}:
+
+\begin{Verbatim}[frame=single]
+#include <iostream>
+#include "Fib1.h"
+#include "Fib2.h"
+
+int main()
+{
+    int correct[] = {1, 1, 2, 3, 5, 8, 13, 21, 34, 55};
+
+    ... test code for Fib1 ...
+
+    std::cout << "Testing Fib2:" << std::endl;
+    Fib2 fib2;
+    std::cout << "Test 1 " << (fib2[2] == -1 ? "pass" : "FAIL")
+              << std::endl;
+
+    for (int i = 0; i < 10; ++i)
+    {
+        std::cout << "Test " << i + 2 << ' '
+                  << (fib2(i) == correct[i] ? "pass" : "FAIL")
+                  << std::endl;
+    }
+
+    std::cout << "Test 12 " << (fib2[2] == 2 ? "pass" : "FAIL")
+              << std::endl;
+
+    return 0;
+}
+\end{Verbatim}
+
+To understand the improvement made in \texttt{Fib2}, perform the following experiment. Print \verb!fib1(i)! for i
+= 0, ..., 39 and then print \verb!fib2(i)! for i = 0, ..., 39. The second object should compute a lot faster.
+
+
+
+\newpage
+Q3.
+\textsc{The Fib3 Class: A Static Table Lookup}
+
+Obviously there's no reason for keeping different tables in different \texttt{Fib2} objects:
+\begin{Verbatim}[frame=single]
+Fib2 fib2a;
+std::cout << fib2a(5) << "\n"; // fib2a has a table
+
+Fib2 fib2b;
+std::cout << fib2b(5) << "\n"; // fib2b has a table too -- not cool!!!
+\end{Verbatim}
+
+Now:
+\begin{tightlist}
+  \li make the table member static so that they both share the same table. Run your test code to
+  make sure that you haven't broken anything while making the changes. Think of a way of
+  initializing \verb!table!
+  \li Provide a static method, \texttt{lookup()} so that \texttt{Fib3::lookup(n)} returns the value of
+  \verb!table[n]!.
+\end{tightlist}
+
+Here's the test code:
+
+\begin{Verbatim}[frame=single]
+#include <iostream>
+#include "Fib1.h"
+#include "Fib2.h"
+#include "Fib3.h"
+
+int main()
+{
+    int correct[] = {1, 1, 2, 3, 5, 8, 13, 21, 34, 55};
+
+    ... test code for Fib1 ...
+    ... test code for Fib2 ...
+    
+    std::cout << "Testing Fib3:" << std::endl;
+    Fib3 fib3;
+    std::cout << "Test 1 " << (Fib3::lookup(2) == -1 ? "pass" : "FAIL")
+              << std::endl;
+
+    for (int i = 0; i < 10; ++i)
+    {
+        std::cout << "Test " << i + 2 << ' '
+                  << (fib3(i) == correct[i] ? "pass" : "FAIL")
+                  << std::endl;
+    }
+      
+    std::cout << "Test 12 "
+              << (Fib3::lookup(2) == 2 ? "pass" : "FAIL") << std::endl;
+    
+    return 0;
+}
+\end{Verbatim}
+
+
+
+\newpage
+Q4.
+\textsc{The Fib4 Class: A Lookup Table with Variable Size}
+
+There's no reason why you should limit the size of the table member to size 20. Change your code
+so that you can specify the size of the table. The size of \verb!table! is set when you create a \texttt{Fib4}
+object.
+
+\begin{Verbatim}[frame=single]
+Fib4 fib4(30); // Now the static table is an array of 30 integers
+\end{Verbatim}
+
+For the above code, \verb!fib4(30)! will point \verb!table! to an array of integers of size 30. Use 20 for the
+default size. (Of course now \verb!table! is an \verb!int! pointer).
+
+Note that your code must manage memory properly. For instance the following code tells you that it's
+possible to have two memory allocations for the static \verb!table! member.
+
+\begin{Verbatim}[frame=single]
+Fib4 fib4a(30); // static table is an array of 30 integers
+Fib4 fib4b(40); // static table is an array of 40 integers and the
+                // previous array of 30 integers are properly de-allocated
+\end{Verbatim}
+
+Hint:
+\begin{tightlist}
+  \li \verb!table! should be initialized to \verb!NULL!
+  \li In the constructor, before allocating memory for \verb!table!, the method should deallocate the
+  memory \verb!table! is pointing to if \verb!table! is not \verb!NULL!.
+\end{tightlist}
+
+Besides allocating memory properly, previously computed values should be retained.
+
+\begin{Verbatim}[frame=single]
+Fib4 fib4a(30); // static table is an array of 30 integers
+Fib4 fib4b(40); // static table is an array of 40 integers and the
+                // values in the previous array of 30 integers are
+                // copied over to the new array of 40 integers before it
+                // is de-allocated
+\end{Verbatim}
+
+The default constructor will allocate 20 integers for \verb!table!:
+\begin{Verbatim}[frame=single]
+Fib4 fib4c; // static table is an array of 20 integers
+\end{Verbatim}
+
+
+
+
+\newpage
+\begin{Verbatim}[frame=single]
+#include <iostream>
+#include "Fib1.h"
+#include "Fib2.h"
+#include "Fib3.h"
+#include "Fib4.h"
+
+int main()
+{
+    int correct[] = {1, 1, 2, 3, 5, 8, 13, 21, 34, 55};
+
+    ... test code for Fib1 ...
+    ... test code for Fib2 ...
+    ... test code for Fib3 ...
+
+    std::cout << "Testing Fib4:" << std::endl;
+    Fib4 fib4;
+    std::cout << "Test 1 " << (Fib4::lookup(2) == -1 ? "pass" : "FAIL")
+              << std::endl;
+
+    for (int i = 0; i < 10; ++i)
+    {
+        std::cout << "Test " << i + 2 << ' '
+                  << (fib4(i) == correct[i] ? "pass" : "FAIL")
+                  << std::endl;
+    }
+    std::cout << "Test 12 "
+              << (Fib4::lookup(2) == 2 ? "pass" : "FAIL") << std::endl;
+
+    Fib4 fib4b(30);
+    std::cout << "Test 13 "
+              << (Fib4::lookup(2) == 2 ? "pass" : "FAIL") << std::endl;
+    std::cout << "Test 14 "
+              << (Fib4::lookup(25) == -1 ? "pass" : "FAIL") << std::endl;
+
+    return 0;
+}
+\end{Verbatim}
+
+
+
+
+
+\newpage
+Q5.
+\textsc{The Fib5 class: Static Object in Fib5 Class and Private Constructors}
+
+It's annoying that we always have to create a Fibonacci object before using it. Furthermore ... do we
+really need to be able to create two Fibonacci objects?
+
+Create a static object called \verb!fib5! in \texttt{Fib5}. Initialize the lookup table with a size of 20. Next, since we
+want users to use the static \texttt{Fib5::fib5} object and not create their own objects, ... \mybold{for the first}
+\mybold{time} ... make the constructors \textbf{private} (both the default and the copy constructor). In other words
+make the following code impossible to compile:
+
+\begin{Verbatim}[frame=single]
+Fib5 fib5;                // won't compile ... yeah!
+Fib5 fib5(Fib5::fib5);    // STILL won't compile ... :)
+\end{Verbatim}
+
+Include a static method to resize the size of the table. Call it \texttt{resize()} (duh). So \texttt{Fib5::fib5(5)}
+computes the 5 th Fibonacci number while \texttt{Fib5::resize(100)} resizes the table lookup to a size of
+100.
+
+(Note: Although you don't have to do this, you can use your \texttt{IntDynArr} class instead of \verb!int*! for
+\verb!table!. You also realize that earlier we made \verb!table! static in order to prevent objects from having
+their own \verb!table!. Now that the constructors are private, and there is only one public static \texttt{Fib5}
+object, this is not an issue anymore.)
+
+
+
+
+\newpage
+\begin{Verbatim}[frame=single]
+#include <iostream>
+#include "Fib1.h"
+#include "Fib2.h"
+#include "Fib3.h"
+#include "Fib4.h"
+#include "Fib5.h"
+
+int main()
+{
+    int correct[] = {1, 1, 2, 3, 5, 8, 13, 21, 34, 55};
+
+    ...test code for Fib1 ...
+    ...test code for Fib2 ...
+    ...test code for Fib3 ...
+    ...test code for Fib4 ...
+
+    std::cout << "Testing Fib5:" << std::endl;
+    std::cout << "Test 1 " << (Fib5::lookup(2) == -1 ? "pass" : "FAIL")
+              << std::endl;
+
+    for (int i = 0; i < 10; ++i)
+    {
+        std::cout << "Test " << i + 2
+                  << (Fib5::fib5(i) == correct[i] ? "pass" : "FAIL")
+                  << std::endl;
+    }
+    std::cout << "Test 12 "
+              << (Fib5::lookup(2) == 2 ? "pass" : "FAIL") << std::endl;
+
+    Fib5::resize(30);
+    std::cout << "Test 13 "
+              << (Fib5::lookup(2) == 2 ? "pass" : "FAIL") << std::endl;
+    std::cout << "Test 14 "
+              << (Fib5::lookup(25) == -1 ? "pass" : "FAIL") << std::endl;
+
+    return 0;
+}
+\end{Verbatim}
+
+
+
+
+
+\newpage
+Q6. \textsc{The Math header and cpp File}
+
+The next step in this assignment is written in two parts to make it easier for your to accomplish the
+task.
+
+We now have a class \texttt{Fib5} and there's only one object in it called \texttt{Fib5::fib5}.
+
+In the same manner, suppose you have another mathematical function that you want to write, say the
+factorial function. Does that mean we need to write \texttt{Factorial::factorial} if we use the same
+technique of a table lookup?
+
+That's cumbersome and a little artificial. Why do I need to say \texttt{Fib5} \textbf{and} \verb!fib5!? Or \texttt{Factorial} \textbf{and}
+\verb!factorial!? How silly can this get ... ?!? ...
+
+\begin{Verbatim}[frame=single]
+std::cout << Fib5::fib5(5) << "\n";
+Fib5::fib5.resize(100);
+std::cout << Factorial::factorial(6) << "\n";
+std::cout << Log::log(7.4) << "\n";
+\end{Verbatim}
+
+Wouldn't it be more natural to say
+
+\begin{Verbatim}[frame=single]
+std::cout << fib(5) << "\n";
+fib.resize(100);
+std::cout << factorial(6) << "\n";
+std::cout << log(7.4) << "\n";
+\end{Verbatim}
+
+Do the following:
+\begin{tightlist}
+  \li In your \texttt{Fib5.cpp}, declare a \texttt{Fib5} reference (i.e. \texttt{Fib5 \&}) called \verb!fib! and initialize it to
+  \texttt{Fib5::fib5}.
+  \li To access \verb!fib! from \texttt{Fib5}, in your cpp containing
+  \texttt{main()} you add this statement:
+  \texttt{extern Fib5 \& fib;}.
+  This tells your compiler that the identifier \verb!fib! is in some cpp file.
+  Of course \verb!fib! is really the
+  same as \texttt{Fib5::fib5}. At this point your should test that you
+  can execute this in your
+  \texttt{main()}:
+      \verb!std::cout << fib(7) << std::endl;!
+      \li To make this even easier for users of your Fibonacci computations as
+      well as other
+      mathematical functions, you now move your external declarations into
+      a header file. Create a
+  header file called \texttt{Math.h}. Move your external declaration of \verb!fib! to the file \texttt{Math.h}.
+\end{tightlist}
+
+(Now ... keep this header file carefully. Build upon it by including all the useful things you might need.
+For instance you can declare a constant \verb!PI! as the double 3.14159365, etc. in your \texttt{Math.cpp} and
+create an external declaration for \verb!PI!, etc. in your \texttt{Math.h}.)
+
+\begin{Verbatim}[frame=single]
+#include <iostream>
+#include "Fib1.h"
+#include "Fib2.h"
+#include "Fib3.h"
+#include "Fib4.h"
+#include "Fib5.h"
+#include "Math.h"
+
+int main()
+{
+    int correct[] = {1, 1, 2, 3, 5, 8, 13, 21, 34, 55};
+
+    ... test code for Fib1 ...
+    ... test code for Fib2 ...
+    ... test code for Fib3 ...
+    ... test code for Fib4 ...
+    ... test code for Fib5 ...
+
+    std::cout << "Testing fib:" << std::endl;
+    for (int i = 0; i < 10; ++i)
+    {
+        std::cout << "Test " << i + 1 << ' '
+                  << (fib(i) == correct[i] ? "pass" : "FAIL")
+                  << std::endl;
+    }
+
+    return 0;
+}
+\end{Verbatim}
+
+Note that written in this fashion, the user does not need to know anything
+about any Fibonacci
+computation class. All of that is taken care of by \texttt{Math.h}.
+
+\end{document}
+
