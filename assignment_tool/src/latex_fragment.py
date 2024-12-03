@@ -51,6 +51,7 @@ def thispreamble():
 \input{thistitle}
 \renewcommand\EMAIL{}
 \input{\COURSE}
+\usepackage{import}
 \textwidth=6in
 
 \input{thispackages}
