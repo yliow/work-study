@@ -49,6 +49,7 @@ FILE_VERSION = File_type[VERS] # do the initial file structure, false if we want
 
 #store these constants in a different file
 OTHER = 'other'
+EXTRA_DOCUMENTS = "documents"
 LATEXSTR = 'latex string'
 QUEST_CODE = 'QUESTION'
 QUEST_MATH = 'question'
@@ -71,8 +72,20 @@ def is_answer(path):
 def include_latex(path):
     if (is_answer(path)):
         return r'''\myincludetex{%(path)s}''' %{'path':path}
+    #else:
+    #    return r'''\input{%(path)s}''' %{'path':path}
     else:
-        return r'''\input{%(path)s}''' %{'path':path}
+        file_ = file_getter(path)
+        
+        if path == file_:
+            return r'''\input{%(path)s}''' %{'path': path}
+        
+        
+        len_ = len(path) - len(file_)
+        directory = path[:len_]
+        
+        return r'''\subimport*{%(path)s}{%(file)s}''' %{'path': directory, 'file': file_}
+    
     return ""
 
 def include_src(path, frame='single', fontsize='\\footnotesize'):
@@ -102,7 +115,7 @@ def file_getter(path):
         if path[start] == '/':
             return path[start + 1: end]
         start -= 1
-    return path[start + 1: end]
+    return path[start: end]
 
 
 def copy_path(oldpath, newpath):
@@ -113,46 +126,68 @@ QUESTION_ITERATOR = 0
 def include(path):
     s = ''
     global QUESTION_ITERATOR
+    
     # global basepath
     # global assignment
     # global assignment_it
     # global destination
+    
     global OTHER
     global LATEXSTR
     global QUEST_CODE
     global QUEST_MATH
     global SKELETON
+    global EXTRA_DOCUMENTS
+    
     i = QUESTION_ITERATOR
+    
     if path[0] == QUEST_CODE or path[0] == QUEST_MATH:
+        
         i += 1
         dest = struct['q doc%(i)s'%{'i': str(i)}]
         question = '/q' + str(i).zfill(2)
         copy_path(path[1], dest + question + '.tex')
+        
         os.system("chmod a=r " + dest + question + '.tex')
-        textpath = dest[len(con.destination) + 1:] + question 
-        s += '''
-        Q%(question)s. %(textpath)s''' %{'textpath':include_(textpath + '.tex'), 'question': i}
+        textpath = dest[len(con.destination) + 1:] + question
+        
+        s += '''Q%(question)s. %(textpath)s
+''' %{'textpath':include_(textpath + '.tex'), 'question': i}
+        
         if path[0] == QUEST_MATH:
             writefile(textpath + 's.tex', '')
-            s += r'''
-            
-            \SOLUTION
-            
-            %(textpath)s''' %{'textpath': include_(textpath + 's.tex')}
-    elif path[0] == LATEXSTR:
-        s = path[1]
-    elif path[0] == SKELETON:
+            s += r'''\SOLUTION
+%(textpath)s
+''' %{'textpath': include_(textpath + 's.tex')}
+    elif path[0] == EXTRA_DOCUMENTS:
+        dest = struct['q doc%(i)s'%{'i': str(i)}]
+        
         file_ = file_getter(path[1])
+        copy_path(path[1], dest + '/' + file_)
+        s = ''''''
+        
+    elif path[0] == LATEXSTR:
+        s = path[1] + ' '
+        
+    elif path[0] == SKELETON:
+        
+        file_ = file_getter(path[1])
+        
         dest = struct['skel%(i)s'%{'i': str(i)}]
         copy_path(path[1], dest + '/' + file_)
         textpath = dest[len(con.destination) + 1:] + '/' + file_
-        s += '''
-        %(textpath)s'''%{'textpath': include_(textpath)}
+        s += '''%(textpath)s
+
+'''%{'textpath': include_(textpath)}
+        
     elif path[0] == OTHER:
+        
         file_ = file_getter(path[1])
         dest = con.destination
+        
         copy_path(path[1], dest + '/' + file_)
-        s += '''
-        %(textpath)s'''%{'textpath': include_(file_)}
+        
+        s += '''%(textpath)s
+'''%{'textpath': include_(file_)}
     QUESTION_ITERATOR = i
     return s
