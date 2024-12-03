@@ -27,19 +27,12 @@ destination = basepath + assignment
 # - skel is the skelenton code that needs to be in the 
 # - other is any other latex files that needs to be included
 # - name of file
-contents = [(at.OTHER, "../../courses/ciss240/a/a01/objectives.tex"),
+contents = [(at.QUEST_CODE, "../../courses/ciss240/a/a02/a02q01/question/main.tex"),
             (at.LATEXSTR, r"\newpage"),
-            (at.OTHER, "../../courses/ciss240/a/a01/instructions.tex"),
+            (at.QUEST_CODE, "../../courses/ciss240/a/a02/a02q02/question/main.tex"),
             (at.LATEXSTR, r"\newpage"),
-            (at.QUEST_CODE, "../../courses/ciss240/a/a01/a01q01/question/main.tex"),
+            (at.QUEST_CODE, "../../courses/ciss240/a/a02/a02q03/question/main.tex"),
             (at.LATEXSTR, r"\newpage"),
-            (at.QUEST_CODE, "../../courses/ciss240/a/a01/a01q02/question/main.tex"),
-            (at.LATEXSTR, r"\newpage"),
-            (at.QUEST_CODE, "../../courses/ciss240/a/a01/a01q03/question/main.tex"),
-            (at.LATEXSTR, r"\newpage"),
-            (at.QUEST_CODE, "../../courses/ciss240/a/a01/a01q04/question/main.tex"),
-            (at.LATEXSTR, r"\newpage"),
-            (at.QUEST_CODE, "../../courses/ciss240/a/a01/a01q05/question/main.tex"),
-            (at.LATEXSTR, r"\newpage")
+            (at.QUEST_CODE, "../../courses/ciss240/a/a02/a02q04/question/main.tex")
             ]
 ###########################################################################
