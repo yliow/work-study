@@ -27,9 +27,9 @@ destination = basepath + assignment
 # - skel is the skelenton code that needs to be in the 
 # - other is any other latex files that needs to be included
 # - name of file
-contents = [(at.OTHER, "Old/objective.tex"),
+contents = [(at.OTHER, "Old/objectives.tex"),
             (at.LATEXSTR, r"\newpage"),
-            (at.OTHER, "Old/instruction.tex"),
+            (at.OTHER, "Old/instructions.tex"),
             (at.LATEXSTR, r"\newpage"),
             (at.QUEST_CODE, "Old/q01.tex"),
             ]
