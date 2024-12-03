@@ -37,7 +37,7 @@ def file_struct2(path, num):
 
 File_type = [file_struct1, file_struct2]
 
-VERS = 1
+VERS = 0
 FILE_VERSION = File_type[VERS] # do the initial file structure, false if we want to do the other one
 
 
@@ -131,7 +131,7 @@ def include(path):
         os.system("chmod a=r " + dest + question + '.tex')
         textpath = dest[len(con.destination) + 1:] + question 
         s += '''
-        %(textpath)s''' %{'textpath':include_(textpath + '.tex')}
+        Q%(question)s. %(textpath)s''' %{'textpath':include_(textpath + '.tex'), 'question': i}
         if path[0] == QUEST_MATH:
             writefile(textpath + 's.tex', '')
             s += r'''
