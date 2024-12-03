@@ -131,6 +131,7 @@ def include(path):
         os.system("chmod a=r " + dest + question + '.tex')
         textpath = dest[len(con.destination) + 1:] + question 
         s += '''
+        
         Q%(question)s. %(textpath)s''' %{'textpath':include_(textpath + '.tex'), 'question': i}
         if path[0] == QUEST_MATH:
             writefile(textpath + 's.tex', '')
