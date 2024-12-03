@@ -10,8 +10,8 @@ import attributes as at
 # depends on file structure
 courses = "ciss240"
 name = "yliow"
-assignment = "a01"
-assignment_it = "1";
+assignment = "a13"
+assignment_it = "13";
 basepath = "New/" # insert path for new directory (you are able to go back)
 destination = basepath + assignment
 # basepath = 
@@ -29,7 +29,7 @@ destination = basepath + assignment
 # - name of file
 contents = [(at.OTHER, "Old/objectives.tex"),
             (at.LATEXSTR, r"\newpage"),
-            (at.OTHER, "Old/instructions.tex"),
+            (at.OTHER, "Old/instruction.tex"),
             (at.LATEXSTR, r"\newpage"),
             (at.QUEST_CODE, "Old/q01.tex"),
             (at.LATEXSTR, r"\newpage"),
@@ -37,9 +37,6 @@ contents = [(at.OTHER, "Old/objectives.tex"),
             (at.LATEXSTR, r"\newpage"),
             (at.QUEST_CODE, "Old/q03.tex"),
             (at.LATEXSTR, r"\newpage"),
-            (at.QUEST_CODE, "Old/q04.tex"),
-            (at.LATEXSTR, r"\newpage"),
-            (at.QUEST_CODE, "Old/q05.tex"),
-            (at.LATEXSTR, r"\newpage")
+            (at.QUEST_CODE, "Old/q04.tex")
             ]
 ###########################################################################
