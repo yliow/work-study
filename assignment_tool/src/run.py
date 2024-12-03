@@ -5,7 +5,6 @@ import config #config should be imported from a general "a0X" structure
 import attributes as at
 import shutil
 
-shutil.copy('ciss240_1.py', 'config.py')
 
 # makes the file structure
 if f.file_struct():
