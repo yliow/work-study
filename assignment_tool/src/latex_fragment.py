@@ -8,26 +8,20 @@ import os
 def main():
     s = r'''
 \input{thispreamble.tex}
-
 \newcommand\myincludetex[1]{\textbox{{\scriptsize \texttt{#1}}}
 
-
     \input{#1}
-
 }
 
 \newcommand\myincludesrc[1]{\textbox{{\scriptsize \texttt{#1}}}
-
-
+    
     \VerbatimInput[fontsize=\footnotesize,frame=single]{#1}
-
 }
-    '''
+
+'''
     i = 1
     for path in con.contents:
-        s += r'''
-%(include)s
-        '''  % {'include':at.include(path)}
+        s += '%(include)s'  % {'include':at.include(path)}
     s += r'''
 \input{thispostamble.tex}
     '''

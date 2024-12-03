@@ -43,6 +43,9 @@ contents = [(at.OTHER, "Old/objective.tex"),
             (at.LATEXSTR, r"\newpage"),
             (at.QUEST_CODE, "Old/q06.tex"),
             (at.LATEXSTR, r"\newpage"),
-            (at.QUEST_CODE, "Old/q07.tex")
+            (at.QUEST_CODE, "Old/q07.tex"),
+            (at.EXTRA_DOCUMENTS, "Old/q07/pic1.png"),
+            (at.EXTRA_DOCUMENTS, "Old/q07/pic2.png"),
+            
             ]
 ###########################################################################
