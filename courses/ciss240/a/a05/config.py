@@ -29,8 +29,6 @@ destination = basepath + assignment
 # - name of file
 contents = [(at.OTHER, "Old/objective.tex"),
             (at.LATEXSTR, r"\newpage"),
-            (at.OTHER, "Old/instructions.tex"),
-            (at.LATEXSTR, r"\newpage"),
             (at.QUEST_CODE, "Old/q01.tex"),
             (at.LATEXSTR, r"\newpage"),
             (at.QUEST_CODE, "Old/q02.tex"),
@@ -41,7 +39,6 @@ contents = [(at.OTHER, "Old/objective.tex"),
             (at.LATEXSTR, r"\newpage"),
             (at.QUEST_CODE, "Old/q05.tex"),
             (at.LATEXSTR, r"\newpage"),
-            (at.QUEST_CODE, "Old/q06.tex"),
-            (at.LATEXSTR, r"\newpage")
+            (at.QUEST_CODE, "Old/q06.tex")
             ]
 ###########################################################################

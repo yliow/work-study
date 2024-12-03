@@ -29,15 +29,15 @@ destination = basepath + assignment
 # - name of file
 contents = [(at.OTHER, "Old/objective.tex"),
             (at.LATEXSTR, r"\newpage"),
-            (at.OTHER, "Old/instructions.tex"),
+            (at.OTHER, "Old/instruction.tex"),
             (at.LATEXSTR, r"\newpage"),
-            (at.QUEST_CODE, "Old/a04q01/question/main.tex"),
+            (at.QUEST_CODE, "Old/q01.tex"),
             (at.LATEXSTR, r"\newpage"),
-            (at.QUEST_CODE, "Old/a04q02/question/main.tex"),
+            (at.QUEST_CODE, "Old/q02.tex"),
             (at.LATEXSTR, r"\newpage"),
-            (at.QUEST_CODE, "Old/a04q03/question/main.tex"),
+            (at.QUEST_CODE, "Old/q03.tex"),
             (at.LATEXSTR, r"\newpage"),
-            (at.QUEST_CODE, "Old/a04q04/question/main.tex"),
+            (at.QUEST_CODE, "Old/q04.tex"),
             (at.LATEXSTR, r"\newpage")
             ]
 ###########################################################################

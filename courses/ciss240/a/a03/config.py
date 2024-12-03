@@ -12,7 +12,7 @@ courses = "ciss240"
 name = "yliow"
 assignment = "a03"
 assignment_it = "3";
-basepath = "test/ciss240/" # insert path for new directory (you are able to go back)
+basepath = "New/" # insert path for new directory (you are able to go back)
 destination = basepath + assignment
 # basepath = 
 # go to basepath, write, then go back to cwd
@@ -27,15 +27,15 @@ destination = basepath + assignment
 # - skel is the skelenton code that needs to be in the 
 # - other is any other latex files that needs to be included
 # - name of file
-contents = [(at.OTHER, "../../courses/ciss240/a/a03/objective.tex"),
+contents = [(at.OTHER, "Old/objective.tex"),
             (at.LATEXSTR, r"\newpage"),
-            (at.QUEST_CODE, "../../courses/ciss240/a/a03/a03q01/question/main.tex"),
+            (at.QUEST_CODE, "Old/q01.tex"),
             (at.LATEXSTR, r"\newpage"),
-            (at.QUEST_CODE, "../../courses/ciss240/a/a03/a03q02/question/main.tex"),
+            (at.QUEST_CODE, "Old/q02.tex"),
             (at.LATEXSTR, r"\newpage"),
-            (at.QUEST_CODE, "../../courses/ciss240/a/a03/a03q03/question/main.tex"),
+            (at.QUEST_CODE, "Old/q03.tex"),
             (at.LATEXSTR, r"\newpage"),
-            (at.QUEST_CODE, "../../courses/ciss240/a/a03/a03q04/question/main.tex"),
+            (at.QUEST_CODE, "Old/q04.tex"),
             (at.LATEXSTR, r"\newpage")
             ]
 ###########################################################################
