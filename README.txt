@@ -24,13 +24,13 @@ a01                        work
 a02                        work                                                
 a03                        work                                                
 a04                        work                                                
-a05                                                                        
-a06                                                                        
-a07                                      done                     
-a08                                                                        
-a09                                                                        
-a10                                                                        
-a11                                                                        
+a05                              
+a06                              work                                          
+a07                                       done                     
+a08                              work                                          
+a09                              work                                          
+a10                              work                                          
+a11                              work                                          
 a12                                                                        
 a13                                                                        
                                                                
