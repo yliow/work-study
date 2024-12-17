@@ -1,0 +1,148 @@
+%-*-latex-*-
+Write a function \verb!days_in_month()! such that
+\verb!days_in_month(month, year)! returns the number of days in the given
+\verb!month! (an \verb!int!) of the given \verb!year! (an \verb!int!).
+(See $a06$.)
+
+You must use the skeleton code given below. Note that the test cases are
+included in the code.
+
+You will need the function from Q3. Therefore you should copy-and-paste the
+function from Q3 to the code for this question.
+\begin{console}
+#include <iostream>
+
+
+//------------------------------------------------------------------------
+// This function returns true if year is a leap year. Otherwise false is
+// returned.
+// (This function has no output.)
+//------------------------------------------------------------------------
+bool is_leap_year(int year)
+{
+    ... your code here ...
+}
+
+
+//------------------------------------------------------------------------
+// This function returns the number of days in given month and year.
+// (This function has no output.)
+//------------------------------------------------------------------------
+int days_in_month(int month, int year)
+{
+    ... your code here ...
+}
+
+
+int main()
+{
+    int m, y;
+    std::cin >> m >> y;
+    std::cout << days_in_month(m, y) << std::endl;
+
+    return 0;
+}
+\end{console}
+
+For your reference, here's a relevant program from a previous assignment:
+\begin{Verbatim}[frame=single]
+#include <iostream>
+
+int main()
+{
+    int yyyymmdd = 0;
+    std::cin >> yyyymmdd;
+    
+    int yyyy = yyyymmdd / 10000;    // year
+    int mm = yyyymmdd / 100 % 100;  // month
+    int dd = yyyymmdd % 100;        // day-of-month
+        
+    bool valid = false; // true exactly when yyyymmdd is a valid date
+    
+    if (1 <= mm && mm <= 12)
+    {
+        if (mm == 2)
+        {
+            //------------------------------------------------------------
+            // CASE: February. 
+            // There are 29 or 28 days depending on whether the year
+            // is a leap year or not. 
+            //------------------------------------------------------------
+            if (yyyy % 4 == 0 
+                && ((yyyy % 100 != 0) || (yyyy % 100 == 0) 
+                    && (yyyy % 400 == 0)))
+            {
+                valid = (1 <= dd && dd <= 29);
+            }
+            else
+            {
+                valid = (1 <= dd && dd <= 28);
+            }
+        }
+        else if ((mm % 2 == 1 && mm <= 7) || (mm % 2 == 0 && mm >= 8))
+        {
+            //------------------------------------------------------------
+            // CASE: 31 days in months 1,3,5,7,8,10,12
+            //------------------------------------------------------------
+            valid = (1 <= dd && dd <= 31);
+        }
+        else
+        {
+            //------------------------------------------------------------
+            // CASE: 30 days in months 4,6,9,11
+            //------------------------------------------------------------
+            valid = (1 <= dd && dd <= 30);
+        }
+    }
+    
+    if (valid) 
+    {
+        std::cout << "correct" << std::endl;
+    }
+    else
+    {
+        std::cout << "incorrect" << std::endl;
+    }
+
+    return 0;
+}
+\end{Verbatim}
+
+Make sure you test your program thoroughly.
+
+\resett
+\nextt
+\begin{console}[frame=single, commandchars=\\\{\}]
+\userinput{2 2004}
+29
+\end{console}
+
+\nextt
+\begin{console}[frame=single, commandchars=\\\{\}]
+\userinput{2 2003}
+28
+\end{console}
+
+\nextt
+\begin{console}[frame=single, commandchars=\\\{\}]
+\userinput{5 2003}
+31
+\end{console}
+
+\nextt
+\begin{console}[frame=single, commandchars=\\\{\}]
+\userinput{2 1900}
+28
+\end{console}
+
+\nextt
+\begin{console}[frame=single, commandchars=\\\{\}]
+\userinput{9 2008}
+30
+\end{console}
+
+\nextt
+\begin{console}[frame=single, commandchars=\\\{\}]
+\userinput{2 1200}
+29
+\end{console}
