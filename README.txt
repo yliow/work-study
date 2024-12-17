@@ -1,25 +1,53 @@
 PROJECT: NOTES
-                                                                   (Put "work" or "done")
-yliow home dir                          work study dir             ryan  robert  nasser      liow
---------------                          --------------             ----  ------  ------      ----
-courses/ciss350/a/a01                   courses/ciss350/a/a01                                               
-courses/ciss350/a/a02                   courses/ciss350/a/a02                                               
-courses/ciss350/a/a03                   courses/ciss350/a/a03                                               
 
-courses/ciss240/a/a01                   courses/ciss240/a/a01             work                               
-courses/ciss240/a/a02                   courses/ciss240/a/a02             work
-courses/ciss240/a/a03                   courses/ciss240/a/a03
-courses/ciss240/a/a04                   courses/ciss240/a/a04             work
-courses/ciss240/a/a05                   courses/ciss240/a/a05             work
-courses/ciss240/a/a06                   courses/ciss240/a/a06             work
-courses/ciss240/a/a07                   courses/ciss240/a/a07             work
-courses/ciss240/a/a08                   courses/ciss240/a/a08
-courses/ciss240/a/a09                   courses/ciss240/a/a09
-courses/ciss240/a/a10                   courses/ciss240/a/a10
-courses/ciss240/a/a11                   courses/ciss240/a/a11
-courses/ciss240/a/a12                   courses/ciss240/a/a12
-
-courses/ciss358/a/a02                   courses/ciss358/a/a02
+ciss240                    ryan  robert  nasser      liow
+--------------             ----  ------  ------      ----
+                                                           
+a01                              done                       
+a02                              done                       
+a03                              done                     
+a04                              done                     
+a05                              done                     
+a06                              done                     
+a07                              done                     
+a08                              done                     
+a09                              done                     
+a10                              done                     
+a11                              done                     
+a12                              done                     
+a13                              done                     
+                                                               
+ciss245                    ryan  robert  nasser      liow
+--------------             ----  ------  ------      ----
+                                                           
+a01                        work                                                
+a02                        work                                                
+a03                        work                                                
+a04                        work                                                
+a05                                                                        
+a06                                                                        
+a07                                      done                     
+a08                                                                        
+a09                                                                        
+a10                                                                        
+a11                                                                        
+a12                                                                        
+a13                                                                        
+                                                               
+ciss350                    ryan  robert  nasser      liow
+--------------             ----  ------  ------      ----
+                                                           
+a01                        work                                                
+a02                        work                                                
+a03                        work                                                
+a04                        work                                                
+a05                                                                        
+a06                                                                        
+a07                                                           
+a09                                                                        
+a10                                                                        
+a13                                                                        
+a14                                                                        
 
 IMPORTANT ASSIGNMENT_TOOL INFO:
 All files under "..\assignment_tool" should go under a directory in "/usr/lib/python3.12/site-packages"
