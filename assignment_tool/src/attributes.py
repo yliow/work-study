@@ -49,11 +49,13 @@ FILE_VERSION = File_type[VERS] # do the initial file structure, false if we want
 
 #store these constants in a different file
 OTHER = 'other'
-EXTRA_DOCUMENTS = "documents"
+EXTRA_DOCUMENTS = "extra_documents"
+DOCUMENTS = "documents"
 LATEXSTR = 'latex string'
 QUEST_CODE = 'QUESTION'
 QUEST_MATH = 'question'
 SKELETON = 'skeleton'
+SKEL_PDF = 'skel in pdf'
 
 
 def writefile(path, s):
@@ -67,7 +69,8 @@ def is_latex(path):
 
 def is_answer(path):
     x = path[len(path) - 5:]
-    return x == 's.tex'
+    file_ = file_getter(path)
+    return x == 's.tex' and file_[0] == 'q'
 
 def include_latex(path):
     if (is_answer(path)):
@@ -137,7 +140,9 @@ def include(path):
     global QUEST_CODE
     global QUEST_MATH
     global SKELETON
+    global SKEL_PDF
     global EXTRA_DOCUMENTS
+    global DOCUMENTS
     
     i = QUESTION_ITERATOR
     
@@ -159,25 +164,29 @@ def include(path):
             s += r'''\SOLUTION
 %(textpath)s
 ''' %{'textpath': include_(textpath + 's.tex')}
-    elif path[0] == EXTRA_DOCUMENTS:
+    elif path[0] == EXTRA_DOCUMENTS or path[0] == DOCUMENTS:
         dest = struct['q doc%(i)s'%{'i': str(i)}]
         
         file_ = file_getter(path[1])
         copy_path(path[1], dest + '/' + file_)
-        s = ''''''
+        if path[0] == DOCUMENTS:
+            textpath = dest[len(con.destination) + 1:] + '/' + file_
+            
+            s += ''' %(textpath)s
+''' %{'textpath':include_(textpath)}
         
     elif path[0] == LATEXSTR:
         s = path[1] + ' '
         
-    elif path[0] == SKELETON:
+    elif path[0] == SKELETON or path[0] == SKEL_PDF:
         
         file_ = file_getter(path[1])
         
         dest = struct['skel%(i)s'%{'i': str(i)}]
         copy_path(path[1], dest + '/' + file_)
         textpath = dest[len(con.destination) + 1:] + '/' + file_
-        s += '''%(textpath)s
-
+        if path[0] == SKEL_PDF:
+            s += '''%(textpath)s
 '''%{'textpath': include_(textpath)}
         
     elif path[0] == OTHER:
