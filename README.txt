@@ -20,13 +20,13 @@ a13                              done
 ciss245                    ryan  robert  nasser      liow
 --------------             ----  ------  ------      ----
                                                            
-a01                        work                                                
-a02                        work                                                
-a03                        work                                                
-a04                        work                                                
-a05                              
+a01                        work          done                                  
+a02                        work          done                                  
+a03                        work          done                                   
+a04                        work          done                                   
+a05                                      done
 a06                              work                                          
-a07                                       done                     
+a07                              done                     
 a08                              work                                          
 a09                              work                                          
 a10                              work                                          
@@ -41,10 +41,10 @@ a01                        work
 a02                        work                                                
 a03                        work                                                
 a04                        work                                                
-a05                                                                        
-a06                                                                        
-a07                                                           
-a09                                                                        
+a05                                      work                                  
+a06                                      work                                  
+a07                                      work                     
+a09                                      work                                  
 a10                                                                        
 a13                                                                        
 a14                                                                        
