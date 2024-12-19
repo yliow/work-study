@@ -1,0 +1,286 @@
+\textsc{SPOILERS: Advice and recursion}
+
+The following are some suggestions/advice. You need not follow 
+them. In fact, treat them as spoilers. Look at them only when 
+you're stuck. Also, I'll try not to give you too much help below 
+so that you can learn from your struggles. But if you really need 
+help, read the following and if you need more help, obviously you 
+can talk to me or discuss with fellow students and share ideas. 
+And remember that plagiarism – as in copying code – is not allowed. 
+
+Again, implement one small feature at a time, testing it completely 
+before moving on to the next.
+
+Clearly you must implement constructors first. The next thing to 
+implement is printing. After all, if you can't print, you can't debug!
+
+After you have read the requirements above (carefully), 
+you might want to think about how you want to split the logic in your methods
+into cases before writing methods for all cases at once.
+
+
+For \verb!operator+! and \verb!operator+=!, remember that you can easily 
+implement \verb!operator+! once you have \verb!operator+=! since for 
+almost any imaginable \verb!class C!, once you have the copy constructor 
+and \verb!operator+=! working correctly, \verb!operator+! will always 
+look like this:
+
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+C operator+(const C & c) const
+{
+    return C(*this) += c;
+}
+\end{Verbatim}
+
+So the focus is on \verb!operator+=!. I suggest you first handle the case 
+of adding positive \verb!LongInt! objects. In other words test 
+\begin{console}[fontsize=\footnotesize]
+LongInt(123) + LongInt(456)
+\end{console}
+and
+\begin{console}[fontsize=\footnotesize]
+LongInt i(123);
+i += LongInt(456); 
+\end{console}
+and not 
+\begin{console}[fontsize=\footnotesize]
+LongInt i(123);
+i += (LongInt(-456)
+\end{console}
+or
+\begin{console}[fontsize=\footnotesize]
+LongInt(123) + (LongInt(-456)
+\end{console}
+
+This means that you might (I'm not 
+saying you must) want your \verb!operator+=! to look like this:
+
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+LongInt & operator+=(const LongInt & I)
+{
+    if (*this is positive and I is positive)
+    {
+    }
+    // leave the other cases out first
+}
+\end{Verbatim}
+and if so, you might want to have an “is positive method” in your class, 
+i.e., have your \verb!operator>=! done first. This means that you might 
+as well finish all the boolean operators first:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+operator==
+operator!=
+operator<
+operator<=
+operator>
+operator>=
+\end{Verbatim}
+(After all these are much simpler.)
+Once you're done with \verb!operator+=! for positive \verb!LongInt! objects, 
+you should realize after some thought that adding two negative numbers is 
+actually very easy. Why? If you try to add -123 and -456, isn't that the same 
+as adding 123 and 456 and then sticking in a negative sign? Therefore the addition 
+of two negative numbers actually depend on the addition of two position numbers. 
+I'll let you think about that.
+The pseudocode is then:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+LongInt & operator+=(const LongInt & I)
+{
+    if (*this is positive and I is positive)
+    {
+    }
+    else (*this is negative and I is negative)
+    {
+        let J be the same as *this but with sign = 1
+        let K be the same as I but with sign = 1
+        then both J and K are positive
+        perform J += K (recursion)
+        copy J to *this, but set the sign of *this to -1
+    }
+    // other cases
+}
+\end{Verbatim}
+
+But what about the addition of a positive and a 
+negative? For instance 123 and -456. You can actually think of that as the subtraction 
+$123 - 456$. So in this case, it depends on \verb!operator-=! where the two number are 
+positive. Etc.
+
+Altogether there are 4 cases for \verb!operator+=! and also several cases for \verb!operator-=!.
+Figure out the simple cases, write and test them, and then
+get the other cases to call these simple cases (recursively) and it will
+save you a lot of work.
+
+
+\newpage
+\textsc{SPOILERS: Multiplication}
+
+You should use the standard column multiplication algorithm which you should be very 
+familiar with. Here's an example. Suppose you want to multiply $A = 123$ with $B = 142$, you would do this:
+
+\begin{Verbatim}
+                      1 2 3
+                x     1 4 2
+                ------------
+                      2 4 6
+                    4 9 2
+                + 1 2 3
+                ------------
+                  1 7 4 6 6
+                ------------
+\end{Verbatim}
+
+Of course this is just
+
+\begin{Verbatim}
+                      1 2 3
+                x     1 4 2
+                ------------
+                      2 4 6
+                    4 9 2 0
+                + 1 2 3 0 0
+                ------------
+                  1 7 4 6 6
+                ------------
+\end{Verbatim}
+
+(I've added zeroes.) The rows that you're adding are:
+
+\begin{Verbatim}
+                      2 4 6
+                    4 9 2 0
+                  1 2 3 0 0
+\end{Verbatim}
+
+And where do they come from?
+
+\begin{Verbatim}
+                      2 4 6 = 123 x 1
+                    4 9 2 0 = 123 x 4 x 10
+                  1 2 3 0 0 = 123 x 2 x 100
+\end{Verbatim}
+
+or
+
+\begin{Verbatim}
+                      2 4 6 = 123 x 1 x 10^0
+                    4 9 2 0 = 123 x 4 x 10^1
+                  1 2 3 0 0 = 123 x 2 x 10^2
+\end{Verbatim}
+
+(To make things more regular looking.) If I replace the 123 by \verb!A!, 
+the rows become
+
+\begin{Verbatim}
+                      2 4 6 = A x 1 x 10^0
+                    4 9 2 0 = A x 4 x 10^1
+                  1 2 3 0 0 = A x 2 x 10^2
+\end{Verbatim}
+
+Of course the 1 and 4 and 2 are the digits of B.
+
+\begin{Verbatim}
+                      2 4 6 = A x B[0] x 10^0
+                    4 9 2 0 = A x B[1] x 10^1
+                  1 2 3 0 0 = A x B[2] x 10^2
+\end{Verbatim}
+
+This means that as long as you have a way to multiply your 
+\verb!LongInt! objects by a digit and you have a way to multply 
+your \verb!LongInt! object by 10 powers, you can generate the 
+rows in your column multiplication. Suppose we call these 
+functions (or methods – it's up to you) \verb!MULT_BY_DIGIT! 
+and \verb!MULT_BY_TENPOWER!, the above is
+
+\begin{Verbatim}
+                  2 4 6 = MULT_BY_TENPOWER(MULT_BY_DIGIT(A, B[0]), 0)
+                4 9 2 0 = MULT_BY_TENPOWER(MULT_BY_DIGIT(A, B[1]), 1)
+              1 2 3 0 0 = MULT_BY_TENPOWER(MULT_BY_DIGIT(A, B[2]), 2)
+\end{Verbatim}
+
+Clearly this is a loop over the digits of B. Once you have your program 
+printing out the row correctly, you can start to add them. The 
+pseudocode is of course this:
+
+\begin{Verbatim}
+                sum = 0
+                for i = 0, 1, 2, ...:
+                    term = MULT_BY_TENPOWER(MULT_BY_DIGIT(A, B[i]), i)
+                    sum += term
+\end{Verbatim}
+
+Of course it's clear that you MUST have all the addition operations 
+done before doing multiplication. And of course you have to make the 
+above work for all \verb!LongInt! objects including objects with 
+different sizes. You also have to make sure that you can multiply 
+integers which are negative. This is easy. For instance if you're 
+told in school to multiply 123 and -142, you would just multiply 123 
+and 142 and then add a negative sign to the product.
+
+(The high school multiplication method is actually not the only 
+way to perform multiplication. Its been thought for a very long time 
+that it's the most efficient way. It was only very recent – a couple 
+of decades ago – that a more efficient method was discovered by a 
+Russian around the 60s. This is called the Karatsuba algorithm.
+See CISS358.)
+
+
+\newpage 
+\textsc{Division and mod \%}
+
+I'll leave division and mod (i.e., \texttt{\%}) to you. You only need to think 
+about \verb!LongInt! division for positive integers.
+
+I have already given you the algorithm in CISS240:
+\[
+\frac{21}{4} = 5 \frac{1}{4}
+\]
+where $5$ is the integer division of 21 by 4 (also called the quotient)
+and $1$ is the remainder, i.e., $1$ is $21 \% 4$.
+And how do you calculate the 5 and the 1?
+
+Pretend you have 21 dollars and you want to give that out evenly to 4 friends.
+Continually give out 4 dollars to each friend.
+At some point in time you'll be left with $1$. That's the remainder.
+And each friend has 5 dollars.
+Therefore the quotient and remainder can be calculated
+by repeated subtraction.
+
+There's a fastest way based on \lq\lq long division" method from middle
+school.
+For instance if you want to compute quotient and remainder of
+$3001$ by $2$ using the repeated subtraction, you would have to perform
+$1500$ subtractions of $2$ from $3001$ before you stop.
+A faster way is to realize that since $2$ is so small, you can
+subtract 1000 of $2$'s.
+That will bring $3001$ down to $1001$. Right?
+That's the idea behind long division from middle school.
+At this point, your running-quotient is $1000$.
+You can still subtract $2$ from $1001$.
+But instead of subtracting a $2$ at a time, you can subtract a larger
+number of $2$'s.
+For instance you can subtract $500$ $2$'s from $1001$
+to get it down to $1$.
+At this point your running quotient is $1000 + 500 = 1500$.
+Since you are now down to $1$, you cannot subtract $2$ from $1$ and stay
+positive.
+So the quotient is $1500$ and the remainder is $1$.
+Get it?
+If you don't you should go online and review long division.
+Andif you have not been paying attention in your K-12 math classes, then you
+have been missing out on lots of algorithms discovered for the past 4000 years.
+The general idea is this:
+\begin{console}[fontsize=\footnotesize]
+INPUT: n and divisor
+OUTPUT: quotient and remainder
+1. Let quotient = 0.
+2. Find some m such that n - m * divisor >= 0. If you cannot, go to 5.
+3. Compute n = n - m * divisor and quotient = quotient + m.
+4. Go to 2.
+5. Return quotient and n.
+\end{console}
+The repeated subtraction is when $m$ is always chosen to be $1$.
+
+I leave it to you to decide if you want to implement division and mod using
+repeated subtraction or long division.
+
