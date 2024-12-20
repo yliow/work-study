@@ -37,10 +37,6 @@ a13                              done
 ciss350                    ryan  robert  nasser      liow
 --------------             ----  ------  ------      ----
                                                            
-a01                        work                                                
-a02                        work                                                
-a03                        work                                                
-a04                        work                                                
 a05                                      work                                  
 a06                                      work                                  
 a07                                      work                     
