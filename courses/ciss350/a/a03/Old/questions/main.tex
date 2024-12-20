@@ -1,0 +1,646 @@
+%-*-latex-*-
+\input{myassignmentpreamble}
+\input{yliow}
+\input{ciss350}
+\renewcommand\TITLE{Assignment 3}
+
+\begin{document}
+\topmatter
+
+\textsc{Objectives:}
+\begin{enumerate}[topsep=0pt]
+\item View problems recursively
+\item Write recursive functions
+\end{enumerate}
+
+
+The skeleton code given for each question must be used.
+The trace printing in the code cannot be removed.
+(Just as in CISS245, the skeleton code is of course not complete
+and might have errors. The point is to give you something to begin your
+work.)
+
+\begin{comment}
+
+Q1. [Review of CISS245]
+
+Write a matrix class of \texttt{double}s.
+You should have addition, subtraction, multiplication,
+scalar multiplication, etc.
+You can also compare matrices: \verb!==! and \verb@!=@.
+You can get the number of rows and number of columns using
+\verb!m.nroww()!
+and
+\verb!m.ncols()!
+If you are not familiar with matrix multiplication,
+check online or see below.
+Also, write the the determinant function.
+\begin{Verbatim}[frame=single]
+Mat m0(3, 4);    // 3-by-4 matrix
+Mat m1(3, 4, 0); // 3-by-4 matrix of zeroes
+m0(1, 2) = 5.0;  // Set row 1, column 2 to 5.0
+Mat m2 = m0;     // The obvious copy constructor
+m2 += m1;        // The obvious += operator
+m2 = m2 + m1;
+m2 -= m1;
+m2 = m2 - m1;
+
+Mat m3(4, 3, 2); // 4-by-3 matrix of 2s
+Mat m4(3, 3);
+m4 = m2 * m3;
+
+m4 = 0.5 * m4;
+m4 = m4 * 0.5;
+m4 *= 0.5;
+
+Mat m5 = Mat::identity(3); // m5 is 3-by-3 identity matrix
+
+double x[] = {1.1, 2.2, 3.3, 4.4, 5.5, 6.6};
+Mat m6(2, 3, x); // m6 is 2-by-3 filled with values from x
+\end{Verbatim}
+For output, if \verb!m! models this array
+\[
+\begin{bmatrix}
+1 & 2 & 3.3 \\
+4.56 & 5 & 6 
+\end{bmatrix}
+\]
+the output should be
+\begin{Verbatim}
+[[   1 2 3.3]
+ [4.56 5   6]]
+\end{Verbatim}
+(For the output, go online and check C++ string stream class.
+You can cout the values of the matrix to a string stream object
+which will then give you the lengths of the output of all entries.)
+\end{comment}
+
+
+
+
+\newpage
+Q1. Write a recursive function that implements a power function
+recursively. You must use the following skeleton code which
+contains tracing of your function.
+The recursive power function below computes $a^n$ where $a$ has a 
+\verb!double! value \verb!n! has an integer values that is $\geq 0$.
+(You need not worry about the case when \verb!n! is $< 0$.)
+\begin{Verbatim}[frame=single, fontsize=\small]
+#include <iostream>
+
+double pow_rec(double a, int n)
+{
+    if (n == -99999) // modify base condition
+    {
+        double ret = -99999; // set ret to correct value
+        std::cout << "pow_rec(" << a << ", " << n << ") base case ... return "
+                  << ret << '\n';
+        return ret;
+    }
+    else
+    {
+        std::cout << "pow_rec(" << a << ", " << n << ") recursive case ...\n";
+        double ret = -99999; // set ret to correct value
+        std::cout << "pow_rec(" << a << ", " << n << ") recursive case ... "
+                  << "return " << ret << '\n';
+        return ret;        
+    }
+}
+
+int main()
+{
+    double a;
+    int n;
+    std::cin >> a >> n;
+    double p = pow_rec(a, n);
+    std::cout << p << '\n';
+    return 0;
+}
+\end{Verbatim}
+
+Hint:
+If $a$ is a real number say $3.1$ and $n$ is a positive say $5$.
+You want to think of $3.1^5$ in terms of a smaller subproblem.
+For instance is there a relationship between $3.1^5$ and $3.1^4$?
+
+\textsc{Test 1}
+\begin{Verbatim}[frame=single, fontsize=\small, commandchars=\\\{\}]
+\underline{2 0}
+pow_rec(2, 0) base case ... return 1
+1
+\end{Verbatim}
+
+\textsc{Test 2}
+\begin{Verbatim}[frame=single, fontsize=\small, commandchars=\\\{\}]
+\underline{2 4}
+pow_rec(2, 4) recursive case ...
+pow_rec(2, 3) recursive case ...
+pow_rec(2, 2) recursive case ...
+pow_rec(2, 1) recursive case ...
+pow_rec(2, 0) base case ... return 1
+pow_rec(2, 1) recursive case ... return 2
+pow_rec(2, 2) recursive case ... return 4
+pow_rec(2, 3) recursive case ... return 8
+pow_rec(2, 4) recursive case ... return 16
+16
+\end{Verbatim}
+
+Make sure you create your own test cases as well.
+
+
+
+
+\newpage
+Q2.
+Write a recursive max function that implements
+the maximum value of an array.
+You must use the following skeleton code which
+contains tracing of your function.
+You may assume the array has at least one value (i.e., the size is $\geq 1$.)
+
+The function
+\verb!max_rec(x, start, end)!
+computes the maximum value of
+\verb!x[start]!, 
+\verb!x[start + 1]!, 
+\verb!x[start + 2]!, ...,
+\verb!x[end - 1]!.
+
+You must use a recursive relation between
+\verb!max_rec(x, start, end)!
+and
+\\
+\verb!max_rec(x, start, end - 1)!
+
+\begin{Verbatim}[frame=single, fontsize=\small]
+#include <iostream>
+
+int max_rec(int x[], int start, int end)
+{
+    if (start == end - 1)
+    {
+        int ret = -99999; // set ret to correct value
+        std::cout << "max_rec(x, " << start << ", " << end
+                  << ") base case ... "
+                  << "return " << ret << '\n';
+        return ret;
+    }
+    else
+    {
+        std::cout << "max_rec(x, " << start << ", " << end
+                  << ") recursive case ...\n";
+
+        int ret = -99999; // set ret to correct value
+
+
+
+
+
+        std::cout << "max_rec(x, " << start << ", " << end 
+                  << ") recursive case ... "
+                  << "return " << ret << '\n';
+        return ret;        
+    }
+}
+
+int main()
+{
+    int n;
+    std::cin >> n;
+    int * x = new int[n];
+    for (int i = 0; i < n; ++i)
+    {
+        std::cin >> x[i];
+    }
+    int max = max_rec(x, 0, n);
+    std::cout << max << '\n';
+    delete [] x;
+    return 0;
+}
+\end{Verbatim}
+
+\textsc{Test 1}
+\begin{Verbatim}[commandchars=\\\{\}, fontsize=\small, frame=single]
+\underline{5}
+\underline{1 6 9 2 4}
+max_rec(x, 0, 5) recursive case ...
+max_rec(x, 0, 4) recursive case ...
+max_rec(x, 0, 3) recursive case ...
+max_rec(x, 0, 2) recursive case ...
+max_rec(x, 0, 1) base case ...return 1
+max_rec(x, 0, 2) recursive case ...return 6
+max_rec(x, 0, 3) recursive case ...return 9
+max_rec(x, 0, 4) recursive case ...return 9
+max_rec(x, 0, 5) recursive case ...return 9
+9
+\end{Verbatim}
+(Clearly the inputs are the size of the array and the array.)
+
+\textsc{Test 2}
+\begin{Verbatim}[commandchars=\\\{\}, fontsize=\small, frame=single]
+\underline{5}
+\underline{9 4 1 2 6}
+max_rec(x, 0, 5) recursive case ...
+max_rec(x, 0, 4) recursive case ...
+max_rec(x, 0, 3) recursive case ...
+max_rec(x, 0, 2) recursive case ...
+max_rec(x, 0, 1) base case ...return 9
+max_rec(x, 0, 2) recursive case ...return 9
+max_rec(x, 0, 3) recursive case ...return 9
+max_rec(x, 0, 4) recursive case ...return 9
+max_rec(x, 0, 5) recursive case ...return 9
+9
+\end{Verbatim}
+
+\textsc{Test 4}
+\begin{Verbatim}[commandchars=\\\{\}, fontsize=\small, frame=single]
+\underline{1}
+\underline{10}
+max_rec(x, 0, 1) base case ...return 10
+10
+\end{Verbatim}
+
+
+Make sure you create your own test cases as well.
+
+
+
+
+
+
+\newpage
+Q3.
+Write a recursive linear search function that implements
+a linear search recursively.
+You must use the following skeleton code which
+contains tracing of your function.
+The recursive linear search function below returns
+the first index \verb!i! where \verb!x[i]! is \verb!target!
+in the array \verb!x!.
+Otherwise \verb!-1! is returned.
+
+You must use a recursive relation between
+\verb!linearsearch_rec(x, start, end, target)!
+and
+\verb!linearsearch_rec(x, start + 1, end, target)!
+when \verb!n! is \verb!start! is $<$ \verb!end - 1!.
+Basically,
+\\
+\verb!linearsearch_rec(x, start, end, target)!
+performs a linear search on
+\\
+\verb!x[start]!,
+\verb!x[start + 1]!,
+\verb!x[start + 2]!, ...,
+\verb!x[end - 1]!,
+
+\begin{Verbatim}[frame=single, fontsize=\small,commandchars=\~\!\@]
+#include <iostream>
+
+int linearsearch_rec(int x[], int start, int end, int target)
+{
+    if (start == end)
+    {
+        int ret = -99999; // set ret to correct value
+        std::cout << "linearsearch_rec(x, " << start << ", " << end << ", "
+                  << target << ") base case ... "
+                  << "return " << ret << '\n';
+        return ret;
+    }
+    else
+    {
+        std::cout << "linearsearch_rec(x, " << start << ", " << end << ", "
+                  << target << ") recursive case ...\n";
+
+        int ret = -99999; // set ret to correct value
+
+
+
+
+
+        std::cout << "linearsearch_rec(x, " << start << ", " << end << ", "
+                  << target << ") recursive case ... "
+                  << "return " << ret << '\n';
+        return ret;        
+    }
+}
+
+int main()
+{
+    int n, target;
+    std::cin >> n;
+    int * x = new int[n];
+    for (int i = 0; i < n; ++i)
+    {
+        std::cin >> x[i];
+    }
+    std::cin >> target;
+    int index = linearsearch_rec(x, 0, n, target);
+    std::cout << index << '\n';
+    delete [] x;
+    return 0;
+}
+\end{Verbatim}
+
+\textsc{Test 1}
+\begin{Verbatim}[commandchars=\\\{\}, fontsize=\small, frame=single]
+\underline{5}
+\underline{1 3 2 5 4}
+\underline{2}
+linearsearch_rec(x, 0, 5, 2) recursive case ...
+linearsearch_rec(x, 1, 5, 2) recursive case ...
+linearsearch_rec(x, 2, 5, 2) recursive case ...
+linearsearch_rec(x, 2, 5, 2) recursive case ...return 2
+linearsearch_rec(x, 1, 5, 2) recursive case ...return 2
+linearsearch_rec(x, 0, 5, 2) recursive case ...return 2
+2
+\end{Verbatim}
+(Clearly the inputs are the size of the array, the array, and the target.)
+
+\textsc{Test 2}
+\begin{Verbatim}[commandchars=\\\{\}, fontsize=\small, frame=single]
+\underline{5}
+\underline{1 3 2 5 4}
+\underline{4}
+linearsearch_rec(x, 0, 5, 4) recursive case ...
+linearsearch_rec(x, 1, 5, 4) recursive case ...
+linearsearch_rec(x, 2, 5, 4) recursive case ...
+linearsearch_rec(x, 3, 5, 4) recursive case ...
+linearsearch_rec(x, 4, 5, 4) recursive case ...
+linearsearch_rec(x, 4, 5, 4) recursive case ...return 4
+linearsearch_rec(x, 3, 5, 4) recursive case ...return 4
+linearsearch_rec(x, 2, 5, 4) recursive case ...return 4
+linearsearch_rec(x, 1, 5, 4) recursive case ...return 4
+linearsearch_rec(x, 0, 5, 4) recursive case ...return 4
+4
+\end{Verbatim}
+
+\textsc{Test 4}
+\begin{Verbatim}[commandchars=\\\{\}, fontsize=\small, frame=single]
+\underline{5}
+\underline{3 1 4 5 2}
+\underline{3}
+linearsearch_rec(x, 0, 5, 3) recursive case ...
+linearsearch_rec(x, 0, 5, 3) recursive case ...return 0
+0
+\end{Verbatim}
+
+\textsc{Test 5}
+\begin{Verbatim}[commandchars=\\\{\}, fontsize=\small, frame=single]
+\underline{5}
+\underline{5 4 3 2 1}
+\underline{0}
+linearsearch_rec(x, 0, 5, 0) recursive case ...
+linearsearch_rec(x, 1, 5, 0) recursive case ...
+linearsearch_rec(x, 2, 5, 0) recursive case ...
+linearsearch_rec(x, 3, 5, 0) recursive case ...
+linearsearch_rec(x, 4, 5, 0) recursive case ...
+linearsearch_rec(x, 5, 5, 0) base case ...return -1
+linearsearch_rec(x, 4, 5, 0) recursive case ...return -1
+linearsearch_rec(x, 3, 5, 0) recursive case ...return -1
+linearsearch_rec(x, 2, 5, 0) recursive case ...return -1
+linearsearch_rec(x, 1, 5, 0) recursive case ...return -1
+linearsearch_rec(x, 0, 5, 0) recursive case ...return -1
+-1
+\end{Verbatim}
+
+Make sure you create your own test cases as well.
+
+
+
+
+
+
+
+\newpage
+Q4.
+Write a recursive bubblesort function that implements
+bubblesort recursively.
+Specifically, \verb!bubblesort_rec(x, start, end)!
+performs bubblesort on
+\\
+\verb!x[start]!,
+\verb!x[start + 1]!,
+\verb!x[start + 2]!, ...,
+\verb!x[end - 1]!,
+
+You must use the following skeleton code which
+contains tracing of your function.
+
+You must use a recursive relation between
+\verb!bubblesort_rec(x, start, end)!
+and
+\\
+\verb!bubblesort_rec(x, start, end - 1)!.
+
+\begin{Verbatim}[frame=single, fontsize=\small]
+#include <iostream>
+#include <string>
+
+void print(int x[], int end)
+{
+    std::string delim = "";
+    std::cout << '{';
+    for (int i = 0; i < end; ++i)
+    {
+        std::cout << delim << x[i];
+        delim = ", ";
+    }
+    std::cout << '}';
+}
+
+
+void bubblesort_rec(int x[], int start, int end)
+{
+    if (start >= end - 1)
+    {
+        std::cout << "bubblesort_rec(";
+        print(x, end);
+        std::cout << ", " << start << ", " << end
+                  << ") base case ... return\n";
+        return;
+    }
+    else
+    {
+        std::cout << "bubblesort_rec(";
+        print(x, end);
+        std::cout << ", " << start << ", " << end
+                  << ") recursive case ...\n";
+
+
+
+
+        
+
+
+        std::cout << "bubblesort_rec(";
+        print(x, end);
+        std::cout << ", " << start << ", " << end
+                  << ") recursive case ... return\n";
+        return;
+    }
+}
+
+int main()
+{
+    int n;
+    std::cin >> n;
+    int * x = new int[n];
+    for (int i = 0; i < n; ++i)
+    {
+        std::cin >> x[i];
+    }
+    bubblesort_rec(x, 0, n);
+    print(x, n);
+    std::cout << '\n';
+    delete [] x;
+    return 0;
+}
+\end{Verbatim}
+
+\textsc{Test 1}
+\begin{Verbatim}[commandchars=\~\!\@, fontsize=\small, frame=single]
+~underline!5@
+~underline!5 1 4 2 3@
+bubblesort_rec({5, 1, 4, 2, 3}, 0, 5) recursive case ...
+bubblesort_rec({1, 4, 2, 3}, 0, 4) recursive case ...
+bubblesort_rec({1, 2, 3}, 0, 3) recursive case ...
+bubblesort_rec({1, 2}, 0, 2) recursive case ...
+bubblesort_rec({1}, 0, 1) base case ... return
+bubblesort_rec({1, 2}, 0, 2) recursive case ... return
+bubblesort_rec({1, 2, 3}, 0, 3) recursive case ... return
+bubblesort_rec({1, 2, 3, 4}, 0, 4) recursive case ... return
+bubblesort_rec({1, 2, 3, 4, 5}, 0, 5) recursive case ... return
+{1, 2, 3, 4, 5}
+\end{Verbatim}
+(Clearly the inputs are the size of the array and the array.)
+
+\textsc{Test 2}
+\begin{Verbatim}[commandchars=\\\{\}, fontsize=\small, frame=single]
+\underline{1}
+\underline{5}
+bubblesort_rec({5}, 0, 1) base case ... return
+{5}
+\end{Verbatim}
+
+Make sure you create your own test cases as well.
+
+Spoilers on next page.
+
+\newpage
+\textsc{Spoilers}
+
+The base case is when there are either no values or only one value
+to sort.
+There is one value to sort if \verb!start! is \verb!end - 1!.
+There are no values to sort if \verb!start! $>$ \verb!end - 1!.
+Suppose recursively, \verb!bubblesort_rec(x, start, end)! calls
+\\
+\verb!bubblesort_rec(x, start, end - 1)!.
+In that case, on return from
+\\
+\verb!bubblesort_rec(x, start, end - 1)!,
+the values
+\verb!x[start]!,
+\verb!x[start + 1]!,
+\verb!x[start + 2]!, ..., 
+\verb!x[end - 2]!
+are sorted.
+
+For instance support \verb!start! is 0 and \verb!end! is 5.
+\verb!bubblesort_rec(x, 0, 5)! is supposed to sort
+\verb!x[0]!,
+\verb!x[1]!,
+\verb!x[2]!, 
+\verb!x[3]!, 
+\verb!x[4]!.
+But since
+\verb!bubblesort_rec(x, 0, 5)!
+calls
+\\
+\verb!bubblesort_rec(x, 0, 4)!
+that means that
+\verb!bubblesort_rec(x, 0, 4)!
+will sort
+\verb!x[0]!,
+\verb!x[1]!,
+\verb!x[2]!,
+\verb!x[3]!.
+What must
+\verb!bubblesort_rec(x, 0, 5)! do to 
+\verb!x[0]!,
+\verb!x[1]!,
+\verb!x[2]!, ...
+\verb!x[4]!.
+before calling
+\verb!bubblesort_rec(x, 0, 4)!?
+
+\newpage
+\textsc{Divide-and-conquer}
+
+Make sure you review my notes on recursion (\#28).
+
+In all the previous recursions, there's a common theme:
+\begin{enumerate}[nosep]
+\item Power computation: If I write \texttt{pow(x, n)} for $x$
+to the power of $n$,
+then the recursion is
+\[
+\text{\texttt{pow(x, n)}: uses \texttt{pow(x, n - 1)} (and \texttt{x})}
+\]
+\item Linear search: Let me write \texttt{x[0..n-1]}
+to denote the array
+of values \texttt{x[0],...,x[n-1]}
+(and ignore implementation specifics
+whether using array, \verb!std::vector!, pointer to array, etc.
+If I write \verb!linearsearch(x[0..n-1], target)! for the
+linear search of \verb!target!
+in \verb!x[0..n-1]!, then the recursion is
+{\small
+\[
+\text{\texttt{linearsearch(x[0..n-1], target)}: uses
+\texttt{linearsearch(x[1..n-1], target)} (and \texttt{x[0]})}
+\]
+}
+\item Bubblesort:  
+If I write \verb!bubblesort(x[0..n-1])! for the bubblesort of
+\verb!x[0..n-1]!, then the recursion is
+\[
+\text{\texttt{bubblesort of x[0..n-1]}: uses
+\texttt{bubblesort(x[0..n-2])}
+}
+\]
+\end{enumerate}
+If $n$ denotes the size of a problem (in the case of the power computation
+it's the exponent and in the case of array type problems it's the size of the
+array), then in all the above the philosophy of recursion is this:
+If $P(n)$ is a problem, then to solve $P(n)$ by recursion you might want to try
+\[
+\text{to solve $P(n)$: solve $P(n-1)$ (as well as some other computations)}
+\]
+For instance
+\[
+\text{to compute $x^n$: compute $x^{n-1}$ (and multiply it with $x$)}
+\]
+(Such recursions are called linear recursions of degree 1.)
+
+A divide-and-conquer (DAC) recursion is \lq\lq usually" different.
+The philosophy of DAC is like this:
+\[
+\text{to solve $P(n)$: solve one or two $P(n/2)$ problems (and do some computations)}
+\]
+The $n/2$ is not exactly $n/2$, but an integer value roughly $n/2$.
+
+Note however that
+some people consider \textit{both} methods,
+\begin{tightlist}
+\li $P(n)$ in terms of $P(n-1)$ and
+\li $P(n)$ in terms of $P(n/2)$
+\end{tightlist}
+as DAC.
+In other words for some people, as long as a problem is solved
+in terms
+of \lq\lq smaller" problem(s), it's a DAC solution,
+whether it is smaller by 1 or smaller by a factor of $1/2$.
+
+\end{document}

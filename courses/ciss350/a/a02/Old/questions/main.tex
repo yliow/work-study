@@ -1,0 +1,1087 @@
+%-*-latex-*-
+\input{myassignmentpreamble}
+
+\input{yliow}
+\input{ciss350}
+\renewcommand\TITLE{Assignment 2}
+
+\begin{document}
+\topmatter
+
+\textbf{Objectives:}
+\begin{enumerate}[topsep=0pt]
+\item Review of CISS240/CISS245 including classes, objects, instance variables,
+methods, templates, etc.
+\end{enumerate}
+
+\newpage
+
+\newpage
+Q1. [Review of CISS240]
+
+Here's a very famous unsolved problem in math and computer science. 
+Consider the function $f$
+defined as follows:
+\begin{enumerate}
+\item If $n$ is even, then
+\[
+f(n) = n/2
+\]
+\item If $n$ is odd, then
+\[
+f(n) = 3n + 1
+\]
+\end{enumerate}
+For instance
+\[
+f(7) = 22 \text{ and } f(22) = 11
+\]
+There is something very special about this function $f$. 
+Note that if you start with $n=7$ and continually
+apply $f$ you get this:
+\begin{align*}
+f(7)  &= 7 \times 3 + 1 = 22 \\
+f(22) &= 22/2 = 11 \\
+f(11) &= 11 \times 3 + 1 = 34 \\
+f(34) &= 34/2 = 17 \\
+f(17) &= 3 \times 17 + 1 = 52 \\
+f(52) &= 52/2 = 26 \\
+f(26) &= 26/2 = 13 \\
+f(13) &= 13 \times 3 + 1 = 40 \\
+f(40) &= 40/2 = 20 \\
+f(20) &= 20/2 = 10 \\
+f(10) &= 10/2 = 5 \\
+f(5)  &= 3 \times 5 + 1 = 16 \\
+f(16) &= 16/2 = 8 \\
+f(8)  &= 8/2 = 4 \\
+f(4)  &= 4/2 = 2 \\
+f(2)  &= 2/2 = 1
+\end{align*}
+and you reach the value of 1. 
+A very famous conjecture says that no matter what positive integer $n > 0$
+you start with, you will always reach 1 if you apply enough times of $f$.
+In the above case of $n = 7$, 
+you need to apply $f$ sixteen times to reach 1, i.e.
+\[
+f(f(f(f(f(f(f(f(f(f(f(f(f(f(f(f(7))))))))))))))))
+\]
+Write a program that accepts a positive integer value for $n$ 
+from the user and prints $n$, the values
+obtained from continually applying function $f$, 
+and the number of times function $f$ was applied.
+Your code should include a (\cpp) function
+\[
+\verb!int f(int n);!
+\]
+which computes just like the above (mathematical) function $f$.
+
+
+\textsc{Test 1}
+\begin{console}[frame=single, fontsize=\footnotesize,commandchars=\\\{\}]
+\userinput{1}
+1 0
+\end{console}
+[\textsc{Note}: Underlined text refers to input. 
+In the above test case, the user enters 1 and press the enter key.]
+
+\textsc{Test 2}
+\begin{console}[frame=single,fontsize=\footnotesize,commandchars=\\\{\}]
+\userinput{7}
+7 22 11 34 17 52 26 13 40 20 10 5 16 8 4 2 1 16
+\end{console}
+
+
+\newpage
+Q2. [Review of CISS245]
+
+The following is a generalization of Q1. 
+Given positive integers $a$, $b$, $d$, we define function $f$ as
+follows:
+\begin{enumerate}
+\item If $n$ is divisible by $d$, then
+\[
+f(n) = n/d
+\]
+\item Otherwise
+\[
+f(n) = an + b
+\]
+\end{enumerate}
+(This is a generalization of the function $f$ in Q1: 
+if $a=3, b=1, d=2$, you get the function in Q1.)
+
+Write a program that accepts positive integer values for $a, b, d, n$, and 
+$N$ (I'll explain $N$ in a bit) and
+does the following.
+
+First, if you can reach 1 after at most $N$ applications of function $f$, 
+you print $a, b, d, n, N$, the string \verb!pass!, 
+the number of tries, 
+and the list of numbers obtained. For instance:
+\begin{console}[frame=single,fontsize=\footnotesize, commandchars=\\\{\}]
+\userinput{3 1 2 7 1000}
+3 1 2 7 1000 pass 16 7 22 11 34 17 52 26 13 40 20 10 5 16 8 4 2 1
+\end{console}
+
+Second, if you cannot reach 1 after $N$ tries, 
+you print the same information as above except that
+you print \verb!fail! instead of \texttt{pass}. For instance:
+\begin{console}[frame=single,fontsize=\footnotesize, commandchars=\\\{\}]
+\userinput{3 1 2 7 10}
+3 1 2 7 10 fail 10 7 22 11 34 17 52 26 13 40 20 10
+\end{console}
+
+Note that in this case after applying this particular $f$ 10 times to 7, 
+you have 11 numbers (including 7)
+and the last is not 1 (it's 10).
+
+In this case you must write a (\cpp) function $f$ that accepts 
+$a, b, d$ in such a way that the $f$ function call
+in Q1 still works, i.e. your function prototype must be
+\[
+\verb!int f(int n, int a=3, int b=1, int d=2);!
+\]
+There is another function \verb!fs! that accepts a pointer to int array,
+\[
+\text{\texttt{
+int fs(int * \& p, int n, int a=3, int b=1, int d=2, int N=1);
+}}
+\]
+allocates an integer array of size $N$ to $p$. 
+Note that the value of $n$ is not stored in this array. 
+The return value is the number of integers placed in the array. 
+For instance when $a=3,b=1,d=2,n=7, N=1000$ 
+(see above test case), 
+there are 17 values (including $n=7$). 
+The values stored in the array \verb!p! points to are
+{\small
+\begin{console}[frame=single]
+22 11 34 17 52 26 13 40 20 10 5 16 8 4 2 1
+\end{console}
+}
+(i.e. 7 is not included) and hence the return value in this case is 16.
+
+Make sure you deallocate memory \verb!p! points to before program halts.
+
+\textsc{Test 1}
+\begin{console}[frame=single,fontsize=\footnotesize, commandchars=\\\{\}]
+\userinput{3 1 2 7 1000}
+3 1 2 7 1000 pass 16 7 22 11 34 17 52 26 13 40 20 10 5 16 8 4 2 1
+\end{console}
+
+\textsc{Test 2}
+\begin{console}[frame=single,fontsize=\footnotesize, commandchars=\\\{\}]
+\userinput{3 1 2 7 10}
+3 1 2 7 10 fail 10 7 22 11 34 17 52 26 13 40 20 10
+\end{console}
+
+\textsc{Test 3}
+\begin{console}[frame=single,fontsize=\footnotesize,commandchars=\\\{\}]
+\userinput{7 5 3 7 10}
+7 5 3 7 10 fail 10 7 54 18 6 2 19 138 46 327 109 768
+\end{console}
+
+In the case of Test 3 the function $f$ is defined as
+\begin{enumerate}
+\item If $n$ is divisible by 3, then $f(n) = n/3$
+\item If $n$ is not divisible by 3, then $f(n) = 7n + 5$
+\end{enumerate}
+
+Therefore we have
+\begin{align*}
+f(7)   &= 7 \times 7+5 = 54 \\
+f(54)  &= 54/3 = 18 \\
+f(18)  &= 18/3 = 6 \\
+f(6)   &= 6/3 = 2 \\
+f(2)   &= 2 \times 7+5 = 19 \\
+f(19)  &= 3 \times 19+5 = 138 \\
+f(138) &= 138/3 = 46 \\
+f(46)  &= 7 \times 46+5 = 327 \\
+f(327) &= 327/3 = 109 \\
+f(109) &= 7 \times 109+5 = 768 \\
+\end{align*}
+
+
+
+
+\newpage
+Q3. [Review of CISS245]
+
+This is a continuation of Q2.
+This is essentially the same as Q2 except that instead of testing a single 
+$n$, you test a range of values
+of $n$. 
+In this case you prompt the user for $a, b, d, n0, n1, N$ and
+essentially test the given function
+(which depends on $a, b, c$) for $n = n0, n0+1, n0+2, ..., n1$ (inclusive).
+
+\textsc{Test 1}
+\begin{console}[frame=single,fontsize=\footnotesize, commandchars=\\\{\}]
+\userinput{3 1 2 1 9 1000}
+3 1 2 1 1000 pass 0 1
+3 1 2 2 1000 pass 1 2 1
+3 1 2 3 1000 pass 7 3 10 5 16 8 4 2 1
+3 1 2 4 1000 pass 2 4 2 1
+3 1 2 5 1000 pass 5 5 16 8 4 2 1
+3 1 2 6 1000 pass 8 6 3 10 5 16 8 4 2 1
+3 1 2 7 1000 pass 16 7 22 11 34 17 52 26 13 40 20 10 5 16 8 4 2 1
+3 1 2 8 1000 pass 3 8 4 2 1
+3 1 2 9 1000 pass 19 9 28 14 7 22 11 34 17 52 26 13 40 20 10 5 16 8 4 2 1
+\end{console}
+
+\textsc{Test 2}
+\begin{console}[frame=single,fontsize=\footnotesize, commandchars=\\\{\}]
+\userinput{3 1 2 1 9 5}
+3 1 2 1 5 pass 0 1
+3 1 2 2 5 pass 1 2 1
+3 1 2 3 5 fail 5 3 10 5 16 8 4
+3 1 2 4 5 pass 2 4 2 1
+3 1 2 5 5 pass 5 5 16 8 4 2 1
+3 1 2 6 5 fail 5 6 3 10 5 16 8
+3 1 2 7 5 fail 5 7 11 22 34 17 52
+3 1 2 8 5 pass 3 8 4 2 1
+3 1 2 9 5 fail 5 9 28 14 7 22 11
+\end{console}
+
+
+
+\newpage
+Q4. [Review of CISS245]
+
+This is a very minor modification to Q3. 
+The program now accepts a boolean value (besides the values described in Q3) 
+whether or not to print the number of tries and the list of numbers obtained.
+
+\textsc{Test 1}
+\begin{console}[frame=single,fontsize=\footnotesize, commandchars=\\\{\}]
+\userinput{3 1 2 1 9 1000 1}
+3 1 2 1 1000 pass 0 1
+3 1 2 2 1000 pass 1 2 1
+3 1 2 3 1000 pass 7 3 10 5 16 8 4 2 1
+3 1 2 4 1000 pass 2 4 2 1
+3 1 2 5 1000 pass 5 5 16 8 4 2 1
+3 1 2 6 1000 pass 8 6 3 10 5 16 8 4 2 1
+3 1 2 7 1000 pass 16 7 22 11 34 17 52 26 13 40 20 10 5 16 8 4 2 1
+3 1 2 8 1000 pass 3 8 4 2 1
+3 1 2 9 1000 pass 19 9 28 14 7 22 11 34 17 52 26 13 40 20 10 5 16 8 4 2 1
+\end{console}
+
+In the case of Test 1, 
+the last input value is 1 which indicates a request to print the values after 
+the \lq\lq pass/fail'' column.
+
+
+\textsc{Test 2}
+\begin{console}[frame=single,fontsize=\footnotesize, commandchars=\\\{\}]
+\userinput{3 1 2 1 9 1000 0}
+3 1 2 1 1000 pass
+3 1 2 2 1000 pass
+3 1 2 3 1000 pass
+3 1 2 4 1000 pass
+3 1 2 5 1000 pass
+3 1 2 6 1000 pass
+3 1 2 7 1000 pass
+3 1 2 8 1000 pass
+3 1 2 9 1000 pass
+\end{console}
+In the case of Test 2, 
+the last input value is 0 which indicates a request not to print the 
+values after the \lq\lq pass/fail'' column.
+
+\textsc{Test 3}
+\begin{console}[frame=single,fontsize=\footnotesize, commandchars=\\\{\}]
+\userinput{3 1 2 1 9 5 1}
+3 1 2 1 5 pass 0 1
+3 1 2 2 5 pass 1 2 1
+3 1 2 3 5 fail 5 3 10 5 16 8 4
+3 1 2 4 5 pass 2 4 2 1
+3 1 2 5 5 pass 5 5 16 8 4 2 1
+3 1 2 6 5 fail 5 6 3 10 5 16 8
+3 1 2 7 5 fail 5 7 22 11 34 17 52
+3 1 2 8 5 pass 3 8 4 2 1
+3 1 2 9 5 fail 5 9 28 14 7 22 11
+\end{console}
+
+\textsc{Test 4}
+\begin{console}[frame=single,fontsize=\footnotesize,commandchars=\\\{\}]
+\userinput{3 1 2 1 9 5 0}
+3 1 2 1 5 pass
+3 1 2 2 5 pass
+3 1 2 3 5 fail
+3 1 2 4 5 pass
+3 1 2 5 5 pass
+3 1 2 6 5 fail
+3 1 2 7 5 fail
+3 1 2 8 5 pass
+3 1 2 9 5 fail
+\end{console}
+
+
+
+
+\newpage
+Q5. [Review of classes of CISS245]
+
+This is a review of writing a class (without pointers).
+
+Write a \texttt{Fraction} class that should do the obvious.
+No skeleton code is given.
+The header file is named \texttt{Fraction.h}
+and the implementation file is named \texttt{Fraction.cpp}.
+You must design and implement the class yourself.
+You should of course test your code, i.e., you should have a
+\verb!main.cpp! that tests the features of your fraction library.
+Try not to refer to your previous work if you have already implemented
+such a class -- otherwise it defeats the purpose of review.
+You can however refer to my notes on object-oriented
+concepts/syntax of \cpp.
+Only refer to your previous code briefly for the \verb!Fraction! if you are
+totally lost.
+You should be able to complete this library in less than 1 hour.
+
+The following illustrates features of this class.
+
+The basic constructor should work as expected:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize, commandchars=\~\!\@]
+Fraction f(2, 3);
+Fraction g(42);                           
+Fraction h;                               // default constructor
+
+std::cout << f << '\n';                   // prints "2/3" (without the double quotes)
+std::cout << g << '\n';                   // prints "42"
+std::cout << h << '\n';                   // prints "0" 
+
+std::cout << Fraction(2, 4) << '\n';      // prints "1/2"
+std::cout << Fraction(-2, 4) << '\n';     // prints "-1/2"
+std::cout << Fraction(2, -4) << '\n';     // prints "-1/2"
+std::cout << Fraction(-2, -4) << '\n';    // prints "1/2"
+
+std::cout << Fraction(2, 2) << '\n';      // prints "1"
+std::cout << Fraction(2, -2) << '\n';     // prints "-1"
+std::cout << Fraction(-2, 2) << '\n';     // prints "-1"
+std::cout << Fraction(-2, -2) << '\n';    // prints "1"
+
+std::cout << Fraction(100, 20) << '\n';   // prints "5"
+std::cout << Fraction(100, -20) << '\n';  // prints "-5"
+std::cout << Fraction(-100, 20) << '\n';  // prints "-5"
+std::cout << Fraction(-100, -20) << '\n'; // prints "5"
+
+std::cout << Fraction(100) << '\n';       // prints "100"
+std::cout << Fraction(-100, 1) << '\n';   // prints "-100"
+std::cout << Fraction(100, -1) << '\n';   // prints "-100"
+std::cout << Fraction(-100, -1) << '\n';  // prints "100"
+
+std::cout << Fraction() << '\n';          // prints "0"
+std::cout << Fraction(0, 100) << '\n';    // prints "0"
+std::cout << Fraction(0, -100) << '\n';   // prints "0"
+
+
+// Testing division by zero exception catching
+try
+{
+    std::cout << Fraction(0, 0) << '\n';
+}
+catch (ZeroDivisionError & e)
+{
+    std::cout << "ZeroDivisionError exception caught\n";
+}
+
+try
+{
+    std::cout << Fraction(-10, 0) << '\n';
+}
+catch (ZeroDivisionError & e)
+{
+    std::cout << "ZeroDivisionError exception caught\n";
+}
+\end{Verbatim}
+Note that the numerator and denominator are reduced before they are
+saved in the \texttt{Fraction} object.
+
+Copy constructor and assignment operator should work as expected:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+Fraction f0(1, 2);
+Fraction f1(f0); // copy constructor
+f1 = f0;         // assignment operator
+\end{Verbatim}
+(Do you need to overwrite the default copy constructor
+and assignment operator for this class?)
+
+Various unary and binary operators should work as expected:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+Fraction f0(1, 2), f1(3, 4), f2;
+f2 = +f0;  
+f2 = -f0;
+f2 = (f0 += f1);
+f2 = (f0 -= f1);
+f2 = (f0 *= f1);
+f2 = (f0 /= f1);
+f2 = f0 + f1;  
+f2 = f0 - f1;  
+f2 = f0 * f1;  
+f2 = f0 / f1;
+\end{Verbatim}
+
+The \verb!Fraction! class works seamlessly with integers:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+Fraction f0(1, 2), f1(3, 4), f2;
+f2 = f0 + 42;
+f2 = f0 - 42;
+f2 = f0 * 42;
+f2 = f0 / 42;
+
+f2 = 42 + f0;
+f2 = 42 - f0;
+f2 = 42 * f0;
+f2 = 42 / f0;
+
+f2 = (f0 += 42);
+f2 = (f0 -= 42);
+f2 = (f0 *= 42);
+f2 = (f0 /= 42);
+
+int i = 42, j;
+j = (i += f0);
+j = (i -= f0);
+j = (i *= f0);
+j = (i /= f0);
+\end{Verbatim}
+
+Comparisons are possible:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+Fraction f0(-1, 2), f1(3, 4);
+std::cout << (f0 == f1) << '\n';
+std::cout << (f0 != f1) << '\n';
+std::cout << (f0 < f1) << '\n';
+std::cout << (f0 <= f1) << '\n';
+std::cout << (f0 > f1) << '\n';
+std::cout << (f0 >= f1) << '\n';
+\end{Verbatim}
+
+Finally it's possible to compute the absolute value
+and integer power of a \texttt{Fraction}:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+Fraction f0(-1, 2);
+std::cout << abs(f0) << '\n';
+std::cout << pow(f0, 5) << '\n';
+std::cout << pow(f0, -5) << '\n';
+\end{Verbatim}
+
+
+\newpage
+\textsc{Review of pointers}
+
+The following is a quick review of pointers.
+Refer to my pointer notes for details.
+
+\textsc{Declaration:}
+Suppose \verb!T! is a type 
+(example: \verb!int!, \verb!double!, \verb!char!, \verb!bool!, 
+some struct, some class),
+then you do the following to declare \verb!p! to be a pointer to a 
+\verb!T! value:
+\begin{console}[frame=single]
+T * p;
+\end{console}
+At this point, \verb!p! does not point to a valid 
+value (whether on the heap on in a scope/frame) yet.
+
+
+\textsc{Allocating/using/deallocating a single value:}
+To allocate a single \verb!T! value for \verb!p! to point to
+(or we can also say \lq\lq to allocate a value for \verb!p!"),
+we do
+\begin{console}[frame=single]
+p = new T;
+\end{console}
+After this you can use the value \verb!p! points to.
+You refer to this value as \verb!*p!.
+
+Note that the \textit{address} of this value is stored in \verb!p!.
+The \textit{value} that \verb!p! points to is \verb!*p!.
+Make sure you see the difference between \verb!p! and \verb!*p!.
+
+When you're done using this value, you can release this memory, 
+or we say deallocate the value that \verb!p! point to (or just say deallocate \verb!p!),
+by doing
+\begin{console}[frame=single,fontsize=\footnotesize]
+delete p;
+\end{console}
+Here's a simple example:
+\begin{console}[fontsize=\footnotesize]
+#include <iostream>
+
+int main()
+{
+    double * p = new double;
+    std::cout << "enter a double: ";
+    std::cin >> (*p);
+
+    std::cout << "you entered " << (*p) << std::endl;
+    delete p;
+
+    return 0;
+}
+\end{console}
+
+\textsc{Allocating/using/deallocating an array of values:}
+Now suppose instead of a single value of type
+\verb!T! you want to use an array of values
+of type \verb!T!, say \verb!n! such values.
+To allocate an array of \verb!n! 
+\verb!T!--values for \verb!p!, you do this:
+\begin{console}[frame=single,fontsize=\footnotesize]
+p = new T[n];
+\end{console}
+After this, \verb!p! points to the first of \verb!n!
+\verb!T!--values.
+The \verb!i!--th \textit{value} of the 
+array \verb!p! points to is just
+\verb!p[i]!.
+The \textit{address} of the
+\verb!i!--th value is \verb!p+i!.
+Therefore the \verb!i!--th value is also
+known as \verb!*(p+i)!, i.e.,
+\verb!p[i]!
+and
+\verb!*(p+i)!
+mean the same thing.
+
+After you're done with this array of \verb!T!
+values, you can deallocate the memory that \verb!p! points to
+(i.e. release the memory back to the heap)
+if you do
+\begin{console}[frame=single,fontsize=\footnotesize]
+delete [] p;
+\end{console}
+
+Here's a simple example:
+\begin{console}[frame=single,fontsize=\footnotesize]
+#include <iostream>
+
+int main()
+{
+    int n;
+    std::cout << "how many double do you need? ";
+    std::cin >> n;
+
+    double * p = new double[n];
+    for (int i = 0; i < n; i++)
+    {
+        std::cout << "enter double #" << i << ": ";
+        std::cin >> p[i];
+    }
+
+    std::cout << "here are all your doubles: ";
+    for (int i = 0; i < n; i++)
+    {
+        std::cout << p[i] << ' ';
+    }
+    std::cout << std::endl;
+
+    delete [] p;
+
+    return 0;
+}
+\end{console}
+The above iterates over the value that \verb!p! points
+to using index values.
+You can iterate using a pointer like this:
+\begin{console}[frame=single,fontsize=\footnotesize]
+#include <iostream>
+
+int main()
+{
+    int n;
+    std::cout << "how many double do you need? ";
+    std::cin >> n;
+
+    double * p = new double[n];
+    for (int i = 0; i < n; i++)
+    {
+        std::cout << "enter double #" << i << ": ";
+        std::cin >> p[i];
+    }
+
+    std::cout << "here are all your doubles: ";
+    for (double * q = p; q < p + n; ++q)
+    {
+        std::cout << (*q) << ' ';
+    }
+    std::cout << std::endl;
+
+    delete [] p;
+
+    return 0;
+}
+\end{console}
+In this case, the pointer \verb!q! (in the second \verb!for!--loop)
+iteratively points to the values
+of the array that \verb!p! points to.
+
+\textsc{Functions:}
+Of course pointers, like any variable, can be passed to functions.
+So of course you can rewrite:
+\begin{console}[frame=single,fontsize=\footnotesize]
+#include <iostream>
+
+int main()
+{
+    int n;
+    std::cout << "how many double do you need? ";
+    std::cin >> n;
+
+    double * p = new double[n];
+    for (int i = 0; i < n; i++)
+    {
+        std::cout << "enter double #" << i << ": ";
+        std::cin >> p[i];
+    }
+
+    std::cout << "here are all your doubles: ";
+    for (int i = 0; i < n; i++)
+    {
+        std::cout << p[i] << ' ';
+    }
+    std::cout << std::endl;
+
+    delete [] p;
+
+    return 0;
+}
+\end{console}
+as
+\begin{console}[frame=single,fontsize=\footnotesize]
+#include <iostream>
+
+void fill_doubles(double * p, int n)
+{
+    for (int i = 0; i < n; ++i)
+    {
+        std::cout << "enter double #" << i << ": ";
+        std::cin >> p[i];
+    }
+}
+
+void print_doubles(double * start, double * end)
+{
+    std::cout << "here are all your doubles: ";
+    for (double * q = start; q < end; ++q)
+    {
+        std::cout << (*q) << ' ';
+    }
+    std::cout << std::endl;
+}
+
+int main()
+{
+    int n;
+    std::cout << "how many double do you need? ";
+    std::cin >> n;
+
+    double * p = new double[n];
+
+    fill_doubles(p, n);
+    print_doubles(p, p + n);
+
+    delete [] p;
+
+    return 0;
+}
+\end{console}
+
+Recall that there's a memory debugging tool (google's asan -- address sanitizer)
+that can check your code for memory problems.
+See class website or my website.
+
+
+
+\newpage
+Q6. [Review of template class in CISS245 -- dynamic arrays]
+
+This is a review of writing a class template with a pointer
+and dynamic arrays in the heap.
+
+The goal is to write a class to make \cpp\ arrays a lot easier to use.
+
+Specifically, the \verb!vector! class is a class template
+that provides most of \cpp's array features.
+Study the skeleton code for \verb!vector! carefully.
+Specifically, note that each \verb!vector! object has three members:
+\verb!size_!, \verb!capacity_! and \verb!p_!.
+Obviously \verb!p_! points to an array allocated in the free store,
+\verb!capacity_! records the number of elements in the array, and
+\verb!size_! records the number of elements in the array that are \lq\lq in
+use".
+The file \verb!test.cpp! includes some usage examples.
+\verb!vector! is similar to our \verb!IntDynArray! from CISS245 except that
+\verb!IntDynArray! is not a class template.
+\verb!vector! is similiar to the \cpp\ STL \verb!std::vector! class
+template.
+
+Your goal is to complete the given
+skeleton file \verb!vector.h!.
+You are advised strongly to test your code.
+In particular, you should add more test cases to \verb!test.cpp!;
+what I've provided is absolutely not enough.
+If you work for a really good company, you will see
+that in some cases the test code can be longer than the code
+being tested.
+
+It should be clear what you need to complete just by looking at the
+skeleton code.
+All methods mentioned in the skeleton code must be completed.
+(For your own learning, you may add other methods if you like.)
+Let me just mention a few things.
+
+\verb!vector! objects can be constructed by specifying a size:
+\begin{console}[fontsize=\footnotesize]
+vector< int > x(5);    // x models an int array of size 5
+vector< double > y(4); // y models a double array of size 4
+vector< char > x(5);   // x models a char array of size 3
+\end{console}
+The memory used is of course from the free store (or memory heap).
+Specifically, pointer \verb!x.p_! will point to an array
+of 5 integer in the free store and 
+\verb!x.size_!
+\verb!x.capacity_!
+is set to 5.
+
+After the above you can read the values of \lq\lq array'' \verb!x!
+(or rather the values of the array that \verb!x.p_! points to):
+\begin{console}[fontsize=\footnotesize]
+std::cout << x[2] << '\n';
+\end{console}
+or you can write to the array:
+{\small
+\begin{console}
+x[2] = 42;
+\end{console}
+}
+This means that your class must have
+\verb!operator[]! for reading and writing.
+Since \verb!vector! objects model arrays in C/\cpp, this is not 
+surprising.
+However your \verb!operator[]! must provide protection
+against invalid index values.
+This means that if your \verb!vector! object has size 5,
+then calling \verb!operator[]! outside of the
+range of 0,1,2,3,4 will result in 
+\verb!IndexError! object being thrown as an exception object.
+The regular C/\cpp\ arrays do not have this protection
+and is a very common programming error resulting not just in 
+programs crashing but in fact can cause serious
+security issues.
+
+Of course there's the destructor, copy constructor, and assignment
+operator.
+Once you have memory allocation in your constructor(s), you must
+overwrite these, right?
+
+Another important constructor is
+\begin{console}[fontsize=\footnotesize]
+vector(T arr[], int size);
+\end{console}
+This allows you to construct a \verb!vector! object from a regular
+C/\cpp\ array. For instance the above
+constructor allows you to do the following
+\begin{console}[fontsize=\footnotesize]
+int x[] = {1,3,5,2,4,6};
+vector< int > y(x, 6);
+\end{console}
+Otherwise you would have to do this:
+\begin{console}[fontsize=\footnotesize]
+int x[] = {1,3,5,2,4,6};
+vector< int > y(6);
+for (int i = 0; i < 6; i++)
+{
+    x[i] = y[i]; 
+}
+\end{console}
+
+Code to print the vector is provided so that you can do this:
+\begin{console}[fontsize=\footnotesize]
+std::cout << x << '\n';
+\end{console}
+Study it carefully.
+By the way, printing like the above is probably
+among the earliest thing to write. 
+How in the world do you debug if you can't print?!?
+(Also, see the note below on debug printing.)
+
+The comparison operator, \verb!operator==!, returns \verb!true!
+exactly when the two relevant \verb!vector! objects
+model the same array, i.e., if you call
+\begin{console}[fontsize=\footnotesize]
+x == y
+\end{console}
+where \verb!x! and \verb!y! are, say \verb!vector< char >! objects,
+then you get \verb!true! 
+exactly when their sizes are the same and the values in the arrays
+that they point to have the same values.
+This operator must also be coded very early in order to 
+automate testing. 
+
+Of course the assignment operator, \verb!operator=()!, does the obvious.
+If you have
+\begin{console}[fontsize=\footnotesize]
+vector< double > x(5);
+vector< double > y(10);
+// code to put values into the arrays of x and y
+\end{console}
+then on calling the assignment operator:
+\begin{console}[fontsize=\footnotesize]
+x = y;
+\end{console}
+the arrays (in the free store) of both \verb!x! and \verb!y!
+have the same values; of course the size of \verb!x! and \verb!y!
+becomes the same.
+
+All the rest should be obvious from reading the skeleton code.
+
+The above is what you would expect to make \cpp's array more
+user-friendly.
+
+Now for the \verb!insert! method.
+This is not directly available in your usual C/\cpp\ arrays.
+
+Add a method \verb!insert(int index, const T & value)! so that 
+you can insert a 
+value into
+the array at the given index position. 
+This is the expected behavior (the following includes 3 test cases):
+\begin{console}[fontsize=\footnotesize]
+vector< int > a(3);
+a[0] = 5;
+a[1] = 10;
+a[2] = -6;
+std::cout << a << std::endl; // prints [5, 10, -6]
+
+a.insert(0, 42);
+std::cout << a << std::endl; // prints [42, 5, 10, -6]
+
+a.insert(2, 999);
+std::cout << a << std::endl; // prints [42, 5, 999, 10, -6]
+
+a.insert(5, -11111);
+std::cout << a << std::endl; // prints [42, 5, 999, 10, -6, -11111]
+\end{console}
+
+Note that if \verb!a! has size 5, you can only call \verb!insert!
+for \verb!index = 0, 1, 2, 3, 4, 5!.
+You cannot for instance insert at index value -1 and you cannot insert at
+index value 6.
+In general if the size of \verb!a! is \verb!s!, then you can 
+only insert at \verb!index = 0, 1, 2, ..., s!.
+If \verb!insert! is invoked at index outside this range your code
+should throw an \verb!IndexError! exception object.
+
+Here are test cases that test correct index positions:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+try
+{
+    vector< int > a(10);
+    a.insert(0, 42);
+    std::cout << "pass\n";
+}
+catch (IndexError & e)
+{
+    std::cout << "fail\n";
+}
+
+try
+{
+    vector< int > a(10);
+    a.insert(5, 42);
+    std::cout << "pass\n";
+}
+catch (IndexError & e)
+{
+    std::cout << "fail\n";
+}
+
+try
+{
+    vector< int > a(10);
+    a.insert(10, 42);
+    std::cout << "pass\n";
+}
+catch (IndexError & e)
+{
+    std::cout << "fail\n";
+}
+
+try
+{
+    vector< int > a(10);
+    a.insert(10, 42);
+    std::cout << "pass\n";
+}
+catch (IndexError & e)
+{
+    std::cout << "fail\n";
+}
+\end{Verbatim}
+
+Here are some test cases that test invalid index positions:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+try
+{
+    vector< int > a(10);
+    a.insert(-6, 42);
+    std::cout << "fail\n";
+}
+catch (IndexError & e)
+{
+    std::cout << "pass\n";
+}
+
+try
+{
+    vector< int > a(10);
+    a.insert(20, 42);
+    std::cout << "fail\n";
+}
+catch (IndexError & e)
+{
+    std::cout << "pass\n";
+}
+\end{Verbatim}
+
+Add a method to concatenate two \verb!vector! objects.
+This involves overloading the \verb!operator+=! and \verb!operator+!.
+For instance if \verb!a! and \verb!b! are \verb!vector< int >! objects,
+then \verb!a += b! will result in the values of \verb!b! being appended
+to \verb!a! (in the obvious way).
+Note that \verb!operator+=! should return a reference to the object
+invoking the operator.
+In other words, your class should allow you to do this:
+\begin{console}[fontsize=\footnotesize]
+(a += b) += b;
+\end{console}
+
+The \verb!push_back! method adds a value to the end of the
+array that your \verb!vector! models.
+\begin{console}[frame=single,fontsize=\footnotesize]
+int x[] = {1, 3, 5, 2, 4, 6};
+vector< int > y(x, 6); // y is {1, 3, 5, 2, 4, 6}
+y.push_back(42);       // y is {1, 3, 5, 2, 4, 6, 42}
+\end{console}
+Note that the \verb!y.size_! is changed from \verb!6! to \verb!7!.
+If the array that \verb!y.p_! cannot accomodate 7 values
+(i.e., if \verb!y.capacity_! is 6),
+then you need to reallocate a larger array for \verb!y.p_! to
+point to (just like the \verb!IntDynArray! example/assignment from CISS245).
+In this case, when you reallocate, the array must be twice of
+what you need.
+For instance in the above example, since \verb!y.p_! needs 7 values,
+the new array allocated must have 14 values.
+
+The skeleton code is of course not correct. You have to work on it.
+I do not need to tell you this but I'm going to anyway:
+Make sure that you use pass-by-reference for object parameters
+as much as possible.
+Also, parameters and methods should be constant whenever possible.
+
+(The \verb!IntDynArray! example/assignment from CISS245 and also
+the \cpp\ STL \verb!std::vector! has more methods
+than described above.
+You need not implement these extra methods.)
+
+Of course you have must ensure that there are no memory issues such as
+memory leaks and double free errors.
+You should definitely check your code with google asan.
+
+\newpage
+\textsc{Note on debug printing}
+
+Frequently, it is helpful to have the ability to print everything
+useful for debugging purposes.
+Our \verb!operator<<! is only helpful when \textit{using} this
+\verb!vector! class and debugging at a higher level assuming that
+the \verb!vector! class is already working perfectly.
+However for debugging \verb!vector!,
+besides printing the values in the 
+array, it might be helpful to print the \verb!size! and the pointer
+\verb!p! as well.
+I suggest you write a method
+\begin{console}[fontsize=\footnotesize]
+void debugprint() const;
+\end{console}
+to print everything associated to the object, i.e.,
+print the \verb!size! and \verb!p! besides the array values.
+This is very helpful especially in chasing pointers.
+In more complex classes with pointers, you absolutely have to print the 
+pointers for debugging.
+This method is not required for this assignment.
+
+
+\newpage
+Skeleton for \verb!vector.h!:
+{\footnotesize
+\includesourcenonumbers{vector.h}
+}
+
+\newpage
+Minimal \verb!test.cpp!:
+{\footnotesize
+\includesourcenonumbers{test.cpp}
+}
+
+
+
+
+\newpage
+Q7. [Review of template class in CISS245 -- pointer class]
+
+This is a review of writing a template class with a pointer that points
+to a single value.
+
+Write a template pointer class, \verb!ptr!.
+(The previous problem is an array class with a pointer that points to an
+array of values. For this problem, the pointer points to a single value.)
+
+The header file is named \verb!ptr.h!.
+Each object of \verb!ptr! contains a pointer that when allocated points to
+\textit{one} value of type \verb!T! where \verb!T! is the template
+type parameter of the \verb!ptr! class.
+Call the pointer \verb!p_!.
+
+Here are some usage examples illustrating what your class can do:
+\begin{console}[fontsize=\footnotesize]
+void f()
+{
+    ptr< int > p;    // p.p_ points to an int value in the heap
+    ptr< double > q; // q.p_ points to a double value in the heap
+    ptr< char > r;   // r.p_ points to a char value in the heap
+  
+    *p = 42;
+    std::cout << (*p) << std::endl; // prints 42
+    *p = 43;
+    std::cout << (*p) << std::endl; // prints 43
+
+    ptr< int > s(42); // here's another constructor. s.p_ will point to
+                      // a 42 in the heap.
+    
+    // here ... where p,q,r,s go out of scope, their destructor will
+    // deallocate memory used by their pointers.
+}
+\end{console}
+Clearly you must overwrite the default destructor, copy constructor,
+and assignment operator of \verb!ptr!.
+\begin{console}[fontsize=\footnotesize]
+void g()
+{
+    ptr< int > p(42); 
+    ptr< int > q(p);  // q.p_ points to 42 in the heap which is different
+                      // from the 42 that p.p_ points to
+    ptr< int > r;
+    r = p;            // the integer that r.p_ points to is changed to 42
+}
+\end{console}
+
+Of course you have must ensure that there is no memory issues such as
+memory leaks and double free errors.
+You should definitely check your code with google asan.
+
+\end{document}
