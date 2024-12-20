@@ -1,0 +1,254 @@
+%-*-latex-*-
+\textsc{Methods for tree nodes}
+
+Now I'm going to describe all the methods/functions/operators
+that you must implement for all tree node classes.
+First let me talk about the instance variables.
+
+Each node class has a \verb!key_! member and a \verb!parent_! 
+pointer. (Recall that there are situations where a parent pointer
+is not necesary, but for this assignment, we will include parent
+pointers.)
+Besides that, we need to talk about the member variables
+for the children pointers.
+The following are the options that we'll deal with for this assignment.
+
+The class that uses \verb!std::vector! of pointers for children looks like
+this:
+\begin{console}[commandchars=\~\!\@,fontsize=\footnotesize]
+template < typename T >
+class TreeNodev
+{
+public:
+    const T & key() const
+    {
+        return key_;
+    }
+    T & key()
+    {
+        return key_;
+    }
+private:
+    T key_;
+    TreeNodev * parent_;
+    std::vector< TreeNodev * > child_;
+};
+\end{console}
+(Memory aid: \verb!TreeNodev! with \verb!v = vector!.)
+
+The class that uses \verb!std::list! looks like this:
+\begin{console}[fontsize=\footnotesize]
+template < typename T >
+class TreeNodel
+{
+private:
+    T key_;
+    TreeNodel * parent_;
+    std::list< TreeNodel * > child_;
+};
+\end{console}
+(Memory aid: \verb!TreeNodel! with \verb!l = list!.)
+
+The class for binary tree node looks like this:
+\begin{console}[fontsize=\footnotesize]
+template < typename T >
+class BinaryTreeNode
+{
+private:
+    T key_;
+    BinaryTreeNode * parent_;
+    BinaryTreeNode * left_;
+    BinaryTreeNode * right_;
+};
+\end{console}
+
+The following is a list of methods that must be supported by
+all the tree node classes.
+In the following, let \verb!node! be an object
+from any of the tree node classes.
+There are also corresponding functions that do the same thing.
+except that the functions accept pointers. For instance there's a
+\verb!height! \textit{function} that accepts a pointer to a node object;
+the return value is of course an \verb!int!.
+In other words the prototype of the \verb!height! \textit{function} 
+looks like this:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+template < typename T >
+int height(const TreeNodev< T > * const p);
+\end{Verbatim}
+
+Of course each node must be able to return the \verb!key_! as a reference:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+node.key()           key_ as a reference 
+\end{Verbatim}
+If the \texttt{node} is constant, the reference returned is a constant.
+This has nothing to do with trees.
+
+
+Now for the common methods for all tree node class.
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+node.is_root()       true iff node is a root
+node.is_leaf()       true iff node is a leaf
+node.is_nonleaf()    true iff node is non-leaf
+node.height()        height of node
+node.depth()         depth of node (note: level and depth are the same)
+node.size()          number of descendents + 1
+
+node.parent()        pointer to parent (returned as a reference)
+node.root()          pointer to root
+
+node.next()          pointer to next sibling, 
+                     NULL if there's no next sibling. In the case of binary 
+                     tree node, assume left pointer to the 0--th child and 
+                     right points to the 1-st child..
+node.prev()          pointer to previous sibling,
+                     NULL if there's no next sibling. In the case of binary 
+                     tree node, assume left pointer to the 0--th child and 
+                     right points to the 1-st child.
+
+node.num_children()  number of children.
+node.first_child()   pointer to first child (can be NULL)
+node.last_child()    pointer to last child (can be NULL)
+node.child(i)        pointer to i-th child (i = 0 is the first, can be 
+                     NULL)
+node.left()          left pointer (only for case of binary tree node)
+node.right()         right pointer (only for case of binary tree node)
+node.leftmost()      pointer to leftmost child
+node.rightmost()     pointer to rightmost child
+
+node.insert(i, data) create a new node n, set n.key_ to data and attach n 
+                     as i-th child of node. Note that this might require
+                     adding NULL pointers to fill up to child i - 1.
+                     If there is already an i-th child, ValueError 
+                     exception object is thrown. 
+node.insert_parent(data)
+                     create a new node n, set n.key_ to data and attach n 
+                     as parent. If there is already a parent, a ValueError
+                     exception object is thrown.
+node.insert_left(data)
+                     create a new node n, set n.key_ to data and attach n 
+                     as left child of node.
+                     If there is already a left child (i.e., left pointer
+                     is not NULL) ValueError exception object is thrown.
+                     (Only for case of binary tree node.)
+node.insert_right(data)
+                     create a new node n, set n.key_ to data and attach n 
+                     as right child of node.
+                     If there is already a right child (i.e., right pointer
+                     is not NULL) ValueError exception object is thrown.
+                     (Only for case of binary tree node.)
+
+node.remove(i)       remove the subtree at child i.
+node.remove_left()   remove the subtree at left child 
+                     (Only for case of binary tree node.)
+node.remove_right()  remove the subtree at right child 
+                     (Only for case of binary tree node.)
+\end{Verbatim}
+
+In case of an error, a \verb!ValueError! exception object is thrown.
+The following is the \verb!ValueError! class:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+class ValueError
+{};
+\end{Verbatim}
+
+Of course the classes also have obvious methods
+such as constructors, destructors, 
+\verb!operator=()!, \verb!operator==()!, \verb@operator!=()@.
+This is also the case for any tree class.
+
+Note that for copy constructor and \verb!operator=()!, 
+make sure that objects are actually created.
+In other words, suppose a node \verb!node2!
+has exactly a child pointer that is pointing
+to a node (i.e., it is not \verb!NULL!).
+Then after the copy constructor 
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+node1 = node2;
+\end{Verbatim}
+is called, \verb!node1! also has exactly one child pointer
+that points a node.
+
+When the destructor is called, all the memory used must be 
+deallocated
+correctly. This applies to the whole tree structure, i.e.,
+the memory used by all descendents.
+Note that this implies that the memory used by a child must be 
+deallocated before memory used by a parent is deallocated.
+
+Of course 
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+node1 == node2
+\end{Verbatim}
+returns \verb!true! exactly when \verb!node1.key_!
+has the same value as \verb!node2.key_!,
+both have the same tree structure, and the corresponding
+descendents have the same \verb!key_! values as well.
+Otherwise \verb!false! is returned.
+
+With the above methods, if \verb!node! is a tree node object,
+then one can for instance print the children of \verb!node! like this:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+for (int i = 0; child.child(i) != NULL; i++)
+{
+    std::cout << *(node.child(i)) << std::endl;
+}
+\end{Verbatim}
+or this 
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+p = node.first_child()
+while (p != NULL)
+{
+    std::cout << *p << std::endl;
+    p = p->next();
+}
+\end{Verbatim}
+where \verb!p! is a pointer of the appropriate type.
+
+With the above methods/operators/functions,
+one can quickly build a binary tree
+\begin{python}
+from latextool_basic import *
+print(r"""
+\begin{center}
+%s
+\end{center}
+""" % graph(yscale=0.9,layout='''
+   A
+ B   C
+D E F G
+''',
+minimum_size='8mm',
+edges='A-B,A-C,B-D,B-E,C-F,C-G',
+A=r'label=\texttt{+}',
+B=r'label=\texttt{*}',
+C=r'label=\texttt{-}',
+D=r'label=\texttt{1}',
+E=r'label=\texttt{2}',
+F=r'label=\texttt{3}',
+G=r'label=\texttt{4}')
+\end{python}
+like this:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+BinaryTreeNode< std::string > * p = new BinaryTreeNode("+");
+p->insert_left("*");
+p->insert_right("-");
+
+p->left()->insert_left("1");
+p->left()->insert_right("2");
+
+p->right()->insert_left("3");
+p->right()->insert_right("4");
+\end{Verbatim}
+Using the functions instead, we would do this:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+BinaryTreeNode< std::string > * p = new BinaryTreeNode("+");
+insert_left(p, "*");
+insert_right(p, "-");
+
+insert_left(left(p), "1");
+insert_right(left(p), "2");
+
+insert_left(left(p), "3");
+insert_right(right(p), "4");
+\end{Verbatim}
