@@ -49,11 +49,17 @@ FILE_VERSION = File_type[VERS] # do the initial file structure, false if we want
 
 #store these constants in a different file
 OTHER = 'other'
+<<<<<<< HEAD
 EXTRA_DOCUMENTS = "documents"
+=======
+EXTRA_DOCUMENTS = "extra_documents"
+DOCUMENTS = "documents"
+>>>>>>> 1180b8f974706c6c0e68cdb8e2d645a1c0b8712a
 LATEXSTR = 'latex string'
 QUEST_CODE = 'QUESTION'
 QUEST_MATH = 'question'
 SKELETON = 'skeleton'
+SKEL_PDF = 'skel in pdf'
 
 
 def writefile(path, s):
@@ -67,7 +73,8 @@ def is_latex(path):
 
 def is_answer(path):
     x = path[len(path) - 5:]
-    return x == 's.tex'
+    file_ = file_getter(path)
+    return x == 's.tex' and file_[0] == 'q'
 
 def include_latex(path):
     if (is_answer(path)):
@@ -137,7 +144,13 @@ def include(path):
     global QUEST_CODE
     global QUEST_MATH
     global SKELETON
+<<<<<<< HEAD
     global EXTRA_DOCUMENTS
+=======
+    global SKEL_PDF
+    global EXTRA_DOCUMENTS
+    global DOCUMENTS
+>>>>>>> 1180b8f974706c6c0e68cdb8e2d645a1c0b8712a
     
     i = QUESTION_ITERATOR
     
@@ -159,25 +172,46 @@ def include(path):
             s += r'''\SOLUTION
 %(textpath)s
 ''' %{'textpath': include_(textpath + 's.tex')}
+<<<<<<< HEAD
     elif path[0] == EXTRA_DOCUMENTS:
+=======
+    elif path[0] == EXTRA_DOCUMENTS or path[0] == DOCUMENTS:
+>>>>>>> 1180b8f974706c6c0e68cdb8e2d645a1c0b8712a
         dest = struct['q doc%(i)s'%{'i': str(i)}]
         
         file_ = file_getter(path[1])
         copy_path(path[1], dest + '/' + file_)
+<<<<<<< HEAD
         s = ''''''
+=======
+        if path[0] == DOCUMENTS:
+            textpath = dest[len(con.destination) + 1:] + '/' + file_
+            
+            s += ''' %(textpath)s
+''' %{'textpath':include_(textpath)}
+>>>>>>> 1180b8f974706c6c0e68cdb8e2d645a1c0b8712a
         
     elif path[0] == LATEXSTR:
         s = path[1] + ' '
         
+<<<<<<< HEAD
     elif path[0] == SKELETON:
+=======
+    elif path[0] == SKELETON or path[0] == SKEL_PDF:
+>>>>>>> 1180b8f974706c6c0e68cdb8e2d645a1c0b8712a
         
         file_ = file_getter(path[1])
         
         dest = struct['skel%(i)s'%{'i': str(i)}]
         copy_path(path[1], dest + '/' + file_)
         textpath = dest[len(con.destination) + 1:] + '/' + file_
+<<<<<<< HEAD
         s += '''%(textpath)s
 
+=======
+        if path[0] == SKEL_PDF:
+            s += '''%(textpath)s
+>>>>>>> 1180b8f974706c6c0e68cdb8e2d645a1c0b8712a
 '''%{'textpath': include_(textpath)}
         
     elif path[0] == OTHER:

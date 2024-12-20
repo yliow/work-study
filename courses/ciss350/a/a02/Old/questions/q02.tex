@@ -1,0 +1,108 @@
+[Review of CISS245]
+
+The following is a generalization of Q1. 
+Given positive integers $a$, $b$, $d$, we define function $f$ as
+follows:
+\begin{enumerate}
+\item If $n$ is divisible by $d$, then
+\[
+f(n) = n/d
+\]
+\item Otherwise
+\[
+f(n) = an + b
+\]
+\end{enumerate}
+(This is a generalization of the function $f$ in Q1: 
+if $a=3, b=1, d=2$, you get the function in Q1.)
+
+Write a program that accepts positive integer values for $a, b, d, n$, and 
+$N$ (I'll explain $N$ in a bit) and
+does the following.
+
+First, if you can reach 1 after at most $N$ applications of function $f$, 
+you print $a, b, d, n, N$, the string \verb!pass!, 
+the number of tries, 
+and the list of numbers obtained. For instance:
+\begin{console}[frame=single,fontsize=\footnotesize, commandchars=\\\{\}]
+\userinput{3 1 2 7 1000}
+3 1 2 7 1000 pass 16 7 22 11 34 17 52 26 13 40 20 10 5 16 8 4 2 1
+\end{console}
+
+Second, if you cannot reach 1 after $N$ tries, 
+you print the same information as above except that
+you print \verb!fail! instead of \texttt{pass}. For instance:
+\begin{console}[frame=single,fontsize=\footnotesize, commandchars=\\\{\}]
+\userinput{3 1 2 7 10}
+3 1 2 7 10 fail 10 7 22 11 34 17 52 26 13 40 20 10
+\end{console}
+
+Note that in this case after applying this particular $f$ 10 times to 7, 
+you have 11 numbers (including 7)
+and the last is not 1 (it's 10).
+
+In this case you must write a (\cpp) function $f$ that accepts 
+$a, b, d$ in such a way that the $f$ function call
+in Q1 still works, i.e. your function prototype must be
+\[
+\verb!int f(int n, int a=3, int b=1, int d=2);!
+\]
+There is another function \verb!fs! that accepts a pointer to int array,
+\[
+\text{\texttt{
+int fs(int * \& p, int n, int a=3, int b=1, int d=2, int N=1);
+}}
+\]
+allocates an integer array of size $N$ to $p$. 
+Note that the value of $n$ is not stored in this array. 
+The return value is the number of integers placed in the array. 
+For instance when $a=3,b=1,d=2,n=7, N=1000$ 
+(see above test case), 
+there are 17 values (including $n=7$). 
+The values stored in the array \verb!p! points to are
+{\small
+\begin{console}[frame=single]
+22 11 34 17 52 26 13 40 20 10 5 16 8 4 2 1
+\end{console}
+}
+(i.e. 7 is not included) and hence the return value in this case is 16.
+
+Make sure you deallocate memory \verb!p! points to before program halts.
+
+\textsc{Test 1}
+\begin{console}[frame=single,fontsize=\footnotesize, commandchars=\\\{\}]
+\userinput{3 1 2 7 1000}
+3 1 2 7 1000 pass 16 7 22 11 34 17 52 26 13 40 20 10 5 16 8 4 2 1
+\end{console}
+
+\textsc{Test 2}
+\begin{console}[frame=single,fontsize=\footnotesize, commandchars=\\\{\}]
+\userinput{3 1 2 7 10}
+3 1 2 7 10 fail 10 7 22 11 34 17 52 26 13 40 20 10
+\end{console}
+
+\textsc{Test 3}
+\begin{console}[frame=single,fontsize=\footnotesize,commandchars=\\\{\}]
+\userinput{7 5 3 7 10}
+7 5 3 7 10 fail 10 7 54 18 6 2 19 138 46 327 109 768
+\end{console}
+
+In the case of Test 3 the function $f$ is defined as
+\begin{enumerate}
+\item If $n$ is divisible by 3, then $f(n) = n/3$
+\item If $n$ is not divisible by 3, then $f(n) = 7n + 5$
+\end{enumerate}
+
+Therefore we have
+\begin{align*}
+f(7)   &= 7 \times 7+5 = 54 \\
+f(54)  &= 54/3 = 18 \\
+f(18)  &= 18/3 = 6 \\
+f(6)   &= 6/3 = 2 \\
+f(2)   &= 2 \times 7+5 = 19 \\
+f(19)  &= 3 \times 19+5 = 138 \\
+f(138) &= 138/3 = 46 \\
+f(46)  &= 7 \times 46+5 = 327 \\
+f(327) &= 327/3 = 109 \\
+f(109) &= 7 \times 109+5 = 768 \\
+\end{align*}
