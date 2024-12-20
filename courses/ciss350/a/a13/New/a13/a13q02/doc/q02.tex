@@ -1,0 +1,47 @@
+Implementation of template hashtable with separate chaining
+
+The hashtable in Q1 accepts keys of \verb!std::string! type
+and values of \verb!double! type.
+Modify the hashtable from Q1 so that is a class template of the following
+form:
+\begin{console}
+class < typename Key, typename Value >
+class HT
+{
+    ...
+};
+\end{console}
+so that
+\begin{console}
+HT< std::string, double >
+\end{console}
+becomes the class in Q1.
+
+But wait!
+
+Instead of having hash functions all over the place, it's better to tie
+hash functions into the classes that we're using as \verb!Key!.
+
+In fact, for practice, create a \verb!Hashable! abstract base class
+and create a class \verb!HashableString! that subclasses
+\verb!std::string! and \verb!Hashable!.
+\verb!Hashable! has a pure virtual method \verb!hash!.
+In that case
+{\small
+\begin{console}
+HT< HashableString, double >
+\end{console}
+}
+is what you have in Q1.
+By doing it this way, you can have different hash functions
+for different hashtables for even the same key type.
+For instance suppoer you have a hashtable with keys 
+made up of SSN and the SSNs you're putting into your hashtable
+always begin with the same 3 characters -- you might want to ignore
+the first 3 characters when computing the hash.
+
+[Note: You should also modify your \verb!HTRow! class as well.
+Note also that for different \verb!Key! types you need different
+hash functions.]
+
+SPOILERS ON NEXT PAGE ...

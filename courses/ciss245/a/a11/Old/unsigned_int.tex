@@ -1,0 +1,67 @@
+\textsc{Unsigned Integers}
+
+In the short tutorial on STL vector class above, you would notice 
+that the compiler might give you a warning here:
+
+\begin{Verbatim}[frame=single, commandchars=\^\@\~, fontsize=\footnotesize]
+#include <iostream>
+#include <vector>
+
+int main()
+{
+    std::vector< int > v; // default constructor
+    std::cout << "size:" << v.size() << '\n';
+    
+    v.push_back(5); // expand v by inserting 5 to the end of v
+    std::cout << "size:" << v.size() << "    array:";
+    ^underline@^textbf@for (int i = 0; i < v.size(); i++)~~
+        std::cout << v[i] << ' ';
+    std::cout << '\n';
+
+
+    return 0;
+}
+\end{Verbatim}
+
+saying that you're comparing \verb!unsigned int! with \verb!int!.
+
+There are many integer types in C++. (Refer to your CISS240 notes). 
+The \verb!int! is the most common. 
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+int x = 0;
+\end{Verbatim}
+In this case, assuming a 32-bit machine and compiler, your \verb!x! 
+can hold an integer value from $-2^{31}$ to $2^{31} - 1$, i.e., roughly 
+-2 billion to +2 billion. An \verb!unsigned int! is declared like this:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+unsigned int x = 0;
+\end{Verbatim}
+or 
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+unsigned x = 0;
+\end{Verbatim}
+In this case \verb!x! can hold an integer value from 0 to $2^{32} - 1$, 
+i.e., from 0 to roughly 4 billion. That's all there is to 
+\verb!unsigned int!.
+
+If \verb!v! is a STL vector object, then \verb!v.size()! is an 
+\verb!unsigned int!. In the code above \verb!i! is declared to 
+be an \verb!int!. That's why there was a warning. It's not 
+necessarily an error. This is not an issue when \verb!i! and 
+\verb!v.size()! have values in their common ranges, i.e., 
+0 to $2^{31} - 1$. To be absolutely safe and to avoid having compiler 
+warning messages, you do this:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+...
+
+int main()
+{
+    ...
+
+    for (unsigned int i = 0; i < v.size(); i++)
+        std::cout << v[i] << ' ';
+    
+    ...
+}
+\end{Verbatim}
+

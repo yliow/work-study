@@ -1,0 +1,303 @@
+\textsc{CISS240 Review: Tracing a Recursive Function}
+
+How does our C/C++ function work? Let's do an example. Suppose you call \verb!fib(3)!:
+
+\verb!    std::cout << fib(3);!
+
+The execution of \verb!fib(3)! will call \verb!fib(3 - 1)! i.e. \verb!fib(2)! because of
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+    running fib(3):
+        ...
+        returning \mybold{fib(n - 1)} + fib(n - 2);
+\end{Verbatim}
+
+Now the execution of \verb!fib(2)! will call \verb!fib(2 - 1)! i.e. \verb!fib(1)! because of
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+    running fib(2):
+        ...
+        returning \mybold{fib(n - 1)} + fib(n - 2);
+\end{Verbatim}
+
+The execution of \verb!fib(1)! will execute this:
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+    running fib(1):
+        ...
+        \mybold{return 1};
+\end{Verbatim}
+
+On returning to \verb!fib(2)! we have the value of \verb!fib(n - 1)!, i.e. 1, and we still
+have to call \verb!fib(n - 2)! i.e. \verb!fib(0)!
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+    running fib(2):
+        ...
+        returning fib(n - 1) + \mybold{fib(n - 2)};
+\end{Verbatim}
+
+This call will execute this:
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+    running fib(0):
+        ...
+        \mybold{return 1};
+\end{Verbatim}
+
+
+
+\newpage
+Returning to the execution of \verb!fib(2)! with \verb!fib(n - 1)! = 1 and \verb!fib(n - 2)! = 1
+we can now execute the addition in
+
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+    running fib(2):
+        ... 
+        returning \mybold{fib(n - 1) + fib(n - 2)};
+      \end{Verbatim}
+      
+which will return 2 for the call for \verb!fib(n - 1)! during the execution of \verb!fib(3)! (did
+you even remember where that was??)
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+     running fib(3):
+        ...
+        returning fib(n - 1) + \mybold{fib(n - 2)};
+\end{Verbatim}
+
+which will result in the call to
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+    running fib(1):
+        ...
+        \mybold{return 1};
+\end{Verbatim}
+
+which returns 1 to \verb!fib(n - 2)! in the execution of \verb!fib(3)!. Now that all calls have
+returned (\verb!fib(n - 1)! returned 2 and \verb!fib(n - 2)! returned 1), we can execute the addition in
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+    running fib(3):
+        ...
+        return \mybold{fib(n - 1) + fib(n - 2)};
+\end{Verbatim}
+
+which will return 3.
+
+
+\textbf{Phew!!} Basically you can see the calls if you use mathematical equations:
+{\small
+\begin{Verbatim}
+fib(3):
+  
+= fib(2) + fib(1)           fib(3) calls fib(2) and fib(1)
+= fib(1) + fib(0) + fib(1)  fib(2) calls fib(1) and fib(0)
+= 1 + 1 + fib(1)            fib(1) returns 1 to fib(2), fib(0) returns 1 to fib(2)
+= 2 + fib(1)                fib(2) returns 2 to fib(3), fib(3) calls fib(1)
+= 2 + 1                     fib(1) returns 1 to fib(2)
+= 3                         fib(3) returns 3
+      \end{Verbatim}
+      }
+
+
+
+\newpage
+Of course if I'm not interested in keeping track of the number of function
+calls and I'm only interested in
+the result I can write
+
+\begin{Verbatim}
+fib(3)    = fib(2) + fib(1)
+          = fib(1) + fib(0) + 1
+          = 1 + 1 + 1
+          = 3
+\end{Verbatim}
+        
+There ... I've explained it twice. Now I want to do it \textbf{again} with a different picture. The arrows denote
+function calls. The number above the arrows show you the value returned:
+
+\begin{Verbatim}
+             2                1
+fib(3) ----+---> fib(2) ----+---> fib(1)
+           |                | 1
+           | 1              +---> fib(0)
+           +---> fib(1)
+\end{Verbatim}
+         
+There you go ... three explanations. Note that there were two (repeated) function calls of \verb!fib(1)!:
+
+\begin{Verbatim}
+             3                2                1
+fib(4) ----+---> fib(3) ----+---> fib(2) ----+---> fib(1)
+           |                |                | 1
+           |                | 1              +---> fib(0)
+           |                +---> fib(1)
+           |
+           | 2                1
+           +---> fib(2) ----+---> fib(1)
+                            | 1
+                            +---> fib(0)
+\end{Verbatim}
+
+Obviously \verb!fib(4)! returns 3 + 2 = 5. Now in this case note that \verb!fib(4)! makes the following calls
+(directly or indirectly):
+
+\begin{tightlist}
+    \li \verb!fib(3)! -- 1 call
+    \li \verb!fib(2)! -- 2 calls
+    \li \verb!fib(1)! -- 3 calls
+    \li \verb!fib(0)! -- 2 calls
+\end{tightlist}
+
+
+
+\newpage
+Hey this is fun! (For me ...). Let's do \verb!fib(5)!. I know that
+\verb!fib(5)! will call
+
+\begin{Verbatim}
+             3                2                1
+fib(4) ----+---> fib(3) ----+---> fib(2) ----+---> fib(1)
+           |                |                | 1
+           |                | 1              +---> fib(0)
+           |                +---> fib(1)
+           |
+           | 2                1
+           +---> fib(2) ----+---> fib(1)
+                            | 1
+                            +---> fib(0)
+\end{Verbatim}           
+and
+\begin{Verbatim}
+             2                1
+fib(3) ----+---> fib(2) ----+---> fib(1)
+           |                | 1
+           | 1              +---> fib(0)
+           +---> fib(1)
+\end{Verbatim}
+
+So putting them together I get:
+
+\begin{Verbatim}
+         4               3                2              1
+fib(5)-+--->fib(4) ----+---> fib(3) ----+---> fib(2)---+---> fib(1)
+       |               |                |              | 1
+       |               |                | 1            +---> fib(0)
+       |               |                +---> fib(1)
+       |               |
+       |               | 2                1
+       |               +---> fib(2) ----+---> fib(1)
+       |                                | 1
+       |                                +---> fib(0)
+       |   
+       | 3               2                1
+       +--->fib(3) ----+---> fib(2) ----+---> fib(1)
+                       |                | 1
+                       | 1              +---> fib(0)
+                       +---> fib(1)
+\end{Verbatim}
+(Such a diagram is called a function call tree.)
+
+
+\newpage
+The calls from \verb!fib(5)! are:
+\begin{tightlist}
+  \li \verb!fib(4)! -- 1 call
+  \li \verb!fib(3)! -- 2 calls
+  \li \verb!fib(2)! -- 3 calls
+  \li \verb!fib(1)! -- 5 calls
+  \li \verb!fib(0)! -- 3 calls
+\end{tightlist}
+
+Obviously there is a lot of repeated calls and it will grow as you increase
+with larger \verb!n! for \verb!fib(n)!. These
+are small numbers. But how fast do they grow?? Well you can do the math, but
+let's get the program
+to tell us:
+
+\begin{Verbatim}[frame=single]
+int fib(int n)
+{
+    std::cout << "fib(" << n << ") ...\n";
+    if (n <= 1)
+        return 1;
+    else
+        return fib(n - 1) + fib(n - 2);
+}
+\end{Verbatim}      
+
+Now call \verb!fib(10)!. Since I'm too lazy (or too smart) to count, I'll get
+the program to count for me:
+
+\begin{Verbatim}[frame=single]
+int count[10]; // global variable, accessible to all functions in this file
+
+void reset()
+{
+    for (int i = 0; i < 10; ++i)
+    {
+        count[i] = 0;
+    }  
+}
+  
+void print()
+{
+    for (int i = 0; i < 10; ++i)
+    {
+        std::cout << count[i] << " ";
+    }
+}
+  
+int sum()
+{
+    int s = 0;
+    for (int i = 0; i < 10; ++i)
+    {
+        s += count[i];
+    }
+}
+
+int fib(int n)
+{
+    // std::cout << "fib(" << n << ") ...\n";
+    count[n]++;
+    if (n <= 1)
+    {
+        return 1;
+    }
+    else
+    {
+        return fib(n-1) + fib(n-2);
+    }
+}
+\end{Verbatim}
+
+with \verb!main()! as:
+
+\begin{Verbatim}[frame=single]
+for (int i = 0; i < 10; ++i)
+{
+    reset();
+    fib(i);
+    print();
+    std::cout << "sum:" << sum() << std::endl;
+}
+\end{Verbatim}
+
+You see that the number of calls grow very quickly and many of the calls are
+actually repeated calls.
+How does \verb!fib! perform
+\lq\lq in the long run"? Try this for your \verb!main()!:
+
+\begin{Verbatim}[frame=single]
+for (int i = 0; i < 100; ++i)
+{
+    std::cout << fib(i) << "\n";
+}
+\end{Verbatim}
+
+Are you convinced that the implementation of \verb!fib! is really bad?
+
+

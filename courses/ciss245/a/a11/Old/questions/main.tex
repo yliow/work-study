@@ -1,0 +1,1186 @@
+%-*-latex-*-
+\input{myassignmentpreamble.tex}
+\input{yliow}
+\input{ciss245}
+\renewcommand\TITLE{Assignment 11}
+
+\begin{document}
+\topmatter
+
+\textsc{Objectives}     
+\begin{enumerate}[nosep]
+        \item Design a class with supporting methods and functions
+        \item Design a class with object composition
+        \item Declare objects
+        \item Access member variables of an object
+        \item Write member functions/operators
+        \item Overload operators
+        \item Translate algorithms to code
+    \end{enumerate}
+
+As always read the whole document carefully before diving into coding.
+While many previous assignments are practice on syntax, this one
+requires problem solving.
+Start early ... and be careful.
+
+\newpage
+Q1.
+The goal is to implement a class and functions for integer computations, not at
+the level of the C/C++ \verb!int!, but rather integers with an extremely huge
+number of digits. We will call this the \verb!LongInt! class.  Such
+computations occur frequently in cryptography, physics, etc. This is,
+conceptually speaking, probably one of the first problem we have to solve.
+After all, if we can't operate with integers of any size, how can we handle
+real numbers, complex numbers, functions, etc.?
+
+With this class, you will be able to compute, for instance, the factorial of
+1000 (i.e. 1000!) and more.  (Check the web for the factorial of 1000.) Also,
+you can modify your \verb!Rational! class to use \verb!LongInt! instead of
+\verb!int!  for numerator and denominator. With that, you can compute with
+fractions that look like this:
+
+\verb!  12312312415412312365476798 / 123598347693429857485202845!
+
+and you can check if
+
+\verb!  12312312415412312365476791!
+
+is prime.  This is helpful in many area of math and CS. For instance modern
+cryptography (example RSA cryptography) uses extremely huge prime numbers of
+several hundred digits in length (at this point in time). RSA cryptography
+depends on the difficulty of factoring numbers. In particular, it involves
+numbers such as
+
+\begin{Verbatim}
+2260138526203405784941654048610197513508038915719776718321197768109445641817
+ 9666766085931213065825772506315628866769704480700018111497118630021124879281
+ 99487482066070131066586646083327982803560379205391980139946496955261
+\end{Verbatim}
+
+This is a product of two primes. The goal is to find these two primes. Clearly
+you can't even begin if your computer cannot work with numbers of this size. If
+you can factorize the above number into two primes, then ciphertext (i.e.,
+encrypted text) that is encrypted using RSA and using the above number is
+completely broken and you can gain access to the encrypted data.
+
+The fact that C/C++ natively can only handle integers with 10 digits is not a
+drawback of the language. No one expects a programming language to supply all
+the possible types and classes in the world. It's more important for a language
+to be extensible, i.e., that it provides features to create new types of
+values.  That's why object-oriented programming is important.  Now back to our
+“long integer” class.
+
+Note that the integers in C/C++ are limited in size. Specifically an \verb!int!
+value is usually about -2 billion to 2 billion. The goal of this assignment is
+to write a class to compute integers outside of this range.  This can be
+achieved using arrays. For instance for the integer 1352 (the numeric concept
+of “one thousand, three hundred and fifty-two”), can be stored in an array,
+\verb!size!, and \verb!sign! variables:
+
+\begin{Verbatim}
+            x[0] = 2 x[1] = 5 x[2] = 3 x[3] = 1 size = 4 sign = 1 // sign
+ equals 1 means the number being modeled // is “positive”
+\end{Verbatim}
+
+and the integer -237 (the numeric concept of “negative two hundred and
+thirty-seven”) can be modeled using:
+
+\begin{Verbatim}
+            x[0] = 7 x[1] = 3 x[2] = 2 size = 3 sign = -1 // sign equals -1
+ means the number being modeled // is “negative”
+\end{Verbatim}
+
+Note that the \lq\lq ones" digit go into \verb!x[0]!, the \lq\lq 10s" digit go
+into \verb!x[1]!, etc. Note that 0 (the concept of \lq\lq zero") can be modeled
+using
+
+\begin{Verbatim}
+            x[0] = 0 size = 1 sign = 1
+\end{Verbatim}
+
+Design a class for such objects. The name of the class is \verb!LongInt!.  For
+the integer array, you should use the STL \verb!vector! class – see section
+below for information on the \verb!vector! class. This is similar to our
+\verb!IntDynArr! class. (The point of working on \verb!IntDynArr!  is to gain
+an understanding of the internal workings of \verb!std::vector!.)  Note that
+each \verb!vector! object already maintains a \verb!size! instance
+variable. Therefore for this class, you only need to add \verb!sign! to the
+class. Hence the class should look like this:
+
+\begin{Verbatim}
+            class LongInt { private: std::vector< int > x; int sign; };
+\end{Verbatim}
+
+Note that we are using object composition. By the way, do not confuse the C++
+STL \verb!vector! with vectors from math or our \verb!vec2d! class.  In
+computer science, a dynamic array of values is also called a vector.
+
+Note the curious syntax of the class we're using for the dynamic array of
+digits:
+
+\verb!  std::vector< int >!
+
+This basically tells C++ that you want a vector of \verb!int! values.  (For
+details refer to notes on templates.)
+
+Now let me describe what features we want for this class ...
+
+With your class, you should be able to do the following:
+
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+LongInt i; // i models 0 with default constructor std::cout << i << '\n';; //
+ Prints 0 LongInt j(123); // Constructor call with int value std::cout << j <<
+ '\n'; // Prints 123 LongInt k("9876543210"); // Constructor call with C-string
+ std::cout << k << '\n'; // Prints 9876543210 LongInt l("-9876543210");
+ std::cout << l << '\n'; // Prints -9876543210 LongInt m = l; // Copy
+ constructor: m models the same // integer that l models std::cout << m <<
+ '\n'; // Prints -9876543210
+\end{Verbatim}
+
+The above describes the various constructors for this class. Of course you need
+to implement all the arithmetic operators:
+
+\begin{Verbatim}
+            LongInt i("1000000000000"); LongInt j(3); i += j; std::cout << i <<
+ '\n'; // prints 1000000000003 i -= j; std::cout << i << '\n'; // prints
+ 1000000000000
+\end{Verbatim}
+
+[\textsc{Important debugging suggestion}: It's a good idea while testing your
+  code to temporarily print your \verb!LongInt! objects in a slightly different
+  way:
+
+\begin{Verbatim}
+            LongInt i("123456789"); LongInt j("-123456789"); std::cout << i <<
+ '\n'; // prints < + 1 2 3 4 5 6 7 8 9 > std::cout << j << '\n'; // prints < -
+ 1 2 3 4 5 6 7 8 9 >
+\end{Verbatim}
+
+Why? Because if the output is for instance -123 it could be that the values in
+the \verb!vector! is 3, -12 and the \verb!sign! is 1 or it could be 3, 2, -1
+and the \verb!sign! is 1. Once you know your class works correctly, you change
+the output back to what it should be.]
+
+Read the following very carefully ...
+
+Note that if your class \verb!LongInt! class has a pointer to a dynamic array
+of integers in the heap for the digits (like the \verb!IntDynArr!  class) then
+you would need to define your own destructor, and copy constructor, and
+\verb!operator=!. However we are using the STL \verb!vector! class (which
+contains a pointer for the same purpose). The \verb!vector!  class already has
+a destructor to deallocate the memory used by the pointer in \verb!vector!
+objects. Therefore when your \verb!LongInt!  default destructor is called, C++
+will call the destructor of \verb!vector! for you, doing the right
+thing. Likewise when you call \verb!operator=! for your \verb!LongInt! object
+like this
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+i = j;
+\end{Verbatim}
+where \verb!i! and \verb!j! are \verb!LongInt! objects, C++ will call
+\verb!operator=! on the STL \verb!vector! object inside the \verb!LongInt!
+objects, again doing the right thing. So you do not have to implement
+\verb!operator=! for the \verb!LongInt! class. (But just because I say you
+don't have to, it does not mean you don't have to know why.)
+
+Other augmented operators (besides the \verb!+=! and \verb!-=! from above) you
+must have are the \verb!*=, /=, %=!. Of course there are the binary operators
+\verb!+, -, *, /, %.!
+
+Your \verb!LongInt! class must be able to inter-operate with \verb!int!  values
+too. For instance
+\begin{Verbatim}[fontsize=\footnotesize,frame=single]
+LongInt i(2); i += 3; std::cout << i << std::endl; // prints 5 std::cout << (i
+ + 1) << std::endl; // prints 6 std::cout << (1 + i) << std::endl; // prints 7
+ int j = 2; j += i; std::cout << j << std::endl; std::cout << (1 + j) <<
+ std::endl; std::cout << (1 + j) << std::endl;
+\end{Verbatim}
+
+The same applies to \verb!-=, *=, %=, -, *, /.! (For this, you should refer to
+your \verb!Rational! class for review and hints.)
+
+All these operators behave in the usual mathematical way. For instance you have
+to be careful about carries:
+\begin{Verbatim}[fontsize=\footnotesize,frame=single]
+LongInt i("10099999"); i = i + 2; std::cout << i << std::endl; // prints
+ 10100001
+\end{Verbatim}
+and you have to be careful with borrows during subtraction:
+\begin{Verbatim}[fontsize=\footnotesize,frame=single]
+LongInt i("3000000000000"); i = i - 1; std::cout << i << std::endl; // prints
+ 2999999999999
+\end{Verbatim}
+
+To allow easy assignment for extremely long integers you must overload
+operator= to be able to do this:
+\begin{Verbatim}[fontsize=\footnotesize,frame=single]
+LongInt i; i = "9876543210"; std::cout << i << std::endl; // prints 9876543210
+ i = "-9876543210"; std::cout << i << std::endl; // prints -9876543210
+\end{Verbatim}
+
+Your class must also allow comparisons among objects and with integers using
+\verb@==@, \verb@!=@, \verb!<!, \verb!<=!, \verb!>!, \verb!>=!.  For instance
+\begin{Verbatim}[fontsize=\footnotesize,frame=single]
+LongInt i(123), j(74); bool b0 = (i == j); // false bool b1 = (i < 42); //
+ false bool b1 = (42 <= j); // true bool b2 = (-1 == j); // false
+\end{Verbatim}
+
+Etc.
+
+Other operators include \verb!++! and \verb!--!. Note that there are two types
+of \verb!++! and \verb!--!. C++ differentiates between the pre- and
+post-increment operators in the following way:
+\begin{align*}
+\texttt{++i} \,\,\,\, &\text{ same as } \,\,\,\, \texttt{i.operator++()}
+\\ \texttt{i++} \,\,\,\, &\text{ same as } \,\,\,\, \texttt{i.operator++(0)}
+\end{align*}
+(Refer to the notes on operator overloading.) The difference between the pre-
+and post-increment operator is that the pre- version all return a reference to
+the object after some form of operator. Here's a simple experiment on ++ for
+int type:
+
+\begin{Verbatim}[fontsize=\footnotesize,frame=single]
+int i = 0; int & j = (++i); // i becomes 1 and j references i
+\end{Verbatim}
+
+The post version actually returns a clone of the old value of \verb!i!
+
+\begin{Verbatim}[fontsize=\footnotesize,frame=single]
+int i = 0; int j = (i++); // i becomes 1 but j is set to 0, the original //
+ value of i
+\end{Verbatim}
+
+Therefore in term of implementation in a class say C, the pre- and
+post-increment operators would look like this:
+
+\begin{Verbatim}[fontsize=\footnotesize,frame=single]
+class C { public: C & operator++() // pre-increment. Note return type.  { //
+ some code to change object *this return *this; } C operator++(int i) //
+ post-increment. Note return type.  { C old_object = (*this); // some code to
+ change object *this return old_object; } };
+\end{Verbatim}
+
+You should also implement the “negative of” operator:
+
+\begin{Verbatim}[fontsize=\footnotesize,frame=single]
+LongInt i(123); LongInt j = -i; // j is the same as LongInt(-123)
+\end{Verbatim}
+
+Note that
+
+\verb!  -i same as i.operator-();!
+
+This is the unary “negative” operator (which is not the same as the subtraction
+binary operator) which is not the same as \verb!i - j!  which is
+\verb!i.operator-(j)!, i.e. the two operators have different signatures.
+
+Of course there's also the unary positive operator:
+
+\verb!  +i same as i.operator+();!
+
+(Refer to the \verb!Rational! class for a quick review.)
+
+You should also implement an \verb!abs()! method that returns the absolute
+value of the LongInt object:
+
+\begin{Verbatim}[fontsize=\footnotesize,frame=single]
+LongInt i(-123); LongInt j = i.abs(); // j is the same as LongInt(123)
+\end{Verbatim}
+
+For convenience, you should also have a non-member function \verb!abs()!:
+
+\begin{Verbatim}[fontsize=\footnotesize,frame=single]
+LongInt i(-123); LongInt j = abs(i); // j is the same as LongInt(123)
+\end{Verbatim}
+
+With all the above methods you can more or less treat \verb!LongInt! the same
+as \verb!int!. For instance you can print the factorial of 1000:
+
+\begin{Verbatim}[fontsize=\footnotesize,frame=single]
+LongInt product(1); for (int i = 1; i <= 1000; i++) { product *= i; std::cout
+ << i << ' ' << product << std::endl; }
+\end{Verbatim}
+
+The factorial of 1000 (i.e. 1000!) is an extremely long integer. You can check
+the correctness of your output by searching for it on the web.  Of course you
+can even declare i to be a \verb!LongInt! object:
+
+\begin{Verbatim}[fontsize=\footnotesize,frame=single]
+LongInt product(1); for (LongInt i = 1; i <= 1000; i++) { product *= i;
+ std::cout << i << ' ' << product << std::endl; }
+\end{Verbatim}
+
+but of course you would expect \verb!int! variables to perform computations
+faster than \verb!LongInt! objects.
+
+\textsc{Other Requirements}
+
+As always:
+\begin{tightlist}
+    \li Methods must be constant wherever possible \li Object parameters passed
+    by reference whenever possible; they must also be made constant wherever
+    possible \li Code duplication must be kept to a minimal. In general the
+    augmented assignment operators should be implemented first, with the
+    non-augmented ones depending on the augmented ones.  Similarly,
+    \texttt{operator!=} is just the opposite of \verb!operator==!.  \li You
+    must have a header file \verb!LongInt.h! and a class implementation file
+    \verb!LongInt.cpp!.  \li You must include a test file
+    \verb!testLongInt.cpp! that tests all the functions and methods of your
+    \verb!LongInt! library.
+\end{tightlist}
+
+
+\newpage
+\textsc{The STL Vector Class}
+
+Although we already have an \verb!IntDynArr! class that can be used 
+to model our \verb!LongInt! class, we will use the STL (standard 
+template library) \verb!vector! class. Note that although C++ 
+compilers comes with the \verb!vector! class which you can use right 
+away, it is still important to implement your version of the 
+\verb!vector! class (which we call \verb!IntDynArr!). Only then will 
+you understand the performance differences between “container” classes  
+for storing values -- the \verb!vector! class is not the only class used 
+for storing values. One class might be faster in a certain scenario while 
+another might be better in a different scenario. Also in the real world, 
+there are situations where you have to modify the classes that come with 
+your C++ compiler. This means that you cannot restrict yourself to being 
+a user of classes supplied by your C++ compiler. You have to know the 
+inner guts of these classes.
+
+Many of the methods you have implemented in the \verb!IntDynArr! class 
+actually appear in this STL \verb!vector! class. This \verb!vector! class 
+comes with most C++ compilers. Make sure you try the following examples 
+to understand some methods available in this class.
+
+\begin{Verbatim}[frame=single, commandchars=\^\@\~, fontsize=\small]
+#include <iostream>
+#include <vector>
+
+int main()
+{
+    std::vector< int > v; // default constructor
+    std::cout << "size:" << v.size() << '\n';
+    
+    v.push_back(5); // expand v by inserting 5 to the end of v
+    std::cout << "size:" << v.size() << "    array:";
+    for (int i = 0; i < v.size(); i++)
+        std::cout << v[i] << ' ';
+    std::cout << '\n';
+
+    v.push_back(-54);
+    std::cout << "size:" << v.size() << "    array:";
+    for (int i = 0; i < v.size(); i++)
+        std::cout << v[i] << ' ';
+    std::cout << "\n";
+
+    v.push_back(13542);
+    std::cout << "size:" << v.size() << "    array:";
+    for (int i = 0; i < v.size(); i++)
+        std::cout << v[i] << ' ';
+    std::cout << "\n";
+
+    v.resize(5); // change the size to 5 so that we also have v[3], v[4]
+    v[3] = 3;
+    v[4] = 4;
+    std::cout << "size:" << v.size() << "    array:";
+    for (int i = 0; i < v.size(); i++)
+        std::cout << v[i] << ' ';
+    std::cout << "\n";
+    
+    v.resize(0);
+    std::cout << "size:" << v.size() << "    array:";
+    for (int i = 0; i < v.size(); i++)
+        std::cout << v[i] << ' ';
+    std::cout << "\n";
+
+    v.resize(5);
+    for (int i = 0; i < 5; i++) v[i] = i;
+    std::vector< int > u = v; // invoke copy constructor 
+    std::cout << "size:" << u.size() << "    array:";
+    for (int i = 0; i < u.size(); i++)
+        std::cout << u[i] << ' ';
+    std::cout << "\n";
+
+    u[0] = -13579;
+    u[1] = -24680;
+    for (int i = 2; i < u.size(); i++) u[i] = 0; 
+    v = u; // Invoking the assignment operator
+    std::cout << "size:" << v.size() << "    array:";
+    for (int i = 0; i < v.size(); i++)
+        std::cout << v[i] << ' ';
+    std::cout << "\n";
+
+    v.resize(2);
+    std::cout << "size:" << v.size() << "    array:";
+    for (int i = 0; i < v.size(); i++)
+        std::cout << v[i] << ' ';
+    std::cout << "\n";
+    
+    return 0;
+}
+\end{Verbatim}
+
+\newpage
+
+You can also find information on the vector class on the web. 
+Here are some references:
+\begin{tightlist}
+\li \url{http://www.cppreference.com/wiki/stl/vector/start}
+\li \url{http://www.cplusplus.com/reference/stl/vector/}
+\end{tightlist}
+
+It's important for you (at this point in your CS career) to be 
+comfortable using resources on the web – without plagiarism of 
+course – for references and to learn new things. You can learn 
+almost anything you want as long as you have internet access. 
+But this is especially the case for CS since CS people are heavy 
+users of the internet. After all we did invent the internet. 
+Therefore you will find lots of CS resources on the web. Nonetheless, 
+it's still good to have a copy of well-written CS books. Sometimes 
+the problem with the web is that there's TOO much information and 
+you spend time differentiating between good and up-to-date 
+information from mis-information.
+
+The vector class is usually mentioned in most C++ textbooks.
+
+Note that you should only use online resources only when you
+are allowed to do so.
+Otherwise you are plagiarizing.
+Plagiarism is a serious academic misconduct -- think academic crime.
+
+
+\newpage
+\textsc{Unsigned Integers}
+
+In the short tutorial on STL vector class above, you would notice 
+that the compiler might give you a warning here:
+
+\begin{Verbatim}[frame=single, commandchars=\^\@\~, fontsize=\footnotesize]
+#include <iostream>
+#include <vector>
+
+int main()
+{
+    std::vector< int > v; // default constructor
+    std::cout << "size:" << v.size() << '\n';
+    
+    v.push_back(5); // expand v by inserting 5 to the end of v
+    std::cout << "size:" << v.size() << "    array:";
+    ^underline@^textbf@for (int i = 0; i < v.size(); i++)~~
+        std::cout << v[i] << ' ';
+    std::cout << '\n';
+
+
+    return 0;
+}
+\end{Verbatim}
+
+saying that you're comparing \verb!unsigned int! with \verb!int!.
+
+There are many integer types in C++. (Refer to your CISS240 notes). 
+The \verb!int! is the most common. 
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+int x = 0;
+\end{Verbatim}
+In this case, assuming a 32-bit machine and compiler, your \verb!x! 
+can hold an integer value from $-2^{31}$ to $2^{31} - 1$, i.e., roughly 
+-2 billion to +2 billion. An \verb!unsigned int! is declared like this:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+unsigned int x = 0;
+\end{Verbatim}
+or 
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+unsigned x = 0;
+\end{Verbatim}
+In this case \verb!x! can hold an integer value from 0 to $2^{32} - 1$, 
+i.e., from 0 to roughly 4 billion. That's all there is to 
+\verb!unsigned int!.
+
+If \verb!v! is a STL vector object, then \verb!v.size()! is an 
+\verb!unsigned int!. In the code above \verb!i! is declared to 
+be an \verb!int!. That's why there was a warning. It's not 
+necessarily an error. This is not an issue when \verb!i! and 
+\verb!v.size()! have values in their common ranges, i.e., 
+0 to $2^{31} - 1$. To be absolutely safe and to avoid having compiler 
+warning messages, you do this:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+...
+
+int main()
+{
+    ...
+
+    for (unsigned int i = 0; i < v.size(); i++)
+        std::cout << v[i] << ' ';
+    
+    ...
+}
+\end{Verbatim}
+
+
+
+\newpage
+\textsc{Test code}
+
+You are now on your own:
+you should design a complete test like previous assignments.
+Desiging test cases and trying to break your code (or someone else's)
+is an extremely important discipline.
+
+For instance when you run your \verb!main()! (in \verb!testLongInt.cpp!)
+the user enters option 0 to test the constructor that accepts an int
+and prints the LongInt constructor with the int,
+the user enters option 1 to test the constructor that accepts a
+C-string and prints the LongInt constructor with the C-string, etc.
+Also, see section on \textsc{Ultimate test cases}.
+
+Temporarily, you can use the following ad-hoc and incomplete test code.
+The test code is incomplete; you should add code to test all methods/functions 
+to this code. The \verb!multeq_digit()! method multiplies a 
+digit to the object. The \verb!multeq_tenpower()! multiplies a 
+tenpower to object. For instance if a is \verb!LongInt(123)!, 
+then \verb!a.multieq_digit(2)! will make \verb!a! the same as 
+\verb!LongInt(246)! and \verb!a.multeq_tenpower(4)! will make 
+a the same as \verb!LongInt(1230000)!.
+
+\begin{Verbatim}[commandchars=\^\@\~, frame=single, fontsize=\footnotesize]
+#include <iostream>
+#include <cmath>
+#include "LongInt.h"
+
+typedef LongInt Z; // see note on typedef
+
+int main()
+{
+    {
+        Z z;
+        std::cout << "Testing constructor: You should see 0\n" << z << '\n';
+    }
+    {
+        std::cout << "Testing constructor: You should see -20 -19 ... 19 20\n"; 
+        for (int i = -20; i <= 20; i++)
+        {
+            Z z(i);
+            std::cout << z << ' ';
+        }
+        std::cout << '\n';
+    }
+    {
+        std::cout << "Testing LongInt(char []) ...\n";
+        if (Z("0") != Z(0)) std::cout << "fail for \"0\"\n";
+        if (Z("1") != Z(1)) std::cout << "fail for \"1\"\n";
+        if (Z("-1") != Z(-1)) std::cout << "fail for \"-1\"\n";
+        if (Z("54321") != Z(54321)) std::cout << "fail for \"54321\"\n";
+        if (Z("-54321") != Z(-54321)) std::cout << "fail for \"-54321\"\n";        
+    }
+    {
+        std::cout << "Testing == and != ... " << std::endl;
+        for (int i = -1000; i < 1000; i++)
+        {
+            for (int j = -1000; j < 1000; j++)
+            {
+                LongInt I(i), J(j);
+                if ((i == j) != (I == J))
+                {
+                    std::cout << "== error for i:"
+                              << i << ", " << "j:" << j << std::endl;
+                }
+                if ((i != j) != (I != J))
+                {
+                    std::cout << "!= error for i:"
+                              << i << ", " << "j:" << j << std::endl;
+                }
+            }
+        }
+    }
+
+    {
+        std::cout << "Testing < ...\n";
+        for (int i = -1000; i < 1000; i++)
+        {
+            for (int j = -1000; j < 1000; j++)
+            {
+                if (
+                    ((i < j) != (Z(i) < Z(j))) &&
+                    ((i < j) != (Z(i) < j)) &&
+                    ((i < j) != (i < Z(j)))
+                    )
+                {
+                    std::cout << "< error for " << i << ' ' << j << '\n';
+                }
+            }
+        }
+    }
+
+    {
+        std::cout << "Testing += and + ...\n";
+        for (int i = -1000; i < 1000; i++)
+        {
+            for (int j = -1000; j < 1000; j++)
+            {
+                LongInt I(i), J(j);
+                LongInt a = (I += J);
+                LongInt b = LongInt(i) + LongInt(j);
+                if ((i + j) != a || I != (i + j))
+                {
+                    std::cout << "+= error for ";
+                    std::cout << i << ' ' << j << '\n';
+                }
+                if ((i + j) != b)
+                {
+                    std::cout << "+ error for ";
+                    std::cout << i << ' ' << j << '\n';
+                }
+            }
+        }
+    }
+
+    {
+        std::cout << "Testing -= and - ...\n";
+        for (int i = -1000; i < 1000; i++)
+        {
+            for (int j = -1000; j < 1000; j++)
+            {
+                LongInt I(i), J(j);
+                LongInt a = (I -= J);
+                LongInt b = LongInt(i) - LongInt(j);
+                if ((i - j) != a || (i - j) != I)
+                {
+                    std::cout << "-= error for " << i << ' ' << j << '\n';
+                }
+                if ((i - j) != b)
+                {
+                    std::cout << "- error for " << i << ' ' << j << '\n';
+                }
+            }
+        }
+    }
+
+    {
+        std::cout << "Testing multeq_tenpower ...\n";
+        for (int i = -1000; i < 1000; i++)
+        {
+            for (int j = 0; j < 5; j++)
+            {
+                LongInt a(i);
+                a.multeq_tenpower(j);
+                if (i * int(pow(10, j)) != a)
+                {
+                    std::cout << i << ' ' << j << ' ' << a << '\n';
+                }
+            }
+        }
+    }
+
+    {
+        std::cout << "Testing multeq_digit ...\n"; 
+        for (int i = -10000; i < 10000; i++)
+        {
+            for (int j = 0; j < 10; j++)
+            {
+                LongInt a(i);
+                a.multeq_digit(j);
+                if (i * j != a)
+                {
+                    std::cout << "error for " << i << ' ' << j << '\n';
+                }
+            }
+        }
+    }
+
+    {
+        std::cout << "Testing *= and * ...\n";
+        for (int i = -10000; i < 10000; i++)
+        {
+            for (int j = -10000; j < 10000; j++)
+            {
+                LongInt a(i);
+                LongInt b(j);
+                LongInt c = a * b;
+                a *= b;
+                if (i * j != a)
+                {
+                    std::cout << "error for *= for " << i << ' ' << j << '\n';
+                }
+                if (i * j != c)
+                {
+                    std::cout << "error for * for " << i << ' ' << j << '\n';
+                }
+            }
+        }
+    }
+
+    {
+        std::cout << "Testing pre ++ ...\n";
+        for (int i = -1000000; i < 1000000; i++)
+        {
+            LongInt a(i);
+            if (i + 1 != (++a))
+            {
+                std::cout << "error for " << i << '\n';
+            }
+        }
+    }
+
+    {
+        std::cout << "Testing post ++ ...\n";
+        for (int i = -1000000; i < 1000000; i++)
+        {
+            LongInt I(i);
+            LongInt c = (I++);
+            if (i != c || i + 1 != I)
+            {
+                std::cout << "error for " << i << '\n';
+            }
+        }
+    }
+
+
+    {
+        std::cout << "Testing / and % ...\n";
+        int i,j;
+        for (j = 1; j < 1000000; j++)
+        {
+            for (i = 1; i < 1000000; i++)
+            {
+                if (i % 1000 == 0)
+                    std::cout << "i:" << i << "  j:" << j << std::endl;
+                LongInt a(i), b(j);
+                LongInt q = a / b, r = a % b;
+                if (i / j != q)
+                {
+                    std::cout << "/ error for "
+                              << i << ' ' << j << std::endl;
+                    return 0;
+                }
+                if (i % j != r)
+                {
+                    std::cout << "% error in "
+                              << i << ' ' << j << std::endl;
+                    return 0;
+
+                }
+            }
+        }
+    }
+    
+    return 0;
+}
+\end{Verbatim}
+
+\newpage
+\textsc{Typedef}
+
+A typedef is just a shorthand for a type. For instance support you
+are too lazy to type \verb!bool!. You can do this:
+
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+typedef bool B; // B is the same as bool
+B someflag = true; 
+\end{Verbatim}
+
+It's important to know that \verb!B! is the same as \verb!bool!. This 
+means for instance that you cannot have the following:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+void f(bool);
+void f(B);
+\end{Verbatim}
+since the two functions have the same prototype. When compared with 
+structures:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+struct W 
+{
+    bool flag;
+};
+
+struct X
+{
+    bool flag;
+};
+\end{Verbatim}
+the above \verb!W! and \verb!X! are actually different event though 
+they have the same content. Likewise, the following classes are 
+considered different:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+class Y
+{
+private:
+    bool flag;
+};
+
+class Z
+{
+private:
+    bool flag;
+};
+\end{Verbatim}
+
+Therefore it's OK to have the following:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+void f(W);
+void f(X);
+void f(Y);
+void f(Z);
+\end{Verbatim}
+
+You can have typedefs for arrays, pointers, and references. 
+This is how you do it:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+typedef int G [100];
+typedef int * H;
+typedef int & J;
+G g;           // g is an array of 100 integers
+H h = new int; // h is a pointer to an int value
+J j = *h;      // j is a reference to an int value
+\end{Verbatim}
+
+Typedefs are frequently used for really long types or classes. 
+For instance you can do this:
+
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+typedef LongInt Z;
+Z i; // i is a LongInt object
+\end{Verbatim}
+
+
+\newpage
+\textsc{SPOILERS: Advice and recursion}
+
+The following are some suggestions/advice. You need not follow 
+them. In fact, treat them as spoilers. Look at them only when 
+you're stuck. Also, I'll try not to give you too much help below 
+so that you can learn from your struggles. But if you really need 
+help, read the following and if you need more help, obviously you 
+can talk to me or discuss with fellow students and share ideas. 
+And remember that plagiarism – as in copying code – is not allowed. 
+
+Again, implement one small feature at a time, testing it completely 
+before moving on to the next.
+
+Clearly you must implement constructors first. The next thing to 
+implement is printing. After all, if you can't print, you can't debug!
+
+After you have read the requirements above (carefully), 
+you might want to think about how you want to split the logic in your methods
+into cases before writing methods for all cases at once.
+
+
+For \verb!operator+! and \verb!operator+=!, remember that you can easily 
+implement \verb!operator+! once you have \verb!operator+=! since for 
+almost any imaginable \verb!class C!, once you have the copy constructor 
+and \verb!operator+=! working correctly, \verb!operator+! will always 
+look like this:
+
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+C operator+(const C & c) const
+{
+    return C(*this) += c;
+}
+\end{Verbatim}
+
+So the focus is on \verb!operator+=!. I suggest you first handle the case 
+of adding positive \verb!LongInt! objects. In other words test 
+\begin{console}[fontsize=\footnotesize]
+LongInt(123) + LongInt(456)
+\end{console}
+and
+\begin{console}[fontsize=\footnotesize]
+LongInt i(123);
+i += LongInt(456); 
+\end{console}
+and not 
+\begin{console}[fontsize=\footnotesize]
+LongInt i(123);
+i += (LongInt(-456)
+\end{console}
+or
+\begin{console}[fontsize=\footnotesize]
+LongInt(123) + (LongInt(-456)
+\end{console}
+
+This means that you might (I'm not 
+saying you must) want your \verb!operator+=! to look like this:
+
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+LongInt & operator+=(const LongInt & I)
+{
+    if (*this is positive and I is positive)
+    {
+    }
+    // leave the other cases out first
+}
+\end{Verbatim}
+and if so, you might want to have an “is positive method” in your class, 
+i.e., have your \verb!operator>=! done first. This means that you might 
+as well finish all the boolean operators first:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+operator==
+operator!=
+operator<
+operator<=
+operator>
+operator>=
+\end{Verbatim}
+(After all these are much simpler.)
+Once you're done with \verb!operator+=! for positive \verb!LongInt! objects, 
+you should realize after some thought that adding two negative numbers is 
+actually very easy. Why? If you try to add -123 and -456, isn't that the same 
+as adding 123 and 456 and then sticking in a negative sign? Therefore the addition 
+of two negative numbers actually depend on the addition of two position numbers. 
+I'll let you think about that.
+The pseudocode is then:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+LongInt & operator+=(const LongInt & I)
+{
+    if (*this is positive and I is positive)
+    {
+    }
+    else (*this is negative and I is negative)
+    {
+        let J be the same as *this but with sign = 1
+        let K be the same as I but with sign = 1
+        then both J and K are positive
+        perform J += K (recursion)
+        copy J to *this, but set the sign of *this to -1
+    }
+    // other cases
+}
+\end{Verbatim}
+
+But what about the addition of a positive and a 
+negative? For instance 123 and -456. You can actually think of that as the subtraction 
+$123 - 456$. So in this case, it depends on \verb!operator-=! where the two number are 
+positive. Etc.
+
+Altogether there are 4 cases for \verb!operator+=! and also several cases for \verb!operator-=!.
+Figure out the simple cases, write and test them, and then
+get the other cases to call these simple cases (recursively) and it will
+save you a lot of work.
+
+
+\newpage
+\textsc{SPOILERS: Multiplication}
+
+You should use the standard column multiplication algorithm which you should be very 
+familiar with. Here's an example. Suppose you want to multiply $A = 123$ with $B = 142$, you would do this:
+
+\begin{Verbatim}
+                      1 2 3
+                x     1 4 2
+                ------------
+                      2 4 6
+                    4 9 2
+                + 1 2 3
+                ------------
+                  1 7 4 6 6
+                ------------
+\end{Verbatim}
+
+Of course this is just
+
+\begin{Verbatim}
+                      1 2 3
+                x     1 4 2
+                ------------
+                      2 4 6
+                    4 9 2 0
+                + 1 2 3 0 0
+                ------------
+                  1 7 4 6 6
+                ------------
+\end{Verbatim}
+
+(I've added zeroes.) The rows that you're adding are:
+
+\begin{Verbatim}
+                      2 4 6
+                    4 9 2 0
+                  1 2 3 0 0
+\end{Verbatim}
+
+And where do they come from?
+
+\begin{Verbatim}
+                      2 4 6 = 123 x 1
+                    4 9 2 0 = 123 x 4 x 10
+                  1 2 3 0 0 = 123 x 2 x 100
+\end{Verbatim}
+
+or
+
+\begin{Verbatim}
+                      2 4 6 = 123 x 1 x 10^0
+                    4 9 2 0 = 123 x 4 x 10^1
+                  1 2 3 0 0 = 123 x 2 x 10^2
+\end{Verbatim}
+
+(To make things more regular looking.) If I replace the 123 by \verb!A!, 
+the rows become
+
+\begin{Verbatim}
+                      2 4 6 = A x 1 x 10^0
+                    4 9 2 0 = A x 4 x 10^1
+                  1 2 3 0 0 = A x 2 x 10^2
+\end{Verbatim}
+
+Of course the 1 and 4 and 2 are the digits of B.
+
+\begin{Verbatim}
+                      2 4 6 = A x B[0] x 10^0
+                    4 9 2 0 = A x B[1] x 10^1
+                  1 2 3 0 0 = A x B[2] x 10^2
+\end{Verbatim}
+
+This means that as long as you have a way to multiply your 
+\verb!LongInt! objects by a digit and you have a way to multply 
+your \verb!LongInt! object by 10 powers, you can generate the 
+rows in your column multiplication. Suppose we call these 
+functions (or methods – it's up to you) \verb!MULT_BY_DIGIT! 
+and \verb!MULT_BY_TENPOWER!, the above is
+
+\begin{Verbatim}
+                  2 4 6 = MULT_BY_TENPOWER(MULT_BY_DIGIT(A, B[0]), 0)
+                4 9 2 0 = MULT_BY_TENPOWER(MULT_BY_DIGIT(A, B[1]), 1)
+              1 2 3 0 0 = MULT_BY_TENPOWER(MULT_BY_DIGIT(A, B[2]), 2)
+\end{Verbatim}
+
+Clearly this is a loop over the digits of B. Once you have your program 
+printing out the row correctly, you can start to add them. The 
+pseudocode is of course this:
+
+\begin{Verbatim}
+                sum = 0
+                for i = 0, 1, 2, ...:
+                    term = MULT_BY_TENPOWER(MULT_BY_DIGIT(A, B[i]), i)
+                    sum += term
+\end{Verbatim}
+
+Of course it's clear that you MUST have all the addition operations 
+done before doing multiplication. And of course you have to make the 
+above work for all \verb!LongInt! objects including objects with 
+different sizes. You also have to make sure that you can multiply 
+integers which are negative. This is easy. For instance if you're 
+told in school to multiply 123 and -142, you would just multiply 123 
+and 142 and then add a negative sign to the product.
+
+(The high school multiplication method is actually not the only 
+way to perform multiplication. Its been thought for a very long time 
+that it's the most efficient way. It was only very recent – a couple 
+of decades ago – that a more efficient method was discovered by a 
+Russian around the 60s. This is called the Karatsuba algorithm.
+See CISS358.)
+
+
+\newpage 
+\textsc{Division and mod \%}
+
+I'll leave division and mod (i.e., \texttt{\%}) to you. You only need to think 
+about \verb!LongInt! division for positive integers.
+
+I have already given you the algorithm in CISS240:
+\[
+\frac{21}{4} = 5 \frac{1}{4}
+\]
+where $5$ is the integer division of 21 by 4 (also called the quotient)
+and $1$ is the remainder, i.e., $1$ is $21 \% 4$.
+And how do you calculate the 5 and the 1?
+
+Pretend you have 21 dollars and you want to give that out evenly to 4 friends.
+Continually give out 4 dollars to each friend.
+At some point in time you'll be left with $1$. That's the remainder.
+And each friend has 5 dollars.
+Therefore the quotient and remainder can be calculated
+by repeated subtraction.
+
+There's a fastest way based on \lq\lq long division" method from middle
+school.
+For instance if you want to compute quotient and remainder of
+$3001$ by $2$ using the repeated subtraction, you would have to perform
+$1500$ subtractions of $2$ from $3001$ before you stop.
+A faster way is to realize that since $2$ is so small, you can
+subtract 1000 of $2$'s.
+That will bring $3001$ down to $1001$. Right?
+That's the idea behind long division from middle school.
+At this point, your running-quotient is $1000$.
+You can still subtract $2$ from $1001$.
+But instead of subtracting a $2$ at a time, you can subtract a larger
+number of $2$'s.
+For instance you can subtract $500$ $2$'s from $1001$
+to get it down to $1$.
+At this point your running quotient is $1000 + 500 = 1500$.
+Since you are now down to $1$, you cannot subtract $2$ from $1$ and stay
+positive.
+So the quotient is $1500$ and the remainder is $1$.
+Get it?
+If you don't you should go online and review long division.
+Andif you have not been paying attention in your K-12 math classes, then you
+have been missing out on lots of algorithms discovered for the past 4000 years.
+The general idea is this:
+\begin{console}[fontsize=\footnotesize]
+INPUT: n and divisor
+OUTPUT: quotient and remainder
+1. Let quotient = 0.
+2. Find some m such that n - m * divisor >= 0. If you cannot, go to 5.
+3. Compute n = n - m * divisor and quotient = quotient + m.
+4. Go to 2.
+5. Return quotient and n.
+\end{console}
+The repeated subtraction is when $m$ is always chosen to be $1$.
+
+I leave it to you to decide if you want to implement division and mod using
+repeated subtraction or long division.
+
+
+
+\newpage
+\textsc{Ultimate test cases}
+
+Finally add the following tests to your \verb!main()!:
+\begin{enumerate}[nosep]
+\item If the user enters test option 100,
+your program accepts $n$ from the
+user and then computes and prints $n!$ (factorial of $n$).
+You should test your program by printing the factorial of 1000 and
+factorial of 5000.
+You can save your computation like this:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+./a.out > factorial5000.txt
+\end{Verbatim}
+You are strongly encouraged to check your computation with others in the
+class. For instance how many right-trailing zeroes are there in your
+$1000!$? What is the 200-th digit of $5000!$? Etc. 
+\item If the user enters test option 101,
+your accepts $n$ from the
+user and prints the prime factorization of $n$.
+If you enter $6$ for $n$, the output is in this format
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+2 3
+\end{Verbatim}
+i.e., print the primes in accending order.
+If you enter 20, the output is
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+2 2 5
+\end{Verbatim}
+You should test by factoring $3224380470287$.
+\end{enumerate}
+
+\newpage
+\textsc{DIY: The RSA challenges}
+
+This is optional.
+
+Go to \url{https://en.wikipedia.org/wiki/RSA_Factoring_Challenge}
+and try to factorize any of the RSA challenges.
+For instance here's RSA-260:
+\begin{Verbatim}[fontsize=\footnotesize,frame=single]
+2211282552952966643528108525502623092761208950247001539441374831912882294140
+2001986512729726569746599085900330031400051170742204560859276357953757185954
+2988389587092292384910067030341246205457845664136645406842143612930176940208
+46391065875914794251435144458199
+\end{Verbatim}
+You will need to run your program a very very very long time.
+Think years/centuries/millenia or longer.
+And you might need multiple computers.
+You might want to google prime factorization algorithms.
+
+\end{document}

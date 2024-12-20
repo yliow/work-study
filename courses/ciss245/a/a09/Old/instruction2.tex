@@ -1,0 +1,127 @@
+
+Here are the test option numbering.
+\begin{tightlist}
+    \item   Print and \verb!mystring()!
+    \item   Print and \verb!mystring(char)!
+    \item   Print and \verb!mystring(char [])!
+    \item   Print and copy constructor
+    \item   Input
+    \item   \verb!operator==!
+    \item   \verb!operator!=!
+    \item   \verb!operator=!
+    \item   \verb!empty!
+    \item   \verb!char operator[](int) const!
+    \item   \verb!char & operator[](int)!
+    \item   \verb!mystring & operator+=(const mystring &)!
+    \item   \verb!mystring & operator+=(char)!
+    \item   \verb!mystring operator+(const mystring &)!
+    \item   \verb!mystring operator+(char)!
+    \item   \verb!void resize(int i)!
+    \item   \verb!void resize(int i, char c)!
+    \item   \verb!int find(char c, start = 0)!
+    \item   \verb!int find(const mystring &)!
+    \item   \verb!mystring substr(int i, int len)!
+\end{tightlist}
+There are no tests for nonmember functions other than input and output
+which are tested in 1--5.
+
+
+
+
+
+\newpage
+\textsc{Reminder: Giving access to instance varaiable by returning a reference to an instance varaiable}
+
+If you want to set the value of an instance variable, you can do something like this:
+\begin{Verbatim}[frame=single]
+#include <iostream>
+
+class X
+{
+public:
+    void set_i(int newi)
+    {
+        i = newi;
+    }
+
+    int i;  // make this public for this experiment
+};
+
+int main()
+{
+    X x;
+    x.set_i(5);
+    std::cout << x.i << '\n'; // you should get 5
+    return 0;
+}
+\end{Verbatim}
+Another way to achieve the same this is to give the client using your class (in this case client = main)
+access to the instance variable directly. You do that by returning a reference to the instance variable.
+\begin{Verbatim}[frame=single]
+#include <iostream>
+
+class X
+{
+public:
+    void set_i(int newi)
+    {
+        i = newi;
+    }
+    int & iref()  // obviously this method cannot be constant
+    {
+        return i;
+    }
+
+    int i; // make this public for this experiment
+};
+
+int main()
+{
+    X x;
+    x.set_i(5);
+    std::cout << x.i << '\n';  // you should get 5
+    x.iref() = 6;              // lefthand side of = is a reference to x.i
+    std::cout << x.i << '\n';  // you should get 6
+    return 0;
+}
+\end{Verbatim}
+Make sure you see the difference between \verb!X::set_i(int)! and \verb!X::iref()!. The former sets the value of \verb!i! for
+you. The client has an indirect write access to \verb!i!. For \verb!X::iref()!, the client has direct access to \verb!i!.
+
+If an instance variable is an array, say \verb!a!, and you want to give a client access to \verb!a[0]!, then you give the
+client a public method that returns a reference to \verb!a[0]!, not the value of \verb!a[0]!.
+
+Make sure you review the notes on references and pointers.
+
+The above is enough information for this assignment. Read on if want to know a bit more ...
+
+If you have the following in \cpp\ (actually for most languages):
+\begin{Verbatim}
+            x = a + b + c;
+\end{Verbatim}
+Notice that there's a difference between the way you use the names on the right (i.e., \verb!a!, \verb!b!, and \verb!c!) and
+the name on the left (i.e., \verb!x!). Of course \verb!a!, \verb!b!, \verb!c!, \verb!x! all refer to ``boxes'' containing some 
+value (more accurately, they refer to some part of your computer's memory). Howerver note that for \verb!a!, \verb!b!, \verb!c!
+, you RETRIEVE (read access) the values at \verb!a!, \verb!b!, and \verb!c!. For \verb!x!, you PUT A VALUE INTO (write access)
+the box corresponding to \verb!x!. What actually happens is this: you read the values for \verb!a!, \verb!b!, \verb!c! and say
+\verb!a!, \verb!b!, \verb!c! have values 1, 2, 3, then the exression \verb!a+b+c! generates 6. Now \verb!a!, \verb!b!, 
+\verb!c! themselves have values which are of course at some fixed memory locations. However the value 6 does not have a fixed 
+loaction - it's temporary, so we say that 6 is an \textbf{r-value}. On the other hand \verb!x! on the left of the assignment,
+ since it refers to the box of \verb!x!, or more preciesely to a chunck of memory, is an \textbf{l-value}.
+
+Informally, you can think of a \verb!r-value! as ``something that can be assigned a value and appear on the left
+of an assignment operator'' while a \verb!l-value! is ``something that cannot be assigned, is a value, and
+appears on the right of the assignment operator''. That's enough for right now. The real picture is slightly more complicated.
+
+Knowing the above is important because some compilers will use the above terminology (\verb!l-value! and \verb!r-value!) for 
+error messages. For instance try to compile this program and then read the error message:
+\begin{Verbatim}[frame=single]
+int main()
+{
+    2 = 5;
+    return 0;
+}
+\end{Verbatim}
+If you're using \gpp, it will give you an error message that basically says that the lefthand side of the assignment generates
+the value 2 which is not a \verb!l-value!, i.e., it cannot be assigned a value.
+\end{document}

@@ -1,0 +1,126 @@
+/*****************************************************************************
+
+File  : vec2d.h
+Author: smaug
+Date  : 01/01/2017
+
+Description
+This is the header file of the vec2d class.
+
+Each vec2d object models a 2-dimensional vector with double coordinates. The
+methods and operators supported are described below. In the following, u, v,
+and w are vec2d objects while c, d are doubles.
+
+vec2d(x,y)     - Constructor. This sets the x and y values of u to values of
+                 parameters x and y respectively. The default values are 0,0 
+                 respectively.
+
+std::cout << u - Prints vector u. The format is "<x, y>" where x and y 
+                 are the x and y values of u.
+std::cin >> u  - Input for u.
+
+u.get_x()      - Returns the x value of vec2d oject u.
+u.get_y()      - Returns the y value of vec2d oject u.
+u.set_x(x0)    - Sets the x value of u to the value of x0.
+u.set_y(y0)    - Sets the y value of u to the value of y0
+u[i]           - Returns the x value or a reference to the x value of u
+                 if i is 0; otherwise the y value or reference to the y
+                 value is returned. 
+
+u == v         - Returns true iff the respective x, y values of u and v are
+                 the same.
+u != v         - The boolean opposite of (u == v)
+u = v          - Copies the x,y values of v to u.
+
++u             - Returns a copy of u.
+u += v         - Increments the x and y values of u by the x and y values
+                 of v respectively. A reference to u is returned so that
+                 you can also execute
+                 (u += v) += w.
+u + v	   - Returns the vector sum of u and v.
+
+-u             - Return the negative of u, i.e., the vec2d object returned
+                 has x,y values which are the negative of the x,y values of
+                 u.
+u -= v         - Decrements the x and y values of u by the x and y values
+                 of v. A reference to u is returned so that you can also
+                 execute (u -= v) -= w).
+u - v	   - Returns the vector difference of u and v.
+
+u *= c	   - Multiplies the x,y values of u by double c and set the
+                 x,y values to these new values (respectively). A
+                 reference to u is returned so that you can also execute
+                 (u *= c) *= d.
+u * c	   - Returns the vector scalar product of vector u by double
+                 c, i.e., a vec2d object is returned where the x,y values
+                 of this new vec2d object are the x,y values of u
+                 multiplied by c.
+c * u          - Similar to u * c.
+
+u /= c         - Divides the x,y values of u by double c and set the x,y
+                 values to these new values (respectively). A reference
+                 to u is returned so that you can also execute
+                 (u /= c) /= d.
+u / c          - Returns the vector scalar product of vector u by the double double
+                 (1/c).
+
+len(u)         - Returns the length of vector u as a double. This is the
+                 square root of x*x + y*y where x and y are the x,y values
+                 in u. Note that this is a non-memnber function.
+u.len()        - Same as len(u) except that this is a method.
+
+dotprod(u, v)  - Returns the dot product of vectors u and v as a double.
+norm(u)        - Return the normalized vector of u, i.e., this function
+                 returns u / len(u), a vector of length 1 going in the
+                 same direction as u.
+
+******************************************************************************/
+#ifndef _VEC2D_H_
+#define _VEC2D_H_
+
+#include <iostream>
+
+class vec2d
+{
+public:
+    vec2d(double x = 0, double y = 0)
+        : x_(x), y_(y)
+    {}
+
+    bool operator==(const vec2d &) const;
+    bool operator!=(const vec2d &) const;
+
+    double get_x() const;
+    double get_y() const;
+    void set_x(double);
+    void set_y(double);
+
+    double operator[](int) const;
+    double & operator[](int);
+
+    vec2d operator+() const;
+    vec2d & operator+=(const vec2d &);
+    vec2d operator+(const vec2d &) const;
+
+    vec2d operator-() const;    
+    vec2d & operator-=(const vec2d &);
+    vec2d operator-(const vec2d &) const;
+
+    vec2d & operator*=(double);
+    vec2d operator*(double) const;
+
+    vec2d & operator/=(double);
+    vec2d operator/(double) const;
+
+private:
+    double x_, y_;
+};
+
+vec2d operator*(double, const vec2d &);
+double len(const vec2d &);
+double dotprod(const vec2d &, const vec2d &);
+vec2d norm(const vec2d &);
+std::ostream & operator<<(std::ostream &, const vec2d &);
+std::istream & operator>>(std::istream &, vec2d &);
+
+#endif

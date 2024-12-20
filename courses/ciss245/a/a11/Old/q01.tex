@@ -1,0 +1,302 @@
+The goal is to implement a class and functions for integer computations, not at
+the level of the C/C++ \verb!int!, but rather integers with an extremely huge
+number of digits. We will call this the \verb!LongInt! class.  Such
+computations occur frequently in cryptography, physics, etc. This is,
+conceptually speaking, probably one of the first problem we have to solve.
+After all, if we can't operate with integers of any size, how can we handle
+real numbers, complex numbers, functions, etc.?
+
+With this class, you will be able to compute, for instance, the factorial of
+1000 (i.e. 1000!) and more.  (Check the web for the factorial of 1000.) Also,
+you can modify your \verb!Rational! class to use \verb!LongInt! instead of
+\verb!int!  for numerator and denominator. With that, you can compute with
+fractions that look like this:
+
+\verb!  12312312415412312365476798 / 123598347693429857485202845!
+
+and you can check if
+
+\verb!  12312312415412312365476791!
+
+is prime.  This is helpful in many area of math and CS. For instance modern
+cryptography (example RSA cryptography) uses extremely huge prime numbers of
+several hundred digits in length (at this point in time). RSA cryptography
+depends on the difficulty of factoring numbers. In particular, it involves
+numbers such as
+
+\begin{Verbatim}
+2260138526203405784941654048610197513508038915719776718321197768109445641817
+ 9666766085931213065825772506315628866769704480700018111497118630021124879281
+ 99487482066070131066586646083327982803560379205391980139946496955261
+\end{Verbatim}
+
+This is a product of two primes. The goal is to find these two primes. Clearly
+you can't even begin if your computer cannot work with numbers of this size. If
+you can factorize the above number into two primes, then ciphertext (i.e.,
+encrypted text) that is encrypted using RSA and using the above number is
+completely broken and you can gain access to the encrypted data.
+
+The fact that C/C++ natively can only handle integers with 10 digits is not a
+drawback of the language. No one expects a programming language to supply all
+the possible types and classes in the world. It's more important for a language
+to be extensible, i.e., that it provides features to create new types of
+values.  That's why object-oriented programming is important.  Now back to our
+“long integer” class.
+
+Note that the integers in C/C++ are limited in size. Specifically an \verb!int!
+value is usually about -2 billion to 2 billion. The goal of this assignment is
+to write a class to compute integers outside of this range.  This can be
+achieved using arrays. For instance for the integer 1352 (the numeric concept
+of “one thousand, three hundred and fifty-two”), can be stored in an array,
+\verb!size!, and \verb!sign! variables:
+
+\begin{Verbatim}
+            x[0] = 2 x[1] = 5 x[2] = 3 x[3] = 1 size = 4 sign = 1 // sign
+ equals 1 means the number being modeled // is “positive”
+\end{Verbatim}
+
+and the integer -237 (the numeric concept of “negative two hundred and
+thirty-seven”) can be modeled using:
+
+\begin{Verbatim}
+            x[0] = 7 x[1] = 3 x[2] = 2 size = 3 sign = -1 // sign equals -1
+ means the number being modeled // is “negative”
+\end{Verbatim}
+
+Note that the \lq\lq ones" digit go into \verb!x[0]!, the \lq\lq 10s" digit go
+into \verb!x[1]!, etc. Note that 0 (the concept of \lq\lq zero") can be modeled
+using
+
+\begin{Verbatim}
+            x[0] = 0 size = 1 sign = 1
+\end{Verbatim}
+
+Design a class for such objects. The name of the class is \verb!LongInt!.  For
+the integer array, you should use the STL \verb!vector! class – see section
+below for information on the \verb!vector! class. This is similar to our
+\verb!IntDynArr! class. (The point of working on \verb!IntDynArr!  is to gain
+an understanding of the internal workings of \verb!std::vector!.)  Note that
+each \verb!vector! object already maintains a \verb!size! instance
+variable. Therefore for this class, you only need to add \verb!sign! to the
+class. Hence the class should look like this:
+
+\begin{Verbatim}
+            class LongInt { private: std::vector< int > x; int sign; };
+\end{Verbatim}
+
+Note that we are using object composition. By the way, do not confuse the C++
+STL \verb!vector! with vectors from math or our \verb!vec2d! class.  In
+computer science, a dynamic array of values is also called a vector.
+
+Note the curious syntax of the class we're using for the dynamic array of
+digits:
+
+\verb!  std::vector< int >!
+
+This basically tells C++ that you want a vector of \verb!int! values.  (For
+details refer to notes on templates.)
+
+Now let me describe what features we want for this class ...
+
+With your class, you should be able to do the following:
+
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+LongInt i; // i models 0 with default constructor std::cout << i << '\n';; //
+ Prints 0 LongInt j(123); // Constructor call with int value std::cout << j <<
+ '\n'; // Prints 123 LongInt k("9876543210"); // Constructor call with C-string
+ std::cout << k << '\n'; // Prints 9876543210 LongInt l("-9876543210");
+ std::cout << l << '\n'; // Prints -9876543210 LongInt m = l; // Copy
+ constructor: m models the same // integer that l models std::cout << m <<
+ '\n'; // Prints -9876543210
+\end{Verbatim}
+
+The above describes the various constructors for this class. Of course you need
+to implement all the arithmetic operators:
+
+\begin{Verbatim}
+            LongInt i("1000000000000"); LongInt j(3); i += j; std::cout << i <<
+ '\n'; // prints 1000000000003 i -= j; std::cout << i << '\n'; // prints
+ 1000000000000
+\end{Verbatim}
+
+[\textsc{Important debugging suggestion}: It's a good idea while testing your
+  code to temporarily print your \verb!LongInt! objects in a slightly different
+  way:
+
+\begin{Verbatim}
+            LongInt i("123456789"); LongInt j("-123456789"); std::cout << i <<
+ '\n'; // prints < + 1 2 3 4 5 6 7 8 9 > std::cout << j << '\n'; // prints < -
+ 1 2 3 4 5 6 7 8 9 >
+\end{Verbatim}
+
+Why? Because if the output is for instance -123 it could be that the values in
+the \verb!vector! is 3, -12 and the \verb!sign! is 1 or it could be 3, 2, -1
+and the \verb!sign! is 1. Once you know your class works correctly, you change
+the output back to what it should be.]
+
+Read the following very carefully ...
+
+Note that if your class \verb!LongInt! class has a pointer to a dynamic array
+of integers in the heap for the digits (like the \verb!IntDynArr!  class) then
+you would need to define your own destructor, and copy constructor, and
+\verb!operator=!. However we are using the STL \verb!vector! class (which
+contains a pointer for the same purpose). The \verb!vector!  class already has
+a destructor to deallocate the memory used by the pointer in \verb!vector!
+objects. Therefore when your \verb!LongInt!  default destructor is called, C++
+will call the destructor of \verb!vector! for you, doing the right
+thing. Likewise when you call \verb!operator=! for your \verb!LongInt! object
+like this
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+i = j;
+\end{Verbatim}
+where \verb!i! and \verb!j! are \verb!LongInt! objects, C++ will call
+\verb!operator=! on the STL \verb!vector! object inside the \verb!LongInt!
+objects, again doing the right thing. So you do not have to implement
+\verb!operator=! for the \verb!LongInt! class. (But just because I say you
+don't have to, it does not mean you don't have to know why.)
+
+Other augmented operators (besides the \verb!+=! and \verb!-=! from above) you
+must have are the \verb!*=, /=, %=!. Of course there are the binary operators
+\verb!+, -, *, /, %.!
+
+Your \verb!LongInt! class must be able to inter-operate with \verb!int!  values
+too. For instance
+\begin{Verbatim}[fontsize=\footnotesize,frame=single]
+LongInt i(2); i += 3; std::cout << i << std::endl; // prints 5 std::cout << (i
+ + 1) << std::endl; // prints 6 std::cout << (1 + i) << std::endl; // prints 7
+ int j = 2; j += i; std::cout << j << std::endl; std::cout << (1 + j) <<
+ std::endl; std::cout << (1 + j) << std::endl;
+\end{Verbatim}
+
+The same applies to \verb!-=, *=, %=, -, *, /.! (For this, you should refer to
+your \verb!Rational! class for review and hints.)
+
+All these operators behave in the usual mathematical way. For instance you have
+to be careful about carries:
+\begin{Verbatim}[fontsize=\footnotesize,frame=single]
+LongInt i("10099999"); i = i + 2; std::cout << i << std::endl; // prints
+ 10100001
+\end{Verbatim}
+and you have to be careful with borrows during subtraction:
+\begin{Verbatim}[fontsize=\footnotesize,frame=single]
+LongInt i("3000000000000"); i = i - 1; std::cout << i << std::endl; // prints
+ 2999999999999
+\end{Verbatim}
+
+To allow easy assignment for extremely long integers you must overload
+operator= to be able to do this:
+\begin{Verbatim}[fontsize=\footnotesize,frame=single]
+LongInt i; i = "9876543210"; std::cout << i << std::endl; // prints 9876543210
+ i = "-9876543210"; std::cout << i << std::endl; // prints -9876543210
+\end{Verbatim}
+
+Your class must also allow comparisons among objects and with integers using
+\verb@==@, \verb@!=@, \verb!<!, \verb!<=!, \verb!>!, \verb!>=!.  For instance
+\begin{Verbatim}[fontsize=\footnotesize,frame=single]
+LongInt i(123), j(74); bool b0 = (i == j); // false bool b1 = (i < 42); //
+ false bool b1 = (42 <= j); // true bool b2 = (-1 == j); // false
+\end{Verbatim}
+
+Etc.
+
+Other operators include \verb!++! and \verb!--!. Note that there are two types
+of \verb!++! and \verb!--!. C++ differentiates between the pre- and
+post-increment operators in the following way:
+\begin{align*}
+\texttt{++i} \,\,\,\, &\text{ same as } \,\,\,\, \texttt{i.operator++()}
+\\ \texttt{i++} \,\,\,\, &\text{ same as } \,\,\,\, \texttt{i.operator++(0)}
+\end{align*}
+(Refer to the notes on operator overloading.) The difference between the pre-
+and post-increment operator is that the pre- version all return a reference to
+the object after some form of operator. Here's a simple experiment on ++ for
+int type:
+
+\begin{Verbatim}[fontsize=\footnotesize,frame=single]
+int i = 0; int & j = (++i); // i becomes 1 and j references i
+\end{Verbatim}
+
+The post version actually returns a clone of the old value of \verb!i!
+
+\begin{Verbatim}[fontsize=\footnotesize,frame=single]
+int i = 0; int j = (i++); // i becomes 1 but j is set to 0, the original //
+ value of i
+\end{Verbatim}
+
+Therefore in term of implementation in a class say C, the pre- and
+post-increment operators would look like this:
+
+\begin{Verbatim}[fontsize=\footnotesize,frame=single]
+class C { public: C & operator++() // pre-increment. Note return type.  { //
+ some code to change object *this return *this; } C operator++(int i) //
+ post-increment. Note return type.  { C old_object = (*this); // some code to
+ change object *this return old_object; } };
+\end{Verbatim}
+
+You should also implement the “negative of” operator:
+
+\begin{Verbatim}[fontsize=\footnotesize,frame=single]
+LongInt i(123); LongInt j = -i; // j is the same as LongInt(-123)
+\end{Verbatim}
+
+Note that
+
+\verb!  -i same as i.operator-();!
+
+This is the unary “negative” operator (which is not the same as the subtraction
+binary operator) which is not the same as \verb!i - j!  which is
+\verb!i.operator-(j)!, i.e. the two operators have different signatures.
+
+Of course there's also the unary positive operator:
+
+\verb!  +i same as i.operator+();!
+
+(Refer to the \verb!Rational! class for a quick review.)
+
+You should also implement an \verb!abs()! method that returns the absolute
+value of the LongInt object:
+
+\begin{Verbatim}[fontsize=\footnotesize,frame=single]
+LongInt i(-123); LongInt j = i.abs(); // j is the same as LongInt(123)
+\end{Verbatim}
+
+For convenience, you should also have a non-member function \verb!abs()!:
+
+\begin{Verbatim}[fontsize=\footnotesize,frame=single]
+LongInt i(-123); LongInt j = abs(i); // j is the same as LongInt(123)
+\end{Verbatim}
+
+With all the above methods you can more or less treat \verb!LongInt! the same
+as \verb!int!. For instance you can print the factorial of 1000:
+
+\begin{Verbatim}[fontsize=\footnotesize,frame=single]
+LongInt product(1); for (int i = 1; i <= 1000; i++) { product *= i; std::cout
+ << i << ' ' << product << std::endl; }
+\end{Verbatim}
+
+The factorial of 1000 (i.e. 1000!) is an extremely long integer. You can check
+the correctness of your output by searching for it on the web.  Of course you
+can even declare i to be a \verb!LongInt! object:
+
+\begin{Verbatim}[fontsize=\footnotesize,frame=single]
+LongInt product(1); for (LongInt i = 1; i <= 1000; i++) { product *= i;
+ std::cout << i << ' ' << product << std::endl; }
+\end{Verbatim}
+
+but of course you would expect \verb!int! variables to perform computations
+faster than \verb!LongInt! objects.
+
+\textsc{Other Requirements}
+
+As always:
+\begin{tightlist}
+    \li Methods must be constant wherever possible \li Object parameters passed
+    by reference whenever possible; they must also be made constant wherever
+    possible \li Code duplication must be kept to a minimal. In general the
+    augmented assignment operators should be implemented first, with the
+    non-augmented ones depending on the augmented ones.  Similarly,
+    \texttt{operator!=} is just the opposite of \verb!operator==!.  \li You
+    must have a header file \verb!LongInt.h! and a class implementation file
+    \verb!LongInt.cpp!.  \li You must include a test file
+    \verb!testLongInt.cpp! that tests all the functions and methods of your
+    \verb!LongInt! library.
+\end{tightlist}

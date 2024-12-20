@@ -1,0 +1,54 @@
+Implementation of sparse matrix using hashtable
+
+Matrices are basically 2d arrays.
+They appear everywhere in CS and math.
+In real-life applications matrices are extremely huge, possibly
+going up a size of to thousands by thousands.
+Sometimes a matrix can be full of zeroes -- this is very common in
+real life applications.
+Such matrices are called sparse matrices.
+There are many different ways to represent sparse matrices -- see
+linked list notes for an implementation using doubly linked list.
+Another way to represent a sparse matrix is to use hashtables.
+In this case the key is the (row,column) of a value.
+For instance if the matrix is a 2-by-2:
+\[
+\texttt{\{\{5,0\},\{0,7\}\}}
+\]
+Then at (row,column) = $(0,0)$, the value is $5$:
+the key is $(0,0)$ and the
+value is $5$.
+
+Create a class \texttt{SparseMatrix} with doubles as values.
+\begin{console}
+SparseMatrix m(1000, 2000); // 1000-by-2000
+m.set(10, 20, 3.1415);      // set value at row 10, column 20 to 3.1415
+std::cout << m.get(10, 20); // prints 3.1415
+std::cout << m.get(0, 0);   // prints 0 -- the default value
+\end{console}
+The implementation should use hashtables with separate chaining.
+(Modify Q1.)
+For the hash function, do the following:
+say the (row, column) is (4, 5). First convert the key to the string
+\[
+\texttt{"4,5"}
+\]
+(note the comma) and then use the method from Q1.
+Attempt to access a value with row or column outside the sizes
+specified using constructor call will result in 
+the exception object from class \texttt{IndexError} being thrown.
+
+Note several things:
+\begin{itemize}
+  \item The runtime to access a value in the sparse matrix is
+  (in the best case) $O(1)$ and the runtime to access the matrix as a
+  2D array is also $O(1)$.
+  \item 
+  However if the matrix has a large rowsize and columnsize, then
+  the 2d array method will use more memory.
+  \item In fact if the rowsize and columnsize is too huge, the
+  total size of the array (i.e., rowsize $\times$ columnsize)
+  could be too big for the computer to handle -- there's a limit
+  to how much memory is allowed for an array.
+  In this case the hashtable can actually work.
+\end{itemize}

@@ -1,0 +1,81 @@
+\textsc{Coda and miscellaneous notes}
+
+You're done with the assignment.
+Here are some comments.
+(You do not need to implement any of the features mentioned below.)
+
+The above implies that you can, for instance,
+given a polynomial with fractional coefficients,
+you
+now find the exact fractional roots in a range and
+up to an accuracy of, say 1/100.
+For instance to find fractional roots in [0, 100]
+of  
+\[
+\frac{1}{3} x^3 - \frac{5}{3} x + \frac{7}{42} = 0
+\]
+you do
+\begin{Verbatim}[frame=single,fontsize=\small,commandchars=\~\!\@]
+Fraction start = get_Fraction(0, 1);
+Fraction end = get_Fraction(100, 1);
+Fraction step = get_Fraction(1, 100);
+
+Fraction a = get_Fraction(1, 3);
+Fraction b = get_Fraction(3, 3);
+Fraction c = get_Fraction(7, 42);
+Fraction zero = get_Fraction(0, 1);
+
+for (Fraction x = start; x <= end; x += step)
+{
+    reduce(~textred!x@);
+    if (a * x * x * x - b * x + c == zero)
+    {
+        std::cout << x << std::endl;
+    }
+}
+\end{Verbatim}
+
+Note that there are several convenient features which are
+still missing in your \verb!Fraction! library.
+
+You do not have mixed mode operations.
+For instance you cannot perform addition of a fraction and an int:
+\begin{console}
+Fraction f = get_Fraction(1, 3);
+f = f + 2; // NOT POSSIBLE
+\end{console}
+Right now, we add two \verb!Fraction! values.
+We have not taught our library
+how to add a \verb!Fraction! with an \verb!int! or an \verb!int! with a
+\verb!Fraction!.
+To do this, 
+you need to implement the following:
+\begin{console}
+Fraction operator+(const Fraction &, int);
+\end{console}
+This also appears in the above:
+\begin{console}
+...
+    if (a * x * x * x - b * x + c == zero)
+...
+\end{console}
+You do not have \verb!operator==! that compares a \verb!Fraction! value with an
+int.
+If you do have
+\begin{console}
+bool operator==(const Fraction &, int);
+\end{console}
+then the above boolean expression simplies to
+\begin{console}
+...
+    if (a * x * x * x - b * x + c == 0)
+...
+\end{console}
+
+Etc.
+
+The issue of converting a \verb!double! to a \verb!Fraction! also requires more
+thought. For instance, the \verb!double! $0.333333333$ is probably meant to
+be the fraction $\frac{1}{3}$. However the type conversion function from
+\verb!double! to \verb!Fraction! might be written so that the fraction is
+$\frac{333333333}{11000000000}$.

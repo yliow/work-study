@@ -1,0 +1,77 @@
+
+The goal is to convert a (regular) class to a template class. The class chosen is our
+\verb!vec2d! class.
+
+We already have a \verb!vec2d! class.
+Objects of this class models 2-dimensional vectors with \verb!double!
+coordinates.
+Frequently in games (or scientific simulation),
+\verb!float!s are sufficient.
+Note that \verb!double!s can represent more real numbers than \verb!float!s.
+Furthermore in many \lq\lq simple" games such as 2-d games from the 80s,
+integer coordinates are enough and integer operation are a lot faster than
+\verb!double! or \verb!float! operations. 
+
+The goal of this question is to build a template 2-dimensional vector class,
+\verb!vec2!.
+You should use the \verb!vec2d! class from our previous assignment.
+With this class we
+can create 2-dimensional vectors of different numeric types
+(\verb!int!, \verb!float!, \verb!double!) like this:
+\begin{Verbatim}[frame=single]
+vec2< int > u(1, 2);         // u is a 2-d vector with integer coordinates
+vec2< float > v(1.2f, 3.4f); // v is a 2-d vector with float coordinates
+vec2< double > w(1.2, 3.4);  // w is a 2-d vector with double coordinates
+\end{Verbatim}
+  
+In your \verb!vec2! header file you should include three typedefs:
+\begin{tightlist}
+\li \verb!vec2i! which is an alias for \verb!vec2< int >!
+\li \verb!vec2f! which is an alias for \verb!vec2< float >!
+\li \verb!vec2d! which is an alias for \verb!vec2< double >!
+\end{tightlist}
+Of course this depends on \verb!vec2!,
+so these typedefs should be after the \verb!vec2! class.
+
+With these typedefs the above examples become
+\begin{Verbatim}[frame=single]
+vec2i u(1, 2); // u is a 2-d vector with integer coordinates
+vec2f v(1.2f, 3.4f); // v is a 2-d vector with float coordinates
+vec2d w(1.2, 3.4); // w is a 2-d vector with double coordinates
+\end{Verbatim}
+
+Note that the length function,
+\verb!len()!,
+must return a \verb!double! regardless of the template type parameter.
+
+Also, note that the argument for \verb!operator[]! is either 0 or 1.
+If a value other than 0 or 1 is given, then you must
+throw a \verb!ValueError! exception. This class should be included
+at the the top of your \verb!vec2.h! file, i.e.,
+\begin{console}
+#ifndef VEC2_H
+#define VEC2_H
+
+class ValueError
+{};
+
+...
+#endif
+\end{console}
+and the following will catch a \verb!ValueError! object:
+\begin{console}
+vec2f v(1, 2);
+try
+{
+    std::cout << v[42] << '\n';
+}
+catch (ValueError & e)
+{
+    std::cout << "caught ValueError object\n";
+}
+\end{console}
+
+Test your code thoroughly.
+The test file must be named \verb!testvec2.cpp!.
+(The test cases you should include should be very similar to the test code
+for \verb!vec2d!.)

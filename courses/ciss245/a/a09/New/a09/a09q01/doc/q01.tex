@@ -1,0 +1,342 @@
+Strings
+
+Review your notes on C-strings right away. The following is a quick review and
+is not complete.
+
+A C-string (also called a null-terminated string is a character array
+containing the character \verb!'\0'!. The 
+character \verb!'\0'! has an ASCII integer value of 0. Try this:
+
+{\small
+\begin{Verbatim}[frame=single, commandchars = \~\@\!]
+char s[10] = {'a', 'b', 'c', '\0', 'd', 'e'};
+std::cout << s[0] << ' ' << int(s[0]) << '\n'; // prints 'a' and ASCII
+                                               // value of 'a'
+std::cout << s[3] << ' ' << int(s[3]) << '\n'; // prints '\0' and the
+                                               // ASCII value of '\0'
+\end{Verbatim}
+}
+(Google \lq\lq ascii table".)
+
+Note that \verb!s! is a character array of size 10.
+The first 6 characters are initialized. The last 4 are therefore
+initialized to the character with integer value (ASCII value) of 0, i.e.,
+the remaining 4 are initialzed to
+\verb!'\0'!. The character \verb!'\0'! is also called the null character
+since the ASCII value is 0.
+
+When we call \verb!s! a string, what we really meant is the \verb!"abc"!,
+i.e., 4 characters with the last being character \verb!'\0'!.
+The point of the \verb!'\0'! character is simply to
+tell the computer when the string data (characters) end.
+In other words, you can (and should) think \verb!'\0'! as
+a sentinel value in the array.
+The \verb!'\0'! is therefore used to indicate
+\lq\lq when the string ends within the character array".
+This is used for instance in printing \verb!s!:
+{\small
+\begin{Verbatim}[frame=single, commandchars = \~\@\!]
+char s[10] = {'a', 'b', 'c', '\0', 'd', 'e'};
+std::cout << s << std::endl;
+\end{Verbatim}
+}
+You see that the printing of the characters stop once the
+printing operation sees the character \verb!'\0'!, i.e.,
+the \verb!'\0'! terminates the print operation. You can therefore tell
+that the \verb!operator<<! probably looks
+\lq\lq something like this":
+{\small
+\begin{Verbatim}[frame=single, commandchars = \~\@\$]
+std::ostream & operator<<(std::ostream & cout, const char s[])
+{
+    int i = 0;
+    while (s[i] != '\0')
+    {
+        cout << s[i];
+        i++;
+    }
+    return cout;
+}
+\end{Verbatim}
+}
+As you can see in the code above: \verb!'\0'! is used to terminate
+(i.e., as a sentinel value) for the print operation.
+
+Recall that the double-quotes string notation
+{\small
+\begin{Verbatim}[frame=single, commandchars = \~\@\!]
+char s[10] = "abc";
+\end{Verbatim}
+}
+is really the same as (a shorthand for):
+{\small
+\begin{Verbatim}[frame=single, commandchars = \~\@\!]
+char s[10] = {'a', 'b', 'c', '\0'};
+\end{Verbatim}
+}
+Make sure you see the difference between \verb!s! as an array and s as a string:
+\begin{tightlist}
+ \li as an array \verb!s! has 10 characters - the array size of \verb!s! is 10
+ \li as a string \verb!s! has 3 characters - the string length of \verb!s! is 3
+\end{tightlist}
+
+There are several C-string functions that come with all \cpp\ compilers.
+Here are some (again refer to
+my old notes on strings):
+{\small
+\begin{Verbatim}[frame=single, commandchars=\~\@\!]
+#include <iostream>
+#include <cstring> // include prototypes for C-string functions
+
+int main()
+{
+    char s[1024] = "hello world";
+    char t[50] = "ABCDEF";
+    char u[100] = "ABCDEF\0GHIJKL";
+
+    std::cout << strlen(s) << '\n'   // string length function:
+                                     // length of the string, i.e.,
+                                     // number of characters up to but
+                                     // not including '\0'
+
+    strcat(s, t);             // string concatenation function:
+    std::cout << s << '\n';   // string concatenation, i.e., join the string
+                              // t to s.
+    int i = strcmp(s, t);
+    std::cout << i << '\n';              // compare s and t. The return
+    std::cout << strcmp(t, u) << '\n';   // value is 0 if the strings
+                                         // compared are the same. Otherwise
+                                         // it's nonzero.
+    return 0;
+}
+\end{Verbatim}
+}
+Make sure you study and run the above code.
+
+There are many other C-string functions. Google "c string functions" or
+refer to my notes or refer to any
+C/\cpp\ textbook.
+
+Note that \verb!s! is a character array of size 1000, then at most you
+can store a string of length 999 since
+one character is used to indicate end-of-string.
+
+There's another way to describe a string: that's with a character array and
+a \lq\lq length" integer variable.
+For instance if I have this:
+{\small
+\begin{Verbatim}[frame=single, commandchars= \~\@\!]
+char s[1024] = "hello world ... how are you ... ?"
+int len_s = 11;
+\end{Verbatim}
+}
+Then the variable \verb!len_s! tells me that only 11 characters in the
+character array are considered part of the
+string that \verb!s! is trying to represent. Note: \verb!s! does have a
+capacity to hold 1024. Only the first 11
+characters are considered the string that \verb!s! is representing.
+
+This style of representing strings is called a length-based representation.
+(We've talked about this before
+in CISS240.)
+
+What are the benefits of using a length-based representation for strings?
+Well think about it. Suppose
+you want to concatenate two C-strings
+{\small
+\begin{Verbatim}[frame=single, commandchars = \~\@\!]
+char s[1024] = "hello world ... how are you ?";
+char t[1024] = " I'm fine.";
+strcat(s, t);
+\end{Verbatim}
+}
+
+Do you realize that the characters \verb!' '!, \verb!'I'!, \verb!'\''!,
+\verb!'m'!, etc, from \verb!t! must be copied to the end of \verb!s!,
+overwriting
+the \verb!'\0'! of \verb!s!? That means that I have to know where is the
+\verb!'\0'! in \verb!s!. That means that before I begin
+concatenating \verb!t! to \verb!s!, I have to find \verb!'\0'!.
+If \verb!s! is a very long string, that will waste some time.
+In particular this will get slower and slower:
+{\small
+\begin{Verbatim}[frame=single, commandchars = \~\@\!]
+char s[1024] = "hello world ... how are you?";
+char t[1024] = " I'm fine.";
+for (int i = 0; i < 100; ++i)
+{
+    strcat(s,t);
+}
+\end{Verbatim}
+}
+Of course computers are so fast nowadays that you won't notice the
+difference if this is the only code
+in your program. If your program concats millions of strings (which
+is very common in a
+buisness application or an AI program on natural language processing),
+the effect will be noticeable.
+
+For this question, we're going to build a string class that uses a
+length-based approach. The class will
+hold a character array of size 1024 and it will also hold a length variable.
+There's another variable that
+tell us that the maximum capacity is 1024 -- this will be a constant since
+(for this assignment
+question), the size of the character array does not change.
+(Later you will work on the concept of a dynamic array.)
+
+Strings are extremely important. Look at this document.
+Clearly it's made up of strings. Strings (or more
+accurate, languages) are used to communicate ideas and thoughts and emotions.
+Since human ideas are expressed
+strings, the ability to compute with strings is important when it comes to
+analyzing the thoughts of a
+human. NLP (natural language processing) is an area of study in computer
+science with the goal of
+understanding the structure and meaning behind strings (written or oral)
+prodcued by human beings.
+
+If you want to try to play with a fake psycotherapist, go to this website and
+talk to Eliza and explain to
+\lq\lq her" (it?) your problems:
+\underline{http://www.manifestation.com/neruotoys/eliza.php3}.
+It's not particularly smart
+but it does show you that Eliza can at least understand basic English
+structure and therefore can
+pretend to be intelligent to some extent.
+
+As an example of an object of our class, suppose I execute this:
+{\small
+\begin{Verbatim}
+       mystring y("abc");
+\end{Verbatim}
+}
+then \verb!y! is a \verb!mystring! object with three instance variables:
+{\small
+\begin{Verbatim}
+       y.s_         a character array of size 1024
+       y.length_    an int variable
+       y.capacity_  an int constant (set to 1024)
+\end{Verbatim}
+}
+The values placed in \verb!y! by this constructor are:
+{\small
+\begin{Verbatim}
+       y.s_         array containing 'a', 'b', 'c', ...
+       y.length_    3
+       y.capacity_  1024
+\end{Verbatim}
+}
+Since \verb!y.length_! is 3 in this case, only the first 3 characters of
+\verb!y.s_! are relevant. The constructor in
+this case is
+{\small
+\begin{Verbatim}
+       mystring::mystring(const char x[]);
+\end{Verbatim}
+}
+since this one accepts a character array.
+
+The \verb!capacity_! instance variable can be set in the initializer of
+the constructor since we know that it's
+just 1024. A C-string is passed into the constructor as an argument.
+Note that in this case we know that
+\verb!y.length_! is 3, but the constructor needs to scan the character array
+\verb!'a'!, \verb!'b'!, \verb!'c'!, \verb!'\0'!, ... to
+know that there are three characters before the first \verb!'\0'!.
+Therefore \verb!y.length_! cannot be directly
+initialized. So \verb!y.length_! is set in the body of the constructor.
+The character array \verb!y.s_! is also set in
+the body of the constructor. Therefore the constructor that accepts a
+character array looks like this (in
+pseudocode):
+{\small
+\begin{Verbatim}[commandchars = ~\@\!]
+       mystring::mystring(const char x[]);
+          Initialize capacity_ to 1024
+          Loop over x[i] (i = 0, 1, 2, 3, 4, 5, ...) and put x[i] into s_[i]; stop
+          when x[i] is '\0':
+\end{Verbatim}
+}
+\newcommand\ddd{$\downarrow$}
+{\small
+\begin{Verbatim}[commandchars = \\\{\}]
+                  x[0]  x[1]  x[2] ...
+                    \ddd{}     \ddd{}     \ddd{}
+                  s_[0] s_[1] s_[2] ...
+\end{Verbatim}
+}
+{\small
+\begin{Verbatim}[commandchars = ~\@\!]
+          Also, set length_ to the string length of x_, i.e., length_ is set to the
+          number of characters in x up to but not including the first '\0'.
+\end{Verbatim}
+}
+Note that in the class definition of \verb!mystring! in the header file,
+there are three constructors: one
+that accepts a character array, one that is the default constructor,
+and there's the copy constructor. Note that in
+the test code, there's another that accepts a character.
+This is also mentioned in the documentation.
+Therefore you will need to write a constructor that accepts a character.
+
+Here are more examples. If I do:
+{\small
+\begin{Verbatim}
+      mystring a("hello");  // using constructor that accepts a character array
+\end{Verbatim}
+}
+then
+{\small
+\begin{Verbatim}
+      a.s_         has array values 'h','e','l','l','o', ...
+                       (we don't care about the other values)
+      a.length_    has value 5
+      a.capacity_  has value 1024
+\end{Verbatim}
+}
+If I do
+{\small
+\begin{Verbatim}
+      mystring b;  //using the default constructor
+\end{Verbatim}
+}
+then
+{\small
+\begin{Verbatim}
+      b.s_         we don't care about the values
+      b.length_    has value 0
+      b.capacity_  has value 1024
+\end{Verbatim}
+}
+If I do
+{\small
+\begin{Verbatim}
+      mystring c('$');   // using the constructor that accepts a character
+\end{Verbatim}
+}
+then
+{\small
+\begin{Verbatim}
+      c.s_         has values '$', ... (we don't care about the rest)
+      c.length_    has value 1
+      c.capacity_  has value 1024
+\end{Verbatim}
+}
+
+The copy constructor does the obvious. For instance if object \verb!a!
+is the above, then if I do this:
+{\small
+\begin{Verbatim}
+      mystring d(a);
+\end{Verbatim}
+}
+then
+{\small
+\begin{Verbatim}
+      d.s_         has array values 'h','e','l','l','o', ... 
+                      (we don't care about the other values)
+      d.length_    has value 5
+      d.capacity_  1024
+\end{Verbatim}
+}

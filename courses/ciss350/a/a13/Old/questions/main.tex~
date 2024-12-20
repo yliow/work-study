@@ -1,0 +1,304 @@
+\input{myassignmentpreamble}
+\input{yliow}
+\input{ciss350}
+%\renewcommand\TITLE{Assignment 13}
+\renewcommand\TITLE{Final (Programming Part)}
+
+\usepackage{listings}
+\lstset{%
+basicstyle=\ttfamily, frame=single
+}
+
+
+\begin{document}
+\topmatter
+
+
+{\bf Objectives:}
+\begin{enumerate}[topsep=0pt]
+\item Implement as hashtable using separate chaining with
+\verb!std::vector! 
+and \verb!std::list!.
+\item Implement a set using a hashtable.
+\end{enumerate}
+
+\textsc{Warning}:
+As always skeleton code meant to get you started.
+Skeleton code needs to be corrected and completed.
+
+
+\newpage
+{\bf Q1.} Implementation of hashtable with separate chaining using
+linked lists
+
+Implement a hashtable where each record has a key of type 
+\verb!std::string! and value of type \verb!double!.
+Each bucket is a \verb!std::list! of (key, value) pairs.
+
+The following is skeleton code that you should begin with (HT is hashtable for short
+to save on writing):
+{\small
+\includesourcenonumbers{questions/main.cpp}
+}
+
+
+\newpage
+Q2. Implementation of template hashtable with separate chaining
+
+The hashtable in Q1 accepts keys of \verb!std::string! type
+and values of \verb!double! type.
+
+Modify the hashtable from Q1 so that is a class template of the following
+form:
+\begin{console}
+class < typename Key, typename Value >
+class HT
+{
+    ...
+};
+\end{console}
+so that
+\begin{console}
+HT< std::string, double >
+\end{console}
+becomes the class in Q1.
+
+But wait!
+
+Instead of having hash functions all over the place, it's better to tie
+hash functions into the classes that we're using as \verb!Key!.
+
+In fact, for practice, create a \verb!Hashable! abstract base class
+and create a class \verb!HashableString! that subclasses
+\verb!std::string! and \verb!Hashable!.
+\verb!Hashable! has a pure virtual method \verb!hash!.
+In that case
+{\small
+\begin{console}
+HT< HashableString, double >
+\end{console}
+}
+is what you have in Q1.
+By doing it this way, you can have different hash functions
+for different hashtables for even the same key type.
+For instance suppoer you have a hashtable with keys 
+made up of SSN and the SSNs you're putting into your hashtable
+always begin with the same 3 characters -- you might want to ignore
+the first 3 characters when computing the hash.
+
+[Note: You should also modify your \verb!HTRow! class as well.
+Note also that for different \verb!Key! types you need different
+hash functions.]
+
+SPOILERS ON NEXT PAGE ...
+
+\newpage
+
+{\small
+\begin{console}
+#include <string>
+
+class Hashable
+{
+public:
+    virtual unsigned int hash() = 0;
+};
+
+
+class HashableString: public std::string, Hashable
+{
+public:
+    HashableString(const std::string & s)
+        : std::string(s)
+    {}
+    
+    unsigned int hash()
+    {
+        unsigned int h = 0;
+        unsigned int power = 1;
+        for (unsigned int i = 0; i < length(); i++)
+        {
+            h += operator[](i) * power; power *= 10;
+        }
+        return h;
+    }
+};
+\end{console}
+}
+
+
+\newpage
+Q3. Implementation of sets using hashtables
+
+[FALL 2017: OMIT]
+
+There are times when you might want a container to keep
+keys instead of (key, value) pairs.
+Think for instance of a set.
+A set (just like a set in your math classes -- you first saw
+sets in precalc) is just a container of value
+where you want to:
+\begin{tightlist}
+  \item Check if a value in the set (or not).
+  \item Add a value into the set.
+  \item Remove a value from the set.
+\end{tightlist}
+(and possibly other basic operations such as the size of the set, etc.)
+Note that you are only interested in whether a value is in the set --
+you don't really care how many times a value occurs in the set.
+Therefore sets do not have duplicates.
+You also do not care about the ordering of values in the set --
+you never ask what is the value before or after this value.
+
+
+You can redevelop the hashtable or you can also do this:
+For a set of \verb!std::string! objects, you are looking at a 
+hashtable with \verb!std::string! for key type and your
+value type be any any type and you can just put in some dummy data
+for the value part.
+(Obviously you want to put in something that's small -- like an
+integer.
+As a personal project, you can optimize by redoing Q1 without the value part.)
+
+{\small
+\begin{Verbatim}[frame=single]
+class < typename T >
+class Set
+{
+public:
+
+    // Adds x to d is x is not in d.
+    void insert(const T & x)
+    {}
+
+    // Removes x from d if x is in d. Otherwise KeyError is thrown.
+    void remove(const T & x)
+    {}
+
+    // Returns true if x is in d
+    bool has_element(const T & x) const
+    {}
+
+    // Returns true if each value in d is also in set.d
+    bool issubset(const Set< T > & set) const
+    {}
+
+    // Same as issubset
+    bool operator<=(const Set< T > & set) const
+    {}
+
+    // Returns true if each value in set.d is also in d
+    bool issuperset(const Set< T > & set) const
+    {}
+
+    // Same as issuperset
+    bool operator>=(const Set< T > & set) const
+    {}
+
+    // Returns true if *this and set contains the same values
+    bool operator==(const Set< T > & set) const
+    {}
+
+private:
+    HT< T, char > d;
+};
+
+// If set contains "a", "b", print as {a, b}
+template < typename T >
+std::ostream & operator<<(std::stream & cout, const Set< T > set)
+{}
+\end{Verbatim}
+}
+
+\textsc{Notes.}
+\begin{tightlist}
+  \item  C++ STL set (\verb!std::set!) is implemented as a tree and not
+  hashtable.
+  \item Pythonon implements its
+  \verb!set! class (and also \verb!frozenset! class)
+  by using its dictionary (which is a hashtable)
+  with the value part occupied by some dummy value.
+\end{tightlist}
+
+
+\newpage
+Q4. Comparing hashtable set and BST set
+
+[FALL 2017: OMIT]
+
+Using the implementation from Q3, create a set of 100,000 random integers
+and find the time taken to find 1,000 values in this set.
+Next, use your BST and do the same.
+Next repeat the above with
+a set of 200,000 random integers.
+Etc.
+Compare the time and plot a graph.
+
+
+
+
+\newpage
+Q5. Implementation of sparse matrix using hashtable
+
+[FALL 2017: OMIT]
+
+Matrices are basically 2d arrays.
+They appear everywhere in CS and math.
+In real-life applications matrices are extremely huge, possibly
+going up a size of to thousands by thousands.
+Sometimes a matrix can be full of zeroes -- this is very common in
+real life applications.
+Such matrices are called sparse matrices.
+There are many different ways to represent sparse matrices -- see
+linked list notes for an implementation using doubly linked list.
+Another way to represent a sparse matrix is to use hashtables.
+In this case the key is the (row,column) of a value.
+For instance if the matrix is a 2-by-2:
+\[
+\texttt{\{\{5,0\},\{0,7\}\}}
+\]
+Then at (row,column) = $(0,0)$, the value is $5$:
+the key is $(0,0)$ and the
+value is $5$.
+
+Create a class \texttt{SparseMatrix} with doubles as values.
+\begin{console}
+SparseMatrix m(1000, 2000); // 1000-by-2000
+m.set(10, 20, 3.1415);      // set value at row 10, column 20 to 3.1415
+std::cout << m.get(10, 20); // prints 3.1415
+std::cout << m.get(0, 0);   // prints 0 -- the default value
+\end{console}
+The implementation should use hashtables with separate chaining.
+(Modify Q1.)
+For the hash function, do the following:
+say the (row, column) is (4, 5). First convert the key to the string
+\[
+\texttt{"4,5"}
+\]
+(note the comma) and then use the method from Q1.
+Attempt to access a value with row or column outside the sizes
+specified using constructor call will result in 
+the exception object from class \texttt{IndexError} being thrown.
+
+Note several things:
+\begin{itemize}
+  \item The runtime to access a value in the sparse matrix is
+  (in the best case) O(1) and the runtime to access the matrix as a
+  2D array is also O(1).
+  \item 
+  However if the matrix has a large rowsize and columnsize, then
+  the 2d array method will use more memory.
+  \item In fact if the rowsize and columnsize is too huge, the
+  total size of the array (i.e., rowsize $\times$ columnsize)
+  could be too big for the computer to handle -- there's a limit
+  to how much memory is allowed for an array.
+  In this case the hashtable can actually work.
+\end{itemize}
+
+
+\newpage
+
+Q6. [Creating hash function]
+
+
+\end{document}

@@ -1,0 +1,133 @@
+\texttt{\bf operator+}
+
+Define \verb!operator+! so that when \verb!operator+! is called with two
+\verb!Fraction! variables, the return value is a \verb!Fraction! value
+that models the addition of two fractions in the \lq\lq real" world.
+Mathematically, this is how you add two fractions:
+\[
+  \frac{a}{b} + \frac{c}{d} = \frac{ad + bc}{bd}
+\]
+
+Note that \verb!operator+! accepts two \verb!Fraction! values and returns a
+\verb!Fraction! value. Therefore, you have to add this to the \verb!Fraction!
+header file:
+\begin{Verbatim}[frame=single]
+// Author: 
+// Date  : 
+// File  : Fraction.h
+
+#ifndef FRACTION_H
+#define FRACTION_H
+
+struct Fraction
+{
+    int n; // numerator
+    int d; // denominator
+};
+
+std::ostream & operator<<(std::ostream &, const Fraction &);
+Fraction operator+(const Fraction &, const Fraction &);
+
+#endif
+\end{Verbatim}
+
+And the following test code to your \verb!main()!:
+{\small
+\begin{Verbatim}[frame=single]
+// Author: 
+// Date  : 
+// File  : test_fraction.cpp
+
+#include <iostream>
+#include "Fraction.h"
+
+
+void test_print()
+{
+    int n = 0, d = 0;
+    std::cin >> n >> d;
+    Fraction f = {n, d};
+    std::cout << f << std::endl;
+}
+
+
+void test_add()
+{
+    int n0, d0, n1, d1;
+    std::cin >> n0 >> d0 >> n1 >> d1;  
+    Fraction r0 = {n0, d0};
+    Fraction r1 = {n1, d1};
+    std::cout << (r0 + r1) << std::endl;
+}
+
+
+int main()
+{
+    int option;
+    std::cin >> option;
+    
+    switch (option)
+    {
+        case 1:
+            test_print();
+            break;
+        case 2:
+            test_add();
+            break;
+    }
+
+    return 0; 
+}
+\end{Verbatim}
+}
+
+Here are a couple of test cases for you:
+
+\textbf{Test 1:}
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\underline{2 1 3 2 4}
+5/6
+\end{Verbatim}
+
+\textbf{Test 2:}
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\underline{2 5 7 -2 13}
+51/91
+\end{Verbatim}
+
+Add more test cases to your \verb!stdin.txt!.
+
+\newpage
+
+\textbf{HINT: SPOILERS AHEAD ... READ ONLY IF YOU REALLY NEED IT ...}
+
+Mathematically this is how we add fractions:
+\[
+  \frac{a}{b} + \frac{c}{d} = \frac{ad + bc}{bd}
+\]
+
+If \verb!x! and \verb!y! are the parameters in the body of \verb!operator+!,
+then conceptually in terms of the members of \verb!x! and \verb!y!, we have:
+
+\verb!                  x.n   y.n    (x.n) * (y.d) + (x.d) * (y.n)!\\
+\verb!         x + y = ! ${\hspace{0.3in}}\over{\hspace{0.3in}}$ \verb!+!
+${\hspace{0.3in}}\over{\hspace{0.3in}}$\verb! = !${\hspace{2.5in}}\over{\hspace{2.5in}}$\\
+\verb!                  x.d   y.d           (x.d) * (y.d)!
+
+The operator looks like this:
+\begin{console}
+Fraction operator+(const Fraction & x, const Fraction & y)
+{
+    Fraction sum;
+    return sum;
+}
+\end{console}
+
+Of course you need to set the numerator and denominator of the value to return:
+\begin{console}
+Fraction operator+(const Fraction & x, const Fraction & y)
+{
+    Fraction sum = {???, ???};
+    return sum;
+}
+\end{console}

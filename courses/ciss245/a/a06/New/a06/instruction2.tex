@@ -1,0 +1,108 @@
+
+\textsc{Initializer, Get and Set functions}
+
+An important principle in Software Engineering is \lq\lq \textbf{information hiding}".
+
+The concept of numerator and denominator is now contained in the concept of
+\verb!Fraction!. As much as possible, we want to prevent users from directly
+accessing the \verb!n! and \verb!d! member variables. Why? If users of our
+library minimize their access to member variables, then we can change the way
+we design the concept. For instance, suppose that instead of using two integers
+as member variables, suppose I know that the numerators and denominators of all
+the fractions I care about are positive and less than $1000$. In that case,
+instead of modeling the fraction $\frac{2}{3}$ with
+\begin{console}
+n = 2, d = 3
+\end{console}
+I can model it with \textbf{\underline{ONE}} single integer
+\begin{console}
+nd = 0002003
+\end{console}
+i.e., I use the lower--order $3$ digits of a single integer to model the
+denominator and the higher--order $3$ digits to model the numerator. The
+highest--order digit models the sign. This saves me $50\%$ of memory for every
+\verb!Fraction! variable. In this case, my \verb!Fraction struct! would look like
+\begin{console}
+struct Fraction
+{
+    int nd;
+};
+\end{console}
+and I have to change the body of the operators and functions accordingly.
+
+If users do NOT touch member variables, their code need NOT change a single bit
+if I made the change to this new \verb!struct!. This technique therefore allows
+software engineers to work independently without stepping on each other's toes.
+It's a technique for containing software change.
+
+But for me to have this freedom, I do NOT want users of my
+\verb!Fraction struct! to touch the member variables. Therefore, I must provide
+ways to read and write/modify the numerator and denominator of \verb!Fraction!
+variables without accessing them directly. The following functions are
+therefore needed:
+\begin{Verbatim}[frame=single]
+Fraction get_Fraction(int n, int d); // Used to create a Fraction
+                                     // with the given n and d
+int get_n(const Fraction & f);       // Return copy of the numerator
+int get_d(const Fraction & f);       // Return copy of the denominator
+void set_n(Fraction & r, int new_n); // Set r.n to new_n
+void set_d(Fraction & r, int new_d); // Set r.d to new_d
+void set(Fraction & r, int new_n, int new_d); // Sets both n and d of r
+                                              // with the new values
+\end{Verbatim}
+
+(Why are some \lq\lq pass by reference" while others \lq\lq pass by constant
+reference"?)
+
+To make these functions concrete to you, here are examples of how these
+functions can be used:
+\begin{Verbatim}[frame=single]
+Fraction f = get_Fraction(7, 5); // f.n is 7 and f.d is 5
+
+std::cout << get_n(f) << '\n'; // 7 is printed
+std::cout << get_d(f) << '\n'; // 5 is printed
+
+set_n(f, 100);                  // f.n becomes 100
+std::cout << get_n(f) << '\n'; // 100 is printed
+std::cout << get_d(f) << '\n'; // 5 is printed
+
+set_d(f, -23);                  // f.d becomes -23
+std::cout << get_n(f) << '\n'; // 100 is printed
+std::cout << get_d(f) << '\n'; // -23 is printed
+
+set(f, 22, 7);                  // f.n becomes 22 and f.d becomes 7
+std::cout << get_n(f) << '\n'; // 22 is printed
+std::cout << get_d(f) << '\n'; // 7 is printed
+\end{Verbatim}
+
+Once this is done, you should look at your test code and make sure it minimizes
+access to member variables. For instance, this line in
+\verb!test_fraction.cpp!:
+\begin{Verbatim}[frame=single]
+...
+           Fraction r = {n, d};
+...
+\end{Verbatim}
+can be changed to
+\begin{Verbatim}[frame=single]
+...
+           Fraction r = get_Fraction(n, d);
+...
+\end{Verbatim}
+
+This will allow your \verb!get_Fraction()! to set the numbers in whatever way
+you like, instead of exposing the fact that it's a struct with two values.
+
+By the way, functions for initializing, getting, and setting values in a
+\verb!struct! variable are usually developed first.
+
+Note that there is nothing to prevent the users from accessing the \verb!n!
+and \verb!d! member variables. You can tell them to use your initialier,
+getter, and setter functions, but they can still go behind your back. Later,
+when we talk about classes and objects, we'll see how to strictly enforce
+information hiding to protect the internal representation of objects.
+
+\underline{\textit{\textbf{Don't simplify}}}
+the fraction for any of these functions. If you get a
+$\frac{2}{-0}$, store it as a \verb!Fraction! with \verb!n = 2! and
+\verb!d = -0!.
