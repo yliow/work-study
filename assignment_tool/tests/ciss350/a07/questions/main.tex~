@@ -1,0 +1,389 @@
+\input{myassignmentpreamble}
+\input{yliow}
+\input{ciss350}
+
+\renewcommand\TITLE{Assignment 8}
+\newcommand\cpp{\text{C\texttt{++}} }
+
+\begin{document}
+\topmatter
+
+
+\textsc{Objectives:}
+\begin{enumerate}[topsep=0pt]
+\item Applications of linked list, stacks, queues, and deques.
+\end{enumerate}
+
+
+\newpage
+\textbf{Q1.} [Introduction to Lexing]
+
+If you're given a string such as
+\[
+\texttt{"10 + 21 * (33 - 47)"}
+\]
+which correspond to a mathematical expression and you want to
+evaluate it, you want to convert this into a sequence of
+meaning items:
+\[
+\texttt{"10", "+",  "21", "*", "(", "33", "-", "47", ")"}
+\]
+where each string in this sequence has meaning.
+For instance \texttt{"10"} correspond to the meaning of \lq\lq ten", etc.
+The strings above (such as \texttt{"10"}) are called lexemes.
+
+It is convenient to attach types to these lexemes.
+For instance we want to think of \texttt{"10"} as a lexeme that
+is different from the lexeme \texttt{"+"}.
+Using object-oriented programming, we will convert these
+lexemes into different token types.
+For instance \texttt{"10"} will be converted into an
+integer token object and
+\texttt{"+"} will be converted into a plus token object.
+
+Here are the classes:
+{\small
+\begin{Verbatim}[frame=single]
+class Token
+{};
+
+class IntToken: public Token
+{
+public:
+    int value;
+};
+
+class PlusToken: public Token
+{};
+
+class MinusToken: public Token
+{};
+
+class MultToken: public Token
+{};
+
+class DivToken: public Token
+{};
+
+class LParenToken: public Token // Left parenthesis
+{};
+
+class RParenToken: public Token // Right parenthesis
+{};
+\end{Verbatim}
+}
+(You don't have to worry about the mod \verb!%! operator.)
+
+The goal is to write a program that gets a string such as
+\[
+\texttt{"10 + 21 * (33 - 47)"}
+\]
+from the user and then produce a \verb!std::vector! of tokens.
+
+You must provide code to print all the above tokens.
+For instance
+\begin{console}
+std::cout << IntTok(5) << '\n'; // Prints IntTok(5)
+std::cout << PlusTok() << '\n'; // Prints PlusTok
+\end{console}
+You must also provide code to print a \verb!std::vector! of tokens.
+\begin{console}
+std::vector< Token > toks;
+toks.push_back(IntTok(5));
+toks.push_back(PlusTok());
+std::cout << toks << '\n'; // Prints [IntTok(5), PlusTok]
+\end{console}
+
+Here's an execution of the program:
+
+\textsc{Test 1}
+{\scriptsize
+\begin{console}[commandchars=\\\{\},frame=single]
+\underline{10 + 21 * (33 - 47)}
+[IntTok(10), PlusTok, IntTok(21), MultTok, LParenTok, IntTok(33), MinusTok, IntTok(47), RParenTok]
+\end{console}
+}
+
+Ignore \lq\lq negative of'' (the unary $-$).
+In other words, when your program sees a $-$, generate a \verb!MinusTok!.
+
+\textsc{Test 2}
+{\scriptsize
+\begin{console}[commandchars=\\\{\},frame=single]
+\underline{10 + 21 * (33 - -47)}
+[IntTok(10), PlusTok, IntTok(21), MultTok, LParenTok, IntTok(33), MinusTok, MinusTok, IntTok(47), RParenTok]
+\end{console}
+}
+
+\textsc{Note.} In a compiler, the process of analysing a source file
+is not broken up into lexing as a complete first step:
+\begin{Verbatim}
+    get string s from program source file
+    get toks, a vector of tokens, from s (lexing)
+    analyze tokens (parsing)
+\end{Verbatim}
+The process actually extracts enough characters from a source file
+to form a token and then pass the token to the part of the compiler that
+analyzes the structure of the program. In other words, the compiler
+alternates between lexing and analysis:
+\begin{Verbatim}
+    get string s from program source file
+    loop as long as there are characters in s:
+        extract enough characters from s to get the next token t
+        continue analyzing structure of program with new token t 
+\end{Verbatim}
+So the process is more like lex-parse-lex-parse-lex-parse-...
+The reason is because it's too costly to lex the whole string -- what if
+there's a very early program error in an extremely huge source file?
+
+
+
+\newpage
+
+\textsc{\cpp \textnormal{\texttt{std::stack}, \textnormal{\texttt{std::queue}}}, and
+  \textnormal{\texttt{std::list}} classes}
+
+Using the web, read up on the
+\verb!std::stack!
+and
+\verb!std::queue!
+class templates.
+In the following, you should use these class.
+
+Here's an example of some basic methods in the \verb!std::stack! class
+template:
+{\small
+\VerbatimInput[frame=single]{stack.cpp}
+}
+
+Run the program and look at the output.
+Check the web for more methods for this class.
+
+Here's an example of some basic methods in the \verb!std::queue! class
+template:
+{\small
+\VerbatimInput[frame=single]{queue.cpp}
+}
+
+Run the program and look at the output.
+Check the web for more methods for this class.
+
+If \verb!s! is a stack and \verb!q! is a queue, then:
+{\small
+\begin{Verbatim}[frame=single]
+s.empty() -- true if s is empty; otherwise false
+q.empty() -- true if q is empty; otherwise false
+
+s.size()  -- size of s
+q.size()  -- size of q
+
+s.push(x) -- push x onto top of s
+q.push(x) -- enqueue x into back of q
+
+s.pop()   -- remove top of s
+q.pop()   -- remove front of q
+
+s.top()   -- reference to the top of stack s
+q.front() -- reference to the front of queue q
+q.back()  -- reference to the end of queue q
+\end{Verbatim}
+}
+
+\cpp \verb!std::list! class is a doubly-linked list class.
+Here's an example of some basic methods in the \verb!std::list! class
+template:
+{\small
+\VerbatimInput[frame=single]{list.cpp}
+}
+Run the program and look at the output.
+Check on the web for more methods for this class.
+
+If list is a \verb!std::list! object, then
+{\small
+\begin{Verbatim}[frame=single]
+list.empty()       -- true if list is empty; otherwise false
+
+list.size()        -- size of list
+
+list.push_front(x) -- insert x at head
+list.push_back(x)  -- insert x at tail
+
+list.pop_front()   -- remove front of list
+list.pop_back()    -- remove back of list
+
+list.front()       -- reference to the front/head of list
+list.back()        -- reference to the end/tail of list
+
+list.clear()       -- delete all nodes from list
+list.erase(p)      -- delete node that iterator p points to
+\end{Verbatim}
+Here \verb!p! is an iterator of the list (see example code), i.e.,
+it's an object that acts like a pointer to the list.
+}
+
+\newpage
+Q2. [Polish notation calculator]
+
+Write a program that evaluates an integer expression written using the Polish
+notation.
+For simplicity, assume that the user does not enter negative numbers.
+
+\textsc{Test 1}
+\begin{console}[commandchars=\\\{\}]
+\underline{* 1 - + 2 - 3 5 4}
+-4
+\end{console}
+
+\textsc{Test 2}
+\begin{console}[commandchars=\\\{\}]
+\underline{* 1}
+ERROR
+\end{console}
+
+Try out more test cases of your own.
+
+\newpage
+Q3. [Reverse polish notation calculator]
+
+Write a program that evaluates an integer expression written using the reverse polish
+notation.
+For simplicity, assume that the user does not enter negative numbers.
+
+\textsc{Test 1}
+\begin{console}[commandchars=\\\{\}]
+\underline{1 2 3 5 + - 4 - *}
+-10
+\end{console}
+
+\textsc{Test 2}
+\begin{console}[commandchars=\\\{\}]
+\underline{1 +}
+ERROR
+\end{console}
+
+Try out more test cases of your own.
+
+\newpage
+Q4. [Infix calculator]
+
+Write a program that evaluates an integer expression written using the
+infix notation.
+For simplicity, assume that the user does not enter negative numbers.
+
+\textsc{Test 1}
+\begin{console}[commandchars=\\\{\}]
+\underline{0 - ( 1 + 2 + 3 * ( 4 - 5 ) + 6 )}
+-6
+\end{console}
+
+\textsc{Test 2}
+\begin{console}[commandchars=\\\{\}]
+\underline{0 - 6 )}
+ERROR
+\end{console}
+
+Try out more test cases of your own.
+
+\newpage
+Q5. [Infix to reverse polish notation] [OMIT]
+
+Write a program that converts an integer expression written using the infix 
+notation into RPN.
+
+\textsc{Test 1}
+\begin{console}[commandchars=\\\{\}]
+\underline{0 - 1 + 2 * 3 - 4 / 5 * 6}
+0 1 - 2 3 * + 4 5 / 6 * - 
+\end{console}
+
+Try out more test cases of your own.
+
+[Note: As a vector of tokens, the expression is
+\texttt{[IntTok(0), IntTok(1), MinusTok, IntTok(2), IntTok(3), MultTok, PlusTok, IntTok(4), IntTok(5), DivTok, IntTok(6), MultTok, MinusTok]}.
+Of course it's easy to write a function that takes a vector of tokens and
+print the tokens as an RPN string.]
+
+
+
+\newpage
+Q6. [Sparse polynomial]
+
+Using \verb!std::list!, implement an integer polynomial class where
+zero coefficient terms are not stored.
+(The case of a class template is easy once the integer version is done.)
+{\small
+\begin{console}
+// A monomial is a term in a polynomial. For instance 5 * x ^ 3 is a
+// monomial. For this term, we store (3, 5), i.e., the degree and the
+// coefficient.
+class Monomial
+{
+public:
+    int degree;
+    int coefficient;
+};
+
+class Polynomial
+{
+public:
+private:
+    std::list< Monomial > p; // The term with smallest degree is at the head.
+};
+\end{console}
+}
+The following describes the expected usage of the class:
+{\small
+\begin{Verbatim}[frame=single]
+Polynomial p("3x^2 + 7x^12 - 9x^100 + -2x^32 + x^5 + 0x^6 + 6x^2 + 32 + 1x^0");
+std::cout << p << '\n'; // prints -9x^100 - 2x^32 + 7x^12 + x^5 + 9x^2 + 33
+
+Polynomial p0(42);      // p0 = 42 as a polynomial
+Polynomial p1(p);       // p1 = p as a polynomial
+
+std::cout << (p0 == p) << '\n';
+std::cout << (p1 != p) << '\n';
+std::cout << (5 == p) << '\n';
+std::cout << (p != 5) << '\n';
+
+std::cout << deg(p) << '\n'; // degree of p
+
+Polynomial q("x^2 + x + 1");
+
+p += q;
+p -= q;
+p *= q;
+
+p += 42;
+p -= 42;
+p *= 42;
+
+Polynomial r; // r = 0 as a polynomial
+
+r = p - q;
+r = p * q;
+
+r = 42 + p;
+r = p + 42;
+
+r = 42 - p;
+r = p - 42;
+
+r = 42 * p;
+r = p * 42;
+
+r = 42 * p;
+\end{Verbatim}
+}
+Make sure you examine the constructors and output carefully.
+In particular, note that in the constructors, the input string need not
+list monomials in any particular order by degree.
+Also, in the printout of the polynomials, higher degree terms are
+printed first.
+
+\textsc{Note.} It's a good exercise to use your \verb!Rational! class (to model
+fractions) and create
+a polynomial of rational coefficients.
+Then you can also perform long division to get quotients
+and remainders.
+
+\end{document}
