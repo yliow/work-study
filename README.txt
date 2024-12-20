@@ -31,8 +31,8 @@ a08                              work
 a09                              work                                          
 a10                              work                                          
 a11                              work                                          
-a12                        work                                            
-a13                        work                                            
+a12                        work                                           
+a13                        work  done
                                                                
 ciss350                    ryan  robert  nasser      liow
 --------------             ----  ------  ------      ----
@@ -45,9 +45,9 @@ a05                                      work
 a06                                      work                                  
 a07                                      work                     
 a09                                      work                                  
-a10                                                                        
-a13                                                                        
-a14                                                                        
+a10                              work                                          
+a13                              work                                          
+a14                              work                                          
 
 IMPORTANT ASSIGNMENT_TOOL INFO:
 All files under "..\assignment_tool" should go under a directory in "/usr/lib/python3.12/site-packages"
