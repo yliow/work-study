@@ -20,10 +20,10 @@ a13                              done
 ciss245                    ryan  robert  nasser      liow
 --------------             ----  ------  ------      ----
                                                            
-a01                        work          done                                  
-a02                        work          done                                  
-a03                        work          done                                   
-a04                        work          done                                   
+a01                                      done                                  
+a02                                      done                                  
+a03                                      done                                   
+a04                                      done                                   
 a05                                      done
 a06                              work                                          
 a07                              done                     
@@ -31,8 +31,8 @@ a08                              work
 a09                              work                                          
 a10                              work                                          
 a11                              work                                          
-a12                                                                        
-a13                                                                        
+a12                        work                                            
+a13                        work                                            
                                                                
 ciss350                    ryan  robert  nasser      liow
 --------------             ----  ------  ------      ----
