@@ -1,0 +1,555 @@
+\input{myassignmentpreamble}
+\input{yliow}
+\input{ciss350}
+\renewcommand\TITLE{Assignment 7}
+
+\begin{document}
+\topmatter
+
+
+\objectives{
+\begin{tightlist}
+\item Implement a singly-linked list with several supporting methods.
+\item Implement a doubly-linked list with several supporting methods
+\item Implement a list-based stack.
+\item Implement a list-based queue.
+\item Implement a list-based double-ended queue.
+\end{tightlist}
+}
+
+For this assignment, you will implement the singly- and doubly-linked list.
+For the singly-linked list, each object will have a pointer 
+that points to 
+head node or \verb!NULL!.
+For the doubly-linked list, each object will have a 
+\verb!head_sentinel! and \verb!tail_sentinel!.
+Recall that are the standard ways of implement linked list 
+(doubly--linked or singly--linked).
+
+You will see the \verb!SLNode! and \verb!SLList! classes:
+Here's a memory aid: \verb!SL! = singly--linked.
+Likewise \verb!DL! = doubly-linked.
+
+Some skeleton code is provided.
+Note that the skeleton requires modification and addition to the code.
+The purpose is just to give you a starting point and  some ideas.
+
+Reminders:
+If an object contains member variables that consumes some resources
+(example: memory from the heap)
+that is allocated by your code during object construction, then
+you must provide a copy constructor, the destructor, and
+assignment operator (i.e., \verb!operatorname=!).
+If you don't, something will go wrong.
+
+\textsc{Aside.}
+Note that, depending on what you want your 
+list (singly- or doubly-linked) to achieve, usage of the list class
+might not need to know anything about the node class:
+\begin{console}
+SLList list;
+list.insert_head(5);
+list.insert_tail(3);
+// Etc.
+int x = list.remove_tail();
+\end{console}
+If that's the case, then you can put the node class inside the
+list class so that it is a nested class within the list class:
+\begin{console}
+class SLList
+{
+    ...
+
+    class SLNode 
+    {
+    };
+};
+\end{console}
+and to protect outsiders from using the nested class you can do this:
+\begin{console}
+class SLList
+{
+    ...
+private:
+    class SLNode 
+    {
+    };
+};
+\end{console}
+
+\newpage
+
+
+Q1. You are given the following 
+
+{\small
+\begin{Verbatim}[frame=single]
+// File: SLNode.h
+
+#ifndef SLNODE_H
+#define SLNODE_H
+
+template < typename T > 
+class SLNode
+{
+public:
+    SLNode(const T & key, SLNode * next=NULL)
+        : key_(key), next_(next)
+    {}
+private:
+    T key_;
+    SLNode * next_;
+};
+#endif
+\end{Verbatim}
+
+\begin{Verbatim}[frame=single]
+// File: SLList.h
+
+#ifndef SLLIST_H
+#define SLLIST_H
+
+
+class IndexError          // An IndexError object is thrown if
+{};                       // an invalid index value is used in
+                          // a method/operator in the SLList
+                          // class.
+                          
+class ValueError          // A ValueError object is thrown if
+{};                       // an invalid value is used in a
+                          // method/operator in the SLList class.
+                          // If the value is an index value, then
+                          // the IndexError class is used instead.
+                          
+template < typename T >
+class SLList
+{
+public:
+    SLList()
+        : phead_(NULL)
+    {}
+private:
+    SLNode * phead_;
+};
+
+#endif
+\end{Verbatim}
+}
+
+Implement the above classes so that the following test code works.
+The behavior of the methods is clear from the
+description below.
+
+\begin{Verbatim}[frame=single,commandchars=\~\@\$]
+// File: test.cpp
+
+#include <iostream>
+#include "SLNode.h"
+#include "SLList.h"
+
+int main()
+{
+    SLNode< int > node(5);
+    std::cout << node << std::endl; // Prints the class of node, the 
+                                    // address of the node, the key_ and 
+                                    // the next_ pointer in this format:
+                                    // <SLNode 0xbff9b4fc key:5, next:0>
+                                    // where 0xbff9b4fc is the address of
+                                    // this node, 5 is the value of key_,
+                                    // 0 is the address in node.next_.
+                                    // Different nodes will of course have
+                                    // different values printed.
+                                    // The format must however follow the
+                                    // above.
+
+    // The above format for printing is suitable for debugging your class.
+    // Once your class is working you can turn off debug-printing and just
+    // print the key_ in the node. This can be done as follows:
+    SLNode< int >::debug_printing(false);
+    std::cout << node << std::endl; // Prints 5 (and newline).
+    SLNode< int >::debug_printing(true);// Turn on debug printing again.
+    
+    // The get_key(), set_key() and get_next(), set_next() of the node 
+    // does the obvious.
+    std::cout << node.get_key() << std::endl;   // Prints 5 
+    std::cout << node.get_next() << std::endl;  // Prints 0
+    node.set_key(6);                            // node.key_ is 6
+    SLNode< int > node2(7);
+    node.set_next(&node2);                      // node.next_ is &node2
+
+    SLList< int > list;
+    std::cout << list << std::endl; 
+    // Prints newline and then
+    // <SLList 0x9788038 phead:0 
+    // >
+
+    list.insert_head(5);
+    std::cout << list << std::endl; 
+    // Prints newline and then
+    // <SLList 0x9788038 phead:0x9788028 
+    //     <SLNode 0x9788028 key:5, next:0>
+    // >
+
+    list.insert_head(6);
+    std::cout << list << std::endl;
+    // Prints newline and then
+    // <SLList 0x9788038 phead:0x9788028 
+    //     <SLNode 0x9788028 key:5, next:0x9788018>
+    //     <SLNode 0x9788018 key:6, next:0>
+    // >
+
+    // The above format for printing is suitable for debugging.
+    // Once your SLList class is working, you can turn debug-printing
+    // off.
+    SLList< int >::debug_printing(false);
+    SLNode< int >::debug_printing(false);
+
+    list.insert_head(3);
+    std::cout << list << std::endl; // Prints [3, 6, 5]
+    list.insert_tail(3);
+    std::cout << list << std::endl; // Prints [3, 6, 5, 3]
+    list.insert_tail(2);
+    std::cout << list << std::endl; // Prints [3, 6, 5, 3, 2]
+
+    int x;
+
+    x = list.remove_head();
+    std::cout << list << std::endl; // Prints [6, 5, 3, 2]
+    std::cout << x << std::endl;    // Prints 3
+
+    x = list.remove_tail();
+    std::cout << list << std::endl; // Prints [6, 5, 3]
+    std::cout << x << std::endl;    // Prints 2
+
+    SLNode< int > * p = list.find(5);// p points to the first node
+                                    // with key_ = 5.
+    x = list.remove(p);
+    std::cout << list << std::endl; // Prints [6, 3]
+    std::cout << x << std::endl;    // Prints 5
+
+    try
+    {
+        SLNode< int > * p;
+        list.remove(p);             // A ValueError exception object is
+                                    // thrown if the pointer argument is
+                                    // not valid.
+    }
+    catch (ValueError & e)
+    {
+        std::cout << "ValueError caught" << std::endl;
+    }
+
+    list.clear();                   // list becomes empty.
+    std::cout << list << std::endl; // Prints []
+
+    list.insert_tail(5);
+    list.insert_tail(6);
+    list.insert_tail(7);
+    list.insert_tail(8);
+    list.remove(list.find(5));
+    std::cout << list << std::endl; // Print [6, 7, 8]
+    list.remove(list.find(8));
+    std::cout << list << std::endl; // Print [6, 7]
+    list.clear();
+
+    list.insert_tail(5);
+    list.insert_tail(6);
+    list.insert_tail(7);
+    list.insert_tail(6);
+    list.remove(6);                 // Remove first node whose key_ is 6.
+    std::cout << list << std::endl; // Print [5, 7, 6]
+    try
+    {
+        list.remove(100);           // A ValueError exception object is
+                                    // thrown if the key_ value to be 
+                                    // removed is not found.
+    }
+    catch (ValueError & e)
+    {
+        std::cout << "ValueError caught" << std::endl;
+    }
+    list.clear();
+
+    list.insert_tail(5);
+    list.insert_tail(6);
+    list.insert_tail(7);
+    list.insert_tail(6);
+
+    SLList< int > newlist(list);
+    std::cout << newlist << std::endl; // Prints [5, 6, 7, 6]
+    list.insert_tail(8);
+    newlist = list;
+    std::cout << newlist << std::endl; // Prints [5, 6, 7, 6, 8]
+
+    list.clear();
+    list.insert_tail(5);
+    list.insert_tail(6);
+    list.insert_tail(7);
+    list.insert_tail(6);
+    std::cout << list[0] << std::endl; // Prints 5, i.e., list[0] returns
+                                       // the key_ in the first node of 
+                                       // list. Note that this should be 
+                                       // returned as a reference so that 
+                                       // it's possible to do this:
+                                       // list[0] = 42;
+    std::cout << list[1] << std::endl; // Prints 6
+    std::cout << list[2] << std::endl; // Prints 7
+    std::cout << list[3] << std::endl; // Prints 6
+    try
+    {
+        list[4];                       // This will cause a IndexError
+                                       // object to be thrown since list
+                                       // has only 4 nodes.
+    }
+    catch (IndexError & e)
+    {
+      std::cout << "IndexError caught" << std::endl;
+    }
+    try
+    {
+        list[-1];                      // This will also cause an IndexError
+                                       // to be thrown since the index is < 0.
+    }
+    catch (IndexError & e)
+    {
+        std::cout << "IndexError caught" << std::endl;
+    }
+    list.clear();
+
+    list.insert_tail(5);
+    list.insert_tail(6);
+    list.insert_tail(7);
+    list.insert_tail(6);
+    std::cout << list.size() << std::endl;     // Prints 4.
+    std::cout << list.is_empty() << std::endl; // Prints 0
+
+    list.clear()
+    std::cout << list.is_empty() << std::endl; // Prints 1
+
+    // You can also compare lists. In other words if list1 and list2
+    // are two SLList objects, then list1 == list2 is true exactly
+    // when the values in list1 and list2 are the same and appear in
+    // order, starting from the head. 
+    // Of course operator!= is just the "opposite" of operator==.
+
+    // If list is an SLList object and p points to a node in list,
+    // then calling list.insert_before(p, 5) will insert 5 (as a node)
+    // in front of the node that p points to.
+    // list.insert_after(p, 5) will insert 5 (as a node) behind the
+    // node that p points to.
+
+    // If list is an SLList object, then list.front() returns a reference
+    // to the key_ member of the head node of list. This is similar to
+    // list[0].
+
+    // If list is an SLList object, then list.back() returns a reference 
+    // to the key member of the tail node of list.
+
+    return 0;
+}
+\end{Verbatim}
+
+
+
+Note that a linked list is not meant to act completely like an
+array/vector.
+So a linked list class (singly-linked or doubly-linked)
+usually wouldn't have \verb!operator[]!.
+This is included here only for practice.
+So for instance in the C++ STL library, \verb!std::list!,
+you won't find \verb!operator[]!.
+
+
+
+\newpage
+Q2.
+The \texttt{DLNode} and \verb!DLList! class is analogous to the classes
+in Q1 except that these are doubly-linked.
+Furthermore you must implement the \verb!DLList! using 
+sentinel nodes:
+\begin{console}
+class DLList
+{
+private:
+    DLNode head_sentinel;
+    DLNode tail_sentinel;
+};
+\end{console}
+Note that the \verb!head_sentinel.prev_! is \verb!NULL!
+while  \verb!tail_sentinel.next_! is \verb!NULL!.
+
+The corresponding node class of course looks like this:
+{\small
+\begin{Verbatim}[frame=single]
+template < typename T >
+class DLNode
+{
+public:
+    DLNode(const T & key, DLNode * prev=NULL, DLNode * next=NULL)
+        : key_(key), next_(next), prev_(prev)
+    {}
+
+private:
+    T key;
+    DLNode * prev_;
+    DLNode * next_;
+};
+\end{Verbatim}
+
+Implement the above classes with methods completely analogous to those in 
+Q1.
+
+\textsc{Recall:}
+Although a \verb!DLList! object have the same behavior
+as a \verb!SLList! object, recall that the runtime
+is very different.
+For instance inserting at the tail of a \verb!SLList! has a runtime of
+$O(n)$ where $n$ is the size of the list whereas
+for a \verb!DLList! object, the runtime is $O(1)$.
+
+
+\newpage
+Q3.
+Implement a list-based stack.
+As mentioned in class, a singly linked list can be used where the 
+top of the stack corresponds to the head (not the tail!)
+The following is what you can do:
+\begin{console}
+Stack< int > stack;
+stack.push(5);            // Top of stack is 5
+stack.push(6);            // Top of stack is 6 (5 is below 6)
+stack.push(4);            // Top of stack is 4 (6 is below 4)
+stack.pop();              // Top of stack is 6 (5 is below 6)
+int x = stack.top();      // x has value 6
+stack.top() = 7;          // Top of stack is 7 (5 is below 7)
+int size = stack.size();  // size has value 2
+int b = stack.is_empty(); // b has value false
+stack.clear();            // stack.size is 0
+                          // Calling stack.pop() here will
+                          // result in the throwing of an 
+                          // UnderflowError object
+\end{console} 
+Here's the skeleton:
+\begin{console}
+// Stack.h
+class UnderflowError      // An UnderflowError object is thrown if
+{};                       // you execute pop() on an empty stack.
+
+template < typename T >
+class Stack
+{
+public:
+
+private:
+    SLList< T > list;
+};
+\end{console}
+(I'm using composition instead of inheritance.)
+
+Once the singly linked list is done, the stack class is extremely easy.
+So you must finish the singly linked list class first.
+
+
+
+
+\newpage
+Q4.
+Implement a list-based double-ended queue, or deque.
+As mentioned in class, a doubly linked list should be used.
+Treat the front of a deque as the head of the underlying list
+and the back of the deque as the tail of the underlying list.
+The following is what you can do:
+\begin{console}
+Deque< int > deque;
+deque.push_front(5);      
+deque.push_back(6);
+int x = deque.front();     // x = 5
+deque.front() = 4;         // front of deque is now 4
+int y = deque.back();      // y = 6
+deque.back() = 7;          // back of deque is 7
+deque.pop_front();         // deque has now 1 value, i.e., 7
+deque.pop_back();          // deque is now empty
+int size = deque.size();   // size is zero
+bool b = deque.is_empty(); // b is true
+deque.push_front(1);
+deque.push_front(1);
+deque.push_front(1);
+deque.clear();             // deque is now empty
+\end{console} 
+Here's the skeleton:
+\begin{console}
+// Deque.h
+class UnderflowError       // An UnderflowError object is thrown
+{};                        // if you execute any operation to
+                           // remove a value from a deque that is
+                           // empty.
+                           
+template < typename T >
+class Deque
+{
+public:
+
+private:
+    DLList< T > list;
+};
+\end{console}
+You can print a Deque object.
+The output is similar to previous questions -- just 
+make sure you print the front first.
+
+Once the doubly linked list is done, the Deque class is extremely easy.
+So you must finish the doubly linked list class first.
+
+
+
+\newpage
+Q5.
+Now implement a Queue class.
+Note that a queue is just a deque except that 
+you can only add to the back and remove from the front.
+Therefore the Queue class can just inherit from the Deque class.
+Here's the skeleton:
+\begin{console}
+// File: Queue.h
+template < typename T >
+class Queue
+{
+public:
+    void enqueue(int x)
+    {
+        push_back(x);
+    }
+// etc.
+private:
+    Deque< T > deque;
+};
+\end{console}
+(I'm using composition instead of inheritance.)
+
+You can do the following
+\begin{console}
+Queue< int > queue;
+queue.enqueue(5);          // 5 is at the front 
+queue.enqueue(6);          // 5 is at the front and 6 is at the back 
+int x = queue.front();     // x = 5
+queue.front() = 4;         // front of queue is now 4
+int y = queue.back();      // y = 6
+queue.dequeue();           // queue has 1 value
+int size = queue.size();   // size is 1
+queue.clear();             // queue is now empty
+bool b = deque.is_empty(); // b is true
+queue.enqueue(1);
+queue.enqueue(1);
+queue.enqueue(1);
+queue.clear();             // queue is now empty
+\end{console} 
+
+You can print a Queue object.
+The output is similar to previous questions -- just 
+make sure you print the front first.
+
+The Queue class is very easy once the Deque class is done.
+So first make sure your Deque class is correct.
+
+
+\end{document}

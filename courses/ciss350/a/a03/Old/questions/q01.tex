@@ -1,0 +1,121 @@
+\begin{comment}
+Q1. [Review of CISS245]
+
+Write a matrix class of \texttt{double}s.
+You should have addition, subtraction, multiplication,
+scalar multiplication, etc.
+You can also compare matrices: \verb!==! and \verb@!=@.
+You can get the number of rows and number of columns using
+\verb!m.nroww()!
+and
+\verb!m.ncols()!
+If you are not familiar with matrix multiplication,
+check online or see below.
+Also, write the the determinant function.
+\begin{Verbatim}[frame=single]
+Mat m0(3, 4);    // 3-by-4 matrix
+Mat m1(3, 4, 0); // 3-by-4 matrix of zeroes
+m0(1, 2) = 5.0;  // Set row 1, column 2 to 5.0
+Mat m2 = m0;     // The obvious copy constructor
+m2 += m1;        // The obvious += operator
+m2 = m2 + m1;
+m2 -= m1;
+m2 = m2 - m1;
+
+Mat m3(4, 3, 2); // 4-by-3 matrix of 2s
+Mat m4(3, 3);
+m4 = m2 * m3;
+
+m4 = 0.5 * m4;
+m4 = m4 * 0.5;
+m4 *= 0.5;
+
+Mat m5 = Mat::identity(3); // m5 is 3-by-3 identity matrix
+
+double x[] = {1.1, 2.2, 3.3, 4.4, 5.5, 6.6};
+Mat m6(2, 3, x); // m6 is 2-by-3 filled with values from x
+\end{Verbatim}
+For output, if \verb!m! models this array
+\[
+\begin{bmatrix}
+1 & 2 & 3.3 \\
+4.56 & 5 & 6 
+\end{bmatrix}
+\]
+the output should be
+\begin{Verbatim}
+[[   1 2 3.3]
+ [4.56 5   6]]
+\end{Verbatim}
+(For the output, go online and check C++ string stream class.
+You can cout the values of the matrix to a string stream object
+which will then give you the lengths of the output of all entries.)
+\end{comment}
+\newpage
+Q1. Write a recursive function that implements a power function
+recursively. You must use the following skeleton code which
+contains tracing of your function.
+The recursive power function below computes $a^n$ where $a$ has a 
+\verb!double! value \verb!n! has an integer values that is $\geq 0$.
+(You need not worry about the case when \verb!n! is $< 0$.)
+\begin{Verbatim}[frame=single, fontsize=\small]
+#include <iostream>
+
+double pow_rec(double a, int n)
+{
+    if (n == -99999) // modify base condition
+    {
+        double ret = -99999; // set ret to correct value
+        std::cout << "pow_rec(" << a << ", " << n << ") base case ... return "
+                  << ret << '\n';
+        return ret;
+    }
+    else
+    {
+        std::cout << "pow_rec(" << a << ", " << n << ") recursive case ...\n";
+        double ret = -99999; // set ret to correct value
+        std::cout << "pow_rec(" << a << ", " << n << ") recursive case ... "
+                  << "return " << ret << '\n';
+        return ret;        
+    }
+}
+
+int main()
+{
+    double a;
+    int n;
+    std::cin >> a >> n;
+    double p = pow_rec(a, n);
+    std::cout << p << '\n';
+    return 0;
+}
+\end{Verbatim}
+
+Hint:
+If $a$ is a real number say $3.1$ and $n$ is a positive say $5$.
+You want to think of $3.1^5$ in terms of a smaller subproblem.
+For instance is there a relationship between $3.1^5$ and $3.1^4$?
+
+\textsc{Test 1}
+\begin{Verbatim}[frame=single, fontsize=\small, commandchars=\\\{\}]
+\underline{2 0}
+pow_rec(2, 0) base case ... return 1
+1
+\end{Verbatim}
+
+\textsc{Test 2}
+\begin{Verbatim}[frame=single, fontsize=\small, commandchars=\\\{\}]
+\underline{2 4}
+pow_rec(2, 4) recursive case ...
+pow_rec(2, 3) recursive case ...
+pow_rec(2, 2) recursive case ...
+pow_rec(2, 1) recursive case ...
+pow_rec(2, 0) base case ... return 1
+pow_rec(2, 1) recursive case ... return 2
+pow_rec(2, 2) recursive case ... return 4
+pow_rec(2, 3) recursive case ... return 8
+pow_rec(2, 4) recursive case ... return 16
+16
+\end{Verbatim}
+
+Make sure you create your own test cases as well.

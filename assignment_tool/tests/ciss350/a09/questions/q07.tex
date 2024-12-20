@@ -1,0 +1,84 @@
+%-*-latex-*-
+\textsc{[Expression tree]}
+
+You must use \verb!BinaryTreeNode! from the previous question.
+
+Write a program that accepts an arithmetic expression in this form:
+If the user wants to compute
+\[
+1 + (2 - 3)
+\]
+he enters
+\begin{console}
+1+(2-3)
+\end{console}
+(i.e., no spaces).
+The arithmetic expression operates only on single-digit numbers 
+from \verb!0! to \verb!9!
+(it's pretty easy to include other multi-digit numbers but you don't
+have to worry about these cases)
+and the operators are \verb!+,-,*,/,%!.
+
+The program then builds a tree
+\begin{python}
+from latextool_basic import *
+print(r"""
+\begin{center}
+%s
+\end{center}
+""" % graph(yscale=0.9,layout='''
+   A
+  B C
+   F G
+''',
+minimum_size='8mm',
+edges='A-B,A-C,C-F,C-G',
+A=r'label=\texttt{+}',
+B=r'label=\texttt{1}',
+C=r'label=\texttt{-}',
+F=r'label=\texttt{2}',
+G=r'label=\texttt{3}'))
+\end{python}
+
+Your program must generate the tree according to standard precedence
+rules.
+For instance multiplication goes before addition.
+Therefore for the string \verb!1+2*3!, the tree is 
+\begin{python}
+from latextool_basic import *
+print(r"""
+\begin{center}
+%s
+\end{center}
+""" % graph(yscale=0.9,layout='''
+   A
+  B C
+   F G
+''',
+minimum_size='8mm',
+edges='A-B,A-C,C-F,C-G',
+A=r'label=\texttt{+}',
+B=r'label=\texttt{1}',
+C=r'label=\texttt{*}',
+F=r'label=\texttt{2}',
+G=r'label=\texttt{3}'))
+\end{python}
+(Note that some nodes hold operators and some hold integer values.)
+
+Your program then generates a dot file for graphviz,
+prints the arithmetic expression in RPN (in the console window), and
+print the result of the expression (in the console window).
+You then generate a \verb!ps! file to display the tree.
+For the above expression \verb!1+2*3!, in RPN, it becomes
+\verb!123*+!.
+
+\textsc{Note.}
+\begin{tightlist}
+\item It's OK to use the textbook or the web to find a suitable algorithm to
+create the tree from the arithmetic expression string.
+You can also refer to my notes or the textbook.
+But you must write the code yourself, of course.
+\item Of course you also have unary operators (example: \lq\lq negative of'' and \lq\lq
+positive of'')
+and ternary operators (example: \texttt{(:?)}).
+\end{tightlist}
