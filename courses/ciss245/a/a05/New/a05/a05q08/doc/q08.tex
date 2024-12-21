@@ -1,0 +1,139 @@
+The goal of this question is to implement the
+\verb!init! and \verb!print!
+of \verb!world.h!.
+The implementation is of course placed in
+\verb!world.cpp!.
+
+The folder for this question
+includes the files from the previous question.
+
+The algorithm for \verb!init! is at the end of this question.
+You must follow it.
+
+{\small
+\begin{Verbatim}[frame=single]
+#include <iostream>
+#include <cstdlib>
+#include "Robot.h"
+#include "world.h"
+
+// Test functions from previous questions
+
+void test_init_and_print_world()
+{
+    char world[10][10];
+    init(world);
+    print(world);
+}
+
+
+int main()
+{
+    int seed;
+    std::cin >> seed;
+    srand(seed);
+    
+    int option = 0;
+    std::cin >> option;
+    switch (option)
+    {
+        // code from Q1 - Q7.
+
+        case 8:
+            test_init_and_print_world();
+            break;
+    }
+      
+    return 0;
+}
+\end{Verbatim}
+}
+
+Test 1.
+{\small
+\begin{console}[commandchars=\\\{\}]
+\underline{8}
+   0123456789
+  XXXXXXXXXXXX
+0 X          X
+1 X  XXXX    X
+2 X          X
+3 X          X
+4 X      X   X
+5 X      X   X
+6 X      X   X
+7 X      X   X
+8 X          X
+9 X          X
+  XXXXXXXXXXXX
+\end{console}
+}
+(The actual placement of the walls depend on the seed value of
+\verb!srand!)
+
+Test 2.
+{\small
+\begin{console}[commandchars=\\\{\}]
+\underline{9}
+  0123456789
+  XXXXXXXXXXXX
+0 X          X
+1 X          X
+2 X  X       X
+3 X  X       X
+4 X  XXXXX   X
+5 X  X       X
+6 X          X
+7 X          X
+8 X          X
+9 X          X
+  XXXXXXXXXXXX
+\end{console}
+}
+
+Note that the walls do not overlap.
+For instance the following is \textit{WRONG}:
+\begin{Verbatim}[frame=single]
+   0123456789
+  XXXXXXXXXXXX
+0 X          X
+1 X  XXXX    X
+2 X     X    X
+3 X     X    X
+4 X     X    X
+5 X          X
+6 X          X
+7 X          X
+8 X          X
+9 X          X
+  XXXXXXXXXXXX
+\end{Verbatim}
+In other words, within the world, there \textit{must} be exactly 8
+\verb!X!'s.
+
+
+
+\textsc{Algorithm for setting up the two random walls in the world}
+
+
+First randomly pick an integer $x$ from 0 to 9 and do the same
+to get a random $y$.
+This gives you a point in the world which will serve
+as a starting point for the
+first wall.
+Now randomly pick a random integer 0, 1, 2, 3
+where 0 means north, 1 means south, 2 means east, and 3 means west.
+If you picked 0, then starting the above $(x,y)$, you build a wall
+in the north direction so that it has length 4.
+If this is impossible (for instance the $(x,y)$ is too close to the
+left of the world and the direction is west.), you start all over.
+Similar for the other 3 directions.
+If this wall is in the world, you continue on to the second wall.
+
+The process for erecting the second wall is the same,
+except that if it's impossible, you get rid of the first wall altogether
+and start all over.
+Note that the second wall has length 4, must stay in the world,
+and must not overlap the first wall.
+
+

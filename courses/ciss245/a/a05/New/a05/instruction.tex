@@ -1,0 +1,325 @@
+
+Follow the usual way of naming your folders.
+For question Q1, create a folder \verb!a05q01! and put all 
+\verb!*.cpp! and \verb!*.h! files into this folder.
+Etc.
+All folders should be kept in folder \verb!a05! and \verb!a05! should be
+in \verb!a! in \verb!ciss245!.
+
+Although there are many questions,
+this is actually not a difficult assignment since this assignment is
+mainly a practice on working with \texttt{struct}.
+
+\newpage
+
+We will write a simple simulation of several robots wandering about in a
+finite 2-dimensional world.
+
+Each robot has the following:
+\begin{tightlist}
+\item name
+\item energylevel
+\item x--coordinate
+\item y--coordinate
+\end{tightlist}
+Here's our world with 3 robots
+\begin{console}
+time: 50
+   0123456789
+  XXXXXXXXXXXX
+0 X          X
+1 X  c    G  X
+2 X     P    X
+3 X P        X
+4 X   XXXX   X
+5 X   r      X
+6 X   X      X
+7 X   X   P  X
+8 X d X      X
+9 X   X      X
+  XXXXXXXXXXXX
+<Robot: name=c: x=2, y=1, energylevel=90>
+<Robot: name=d: x=3, y=5, energylevel=45>
+<Robot: name=r: x=1, y=8, energylevel=75>
+<PowerStation: x=1, y=3, energylevel=50>
+<PowerStation: x=5, y=2, energylevel=50>
+<PowerStation: x=7, y=7, energylevel=50>
+<Gold: x=7, y=1>
+\end{console}
+The world is 10-by-10.
+Robots can only walk in the world.
+There are two walls of length 4 in the world (look for the
+\verb!X! in the above output).
+
+When you run the program,
+the two walls are erected randomly in the world (or \lq\lq room'' if you
+wish to think of it that way.)
+The walls are built randomly; they are either vertical or 
+horizontal and of length 4.
+
+Furthermore, there are power stations \verb!P! in the world.
+There are 3 power stations and their positions are randomly selected.
+Their positions are chosen on available spaces, i.e., they
+are not in the walls and are not on top of each other and are not
+on the same position as the pot of gold (see below).
+Initially the power stations have a power level of 50.
+Power stations do not move; they are stationary.
+
+There is also a pot of gold, \verb!G!, placed randomly in the world.
+Of course the pot of gold cannot be placed in the wall!
+Also, the pot of gold cannot occupy the the same position as a power station.
+\verb!G! is also stationary.
+
+The robots are initially randomly placed in the world all starting
+with energy level of 100.
+
+When the simulation starts, the time is set to 100.
+For each iteration of the simulation, the time decrements by 1.
+The robots walk randomly and with each step, their energy level decrements by
+1.
+Of course the robot cannot walk into a wall nor can two robots stand
+on the same position.
+Likewise robots cannot stand on the same position as the \verb!P!'s or
+\verb!G!.
+Here's the first few iterations of a simulation:
+{\small
+\begin{console}[commandchars=\\\{\}]
+\underline{42}
+time: 100
+   0123456789
+  XXXXXXXXXXXX
+0 X          X
+1 X  c    G  X
+2 X     P    X
+3 X P        X
+4 X   XXXX   X
+5 X   r      X
+6 X   X      X
+7 X   X   P  X
+8 X d X      X
+9 X   X      X
+  XXXXXXXXXXXX
+<Robot: name:c, x=2, y=1, energylevel=100>
+<Robot: name:d, x=1, y=8, energylevel=100>
+<Robot: name:r: x=3, y=5, energylevel=100>
+<PowerStation: x=1, y=3, energylevel=50>
+<PowerStation: x=5, y=2, energylevel=50>
+<PowerStation: x=7, y=7, energylevel=50>
+<Gold: x=7, y=1>
+
+time: 99
+   0123456789
+  XXXXXXXXXXXX
+0 X          X
+1 X   c   G  X
+2 X     P    X
+3 X P        X
+4 X   XXXX   X
+5 X  r       X
+6 X   X      X
+7 X d X   P  X
+8 X   X      X
+9 X   X      X
+  XXXXXXXXXXXX
+<Robot: name=c, x=3, y=1, energylevel=99>
+<Robot: name=d, x=2, y=5, energylevel=99>
+<Robot: name=r, x=1, y=7, energylevel=99>
+<PowerStation: x=1, y=3, energylevel=50>
+<PowerStation: x=5, y=2, energylevel=50>
+<PowerStation: x=7, y=7, energylevel=50>
+<Gold: x=7, y=1>
+\end{console}
+}
+(The user entered \verb!42! as the seed for the random generator.
+In the following, I will not display the user entry of the seed.)
+
+When a robot moves to a position that is just next to a \verb!P!,
+up to 10 points of energy is transferred from the power station to the robot.
+Of course if the power station has a power level of 0, 
+no power is transferred to the robot.
+When I say \lq\lq next to'' I mean the robot is one square to the left
+or right or top or bottom of \verb!P!.
+Note that the energy is transferred once the robot moves to a square just
+next to the power station.
+Here's an example where Robot \verb!c! is just next to a power station
+and will immediately get up to 10 points of energy:
+{\small
+\begin{console}
+   0123456789
+  XXXXXXXXXXXX
+0 X          X
+1 X       G  X
+2 X    cP    X
+3 X P        X
+4 X   XXXX   X
+5 X   r      X
+6 X   X      X
+7 X   X   P  X
+8 X d X      X
+9 X   X      X
+  XXXXXXXXXXXX
+\end{console}
+}
+However in the following, \verb!c! is not considered next to a power station:
+{\small
+\begin{console}
+   0123456789
+  XXXXXXXXXXXX
+0 X          X
+1 X    c  G  X
+2 X     P    X
+3 X P        X
+4 X   XXXX   X
+5 X   r      X
+6 X   X      X
+7 X   X   P  X
+8 X d X      X
+9 X   X      X
+  XXXXXXXXXXXX
+\end{console}
+}
+Note that in each iteration of the simulation, two robots
+arrive at the power station at the same time.
+For instance at time 25 we can have:
+{\small
+\begin{console}
+   0123456789
+  XXXXXXXXXXXX
+0 X          X
+1 X    c  G  X
+2 X     P    X
+3 X P    r   X
+4 X   XXXX   X
+5 X          X
+6 X   X      X
+7 X   X   P  X
+8 X d X      X
+9 X   X      X
+  XXXXXXXXXXXX
+\end{console}
+}
+and at time 24 we have this:
+{\small
+\begin{console}
+   0123456789
+  XXXXXXXXXXXX
+0 X          X
+1 X       G  X
+2 X    cP    X
+3 X P   r    X
+4 X   XXXX   X
+5 X          X
+6 X   X      X
+7 X   X   P  X
+8 X d X      X
+9 X   X      X
+  XXXXXXXXXXXX
+\end{console}
+}
+Both \verb!c! and \verb!r! are next to the same power station.
+In this case \verb!c! and \verb!r! will get the same amount of energy points.
+For instance if the power station have 9 energy points,
+then they each get 4 (and then move away in the next iteration)
+leaving the power station with 1 energy point.
+
+When a robot's energy level goes to 0, the robot stops moving.
+
+The simulation stops when the time reaches 0 or when one of the robots
+found the gold, i.e., is next to \verb!G!.
+
+(Note that since randomization is involved, you will 
+need to use the \verb!rand()!
+function.)
+
+\newpage
+\textsc{Skeleton code for Robot}
+
+Th skelton code is provided only as a guide.
+It's of course incomplete and might contain errors.
+
+You will provide useful functionalities for
+\verb!Robot! structure variables.
+
+Here's the header file for \verb!Robot.h!:
+{\small
+\begin{Verbatim}[frame=single]
+/*********************************************************************
+
+File  : Robot.h
+Author: smaug
+
+void init(Robot &, char name, int x, int y, int energylevel);
+Sets the name, x, y, and energylevel to the arguments passed into the 
+function.
+
+void print(const Robot & robot);
+Prints the instance variables of the robot. If the name, x, y, 
+energylevel of robot is 'c', 10, 20, 30, then the output is
+<Robot: name=c, x=10, y=20, energylevel=30>
+A newline is printed at the end.
+
+void move_north(Robot & robot);
+Decrement the y value of robot and decrements the energylevel by 1.
+
+void move_south(Robot & robot);
+Increments the y value of robot and decrements the energylevel by 1.
+
+void move_east(Robot & robot);
+Increments the x value of robot and decrements the energylevel by 1.
+
+void move_west(Robot & robot);
+Decrements the x value of robot and decrements the energylevel by 1.
+
+void inc_energylevel(Robot & robot, int d);
+Increments the energylevel of robot by d.
+
+void dec_energylevel(Robot & robot, int d);
+Decrements the energylevel of robot by d.
+
+*********************************************************************/
+
+#ifndef ROBOT_H
+#define ROBOT_H
+
+struct Robot
+{
+    char name;
+    int x, y;
+    int energylevel;
+};
+
+void init(Robot &, char name, int x, int y, int energylevel);
+void print(const Robot & robot);
+void move_north(Robot & robot);
+void move_south(Robot & robot);
+void move_east(Robot & robot);
+void move_west(Robot & robot);
+void inc_energylevel(Robot & robot, int d);
+void dec_energylevel(Robot & robot, int d);
+
+#endif
+
+\end{Verbatim}
+\begin{Verbatim}[frame=single]
+/*********************************************************************
+
+File  : Robot.cpp
+Author: smaug
+
+Implementation of functions prototypes in Robot.h.
+
+*********************************************************************/
+#include <iostream>
+#include "Robot.h"
+
+void init(Robot & r, char name, int x, int y, int energylevel)
+{
+    r.name = name;
+    r.x = x;
+    r.y = y;
+    r.energylevel = energylevel;
+}
+
+\end{Verbatim}
+}
+
