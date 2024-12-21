@@ -1,0 +1,130 @@
+%-*-latex-*-
+\textsc{Some details about input}
+
+What happens during input?
+You should think of your \verb!std::cin! as
+getting from a data stream, like an array of characters.
+When you type something on your keyboard, the characters
+are placed in the stream at the end.
+\verb!std::cin! works by extracting characters
+from the front of the stream.
+(It's more like a queue.)
+
+If you execute
+\verb!std::cin.getline(s, 1024)!,
+\verb!std::cin! will keep extracting
+characters until it sees a newline character.
+Character extracted from the input stream is 
+placed in \verb!s!.
+A \verb!'\0'! is then added to \verb!s!.
+Note that the newline character is extracted from the
+input stream but not placed in \verb!s!.
+Note also that the \verb!1024! in
+\verb!std::cin.getline(s, 1024)!
+means that
+\verb!std::cin!
+will only write
+at most 1023 characters into \verb!s!, reserving
+one spot for \verb!'\0'!.
+If \verb!std::cin! reads more than 1023 characters,
+an error will occur.
+
+A couple of things can go wrong ...
+
+First, if
+\verb!std::cin! reads more than 1023 characters without reading
+a newline character, you'll get an error.
+
+Second,
+\verb!std::cin!
+might read beyond the input stream, i.e.,
+it has reached the
+EOF.
+
+Third,
+something catastrophic might occur such as some
+hardware failure or something went wrong with the OS.
+
+Fourth, instead of using \verb!getline!,
+when you use
+\verb!std::cin! to read an input
+for an integer,
+but
+what is read cannot be converted to an integer.
+For instance if you try to \verb!std::cin >> i! where
+\verb!i! is an \verb!int!, but you enter \verb!abc!.
+
+\verb!std::cin! maintains information on
+\lq\lq eof'', \lq\lq fail'', \lq\lq bad'' status
+using 3 bits
+(the eofbit, failbit, and badbit.)
+\lq\lq eof'' means you've reached the end of data.
+\lq\lq bad'' is the extreme case such as hardware or OS failure.
+\lq\lq fail'' is the other types mentioned above.
+So for instance if your program attempts to read data for an integer and
+the input is \verb!"abc"!,
+then the fail bit is turn on, i.e., to 1.
+Once you've processed this error and you're ready to
+get the next input (if that's what you want to do),
+you need to set the fail bit to 0.
+
+You use
+\verb!std::cin.eof()!,
+\verb!std::cin.fail()!, and
+\verb!std::cin.bad()!
+to check if the eofbit, failbit, badbit is turned on.
+To set all these flags to 0, you do
+\verb!std::cin.clear()!,
+
+There are times when your want your
+\verb!std::cin! to ignore some characters.
+For instance say you have input lines where
+each line has 3 data (say separated by spaces).
+If an error occurs, you might want your
+\verb!std::cin! to throw away all input characters
+until the newline.
+In that case you do
+\verb!std::cin.ignore(100, '\n')!
+which means ignore at most 100 characters or until the newline character.
+
+\begin{Verbatim}[frame=single,fontsize=\small]
+#include <iostream> 
+#include <limits> 
+
+const int MAX_BUF = 1024; 
+
+int main() 
+{ 
+    while (1) 
+    { 
+        char s[MAX_BUF]; 
+        std::cin.getline(s, MAX_BUF);
+        if (std::cin.eof()) break;         
+        if (std::cin.fail() || std::cin.bad()) 
+        {
+            // CASE: Error in input
+            // Do whatever can be done with s
+            std::cin.clear(); 
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+        else
+        {
+            // CASE: No error in input
+            // Do something with s
+        }
+    }
+
+    return 0;
+} 
+  \end{Verbatim}
+
+The above information on how inputs work applies to almost
+all input devices.
+Read the above and use the code from the previous section.
+Do NOT memorize the above information or the sample code from the previous
+section.
+The information is useful to know, but there's NO point in memorizing it.
+It's NOT computer science.
+In the future if you do work with low level I/O devices, just vaguely
+remember there are various forms of input failures.
+And if you need the \cpp\ code for input just look for it here or online.
