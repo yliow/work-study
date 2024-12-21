@@ -5,3 +5,4 @@ copy:
 
 clean:
 	rm attributes.py; rm mk_assignment.py; rm makefile.py; rm file_structure.py; rm latex_fragment.py
+	rm -r __pycache__
