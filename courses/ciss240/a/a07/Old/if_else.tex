@@ -1,0 +1,111 @@
+\textsc{Preventing indentation in a stack of if-else}
+
+Note that if you have code like this where 
+in the \verb!else! block you only have an 
+\verb!if! statement or an 
+\verb!if-else! statement:
+{\footnotesize
+\begin{console}
+if (bool1)
+{
+   ...
+}
+else
+{
+    if (bool2)
+    {
+        ...
+    }
+    else
+    {
+        if (bool3)
+        {
+            ...
+        }
+        else
+        {
+            ...
+        }
+    }
+}
+\end{console}
+}
+then, it's the same as the following 
+(the \verb!else! has only one \verb!if-else! statement
+so the block is redundant -- check your notes):
+{\footnotesize
+\begin{console}
+if (bool1)
+{
+   ...
+}
+else
+    if (bool2)
+    {
+        ...
+    }
+    else
+        if (bool3)
+        {
+            ...
+        }
+        else
+        {
+            ...
+        }
+\end{console}
+}
+which is the same as the following (because
+ C++ ignores whitespaces -- check your notes):
+{\footnotesize
+\begin{console}
+if (bool1)
+{
+   ...
+}
+else if (bool2)
+{
+    ...
+}
+else if (bool3)
+{
+    ...
+}
+else
+{
+    ...
+}
+\end{console}
+}
+In other words, we join an \verb!if! with the preceding \verb!else!.
+
+Writing it this way will prevent too much indentation toward the 
+right and make your program look like a table.
+This is one of the very few cases where we ignore the standard
+indentation rules in order not to over--indent.
+
+Note that this won't work if the \verb!else! contains more than
+just an \verb!if-else!, for instance
+{\footnotesize
+\begin{console}[commandchars=\~\!\@]
+if (bool1)
+{
+   ...
+}
+else
+{
+    ~underline!x = 1;@
+    if (bool2)
+    {
+        ...
+    }
+    else
+    {
+        ...
+    }
+}
+\end{console}
+}
+In this case, since the outermost \verb!else! has two statements,
+you cannot get rid of the block symbols \verb!{}! to join up the 
+inner \verb!if! with the outer \verb!else!.
