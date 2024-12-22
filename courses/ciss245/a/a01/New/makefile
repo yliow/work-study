@@ -23,4 +23,4 @@ s:
 	@echo ""
 
 t tree :
-	tree a06q01/ a06q02/ a06q03/
+	tree a01q01/ a01q02/ a01q03/

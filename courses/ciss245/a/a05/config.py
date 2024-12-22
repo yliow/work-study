@@ -62,5 +62,7 @@ contents = [(at.OTHER, "Old/objectives.tex"),
             (at.QUEST_CODE, "Old/q11.tex"),
             (at.LATEXSTR, r"\newpage"),
             (at.QUEST_CODE, "Old/q12.tex")
+            (at.LATEXSTR, r"\newpage"),
+            (at.EXTRA_DOCUMENTS, "Old/seed_rand_num_gen.cpp")
             ]
 ###########################################################################
