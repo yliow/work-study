@@ -8,11 +8,11 @@ import attributes as at
 #rename config to reflect assignment that has been generated using run.py
 ##################################################################
 # depends on file structure
-courses = "ciss350"
+courses = "ciss245"
 name = "yliow"
 assignment = "a01"
 assignment_it = "1";
-basepath = "test/ciss350/" # insert path for new directory (you are able to go back)
+basepath = "../../courses/ciss245/a/a01/New" # insert path for new directory (you are able to go back)
 destination = basepath + assignment
 # basepath = 
 # go to basepath, write, then go back to cwd
@@ -27,16 +27,14 @@ destination = basepath + assignment
 # - skel is the skelenton code that needs to be in the 
 # - other is any other latex files that needs to be included
 # - name of file
-contents = [# (at.OTHER, "../../courses/ciss350/a/a01/questions/objectives.tex"),
-            # (at.LATEXSTR, r"\newpage"),
-            (at.QUEST_CODE, "../../courses/ciss350/a/a01/a01q01/question/Objective.tex"),
+contents = [(at.OTHER, "../../courses/ciss245/a/a01/Old/Objective.tex"),
             (at.LATEXSTR, r"\newpage"),
-            (at.QUEST_CODE, "../../courses/ciss350/a/a01/a01q01/question/Instruction.tex"),
+            (at.OTHER, "../../courses/ciss245/a/a01/Old/Instruction.tex"),
             (at.LATEXSTR, r"\newpage"),
-            (at.QUEST_CODE, "../../courses/ciss350/a/a01/a01q01/question/main.tex"),
+            (at.QUEST_CODE, "../../courses/ciss245/a/a01/Old/q01.tex"),
             (at.LATEXSTR, r"\newpage"),
-            (at.QUEST_CODE, "../../courses/ciss350/a/a01/a01q02/question/main.tex"),
+            (at.QUEST_CODE, "../../courses/ciss245/a/a01/Old/q02.tex"),
             (at.LATEXSTR, r"\newpage"),
-            (at.QUEST_CODE, "../../courses/ciss350/a/a01/a01q03/question/main.tex")
+            (at.QUEST_CODE, "../../courses/ciss245/a/a01/Old/q03.tex")
             ]
 ###########################################################################
