@@ -19,13 +19,13 @@ a13                              done
                                                                
 ciss245                    ryan  robert  nasser      liow
 --------------             ----  ------  ------      ----
-a01                        work                                                
-a02                        work                                                
-a03                        work                                                
-a04                        work                                                
-a05                              
+a01                                      done                                  
+a02                                      done                                   
+a03                                      done                              
+a04                                      done                                  
+a05                                      done
 a06                              work                                          
-a07                                       done
+a07                                      done
 a08                              work                                          
 a09                              work                                          
 a10                              work                                          
@@ -37,17 +37,17 @@ ciss350                    ryan  robert  nasser      liow
 --------------             ----  ------  ------      ----
                                                            
 <<<<<<< HEAD
-a01                        work                                                
-a02                        work                                                
-a03                        work                                                
-a04                        work                                                
-a05                                                                        
-a06                                                                        
-a07                                                           
-a09                                                                        
-a10                                                                        
-a13                                                                        
-a14                                                                        
+a01                        done                                             
+a02                        done                                                
+a03                        done                                                
+a04                        done                                                
+a05                                      done                                  
+a06                                      done                                  
+a07                                      done                     
+a09                                      done                                  
+a10                                      done                                  
+a13                                      done                                  
+a14                                      done                                  
 =======
 a05                                      work                                  
 a06                                      work                                  
