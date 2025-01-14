@@ -49,7 +49,6 @@ QUEST_MATH = 'question'
 SKELETON = 'skeleton'
 SKEL_PDF = 'skel in pdf'
 
-
 def writefile(path, s):
     f = open(os.path.join(con.destination, path), "w")
     f.write(s)
