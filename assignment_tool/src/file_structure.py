@@ -10,7 +10,7 @@ def get_num():
             num += 1
     return num
 
-def file_struct():
+def file_struct(): #change name
     if os.path.exists(con.destination):
         print(con.destination)
         answer = input("^ this path already exist are you sure you want to overwrite it? enter [y/n]: ")
@@ -20,5 +20,5 @@ def file_struct():
             shutil.rmtree(con.destination)
     num = get_num()
     path = rf"{con.destination}/{con.assignment}"
-    at.FILE_VERSION(path, num)
+    at.FILE_VERSION(path, num) # change to at.mk_directories
     return True
