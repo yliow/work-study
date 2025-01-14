@@ -10,7 +10,7 @@ def file_struct1(path, num):
         s = rf"{path}q{i:0>2}/"
         stru = s + 'doc'
         os.makedirs(stru)
-        struct['q doc%(i)s'%{'i': str(i)}] = stru
+        struct['q doc%(i)s'%{'i': str(i)}] = stru#CLEANUP
         struct['a doc%(i)s'%{'i': str(i)}] = stru
         os.makedirs(s + 'src')
         struct['q src%(i)s'%{'i': str(i)}] = s + 'src'
