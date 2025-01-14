@@ -29,7 +29,7 @@ def file_struct2(path, num):
         os.makedirs(s + 'answer' + '/doc')
         os.makedirs(s + 'answer' + '/src')
         
-        struct['q doc%(i)s'%{'i': str(i)}] = s + 'question/doc'
+        struct['q doc%(i)s'%{'i': str(i)}] = s + 'question/doc'#CLEANUP
         struct['a doc%(i)s'%{'i': str(i)}] = s + 'answer/doc'
         struct['q src%(i)s'%{'i': str(i)}] = s + 'question/src'
         struct['a src%(i)s'%{'i': str(i)}] = s + 'answer/src'
@@ -51,18 +51,16 @@ SKEL_PDF = 'skel in pdf'
 
 
 def writefile(path, s):
-    f = open(con.destination + '/' + path, "w")
+    f = open(os.path.join(con.destination, path), "w")
     f.write(s)
     f.close()
 
 def is_latex(path):
-    x = path[len(path) - 4:]
-    return x == '.tex'
+    return path.endswith('.tex')
 
 def is_answer(path):
-    x = path[len(path) - 5:]
-    file_ = file_getter(path)
-    return x == 's.tex' and file_[0] == 'q'
+    path = os.path.split(path)[-1]
+    return path.endswith('s.tex') and path[0] == 'q'
 
 def include_latex(path):
     '''
@@ -71,7 +69,7 @@ def include_latex(path):
     \input{...}
     \subimport{...}
     '''
-    if (is_answer(path)):
+    if is_answer(path):
         return r'''\myincludetex{%s}''' % path
     else:
         dir_, file_ = os.path.split(path)
@@ -84,7 +82,7 @@ def include_latex(path):
 def include_src(path, frame='single', fontsize='\\footnotesize'):
     #src = r'''\VerbatimInput[frame=%(frame)s,font=%(fontsize)s]{%(path)s}
     #''' % {'path':path, 'frame':frame, 'fontsize':fontsize}
-    src = r"\myincludesrc{%(path)s}" % {'path':path}
+    src = r"\myincludesrc{%s}" % path
     return src
 
 def include_(path):
@@ -100,7 +98,7 @@ def solution(path):
         return r'\newpage'
     return ''
 
-def file_getter(path):
+def file_getter(path):#DELETE
     end = len(path)
     start = end - 1
     
@@ -111,15 +109,17 @@ def file_getter(path):
     return path[start: end]
 
 
-def copy_path(oldpath, newpath):
+def copy_path(oldpath, newpath):#CLEANUP: DELETE
     shutil.copy(oldpath, newpath)
 
 QUESTION_ITERATOR = 0
     
 def include(path):
     s = ''
+    # what assignment question number we are on
     global QUESTION_ITERATOR
-    
+
+    # DOCUMENT TYPES
     global OTHER
     global LATEXSTR
     global QUEST_CODE
@@ -134,18 +134,18 @@ def include(path):
     if path[0] == QUEST_CODE or path[0] == QUEST_MATH:
         
         i += 1
-        dest = struct['q doc%(i)s'%{'i': str(i)}]
-        question = '/q' + str(i).zfill(2)
-        copy_path(path[1], dest + question + '.tex')
+        dest = struct['q doc%(i)s'%{'i': str(i)}]#CLEANUP
+        question = '/q%s.tex' % str(i).zfill(2) 
+        copy_path(path[1], dest + question)#CLEANUP: OS.PATH.JOIN()
         
-        os.system("chmod a=r " + dest + question + '.tex')
+        os.system("chmod a=r %s.tex" % (dest + question) )#CLEANUP: OS.PATH.JOIN()
         textpath = dest[len(con.destination) + 1:] + question
         
         s += '''Q%(question)s. %(textpath)s
 ''' %{'textpath':include_(textpath + '.tex'), 'question': i}
         
         if path[0] == QUEST_MATH:
-            writefile(textpath + 's.tex', '')
+            writefile(textpath + 's.tex', '')#CLEANUP: OS.PATH.JOIN()
             s += r'''\SOLUTION
 %(textpath)s
 ''' %{'textpath': include_(textpath + 's.tex')}
@@ -164,23 +164,18 @@ def include(path):
         s = path[1] + ' '
       
     elif path[0] == SKELETON or path[0] == SKEL_PDF:
-        
         file_ = file_getter(path[1])
-        
-        dest = struct['skel%(i)s'%{'i': str(i)}]
-        copy_path(path[1], dest + '/' + file_)
-        textpath = dest[len(con.destination) + 1:] + '/' + file_
+        dest = struct['skel%(i)s'%{'i': str(i)}]#CLEANUP
+        copy_path(path[1], dest + '/' + file_) #CLEANUP: OS.PATH.JOIN()
+        textpath = dest[len(con.destination) + 1:] + '/' + file_#CLEANUP: OS.PATH.JOIN()
         if path[0] == SKEL_PDF:
             s += '''%(textpath)s
 '''%{'textpath': include_(textpath)}
         
     elif path[0] == OTHER:
-        
         file_ = file_getter(path[1])
         dest = con.destination
-        
-        copy_path(path[1], dest + '/' + file_)
-        
+        copy_path(path[1], dest + '/' + file_)#CLEANUP: OS.PATH.JOIN()
         s += '''%(textpath)s
 '''%{'textpath': include_(file_)}
     QUESTION_ITERATOR = i
