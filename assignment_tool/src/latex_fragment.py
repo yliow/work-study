@@ -15,13 +15,13 @@ def main():
 
 \newcommand\myincludesrc[1]{\textbox{{\scriptsize \texttt{#1}}}
     
-    \VerbatimInput[fontsize=\footnotesize,frame=single]{#1}
+\VerbatimInput[fontsize=\footnotesize,frame=single]{#1}
 }
 
 '''
     i = 1
     for path in con.contents:
-        s += '%(include)s'  % {'include':at.include(path)}
+        s += '%(include)s'  % {'include':at.include(path)}#CLEANUP
     s += r'''
 \input{thispostamble.tex}
     '''
@@ -49,8 +49,7 @@ def thispreamble():
 \textwidth=6in
 
 \input{thispackages}
-    
-    \input{thismacros}
+\input{thismacros}
 
 \makeindex
 \begin{document}
@@ -66,11 +65,9 @@ def thistitle():
     return "thistitle.tex", tex
 
 def thismacros():
-    tex = ""
-    return "thismacros.tex", tex
+    return "thismacros.tex", ""
 
 def thispackages():
-    tex = ""
-    return "thispackages.tex", tex
+    return "thispackages.tex", ""
 
 
