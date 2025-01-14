@@ -64,22 +64,24 @@ def is_answer(path):
     return x == 's.tex' and file_[0] == 'q'
 
 def include_latex(path):
+    '''
+    returns one of the following with ... replaced by path
+    \myinludetex{...}
+    \input{...}
+    \subimport{...}
+    '''
     if (is_answer(path)):
         return r'''\myincludetex{%(path)s}''' %{'path':path}
-    #else:
-    #    return r'''\input{%(path)s}''' %{'path':path}
     else:
         file_ = file_getter(path)
-        
         if path == file_:
             return r'''\input{%(path)s}''' %{'path': path}
-        
-        
-        len_ = len(path) - len(file_)
-        directory = path[:len_]
-        
-        return r'''\subimport*{%(path)s}{%(file)s}''' %{'path': directory, 'file': file_}
-    
+        else:
+            #len_ = len(path) - len(file_)
+            #directory = path[:len_]
+            #directory = os.path.split()
+            #return r'''\subimport*{%(path)s}{%(file)s}''' %{'path': directory, 'file': file_}
+            return r'''\subimport*{%s}{%s} xxx''' % os.path.split(path)
     return ""
 
 def include_src(path, frame='single', fontsize='\\footnotesize'):
