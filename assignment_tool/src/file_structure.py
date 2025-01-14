@@ -1,3 +1,4 @@
+#mk_directories.py
 import os
 import shutil
 import config as con
