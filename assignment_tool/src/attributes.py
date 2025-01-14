@@ -78,11 +78,7 @@ def include_latex(path):
         if dir_ == "":
             return r'''\input{%s}''' % path
         else:
-            #len_ = len(path) - len(file_)
-            #directory = path[:len_]
-            #directory = os.path.split()
-            #return r'''\subimport*{%(path)s}{%(file)s}''' %{'path': directory, 'file': file_}
-            return r'''\subimport*{%s}{%s} xxx''' % os.path.split(path)
+            return r'''\subimport*{%s}{%s}''' % os.path.split(path)
     return ""
 
 def include_src(path, frame='single', fontsize='\\footnotesize'):
