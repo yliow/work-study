@@ -73,8 +73,8 @@ def include_latex(path):
     if (is_answer(path)):
         return r'''\myincludetex{%s}''' % path
     else:
-        file_ = file_getter(path)
-        if path == file_:
+        dir_, file_ = os.path.split(path)
+        if dir_ == "":
             return r'''\input{%s}''' % path
         else:
             #len_ = len(path) - len(file_)
