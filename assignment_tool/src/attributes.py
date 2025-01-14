@@ -71,11 +71,11 @@ def include_latex(path):
     \subimport{...}
     '''
     if (is_answer(path)):
-        return r'''\myincludetex{%(path)s}''' %{'path':path}
+        return r'''\myincludetex{%s}''' % path
     else:
         file_ = file_getter(path)
         if path == file_:
-            return r'''\input{%(path)s}''' %{'path': path}
+            return r'''\input{%s}''' % path
         else:
             #len_ = len(path) - len(file_)
             #directory = path[:len_]
