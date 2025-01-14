@@ -38,17 +38,8 @@ def file_struct2(path, num):
 File_type = [file_struct1, file_struct2]
 
 VERS = 0
-FILE_VERSION = File_type[VERS] # do the initial file structure, false if we want to do the other one
+FILE_VERSION = File_type[VERS] # do the initial file structure, false if we wantOTHER = 'other'
 
-
-
-#rename "newpath" to a more descriptive name, target, dest, base etc.
-
-
-
-
-#store these constants in a different file
-OTHER = 'other'
 EXTRA_DOCUMENTS = "extra_documents"
 DOCUMENTS = "documents"
 LATEXSTR = 'latex string'
@@ -129,11 +120,6 @@ QUESTION_ITERATOR = 0
 def include(path):
     s = ''
     global QUESTION_ITERATOR
-    
-    # global basepath
-    # global assignment
-    # global assignment_it
-    # global destination
     
     global OTHER
     global LATEXSTR
