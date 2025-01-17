@@ -41,5 +41,5 @@ s:
 	@ls -la submit.tar.gz
 	@echo "================================================================"
 	@echo ""
-%(tree)s'''%{'tree':maketree()}#CLEANUP
+%s'''% maketree()#CLEANUP
     return "makefile", make

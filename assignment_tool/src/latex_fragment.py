@@ -21,7 +21,7 @@ def main():
 '''
     i = 1
     for path in con.contents:
-        s += '%(include)s'  % {'include':at.include(path)}#CLEANUP
+        s += '%s'  % at.include(path)#CLEANUP
     s += r'''
 \input{thispostamble.tex}
     '''
