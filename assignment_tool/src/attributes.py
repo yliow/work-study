@@ -94,23 +94,26 @@ def include(path):
         #copy_path(path[1], dest + question)#CLEANUP: OS.PATH.JOIN()
         shutil.copy(path[1], os.path.join(dest, question))
         os.system("chmod a=r %s" % os.path.join(dest, question) )#CLEANUP: OS.PATH.JOIN()
-        textpath = dest[len(con.destination) + 1:] + question
+        textpath = os.path.join(dest[len(con.destination) + 1:], question)
         
         s += '''Q%(question)s. %(textpath)s
-''' %{'textpath':include_(textpath + '.tex'), 'question': i}
+''' %{'textpath':include_(textpath), 'question': i}
         
         if path[0] == QUEST_MATH:
-            writefile(textpath + 's.tex', '')#CLEANUP: OS.PATH.JOIN()
+            question = 'q%ss.tex' % str(i).zfill(2) 
+            textpath = os.path.join(dest[len(con.destination) + 1:], question)
+            writefile(textpath, '')#CLEANUP: OS.PATH.JOIN()
             s += r'''\SOLUTION
 %(textpath)s
 ''' %{'textpath': include_(textpath + 's.tex')}
     elif path[0] == EXTRA_DOCUMENTS or path[0] == DOCUMENTS:
         dest = struct['q doc%(i)s'%{'i': str(i)}]
         
-        file_ = file_getter(path[1])
+        file_ = os.path.split(path[1])[-1]
+        print(file_)
         copy_path(path[1], dest + '/' + file_)
         if path[0] == DOCUMENTS:
-            textpath = dest[len(con.destination) + 1:] + '/' + file_
+            textpath = os.path.join(dest[len(con.destination) + 1:],file_)
             
             s += ''' %(textpath)s
 ''' %{'textpath':include_(textpath)}
@@ -119,7 +122,8 @@ def include(path):
         s = path[1] + ' '
       
     elif path[0] == SKELETON or path[0] == SKEL_PDF:
-        file_ = file_getter(path[1])
+        file_ = os.path.split(path[1])[-1]
+        print(file_)
         dest = struct['skel%s'% str(i)]#CLEANUP
         copy_path(path[1], os.path.join(dest, file_)) #CLEANUP: OS.PATH.JOIN()
         textpath = os.path.join(dest[len(con.destination) + 1:], file_)#CLEANUP: OS.PATH.JOIN()
