@@ -1,4 +1,5 @@
 import attributes as at
+import os
 ###########################################################################
 #              THIS IS A TEMPLATE FOR THE "config.py" file!!
 #              LOOK AT PDF TO DETERMINE THE STRUCTURE OF "config.py"
@@ -12,8 +13,8 @@ courses = "ciss245"
 name = "yliow"
 assignment = "a01"
 assignment_it = "1";
-basepath = "../../courses/ciss245/a/a01/New" # insert path for new directory (you are able to go back)
-destination = basepath + assignment
+basepath = "New" # insert path for new directory (you are able to go back)
+destination = os.path.join(basepath, assignment)
 # basepath = 
 # go to basepath, write, then go back to cwd
 
@@ -27,14 +28,14 @@ destination = basepath + assignment
 # - skel is the skelenton code that needs to be in the 
 # - other is any other latex files that needs to be included
 # - name of file
-contents = [(at.OTHER, "../../courses/ciss245/a/a01/Old/Objective.tex"),
+contents = [(at.OTHER, "Old/Objective.tex"),
             (at.LATEXSTR, r"\newpage"),
-            (at.OTHER, "../../courses/ciss245/a/a01/Old/Instruction.tex"),
+            (at.OTHER, "Old/Instruction.tex"),
             (at.LATEXSTR, r"\newpage"),
-            (at.QUEST_CODE, "../../courses/ciss245/a/a01/Old/q01.tex"),
+            (at.QUEST_CODE, "Old/q01.tex"),
             (at.LATEXSTR, r"\newpage"),
-            (at.QUEST_CODE, "../../courses/ciss245/a/a01/Old/q02.tex"),
+            (at.QUEST_CODE, "Old/q02.tex"),
             (at.LATEXSTR, r"\newpage"),
-            (at.QUEST_CODE, "../../courses/ciss245/a/a01/Old/q03.tex")
+            (at.QUEST_CODE, "Old/q03.tex")
             ]
 ###########################################################################

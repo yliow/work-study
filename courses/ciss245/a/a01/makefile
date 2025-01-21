@@ -1,26 +1,13 @@
+run:
+	make copy; python *.py; make clean
+copy:
+	cp ../../../../assignment_tool/src/attributes.py .; cp ../../../../assignment_tool/src/makefile.py .; cp ../../../../assignment_tool/src/mk_assignment.py .; cp ../../../../assignment_tool/src/file_structure.py .; cp ../../../../assignment_tool/src/latex_fragment.py .; cp ../../../../assignment_tool/src/tarzip.py .
 
-pdf:
-	-python /home/student/.alex/alexrunner.py replaceemail
-	pdflatex --shell-escape main.tex
-	xdg-open main.pdf
-view:
-	xdg-open main.pdf
-v:
-	xdg-open main.pdf
-cleantmp:
-	rm
-	-rf '__pycache__' 'auto' 'desktop.ini' 	'abc.output' 'texput.log' 'shEsc.tmp'	'main.log' 'main.aux' 'main.toc' 'main.out' 'main.idx' 'main.ilg' 'main.vrb' 'main.snm' 'main.nav' 	'main.py.err' 'main.py.out' 'main.py' 'latex.py' 'main.pytxcode' 	'makefile.old' 'missfont.log' 'traceback.txt'
-c:
-	make cleantmp
-s:
-	make cleantmp
-	rm -rf submit; rm -f submit.tar.gz; mkdir submit; rsync -av . submit --exclude submit; tar -cvf submit.tar
-	submit; gzip submit.tar || true
-	@echo "================================================================"
-	@echo "done ... submit.tar.gz is created:"
-	@ls -la submit.tar.gz
-	@echo "================================================================"
-	@echo ""
+clean:
+	rm attributes.py; rm mk_assignment.py; rm makefile.py; rm file_structure.py; rm latex_fragment.py; rm tarzip.py
+	rm -r __pycache__
 
-t tree :
-	tree a01q01/ a01q02/ a01q03/
+
+tarzip tz:
+	tar -cvf New/a01.tar New/a01
+	gzip New/a01.tar;
