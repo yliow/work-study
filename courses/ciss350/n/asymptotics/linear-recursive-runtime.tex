@@ -1,0 +1,362 @@
+%-*-latex-*-
+\sectionthree{Linear recursive runtime}
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+
+So you see that when you measure the runtime of an algorithm
+like our Fibonacci function implemented with linear recursion
+will give you a runtime function that looks rather similar.
+So the next step is to convert the runtime function
+to a \textit{non-recursive} closed form.
+
+Before I show you the closed form for the runtime of Fibonacci, let's just get a feel for the
+runtime functions by calculating one.
+It turns out that it's pretty bad.
+
+Suppose I need to solve the problem of computing this
+function (it's somewhat like my Fibonacci).
+Note that $g(n)$ is defined by linear recursion.
+\begin{align*}
+g(n) = 
+\begin{cases}
+1                     & \text{ if $n = 0$} \\
+3                     & \text{ if $n = 1$} \\
+2g(n - 1) + 3g(n - 2) & \text{ if $n \geq 2$}
+\end{cases}
+\end{align*}
+Suppose I choose to write my algorithm like this:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+def g(n):
+    if n == 0: 
+        return 1
+    elif n == 1:
+        return 3
+    else:
+        return 2 * g(n - 1) + 3 * g(n - 2)
+\end{Verbatim}
+You know that the runtime function would be like this:
+\[
+T(n) = 
+\begin{cases}
+A                     & \text{if $n = 0, 1$} \\
+T(n-1) + T(n-2) + B & \text{if $n > 1$}
+\end{cases}
+\]
+for some constants $A$ and $B$.
+Later I'll show you how to compute an approximation (in the big-O sense)
+for $T(n)$.
+For now, suppose we compute $g(5)$ using the above 
+program, compute like what a program would, executing one statement
+or one operation at a time.
+This is what you would see:
+
+\begin{align*}
+g(5)
+&= 2g(4) + 3g(3) \\
+&= 2(2g(3) + 3g(2)) + 3g(3) \\
+&= 2(2(2g(2) + 3g(1)) + 3g(2)) + 3g(3) \\
+&= 2(2(2(2g(1) + 3g(0)) + 3g(1)) + 3g(2)) + 3g(3) \\
+&= 2(2(2(2(3) + 3g(0)) + 3g(1)) + 3g(2)) + 3g(3) \\
+&= 2(2(2(6 + 3g(0)) + 3g(1)) + 3g(2)) + 3g(3) \\
+&= 2(2(2(6 + 3(1)) + 3g(1)) + 3g(2)) + 3g(3) \\
+&= 2(2(2(6 + 3) + 3g(1)) + 3g(2)) + 3g(3) \\
+&= 2(2(2(9) + 3g(1)) + 3g(2)) + 3g(3) \\
+&= 2(2(18 + 3g(1)) + 3g(2)) + 3g(3) \\
+&= 2(2(18 + 3(3)) + 3g(2)) + 3g(3) \\
+&= 2(2(18 + 9) + 3g(2)) + 3g(3) \\
+&= 2(2(27) + 3g(2)) + 3g(3) \\
+&= 2(54 + 3g(2)) + 3g(3) & & \text{will this ever end?!?} \\
+&= 2(54 + 3(2g(1) + 3g(0))) + 3g(3) \\
+&= 2(54 + 3(2(3) + 3g(0))) + 3g(3) \\
+&= 2(54 + 3(6 + 3g(0))) + 3g(3) \\
+&= 2(54 + 3(6 + 3(1))) + 3g(3) \\
+&= 2(54 + 3(6 + 3)) + 3g(3) \\
+&= 2(54 + 3(9)) + 3g(3) \\
+&= 2(54 + 27) + 3g(3) \\
+&= 2(81) + 3g(3) \\
+&= 162 + 3g(3) \\
+&= 162 + 3(2g(2) + 3g(1)) & & \text{ ... oh no ... here we go again ...}\\
+&= 162 + 3(2(2g(1) + 3g(0)) + 3g(1)) \\
+&= 162 + 3(2(2(3) + 3g(0)) + 3g(1)) \\
+&= 162 + 3(2(6 + 3g(0)) + 3g(1)) \\
+&= 162 + 3(2(6 + 3(1)) + 3g(1)) \\
+&= 162 + 3(2(6 + 3) + 3g(1)) \\
+&= 162 + 3(2(9) + 3g(1)) \\
+&= 162 + 3(18 + 3g(1)) \\
+&= 162 + 3(18 + 3(3)) \\
+&= 162 + 3(18 + 9) \\
+&= 162 + 3(27) \\
+&= 162 + 81 \\
+&= 243 & & \text{PHEW!!!}
+\end{align*}
+
+\begin{ex}
+  Show that if \verb!g(n)! is the following
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+def g(n):
+    if n == 0: 
+        return 1
+    elif n == 1:
+        return 3
+    else:
+        return 2 * g(n - 1) + 3 * g(n - 2)
+\end{Verbatim}
+Then the runtime is $T(n) = O(2^n)$. (This is not the best big-O.)
+What is the space complexity?
+\end{ex}
+
+\begin{ex}
+  Let
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+def h(n):
+    if n == 0: 
+        return 1
+    elif n == 1:
+        return 2
+    elif n == 2:
+        return 42
+    else:
+        return 7 * h(n - 1) - 3 * h(n - 2) + 4 * h(n - 3)
+\end{Verbatim}
+What is a big-O of $T(n)$ for \verb!h(n)!?
+What is the space complexity?
+\end{ex}
+
+
+So the execution of $g(5)$ using the above algorithm
+seems to indicate that $T(5)$ is huge.
+You can see even from this simple simulation that the main
+problem is that many function calls were actually repeats.
+For instance go ahead and count the number of times
+$g(2)$ was executed in the above.
+
+It turns out that except for recursion like this:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+def h(n):
+    if n == 0:
+        return 42
+    else:
+        return 7 * h(n - 1) + n
+\end{Verbatim}
+where in the recursive part only \textit{one} recursive function call was made,
+most cases will usually be extremely bad, as in exponential bad.
+
+It turns out that in general if you have a numeric recursive function
+like
+\[
+T(n) = aT(n - 1) + bT(n - 2) + c
+\]
+where $a$, $b$, and $c$ are constants,
+you can always compute a nice formula for $T(n)$.
+A \lq\lq nice'' formula for $T(n)$ that does \textit{not} depend on 
+$T(i)$ for smaller $i$ but only on $n$, i.e.,
+you can compute a closed form formula for $T(n)$.
+
+In fact more generally there are extremely powerful 
+tools to compute an \textit{exact} closed form for more complicated
+recursion such as 
+\[
+T(n) = n^2 T(n-1) + (1 + n) T(n - 2) + \frac{2}{3}n^2 - 1 
+\]
+But I'll stick to the simple case of
+\[
+T(n) = aT(n - 1) + bT(n - 2) + c
+\]
+where $a,b,c$ are constants.
+
+Although there are techniques to compute exact closed forms for $T(n)$,
+remember that we only need the big-O of $T(n)$.
+
+For the case of a recursive function such as 
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+def g(n):
+    if n == 0: 
+        return 1
+    elif n == 1:
+        return 3
+    else:
+        return 2 * g(n - 1) + 3 * g(n - 2)
+\end{Verbatim}
+which has a runtime $T(n)$ satisfying
+\[
+T(n) = T(n - 1) + T(n - 2) + A
+\]
+where $A$ is a constant, a rough approximation (using the method
+in an earlier section) the runtime is
+\[
+T(n) = O(2^n)
+\]
+i.e., exponential.
+Which means the runtime is bad.
+How bad? What exactly is \lq\lq exponential bad"?
+You can use the fibonacci function as an example:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+def fib(n):
+    if n == 0: 
+        return 1
+    elif n == 1:
+        return 1
+    else:
+        return fib(n - 1) + fib(n - 2)
+\end{Verbatim}
+and print \verb!fib(n)! for \verb!n = 0, 1, 2, ..., 100!.
+Remember we did this before in CISS245.
+It will grind to a halt before hitting \verb!60!.
+
+In the above, instead of $O(2^n)$, we can be more precise.
+
+First, you ignore the constant $c$ in
+\[
+T(n) = aT(n - 1) + bT(n - 2) + c \tag{1}
+\]
+and look at this recursion instead:
+\[
+T^{(h)}(n) = aT^{(h)}(n - 1) + bT^{(h)}(n - 2) \tag{2}
+\]
+This is called the \defone{homogeneous part} of $T(n)$.
+You need to know that $T^{(h)}(n)$ must have a solution
+roughly of the form
+\[
+T^{(h)}(n) = r^n
+\]
+where $r$ is a constant.
+(Take this on faith for now -- the justification will be
+provided in MATH325.)
+The immediate goal now is to compute $r$.
+You substitute this into (2) to get
+\[
+r^n = ar^{n-1} + br^{n-2}
+\]
+You cross out $r^{n - 2}$ to get
+\[
+r^2 = ar + b
+\]
+i.e., a quadratic equation.
+This then allows you to solve for $r$.
+
+Let's try this technique on our
+\[
+T(n) = T(n - 1) + T(n - 2) + c
+\]
+The homogeneous part of this equation is
+\[
+T^{(h)}(n) = T^{(h)}(n - 1) + T^{(h)}(n - 2)
+\]
+Let $T^{(h)}(n) = r^n$ and substitute it into
+\[
+T^{(h)}(n) = T^{(h)}(n - 1) + T^{(h)}(n - 2)
+\]
+to get
+\[
+r^n = r^{n - 1} + r^{n - 2}
+\]
+Cross out $r^{n - 2}$ to get
+\[
+r^2 = r + 1
+\]
+which gives us the quadratic
+\[
+r^2 - r - 1 = 0
+\]
+Using the quadratic polynomial root formula you get
+\[
+r = \frac{-(-1) \pm \sqrt{(-1)^2 - 4(1)(-1)} }{2}
+\]
+which gives us
+\[
+r = \frac{1 \pm \sqrt{5}}{2}
+\]
+Let 
+\[
+r_1 = \frac{1 + \sqrt{5} }{2} 
+\]
+(... this is the one that is about 1.618)
+and 
+\[
+r_2 = \frac{1 - \sqrt{5} }{2}
+\]
+Then you know that if the recurrence relation on $T^{(h)}(n)$ is
+\[
+T^{(h)}(n) = T^{(h)}(n - 1) + T^{(h)}(n - 2)
+\]
+then $T^{(h)}(n)$ must have the form
+\[
+T^{(h)}(n) = \alpha \cdot r_1^n + \beta \cdot r_2^n
+\]
+where $\alpha, \beta$ are constants.
+This is the closed form for $T^{(h)}(n)$, not $T(n)$.
+Now, $|r_2| = 0.618...$ whereas $r_1 = 1.618...$.
+Since $r_1 > |r_2|$, I get 
+\[
+T^{(h)}(n) = \alpha \cdot r_1^n + \beta \cdot r_2^n = O(r_1^n)
+\]
+But what about $T(n)$?
+Remember that
+\[
+T(n) = T^{(h)}(n) + c
+\]
+Since $T^{(h)}(n) = O(r_1^n)$ and $r_1 > 1$,
+$T^{(h)}(n)$ is going to climb way faster than the constant $c$.
+Therefore the big-O of $T(n)$ is governed by the big-O of
+$T^{(h)}(n)$ and not $c$.
+Hence
+\[
+T(n) = O \left( T^{(h)}(n) + c \right) = O \left( T^{(h)}(n) \right) = O(r_1^n)
+\]
+which means that the algorithm has exponential runtime with base $r_1 > 1$.
+Note that 
+base of the exponential runtime is $1.618...$ instead of $2$.
+$2^n$ climbs much faster than $1.618^n$.
+That's because
+\[
+\frac{2^n}{1.618^n} = 1.236...^n
+\]
+and $1.236...^n$ grows toward infinity as $n$ grows unboundedly
+since $1.236 > 1$.
+So the asymptotic
+\[
+T(n) = O(r_1^n)
+\]
+is way more accurate than
+\[
+T(n) = O(2^n)
+\]
+
+Note that at the stage where you solve for $r$ in 
+the quadratic equation in $r$:
+\[
+r^2 = ar + b \tag{*}
+\]
+in the general case, 
+you will have \textit{three} cases: $(*)$ has
+\begin{enumerate}
+\item[(A)] Two distinct real roots
+\item[(B)] Two distinct complex (and nonreal) roots
+\item[(C)] Two roots with the same real value
+\end{enumerate}
+The Fibonacci case of 
+\[
+r^2 = r + 1
+\]
+gives us two distinct real roots.
+
+For Case (A) and Case (B) above, the $T(n)$ is just
+\[
+T(n) = \alpha r_1^n + \beta r_2^n
+\]
+(For Case (B) you would have to use complex
+numbers -- obviously you would need to know complex numbers for such cases.)
+For Case (C) where there is one value $r_1$ for both roots,
+the closed form becomes
+\[
+T(n) = \alpha r_1^n + \beta nr_1^n
+\]
+so in this case
+\[
+T(n) = O(nr_1^n)
+\]
+Of course as for the specific big-O class, you have to 
+compute the exact root values.
+
+[EXERCISES]

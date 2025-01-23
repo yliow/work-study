@@ -1,0 +1,370 @@
+%-*-latex-*-
+\sectionthree{Sequence of experiments}
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+
+
+Frequently the random experiment you are interested in
+can be broken/decomposed into smaller and simpler
+experiments.
+
+
+\subsection{Sequence of independent experiments}
+
+One way where indicator random variables
+occur is when you need some kind of
+\lq\lq if-else".
+For instance suppose you are
+playing a die-rolling gambling game
+and $X_0$ and $X_1$ are two \lq\lq gain" functions.
+Why two?
+Because I'm changing the game
+so that
+you have to toss a coin.
+If your toss gives you a $\HEAD$,
+your gain will be
+based on $X_0$.
+Otherwise your gain is based on
+$X_1$.
+Instead of doing two separate
+analysis based on the following two cases
+(based on the coin toss),
+you can combine them into one
+by defining two random variables:
+\[
+  X = I_{\HEAD} \cdot X_0 + I_{\TAIL} \cdot X_1
+\]
+where $I_{\HEAD}$ is the random variable
+\[
+  I_{\HEAD}(\HEAD) = 1, \,\,\,
+  I_{\HEAD}(\TAIL) = 0
+\]
+and
+\[
+  I_{\TAIL}(\HEAD) = 0, \,\,\,
+  I_{\TAIL}(\TAIL) = 1
+\]
+This means that in the game,
+where you made toss $t$ (of a fair coin) and made roll $r$ (of a fair die),
+if your toss $t$ is a head, then
+you gain is given by 
+\begin{align*}
+  X(r)
+  &= 1 \cdot X_0(r) +
+    0 \cdot X_1(r)
+  \\
+  &= X_0(r)
+\end{align*}
+and if your toss is a tail, then your gain is
+\begin{align*}
+  X(r)
+  &= X_1(r)
+\end{align*}
+
+Here's a very important warning.
+Pay attention.
+
+Your random experiment
+involves
+tossing a coin \textit{and}
+rolling a die.
+The sample space should really be
+\[
+  S = S_0 \times S_1
+\]
+where
+\[
+  S_0 = \{ \HEAD, \TAIL \}
+\]
+and
+\[
+  S_1 = \{ \ONE, \TWO, \ldots, \SIX \}
+\]
+Assuming the coin and die are both fair,
+we must have
+\begin{align*}
+  p : S = S_0 \times S_1 &\rightarrow [0,1] \\
+  p(t, r) = 1/12
+\end{align*}
+So even though I wrote
+\[
+  I_{\HEAD}(\HEAD) = 1, \,\,\,
+  I_{\HEAD}(\TAIL) = 0
+\]
+i.e., $I_{\HEAD}$ is a random variable on
+\[
+  S_0 = \{ \HEAD, \TAIL \}
+\]
+in the context of
+\[
+  X = I_{\HEAD} \cdot X_0 + I_{\TAIL} \cdot X_1
+\]
+$I_{\HEAD}$ is implicitly extended to
+\[
+  \widetilde{I}_{\HEAD} : S_0 \times S_1
+\]
+i.e.,
+\[
+ \widetilde{I}_{\HEAD}(\HEAD, r) = 1, \,\,\,
+  \widetilde{I}_{\HEAD}(\TAIL, r) = 0
+\]
+for all rolls $r \in S_1$.
+In other words
+$\widetilde{I}_{\HEAD}$ is the indicator
+variable
+$I_{\{\HEAD\} \times S_1}$.
+In other words
+\begin{align*}
+  \widetilde{I}_{\HEAD}(\HEAD, r) &= I_{\HEAD}(\HEAD) = 1 \\
+  \widetilde{I}_{\HEAD}(\TAIL, r) &= I_{\HEAD}(\TAIL) = 0 
+\end{align*}
+for all rolls $r$.
+Furthermore the gain $X_1$
+\[
+  X_1 : S_1 \rightarrow \R
+\]
+should really be extended to
+\[
+  \widetilde{X}_1 : S_0 \times S_1 \rightarrow \R
+\]
+where
+\[
+  \widetilde{X}_1(t, r) = X_1(r)
+\]
+
+So to be really accurate,
+we extend
+$I_{\HEAD}, I_{\TAIL}, S_0, S_1$
+to
+$\widetilde{I}_{\HEAD}, \widetilde{I}_{\TAIL}, \widetilde{S}_0, \widetilde{S}_1$
+and then define $X$ (in the correct way) as
+\[
+  X
+  =
+  \widetilde{I}_{\HEAD} \cdot \widetilde{X}_0
+  +
+  \widetilde{I}_{\TAIL} \cdot \widetilde{X}_1
+\]
+i.e.,
+\[
+  X(t, r)
+  =
+  \widetilde{I}_{\HEAD}(t, r) \cdot \widetilde{X}_0(t, r)
+  +
+  \widetilde{I}_{\TAIL}(t, r) \cdot \widetilde{X}_1(t, r)
+\]
+and then we do get
+\[
+  X(t, r)
+  =
+  I_{\HEAD}(t) X_0(r)
+  +
+  I_{\TAIL}(t) X_1(r)
+\]
+
+By the way, the events \lq\lq the toss is head"
+and \lq\lq the die roll is one" are independent.
+In other words
+\begin{align*}
+  A &= \{ \HEAD \} \times S_1 \\
+  B &= S_0 \times \{ \ONE \} 
+\end{align*}
+are independent.
+Here's the check:
+\begin{align*}
+  p(A)
+  &= p(\{ \{ \HEAD \} \times S_1 \}) = 6/12
+  \\
+  p(B)
+  &= p( S_0 \times \{ \ONE \} ) = 2/12
+  \\
+  \THEREFORE
+  p(A) \cdot p(B) &= 1/12
+\end{align*}
+and
+\begin{align*}
+  p(A \cap B)
+  &= p(\{(\HEAD, \ONE)\}) = 1/12
+\end{align*}
+Hence
+\[
+  p(A \cap B) = p(A) \cdot p(B)
+\]
+In fact $A$ and $B$ are independent
+even when
+$A$ is replaced by \lq\lq any toss"
+and 
+$B$ is replaced by \lq\lq any roll".
+
+Another thing to note is that
+\[
+  p(t, r) = p_0(t) \cdot p_1(r)
+\]
+where $p_0: \{ \HEAD, \TAIL \} \rightarrow [0,1]$ is the
+uniform pdf of a (fair) coin toss
+and $p_1 : \{ \ONE, \TWO, \THREE, ..., \SIX \} \rightarrow [0,1]$
+is the uniform pdf of a (fair) die roll.
+
+\input{exercises/disc-prob-10/main.tex}
+
+\begin{thm}
+If a random experiment involves
+carrying out two separate and independent experiments.
+Suppose the pdfs are 
+$p_0 : S_0 \rightarrow [0,1]$
+and
+$p_1 : S_1 \rightarrow [0,1]$.
+Then
+\[
+p(\{x\} \times S_2) = p_1(x)
+\]
+and
+\[
+p(S_1 \times \{y\}) = p_2(x)
+\]
+and
+\[
+  p(x, y) = p_1(x) p_2(y)
+\]
+\end{thm}
+
+
+This means that if there is a random experiment
+(with pdf $p : S \rightarrow [0,1]$)
+which is made up of a sequence of two independent experiments
+(with pdf $p_i : S_i \rightarrow [0,1]$),
+then $p(x,y) = p_0(x) p_1(y)$, which means that
+the computation simplifies to the computation of
+$p_0(x)$ and $p_1(y)$ and note that
+the computation of $p_0(x)$ for instance allows you to focus on
+$p_0 : S_0 \rightarrow [0,1]$ and this
+random
+experiment has a smaller sample space and is therefore simpler.
+
+The above is also true for a sequence of three independent
+experiments, or four, or five, etc.
+
+
+
+
+
+
+
+
+\subsection{Sequence of dependent experiments}
+
+There are times when a random experiment involves two experiments
+and the second experiment depends on the first.
+Here's an example.
+Suppose you have two boxes: The first box has 1 red ball and 2 green balls
+while the second box has 3 red balls and 5 green balls.
+Here's the experiment:
+I toss a fair coin.
+If I get a head, then I pick a ball from the first box.
+If I get a tail, then I pick a ball from the second box.
+
+It's clear that the sample space is
+\[
+S = \{\HEAD, \TAIL\} \times \{\RED, \GREEN\}
+\]
+The pdf $p$ of the above random experiment is then
+\begin{align*}
+  p(\HEAD, \RED) &= 1/2 \cdot 1/3 = 1/6 \\
+  p(\HEAD, \GREEN) &= 1/2 \cdot 2/3 = 1/3 \\
+  p(\TAIL, \RED) &= 1/2 \cdot 3/8 = 3/16 \\
+  p(\HEAD, \GREEN) &= 1/2 \cdot 5/8 = 5/16 
+\end{align*}
+
+Is the event that I get a head (from the coin toss) independent of the
+event that I get a red ball?
+
+Let $A$ be the first event. This means
+\[
+A = \{(\HEAD, \RED), (\HEAD, \GREEN)\}
+\]
+Let $B$ be the second event. Then
+\[
+B = \{(\HEAD, \RED), (\TAIL, \RED)\}
+\]
+We have
+\begin{align*}
+  p(A \mid B)
+  &= \frac{ p(A \cap B) }{ p(B) } \\
+  &= \frac{ p(\{(\HEAD, \RED)\}) }{p(\{(\HEAD,\RED),(\TAIL,\RED)\})} \\
+  &= \frac{1/6}{1/6 + 3/16} \\
+  &= \frac{8}{17}
+\end{align*}
+which is not $p(A) = 1/6$.
+Therefore $A$ and $B$ are not independent.
+
+
+
+
+\subsection{Multiplication principle}
+
+
+Suppose that a random experiment $R$ involves
+carry out two experiments.
+After getting
+an outcome $x$ from the first random experiment $R_0$.
+Say the pdf of $R_0$ is $p_0 : S_0 \rightarrow [0,1]$.
+I perform the second random experiment $R_1$.
+The second random experiment might depend on the first,
+i.e., I should write $R_1(x)$ --
+what I'm going to say deos not depend on
+whether the two experiments are dependent or not.
+Suppose the pdf for the second experiment is
+$p_{1, x} : S_{1, x} \rightarrow [0,1]$.
+(Note that it's possible that $p_{1,x}$ depends on the first
+outcome $x$.)
+Suppose the output for the second random experiment is $y$.
+Then the probability for outcome $(x, y)$
+is $p_0(x) \cdot p_{1, x}(y)$.
+
+For instance if you roll two dice where the first is fair
+and the
+second is loaded so that 1/2 the time you will get a six,
+then the probability of getting one for the first
+and six for the second
+is
+\[
+1/6 \cdot 1/2
+\]
+Or, if you toss one fair coin and if you
+get a head, you roll a fair die and if you get a tail,
+you roll a loaded die where the chance of
+one is 0.5 and the others are equi-distributed.
+Then the probability of head followed by one is (1/2)(1/6)
+and the probability of tail followed by one is (1/2)(1/2).
+
+The above fact follows from the multiplication
+principle of counting.
+
+
+
+\subsection{Variable length}
+
+There are times when you are interested in an
+experiment that is made up of a sequence of
+experiments where the number of experiments $n$ is not fixed.
+In fact the questions you are interested in involves
+solving for $n$ when a condition is met.
+
+For instance:
+\begin{enumerate}
+\item
+  How many times do I have a roll a die in order to get a 6?
+  (Of course this means \lq\lq What is the average number of times do I have
+  to roll a die ...".)
+\item
+  How many times do I have a roll a die in order to get two 6s?
+\item
+  How many times do I have a roll a die in order to get two consecutive 6s?
+\item
+  How times do I have a die in order
+  so that the chance of 
+  getting two consecutive sixes is greater than 1/2?
+\end{enumerate}
+
+See sections on infinite sample space and geometric distribution. 

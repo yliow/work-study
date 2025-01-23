@@ -1,0 +1,354 @@
+\section{Some Shorthand Notation and Computational Tools}
+
+The purpose of this section is to give you 
+the first bunch of theorems (computational
+tools) and a shorthand notation to begin computing big-O.
+(There will be more powerful theorems later.)
+I'll prove the theorems later. 
+Right now, I just want to make sure that you know how to use the tools.
+
+For a chain of inequalities, you have seen that if
+\[
+a \leq b \text{ and } b \leq c
+\] 
+then 
+\[
+a \leq c
+\]
+
+You have something similar in big-O:
+
+\begin{thm}
+If 
+\[
+f(n) = O(g(n)) \text{ and } g(n) = O(h(n))
+\]
+then
+\[
+f(n) = O(h(n))
+\]
+\end{thm}
+
+I'll prove this later. 
+Informally, you see that if $f(n)$ is bounded above
+by a multiple of $g(n)$ (for large $n$) and 
+$g(n)$ is bounded above by $h(n)$ (for large $n$),
+then $f(n)$ is bounded by a multiple of $h(n)$ (for large $n$).
+It's not too shocking.
+
+For instance, if you know that
+\[
+5n = O(3n^2 + 10) \text{ and }
+3n^2 + 10 = O(2n^5 + 1)
+\]
+then you can conclude
+\[
+5n = O(2n^5 + 1)
+\]
+Although the above deduction is true, it's kind of lengthy to write.
+Instead of saying:
+\[
+\text{\lq\lq}
+5n = O(3n^2 + 10) \text{ and } 3n^2 + 10 = O(2n^5 + 1)
+\text{''}
+\]
+you can say
+\[
+\text{\lq\lq}
+5n = O(3n^2 + 10) = O(2n^5 + 1)
+\text{''}
+\]
+They mean the same thing.
+With this notational shorthand let me repeat what I said earlier ...
+
+If you know that
+\[
+5n = O(3n^2 + 10) = O(2n^5 + 1)
+\]
+then you can conclude
+\[
+5n = O(2n^5 + 1)
+\]
+
+This is perfectly legal (mathematically speaking) and is understood
+by all mathematicians and computer scientists.
+
+In general something like
+\[
+f(n) = O(g(n)) = O(h(n)) = O(i(n))
+\]
+or 
+\begin{align*}
+f(n) 
+&= O(g(n)) \\ 
+&= O(h(n)) \\
+&= O(i(n))
+\end{align*}
+is the same as
+\begin{align*}
+f(n) = O(g(n)) \\
+g(n) = O(h(n)) \\
+h(n) = O(i(n)) \\
+\end{align*}
+Note that the above is not a theorem.
+It's a notational shorthand.
+It's similar to the shorthand that
+\[
+a \leq b \leq c
+\]
+means
+\[
+a \leq b \text{ and } b \leq c
+\]
+
+Here's another fact that you can use:
+\begin{thm}\mbox{}
+\begin{itemize}
+\item[(a)] If $f(n) = O(g(n))$, then
+\[
+f(n) + g(n) = O(g(n))
+\]
+\item[(b)]
+If $f(n) = O(g(n))$
+then
+\[
+f(n) + h(n) = O(g(n) + h(n))
+\]
+\end{itemize}
+\end{thm}
+
+This basically says that if a multiple of 
+$g(n)$ grows faster than $f(n)$, then
+the growth of $f(n) + g(n)$ is basically determined by $g(n)$.
+The second part says this: When computing big-O,
+you can replace a term by the big-O of that term.
+
+Here's another fact that should not shock you.
+Since we ignore constants, the following must be true:
+
+\begin{thm}
+If $c \neq 0$ is a constant then
+\[
+cf(n) = O(f(n))
+\]
+This include the obvious fact that
+\[
+f(n) = O(f(n))
+\]
+\end{thm}
+
+Let me collect all the above facts in one place ...
+
+\newpage
+
+
+\begin{thm} \mbox{}
+\begin{itemize}
+\item[(a)] $f(n) = O(g(n)) = O(h(n))$ $\implies$ $f(n) = O(h(n))$
+\item[(b)] $f(n) = O(g(n))$ $\implies$ $f(n) + g(n) = O(g(n))$
+\item[(c)] $f(n) = O(g(n))$ $\implies$ $f(n) + h(n) = O(g(n) + h(n))$
+\item[(d)] $cf(n) = O(f(n))$ 
+\item[(e)] $f(n) = O(f(n))$ 
+\item[(f)] $f(n) = O(h(n))$, $g(n) = O(h(n))$ $\implies$
+           $f(n) + g(n) = O(h(n))$ 
+\end{itemize}
+The above are theorems.
+The following is a notational convention:
+\begin{itemize}
+\item[(e)] The statement
+\[ 
+f(n) = O(g(n)) = O(h(n))
+\]
+or
+\begin{align*}
+f(n) &= O(g(n)) \\
+     &= O(h(n))
+\end{align*}
+means
+\[
+f(n) = O(g(n)) \text{ and } g(n) = O(h(n))
+\]
+\end{itemize}
+\end{thm}
+\qed
+
+That's enough for now.
+I'll give you more powerful computational tools.
+Let me show you how to use the theorems and notational shorthand.
+
+\newpage
+
+\begin{eg}
+Given
+\begin{align*}
+n       &= O(n^2)  \tag{1}\\
+1       &= O(n)    \tag{2}
+\end{align*}
+prove that
+\[
+10n^2 + 5n + 100 = O(n^2)
+\]
+\end{eg}
+
+[Note that the given facts
+$n = O(n^2)$ and 
+$1 = O(n)$
+are in fact true and can be proven easily.
+I'll prove all the related facts about polynomial big-O in detail later.]
+
+{\it Solution.}
+We make the following deductions that will be used later:
+\begin{align*}
+10n^2 &= O(n^2) & & \text{by Theorem 4d} \tag{3} \\
+5n    &= O(n)   & & \text{by Theorem 4d} \tag{4} \\
+100   &= O(1)   & & \text{by Theorem 4d} \tag{5}
+\end{align*}
+Now we prove the given statement:
+\begin{align*}
+&10n^2 + 5n + 100 \\
+&= O(10n^2 + 5n + 100) & & \text{by Theorem 4e} \\
+&= O(n^2 + 5n + 100)   & & \text{by (3), Theorem 4c} \\
+&= O(n^2 + n + 100)    & & \text{by (4), Theorem 4c} \\
+&= O(n^2 + n^2 + 100)  & & \text{by (1), Theorem 4c} \\
+&= O(2n^2 + 100)       \\
+&= O(2n^2 + 1)         & & \text{by (5), Theorem 4c}\\
+&= O(2n^2 + n)         & & \text{by (2), Theorem 4c}\\
+&= O(2n^2 + n^2)       & & \text{by (1), Theorem 4c}\\
+&= O(3n^2)             \\
+&= O(n^2)              & & \text{by Theorem 4d}
+\end{align*}
+By Theorem 4a, we conclude that
+\[
+10n^2 + 5n + 100 = O(n^2)
+\]
+\qed
+
+Note that there is no justification here:
+\begin{align*}
+...\\
+&= O(n^2 + n^2 + 100)  & & ... \\
+&= O(2n^2 + 100)       \\
+...
+\end{align*}
+because that's just basic algebra.
+
+Note also that there is more than one way to reach the 
+the conclusion.
+(Just like programming or a game of chess.)
+Can you find another proof?
+Maybe a shorter (and correct!) one?
+
+Here's another solution to the same problem ...
+
+\newpage
+
+\begin{eg}
+Given
+\begin{align*}
+n       &= O(n^2)  \tag{1}\\
+1       &= O(n)    \tag{2}
+\end{align*}
+prove that
+\[
+10n^2 + 5n + 100 = O(n^2)
+\]
+\end{eg}
+
+{\it Solution.}
+First we analyze the terms of the given sum.
+The first term gives us
+\begin{align*}
+10n^2 = O(n^2) & & \text{by Theorem 4d} \tag{3}
+\end{align*}
+The second term gives us
+\begin{align*}
+5n 
+&= O(n)   & & \text{by Theorem 4d} \\
+&= O(n^2) & & \text{by (1)}     
+\end{align*}
+which implies
+\begin{align*}
+5n = O(n^2) & & \text{by Theorem 4a} \tag{4}
+\end{align*}
+And the third term gives us
+\begin{align*}
+100
+&= O(1)   & & \text{by Theorem 4d} \\
+&= O(n)   & & \text{by (2)}        \\
+&= O(n^2) & & \text{by (1)}        
+\end{align*}
+which implies
+\begin{align*}
+100 &= O(n^2) & & \text{by Theorem 4a} \tag{5}
+\end{align*}
+Using the above results, we have
+\begin{align*}
+  10n^2 + 5n &= O(n^2) & & \text{by (3), (4), Theorem 4f} \tag{6}
+\end{align*}
+and
+\begin{align*}
+10n^2 + 5n + 100 &= O(n^2) & & \text{by (5), (6), Theorem 4f}
+\end{align*}
+\qed
+
+
+Make sure you study the above two proofs.
+
+One more example ...
+
+\newpage
+
+
+\begin{eg}
+Given
+\begin{align*}
+n       &= O(n^2)  \tag{1} \\
+n^{1.9} &= O(n^2)  \tag{2} \\
+\sin n  &= O(1)    \tag{3} \\
+\ln n   &= O(n)    \tag{4} \\
+1       &= O(n)    \tag{5}
+\end{align*}
+show that
+\[
+n^{1.9} + 10\sin n + 5\ln n = O(n^2)
+\]
+\end{eg}
+
+{\it Solution.}
+We have
+\begin{align*}
+10 \sin n 
+&= O(\sin n) & & \text{by Theorem 4d} \\
+&= O(1)      & & \text{by 3} 
+\end{align*}
+Therefore by Theorem 4a
+\[
+10\sin n = O(1) \tag{5}
+\] 
+
+We also have
+\begin{align*}
+5 \ln n = O(\ln n)  & & \text{by Theorem 4d} \tag{6}
+\end{align*}
+
+Therefore
+\begin{align*}
+&n^{1.9} + 10\sin n + 5 \ln n  \\
+&= O(n^{1.9} + 10\sin n + 5 \ln n) & & \text{by Theorem 4e} \\
+&= O(n^2 + 10\sin n + 5 \ln n)     & & \text{by (2), Theorem 4c} \\
+&= O(n^2 + 1 + 5 \ln n)            & & \text{by (2), Theorem 4c}\\ 
+&= O(n^2 + n + 5 \ln n)            & & \text{by (5), Theorem 4c}\\ 
+&= O(n^2 + n^2 + 5 \ln n)          & & \text{by (1), Theorem 4c} \\
+&= O(2n^2 + 5 \ln n)               \\
+&= O(2n^2 + n)                     & & \text{by (6), Theorem 4c}\\
+&= O(2n^2 + n^2)                   & & \text{by (1), Theorem 4c}\\
+&= O(3n^2)                         \\
+&= O(n^2)                          & & \text{by Theorem 4d}
+\end{align*}
+Therefore by Theorem 4a
+\[
+n^{1.9} + 10\sin n + 5n \ln n = O(n^2)
+\]
+
+
+[EXERCISES]

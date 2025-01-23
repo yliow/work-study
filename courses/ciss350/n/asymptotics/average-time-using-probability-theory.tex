@@ -1,0 +1,124 @@
+%-*-latex-*-
+\section{Average Time Using Probability Theory}
+
+Now I'm going to rephrase our computations of the various
+average times in terms of probability theory.
+Of course you'll get the same results.
+So why do we bother?
+Because by doing so we can bring in facts/formulas/techniques/big guns
+from probability theory without having to re-invent the wheel.
+
+Recall that for out linear search, we looked at this average time scenario:
+\begin{itemize}
+\li \verb!target! is at index 0, 1, 2, ..., n - 1 in array \verb!x!
+\li \verb!target! is not in array \verb!x!
+\end{itemize}
+When phrased in terms of probability theory the above are called
+events.
+For instance \lq\lq \verb!target! is at index 2'' is an event.
+However I want to simplify this and just call it \lq\lq 2''.
+I'm going to call the event \lq\lq \verb!target! is not in the array''
+the event \lq\lq $n$''.
+So here's the set of all possible events
+\[
+S = \{0, 1, 2, ..., n\}
+\]
+The set of all events of a particular \textit{experiment} is called
+the sample space of the experiment.
+Of course in this case the \textit{experiment} is the act of finding
+\verb!target! in \verb!x!.
+
+Now let me add our \lq\lq frequency'' assumption:
+\begin{itemize}
+\li \verb!target! is at index 0, 1, 2, ..., n - 1 in array \verb!x!
+\li \verb!target! is not in array \verb!x!
+\li All the above cases are equally likely.
+\end{itemize}
+
+In terms of probability theory, this is the same as assignment a measure
+of likelyhood to all events such that they add up to 1 (i.e. to 100\%).
+I'm going to using a function for this assignment of measure of likelihood:
+\[
+p: S \rightarrow \R
+\]
+and of course since the events in $S$ are equally likely and there are 
+$n + 1$
+events, the function $p$ is given by
+\[
+p(x) = \frac{1}{n + 1}
+\]
+
+Next I will attach a quantity to each event that I want to count or measure.
+In our case, I attach to each event the runtime.
+For instance for the event \lq\lq \verb!target! is at index 2''
+I attach the quantity $T_2$.
+This assignment is called a random variable.
+I'm going to use $X$ for this assignment.
+So here's the assignment:
+\[
+X: S \rightarrow \{T_0, T_1, ..., T_n\}
+\]
+where
+\[
+X(i) = T_i
+\]
+
+Now everything is set up.
+
+So what's our average time? Or in probability theory we would say
+what is the \lq\lq expected'' time or 
+the \lq\lq expectation of $X$''?
+It's written $E[X]$ and the formula is what I have already shown you:
+\[
+E[X] = \frac{1}{n + 1} (T_0 + T_1 + \cdots T_n)
+\]
+However I want to rewrite it in a different form:
+\begin{align*}
+E[X] 
+&= \frac{1}{n + 1} (T_0 + T_1 + \cdots + T_n) \\
+&= \frac{1}{n + 1} T_0 + \frac{1}{n+1}T_1 + \cdots + \frac{1}{n + 1}T_n \\
+&= p(0) X(0) + p(1) X(1) + \cdots + p(n) X(n) \\
+&= \sum_{x \in S} p(x) X(x)
+\end{align*}
+
+Here's a summary of how to setup quantities in order to use probabily
+theory to compute average values:
+\begin{itemize}
+\li State your experiment. In our case: \lq\lq
+Using the linear search algorithm, 
+find the index where \verb!target! occurs in an array \verb!x!
+of size \verb!n!. If it's not found set index to -1.''
+\li State the sample space, i.e., all the events.
+In our case: 
+\lq\lq
+The index is 0, 1, 2, ..., \verb!n! - 1 if \verb!target!
+is in \verb!x! or the index is -1 when \verb!target! is not in \verb!x!.
+To simplify notation we call these events 0, 1, 2, $n-1$, $n$.
+Let $S = \{0, 1, 2, ..., n\}$.
+\li State the probability function.
+In our case (because we assume the events are equally likely):
+\[
+p: S \rightarrow \R
+\]
+where 
+\[
+p(x) = \frac{1}{n + 1}
+\]
+\li State the random variable.
+In our case: \lq\lq
+\[
+X : S \rightarrow \R
+\]
+where
+\[
+X(i) = A + Bn, \,\,\,\,\, i = 0, 1, 2, ..., n - 1
+\]
+and 
+\[
+X(n) = C + Dn
+\]
+\li Compute the average or the expectation of $X$ using
+\[
+E[X] = \sum_{x \in S} p(x) X(x)
+\]
+\end{itemize}

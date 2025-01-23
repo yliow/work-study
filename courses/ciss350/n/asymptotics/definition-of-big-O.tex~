@@ -1,0 +1,894 @@
+\section{Definition of big-O}
+
+You are now ready for the definition of big-O, at least graphically.
+
+Suppose $f(n)$ and $g(n)$ are functions (of $n$ of course).
+We say that $f(n)$ is the big-O of $g(n)$ and we
+write 
+\[
+f(n) = O(g(n))
+\]
+if a {\it multiple} of $g(n)$ beats $f(n)$ not necessarily for all $n$
+but for {\it all large values} of $n$.
+(I have to make a small adjustment later but this is ood enough for now.)
+
+This means that given $f(n)$ and $g(n)$ 
+in order to say $f(n) = O(g(n))$, I need to find a $C$ such that
+$Cg(n)$ beats $f(n)$ for $n$ beyond a certain point.
+
+Let me give you some examples.
+Suppose we're looking at this function
+\[
+f(n) = 2n + 3
+\]
+
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(domain='0:10', num_points=2, vars=['n','y'])
+p.add('2*n + 3', color='red', python=1, pin='below')
+print p
+\end{python}
+Let's compare that to
+\[
+g(n) = n^2
+\]
+Let's put them together in a plot:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(line_width=1, domain='0:10', vars=['n','y'])
+p.add('2*n+3', color='red', python=1, pin='below')
+p.add('n**2', color='blue', python=1, pin='below', num_points=20)
+print p
+\end{python}
+You see that $f(n) = 2n + 3$ is {\it at worse} $g(n) = n^2$
+for large values of $n$, i.e.,
+\[
+f(n) \leq g(n) \text{ for $n \geq 3$}
+\]
+If I choose $C = 1$ and $N = 3$, then for $n \geq N = 3$, 
+we have (from the graph):
+\[
+f(n) \leq Cg(n)
+\]
+So we say that 
+\[
+f(n) = O(g(n))
+\]
+
+
+
+
+Here's another example.
+
+
+
+Suppose
+\[
+f(n) = 3n^2 + 5 + 10 n \sin (n)
+\]
+Here's the plot:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(line_width=1, domain='0:10', num_points=40, vars=['n','y'])
+p.add('3*n**2 + 5 + 10*n * sin(n)', color='red', python=1, pin='left')
+print p
+\end{python}
+Let's see if we can {\it cap} it with 
+\[
+g(n) = n
+\]
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(line_width=1, domain='0:10', num_points=40, vars=['n','y'])
+p.add('3*n**2 + 5 + 10*n * sin(n)', color='red', python=1, pin='left')
+p.add('n', color='blue', python=1, pin='above', num_points=2)
+print p
+\end{python}
+Not good.
+But don't forget that if we do want to say $f(n) = O(g(n))$,
+then we are allowed to use multiples of $g(n)$.
+So let's try
+\[
+10g(n) = 10 n
+\]
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(line_width=1, domain='0:10', num_points=50, vars=['n','y'])
+p.add('3*n**2 + 5 + 10*n * sin(n)', color='red', python=1, pin='left')
+p.add('10*n', color='blue', python=1, pin='below', num_points=2)
+print p
+\end{python}
+
+Better!!!
+But just by looking at the graph,
+my multiple of $g(n)$ must at least 
+overcome the bump of $f(n)$ at around $n=8.5$.
+Let's try 
+\[
+30g(n) = 30 n
+\]
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(line_width=1, domain='0:10', vars=['n','y'])
+p.add('3*n**2 + 5 + 10*n * sin(n)', color='red', python=1, pin='left')
+p.add('30*n', color='blue', python=1, pin='below', num_points=2)
+print p
+\end{python}
+
+Finally let's try
+\[
+50g(n) = 50n
+\]
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(vars=['n','y'])
+p.add('3*n**2 + 5 + 10*n * sin(n)', color='red', python=1, pin='right', pin_x=5)
+p.add('50*n', color='blue', python=1, pin='left', num_points=2)
+print p
+\end{python}
+
+The picture is not that clear for small $n$ values.
+So let's zoom in near $n = 0$ and see how $50n$ performs
+against $f(n)$:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(domain='0:1', vars=['n'])
+p.add('3*n**2+5+10*n*sin(n)', color='red', python=1, pin='below')
+p.add('50*n', color='blue', python=1, pin='left', num_points=2)
+print p
+\end{python}
+Clearly from the plot for $0 \leq n \leq 1$, we see that
+$50g(n)$ beats $f(n)$ after 0.1.
+
+So from the previous two graphs
+can we say that for $n \geq 1$, $50g(n)$ beats $f(n)$? ... i.e.,
+can we say
+\[
+f(n) \leq 50 g(n) \text{ for $n \geq 1$}
+\]
+and conclude that $f(n) = O(g(n))$?
+
+NO!!!
+
+The problem is that our graphs cannot show {\it all}
+large values of $n$.
+In fact when we plot for $n$ up to 20, we see that trend changes:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(domain='0:20', vars=['n'])
+p.add('3*n**2 + 5 + 10*n * sin(n)', color='red', python=1, pin='below', pin_x=12)
+p.add('50*n', color='blue', python=1, pin='above', num_points=2)
+print p
+\end{python}
+
+It's even more revealing when I plot up to $n = 100$:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(domain='1:100', num_points=300, vars=['n'])
+p.add('3*n**2 + 5 + 10*n * sin(n)', color='red', python=1, pin='left')
+p.add('50*n', color='blue', python=1, pin='above', num_points=2)
+print p
+\end{python}
+
+Clearly {\it no} straight line is going to dominate $f(n)$ because
+it seems that the graph of $f(n)$ {\it bends} up (with wiggles along the way).
+
+Here's an important advice:
+\[
+\text{{\it GRAPHS ARE USEFUL TOOLS BUT THEY CAN DECEIVE!!!}}
+\]
+
+Let's see more of the graph to see if the pattern of bending
+upward with wiggles persists.
+Let's plot up to $n = 200$:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(domain='1:200', vars=['n'])
+p.add('3*n**2 + 5 + 10*n * sin(n)', color='red', python=1, pin='left', num_points=200)
+p.add('50*n', color='blue', python=1, pin='above', num_points=2)
+print p
+\end{python}
+
+So let's abandon our $g(n) = n$ altogether.
+
+What should we use to chase $f(n)$?
+Of course you know that $g(n) = n^2$ is a parabola and bends up.
+But does it increase (or bends) fast enough?
+If you look at 
+\[
+f(n) = 3n^2 + 5 + 10 n \sin (n)
+\]
+You see that it is made up of three functions:
+$3n^2$, $5$, and $10n \sin n$.
+Of course $3n^2$ is going to beat $5$.
+So the growth of $3n^2 + 5$ is primarily determined by $3n^2$.
+Let's look at them together in a graph:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(domain='1:10', num_points=30, vars=['n'])
+p.add('3*n**2', color='blue', python=1, pin='below')
+p.add('3*n**2 + 5', color='blue', python=1, pin='above')
+print p
+\end{python}
+Of course since we can control $f(n)$ with multiples
+later we just need to choose a huge multiple of $3n^2$ to 
+beat $3n^2 + 5$, for instance $1000000(3n^2)$.
+
+What about $10n \sin n$?
+If we plot that with $3g(n) = 3n^2$ we get:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(domain='1:10', vars=['n'])
+p.add('3*n**2', color='blue', python=1, pin='left', num_points=30)
+p.add('10 * n * sin(n)', color='blue', python=1, pin='below')
+print p
+\end{python}
+To make sure that the pattern persists, I'm going to plot up
+to $n = 100$:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(domain='1:100', vars=['n'])
+p.add('3*n**2', color='blue', python=1, pin='left', num_points=30)
+p.add('10 * n * sin(n)', color='blue', python=1, pin='above', num_points=200)
+print p
+\end{python}
+
+At this point, we suddenly recall that the sine function
+wobbles between the value of $-1$ and $1$.
+Therefore $10n \sin n$ wobbles between $10n (-1)$ and $10n (+1)$,
+i.e., $10n \sin n$ can be at most $10n$.
+Let's check that with a plot for $n = 1$ to $n = 20$:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(domain='1:20', vars=['n'])
+p.add('10 * n', color='blue', python=1, pin='above', num_points=2, pin_x=11)
+p.add('10 * n * sin(n)', color='blue', python=1, pin='left', pin_x=17, num_points=150)
+print p
+\end{python}
+
+AHA!!!
+
+This means that $3n^2$ will beat $10n \sin n$ for large values of $n$.
+
+Altogether, this means that the growth of 
+\[
+f(n) = 3n^2 + 5 + 10 n \sin (n)
+\]
+is ultimately determined by $3g(n) = 3n^2$
+and therefore a higher multiple of $g(n) = n^2$ will beat
+$f(n) = 3n^2 + 5 + 10 n \sin (n)$ for large values of $n$.
+
+Here's the plot of $3g(n) = 3n^2$ and $f(n)$ for $0 \leq n \leq 10$:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(vars=['n'])
+p.add('3*n**2 + 5 + 10*n * sin(n)', color='red', python=1, pin='left')
+p.add('3*n**2', color='blue', python=1, pin='below', num_points=20)
+print p
+\end{python}
+It does seem like $f(n)$ winds itself around $3g(n) = 3n^2$.
+To get a better feel for the pattern of things, I'm going 
+to plot up to $n = 100$:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(domain='1:100', vars=['n'])
+p.add('3*n**2 + 5 + 10*n * sin(n)', color='red', python=1, pin='left', num_points=200)
+p.add('3*n**2', color='blue', python=1, pin='below', num_points=20)
+print p
+\end{python}
+and then up to $n = 500$:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(domain='1:500', vars=['n'])
+p.add('3*n**2 + 5 + 10*n * sin(n)', color='red', python=1, pin='left', num_points=200)
+p.add('3*n**2', color='blue', python=1, pin='below', num_points=20)
+print p
+\end{python}
+
+GRRREAT!!!
+
+I see that 
+$f(n) = 3n^2 + 5 + 10 n \sin (n)$
+follows $3g(n)$ very tightly.
+So to beat $f(n)$, let me try $4g(n) = 4n^2$
+(... well ... I'm sure $(3.5)g(n)$ works too ... but I'll stick to $4g(n)$):
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(domain='1:500', vars=['n'])
+p.add('3*n**2 + 5 + 10*n * sin(n)', color='red', python=1, pin='below', pin_x=300, num_points=200)
+p.add('4*n**2', color='blue', python=1, pin='above')
+print p
+\end{python}
+
+To see roughly when $4g(n) = 4n^2$ beats 
+$f(n) = 3n^2 + 5 + 10n  \sin n$, I zoom in and plot 
+the graphs for $0 \leq n \leq 30$:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(domain='1:30', vars=['n'])
+p.add('3*n**2+5+10*n*sin(n)', color='red', python=1, pin='below', pin_x=17, num_points=100)
+p.add('4*n**2', color='blue', python=1, pin='above', num_points=20)
+print p
+\end{python}
+It looks like $4g(n)$ definitely beats $f(n)$ for {\it all} $n$
+such that $n \geq 10$.
+(Actually I can zoom in further and see if \lq\lq $n \geq 9$''
+works as well ... but I'll just use \lq\lq $n \geq 10$''.)
+
+That's it!!!
+
+We can now say that 
+\[
+3n^2 + 5 + 10 n \sin (n) \leq 4n^2 \text{ for $n \geq 10$}
+\]
+Therefore, if I choose $C = 4$ and $N = 10$, I can say that
+\[
+f(n) \leq C g(n) \text{ for $n \geq N$}
+\]
+This means that I can now say
+\[
+f(n) = O(g(n))
+\]
+
+This is more or less the formal idea of big-O.
+There is one detail to add:
+I need to add that you should add the 
+{\it absolute value signs}
+to both sides of the above inequality.
+So (finally!) here's the formal definition of big-O:
+
+Let $f(n)$ and $g(n)$ be functions.
+We write 
+\[
+f(n) = O(g(n))
+\]
+and say that 
+\[
+\text{\lq\lq $f(n)$ is big-O of $g(n)$''} 
+\]
+if we can find a $C$ and an $N$ such that 
+for all $n \geq N$, we have
+\[
+|f(n)| \leq C|g(n)|
+\]
+
+Here's our original problem but this time I'm plotting
+$|3n^2 + 5 + 10 n \sin (n)|$ 
+and $4|n^2|$:
+
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(line_width=1, width='5in', height='3in', domain='1:20')
+p.add('abs(3*x**2 + 5 + 10*x * sin(x))', color='red', python=1, pin='below', pin_message='|3*x^2+5+10x sin(x)|', pin_x=12, num_points=200)
+p.add('4*x**2', color='blue', python=1, pin='above', num_points=20)
+print p
+\end{python}
+
+Well ... what do you know ...
+in this case it seems like both functions are positive anyway.
+(Yes, they {\it are} positive for all $n \geq 0$.
+Do you see why?)
+Therefore the graph looks the same and 
+so I don't have to change my choice of $C$ and $N$.
+Phew!!!
+So now I'm ready to present my solution to this problem ...
+
+\newpage
+\begin{eg}
+Show graphically that if 
+$f(n) = 3n^2 + 5 + 10 n \sin (n)$
+and $g(n) = n^2$, then
+\[
+f(n) = O(g(n))
+\]
+\end{eg}
+
+{\it Solution.}
+Let $N = 10$ and $C = 4$.
+From the following graphs:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(domain='1:500', vars=['n'])
+p.add('3*n**2 + 5 + 10*n * sin(n)', color='red', python=1, pin='below', 
+pin_x=300, num_points=200, pin_message='|3n^2 + 5 + 10n sin(n)|')
+p.add('4*n**2', color='blue', python=1, pin='above', 
+pin_message='4|n^2|')
+print p
+\end{python}
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(line_width=1, width='5in', height='3in', domain='1:30')
+p.add('3*x**2 + 5 + 10*x * sin(x)', color='red', python=1, pin='below', 
+pin_x=17, num_points=100,
+pin_message='|3n^2 + 5 + 10n sin(n)|'
+)
+p.add('4*x**2', color='blue', python=1, pin='above', num_points=20,
+pin_message='4|n^2|')
+print p
+\end{python}
+we see that, for $n \geq N$, we have:
+\[
+|3n^2 + 5 + 10n \sin(n)| \leq C |n^2|
+\]
+i.e.,
+\[
+|f(n)| \leq C|g(n)|
+\]
+Hence $f(n) = O(g(n)$.
+\qed
+
+Remember that technically speaking you cannot prove a mathematical
+fact like $f(n) = O(g(n))$ using graphs
+because graph can lie. 
+How would you know that the graph 
+of $|f(n)|$ won't suddenly shoot up and overtake $4|g(n)|$ at 
+$n = 1000000000000$?
+Later, I'll show you how to prove big-O statements without a shadow of doubt.
+
+Now, let me give you another example.
+Suppose I change my $f(n)$ to {\it this}:
+\[
+f(n) = -3n^2 + 5 - 10 n \sin (n)
+\]
+then when I plot
+$|-3n^2 + 5 - 10 n \sin (n)|$ 
+and $4|n^2|$ for $0 \leq n \leq 5$,
+I get
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(domain='0:5', vars=['n'])
+p.add('abs(-3*n**2 + 5 - 10*n * sin(n))', color='red', python=1, pin='below', 
+pin_message='|-3n^2+5-10n sin(n)|', pin_x=3.5)
+p.add('4*n**2', color='blue', python=1, pin='above', num_points=20)
+print p
+\end{python}
+and then for $0 \leq n \leq 100$:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(domain='0:100', vars=['n'])
+p.add('abs(-3*n**2 + 5 - 10*n * sin(n))', color='red', python=1, pin='below', pin_message='|-3n^2+5-10n sin(n)|', pin_x = 50, num_points=100)
+p.add('4*n**2', color='blue', python=1, pin='above', num_points=20)
+print p
+\end{python}
+In this case $n^2$ still works, i.e., 
+$-3n^2 + 5 - 10 n \sin (n) = O(n^2)$.
+Also, it seems that $4n^2$ breaks away from 
+$|-3n^2+5-10n \sin(n)|$ around $n = 20$.
+So let's plot the graphs for $0 \leq n \leq 20$:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(domain='0:20', vars=['n'])
+p.add('abs(-3*n**2 + 5 - 10*n * sin(n))', color='red', python=1, pin='below', pin_message='|-3n^2+5-10n sin(n)|', pin_x=11.5)
+p.add('4*n**2', color='blue', python=1, pin='above', num_points=20)
+print p
+\end{python}
+Clearly for $n \geq 10$, $4g(n)$ beats $|f(n)$.
+So I'm going to pick $N = 10$.
+
+Now I'm ready to present this ...
+
+\newpage
+
+\begin{eg}
+Let $f(n) = -3n^2+5-10n \sin(n)$ and $g(n) = n^2$.
+Show graphically that 
+\[
+f(n) = O(g(n))
+\]
+\end{eg}
+
+{\it Solution.}
+From the following graphs:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(domain='0:20', vars=['n'])
+p.add('abs(-3*n**2 + 5 - 10*n * sin(n))', color='red', python=1, pin='below', 
+pin_message='|-3n^2+5-10n sin(n)|', pin_x=12)
+p.add('4*n**2', color='blue', python=1, pin='above', num_points=20)
+print p
+\end{python}
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(domain='0:100', vars=['n'])
+p.add('abs(-3*n**2 + 5 - 10*n * sin(n))', color='red', python=1, pin='below', pin_message='|-3n^2+5-10n sin(n)|', pin_x=50)
+p.add('4*n**2', color='blue', python=1, pin='above', num_points=20)
+print p
+\end{python}
+we see that if we choose $C = 4$ and $N  = 20$, then for $n \geq N$,
+we have
+\[
+|-3n^2+5-10n \sin(n)| \leq 4|n^2|
+\]
+i.e.,
+\[
+|f(n)| \leq C|g(n)|
+\]
+Hence $f(n) = O(g(n))$.
+\qed
+
+\newpage
+
+It's not surprising that if 
+\[
+3n^2 + 5 + 10 n \sin (n) = O(n^2)
+\]
+then it is also true that 
+\[
+3n^2 + 5 + 10 n \sin (n) = O(n^3)
+\]
+since $n^3$ grows faster than $n^2$.
+So there are many possible functions to \lq\lq control''
+$3n^2 + 5 + 10n \sin(n)$ from above.
+Also, if
+\[
+|3n^2 + 5 + 10 n \sin (n)| \leq C|n^2|
+\]
+then of course if you replace $C$ by a large value, say $C + 1423$,
+then of course
+\[
+|3n^2 + 5 + 10 n \sin (n)| \leq (C + 1423)|n^2|
+\]
+is still true for $n \geq N$.
+Furthermore, this is also true if you replace $N$ by a larger value
+such as $N + 15313$.
+Therefore the choice of $C$ and $N$ is not unique.
+
+
+Here's another example.
+
+Let
+\[
+f(n) = \frac{2n^5}{1 + n} \sin \frac{1000}{n} - 100
+\]
+Let's find some function $g(n)$ of the form $n$ or $n^2$ or $n^3$ or ...
+such that $f(n) = O(g(n))$.
+
+Let's have a few plots to get a feel for the function.
+Here's the plot for $0 \leq n \leq 10$:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(domain='0:10', num_points=2, vars=['n'])
+p.add('n**5/(1 + n) * sin(1000/n) - 100', color='red', python=1, pin='below', 
+num_points=1000, pin_x=3)
+print p
+\end{python}
+
+Clearly $g(n)$ can't be $n^0 = 1$ (i.e., no multiple of
+$g(n) = 1$ is going to beat $f(n)$ ... right?) 
+so I'm going to skip that.
+I'll try higher powers.
+
+With $g(n) = n$:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(vars=['n'])
+p.add('n**5/(1 + n) * sin(1000/n) - 100', color='red', python=1, 
+pin='left', num_points=1000, pin_x=9.5)
+p.add('n', color='blue', python=1, pin='left', num_points=2, pin_message='')
+print p
+\end{python}
+
+With $g(n) = n^2$:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(vars=['n'])
+p.add('n**5/(1 + n) * sin(1000/n) - 100', color='red', python=1, 
+pin='left', num_points=1000, pin_x=9.5)
+p.add('n**2', color='blue', python=1, pin='left', num_points=20, pin_message='')
+print p
+\end{python}
+Wow. $f(n)$ is exploding so fast that I can't even see $n^2$ bending up at
+all ...
+
+With $g(n) = n^3$:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(vars=['n'])
+p.add('n**5/(1 + n) * sin(1000/n) - 100', color='red', python=1, 
+pin='left', num_points=1000, pin_x=9.5)
+p.add('n**3', color='blue', python=1, pin='left', num_points=50, pin_message='')
+print p
+\end{python}
+OK ... at least I can see $n^3$ bending up a little. 
+But it's still not high enough to bound $f(n)$.
+
+With $g(n) = n^4$:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(vars=['n'])
+p.add('n**5/(1 + n) * sin(1000/n) - 100', color='red', python=1, 
+pin='left', num_points=1000, pin_x=9.5)
+p.add('n**4', color='blue', python=1, pin='left', num_points=50)
+print p
+\end{python}
+Aha! $n^4$ beats $f(n)$!!!
+
+But wait ... 
+we recall that we should plot the {\it absolute value} of 
+$|f(n)|$ and $|g(n)|$!
+Duh!!!
+Note that it won't change $|g(n)|$ since $g(n) = n^4$ is positive.
+But $|f(n)|$ will look different from $f(n)$.
+
+Here's the plot for $|f(n)|$ and $g(n) = n^4$ for $0 \leq n \leq 10$:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(vars=['n'], domain='0:10')
+p.add('abs(n**5/(1 + n) * sin(1000/n) - 100)', color='red', python=1, 
+pin='above left', num_points=1000, pin_message=r'|(n^5/(1 + n) sin(1000/n) - 100|', pin_x=9)
+p.add('n**4', color='blue', python=1, pin='left', num_points=200, pin_x=10)
+print p
+\end{python}
+
+You notice that $g(n)$ beats $|f(n)|$ around 
+$5 \leq n \leq 6.5$.
+Let me zoom in.
+Here's the plot for $3 \leq n \leq 7$:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(vars=['n'], domain='3:7')
+p.add('abs(n**5/(1 + n) * sin(1000/n) - 100)', color='red', python=1, 
+pin='above', pin_x = 1.6, 
+num_points=1000, pin_message=r'|n^5/(1+n) sin(1000/n) - 100|')
+p.add('n**4', color='blue', python=1, pin='below', pin_x=2.6, num_points=50)
+print p
+\end{python}
+
+From the graphs we see that for $n \geq 6$
+\[
+\left| 
+\frac{n^5}{1 + n} \sin \frac{1000}{n} - 100
+\right| 
+\leq 
+\left|
+n^4
+\right|
+\]
+So if I choose $N = 6$ and $C = 1$, then for $n \geq N$,
+\[
+\left|
+\frac{n^5}{1 + n} \sin \frac{1000}{n} - 100
+\right| 
+\leq C
+\left|
+n^4
+\right|
+\]
+i.e.,
+\[
+|f(n)| \leq C|g(n)|
+\]
+Hence
+\[
+f(n) = O(n^4)
+\]
+
+So here's the solution ...
+
+\newpage
+
+\begin{eg}
+Let 
+\[ 
+f(n) = \frac{n^5}{1 + n} \sin \frac{1000}{n} - 100
+\]
+Find the smallest integer $k$ such that for $g(n) = n^k$, we have
+\[
+f(n) = O(g(n))
+\]
+\end{eg}
+
+{\it Solution.}
+The following are plots of $f(n)$ and $g(n) = n^4$:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(domain='0:100', vars=['n'])
+p.add('abs(n**5/(1 + n) * sin(1000/n) - 100)', color='red', python=1, 
+pin='above left', num_points=1000, pin_x=82, 
+pin_message='|n^5/(1+n) sin(1000/n) - 100|')
+p.add('n**4', color='blue', python=1, pin='left', num_points=50, pin_x=97)
+print p
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(domain='3:7', vars=['n'])
+p.add('abs(n**5/(1 + n) * sin(1000/n) - 100)', color='red', python=1, 
+pin='left', num_points=1000, pin_message='|n^5/(1+n) sin(1000/n) - 100|',
+pin_x=6.2)
+p.add('n**4', color='blue', python=1, pin='left', num_points=200, pin_x=7)
+print p
+\end{python}
+If we choose $N = 6$ and $C = 1$,
+we see that for $n \geq N$,
+\[
+\left|
+\frac{n^5}{1 + n} \sin \frac{1000}{n} - 100
+\right| 
+\leq C
+\left|
+n^4
+\right|
+\]
+i.e.,
+\[
+|f(n)| \leq C|g(n)|
+\]
+Hence
+\[
+f(n) = O(n^4)
+\]
+\qed
+
+
+
+
+\newpage
+\begin{ex}
+Let 
+\[
+f(n) = 20 \frac{n^5}{n^3 + 1} + 5n^3 \cos n + 7^8
+\]
+Find the smallest integer $k$ such that $f(n) = O(n^k)$ using
+plots.
+Supply a $C$ and an $N$ such that 
+\[
+|f(n)| \leq C |g(n)|
+\]
+for $n \geq N$.
+Do it in the following steps:
+\begin{itemize}
+\item[(a)] 
+Using a plot, find the smallest positive integer $k$ such that
+$20 \frac{n^5}{n^3 + 1}$ 
+is $\leq Cn^k$ for some $C$ 
+and for large values of $n$.
+\item[(b)] 
+Using a plot, find the smallest positive integer $k$ such that
+$|5n^3 \cos n|$ 
+is $\leq Cn^k$ for some $C$ 
+and for large values of $n$.
+\item[(c)] 
+Using a plot, find the smallest positive integer $k$ such that
+$7^8$
+is $\leq Cn^k$ for some $C$
+and for large values of $n$.
+\item[(d)] Let $k$ be the largest $k$ values from (a)-(c).
+Plot $n^k$ and $f(n)$ from $n = 0$ to a large value.
+\item[(e)] Find a suitable $C$ if necessary to move $n^k$ beyond
+$f(n)$ for large values of $n$.
+\item[(f)] Zoom in on small values of $n$ and find a suitable $N$
+  such that for $n \geq N$, $|f(n)| \leq C|g(n)|$ for $n \geq N$.
+\end{itemize}
+\qed
+\end{ex}
+
+
+
+\newpage
+\begin{ex}
+Let
+\[
+f(n) = 7n^{4} + 20 
+\]
+for $n \geq 1$.
+Using plots, find the smallest integer $k$ such that $f(n) = O(n^k)$.
+Supply a $C$ and an $N$ such that 
+\[
+|f(n)| \leq C |g(n)|
+\]
+for $n \geq N$.
+\qed
+\end{ex}
+
+
+
+
+\newpage
+\begin{ex}
+Let
+\[
+f(n) = 0.31415 n^{4} + 1000n^3 
+\]
+for $n \geq 1$.
+Using plots, find the smallest integer $k$ such that $f(n) = O(n^k)$.
+Supply a $C$ and an $N$ such that 
+\[
+|f(n)| \leq C |g(n)|
+\]
+for $n \geq N$.
+\qed
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Let
+\[
+f(n) = n^{4} - 1234n^3 
+\]
+for $n \geq 1$.
+Using plots, find the smallest integer $k$ such that $f(n) = O(n^k)$.
+Supply a $C$ and an $N$ such that 
+\[
+|f(n)| \leq C |g(n)|
+\]
+for $n \geq N$.
+\qed
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Let
+\[
+f(n) = 7n^{2.7} \ln n + 20 \frac{n^5}{n + 1}
+\]
+for $n \geq 1$.
+Using plots, find the smallest integer $k$ such that $f(n) = O(n^k)$.
+Supply a $C$ and an $N$ such that 
+\[
+|f(n)| \leq C |g(n)|
+\]
+for $n \geq N$.
+[NOTE: $\ln = \log_e$.]
+\qed
+\end{ex}
+
+
+
+\newpage
+\begin{ex}
+Let
+\[
+f(n) = -3n^{3.5} + 42 \frac{n^5}{n^2 + 1}
+\]
+Using plots, 
+find the smallest integer $k$ 
+such that $f(n) = O(n^k)$.
+Supply a $C$ and an $N$ such that 
+\[
+|f(n)| \leq C |g(n)|
+\]
+for $n \geq N$.
+\qed
+\end{ex}
+
+
+
+\newpage
+\begin{ex}
+Let
+\[
+f(n) = -3n^{3.5} + 42 \frac{n^5}{n^2 + 1}
+\]
+Using plots, 
+find the smallest {\it real number} $k$ (not necessarily an integer) 
+such that $f(n) = O(n^k)$.
+Supply a $C$ and an $N$ such that 
+\[
+|f(n)| \leq C |g(n)|
+\]
+for $n \geq N$.
+\qed
+\end{ex}
+
+
+
+\newpage
+\begin{ex}
+Let
+\[
+f(n) = 123456789 + (-1)^n n^3
+\]
+Using plots, 
+find the smallest {\it real number} $k$ (not necessarily an integer) 
+such that $f(n) = O(n^k)$.
+Supply a $C$ and an $N$ such that 
+\[
+|f(n)| \leq C |g(n)|
+\]
+for $n \geq N$.
+\qed
+\end{ex}
+
