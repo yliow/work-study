@@ -1,0 +1,218 @@
+%-*-latex-*-
+\sectionthree{Infinite sample space and geometric distribution}
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+
+In the section on Binomial distribution, I perform a random experiment that is a fixed
+length sequence of a Bernoulli trial (a random experiment with two outcomes).
+Now I'm going to consider a sequence of experiments that does not have a fixed length.
+
+I'm going to slightly generalize my definitions of
+pdfs, random variables, expectation, etc. to the case when the sample space
+is infinite.
+Most of the changes are easy.
+A pdf is still
+\[
+p: S \rightarrow [0,1]
+\]
+except that now $S$ can be an infinite set -- I will restrict
+$S$ to be countable.
+(See notes on Cantor set theory.)
+I will still have the definition of events $A$ being subsets of $S$
+and
+\[
+p(A) = \sum_{x \in S} p(x)
+\]
+and the requirement
+\[
+p(S) = 1
+\]
+Note that there are some trickyness when it comes to infinite sets
+since summations might now be a sum of infinite terms.
+I will assume that all the obviously algebraic operations are valid.
+
+Consider this problem:
+How many die rolls do I need to get a $\SIX$?
+Of course this means \lq\lq What is the average number of
+die rolls to get a $\SIX$?".
+
+Note that for this random experiment, $S$ is the set of all tosses of
+finite length where $\SIX$ occurs only as the last toss:
+\begin{align*}
+  S &= \{(\SIX), \\
+  &\hspace{0.8cm} (\ONE, \SIX), (\TWO, \SIX), ... (\FIVE, \SIX), \\
+  &\hspace{0.8cm} (\ONE, \ONE, \SIX), (\ONE, \TWO, \SIX), ..., (\FIVE, \FIVE, \SIX), \\
+  &\hspace{0.8cm} ...\}
+\end{align*}
+Here's the pdf:
+\[
+p((x_0, ..., x_{n - 1})) = p^n
+\]
+where $p = 1/6$ and $q = 1 - p = 5/6$.
+I want to count the number of tosses to reach the first six.
+Therefore I use the following random variable $X$:
+\[
+X((x_0, ..., x_{n - 1})) = n
+\]
+where $n \geq 1$.
+
+Therefore
+\[
+\Pr[X = n] = q^{n-1}p
+\]
+Hence
+\[
+\E[X] = \sum_{n \geq 1} n \cdot \Pr[X = n] = \sum_{n \geq 1} n q^{n-1}p = p \sum_{n \geq 1} nq^{n - 1}
+\]
+Note that if $|x| < 1$,
+\[
+\sum_{n \geq 1} nx^{n - 1} = \frac{1}{(1 - x)^2}
+\]
+Hence
+\[
+\E[X] = p \sum_{n \geq 1} nq^{n - 1} = p \frac{1}{(1 - q)^2} = p \frac{1}{p^2} = 1/p
+\]
+Therefore the average number of tosses to get a $\SIX$ is
+\[
+1/p = 1/(1/6) = 6
+\]
+
+\input{discrete-probability/exercises/exercise-0/main.tex}
+
+Note that I can simplify the above computation a little.
+I'll group up $\ONE, \TWO, ..., \FIVE$ as $\FAILURE$ -- using a random variable of course.
+So I define a random variable 
+\[
+Y: \{\ONE, \TWO, ..., \FIVE, \SIX\} \rightarrow \{\SUCCESS, \FAILURE\}
+\]
+where
+\[
+Y(x) =
+\begin{cases}
+  \SUCCESS & \text{if } x = \SIX \\
+  \FAILURE & \text{otherwise}
+\end{cases}
+\]  
+Most of the proof is the same.
+The experiment of each toss is now a Bernoulli trails where
+the pdf on
+\[
+\{\SUCCESS, \FAILURE\} \rightarrow [0,1]
+\]
+given by
+\begin{align*}
+  \SUCCESS &\mapsto p = 1/6 \\
+  \FAILURE &\mapsto q = 5/6
+\end{align*}
+This pdf is just $\Pr[Y = \bullet]$.
+Now my sequence of outcomes have terms coming from $\{\SUCCESS, \FAILURE\}$, i.e.,
+the sample space is
+\begin{align*}
+  S' &= \{(\SUCCESS), \\
+  &\hspace{0.8cm} (\FAILURE, \SUCCESS), \\
+  &\hspace{0.8cm} (\FAILURE, \FAILURE, \SUCCESS), \\
+  &\hspace{0.8cm} ...\}
+\end{align*}
+Define random variable $X'$ on this $S'$ as the length of the tuples.
+Then again we have
+\[
+\Pr[X' = n] = q^{n-1}p
+\]
+and
+\[
+\E[X'] = \sum_{n \geq 1} n \cdot \Pr[X' = n] = 1/p
+\]
+
+The above proves the following theorem:
+
+\begin{prop}
+  Consider a Bernoulli trial where the probability of success is $p$, i.e.,
+  the pdf is $\{\SUCCESS, \FAILURE\}$ where $\SUCCESS \mapsto p$.
+  As a random experiment, suppose we perform a sequence of this Bernoulli trial until
+  the first success is achieved.
+  Let $X$ be the random variable for the length of this sequence.
+  \begin{myenum}
+  \item
+    $\Pr[X = n] = q^{n - 1}p$, i.e., 
+    the probability that $n$ trials are needed to get a first success is $q^{n-1}p$. 
+  \item
+    $\E[X] = 1/p$, i.e., 
+    the average number of trials needed to get a first success is $1/p$.
+  \end{myenum}
+\end{prop}
+  
+
+Note that in the above, the function $\Pr[X = n]$ and $\Pr[X' = n]$ looks like this:
+\[
+p: \{1, 2, 3, ... \} \rightarrow [0, 1]
+\]
+where $p(n) = q^{n-1}p$ where $p + q = 1$.
+Note that $p(\{1, 2, 3, ...\}) = 1$.
+This is called a \defone{geometric distribution}.
+
+\input{discrete-probability/exercises/disc-prob-20/main.tex} 
+
+\begin{eg}
+  The number of coin tosses to get a head is $2$.
+  \qed
+\end{eg}
+
+\begin{eg}
+  The number of die rolls to get either $1$ or $6$ is $3$.
+  \qed
+\end{eg}
+
+In the above, I've shown
+\[
+\E[X] = 1/p 
+\]
+where $X$ is the length for the first successful trial.
+There's another way to compute $\E[X]$.
+Note that 
+$p(\FAILURE, \FAILURE, \FAILURE, \SUCCESS)
+= p(\FAILURE) p(\FAILURE) p(\FAILURE) p(\SUCCESS) = qqqp$.
+Before I do the actual new computation of $E[X']$, here's a very important observation.
+\begin{align*}
+  \E[X']
+  &= \sum_{n \geq 1} n \cdot \Pr[X' = n] \\
+  &= 1 \cdot \Pr[X' = 1] + \sum_{n \geq 2} n \cdot \Pr[X' = n] \\
+  &= p + \left( 2 qp + 3 qqp + 4 qqqp + \cdots \right) \\
+  &= p + q \bigl( 2 p + 3 qp + 4 qqp + \cdots \bigr) \\
+  &= p + q\bigl( p + qp + qqp + \cdots \\
+  &\hspace{0.8cm} + 1 p + 2 qp + 3 qqp \cdots \bigr) \\
+  &= p + q\left( p(S') + \E[X'] \right) \\
+  &= p + q\left( 1 + \E[X'] \right)
+\end{align*}
+i.e., you get an equation in $\E[X']$.
+Hence
+\[
+(1 - q)\E[X'] = p + q = 1
+\]
+and therefore
+\[
+\E[X'] = \frac{1}{1 - q} = 1/p
+\]
+
+By the way, the above computation
+should remind you of the standard computation in
+working with generating functions on recurrence relations.
+And you know from MATH325 that generating functions are very
+useful for analyzing recurrences such as finding closed forms.
+Furthermore recall that generating functions are very helpful
+in managing complex interactions between combinatorial problems.
+For instance I use generating functions to count number of
+solutions of $a + b + c + d = 1000$ where each of the terms
+$a,b,c,d$ have their own constraints.
+For the case for analyzing a sequence of
+combinatorial problems such as a sequence of coin tosses or
+die rolls, probability generating function is a very powerful tool.
+See later section on probability generating function.
+
+\input{discrete-probability/exercises/bernoulli-06/main.tex}
+\input{discrete-probability/exercises/bernoulli-07/main.tex}
+\input{discrete-probability/exercises/bernoulli-08/main.tex}
+\input{discrete-probability/exercises/bernoulli-09/main.tex}
+\input{discrete-probability/exercises/bernoulli-10/main.tex}
+\input{discrete-probability/exercises/bernoulli-11/main.tex}
+\input{discrete-probability/exercises/bernoulli-12/main.tex}
