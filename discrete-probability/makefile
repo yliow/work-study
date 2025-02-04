@@ -13,13 +13,13 @@ LATEXRM = rm -f \
         comment.cut comment.err comment.out \
         latex.py
 
-main: stdout/plot01.tex \
-	stdout/plot02.tex \
-	stdout/plot03.tex \
-	stdout/plot04.tex \
-	stdout/plot05.tex \
-	stdout/plot06.tex \
-	stdout/plot07.tex \
+main: stdout/stdout11.tex \
+	stdout/stdout12.tex \
+	stdout/stdout13.tex \
+	stdout/stdout14.tex \
+	stdout/stdout15.tex \
+	stdout/stdout16.tex \
+	stdout/stdout17.tex \
 	stdout/stdout00.tex \
 	stdout/stdout01.tex \
 	stdout/stdout02.tex \
@@ -39,20 +39,20 @@ view:
 v:
 	$(OPEN) main.pdf
 
-stdout/plot01.tex: stdout/plot01.py
-	python stdout/plot01.py > stdout/plot01.tex
-stdout/plot02.tex: stdout/plot02.py
-	python stdout/plot02.py > stdout/plot02.tex
-stdout/plot03.tex: stdout/plot03.py
-	python stdout/plot03.py > stdout/plot03.tex
-stdout/plot04.tex: stdout/plot04.py
-	python stdout/plot04.py > stdout/plot04.tex
-stdout/plot05.tex: stdout/plot05.py
-	python stdout/plot05.py > stdout/plot05.tex
-stdout/plot06.tex: stdout/plot06.py
-	python stdout/plot06.py > stdout/plot06.tex
-stdout/plot07.tex: stdout/plot07.py
-	python stdout/plot07.py > stdout/plot07.tex
+stdout/stdout11.tex: stdout/stdout11.py
+	python stdout/stdout11.py > stdout/stdout11.tex
+stdout/stdout12.tex: stdout/stdout12.py
+	python stdout/stdout12.py > stdout/stdout12.tex
+stdout/stdout13.tex: stdout/stdout13.py
+	python stdout/stdout13.py > stdout/stdout13.tex
+stdout/stdout14.tex: stdout/stdout14.py
+	python stdout/stdout14.py > stdout/stdout14.tex
+stdout/stdout15.tex: stdout/stdout15.py
+	python stdout/stdout15.py > stdout/stdout15.tex
+stdout/stdout16.tex: stdout/stdout16.py
+	python stdout/stdout16.py > stdout/stdout16.tex
+stdout/stdout17.tex: stdout/stdout17.py
+	python stdout/stdout17.py > stdout/stdout17.tex
 stdout/stdout00.tex: stdout/stdout00.py
 	python stdout/stdout00.py > stdout/stdout00.tex
 stdout/stdout01.tex: stdout/stdout01.py

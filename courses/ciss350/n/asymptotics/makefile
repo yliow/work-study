@@ -224,13 +224,13 @@ function_call_6.tex: function_call_6.py fib_node.py
 	python function_call_6.py > function_call_6.tex
 
 pi_x_20.tex:
-	-cp /home/student/yliow/Documents/work/projects/ciss451-book-project-mine/pi_x_20.tex pi_x_20.tex
+	#-cp /home/student/yliow/Documents/work/projects/ciss451-book-project-mine/pi_x_20.tex pi_x_20.tex
 
 pi_x_100.tex:
-	-cp /home/student/yliow/Documents/work/projects/ciss451-book-project-mine/pi_x_100.tex pi_x_100.tex
+	#-cp /home/student/yliow/Documents/work/projects/ciss451-book-project-mine/pi_x_100.tex pi_x_100.tex
 
 pi_x_100000.tex:
-	-cp /home/student/yliow/Documents/work/projects/ciss451-book-project-mine/pi_x_100000.tex pi_x_100000.tex
+	#-cp /home/student/yliow/Documents/work/projects/ciss451-book-project-mine/pi_x_100000.tex pi_x_100000.tex
 
 #exercises-doors:
 #	cd exercises/doors && make
