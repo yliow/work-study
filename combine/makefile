@@ -20,3 +20,11 @@ view:
 	$(OPEN) main.pdf
 v:
 	$(OPEN) main.pdf
+
+c clean:
+	rm -f \
+        	main.aux main.ilg main.log main.idx main.ind main.out \
+        	main.py.err main.py.out \
+        	comment.cut comment.err comment.out \
+        	latex.py
+
