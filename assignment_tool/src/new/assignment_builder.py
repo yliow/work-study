@@ -10,12 +10,12 @@ def writefile(path, s):
 
 
 def include_latex(path, myincl):
-    '''
-    returns one of the following with ... replaced by path
-    \myinludetex{...}
-    \input{...}
-    \subimport{...}
-    '''
+'''
+returns one of the following with ... replaced by path
+\myinludetex{...}
+\input{...}
+\subimport{...}
+'''
     if myincl:
         return r'''\myincludetex{%s}''' % path
     else:
@@ -52,7 +52,11 @@ class Assignment_Builder:
         self.num_assignment = num_assignment
         self.make()
 
-    def add_files(self):
+    def build(self):
+        '''
+        This function adds all the neccesary files based on the number of
+        assignments and the methods called
+        '''
         for path, s in [l.add_maintex(self.include_main_tex),
                         l.thispreamble(self.assignment, self.course, self.name),
                         l.thispackages(), l.thispostamble(), l.thistitle(),
@@ -103,23 +107,25 @@ Q%(question)s. %(textpath)s
 \SOLUTION
 %(textpath)s
 ''' %{'textpath': include_(textpath + 's.tex', True)}
-    def add_skeleton(self, path, in_pdf=True):
+    def add_skeleton(self, path, in_main_tex=True):
+        # if in_main_tex is true skeleton is included in main.tex
         file_ = os.path.split(path)[-1]
         print(file_)
-        dest = self.struct['skel%s'% str(self.question_iterator)]#CLEANUP
-        shutil.copy(path, os.path.join(dest, file_)) #CLEANUP: OS.PATH.JOIN()
-        textpath = os.path.join(dest[len(self.destination) + 1:], file_)#CLEANUP: OS.PATH.JOIN()
-        if in_pdf:
+        dest = self.struct['skel%s'% str(self.question_iterator)]
+        shutil.copy(path, os.path.join(dest, file_)) 
+        textpath = os.path.join(dest[len(self.destination) + 1:], file_)
+        if in_main_tex:
             self.include_main_tex += '''
 %(textpath)s
 '''%{'textpath': include_(textpath, True)}
+    
 
     # so a quality i found in most extra documents is that they were either
     # referenced by another latex file or they were for a particular question
     # so the boolean in_pdf means are they gonna be referenced by the main.tex or not
     # and the boolean for question means are they gonna be used by a particular question
     # if they are they will be put in doc directory
-    def add_extra_document(self, path, in_pdf=True, for_question=False):
+    def add_extra_document(self, path, in_main_tex=True, for_question=False):
         dest = ""
         if for_question:
             dest = self.struct['q doc%(i)s'%{'i': str(self.question_iterator)}]
@@ -129,7 +135,7 @@ Q%(question)s. %(textpath)s
         file_ = os.path.split(path)[-1]
         print(file_)
         shutil.copy(path, os.path.join(dest, file_))
-        if in_pdf:
+        if in_main_tex:
             textpath = os.path.join(dest[len(self.destination) + 1:],file_)
             
             self.include_main_tex += '''
