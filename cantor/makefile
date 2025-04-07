@@ -10,7 +10,7 @@ LATEXRM = rm -f \
         comment.cut comment.err comment.out \
         latex.py
 
-main: 
+main: stdout00.tex
 	$(PDF)
 	$(LATEXRM)
 view:
@@ -19,3 +19,6 @@ v:
 	$(OPEN) main.pdf
 c:
 	$(LATERM)
+
+stdout00.tex: stdout00.py
+	python stdout00.py > stdout00.tex
