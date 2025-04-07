@@ -1,0 +1,70 @@
+%-*-latex-*-
+\section{The big-O Classes: Composition of Logarithm}
+
+What about $\ln^{(k)} n$?
+Here's a plot of $n, \ln^{(1)} n, \ln^{(2)} n$ 
+(you do see quickly just from definition that $\ln^{(1)} n = \ln n$, right?)
+
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(line_width=1, width='5in', height='4in', domain='0:50')
+
+p.add('x', color='red', python=1, pin='above', pin_message='', num_points=2)
+p.add('log(x,e)', color='blue', python=1, pin='above', pin_message='\ln^{(1)} x')
+p.add('log(log(x,e),e)', color='blue', python=1, pin='below', pin_message='\ln^{(2)}', num_points=300)
+print(p)
+\end{python}
+
+\begin{ex}
+Why is it not surprising that $\ln^{(1)} n$ beats $\ln^{(2)} n$?
+\qed
+\end{ex}
+
+Let's forget about the plot for $n$ and just look at the plots for
+$\ln^{(k)} n$ for $k=1, 2, 3, 4$:
+
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(line_width=1, width='5in', height='4in', domain='0:50',
+                 num_points=500)
+p.add('log(x,e)', color='blue', python=1, pin='above', pin_message='')
+p.add('log(log(x,e),e)', color='blue', python=1, pin='below', pin_message='')
+p.add('log(log(log(x,e),e),e)', color='blue', python=1, pin='below', pin_message='')
+p.add('log(log(log(log(x,e),e),e),e)', color='blue', python=1, pin='below', pin_message='')
+print(p)
+\end{python}
+
+So we suspect that for large values of $n$:
+\[
+\ln^{(4)} n < 
+\ln^{(3)} n < 
+\ln^{(2)} n < 
+\ln^{(1)} n = \ln n 
+\]
+
+Let's plot the functions again but for a domain of up to $100$ just
+to visually verify our guess:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(line_width=1, width='5in', height='4in', domain='0:100',
+                 num_points=500)
+p.add('log(x,e)', color='blue', python=1, pin='above', pin_message='')
+p.add('log(log(x,e),e)', color='blue', python=1, pin='below', pin_message='')
+p.add('log(log(log(x,e),e),e)', color='blue', python=1, pin='below', pin_message='')
+p.add('log(log(log(log(x,e),e),e),e)', color='blue', python=1, pin='below', pin_message='')
+print(p)
+\end{python}
+
+In other words in $O(n^r) \subset O(n^{r+1})$ we expand 
+to get
+\begin{align*}
+\cdots
+\subset O(n^r \ln^{(3)})
+\subset O(n^r \ln^{(2)})
+\subset O(n^r &\ln^{(1)}) \\ 
+&\| \\
+O(n^r &\ln n) 
+\subset  O(n^r\ln^2 n) 
+\subset  O(n^r\ln^3 n)
+\subset \cdots 
+\end{align*}

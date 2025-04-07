@@ -1,7 +1,3 @@
-from latextool_basic import *
-from pyutil import *
-
-s = r'''
 # file: main09b.py
 import random; random.seed()
 n = 1000000
@@ -17,10 +13,3 @@ for _ in range(n):
         count += 1
 
 print(count / n, 1 - 2 * 5**5/6**5)
-'''.strip()
-print(r'''\begin{console}[frame=single,fontsize=\footnotesize]
-%s
-\end{console}''' % s) 
-writefile('main09b.py', s)
-print(r'''The output is
-%s''' % shell('python main09b.py', fontsize=r'\footnotesize'))
