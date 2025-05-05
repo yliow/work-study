@@ -1,0 +1,155 @@
+%-*-latex-*-
+\section{Method to function pointer}
+
+You can pass a function pointer to a function.
+For instance
+\begin{python}
+s = r'''
+#include <iostream>
+
+int f(int x)
+{
+    return x * x;
+}
+
+int g(int f(int))
+{
+    return f(3);
+}
+
+int main()
+{
+    std::cout << g(f) << '\n';
+    return 0;
+}
+'''
+print r"""
+{\small
+\begin{console}
+%s
+\end{console}
+}
+""" % s.strip()
+\end{python}
+But you cannot do the same thing with a method:
+\begin{python}
+s = r'''
+#include <iostream>
+
+class C
+{
+public:
+    int m(int x)
+    {
+        return x * x;
+    }
+};
+
+int g(int f(int))
+{
+    return f(3);
+}
+
+int main()
+{
+    C obj;
+    std::cout << g(obj.m) << '\n';
+    return 0;
+}
+'''
+print r"""
+{\small
+\begin{console}
+%s
+\end{console}
+}
+
+You'll get the following error:
+""" % s.strip()
+file('tmp.cpp', 'w').write(s)
+from latextool_basic import *
+print shell('g++ tmp.cpp')
+\end{python}
+Note that it does work if the method is static:
+\begin{python}
+s = r'''
+#include <iostream>
+
+class C
+{
+public:
+    int static m(int x)
+    {
+        return x * x;
+    }
+};
+
+int g(int f(int))
+{
+    return f(3);
+}
+
+int main()
+{
+    C obj;
+    std::cout << g(obj.m) << '\n';
+    return 0;
+}
+'''
+print r"""
+{\small
+\begin{console}
+%s
+\end{console}
+}
+""" % s.strip()
+file('tmp.cpp', 'w').write(s)
+from latextool_basic import *
+print shell('g++ tmp.cpp; ./a.out')
+\end{python}
+
+
+
+You can do this:
+\begin{python}
+s = r'''
+#include <iostream>
+
+class C
+{
+public:
+    int m(int x)
+    {
+        return x * x;
+    }
+    static int * fptr(int); 
+};
+
+int C::*fptr = &C::m;
+int g(int f(int))
+{
+    return f(3);
+}
+
+int main()
+{
+    C obj;
+    std::cout << g(obj.m) << '\n';
+    return 0;
+}
+'''
+print r"""
+{\small
+\begin{console}
+%s
+\end{console}
+}
+""" % s.strip()
+file('tmp.cpp', 'w').write(s)
+from latextool_basic import *
+print shell('g++ tmp.cpp; ./a.out')
+
+\end{python}
+
+
+\url{http://www.newty.de/fpt/fpt.html#defi}
