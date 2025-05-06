@@ -1,7 +1,8 @@
 # chkbook.py
 import os
 
-def check():
+
+def check_dirs():
     exercises_dir_present = False
     stdout_dir_present = False
     chapters_dir_present = False
@@ -13,6 +14,7 @@ def check():
                 stdout_dir_present = True
             elif dn == 'chapters':
                 chapters_dir_present = True
+        break
     if exercises_dir_present and stdout_dir_present and chapters_dir_present:
         return 'test passed (all directories are present) ...'
 
@@ -27,38 +29,31 @@ def check():
 
     return s + 'directories'
 
-if __name__ == '__main__':
-    checking_directories = check()
+def check():
+    checking_directories = check_dirs()
 
     print(checking_directories)
     if 'test passed' in checking_directories:
         print('continue doing checks')
     else:
         print()
-        print('would you like me to create ')
-        if 'exercises' in checking_directories:
-            print('an exercises directory? ')
-            choice = input()
-            if choice != 'n':
-                print('creating exercises directory for you ...')
+        print('would you like me to create the directories for you? (n to leave) ')
+        choice = input()
+        if choice != 'n':
+            if 'exercises' in checking_directories:
                 os.mkdir('exercises')
-            else:
-                print('leaving ...')
-        print()
-        if 'stdout' in checking_directories:
-            print('an stdout directory? ')
-            choice = input()
-            if choice != 'n':
-                print('creating stdout directory for you ...')
+            if 'stdout' in checking_directories:
                 os.mkdir('stdout')
-            else:
-                print('leaving ...')
-        print()
-        if 'chapters' in checking_directories:
-            print('an chapters directory? ')
-            choice = input()
-            if choice != 'n':
-                print('creating chapters directory for you ...')
+            if 'chapters' in checking_directories:
                 os.mkdir('chapters')
-            else:
-                print('leaving ...')
+                print('would you like me to fill the chapters directory with everything in your chap.tex? (n to leave) ')
+                choice = input()
+                if choice != 'n':
+                    print('working ...')
+                else:
+                    print('leaving ...')
+        else:
+            print('leaving')
+
+if __name__ == '__main__':
+    check()
