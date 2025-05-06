@@ -1,6 +1,9 @@
 # chkbook.py
 import os
 
+def fill_chap_dir():
+    print('TODO')
+
 
 def check_dirs():
     exercises_dir_present = False
@@ -49,7 +52,7 @@ def check():
                 print('would you like me to fill the chapters directory with everything in your chap.tex? (n to leave) ')
                 choice = input()
                 if choice != 'n':
-                    print('working ...')
+                    fill_chap_dir()
                 else:
                     print('leaving ...')
         else:
