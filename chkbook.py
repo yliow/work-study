@@ -1,9 +1,30 @@
 # chkbook.py
 import os
+import re
+import shutil
+
+# Since chapters directory is a new development, here we will check if the chapters dir is empty, if so, we fill it ...
+
+def chapters_empty():
+    chap_empty = True
+    for p, dns, fns in os.walk('chapters'):
+        if (fns):
+            chap_empty = False
+    return chap_empty
+
+# Here is where we fill the chapters dir
 
 def fill_chap_dir():
-    print('TODO')
+    try:
+        with open('chap.tex', 'r') as f:
+            input_files = re.findall(r'\\input\{([^}]+)\}', f.read())
+        for i in input_files:
+            if i != 'solutions.tex':
+                shutil.move(i, 'chapters')
+    except FileNotFoundError:
+        raise FileNotFoundError(f'You are missing a necessary latex file ...')
 
+# Here is where we make sure all necessary directories are present
 
 def check_dirs():
     exercises_dir_present = False
@@ -32,13 +53,13 @@ def check_dirs():
 
     return s + 'directories'
 
+# Here is where we make sure all necessary files are present
+
 def check():
     checking_directories = check_dirs()
 
     print(checking_directories)
-    if 'test passed' in checking_directories:
-        print('continue doing checks')
-    else:
+    if 'test passed' not in checking_directories:
         print()
         print('would you like me to create the directories for you? (n to leave) ')
         choice = input()
@@ -49,14 +70,18 @@ def check():
                 os.mkdir('stdout')
             if 'chapters' in checking_directories:
                 os.mkdir('chapters')
-                print('would you like me to fill the chapters directory with everything in your chap.tex? (n to leave) ')
-                choice = input()
-                if choice != 'n':
-                    fill_chap_dir()
-                else:
-                    print('leaving ...')
         else:
             print('leaving')
+
+    if not os.path.isfile('chap.tex'):
+        print('You need a chap.tex file !!!')
+    elif chapters_empty():
+        print('would you like me to fill the chapters directory with everything in your chap.tex? (n to leave) ')
+        choice = input()
+        if choice != 'n':
+            fill_chap_dir()
+        else:
+            print('leaving ...')
 
 if __name__ == '__main__':
     check()
