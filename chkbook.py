@@ -71,17 +71,23 @@ def check():
             if 'chapters' in checking_directories:
                 os.mkdir('chapters')
         else:
-            print('leaving')
+            print('leaving, insufficient directories to use these notes in makebook')
+            return
 
     if not os.path.isfile('chap.tex'):
         print('You need a chap.tex file !!!')
+        print('leaving, insufficient file(s) to use these notes in makebook')
+        return
     elif chapters_empty():
         print('would you like me to fill the chapters directory with everything in your chap.tex? (n to leave) ')
         choice = input()
         if choice != 'n':
             fill_chap_dir()
         else:
-            print('leaving ...')
+            print('leaving, insufficient chapters directory to use these notes in makebook')
+    print('You have sufficient material to use the notes in makebook')
+    print('All tests ... passed')
+    return
 
 if __name__ == '__main__':
     check()
