@@ -21,6 +21,8 @@ def fill_chap_dir():
         for i in input_files:
             if i != 'solutions.tex':
                 shutil.move(i, 'chapters')
+        with open('chap.tex', 'a') as f:
+            # TODO change \input{...} to \input{chapters/...}
     except FileNotFoundError:
         raise FileNotFoundError(f'You are missing a necessary latex file ...')
 
