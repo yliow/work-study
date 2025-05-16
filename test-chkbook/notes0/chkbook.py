@@ -57,5 +57,6 @@ def check():
     print('All tests ... passed')
     return
 
+
 if __name__ == '__main__':
     check()
