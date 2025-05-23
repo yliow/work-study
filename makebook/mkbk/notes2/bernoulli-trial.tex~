@@ -1,0 +1,419 @@
+\section{Bernoulli Trials}
+
+At this point, we have the basic concept of the probability attached to
+a random experiment.
+I have also talked about an experiment that is broken up into two
+independent random experiment -- this is when the pdf is a product of
+two pdfs.
+
+Now I want to talk about the case where
+a random experiment involves
+performing a \textit{sequence} of the same random experiment.
+The sequence need not be made up of two experiments.
+Usually there's no limit on the size of the sequence.
+In fact, I am usually interested in questions like
+\lq\lq
+How many times do I need to execute this random experiment
+until a goal is reached?''
+
+To be specific, consider the following question:
+
+\lq\lq If there's a 32\% change of making \$1 when I buy
+one google stock on Monday at 10:42AM and sell it on the same day at 2:45PM,
+what is the chance of me making \$100 if I buy and sell one google
+stock according to the above day and times for 200 consecutive
+Mondays when the stock market is open''.
+Or:
+\lq\lq How many consecutive Mondays of trading do I need to execute before
+I made 20 days of gains?''
+
+
+A 
+\defterm{Bernoulli trial}
+is a random experiment with two outcomes.
+This term is used especially when the Bernoulli trials
+are performed in a sequence such that the trials are mutually
+independent.
+
+For instance suppose I have a biased coin: 
+the probability of getting head is 1/3.
+What then is the probability of getting 4 heads when the coin 
+is tossed 10 times?
+
+Let me put everything into proper mathematical notation.
+Let pdf $p_i : S_i \rightarrow [0,1]$
+denote the $i$--th time you are tossing the coin.
+Note that 
+\[
+S_i = \{\HEAD, \TAIL\}
+\]
+and
+\[
+p_i(\HEAD) = 1/3, \,\,\,\, p_i(\TAIL) = 2/3
+\]
+(they are all the same.)
+The experiments are mutually independent.
+Therefore if $p : S \rightarrow [0,1]$ is the pdf
+for the experiment of tossing the coin 10 times 
+where $S = S_1 \times \cdots \times S_{10}$,
+then
+\[
+p(x_1, \ldots, x_{10}) = p_i(x_1) \cdots p_i(x_{10})
+\]
+(Note that the probability is a product since
+the $i$--th toss is independent of the $j$--th toss for $i \neq j$.)
+I am interested in the event
+\[
+A = \{(x_1, \ldots, x_{10}) \in S \mid 
+\text{exactly four of the $x_i$'s are $\HEAD$}\}
+\]
+Note that 
+\[
+|A| = \binom{10}{4}
+\]
+and each element of $A$ has the same probability as
+the case where the first four tosses are heads:
+\begin{align*}
+&p(\HEAD, \HEAD, \HEAD, \HEAD, \TAIL, \ldots, \TAIL) \hspace{1cm} \text{(4 heads, 6 tails)}\\
+&= p_1(\HEAD) p_2(\HEAD) p_3(\HEAD) p_4(\TAIL) \cdots p_{10}(\TAIL) \\
+&= (1/3)^4 (2/3)^4
+\end{align*}
+Therefore the required probability is
+\[
+p(A) = \binom{10}{4} (1/3)^4 (2/3)^6 
+\]
+
+
+Because a Bernoulli trial has two outcomes,
+it's common to call one of the outcomes a
+\defterm{success} and the other a
+\defterm{failure}.
+
+In general, you see right away that:
+
+\begin{thm}
+If the probability of the success of a Bernoulli trial is $p$,
+then the probability of having $k$ successes when performing
+$n$ of the Bernoulli trials is given by 
+\[
+\binom{n}{k} p^k (1-p)^{n-k}
+\]
+\qed
+\end{thm}
+
+Frequently you will see the following notations:
+\[
+B_{n,p}(k) = \binom{n}{k} p^k (1-p)^{n-k}
+\]
+or
+\[
+B(n,p; k) = \binom{n}{k} p^k (1-p)^{n-k}
+\]
+
+\newpage
+\begin{ex}
+  \begin{tightlist}
+    \item
+    If a biased coin which has a probability of getting a head is 1/4
+    is tossed 8 times, what is the probability of getting exactly 3 tails?
+    \item
+    What if I changed the above to \lq\lq 3 or less tails''?
+    \item
+    What if I changed the above to
+    \lq\lq exactly 3 consecutive tails''?
+  \end{tightlist}
+\qed
+\end{ex}
+
+\newpage
+\begin{ex}
+A sequence of 10 bits are generated so that the probability
+of producing a 0 is 0.1.
+\begin{tightlist}
+  \item What is the probability of getting 
+  a bit string that begins with three 0s.
+  Assume that the generation of the bits are
+  mutually independent.
+  \item What if I change the above to \lq\lq a bit string
+  with three 0s''?
+  \item What if I change the above to \lq\lq a bit string
+  with at least three 0s''?
+  \item What if I change the above to \lq\lq a bit string
+  with at least three 0s'' and the sequence is not a sequence
+  of length 10, but of length 1000?
+  \item What if I change the above to \lq\lq a bit string
+  with no three consecutive 0s'' and the sequence is not a sequence
+  of length 10, but of length 1000?
+\end{tightlist}
+\qed
+\end{ex}
+
+\newpage
+\begin{ex}
+A sequence of 10 bits are generated so that the probability
+of producing a 0 is 0.1. What is the probability of getting 
+a bit string that begins with three 0s and has five 0s in total.
+Assume that the generation of the bits are
+mutually independent.
+\qed
+\end{ex}
+
+\newpage
+\begin{ex}
+How many coin tosses do you need so that the probability of
+getting 3 heads is at least 0.25. 
+Assume the probability of getting a head is 1/3.
+\qed
+\end{ex}
+
+\SOLUTION
+\\
+Basically we want to find $n$ such that 
+\[
+\binom{n}{3}(1/3)^3(2/3)^{n-3}  \geq 0.25
+\]
+
+\begin{python}
+from math import *
+from latextool_basic import *
+plot = FunctionPlot()
+
+def c(n):
+    return n * (n - 1) * (n - 2) / 6
+
+def f(n):
+    return c(n) * (1.0/3)**3 * (2.0/3)**(n - 3)
+    
+data1 = [(i,f(i)) for i in range(3,20)]
+data2 = [(i,0.25) for i in range(0,20)]
+
+plot.add(data1, line_width='1', color='black')
+plot.add(data2, line_width='1', color='black')
+print plot
+\end{python}
+
+From the graph, $n = 7, 8, 9, 10$.
+\qed
+
+\newpage
+\begin{ex}
+If the probability of getting 3 heads with 10 coin tosses
+is $> 0.5$, what is range of the probability of getting a head for this coin?
+\qed
+\end{ex}
+
+\SOLUTION
+\\
+Basically we want to find $n$ such that 
+\[
+\binom{10}{3}p^3(1-p)^{n-3}  \geq 0.5
+\]
+
+\begin{python}
+from math import *
+from latextool_basic import *
+plot = FunctionPlot()
+
+def c(n):
+    return n * (n - 1) * (n - 2) / 6
+
+def f(p):
+    return c(10) * p**3 * (1 - p)**(10 - 3)
+    
+data1 = [(p/20.0, f(p/20.0)) for p in range(0,20)]
+data2 = [(p/20.0, 0.25) for p in range(0,20)]
+
+plot.add(data1, line_width='1', color='black')
+plot.add(data2, line_width='1', color='black')
+print plot
+\end{python}
+
+From the graph, $n = 7, 8, 9, 10$.
+\qed
+
+\newpage
+\begin{ex}
+You have decided to set up a game table 
+as a fund raising event
+for the CS club.
+To play the game, a player has to pay you \$1.
+After paying you \$1, he/she will roll a die $n=7$ times.
+If he/she gets at least 2 sixes, he/she will get \$100.
+Of course you want to make money (duh) -- what kind of fund raising event
+wants to lose money??
+So you have decided to lower the chance of the player
+getting at least $k=2$ sixes in $n=7$ rolls.
+You found a 3D printer and a program that will allow you to
+build a loaded die.
+What is the lowest
+probability to use if you want to break even?
+(Of course you do want to raise some money.
+If you make it impossible to get a six, then after just a couple of
+games, people would know that the die is rigged.
+So you want to know your break even point and then slightly lower
+the probability of getting a six.)
+\end{ex}
+
+The probability of getting at least 2 sixes is
+\[
+B(n,p; 2) + 
+B(n,p; 3) + 
+B(n,p; 4) + 
+\cdots + 
+B(n,p; 7) 
+\]
+Therefore the student will earn
+\[
+\left(
+  B(n,p; 2) + 
+  B(n,p; 3) + 
+  B(n,p; 4) + 
+  \cdots + 
+  B(n,p; 7)
+  \right) \times 100 - 1
+\]
+(The \lq\lq $-1$'' is because the student has to pay \$1 to play.) 
+Of course to make money, you will want
+\[
+\left(
+  B(n,p; 2) + 
+  B(n,p; 3) + 
+  B(n,p; 4) + 
+  \cdots + 
+  B(n,p; 7)
+  \right) \times 100 - 1 < 0
+\]
+i.e.,
+\[
+  B(n,p; 2) + 
+  B(n,p; 3) + 
+  B(n,p; 4) + 
+  \cdots + 
+  B(n,p; 7)  < 1/100
+\]
+It's easier to use this:
+\[
+  1
+  - B(n,p; 0) 
+  - B(n,p; 1) 
+  - B(n,p; 2) 
+  < 1/100
+\]
+and therefore we want
+\[
+  99/100 < B(n,p; 0) + B(n,p; 1) + B(n,p; 2)
+\]
+which is the same as
+\[
+99/100
+<
+\binom{7}{0}p^0(1-p)^{7-0}
++
+\binom{7}{1}p^1(1-p)^{7-1}
++
+\binom{7}{2}p^2(1-p)^{7-2}
+\]
+
+The following is a graph for different values of $p$:
+\begin{python}
+from math import *
+from latextool_basic import *
+plot = FunctionPlot()
+
+import scipy.misc
+comb = scipy.misc.comb
+
+def B(n, p, k):
+    return comb(n, k) * p**k * (1-p)**(n - k)
+
+def f(p):
+    return B(7, p, 0) + B(7, p, 1) + B(7, p, 2)
+    
+data1 = [(i,f(i)) for i in [float(_)/20.0 for _ in range(0,21)]]
+data2 = [(i,0.99) for i in [float(_)/20.0 for _ in range(0,21)]]
+
+plot.add(data1, line_width='1', color='black')
+plot.add(data2, line_width='1', color='black')
+print plot
+\end{python}
+Zooming in on the part of the graph where $x$ is in $[0.05, 0.1]$, we get
+%\begin{python}
+%from math import *
+%from latextool_basic import *
+%plot = FunctionPlot(width="7in")
+%
+%import scipy.misc
+%comb = scipy.misc.comb
+%
+%def B(n, p, k):
+%    return comb(n, k) * p**k * (1-p)**(n - k)
+%
+%def f(p):
+%    return B(7, p, 0) + B(7, p, 1) + B(7, p, 2)
+%
+%myrange = [0.05, 0.06, 0.08, 0.1]
+%data1 = [(i,f(i)) for i in myrange]
+%data2 = [(i,0.99) for i in myrange]
+%
+%plot.add(data1, line_width='1', color='black')
+%plot.add(data2, line_width='1', color='black')
+%print plot
+%\end{python}
+
+\begin{center}
+\begin{tikzpicture}[line width=1]
+\begin{axis}[width=5in, height=3in,
+             xlabel={\mbox{}},
+             xlabel style={name=xlabel}, 
+             ylabel={\mbox{}},
+             xtick=data,
+             yticklabels={,,},
+             tick label style={/pgf/number format/fixed},
+             legend style={
+                at={(xlabel.south)},
+                yshift=-1ex,
+                anchor=north,
+                legend cell align=left,
+                },
+        ]
+]
+\addplot[draw=black, line width=1] coordinates
+ {(0.05, 0.996)
+  (0.06, 0.994)
+  (0.08, 0.986)
+  (0.10, 0.974)};
+\addplot[draw=black, line width=1] coordinates
+ {(0.05, 0.990)
+  (0.06, 0.990)
+  (0.08, 0.990)
+  (0.10, 0.990)};
+\end{axis}
+\end{tikzpicture}\end{center}
+
+Therefore the break even value for $p$ is approximately $0.07$.
+(For a fair die, the probability for getting a six is $1/6 = 0.167$.)
+
+We now compute our gains for a few values of $p$ near $0.07$.
+If $p = 0.06$, then the player would make
+\[
+(1 - B(7,0.06;0) - B(7,0.06;1) - B(7,0.06;2)) \times 100 - 1
+=
+-0.3706...
+\]
+which means that we gain \$0.37 per game.
+If $p = 0.07$, then the player would make
+\[
+(1 - B(7,0.07;0) - B(7,0.07;1) - B(7,0.07;2)) \times 100 - 1
+=
+-0.0312...
+\]
+which means that we gain \$0.03 per game.
+If $p = 0.08$, then the player would make
+\[
+(1 - B(7,0.08;0) - B(7,0.08;1) - B(7,0.08;2)) \times 100 - 1
+= 0.4014....
+\]
+which means that we would lose \$0.40 per game.
+
+So, for instance, if we use $p = 0.07$ and a total of 100 games were
+played, we will collect \$37.00.
