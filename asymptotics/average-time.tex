@@ -1,0 +1,229 @@
+%-*-latex-*-
+
+
+\section{Average Time}
+
+Recall that we have this is our linear search algorithm:
+
+\begin{Verbatim}[frame=single, fontsize=\footnotesize]
+index = -1
+for i = 0, 1, 2, ..., n - 1:
+    if x[i] is target:
+        index = i
+        break
+\end{Verbatim}
+
+Here's the algorithm with times:
+\begin{Verbatim}[frame=single,commandchars=\\\{\}, fontsize=\footnotesize]
+                                 time   
+         index = -1              t1 
+         i = 0                   t2 
+LOOP:    if i == n:              t3  
+             goto ENDLOOP        t4 
+         if x[i] != target:      t5
+             goto ENDIF          t6
+         index = i               t7 
+         goto ENDLOOP            t8
+ENDIF:   i = i + 1               t9 
+         goto LOOP               t10 
+ENDLOOP:
+\end{Verbatim}
+
+Recall that the best and worst times are
+\begin{align*}
+T_b(n) &= O(1) \\
+T_w(n) &= O(n)
+\end{align*}
+I have also computed the average runtime for the case where the 
+\verb!target! is in the array at index position 
+$k = 0, 1, 2, ..., n - 1$ with equal likelihood.
+\[
+T_a(n) = O(n)
+\]
+Now I'm going to change the average runtime scenario
+a little and compute a
+\textit{new} average runtime.
+
+I'm now going to assume the besides the \verb!target! appear
+at index position $0, 1, 2, ..., n - 1$,
+I also want to include the case where \verb!target! is \textit{not} in the array 
+\verb!x! at all.
+So altogether, in the new average runtime, we have $n + 1$ cases.
+I want to assume that all cases are \textit{equally likely}.
+Let's call out new average runtime $T'_a(n)$.
+
+First let me recall that if I write $T_k$ for the runtime for 
+the case where \verb!target! is at index position $k$
+and $T_n$ is the runtime where the \verb!target! is not in the array
+\verb!x!, then they are of the form
+\begin{align*}
+T_k &= A + Bk, \,\,\,\,\,(k = 0, 1, 2,..., n - 1) \\
+T_n &= C + Dn
+\end{align*}
+
+Of course you know now that the constants are not that important
+when we are computing big-O.
+But anyway, referring to an earlier section we have:
+\begin{align*}
+A &= t_1 + t_2 + t_3 + t_5 + t_6 + t_7 \\
+B &= t_3 + t_5 + t_8 + t_9 \\
+C &= t_1 + t_2 + t_3 + t_4 \\
+D &= t_3 + t_5 + t_9
+\end{align*}
+
+Recall that our \textit{old} average runtime is
+\[
+T_a(n) 
+= \frac{1}{n} 
+   \left(
+     T_0 + T_1 + \cdots + T_{n - 1} 
+   \right) 
+= O(n)
+\]
+This averages over $n$ cases.
+
+For our new average runtime function we have
+\[
+T'_a(n) 
+= \frac{1}{n + 1} 
+   \left(
+     T_0 + T_1 + \cdots + T_{n - 1} + T_n 
+   \right)\\
+\]
+Note that we're now averaging over $n + 1$ cases.
+Now I will compute the big-O of our new average runtime:
+\begin{align*}
+T'_a(n) 
+&= \frac{1}{n + 1}
+   \left(
+     (A + B\cdot 0) + 
+     (A + B\cdot 1) + \cdots
+     (A + B\cdot (n - 1)) + 
+     C + Dn
+   \right)\\
+&= \frac{1}{n + 1}
+   \left(
+     nA + B\cdot (0 + 1 + \cdots + (n - 1)) +
+     C + Dn
+   \right)\\
+&= \frac{1}{n + 1}
+   \left(
+     nA + B\cdot \frac{n(n-1)}{2} +
+     C + Dn
+   \right)\\
+&= \frac{1}{n + 1}
+   \left(
+   \left( \frac{B}{2} \right) n^2
+   + \left( A - \frac{1}{2}B + D \right) n
+   + C
+   \right)
+\\
+&= \left( \frac{B}{2} \right) \frac{n^2}{n + 1}
+   + \left( A - \frac{1}{2}B + D \right) \frac{n}{n + 1}
+   + C \frac{1}{n + 1}
+\end{align*}
+
+Clearly, of the 3 functions of $n$, 
+\[
+\frac{n^2}{n + 1}, \,\,\,\,\,
+\frac{n}{n + 1}, \,\,\,\,\,
+\frac{1}{n + 1}
+\]
+the one that grows the fastest is 
+\[
+\frac{n^2}{n + 1}, \,\,\,\,\,
+\]
+Here's a plot of the three functions:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(domain='0:10', num_points=50, vars=['n'])
+p.add('n**2/(n+1)', color='blue', python=1, pin='above')
+p.add('n/(n+1)', color='blue', python=1, pin_message='')
+p.add('1/(n+1)', color='blue', python=1, pin_message='')
+print(p)
+\end{python}
+
+Although at this point I can say 
+\[
+T'_a(n) = O\left( \frac{n^2}{n + 1}\right)
+\]
+I prefer to bound $n^2/(n + 1)$ by a simpler (and cleaner) function.
+In fact it's really simple:
+\[
+\frac{n^2}{n + 1} = O(n)
+\]
+There are several ways to prove this.
+Here's the simplest proof:
+\[
+\frac{n^2}{n + 1} 
+\leq 
+\frac{n^2}{n + 0} = n
+\]
+Hence 
+\[
+T'_a(n) = O(n)
+\]
+
+Notice that both average runtimes gives the same big-O:
+\begin{align*}
+T_a(n) &= O(n) \\ 
+T'_a(n) &= O(n) \\ 
+\end{align*}
+
+\begin{ex}
+Consider $n + 2$ cases of the linear search.
+\begin{itemize}
+\li \verb!target! is at index position $0$ or $1$ or ... or $n - 1$
+\li \verb!target! is larger than all values in array \verb!x!
+\li \verb!target! is less than all values in array \verb!x!
+\end{itemize}
+and they are equally likely.
+\begin{itemize}
+\item[(a)] Compute the average runtime under the above assumptions.
+\item[(b)] Compute the big-O of the average runtime of (a) in the form of
+$n^k$.
+\end{itemize}
+\qed
+\end{ex}
+
+\begin{ex}
+Here are the same cases as the previous problem.
+\begin{itemize}
+\li \verb!target! is at index position $0$ or $1$ or ... or $n - 1$
+\li \verb!target! is larger than all values in array \verb!x!
+\li \verb!target! is less than all values in array \verb!x!
+\end{itemize}
+After running the linear search for a long time on a particular
+system
+I realize that there is
+a particular value that is searched for very frequently.
+So I move this value to index 0.
+Specifically, the case where the search for \verb!target! at index 0
+is twice as frequent other cases.
+\begin{itemize}
+\item[(a)] Compute the average runtime under the above assumptions.
+\item[(b)] Compute the big-O of the average runtime of (a) in the form 
+of $n^k$.
+\end{itemize}
+\qed
+\end{ex}
+
+\begin{ex}
+For another system, I realized that the following cases are most
+helpful:
+\begin{itemize}
+\li \verb!target! is at index position $0$ or $1$ or ... or $n - 1$.
+The case where \verb!target! is at index 0 is twice as likely
+as each of the other cases where \verb!target! is at index $i$
+for $i = 1, 2, 3, ..., n - 1$.
+\li \verb!target! is not in the array \verb!x!.
+This case is 10 times more likely that the case
+where \verb!target! is at index 1.
+\end{itemize}
+\begin{itemize}
+\item[(a)] Compute the average runtime under the above assumptions.
+\item[(b)] Compute the big-O of the average runtime of (a) in the form 
+of $n^k$.
+\end{itemize}
+\qed
+\end{ex}
