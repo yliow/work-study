@@ -1,0 +1,1356 @@
+\newpage
+\section{Random variable; Average value; expected value}
+
+Now for the definition of the confusing term: random variable.
+A \defterm{random variable} $X$ of $S$ is just a function
+from $S$ to some set, usually the set of real numbers.
+For instance, for the die rolling experiment, suppose I define $X$
+in the obvious way:
+\begin{align*}
+X(\text{\texttt{ONE}}) &= 1 \\
+X(\text{\texttt{TWO}}) &= 2 \\
+X(\text{\texttt{THREE}}) &= 3 \\
+X(\text{\texttt{FOUR}}) &= 4 \\
+X(\text{\texttt{FIVE}}) &= 5 \\
+X(\text{\texttt{SIX}}) &= 6 \\
+\end{align*}
+Given this setup, when I write
+\[
+\Pr[X = 6]
+\]
+I mean
+\[
+\Pr[X = 6] = p[X^{-1}(6)]
+\]
+i.e.,
+\[
+\Pr[X = 6] = p[X^{-1}\{6\}] = p[\{\texttt{SIX}\}] = p(\texttt{SIX})
+\]
+Or if I write
+\[
+\Pr[X = 1, 2]
+\]
+I mean 
+\[ 
+\Pr[X=1,2]
+= p[X^{-1}\{1,2\}] 
+=  p[\{\texttt{ONE},\texttt{TWO}\}]
+=  p(\texttt{ONE})+ p(\texttt{TWO})
+\]
+Or if I say 
+\[
+\Pr[X \text{ is odd}]
+\]
+I mean
+\[
+\Pr[X = 1, 3, 5]
+\]
+which is
+\[
+\Pr[X = 1, 3, 5]
+= p[X^{-1}[\{1, 3, 5\}]]
+= p[\{\ONE, \THREE, \FIVE \}]
+\]
+
+Note that a random variable is not random and it's not a variable:
+it's function!
+This is an example of a badly chosen name for this idea.
+You can and should think of the random variable as some kind of 
+\textit{scoring}
+for each outcome of the sample space of an experiment
+and a way to create subsets of $S$.
+
+Suppose now I toss two fair coins.
+What is the probability of getting two heads?
+When you're given a problem like the above, you can see quickly
+that it must be 1/4 and that's because the problem is so simple.
+However when the problem is more complicated, you cannot rely on your
+intuition!
+Let's rephrase the above with proper mathematical objects:
+First you need a sample space $S$.
+The outcomes are
+\renewcommand\HEAD{\texttt{HEAD}}
+\renewcommand\TAIL{\texttt{TAIL}}
+\begin{tightlist}
+\item First coin gives me a $\HEAD$, second gives me a $\HEAD$
+\item First coin gives me a $\HEAD$, second gives me a $\TAIL$
+\item First coin gives me a $\TAIL$, second gives me a $\HEAD$
+\item First coin gives me a $\TAIL$, second gives me a $\TAIL$
+\end{tightlist}
+It would make me go crazy if I have to describe the events with
+so many words.
+So I'm going to use
+\begin{tightlist}
+\item $(\HEAD, \HEAD)$
+\item $(\HEAD, \TAIL)$
+\item $(\TAIL, \HEAD)$
+\item $(\TAIL, \TAIL)$
+\end{tightlist}
+to denote the above outcomes.
+Since the coins are fair, you would expect these four outcomes to be 
+equally likely, i.e.,
+the pdf 
+\begin{align*}
+p &: \{(\HEAD, \HEAD),
+(\HEAD, \TAIL),
+(\TAIL, \HEAD),
+(\TAIL, \TAIL)\} 
+\rightarrow [0,1]
+\end{align*}
+is given by 
+\begin{align*}
+p((\HEAD, \HEAD)) &= 1/4 \\
+p((\HEAD, \TAIL)) &= 1/4 \\
+p((\TAIL, \HEAD)) &= 1/4 \\
+p((\TAIL, \TAIL))  &= 1/4 
+\end{align*}
+And of course, the probability of getting two heads is 
+\[
+p((\HEAD, \HEAD)) = 1/4
+\]
+
+Given a random experiment with sample space $S$ and a pdf $p$
+and also given a random variable $X$, we can define the 
+average value or the \defterm{expected value} of $X$ to be
+\[
+\E[X] = \sum_{x \in X} X(x) \cdot p(x)
+\]
+$\E[X]$ is also called the expectation of $X$.
+
+
+The variance of $X$ is
+\[
+\Var[X]
+\]
+
+In many cases, the probability of an experiment is not what you're after.
+It's usually some kind of \lq\lq gain'' from doing an experiment or playing a
+probabilistic game.
+This is what I mean:
+
+You are at XYZ Casino, confident of your new found knowledge of
+computing probabilties.
+You approach one of the tables to check out the game.
+Here's the rule of the game: You have to pay \$10 to play the game.
+You throw two dice, one at a time.
+If the first die gives you 6, you win and get \$40.
+Otherwise, your second roll must be the same as your first in which 
+case you also win but you get only \$20.
+Otherwise you lose and get nothing.
+This does not seem to be difficult.
+You just need to simulate the dice roll and return the gain like this:
+\includesourcenonumbers{prob/game1.py}
+
+Of course this is only one game.
+You need to simulate lots of games to determine your 
+\lq\lq ultimate'' gain, i.e., your average gain:
+\includesourcenonumbers{prob/game2.py}
+
+You quickly run your program and get this:
+\bShell[python prob/game2.py >abc.output 2>abc.output]
+\eShell
+{\footnotesize
+\includesourcenonumbers{abc.output}
+}
+
+YIKE!!!
+You're going to lose!!!
+What crooks!
+
+OK ... let's go back to the math behind this game.
+Immediately, you should ask this question:
+How can you compute this gain quickly?
+In particular, where does the probability function for a single die roll
+\[
+p(x) = \frac{1}{6} \hspace{1cm} 
+\text{for $x \in \{\ONE, \TWO, \THREE, \FOUR, \FIVE, \SIX\}$}
+\]
+come in?
+Can we compute the gain mathematically without a computer simulation?
+
+To simplify the argument, suppose you roll one die and
+it's free to play the game.
+If the outcome is 1, I will give you \$0.
+If the outcome is 2, you will give me \$1.
+If the outcome is 3, I will give me \$2.
+If the outcome is 4, you will give me \$3.
+If the outcome is 5, I will give me \$4.
+If the outcome is 6, you will give me \$5.
+Suppose we play a total of 60 games, 
+where there are 
+10 outcomes of die value 1, 
+15 outcomes of die value 2, 
+11 outcomes of die value 3,
+20 outcomes of die value 4, 
+8 outcomes of value 5, and
+18 outcomes of value 6.
+What is the total gain for you?
+It should be
+\[
+0 \cdot 10 + (-1) \cdot 15 + 2 \cdot 11 + (-3) \cdot 20 + 
+4 \cdot 8 + (-5) \cdot 18 
+\]
+And your average gain per game is then
+\[
+\frac
+{0 \cdot 10 + (-1) \cdot 15 + 2 \cdot 11 + (-3) \cdot 20 + 
+4 \cdot 8 + (-5) \cdot 18}
+{10 + 15 + 11 + 20 + 8 + 18}
+\]
+Let $n_\ONE = 10$ (i.e. number of times you get $\ONE$), 
+$n_\TWO = 15$, $n_\THREE = 11$, $n_\FOUR = 20$, $n_\FIVE = 8$, 
+and $n_\SIX = 18$.
+Let $n = n_\ONE + n_\TWO + \cdots + n_\SIX$.
+Then the above becomes:
+\begin{align*}
+&\frac
+{0 \cdot 10 + (-1) \cdot 15 + 2 \cdot 11 + (-3) \cdot 20 + 
+4 \cdot 8 + (-5) \cdot 18}
+{10 + 15 + 11 + 20 + 8 + 18}
+\\
+&= 
+\frac
+{0 \cdot n_\ONE + (-1) \cdot n_\TWO + 2 \cdot n_\THREE + (-3) \cdot n_\FOUR + 
+4 \cdot n_\FIVE + (-5) \cdot n_\SIX}
+{n} \\
+&= 
+0 \cdot \frac{n_\ONE}{n} + 
+(-1) \cdot \frac{n_\TWO}{n} + 
+2 \cdot \frac{n_\THREE}{n} + 
+(-3) \cdot \frac{n_\FOUR}{n} + 
+4 \cdot \frac{n_\FIVE}{n} + 
+(-5) \cdot \frac{n_\SIX}{n}
+\end{align*}
+Wait a minute ... $\frac{n_\ONE}{n}$ is the ratio of
+outcomes which is $\ONE$. 
+That's just the probability of getting 1 ...
+well, if the number of experiments is large, i.e., when $n$ is large.
+If we write $p(x)$ for the probability function of our die, we get:
+\begin{align*}
+&\frac
+{0 \cdot 10 + (-1) \cdot 15 + 2 \cdot 11 + (-3) \cdot 20 + 
+4 \cdot 8 + (-5) \cdot 18}
+{10 + 15 + 11 + 20 + 8 + 18}
+\\
+&= 
+\frac
+{0 \cdot n_\ONE + (-1) \cdot n_\TWO + 2 \cdot n_\THREE + (-3) \cdot n_\FOUR + 
+4 \cdot n_\FIVE + (-5) \cdot n_\SIX}
+{n} \\
+&= 
+0 \cdot \frac{n_\ONE}{n} + 
+(-1) \cdot \frac{n_\ONE}{n} + 
+2 \cdot \frac{n_\THREE}{n} + 
+(-3) \cdot \frac{n_\FOUR}{n} + 
+4 \cdot \frac{n_\FIVE}{n} + 
+(-5) \cdot \frac{n_\SIX}{n}
+\\
+&= 
+0 \cdot p(\ONE) + 
+(-1) \cdot p(\TWO) + 
+2 \cdot p(\THREE) + 
+(-3) \cdot p(\FOUR) + 
+4 \cdot p(\FIVE) + 
+(-5) \cdot p(\SIX)
+\end{align*}
+For this game, if the die value is $\ONE$, your gain is 0,
+if it's $\TWO$, your gain is -1, etc.
+For the time being we write $X(x)$ for the gain for value $x$.
+The above average gain becomes
+\[
+X(\ONE) p(\ONE) + \cdots X(\SIX) p(\SIX)
+= \sum_{x \in S} X(x) p(x)
+\]
+where $S = \{\ONE, ..., \SIX\}$.
+
+Here's the high-tech jargon:
+Given a sample space $S$, the above function
+\[
+X : S \rightarrow \R
+\]
+is called a \defterm{random variable}. 
+The average value of $X$ with the given probability function
+\[
+p : S \rightarrow [0,1]
+\]
+is called the \defterm{expectation or expected value}
+of $X$ and is defined to be
+\[
+E[X] = \sum_{x \in S} X(x)p(x)
+\]
+Note that the expectation value depends on $X$ and $p$.
+
+
+Now you say ... \lq\lq OK, great. Now I know how to gamble.
+But what has this to do with computer science?!?''
+
+One application of probability theory is the runtime computation
+of algorithms.
+For instance if you have the following 
+\begin{Verbatim}[frame=single]
+if (x == 0):
+    f(x)
+else:
+    g(x)
+\end{Verbatim}
+Suppose for this pseudocode, there is s probability of 1/3 that $x$ is 0
+and 2/3 if $x$ is 1.
+(There are no other possible values for $x$.)
+Furthermore, the time taken to execute \verb!f(0)! is $X(0)$ and 
+the time taken to execute $g(1)$ is $X(1)$, then
+the average time to execute this pseudocode is
+\[
+X(0) \cdot \frac{1}{3} + X(1) \cdot \frac{2}{3}
+\]
+
+Using this new idea, let's compute the average value of our
+casino game.
+First of all let's list the outcomes:
+it's $(x, y)$ where $x$ and $y$ are outcomes of rolling dice.
+The probability (assuming XYZ has not digged their dice) is
+\[
+p((x,y)) = \frac{1}{36}
+\]
+What about the random variable?
+The first rule says
+\[
+X((6, y)) = 40 - 10 = 30
+\]
+for $y \in \{1,2,3,4,5,6\}$.
+There are 6 such cases.
+The second rule says that
+\[
+X((x,x)) = 20 - 10 = 10
+\]
+for $x \neq 6$.
+There are 5 such cases.
+For all other cases
+\[
+X((x,y)) = 0 - 10 = -10
+\]
+There are $36 - 6 - 5 = 25$ such cases.
+Therefore your gain is
+\begin{align*}
+E[X] 
+&= \frac{1}{36}[6 \cdot 30 + 5 \cdot 10 + 25 \cdot (-10)]
+  = \frac{1}{36}[180 + 50 - 250] \\
+&= -\frac{20}{36} = -\frac{5}{9} \\
+&\approx -0.5555
+\end{align*}
+
+I'll formalize the concept of random variables in the next section
+where the random variable can take on values which are not real numbers.
+
+
+\newpage
+\section{Random Variables}
+
+Suppose $p : S \rightarrow [0,1]$ is a probability function.
+
+A \defterm{random variable} $X$ is a function $X : S \rightarrow \R$.
+In other words, it's just assigning a numeric (real) value to 
+every outcome in the sample space.
+You can and should think of $X$ as a \lq\lq scoring'' function
+for the sample space.
+
+Note that I'm defining $X$ as assigning real--value to each outcome.
+This is the most common scenario.
+More generally, it's possible  to have $\R$ replaced by other sets.
+
+It's really important to remember that a random variable
+is not random and is not a variable!!!
+It's just a function from a sample space to a set.
+
+There are two main reasons why we need the concept of random variables.
+Pay attention to the following.
+
+\subsection{Random variable as a scoring function}
+
+You can think of $X$ as assigning some kind of gain in a probabilitistic
+game. 
+For instance in the case of tossing a rigged coin with
+\[
+p(\HEAD) = \frac{2}{3}, \,\,\,\,\,
+p(\TAIL) = \frac{1}{3}
+\]
+suppose I play a game with you where I toss a coin and I want to count
+the number of heads, I would set
+\[
+X(\HEAD) = 1, \,\,\,\,\,
+X(\TAIL) = 0
+\]
+Or for instance suppose we play a game where if I toss my toss
+and you see a head, then you give me \$2 and if you see a tail,
+I will give you \$3.
+In this case, we can define a random variable
+\[
+X(\HEAD) = -2, \,\,\,\,\,
+X(\TAIL) = 3
+\]
+In this case, the random variable is your gain in playing the game.
+(Will you play the game?)
+
+Sometimes, instead of saying 
+\begin{itemize}
+\li If $p$ be the probability function
+of tossing a coin that is twice as likely to get a head than a tail,
+then
+\[
+p : \{\HEAD, \TAIL\} \rightarrow [0,1] 
+\]
+\[
+p(\HEAD) = \frac{2}{3}, \,\,\,\,\,
+p(\TAIL) = \frac{1}{3}
+\]
+\end{itemize}
+you might hear this:
+\begin{itemize}
+\li Let $X$ be the random variable of tossing a coin 
+that is twice as likely to get a head than a tail, then
+\[
+\Pr[X = \HEAD] = \frac{2}{3}, \,\,\,\,\,
+\Pr[X = \TAIL] = \frac{1}{3}, \,\,\,\,\,
+\]
+\end{itemize}
+The above mean the same thing.
+Sometimes the probability function related to a random variable $X$ is
+written $p_X$.
+
+You should also be familiar with the following notation.
+Suppose $X$ is the random variable of rolling a particular die.
+You might see something like this:
+\[
+\Pr[X \in \{1, 2, 3\}]
+\]
+This just mean
+\[
+p_X[\{1,2,3\}]
+\]
+where $p_X$ is the probability function of the rolling the die.
+In other words
+\[
+\Pr[X \in \{1, 2, 3\}]
+= \Pr[X = 1] + \Pr[X = 2] + \Pr[X = 3]
+\]
+In many instances, you will see that an author might be very
+informal.
+For instance you might see something like this:
+\[
+\Pr[X \text{ is odd}]
+\]
+What he/she meant is of course
+\[
+\Pr[X \in \{1, 3, 5\}]
+\]
+Of course if $p$ is the probability function, then the above
+is the same as
+\[
+p[\{1, 3, 5\}]
+\]
+
+Now the question to ask is ... why do we need the concept of a random
+variable? 
+For instance you see from the above
+\[
+\Pr[X \in \{1, 3, 5\}]
+\]
+is the same as
+\[
+p[\{1, 3, 5\}]
+\]
+Or
+\[
+\Pr[X = 1]
+\]
+is the same as
+\[
+p(1)
+\]
+
+The reason is that we want to \textit{ order} the outcomes.
+This allows us to define cumulative distribution function:
+\[
+P[X \leq x]
+\]
+
+
+\newpage
+\subsection{Random variables as labeling; creating events}
+
+The second reason for having random variables is
+that we simply want to create some 
+labels for the values in a sample space.
+The labels will then create subsets of the sample space, i.e.,
+random variables helps create meaningful events.
+
+Going back to the die roll experiment,
+the sample space is
+\[
+S = \{\ONE, \TWO, \THREE, \FOUR, \FIVE, \SIX \}
+\]
+We can define a random variable $X$ as follows:
+\[
+X : S \rightarrow \{ \textsc{Even}, \textsc{Odd} \}
+\]
+where
+\[
+X(\ONE) = X(\THREE) = X(\FIVE) = \textsc{Odd}
+\]
+and
+\[
+X(\TWO) = X(\FOUR) = X(\SIX) = \textsc{Odd}
+\]
+This means that we can talk about
+\[
+\Pr[X = \textsc{Odd}]
+\]
+which of course is just
+\[
+p(\{s \in S \mid X(s) = \textsc{Odd} \})
+\]
+Our $X$ allows us to create the following subsets of $S$:
+\begin{tightlist}
+  \li $\{ x \in S \mid X(x) = \textsc{Even} \} \subseteq S$
+  \li $\{ x \in S \mid X(x) = \textsc{Odd} \} \subseteq S$
+\end{tightlist}
+In fact these two sets form a partition of $S$ in the sense that
+they are disjoint and their union is $S$.
+  
+It's possible, in fact it's common, to have multiple
+random variables on the same sample space.
+Here's another one on die rolls:
+\[
+Y : S \rightarrow \{ \textsc{Small}, \textsc{Medium}, \textsc{Large} \}
+\]
+where
+\[
+Y(\ONE) = Y(\TWO) = \textsc{Small}
+\]
+and
+\[
+Y(\THREE) = Y(\FOUR) = \textsc{Medium}
+\]
+and
+\[
+Y(\FIVE) = Y(\SIX) = \textsc{Large}
+\]
+
+
+\newpage
+\subsection{Projection}
+
+Somewhat similar is the case where you use random variables
+as projection onto a coordinate for the case when the
+sample space is a product of space spaces.
+For instance consider the random experiment of
+tossing a coin and rolling a die.
+The sample space is
+\[
+S =
+\{\HEAD, \TAIL \}
+\times
+\{\ONE, \TWO, ..., \SIX \}
+\]
+We can define the random variable $X$ to be
+\[
+X : S \rightarrow
+\{\HEAD, \TAIL \}
+\]
+where
+\[
+X((x, y)) = x
+\]
+and $Y$ to be
+\[
+Y : S \rightarrow
+\{\ONE, ..., \SIX \}
+\]
+where
+\[
+Y((x, y)) = y
+\]
+Or even better, instead of $X$, I use
+$\textsc{Toss}$
+and instead of $Y$, I use
+$\textsc{Roll}$.
+
+This is like labelings. 
+The random variable $\textsc{Toss}$ labels
+the outcome $(\HEAD, \TWO)$ as $\HEAD$ -- it
+simply labels $(x, y)$ as $x$.
+
+
+Now consider probabilities.
+It should be clear that, assuming the coin and die are both fair
+that the pdf is uniform:
+\[
+p((x, y)) = 1/12
+\]
+The probability
+\[
+\Pr[\operatorname{Toss} = \HEAD]
+\]
+is simply
+\[
+p( \{ (x,y) \in S \mid \operatorname{Toss}(x,y) = \HEAD \} )
+\]
+which is
+\[
+p(\{(\HEAD,y) \mid y \in \{\ONE, ..., \SIX\}\} )
+\]
+This is the probability of tossing a coin and rolling a die and the
+coin toss happens to be  head.
+
+\begin{ex}
+  \begin{tightlist}
+    \item What is
+    $\Pr[\textsc{Toss} = \HEAD]$?
+    \item
+    What is
+    $\Pr[\textsc{Roll} = \ONE]$?
+    \item Suppose $p_{\textsc{Toss}}: \{\HEAD, \TAIL\} \rightarrow \R$
+    is the pdf of the random experiment of the toss of a fair coin.
+    What can you tell me about the relationship between
+    function $p_{\textsc{Toss}}$ and the values
+    $\Pr[\textsc{Toss} = \HEAD]$ and
+    $\Pr[\textsc{Toss} = \TAIL]$?
+    \item Suppose $p_{\textsc{Roll}}: \{\ONE, ..., \SIX\} \rightarrow \R$
+    is the pdf of the random experiment of rolling a fair die.
+    What can you tell me about the relationship between
+    function $p_{\textsc{Roll}}$ and the values
+    $\Pr[\textsc{Roll} = \ONE]$,
+    $\cdots$,
+    $\Pr[\textsc{Roll} = \SIX]$?
+  \end{tightlist}
+\end{ex}
+
+The point of the above is that
+\[
+p_{\textsc{Toss}}(x) = \Pr[\textsc{Toss} = x]
+\]
+The left-hand side is about the sample space $\{\HEAD, \TAIL\}$
+whereas on the right-hand side, the sample space is
+$\{\HEAD, \TAIL\} \times \{ \ONE, \ldots, \SIX \}$.
+
+
+\newpage
+\subsection{Indicator}
+
+Suppose you have a sample space $S$ and $A$ is an event of $S$,
+i.e., $A \subseteq S$.
+The following is a very useful random variable:
+\[
+X_A : S \rightarrow \R
+\]
+where
+\[
+X_A(s) =
+\begin{cases}
+  1 & \text{if $s \in A$} \\
+  0 & \text{otherwise} \\
+\end{cases}
+\]
+This is like a labeling: values in $A$ are labeled with 1
+while values not in $A$ are labeled with 0.
+It's also common to write $I_A$ for such a random variable.
+
+There are times when $A$ has only a single value.
+Say $a \in S$.
+Then I will write $X_a$ instead of $X_{\{a\}}$.
+In other words, 
+the indicator random variable for $a$ is
+\[
+X_a : S \rightarrow \R
+\]
+where
+\[
+X_a(s) =
+\begin{cases}
+  1 & \text{if $s = a$} \\
+  0 & \text{otherwise} \\
+\end{cases}
+\]
+
+
+\newpage
+\subsection{Pdf from random variables}
+
+Suppose $p : S \rightarrow \R$ is a probability distribution function
+and $X : S \rightarrow V$ be a random variable.
+Suppose $v \in V$.
+I will write $\Pr[X = v]$ for the following: 
+\[
+\Pr[X = v] = p(\{s \in S \mid X(s) = v \}) = p(X^{-1}(v))
+\]
+You will also see notations such as
+\[
+\Pr \{ X = v \}
+\]
+
+For instance for the case of the die rolling random experiment
+where $X$ is the random variable for even/oddness,
+\[
+\Pr[X = \textsc{Even}]
+\]
+is the probability of getting an even roll and
+\[
+\Pr[X = \textsc{Odd}]
+\]
+Clearly if $p : \{\ONE, \TWO, ..., \SIX\} \rightarrow [0,1]$ is a pdf
+and $X : \{\ONE, \TWO, ..., \SIX\} \rightarrow \{\textsc{Even}, \text{Odd}\}$,
+then we get a function
+\[
+P : \{ \textsc{Even}, \textsc{Odd} \} \rightarrow [0,1]
+\]
+where
+$P(\textsc{Even})$ means our $\Pr[X=\textsc{Even}]$
+and 
+$P(\textsc{Odd})$ means $\Pr[X=\textsc{Odd}]$,
+then $P$ can be viewed as a pdf as well.
+Clearly this $P$ is also a pdf.
+
+\begin{defn}
+If you have a pdf
+\[
+p : S \rightarrow [0, 1]
+\]
+and a random variable
+\[
+X : S \rightarrow V
+\]
+then you have another pdf
+\[
+p_X : V \rightarrow [0, 1]
+\]
+where
+\[
+p_X(v) = \Pr[X = v]
+\]
+\end{defn}
+
+In other words, you can get a pdf from a pdf and a random variable.
+
+\subsection{Sums and multiples of random variables}
+
+Remember that random variables are just functions.
+When you have a collection of random variables from a sample space
+to real numbers:
+\begin{align*}
+X &: S \rightarrow \R \\
+Y &: S \rightarrow \R
+\end{align*}
+then of course you can also consider
+\[
+X + Y : S \rightarrow \R
+\]
+This is clearly also a random variable.
+
+For instance say you have the random experiment of drawing a card
+from a deck.
+You can let $X$ be the random variable where $X(s)$
+is 0,1,2,3 if $s$ is a diamond, spade, heart, or club respectively
+and $Y$ be the random variable where $Y(s)$ is
+$1, 2, ..., 9, 10, 11, 12$ if the card is an A, 2, 3, 4, ..., 9, J, Q, K
+respectvely.
+The random variable $X + Y$ will for instance give you the value of
+$1$ if you draw a card of A of diamond.
+
+Note that
+\[
+E[X + Y] = E[X] + E[Y]
+\]
+The proof is easy.
+
+Also, if $a$ and $b$ are real numbers, and $X$ is a random variable
+of real numbers, then
+\[
+aX + b
+\]
+is also a random variable.
+Furthermore
+\[
+E[aX + b] = a\cdot E[X] + b
+\]
+
+There are many cases where the average value you are trying to
+compute involves the computation of the expectation value of a
+random variable, but the random variable itself can be
+expressioned as a linear combination of random variables.
+
+
+\subsection{The $\Pr[-]$ notation}
+
+So far I have used notations like
+\[
+\Pr[X = v]
+\]
+More general, you will see
+\[
+\Pr[e]
+\]
+where $e$ is a some boolean expression involving random variables.
+For instance you might see something like this:
+\[
+\Pr[X < 2]
+\]
+This means
+\[
+\Pr[X < 2]
+=
+p(\{s \in S \mid X(s) < 2\})
+\]
+It might involve a compound boolean expression such as
+\[
+\Pr[X < 2 \text{ and } X \geq 5]
+\]
+which means
+\[
+\Pr[X < 2 \text{ and } X \geq 5]
+=
+p(\{s \in S \mid X(s) < 2 \text{ and } X \geq 5 \})
+\]
+
+For instance in the case of the last expression, say that
+random variables $X$ and $Y$ are random variables on the
+sample space $S$ with pdf $p$, then
+\[
+P[X < 2 \text{ and } Y > 3]
+=
+p(A)
+\]
+where
+\[
+A = \{s \in S \mid X(s) < 2 \text{ and } Y(s) > 3 \}
+\]
+
+
+\newpage
+\newpage
+\section{Some Notational Confusion}
+
+Consider the following: Let $p$ be the pdf of the random experiment
+of tossing a fair coin where $\HEAD$ denotes the event of getting a head
+and $\TAIL$ the event of getting a tail.
+This means:
+\begin{tightlist}
+\item $S = \{\HEAD, \TAIL\}$
+\item $p: S \rightarrow [0, 1]$, $p(\HEAD) = p(\TAIL) = 1/2$
+\end{tightlist}
+
+Sometimes you will see the following in books:
+\lq\lq Let $X$ be the random variable of tossing a fair coin.''
+After that the book starts talk about 
+\[
+P(X = \HEAD)
+\]
+and 
+\[
+P(X = \TAIL)
+\]
+which are both 1/2.
+It's important for you to translate the above second version to the first.
+Furthermore, note that in this case, you have to assume that the 
+random variable $X$ does not map to $\R$, but in fact is the identity
+function, i.e.,
+\[
+X(\TAIL) = \TAIL
+\]
+and 
+\[
+X(\HEAD) = \HEAD
+\]
+
+
+
+\newpage
+[PUT THIS PROBLEM SOMEWHERE]
+
+Here are problems of the form
+\lq\lq How many times (on the average, of course)
+must you perform an experiment in order to get ...".
+
+\begin{ex}
+  What is the expected number of flips of a coin that
+  shows a head with probability $p$ if we want to get $k$ heads?
+\end{ex}
+
+{\small
+\begin{console}
+import random; random.seed()
+
+def get_flips(n, k):
+    """
+    Probability of getting a head is 1.0 / n
+    Returns the number of flips of coin to reach k heads.
+    """
+    flips = 0
+    heads = 0
+    while heads < k:
+        flips += 1
+        face = random.randrange(n)
+        if face == 0:
+            heads += 1
+    return flips
+
+n = input("n where p(HEAD) is 1/n: ")
+k = ("number of heads to reach: ")
+
+N = 1000 # number of experiments
+total_flips = 0
+for i in range(N):
+    flips = get_flips(n, k)
+    total_flips += flips
+    print "flips:", str(flips).rjust(4), \
+          " E:", float(total_flips) / (i + 1)
+\end{console}
+}
+
+I ran the above for $p = 1/10$ and $k = 10$ and got about $100$.
+When I ran it at $p = /15$ and $k = 20$, I got approximately $300$.
+So, experimentally, it seems that the expected number is
+\[
+\frac{k}{p}
+\]
+
+Here's the solution:
+If you toss the coin once, the expected number of heads is $p$.
+If you toss the coin twice, the expected number of heads is $p + p = 2p$.
+In general if $X_i$ is the indicator
+random variable for the $i$--th toss being a head,
+then we want to find $i$ such that
+\[
+E[X_1 + X_2 + \cdots + X_i] = k
+\]
+Since
+\[
+E[X_1 + X_2 + \cdots + X_i] = E[X_1] + E[X_2] + \cdots + E[X_i] = ip
+\]
+So to get $k$ heads,
+\[
+ip = k
+\]
+and therefore
+\[
+i = k/p
+\]
+i.e., on the average, the number of tosses to get $k$ heads
+is $k/p$. \qed
+
+\begin{ex}
+On the average, how many times must you a roll a die to get $k$ sixes?
+\qed
+\end{ex}
+
+\begin{ex}
+On the average, how many times must you a roll a die to get
+$3$ sixes? $k$ consecutive sixes?
+\qed
+\end{ex}
+
+\begin{ex}
+On the average, how many times must you toss a coin to
+not get alternating HTHT... or THTH...?
+\qed
+\end{ex}
+
+\begin{ex}
+  You write a program to generate 10 random numbers chosen from
+  $0, 1, 2, ..., 99$.
+  How many times do you need to run the program (on the average)
+  to get an ascending sequence?
+  \qed
+\end{ex}
+
+\begin{ex}
+  You have a random sequence of 10 distinct numbers.
+  You randomly pick two numbers and swap them if they are no in ascending
+  order.
+  On the average, how many times must you perform the above swapping
+  operation to sort the numbers in ascending order?
+  \qed
+\end{ex}
+
+\begin{ex}
+  You have a regular $n$--gon.
+  You randomly pick two pairs of vertices of the $n$--gon and join them.
+  On the average, how many pairs do you need to join in order to get
+  at least a point of intersection not on a vertex?
+\end{ex}
+
+\section{Independence of random variables}
+
+\begin{defn}
+  Let $X$ and $Y$ be random variables on sample space $S$.
+  We say that $X$ and $Y$ are \defterm{independent} if
+  \[
+  P[X=x \text{ and } Y=y] = P[X=x] \cdot P[Y=y]
+  \]
+\end{defn}
+
+
+Here's the intuition.
+Suppose you have a die and a coin.
+Your random experiment is rolling the die and tossing the coin.
+Suppose the die is loaded:
+\[
+p_{die}(\ONE) = ... = p_{die}(\FIVE) = 1/10, \,\,\, p_{die}(\SIX) = 1/2
+\]
+and so is the coin:
+\[
+p_{coin}(\HEAD) = 2/3, \,\,\, p_{coin}(\HEAD) = 1/3
+\]
+Let $S = \{\ONE, ..., \SIX\} \times \{\HEAD,\TAIL\}$.
+Let $X : S \rightarrow \{\ONE, ..., \SIX\}$ be
+\[
+X(s, t) = s
+\]
+and
+let $Y : S \rightarrow \{\HEAD, \TAIL\}$ be
+\[
+Y(s, t) = t
+\]
+Then
+\[
+P[X=s \text{ and } Y=t] = p_{die}(s) \cdot p_{coin}(t)
+\]
+Also, we have
+\begin{align*}
+P[X=s] 
+&= \sum_{t \in \{\HEAD, \TAIL\}} p_{die}(s) p_{coin}(t) \\
+&= p_{die}(s) \sum_{t \in \{\HEAD, \TAIL\}} p_{coin}(t) \\
+&= p_{die}(s) 
+\end{align*}
+Likewise
+\[
+P[Y=t] 
+= p_{coin}(t) 
+\]
+Therefore $X$ and $Y$ are independent.
+This is what you would expect:
+The result of the die roll should be independent of the
+result of the coin toss.
+
+
+\begin{thm}
+  Let $X$ ad $Y$ be independent.
+  Then
+  \[
+  E[XY] = E[X] \cdot E[Y]
+  \]
+\end{thm}
+
+
+\proof
+\begin{align*}
+  E[XY]
+  &= \sum_{s \in S} X(s)Y(s) p(s) \\
+\end{align*}
+\endproof
+
+
+\newpage
+\section{Birthday paradox with random variables}
+
+Recall that for the probability of having 2 people among $n$
+to have the same birthday to be $> 1/2$, we need $n \geq 23$.
+
+There's an analogus method that uses random variables.
+
+Assume there are $n$ people in the room.
+Let $X_{ij}$ be the indicator rv that the $i$--th and $j$--th persons
+have the same birth.
+Therefore 
+\[
+E \left[ \sum_{i=1}^{n} \sum_{j=i+1}^{n} X_{ij} \right]
+\]
+is the number of people in the room whose birthday falls on the
+same day as someone else in the room, without double-counting.
+(Without double-counting means is John's birthday equals Tom,
+then we count John,Tom as a matching pair \textit{once}.)
+
+In more details, let $S = \{1, ..., 366\}^n$, i.e., the
+set of $n$--tuples where each value of a tuple is taken from the set
+$\{1, ..., 366\}$.
+I'm assuming that there are 366 days per year.
+Let $p : S \rightarrow \R$ be the uniform pdf on $S$, i.e.,
+$p$ is the product of $n$ uniform pdfs on $\{1, ..., 366\}$.
+Define $X : S \rightarrow \R$ as follows: let
+$s = (s_1, ..., s_{366}) \in S$. Then
+\[
+X(s) = \text{number of $s_i$'s that equals some $s_j$
+where $i < j$}
+\]
+We can also define $X_{ij} : S \rightarrow \R$ such that
+for $s = (s_1, ..., s_n) \in S$,
+\[
+X_{ij}(s) =
+\begin{cases}
+  1 & \text{if $s_i = s_j$} \\
+  0 & \text{otherwise}
+\end{cases}
+\]
+Then
+\[
+X =
+\sum_{i=1}^{n} \sum_{j=i+1}^{n} X_{ij}
+\]
+
+Note that
+\[
+E \left[ X_{ij} \right] = \frac{1}{366}
+\]
+Why? Because
+\[
+E \left[ X_{ij} \right] = \sum_{s \in S} X_{ij}(s) p(s)
+\]
+and the only term that is nonzero is when $X_{ij}(s) = 1$
+where $s_i = s_j$
+and it's easy to see that in this case
+$p(s) = 1/366$: For the case where $s_i = 1 = s_j$, there
+are $366^{n-2}$ tuples,
+for the case where $s_i = 2 = s_j$, there are
+$366^{n-2}$ tuples, etc.
+Therefore there are $365^{n-2} \cdot 365 = 365^{n-1}$ tuples
+where $s_i = s_j$.
+Therefore $p(s) = 365^{n-1}/|S| = 365^{n-1}/365^n = 1/365$.
+
+There's another way to think about the above:
+Let
+\[
+A
+=
+\{s \mid \text{there is some $i$ such that }
+s_i = s_j \text{ for some $j > i$}\}
+\]
+Now for each $i$,
+\[
+A_i = \{s \mid s_i = s_j \text{ for some $j > i$}\}
+\]
+Then
+\[
+A = \dot{\bigcup}_{i=1}^n A_i
+\]
+(the union is disjoint).
+Say there are 4 days in a year and there are 3 people.
+{\scriptsize
+\begin{tightlist}
+  \li $(1,1,1)$
+  \li $(1,1,2)$
+  \li $(1,1,3)$
+  \li $(1,1,4)$
+  \li $(1,2,1)$
+  \li $(1,2,2)$
+  \li $(1,2,3)$
+  \li $(1,2,4)$
+  \li $(1,3,1)$
+  \li $(1,3,2)$
+  \li $(1,3,3)$
+  \li $(1,3,4)$
+  \li $(1,4,1)$
+  \li $(1,4,2)$
+  \li $(1,4,3)$
+  \li $(1,4,4)$
+  \li $(2,1,1)$
+  \li $(2,1,2)$
+  \li $(2,1,3)$
+  \li $(2,1,4)$
+  \li $(2,2,1)$
+  \li $(2,2,2)$
+  \li $(2,2,3)$
+  \li $(2,2,4)$
+  \li $(2,3,1)$
+  \li $(2,3,2)$
+  \li $(2,3,3)$
+  \li $(2,3,4)$
+\end{tightlist}
+}
+Prob $p_1$ that person 1 shares a bday with someone:
+
+Hence the number of pairs of people with non-unique birthdays is given by
+\[
+E \left[
+  \sum_{i=1}^{n} \sum_{j=i+1}^{n} X_{ij}
+  \right]
+  =
+  \sum_{i=1}^{n} \sum_{j=i+1}^{n} 
+  E \left[X_{ij}\right]
+  =
+  \binom{n}{2}\frac{1}{366}
+\]
+Therefore for there to be at least a pair with the same birthdays is the
+same as saying
+\begin{align*}
+     & \binom{n}{2} \frac{1}{366}  \geq 1 \\
+\iff & \,\,\,\,\, \frac{n(n-1)}{2} \geq 366 \\
+\iff & \,\,\,\,\, n(n-1)           \geq 2 \cdot 366 \\
+\iff & \,\,\,\,\, n^2 - n - 2 \cdot 366 \geq 0\\
+\end{align*}
+The roots of $x^2 - x - 2 \cdot 366$ are
+\[
+x = \frac{1 \pm \sqrt{1 + 4 \cdot 2 \cdot 366}}{2}
+\]
+The positive root is approximately $27.56...$.
+Therefore if there are at least 28 people, you will have a pair with
+the same birthday.
+Therfore
+\begin{align*}
+  E \left[
+  \sum_{i=1}^{n} \sum_{j=i+1}^{n} X_{ij}
+  \right] \geq 1
+\iff & \,\,\,\,\, n^2 - n - 2 \cdot 366 \geq 0\\
+\iff & n \geq 28
+\end{align*}
+
+Let $n$ be the number of people who share the same birthday
+and $N$ be the number of days.
+Then the expected number of people who share a birthday with someone is
+\[
+n(1 - (1 - 1/N)^{n-1})
+\]
+So
+\[
+n(1 - (1 - 1/N)^{n-1}) \geq 1
+\]
+The graph shows that this happens with $n \geq 20$ (the value of the
+expression is then 1.11823...)
+Why is this not 23?
+
+Note the difference:
+\begin{tightlist}
+  \item If there are 23 people, then the probability that there's a
+  pair with the same birthdays is approximately $0.5$
+  \item If there are 28 people, then the expected number of pairs
+  of same birthdays is $\geq 1$.
+\end{tightlist}
+
+They sound the same, but in fact they are different (which is why the
+above computation yields two different values or 23 and 28.)
+
+The probability computation tells us that when you have 23 or more people
+in a room, it's more likely that there is a pair of people with the same
+birthday.
+What about the expectation computation?
+Let $p(i)$ denotes the probability that there
+are exactly $i$ people each of
+whom can be paired up with someone else who has the same birthday.
+Then the probability that there is at least one pair with the same birthday is
+then
+\[
+\sum_{i=2}^n p(i)
+\]
+The expectation computated above on the other hand is
+\[
+\sum_{i=0}^n p(i) \cdot i
+\]
+(Of course by definition $p(0) = p(1) = 0$. Right?)
+
+Something's not right.
+Consider a box with 6 red balls and 4 black balls.
+The probability of picking a red is $6/10 > 0.5$.
+The expectation of picking a red is $6/10 \cdot 1 + 4/10 \cdot 0 = 6/10$
+and not 1.
+Or consider the case where the box has $n$ red balls
+and 4 black balls.
+For the probability of picking a red is $n / (n + 4)$.
+For this to be $> 0.5$, $n / (n + 4) > 0.5$
+which give $2n > n + 4$ which is $n > 4$.
+The expectation of picking a red is
+$(n/(n+4)) \cdot 1 + (4/(n+4)) \cdot 0 = n/(n + 4)$.
+For this to be $\geq 1$, we get $n/(n + 4) > 1$
+which is impossible.
+
+
+\subsection{From a website}
+
+\begin{lstlisting}[breaklines=true]
+https://math.stackexchange.com/questions/35791/birthday-problem-expected-number-of-collisions?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa!
+\end{lstlisting}
+
+Let $X$ be the r.v. for number of people with non-unique
+birthdays.
+In other words if $s = (s_1, s_2, \ldots, s_n) \in S$,
+then
+\[
+X(s)
+=
+|\{
+s_i \mid 1 \leq i \leq n, \,\,\, s_i = s_j
+\text{ for some $j \neq i$, $1 \leq j \leq n$}
+\}|
+\]
+Let $X_i$ be
+\[
+X_i(s)
+=
+|\{
+s_i \mid \,\,\, s_i = s_j
+\text{ for some $j \neq i$, $1 \leq j \leq n$}
+\}|
+\]
+Then
+\[
+X = \sum_{i=1}^n X_i
+\]
+Note that this does not count the number of \textit{pairs} of people
+with same birthdays.
+This counts the number of people.
+For instance if $n = 2$ and $s = (1, 1)$,
+then $X_1(s) = 1$ and $X_2(s) = 1$
+since for this selection of people, both have Jan 1 as their birthdays.
+This $X$ will give 2 while the $X$ from the previous section gives 1.
+
+
+From website
+\[
+E[X] = np
+\]
+where
+\[
+p = n(1 - (1 - 1/N)^{n-1})
+\]
+
+Note that if we want to have one person with nonunique birthdays,
+then we need $X \geq 2$.
+So we need to find $n$ such that
+\[
+E[X] = n(1 - (1 - 1/366)^{n-1})
+\]
+
+Here's a program to find the $n$.
+\begin{python}
+N = 366
+for n in range(1, 31):
+    print n, n*(1 - (1 - 1.0/N)**(n-1))
+    print
+\end{python}
+This means that $n$ have to be at least roughly 28 or 29 for
+$X$ to achieve a value of 2.
+
+
+
+
+
+
+\subsection{Comparing the above two methods}
+
+The probability method: Find the smallest $n$ such that
+\[
+p = 1 -
+\left(1 - \frac{1}{366}\right) \cdot 
+\left(1 - \frac{2}{366}\right) \cdot
+\cdots \cdot
+\left(1 - \frac{365}{366}\right) > 0.5
+\]
+The expectation method: Find the smallest $n$ such that
+\[
+E[X] =
+n
+\left(
+  1 - \left(1 -\frac{1}{366}\right)^{n-1}
+\right)
+\geq 2
+\]
+
+
+\subsection{Generalizations}
+

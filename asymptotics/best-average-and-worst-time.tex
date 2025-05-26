@@ -1,0 +1,417 @@
+%-*-latex-*-
+\sectionthree{Best, average, and worst runtime}
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+
+Now let me consider an algorithm 
+when the body of the for-loop 
+contains an \verb!if!-statement.
+
+The following computes the index in an (unsorted) 
+array \verb!x! of size \verb!n!
+where \verb!target! is 
+first found, i.e., this is the linear search algorithm:
+
+\begin{Verbatim}[frame=single, fontsize=\footnotesize]
+index = -1
+for i = 0, 1, 2, ..., n - 1:
+    if x[i] is target:
+        index = i
+        break
+\end{Verbatim}
+Here's the above written in a way that makes timing calculation easier:
+\begin{Verbatim}[frame=single, fontsize=\footnotesize]
+                                 time   
+         index = -1              t1 
+         i = 0                   t2 
+LOOP:    if i >= n:              t3  
+             goto ENDLOOP        t4 
+         if x[i] is not target:  t5
+             goto ELSE           t6
+         index = i               t7 
+         goto ENDLOOP            t8
+ELSE:    i = i + 1               t9 
+         goto LOOP               t10 
+ENDLOOP:
+\end{Verbatim}
+
+(For non-programmers:
+when I say array \verb!x! is an array of size \verb!n! I mean that
+you have \verb!x[0]!, \verb!x[1]!, \ldots, \verb!x[n-1]!
+which is similar to the mathematical idea of 
+a bunch of variables with scripts $x_0$, $x_1$, $\ldots$, $x_{n-1}$.
+\verb!break! means to get out of the current loop.
+The time to access the \verb!i!--th element \verb!x[i]! of \verb!x! is
+constant.)
+
+The amount of time needed of course depends on how fast we hit \verb!target!:
+if \verb!target! happens to be at index 0, of course the algorithm ends
+quickly. 
+This is the best case scenario.
+And if \verb!target! is at index $n-1$ or if it's not even in the array,
+the algorithm would run longer since you would have to scan the whole array.
+These are the worst case scenarios.
+
+Note that in my first timing example that computes the sum from 1 to $n$,
+I converted a for-loop into statements of a simplified
+language that uses the goto and the
+conditional branching statement.
+For the above example, it's easy to see that if you have an algorithm
+that has an if-else statement such as
+\begin{Verbatim}[frame=single, fontsize=\footnotesize]
+if x > 1:
+    statement-1
+    statement-2
+else:
+    statement-3    
+    statement-4
+\end{Verbatim}
+you can rewrite that in the simplified language as
+\begin{Verbatim}[frame=single, fontsize=\footnotesize]
+         if x <= 1:
+             goto ELSE
+         statement-1
+         statement-2
+         goto ENDIF
+ELSE:    statement-3
+         statement-4
+ENDIF:         
+\end{Verbatim}
+Note that the conditional branching leads to the else case, and therefore
+the boolean condition is the opposite of the boolean condition of the
+if-else statement.
+Now let's go back to the timing calculations.
+
+Here's the timing calculation for the best scenario:
+\begin{Verbatim}[frame=single, fontsize=\footnotesize]
+                                   time    number of times   
+         index = -1                t1      1
+         i = 0                     t2      1
+LOOP:    if i >= n:                t3      1
+             goto ENDLOOP          t4      0
+         if x[i] is not target:    t5      1
+             goto ELSE             t6      0
+         index = i                 t7      1
+         goto ENDLOOP              t8      1
+ELSE:    i = i + 1                 t9      0
+         goto LOOP                 t10     0
+ENDLOOP:
+\end{Verbatim}
+The time taken is
+\begin{align*}
+\text{Time taken } 
+&= A
+\end{align*}
+for some constant $A$.
+In this case the constant function $f(n) = A$
+is a constant multiple of the simpler function $g(n) = 1$.
+Since we ignore multiples, I can say that for this 
+\lq\lq optimistic'' case, the runtime is $O(1)$.
+Mathemtically, I can write this:
+\begin{align*}
+\text{Time taken } 
+&= A = O(1)
+\end{align*}
+
+For the worst case where the \verb!target! is the last element of the array,
+i.e., at index \verb!n - 1!,
+we have the following:
+\begin{Verbatim}[frame=single, fontsize=\footnotesize]
+                                   time     number of times   
+         index = -1                t1       1
+         i = 0                     t2       1
+LOOP:    if i >= n:                t3       n
+             goto ENDLOOP          t4       0
+         if x[i] is not target:    t5       n 
+             goto ELSE             t6       n - 1
+         index = i                 t7       1
+         goto ENDLOOP              t8       1
+ELSE:    i = i + 1                 t9       n - 1
+         goto LOOP                 t10      n - 1
+ENDLOOP:
+\end{Verbatim}
+The time taken is
+\begin{align*}
+\text{Time taken } 
+&= t_1 + t_2 + t_7 + t_8 + 
+   (t_3 + t_5)n + 
+   (t_6 + t_9 + t_{10})(n - 1) \\
+&= (t_3 + t_5 + t_6 + t_9 + t_{10})n +
+   (t_1 + t_2 - t_6 + t_7 
+    + t_8 - t_9 - t_{10}) \\ 
+&= An + B
+\end{align*}
+for constants $A$ and $B$.
+In this case the runtime function is big-O of $n$, i.e., it is 
+$O(n)$.
+I write:
+The time taken is
+\[
+\text{Time taken } 
+= An + B = O(n)
+\]
+
+For the worst case where the \verb!target! is not found
+we have the following:
+\begin{Verbatim}[frame=single, fontsize=\footnotesize]
+                                   time    number of times   
+         index = -1                t1      1
+         i = 0                     t2      1
+LOOP:    if i >= n:                t3      n + 1
+             goto ENDLOOP          t4      1
+         if x[i] is not target:    t5      n 
+             goto ELSE             t6      n
+         index = i                 t7      0
+         goto ENDLOOP              t8      0
+ELSE:    i = i + 1                 t9      n
+         goto LOOP                 t10     n
+ENDLOOP:
+\end{Verbatim}
+The time taken is
+\begin{align*}
+\text{Time taken } 
+  &= t_1 + t_2 + 
+    t_4 + 
+    n(t_3 + t_5 + t_6 + t_9 + t_{10}) +
+    (n + 1) t_3 \\
+  &= n(t_3 + t_5 + 
+    t_6  + 
+    t_9 +
+    t_{10}
+    )
+    +
+    t_1 + 
+    t_2 + 
+    t_3 + 
+    t_4 \\
+&= An + B \\
+&= O(n)
+\end{align*}
+for constants $A$ and $B$.
+In the second worst case scenario,
+the runtime function is also big-O of $n$, 
+i.e., it is $O(n)$.
+
+In summary the best runtime and the two worst runtimes are
+\begin{align*}
+A_1 &= O(1) \\
+A_2n + B_2 &= O(n) \\
+A_3n + B_3 &= O(n) 
+\end{align*}
+
+Usually performance of algorithms are described in terms of
+best, worst, and average times.
+If you want to lump up all the runtimes (i.e., you don't really want to
+be that specific), we want to say that runtime is $O(n)$, 
+referring to the absolute worst scenario.
+
+In other words you should think of the big-O notation $O(n)$
+as some kind of \textit{upper} bound approximation, i.e.,
+all the above times are bounded above by a large enough multiple of $n$:
+\begin{align*}
+A_1        &\leq C \cdot n \\
+A_2n + B_2 &\leq C \cdot n \\
+A_3n + B_3 &\leq C \cdot n
+\end{align*}
+where $C$ is some humongous fixed number and the above inequalities
+are true for large values of $n$.
+
+While talking about a specific algorithm, to distinguish between
+the best, worst, and average runtime, I will write
+$T_{b}(n)$,
+$T_{w}(n)$,
+and
+$T_{a}(n)$.
+(Technically speaking there are two different worst case scenarios
+for the linear search above.
+But they both yield the same big-O anyway.)
+
+If I don't say which of the three cases, I always mean the 
+worst case $T_w(n)$.
+
+I have shown you above that for the linear search
+\begin{align*}
+T_b(n) &= O(1) \\
+T_w(n) &= O(n)
+\end{align*}
+
+The average case is a little more complicated.
+In the above linear search algorithm, we looked at
+three cases (one best and two worst).
+But in general, the \verb!target! can be anywhere and you would have to 
+account for all of them, measure their times, 
+say we call them $T_0(n)$, ..., $T_n(n)$
+where the algorithm has $n + 1$ cases
+($T_0(n)$ corresponding to the time where the \verb!target! is at index 0, ...
+and $T_n(n)$ corresponding to the time where the \verb!target! is not
+in the array at all)
+and then take the average:
+\[
+\frac{T_0(n) + \cdots + T_n(n)}{n + 1}
+\]
+But that assumes something: 
+That the cases corresponding to times $T_0(n)$, ..., $T_n(n)$ are
+equally likely to occur.
+
+Depending on specific scenario, 
+there are cases that might occur more frequently.
+For instance if in the above, the case where the index 0 occurs twice
+as frequently as the rest, then the average would be
+\[
+\frac{2T_0(n) + \cdots + T_n(n)}{n + 2}
+\]
+To analyze the average runtime for
+complicated cases requires a little more probability theory.
+For now we will only handle very simplistic average cases.
+
+In general, to compute \textit{an} (not \textit{the}) 
+average runtime, you have to 
+\begin{enumerate}[nosep]
+\item[(1)] state what cases you're averaging over and 
+\item[(2)] what is the likelihood of each case.
+\end{enumerate}
+When the cases are not stated, they are usually obvious.
+Also, if the likelihood of each case is not stated, then it is assumed
+that all cases are equally likely.
+
+For many algorithms and many average scenarios, 
+the average runtimes tend to be
+the same as the worst runtime when you fudge the functions using big-O. 
+
+Now that I've explained how to compute the average runtime, let's
+compute the average runtime of the linear search assuming that we
+are only averaging over the cases where
+\verb!target! is at index $0, 1, 2, ...,  n - 1$.
+Note that I'm not considering the case 
+where \verb!target! is not in the array.
+If you like you can think of this as the 
+\lq\lq average runtime for a successful search''.
+(In a later section, I'll include the case where the \verb!target!
+is not in the array -- this is just slightly more complicated.)
+
+Let me assume that \verb!target! is at index value $k$
+where $0 \leq k \leq n - 1$.
+Here's the number of times each statement will execute in this case:
+\begin{Verbatim}[frame=single, fontsize=\footnotesize]
+                                   time    number of times   
+         index = -1                t1      1
+         i = 0                     t2      1
+LOOP:    if i >= n:                t3      k + 1
+             goto ENDLOOP          t4      0
+         if x[i] is not target:    t5      k + 1 
+             goto ELSE             t6      k 
+         index = i                 t7      1
+         goto ENDLOOP              t8      1
+ELSE:    i = i + 1                 t9      k
+         goto LOOP                 t10     k
+ENDLOOP:
+\end{Verbatim}
+Therefore time taken for this case is
+\begin{align*}
+T_k(n)
+  &= (t_1 + t_2 + t_7 + t_8)
+    + (t_3 + t_5)(k + 1)
+    + (t_6 + t_9 + t_{10})k \\
+  &= (t_3 + t_5 + t_6 + t_9 + t_{10}) k
+    + (t_1 + t_2 + t_3 + t_5 + t_7 + t_8)
+\end{align*}
+for $k = 0, 1, 2, ..., n - 1$.
+Let $T_n$ be the time corresponding to the case where
+\verb!target! is \textit{not} in the array.
+Earlier, I have already computed the runtime for the case where 
+\verb!target! is not in the array:
+\[
+  T_n(n) =
+  (t_3 + t_5 + 
+    t_6  + 
+    t_9 +
+    t_{10}
+    )n
+    +
+    t_1 + 
+    t_2 + 
+    t_3 + 
+    t_4
+\]
+To simplify the constants 
+(because later, we'll be computing by big-O anyway),
+let
+\begin{align*}
+A &= t_3 + t_5 + t_6 + t_9 + t_{10} \\
+B &= t_1 + t_2 + t_3 + t_5 + t_7 + t_8 \\
+C &= t_3 + t_5 + 
+    t_6  + 
+    t_9 +
+    t_{10} \\
+D &= t_1 + 
+    t_2 + 
+    t_3 + 
+    t_4
+\end{align*}
+Here's a summary:
+\begin{align*}
+T_k(n) &= Ak + B, \,\,\,\,\,(k = 0, 1, 2,..., n - 1) \\
+T_n(n) &= Cn + D
+\end{align*}
+
+OK, now I'm going to compute the average runtime
+assuming 
+\begin{itemize}
+\item the \verb!target! is in the array with equal likelihood
+at all index positions.
+\end{itemize}
+
+Remember: This average runtime scenario
+does \textit{not} include the case where the \verb!target!
+is not in array \verb!x!.
+So I need to average over $T_0(n), \ldots, T_{n-1}(n-1)$ ... 
+do \textit{not} include $T_n(n)$.
+
+This average runtime is
+\begin{align*}
+T_a(n) 
+&= \frac{1}{n} 
+   \left(
+     T_0(n) + T_1(n) + \cdots + T_{n - 1}(n) 
+   \right)
+\\
+&= \frac{1}{n}
+   \left(
+     (A\cdot 0 + B) + 
+     (A\cdot 1 + B) + 
+     \cdots
+     (A\cdot (n - 1) + B)
+   \right)
+\\
+&= \frac{1}{n}
+   \left(
+     A\cdot (0 + 1 + \cdots + (n - 1))
+     + Bn 
+   \right)
+\\
+&= \frac{1}{n}
+   \left(
+     A \cdot \frac{n(n-1)}{2} + Bn
+   \right)
+\\
+&= \frac{1}{n}
+   \left( 
+     \frac{A}{2} n^2
+     + \left( B - \frac{1}{2}A \right) n
+   \right)
+\\
+&= \frac{A}{2} n
+   + \left( B - \frac{1}{2}A \right)
+\\
+&= O(n)
+\end{align*}
+
+
+That's it!
+
+\newpage\input{exercises/best-average-worst-0/main.tex}
+\newpage\input{exercises/max/main.tex}
+\newpage\input{exercises/best-average-worst-1/main.tex}
+\newpage\input{exercises/best-average-worst-2/main.tex}
+\newpage\input{exercises/best-average-worst-3/main.tex}
