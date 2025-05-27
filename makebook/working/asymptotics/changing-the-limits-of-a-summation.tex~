@@ -1,0 +1,204 @@
+\section{Bubblesort again: Changing the Limits of a Summation}
+
+In the previous section, I showed you the following big-O formula:
+\[
+\sum_{i=1}^n i^k = O(n^{k+1})
+\]
+But if you look at the big-O computation of the worse case runtime
+for the bubblesort, you see that you the sum that appear is actually
+this:
+\[
+\sum_{i=0}^{n-2} i
+\]
+
+RANT ...  RANT ... RANT:
+\begin{itemize}
+\li The lower limit of the summation is $0$ and not $1$!!!
+\li The upper limit of the summation is $n-2$ and not $n$!!!
+\end{itemize}
+
+AARRGHHH!!! OK, don't panic ... let's see what I can do about them ...
+
+\begin{thm} 
+From the above, we know that if $k \geq 0$ is an integer, then
+\[ \sum_{i=1}^{n} i^k = O(n^{k+1}) \]
+The above is still true if the sum 
+\[
+\sum_{i = 1}^n
+\]
+is replaced by a sum of the form
+\[
+\sum_{i = c}^{n - d}
+\]
+where $c$ and $d$ are constants.
+\end{thm}
+
+\begin{eg}
+For instance the theorem tells us that 
+\begin{align*}
+\sum_{i = 0}^{n} i &= O(n^2) \\
+\sum_{i = 3}^{n - 1} i^{2} &= O(n^3) \\
+\sum_{i = 2}^{n + 2} i^{100} &= O(n^{101})
+\end{align*}
+\qed
+\end{eg}
+
+Now I'm going to prove that changing the lower limit of the summation
+does not affect the big-O.
+In fact this is true for summation of {\it any} type of terms, not just $i^k$.
+The main idea is that the first few terms of a summation is of course ...
+{\it constant!!!}
+
+For instance for the case where the terms are $i^7$ and the lower
+limit of the summation is changed to 4, I have
+\begin{align*}
+\sum_{i = 4}^n i^7 
+&= \sum_{i=1}^n i^7 - 1^7 - 2^7 - 3^7 \\
+&= \sum_{i=1}^n i^7 - C
+\end{align*}
+where $C = - 1^7 - 2^7 - 3^7$ is a constant.
+Of course adding a constant to
+$\sum_{i = 4}^n i^7$
+does not change its big-O.
+
+This gives me the hint that if I should look at an expression of the form
+\[
+F(n) = G(n) + C
+\]
+I want to be able to say:
+\[
+F(n) = G(n) + C \implies F(n) = O \left( G(n) \right)
+\]
+Can I?
+If not, what condition should I put on $F(n)$ and $G(n)$ to be able to 
+say that??
+Well ... if $G(n)$ is unbounded, it beats 
+$C$ after some point, then for $n \geq N$,
+then 
+\[
+G(n) \geq C
+\]
+and then
+\[
+F(n) = G(n) + C \leq G(n) + G(n) = 2G(n)
+\]
+That works!!!
+But what if $G(n)$ is bounded?
+Well, then $G(n) = O(1)$ and
+\[
+F(n) = O(G(n) + C) = O(1 + 1) = O(1)
+\]
+and $F(n)$ and $G(n)$ has the same big-O again.
+So whether $G(n)$ is bounded or unbounded, we have the same result.
+
+\begin{thm} If $c$ is a constants then
+\[
+\sum_{i = c}^{n} f(i) =
+O
+\left(
+\sum_{i = 1}^{n} f(i)
+\right)
+\]
+\end{thm}
+
+{\it Proof.}
+There is nothing to prove is $c = 1$.
+If $c > 1$, then
+\[
+\sum_{i=c}^n f(i) 
+= \sum_{i = 1}^{n} f(i) - (f(1) + f(2) + \cdots + f(c - 1))) 
+= \sum_{i = 1}^{n} f(i) + C
+\]
+where $C$ is a constant.
+And if $c < 1$, then
+\[
+\sum_{i=c}^n f(i) 
+= \sum_{i = 1}^{n} f(i) + (f(c) + f(c+1) + \cdots + f(0)))
+= \sum_{i = 1}^{n} f(i) + D
+\]
+where $D$ is a constant.
+Therefore in both cases, 
+$\sum_{i=c}^n f(i)$ and
+$\sum_{i=1}^n f(i)$
+differ by a constant.
+From our observation above, these two functions of $n$ have the 
+same big-O (or $n$).
+\qed
+
+
+
+Now what about the upper limit?
+In the case where $f(i) = i^k$ for a constant $k$,
+if the upper limit is $n - 2$ instead of $n$:
+\[
+\sum_{i = 1}^{n - 2} i^k
+= \sum_{i=1}^n i^k - (n-1)^k - n^k 
+\]
+Since $\sum_{i=1}^n i^k = O(n^{k+1})$,
+$-(n-1)^k = O(n^k)$, and $-n^k = O(n^k)$,
+we have
+\[
+\sum_{i = 1}^{n - 2} i^k
+= O(n^{k+1})
+\]
+
+
+Now let me show you how to use the above to redo the runtime
+of our bubblesort ... 
+
+\newpage
+
+\begin{eg}
+Compute the big-O of the runtime of the bubblesort:
+\begin{Verbatim}[frame=single]
+for i = n - 2, ..., 0:
+    for j = 0, ..., i:
+        if a[i] > a[i + 1]:
+            t = a[i]
+            a[i] = a[i + 1]
+            a[i + 1] = t
+\end{Verbatim}
+\end{eg}
+
+{\it Solution.}
+The runtime of the body of the inner loop is constant time
+say $A = O(1)$.
+The runtime of the inner loop is
+\[
+U(i) = \sum_{j=0}^i A + B(i+1) + C
+\]
+for constants $B$ and $C$.
+Therefore
+\begin{align*}
+U(i) 
+&= O \left( \sum_{j=0}^i A + B(i+1) + C \right)
+= O \left( \sum_{j=0}^i 1 + i \right)
+= O(i + i)
+= O(i)
+\end{align*}
+For the whole algorithm, the runtime is:
+\[
+T(n) = \sum_{i=0}^{n-2} U(i) + Cn + D
+\]
+Therefore
+\begin{align*}
+T(n) 
+&= O \left (
+         \sum_{i=0}^{n-2} U(i) + Cn + D
+     \right)
+&= O \left (
+         \sum_{i=0}^{n-2} i + n
+     \right)
+&= O \left (
+         n^2 + n
+     \right)
+&= O(n^2)
+\end{align*}
+\qed
+
+\newpage
+
+
+
+[TODO: Talk about the case where the limits are 
+floor/ceiling of proportions of $n$]

@@ -1,0 +1,912 @@
+\section{Recursion with Floors}
+
+Recall the runtime of the mergesort is of the form
+\[
+T(n) 
+= 
+\begin{cases}
+A                        & \text{if $n = 0, 1$} \\
+T(\floor{n/2}) + T(\ceiling{n/2}) + Bn + C & \text{otherwise}
+\end{cases}
+\]
+Recall that in order to compute the runtime, I simplified the recurrence
+to
+\[
+T(n) = 2T(n/2) + Bn + C
+\]
+which is the same as the original recurrence {\it if} $n$ is a power of $2$.
+Using $n = 2^m$, I showed that 
+\[
+T(n) = An + Bn \log_2(n) + C(n-1)
+\]
+and therefore $T(n) = O(n\log_2 n)$ (assuming $B \neq 0)$.
+
+As I mentioned earlier, the above argument is not quite right
+since I assumed $n = 2^m$.
+In this section I want to analyze the above recurrence
+relation for {\it all} positive integers, not just powers of $2$.
+
+Now, in order to make the computations digestible, 
+I'm just going to focus on floors.
+(I'll show you how to handle ceilings later.)
+So for this section, I will show that the above big-O is in fact true but
+I'm going to use this function:
+\[
+T(n) 
+= 
+\begin{cases}
+A                        & \text{if $n = 0, 1$} \\
+2T(\floor{n/2}) + Bn + C & \text{otherwise}
+\end{cases}
+\tag{1}
+\]
+For convenience, let me define
+\[
+g(n) = An + Bn\log_2(n) + C(n - 1)
+\]
+
+Let me plot $T(n)$ and $g(n)$ for the case of
+\[
+A = B = C = 1
+\]
+
+Here's the plot of $T(n)$ (blue) and $g(n)$ (red):
+\begin{python}
+from latextool_basic import *
+N = 33
+STEP = 1
+table = {}
+def t(n):
+    n = int(n)
+    if n <= 1: return 1
+    else:
+        if not table.has_key(n):
+            table[n] = 2 * t(n/2) + n + 1
+        return table[n]
+
+p = FunctionPlot(domain="0:%s" % N, vars=['x'])
+points = [(n, t(n)) for n in range(0, N + 1, STEP)]
+p.add(points, style='step', color='blue', python=1)
+p.add("x + x * log(x, 2) + (x - 1)", color='red', python=1, pin='above left',
+pin_message='n + n \log_2 n + (n - 1)')
+print p
+\end{python}
+
+By the way, you notice that $T(n)$ has some sharp jumps.
+For instance there is a sharp jump at $n = 16$
+for $T(n)$.
+I'll let you think about that.
+
+Here's a zoom in around $n = 16$:
+\begin{python}
+from latextool_basic import *
+N = 18
+STEP = 1
+table = {}
+def t(n):
+    n = int(n)
+    if n <= 1: return 1
+    else:
+        if not table.has_key(n):
+            table[n] = 2 * t(n/2) + n + 1
+        return table[n]
+
+p = FunctionPlot(domain="14:%s" % N, vars=['x'])
+points = [(n, t(n)) for n in [14, 15, 16, 17, 18]]
+p.add(points, style='step', color='blue', python=1)
+p.add("x + x * log(x, 2) + (x - 1)", color='red', python=1)
+print p
+\end{python}
+
+\begin{ex}
+Well ... did you think about it?
+Compute by hand $T(15), T(16), T(17)$.
+Do you see why there must be a sharp jump at $16$?
+If not, compute $T(31), T(32), T(33)$ and think about it.
+\qed
+\end{ex}
+
+We see that 
+\[
+T(n) \leq g(n)
+\]
+
+Let's get back to our definition of $T(n)$:
+\[
+T(n) 
+= 
+\begin{cases}
+A                        & \text{if $n = 0, 1$} \\
+2T(\floor{n/2}) + Bn + C & \text{otherwise}
+\end{cases}
+\tag{1}
+\]
+
+Now given a value of $n$, say $n = 42$, how would you
+compute $T(42)$?
+Of course you keep using the recurrence relation
+so that $T(42)$ is in terms of $T(21)$ (and other stuff),
+and you replace $T(21)$ by $T(10)$ (and other stuff), etc.
+until you reach $T(1)$.
+
+\begin{ex}
+Compute $T(42)$ by hand.
+There's always this rhythm: 
+\lq\lq use recurrence--tidy up'', 
+\lq\lq use recurrence--tidy up'', 
+\lq\lq use recurrence--tidy up'', 
+...
+\qed
+\end{ex}
+
+For the general case, of course you can't work with a specific value of $n$.
+You have to work with a general integer $n$.
+But you pretty much to do the same thing, 
+using recurrence until you reach $T(1)$.
+If I want to get rid of the floor, I might have do this:
+\begin{align*}
+T(2k) &= 2T(k) + B(2k) + C \\
+T(2k + 1) &= 2T(k) + B(2k + 1) + C 
+\end{align*}
+i.e., consider the case when $n$ is even and of the form $2k$
+and of the form $n = 2k$
+and when $n$ is odd and of the form $n = 2k + 1$.
+Hmmm ... I would have to work with two cases. 
+Then I would have to worry about two cases for $k$, one for the
+case when $k$ is even and another for the case when $k$ is odd.
+Too much work ... because this would make the argument way too 
+untidy.
+
+I'm going to use binary numbers to simplify the computations.
+You'll see that in action in a bit.
+Later, I'll show you that in fact using binary numbers 
+when there are floors of the type $\floor{n/2}$ is redundant.
+
+
+If $n$ is written as a binary number:
+\[
+n = (c_d c_{d-1} \cdots c_1 c_0)_2 = c_d2^d + \cdots + c_02^0
+\] 
+The lowest order bit $c_0$ is 0 when $n$ is even,
+and when $n$ is $2k + 1$ is the lowest
+order bit $c_0$ is $1$.
+And when you compute the floor of either $2k$ or $2k + 1$ to $k$,
+in terms of binary representation of $n$, this just mean
+removing the lowest order bit, i.e.,
+\[
+\floor{(c_d \cdots c_0)_2/2} 
+= \floor{c_d2^{d-1} + \cdots + c_1 + \frac{c_0}{2}}
+= (c_d \cdots c_1)_2
+\]
+
+\begin{ex} The following verifies that $\floor{n/2}$ is the same as the 
+binary representation of $n$ with the lowest order bit removed.
+\begin{itemize}
+\li Compute $\floor{42/2}$. Compute the binary representation of $42$ and then the integer with the lowest order bit removed.
+\li Compute $\floor{21/2}$. Compute the binary representation of $21$ and then the integer with the lowest order bit removed.
+\li Compute $\floor{10/2}$. Compute the binary representation of $10$ and then the integer with the lowest order bit removed.
+\li Compute $\floor{5/2}$. Compute the binary representation of $5$ and then the integer with the lowest order bit removed.
+\li Compute $\floor{2/2}$. Compute the binary representation of $2$ and then the integer with the lowest order bit removed.
+\qed
+\end{itemize}
+
+\end{ex}
+
+That's a more uniform way of describing the recurrence.
+To simplify, I'll just write 
+$c_d \cdots c_0$ 
+instead of 
+$(c_d \cdots c_0)_2$. 
+Let's try that out and see if it works ...
+
+Writing $n$ as a binary number
+\[
+n = c_d\cdots c_0 = c_d2^d + \cdots + c_0d^0
+\]
+we have
+\[
+T(c_d \cdots c_0) 
+= 2T(c_d \cdots c_1) + (c_d \cdots c_0)B + C \\
+\]
+Note that in this form, I don't have to worry about two cases where
+$n$ is even or $n$ is odd and the floor goes away.
+In other words I have a uniform description of my recurrence relation
+and without floors.
+Therefore I can say the following for {\it any} $n = c_d \cdots c_0$
+(of course $c_d = 1$):
+\begin{align*}
+&T(c_d \cdots c_0) \\
+&= 2T(c_d \cdots c_1) + (c_d \cdots c_0)B + C \\
+&= 2[2T(c_d \cdots c_2) + (c_d \cdots c_1)B + C] + (c_d \cdots c_0)B + C \\
+&= 2^2T(c_d \cdots c_2) + [2(c_d \cdots c_1) + (c_d \cdots c_0)]B + (2+1)C \\
+&= 2^2[2T(c_d \cdots c_3) + (c_d \cdots c_3)B + C] + [2(c_d \cdots c_1) + (c_d \cdots c_0)]B + (2+1)C \\
+&= 2^3T(c_d \cdots c_3) 
+   + [2^2 (c_d \cdots c_2) + 2(c_d \cdots c_1) + (c_d \cdots c_0)]B 
+   + (2^2 + 2 + 1)C \\
+&=... \\
+&= 2^dT(c_d) 
+   + [2^{d-1}(c_d c_{d-1}) + \cdots + 2(c_d \cdots c_1) + (c_d \cdots c_0)]B 
+   + (2^{d-1} + \cdots + 2 + 1)C \\
+&= 2^dT(1) 
+   + [2^{d-1}(c_d c_{d-1}) + \cdots + 2(c_d \cdots c_1) + (c_d \cdots c_0)]B 
+   + (2^d - 1)C 
+\\
+&= 2^dA
+   + [2^{d-1}(c_d c_{d-1}) + \cdots + 2(c_d \cdots c_1) + (c_d \cdots c_0)]B 
+   + (2^d - 1)C 
+\tag{$*$}\\
+\end{align*}
+Now let's try to prove that 
+\[
+T(n) \leq nA + (n \log_2 n)B + (n - 1)C
+\]
+Of course this means reverting back to $n$ instead of the 
+binary bits of $n$.
+The right-hand side of $(*)$ contains information derived from $n$,
+i.e., $d$, $c_0$, ..., $c_d$.
+The relationship between $n$ and all these stuff is
+\[
+n = c_d \cdots c_0 = c_d 2^d + \cdots + c_0 2^0
+\]
+The \lq\lq $2^d$'' thingies (that appear twice) in $(*)$ seems simpler ... so let's do that first.
+
+Now clearly we have, since $0 \leq c_i \leq 1$,
+\begin{align*}
+n = c_d2^d + \cdots + c_02^0 
+\geq c_d2^d = 2^d
+\end{align*}
+I put
+\[
+2^d \leq n
+\]
+into ($*$) to get
+\begin{align*}
+T(n) 
+&= 2^dA
+   + [2^{d-1}(c_d c_{d-1}) + \cdots + 2(c_d \cdots c_1) + (c_d \cdots c_0)]B 
+   + (2^d - 1)C
+\\
+&\leq nA 
+   + [2^{d-1}(c_d c_{d-1}) + \cdots 
+   + 2^1(c_d \cdots c_1) + 2^0(c_d \cdots c_0)]B 
+   + (n - 1)C 
+\end{align*}
+Now I suspect that the middle part of the above:
+\[
+2^{d-1}(c_d c_{d-1}) + \cdots + 2^1(c_d \cdots c_1) + 2^0(c_d \cdots c_0) 
+\]
+is somehow related to $n \log_2(n)$.
+In particular, we hope that
+\[
+2^{d-1}(c_d c_{d-1}) + \cdots + 2^1(c_d \cdots c_1) + 2^0(c_d \cdots c_0) 
+\leq n \log_2 (n)
+\]
+
+I hope you notice that
+\[
+2^{d-1}(c_d c_{d-1}) 
+= (c_d c_{d-1} 0 \cdots 0)_2 
+\leq (c_dc_{d-1} \cdots c_0)_2 
+= n
+\]
+Likewise all the other terms on the left are actually $n = (c_d \cdots c_0)$ 
+except that 
+some bits are set to 0 and therefore each of these terms is $\leq n$.
+There are $d$ such terms.
+Hence 
+\[
+2^{d-1}(c_d c_{d-1}) + \cdots + 2^1(c_d \cdots c_1) + 2^0(c_d \cdots c_0) 
+\leq nd
+\]
+OK ... now I need to get rid of that pesky $d$.
+And I suspect that $d \leq \log_2(n)$.
+Don't forget that $d$ is defined by 
+\[
+n = c_d 2^d + \cdots + c_0 2^0
+\]
+Also, remember that $c_d = 1$.
+Therefore
+\[
+n = c_d 2^d + \cdots + c_0 2^0 \geq c_d 2^d = 2^d
+\]
+Therefore
+\[
+\log_2 (n) \geq d
+\]
+Hence
+\[
+2^{d-1}(c_d c_{d-1}) + \cdots + 2^1(c_d \cdots c_1) + 2^0(c_d \cdots c_0) 
+\leq nd \leq n \log_2(n)
+\]
+
+Altogether we have shown that
+\begin{align*}
+T(n) 
+&\leq nA 
+   + [2^{d-1}(c_d c_{d-1}) + \cdots 
+   + 2^1(c_d \cdots c_1) + 2^0(c_d \cdots c_0)]B 
+   + (n - 1)C \\
+&\leq An 
+   + Bn \log_2(n) 
+   + C(n - 1)
+\end{align*}
+
+Phew!!!
+
+Oh, by the way, I hope you notice that besides the fact that
+\[
+(c_d c_{d-1} \cdots c_1) = \floor{\frac{n}{2}}
+\]
+(remove the lowest order bit of $n$ is the same as taking
+floor after dividing by $2$)
+we also have
+\[
+(c_d c_{d-1}\cdots c_2) = \floor{\frac{n}{2^2}}
+\]
+Etc.
+Therefore the above expression
+\[
+2^{d-1}(c_d c_{d-1}) + \cdots + 2^1(c_d \cdots c_1) + 2^0(c_d \cdots c_0)
+\]
+is the same as 
+\[
+2^{d-1}\floor{ \frac{n}{2^{d-1}} } 
++ 2^{d-2}\floor{ \frac{n}{2^{d-2}} } 
++ \cdots
++ 2^1\floor{ \frac{n}{2^1} } 
++ 2^0\floor{ \frac{n}{2^0} } 
+\]
+Therefore the relation I derived earlier:
+\[
+T(c_d \cdots c_0) 
+= An 
+   + \left(
+     2^{d-1}(c_d c_{d-1}) + \cdots + 2(c_d \cdots c_1
+     \right) 
+   + (c_d \cdots c_0)]B 
+   + C(n-1) 
+\]
+can also be written as
+\begin{align*}
+T(n) 
+&= 2^dA \\
+&\hspace{0.5cm}
++ \left(
+2^{d-1}\floor{ \frac{n}{2^{d-1}} } 
++ 2^{d-2}\floor{ \frac{n}{2^{d-2}} } 
++ \cdots
++ 2^1\floor{ \frac{n}{2^1} } 
++ 2^0\floor{ \frac{n}{2^0} } 
+\right)B \\ 
+&\hspace{0.5cm}+ (2^d - 1)C 
+\end{align*}
+where $d$ is defined by $n = c_d 2^d + \cdots + c_02^0$ with $c_d = 1$, i.e.,
+$d + 1$ is the length of $n$ when written as a binary number.
+If you like, you can also define $d$ without binary numbers:
+$d$ is the positive integer such that 
+\[
+\floor{
+\frac{n}{2^d}
+} = 1
+\]
+Also,
+\[
+2^d \leq n \leq 2^d + \cdots 2^0 = 2^{d+1} - 1
+\]
+we have
+\[
+d \leq \log_2(n) \leq \log_2(2^{d+1} - 1) < d+1
+\]
+And therefore
+\[
+d = \floor{\log_2(n)} 
+\]
+Let me collect that up for you:
+
+\begin{thm}
+If $n = (c_d \cdots c_0)_2 \geq 1$, i.e., $n$ has $d + 1$ binary digits,
+then $d$ can be defined as follows:
+\begin{itemize} 
+\item[(a)] $d$ can be defined as the positive integer such that
+\[
+\floor{\frac{n}{2^d}} = 1
+\]
+\item[(b)] $d = \floor{\log_2(n)}$
+\end{itemize}
+\end{thm}
+
+Anyway,
+\begin{align*}
+T(n) 
+&= 2^dA \\
+&\hspace{0.5cm}
++ \left(
+2^{d-1}\floor{ \frac{n}{2^{d-1}} } 
++ 2^{d-2}\floor{ \frac{n}{2^{d-2}} } 
++ \cdots
++ 2^1\floor{ \frac{n}{2^1} } 
++ 2^0\floor{ \frac{n}{2^0} } 
+\right)B \\ 
+&\hspace{0.5cm}+ (2^d - 1)C  
+\\
+&\leq An + Bn \log_2(n) + C(n - 1) 
+\end{align*}
+A more compact way of writing the above equality computation is
+\begin{align*}
+T(n) 
+&= A 2^{\floor{\log_2(n)}}
+ + B \sum_{i=0}^{\floor{\log_2(n)} - 1} 2^i\floor{ \frac{n}{2^i} } 
+ + C \left(2^{\floor{\log_2(n)}} - 1\right)
+\end{align*}
+
+\begin{thm}
+Let $T(n)$ be defined by
+\[
+T(n) =
+\begin{cases}
+A                        &\text{if $n = 0, 1$} \\
+2T(\floor{n/2}) + Bn + C &\text{otherwise}
+\end{cases}
+\]
+(actually I will only use $T(1)$).
+Then
+\[
+T(n) 
+= A 2^{\floor{\log_2(n)}}
+ + B \sum_{i=0}^{\floor{\log_2(n)} - 1} 2^i\floor{ \frac{n}{2^i} } 
+ + C \left(2^{\floor{\log_2(n)}} - 1\right)
+\]
+\end{thm}
+
+The above are {\it exact equalities} of course.
+For comparison we have the following:
+
+\begin{thm} Let $d + 1$ be binary length of $n > 0$.
+\begin{itemize}
+\item[(a)] $d \leq \log_2(n)$
+\item[(b)] $2^i\floor{ \frac{n}{2^i} } \leq n$ for $i = 0, 1, 2, \ldots, d$
+\item[(c)] $\sum_{i=0}^{\floor{\log_2(n)} - 1} 2^i\floor{ \frac{n}{2^i} } \leq n \log_2(n)$
+\end{itemize}
+\end{thm}
+
+By the way, if $B \neq 0$, of course the big-O of $T(n)$ 
+above is $n \log_2(n)$.
+However if $B = 0$, then
+the determining factor is $2^d$ and $2^d - 1$.
+In that case, I might want to be more accurate than just to approximate
+\[
+2^d
+\]
+with
+\[
+2^d \leq n
+\]
+I can do the following:
+From
+\[
+d = \floor{\log_2(n)}
+\]
+In that case (i.e., if $B = 0$), 
+\[
+T(n) = A2^{\floor{\log_2(n)}} + C(2^{\floor{\log_2(n)}} - 1)
+= (A + C) 2^{\floor{\log_2(n)}} - C
+\]
+
+An important idea used above is that if you have something like this:
+\[
+T(n) = f(n) T(\floor{n/2}) + g(n)
+\]
+then writing $n = c_d2^d + \cdots c_02^0 = (c_d \cdots c_0)$, we have
+\[
+T(c_d\cdots c_0) = f(c_d \cdots c_0) T(c_d \cdots c_1) + g(c_d \cdots c_0)
+\]
+
+
+Now I want to rederive the closed form
+of $T(n)$:
+\begin{align*}
+T(n) 
+&= 2^dA \\
+&\hspace{0.5cm}
++ \left(
+2^{d-1}\floor{ \frac{n}{2^{d-1}} } 
++ 2^{d-2}\floor{ \frac{n}{2^{d-2}} } 
++ \cdots
++ 2^1\floor{ \frac{n}{2^1} } 
++ 2^0\floor{ \frac{n}{2^0} } 
+\right)B \\ 
+&\hspace{0.5cm}+ (2^d - 1)C  
+\\
+&\leq An + Bn \log_2(n) + C(n - 1) 
+\end{align*}
+without using binary numbers.
+This means working directly with floors without the binary numbers.
+The two methods are the same.
+\begin{align*}
+T(n) 
+&= 2T(\floor{n/2}) + Bn + C \\
+&= 2(2T(\floor{\floor{n/2}/2}) + B\floor{n/2} + C) + Bn + C \\
+&= 2^2 T(\floor{\floor{n/2}/2}) + (2\floor{n/2} + n)B + (2 + 1)C
+\end{align*}
+Now I use the crucial formula
+\[
+\floor{\floor{a/b}/c} = \floor{a/(bc)}
+\]
+to get
+\[
+T(n) 
+= 2^2 T \left(
+  \floor{n/2^2} \right) + 
+  \left( 2\floor{n/2} + n \right)B + (2 + 1)C
+\]
+Now I continue with another use of the recurrence relation:
+\begin{align*}
+T(n) 
+&= 2^2 \left(
+         2T \left( 
+              \floor{ 
+                \floor{n/{2^2}} 
+                / 2
+              } 
+           \right) 
+         + 
+        B \floor{n/2^2} 
+         + C
+       \right) 
+   + \left(2 
+         \floor{
+          n/2
+         } 
+         + n\right)B 
+   + (2 + 1)C \\
+&= 2^2 \left(
+         2T \left( 
+                \floor{
+                  n/2^3 
+              } 
+           \right) 
+         + 
+        B \floor{
+             n/2^2
+           } 
+         + C
+       \right) 
+   + \left(2 
+         \floor{
+           n/2
+         } 
+         + n\right)B 
+   + (2 + 1)C \\
+&= 2^3 
+      T \left( 
+              \floor{
+               n/2^3 
+              } 
+        \right)  
+   + \left(
+             2^2\floor{n/2^2}
+             + 2 
+         \floor{
+          n/2
+         } 
+         + n
+      \right)B 
+   + (2^2 + 2 + 1)C \\
+\end{align*}
+And I again apply the recurrence on  
+\[
+      T \left( 
+              \floor{
+               n/2^3 
+              } 
+        \right)  
+\]
+to get something with
+\[
+      T \left( 
+              \floor{
+               n/2^4 
+              } 
+        \right)  
+\]
+And when do I stop?
+When I reach $T(1)$.
+Now I define $d$ to be the positive integer such that 
+\[
+\floor{\frac{n}{2^d}} = 1
+\]
+Basically $d$ is the number of times I use the recurrence relation
+to move toward $T(1) = A$.
+\begin{align*}
+T(n) 
+&= 2^3 
+      T \left( 
+              \floor{
+               \frac{n}{2^3} 
+              } 
+        \right)  
+   + \left(
+             2^2\floor{\frac{n}{2^2}}
+             + 2 
+         \floor{
+          \frac{n}{2}
+         } 
+         + n
+      \right)B 
+   + (2^2 + 2 + 1)C \\
+&= ... \\
+&= 2^d
+      T \left( 
+              \floor{
+               \frac{n}{2^d} 
+              } 
+        \right) \\ 
+&\hspace{0.5cm}   + \left(
+             2^{d - 1} \floor{\frac{n}{2^{d-1}}}
+ + \cdots + 
+             2^2\floor{\frac{n}{2^2}}
+             + 2 
+         \floor{
+          \frac{n}{2}
+         } 
+         + n
+      \right)B \\
+&\hspace{0.5cm}  
+   + (2^{d-1} + \cdots + 2^2 + 2 + 1)C \\
+&= 2^d A \\ 
+&\hspace{0.5cm}   + \left(
+             2^{d - 1} \floor{\frac{n}{2^{d-1}}}
+ + \cdots + 
+             2^2\floor{\frac{n}{2^2}}
+             + 2 
+         \floor{
+          \frac{n}{2}
+         } 
+         + n
+      \right)B \\
+&\hspace{0.5cm}  
+   + (2^d - 1)C \\
+\end{align*}
+That's it.
+And as you can see, you don't really need binary numbers.
+However it's usually easier to see the above computation
+using binary numbers first.
+
+\begin{ex}
+What would you do if you're given this recurrence instead:
+\[
+T(n) = 4T(\floor{n/2}) + 3n + 2
+\]
+[Follow the above method either using binary numbers or using
+floors -- it's up to you -- and then make similar
+approximations at the end.]
+\qed
+\end{ex}
+
+\begin{ex}
+What would you do if you're given this recurrence instead:
+\[
+T(n) = 3T(\floor{n/3}) + Bn + C
+\]
+[Use the same idea as above but write $n$ in base 3, but 2. 
+After you're done
+try to convert whatever you have to floors.]
+\qed
+\end{ex}
+
+\begin{ex}
+What would you do if you're given this recurrence instead:
+\[
+T(n) = 3T(\floor{n/2}) + Bn + C
+\]
+\qed
+\end{ex}
+
+\begin{ex}
+What would you do if you're given this recurrence instead:
+\[
+T(n) = 2T(\floor{n/3}) + Bn + C
+\]
+\qed
+\end{ex}
+
+\begin{ex}
+What would you do if you're given this recurrence instead:
+\[
+T(n) = 2T(\floor{n/3}) + Bn^2 + C
+\]
+\qed
+\end{ex}
+
+\begin{ex}
+What would you do if you're given this recurrence instead:
+\[
+T(n) = 2T(\floor{n/3}) + B\sqrt{n} + C
+\]
+\qed
+\end{ex}
+
+\begin{ex}
+What would you do if you're given this recurrence instead:
+\[
+T(n) = 2T(\floor{n/3}) + B\log_2(n) + C
+\]
+\qed
+\end{ex}
+
+\begin{ex}
+What would you do if you're given this recurrence instead:
+\[
+T(n) = 2T(\floor{n/3}) + Bn\log_2(n) + C
+\]
+\qed
+\end{ex}
+
+\begin{ex}\mbox{}
+\begin{itemize}
+\li Let $T(n)$ satisfy
+\[
+T(n) =
+\begin{cases}
+A                          & \text{if $n = 0, 1$} \\
+f(n) T(\floor{n/2}) + g(n) & \text{otherwise} 
+\end{cases}
+\]
+Derive an exact expression for $T(n)$.
+\li Note that the case of $f(n) = 2$ and $g(n) = Bn + C$,
+derive a closed form for $T(n)$.
+You should get the same expression I derived in this section.
+\end{itemize}
+\end{ex}
+
+{\it Solution.}
+\begin{align*}
+T(n) 
+&= f(n) T(\floor{n/2}) + g(n) \\
+&= f(n) (f(\floor{n/2}) T(\floor{n/2^2}) + g(\floor{n/2})) + g(n) \\
+&= f(n)f(\floor{n/2}) T(\floor{n/2^2}) + f(n)g(\floor{n/2}) + g(n) \\
+&= f(n)f(\floor{n/2}) (f(\floor{n/2^2})T(\floor{n/2^3}) + g(\floor{n/2^2}))+ f(n)g(\floor{n/2}) + g(n) \\
+&= f(n)f(\floor{n/2})f(\floor{n/2^2}T(\floor{n/2^3}) + f(n)f(\floor{n/2})g(\floor{n/2^2}))+ f(n)g(\floor{n/2}) + g(n) \\
+\end{align*}
+Hence, if $\floor{n/2^d} = 1$, i.e., $d = \floor{\log_2(n)}$, then
+\begin{align*}
+T(n) 
+&=
+   \left( 
+       f(n)f(\floor{n/2})\cdots f(\floor{n/2^{d-1}} 
+   \right)
+   T(\floor{n/2^d}) \\
+&\hspace{0.5cm} + 
+   \left(
+       f(n)f(\floor{n/2}) \cdots f(\floor{n/2^{d-2}}) g(\floor{n/2^{d-1}}))
+         + \cdots 
+         + f(n)g(\floor{n/2}) + g(n)
+    \right)
+\\
+&= 
+   \left( 
+       \prod_{i=0}^{d-1} f(\floor{n/2^{i}} 
+   \right)
+   A \\
+&\hspace{0.5cm} + 
+   \left(
+       \prod_{i=0}^{d-2} f(\floor{n/2^{i}})  
+   \right)
+   g(\floor{n/2^{d-1}})
+   + \cdots + 
+   \left(\prod_{i=0}^{0} f(\floor{n/2^i}) \right) g(\floor{n/2^1}) \\
+&\hspace{0.5cm} + g(n)
+\end{align*}
+For simplicity, let me define
+\[
+F(j) = \prod_{i=0}^{j} f(\floor{n/2^{i}})
+\]
+The above becomes
+\begin{align*}
+T(n) 
+&= F(d-1) A + 
+   F(d-2) g(\floor{n/2^{d-1}})
+   + \cdots + 
+   F(0) g(\floor{n/2^1}) + g(n) \\
+&= F(d-1) A +
+   \sum_{j = 1}^{d-1} F(j-1)g(\floor{n/2^{j}})
+   + g(n) 
+\end{align*}
+For the case when $f(n) = 2$
+\[
+F(j) = \prod_{i=0}^j 2 = 2^{j+1}
+\]
+the above becomes
+\begin{align*}
+T(n) 
+&= 2^{d-1 + 1} A +
+   \sum_{j = 1}^{d-1} 2^{j-1 + 1}g(\floor{n/2^{j}})
+   + g(n) 
+\\
+&= 2^d A +
+   \sum_{j=1}^{d-1} 2^{j}g(\floor{n/2^{j}})
+   + g(n) 
+\end{align*}
+And, in addition, when $g(n) = Bn + C$, the above becomes:
+\begin{align*}
+T(n) 
+&= 2^{d} A +
+   \sum_{j=1}^{d-1} 2^{j}( B \floor{n/2^{j}} + C)
+   + (Bn + C)
+\\
+&= 2^{d} A +
+   B\sum_{j=1}^{d-1} 2^{j}\floor{n/2^{j}} + C\sum_{j=1}^{d-1} 2^j
+   + (Bn + C)
+\\
+&= 2^{d} A +
+   B\sum_{j = 1}^{d-1} 2^{j}\floor{n/2^{j}} + C\sum_{j=1}^{d-1} 2^j
+   + (B 2^0 \floor{n/2^0} + C2^0)
+\\
+&= 2^{d} A +
+   B\sum_{j = 0}^{d-1} 2^{j}\floor{n/2^{j}} + C\sum_{j=0}^{d-1} 2^j
+\\
+&= 2^{d} A +
+   B\sum_{j = 0}^{d-1} 2^{j}\floor{n/2^{j}} + C(2^{d} - 1)
+\end{align*}
+\qed
+
+\begin{ex}
+(a) Let
+\[
+T(n) =
+\begin{cases}
+A                          & \text{if $n = 0, 1$} \\
+f(n) T(\floor{n/2}) + g(n) & \text{otherwise} 
+\end{cases}
+\]
+Prove that
+\begin{align*}
+T(n) 
+&= F(d-1) A +
+   \sum_{j = 1}^{d-1} F(j-1)g(\floor{n/k^{j}})
+   + g(n) 
+\end{align*}
+where
+\[
+d = \floor{\log_k (n)}
+\]
+and 
+\[
+F(j) = \prod_{i=0}^{j} f(\floor{n/k^{i}})
+\]
+
+(b) Let $f(n) = B$ (constant).
+Simplify $T(n)$.
+\end{ex}
+
+\begin{align*}
+F(j) 
+= \prod_{i=0}^{j} f(\floor{n/k^{i}}) = \prod_{i=0}^j B
+= B^{j + 1}
+\end{align*}
+Then
+\begin{align*}
+T(n) 
+&= F(d-1) A +
+   \sum_{j = 1}^{d-1} F(j-1)g(\floor{n/k^{j}})
+   + g(n) 
+\\
+&= B^d A +
+   \sum_{j = 1}^{d-1} B^j g(\floor{n/k^{j}})
+   + g(n) 
+\\
+&= B^{\floor{\log_k(n)}} A +
+   \sum_{j = 1}^{\floor{\log_k(n)}-1} B^j g(\floor{n/k^{j}})
+   + g(n) 
+\\
+&= B^{\floor{\log_k(n)}} A +
+   \sum_{j = 0}^{\floor{\log_k(n)}-1} B^j g(\floor{n/k^{j}})
+\\
+&= B^{\floor{\log_k(n)}} A +
+   \sum_{j = 0}^{\floor{\log_k(n)}-1} 
+   \left( 
+     \frac{B}{k}
+   \right)^j 
+   \cdot k^j g(\floor{n/k^{j}})
+\end{align*}
+
