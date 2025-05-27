@@ -5,11 +5,11 @@ from chkbook import *
 #for important messages during compilation
 def dbg_txt(msg):
     for i in range(len(msg) + 4):
-        print('*', end='')
+        print('=', end='')
     print()
-    print("# %s #" % msg)
+    print("| %s |" % msg)
     for i in range(len(msg) + 4):
-        print('*', end='')
+        print('=', end='')
     print()
     
 old_dir = os.getcwd() + '/'    

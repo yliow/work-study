@@ -15,6 +15,7 @@ selected_notes = []
 processed_notes = []
 new_dir_name = None
 
+#basic block text greeting
 def greeting():
     print("█▀▄▀█ █▀▀█ █─█ █▀▀ █▀▀▄ █▀▀█ █▀▀█ █─█ \n█─▀─█ █▄▄█ █▀▄ █▀▀ █▀▀▄ █──█ █──█ █▀▄ \n▀───▀ ▀──▀ ▀─▀ ▀▀▀ ▀▀▀─ ▀▀▀▀ ▀▀▀▀ ▀─▀")
     #update this as necessary
@@ -66,7 +67,6 @@ def find_notes():
 def select_process(found_notes):
     if found_notes == None or len(found_notes) <= 0:
         dbg_txt("No notes found for selection")
-        print(found_notes)
         return
     print("Enter your selection(s) as a comma separated list, or type 'a' for all\nTo return to the menu, enter 'q'")
     show_notes(found_notes)
@@ -77,16 +77,20 @@ def select_process(found_notes):
         for i in found_notes:
             selected_notes.append(i)
     else:
+        selected_notes = []
         choice = choice.replace(' ', '')
         choice = choice.split(',')
-        print("choice = ", choice)
         for i in choice:
-            i = int(i)
+            if i.isnumeric():
+                i = int(i)
+            else:
+                i = -1
+        used = []
         for i in choice:
-            print(i)
-            if i.isnumeric() and 0 <= int(i) < len(found_notes) and int(i) not in selected_notes:
+            if i.isnumeric() and 0 <= int(i) < len(found_notes) and not (int(i) in used):
+                used.append(int(i))
                 selected_notes.append(found_notes[int(i)])
-    print("Your selections are:", selected_notes)
+    print("Your selections are:", selected_notes, end = '\n\n')
     return
 
 #make a new dir for new notes
@@ -97,6 +101,7 @@ def make_new_dir():
 #process selected notes
 def process_notes(selected_notes):
     wdir = os.getcwd()
+    print(selected_notes)
     if selected_notes == None or len(selected_notes) <= 0:
         print("no notes selected for processing, make your selections first")
     else:
@@ -108,7 +113,6 @@ def process_notes(selected_notes):
     
 #process user selections
 def get_selection(selection):
-    #TODO: IMPLEMENT PROCESSING
     match selection:
         case 1:
             find_notes()
@@ -136,7 +140,7 @@ def menu_loop():
             selection = int(input())
         except:
             print("Invalid selection")
-            selection = 1
+            selection = 0
         get_selection(selection)
 
 menu_loop()
