@@ -12,16 +12,17 @@ from makebook import *
 #variables
 found_notes = []
 selected_notes = []
-processed_notes = None
+processed_notes = []
 new_dir_name = None
 
+#basic block text greeting
 def greeting():
     print("█▀▄▀█ █▀▀█ █─█ █▀▀ █▀▀▄ █▀▀█ █▀▀█ █─█ \n█─▀─█ █▄▄█ █▀▄ █▀▀ █▀▀▄ █──█ █──█ █▀▄ \n▀───▀ ▀──▀ ▀─▀ ▀▀▀ ▀▀▀─ ▀▀▀▀ ▀▀▀▀ ▀─▀")
     #update this as necessary
     print("Makebook v0.1, 2025")
     
 def goodbye():
-    if processed_notes == None:
+    if processed_notes == None or len(processed_notes) <= 0:
         print("Closing Makebook, goodbye...")
     else:
         print("Notes processed:\n", (print(i) for i in processed_notes), "Closing Makebook, goodbye...")
@@ -34,12 +35,12 @@ def menu():
     print('--------------------------------------\n')
     return
 
-#files is a list of potential directories of notes that the user can select from to process    
-def show_notes(files):
+#f is a list of potential directories of notes that the user can select from to process    
+def show_notes(f):
     c = 0
     print("found potential notes to be processed:")
-    for i in files:
-        print('[%s]' % c, i)#, end ='   '
+    for i in f:
+        print('[%s]' % c, i)
         c += 1
 
 #list all the potential notes directories found by the program
@@ -47,7 +48,9 @@ def find_notes():
     f = os.listdir()
     c = 0
     for i in f:
-        if os.path.isdir(i) and not os.path.isfile('%s/chap.tex' % i):
+        if i in found_notes:
+            continue
+        elif os.path.isdir(i) and not os.path.isfile('%s/chap.tex' % i):
             print("UNACCEPTABLE FILE STRUCTURE, NO 'chap.tex' FOR", i)
         elif os.path.isdir(i) and os.path.isfile('%s/chap.tex' % i):
             print("ACCEPTABLE FILE STRUCTURE FOR", i)
@@ -64,36 +67,30 @@ def find_notes():
 def select_process(found_notes):
     if found_notes == None or len(found_notes) <= 0:
         dbg_txt("No notes found for selection")
-        print(found_notes)
         return
-    
-    print("Enter your selection(s) as a comma separated list, or type 'a' for all\n")
+    print("Enter your selection(s) as a comma separated list, or type 'a' for all\nTo return to the menu, enter 'q'")
+    show_notes(found_notes)
     choice = input()
-    if choice == 'a':
+    if choice == 'q':
+        return
+    elif choice == 'a':
         for i in found_notes:
             selected_notes.append(i)
     else:
+        selected_notes = []
+        choice = choice.replace(' ', '')
         choice = choice.split(',')
-        print("choice = ", choice)
         for i in choice:
-            i = i.replace(' ', '')
-            i = int(i)
+            if i.isnumeric():
+                i = int(i)
+            else:
+                i = -1
+        used = []
         for i in choice:
-            #add a method to discard duplicates
-            print(i)
-            if i.isnumeric() and 0 <= int(i) < len(found_notes):
+            if i.isnumeric() and 0 <= int(i) < len(found_notes) and not (int(i) in used):
+                used.append(int(i))
                 selected_notes.append(found_notes[int(i)])
-        # c = 0
-        # while c < len(found_notes):
-        #     print(print(i) for i in found_notes)
-        #     choice = int(input())
-        #     if 0 <= choice < len(found_notes) and selected_notes[choice] != True:
-        #         selected_notes[choice] = True
-        #         c += 1
-        #     else:
-        #         print("Invalid selection for notes, must be within range %s" % len(found_notes))
-        #         if len(selected_notes) == 0:
-        #             selected_notes = None
+    print("Your selections are:", selected_notes, end = '\n\n')
     return
 
 #make a new dir for new notes
@@ -104,6 +101,7 @@ def make_new_dir():
 #process selected notes
 def process_notes(selected_notes):
     wdir = os.getcwd()
+    print(selected_notes)
     if selected_notes == None or len(selected_notes) <= 0:
         print("no notes selected for processing, make your selections first")
     else:
@@ -115,7 +113,6 @@ def process_notes(selected_notes):
     
 #process user selections
 def get_selection(selection):
-    #TODO: IMPLEMENT PROCESSING
     match selection:
         case 1:
             find_notes()
@@ -138,12 +135,12 @@ def menu_loop():
     selection = 0
     while 0 <= selection < 5:
         menu()
-        print("found [%s], selected [%s], process [%s]" % (found_notes, selected_notes, processed_notes))
+        #print("found [%s], selected [%s], process [%s]" % (found_notes, selected_notes, processed_notes))
         try:
             selection = int(input())
         except:
             print("Invalid selection")
-            selection = 1
+            selection = 0
         get_selection(selection)
 
 menu_loop()
