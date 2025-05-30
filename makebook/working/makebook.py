@@ -154,14 +154,11 @@ def make_new_dir():
 def process_notes():
     global selected_notes
     wdir = os.getcwd()
-    print(selected_notes)
-    if selected_notes == None or len(selected_notes) <= 0:
+    if not selected_notes:
         print("no notes selected for processing, make your selections first")
     else:
-        print("Your selections are", selected_notes)
         for i in selected_notes:
-            print("processing", i)
-            os.chdir("%s/%s/" % (wdir, i))
+            print(f'processing {i} ...')
             make_book(i)
     
 #process user selections
@@ -239,11 +236,8 @@ def moveother(f):
     os.system('cp %s %s' % (old_dir + f, new_dir + f))
     
 def make_book(dir_):
-    if not processed_notes:
-        return
-    print('making book')
+    print(f'making {dir_} ...')
     # make_new_book_dir()
 
 menu_loop()
-make_book('.')
 goodbye()
