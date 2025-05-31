@@ -1,0 +1,280 @@
+\section{Roots of Asymptotics}
+
+Historically, the use of asymptotics to analyze the
+growth of functions started around 1800s and was used extensively
+by mathematicians studying analysis (think Calculus) and
+especially in the study of analytic number theory. In fact it was
+introduced by Paul Bachmann who was an analytic number theorist.
+Here's a famous example from analytic number theory, the famous
+Prime Number Theorem. The point is to give you a sense of
+perspective and history (you do want to be educated right?). The
+other reason is to let you read and interpret some mathematical
+facts before we go into details.
+
+Number theory is the study of integers. Originally the techniques
+used involved only integers. Later on techniques involving number
+which are not integers are used to analyze integers. In particular
+analytic number theory uses techniques from analysis (this means
+topics like real and complex analysis). One big goal of number
+theorists is to know everything about prime numbers 2, 3, 5, 7,
+11, 13, $\ldots$. In particular they want to know what is the
+$n$--th prime $p_n$ for positive $n$. So $p_1 = 2$, $p_5 = 11$.
+They want to know if there is a formula for $p_n$ so that for
+instance they can work out very quickly what is $p_{1000000}$.
+They are interested also in the number of primes less then a fixed
+number say $x$; this is called $\pi(x)$. So for instance $\pi(1) =
+0$, $\pi(6.2) = 3$. Right? 
+
+
+$\pi(x)$ for $0 \leq x \leq 10$:
+\begin{python}
+from plot import *
+
+N = 10
+
+f = file('primes-10000000.txt', 'r')
+points = [(0,0)]
+count = 0
+while 1:
+    t = f.readline().strip()
+    if t == '': break
+    prime = int(t)
+    if prime > N: break
+    count += 1
+    points.append((prime, count))
+points.append((N, points[-1][1]))
+f.close()
+
+p = Plot(line_width=1, width='5in', height='3in', domain='0:%s' % N)
+p.add(points, style='step', color='red', python=1)
+print p
+\end{python}
+
+
+$\pi(x)$ for $0 \leq x \leq 100$:
+\begin{python}
+from plot import *
+
+N = 100
+
+f = file('primes-10000000.txt', 'r')
+points = [(0,0)]
+count = 0
+while 1:
+    t = f.readline().strip()
+    if t == '': break
+    prime = int(t)
+    if prime > N: break
+    count += 1
+    points.append((prime, count))
+points.append((N, points[-1][1]))
+f.close()
+
+p = Plot(line_width=1, width='5in', height='3in', domain='0:%s' % N)
+p.add(points, style='step', color='red', python=1)
+print p
+\end{python}
+
+
+
+$\pi(x)$ for $0 \leq x \leq 1000$:
+\begin{python}
+from plot import *
+
+N = 1000
+
+f = file('primes-10000000.txt', 'r')
+points = [(0,0)]
+count = 0
+while 1:
+    t = f.readline().strip()
+    if t == '': break
+    prime = int(t)
+    if prime > N: break
+    count += 1
+    points.append((prime, count))
+points.append((N, points[-1][1]))
+f.close()
+
+p = Plot(line_width=1, width='5in', height='3in', domain='0:%s' % N)
+p.add(points, style='step', color='red', python=1)
+print p
+\end{python}
+
+
+
+$\pi(x)$ for $0 \leq x \leq 10,000$:
+\begin{python}
+from plot import *
+
+N = 10000
+
+f = file('primes-10000000.txt', 'r')
+points = [(0,0)]
+count = 0
+while 1:
+    t = f.readline().strip()
+    if t == '': break
+    prime = int(t)
+    if prime > N: break
+    count += 1
+    points.append((prime, count))
+points.append((N, points[-1][1]))
+f.close()
+
+p = Plot(line_width=1, width='5in', height='3in', domain='0:100000')
+p.add(points, style='step', color='red', python=1)
+print p
+\end{python}
+
+As you see, what started as a very jagged and unpredictable function
+becomes extremely well-behaved and almost smooth when you zoom out.
+Gauss, when analyzing a table of primes up to 100,000, found a 
+function $f(x)$ that approximated the above $\pi(x)$ function.
+
+However he was not able to prove mathematically that his \lq\lq nice''
+$f(x)$ does approximate $\pi(x)$ for all large $x$.
+
+\begin{ex}
+Try to find a \lq\lq nice'' function $f(x)$ such that 
+\[
+\pi(x) \approx f(x)
+\]
+for all large values of $x$.
+WARNING! WARNING! WARNING! ... SPOILERS ON THE NEXT PAGE!!!
+[HINT: The function
+involves $x^a$ and $(\ln x)^b$ for suitable constants $a$ and $b$.]
+\end{ex}
+
+For a very long time, no one was able to prove that 
+Gauss' $f(x)$ is very close to $\pi(x)$.
+Tchebychev was able to proved that there are constants $C_1$ 
+and $C_2$ such that for large values of $x$
+\[
+C_1 f(x) \leq \pi(x) \leq C_2 f(x)
+\]
+where $f(x)$ is Gauss's conjectured approximation.
+By improving on proof techniques, mathematicians were
+able to improve on the constants $C_1$ and $C_2$ to get
+Gauss' $f(x)$ closer and closer to $\pi(x)$.
+
+Much later it was proven that in fact the approximation $f(x)$
+is extremely good and tight. 
+In fact:
+\[
+\lim_{x \rightarrow \infty} \frac{\pi(x)}{f(x)} = 1
+\]
+This fact is also written
+\[
+\pi(x) \sim f(x)
+\]
+This is the famous Prime Number Theorem, PNT.
+One can conclude from PNT that the $n$--th prime is \lq\lq roughly''
+\[
+n \ln n
+\]
+
+From the above statement: 
+\[
+\text{\lq\lq}C_1 f(x) \leq \pi(x) \leq C_2 f(x), \,\,\,\,\,
+\text{ for large $x$''}
+\]
+the right half of the inequality:
+\[
+\text{\lq\lq}\pi(x) \leq C_2 f(x), \,\,\,\,\,
+\text{ for large $x$''}
+\]
+is in fact our big-O:
+\[
+\pi(x) = O(f(x))
+\]
+The left half:
+\[
+\text{\lq\lq}C_1 f(x) \leq \pi(x) \,\,\,\,\,
+\text{ for large $x$''}
+\]
+is another type of asymptotic approximation.
+This statement
+\[
+\text{\lq\lq}
+\lim_{x \rightarrow \infty} \frac{\pi(x)}{f(x)} = 1
+\text{"}
+\]
+is also another type of asymptotic statement.
+I'll also talk about these two type of asymptotics later (as well as others).
+
+It was D.~Knuth who popularized the use of asymptotic
+notation such as big-O in Computer Science (around 1960s).
+
+\newpage
+
+HERE COMES THE SPOILER ...
+
+Historically, Gauss' conjectured \lq\lq nice'' function that
+approximates $\pi(x)$ is this:
+\[
+f(x) = \frac{x}{\ln x}
+\]
+Therefore the prime number theorem is this:
+\[
+\lim_{x \rightarrow \infty} \frac{\pi(x)}{x/\ln x} = 1
+\]
+
+Here's a plot of $\pi(x)$ and $x/\ln x$ for $0 \leq x \leq 10000$:
+\begin{python}
+from plot import *
+
+N = 10000
+
+f = file('primes-10000000.txt', 'r')
+points = [(0,0)]
+count = 0
+while 1:
+    t = f.readline().strip()
+    if t == '': break
+    prime = int(t)
+    if prime > N: break
+    count += 1
+    points.append((prime, count))
+points.append((N, points[-1][1]))
+points = points[::6]
+f.close()
+
+p = Plot(domain='0:%s' % N)
+p.add(points, style='step', color='red', python=1)
+p.add('x/log(x, e)', color='blue', python=1, pin_message='x/\ln x', pin='below')
+print p
+\end{python}
+It seems that $x/\ln x$ is a tad too small.
+However if you plot the same graph 
+but for larger and larger values of $x$
+(i.e. if you zoom out to see more and more of the graph)
+you would notice that the gap narrows.
+
+Here's the plot for $0 \leq x \leq 1000000$:
+\begin{python}
+from plot import *
+
+N = 1000000
+
+f = file('primes-10000000.txt', 'r')
+points = []
+count = 0
+while 1:
+    t = f.readline().strip()
+    if t == '': break
+    prime = int(t)
+    if prime > N: break
+    count += 1
+    points.append((prime, count))
+
+points.append((N, points[-1][1]))
+points = points[::100]
+f.close()
+
+p = Plot(domain='0:%s' % N)
+p.add(points, style='step', color='red', python=1)
+p.add('x/log(x, e)', color='blue', python=1, pin_message='x/\ln x', 
+pin='below')
+print p
+\end{python}

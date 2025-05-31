@@ -1,0 +1,710 @@
+%-*-latex-*-
+\sectionthree{Master theorem}
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+
+So far I have been talking about recurrences like
+\[
+T(n) = c_1 T(n-1) + c_2 T(n-2) + f(n)
+\]
+where $c_i$ are constants and $f(n)$ is an expressions in $n$.
+More generally,
+\[
+T(n) = c_1(n) T(n-1) + c_2(n) T(n-2) + f(n)
+\]
+where $c_i(n)$ are also expressions in $n$.
+Then there are the divide-and-conquer type recurrence relations.
+Here's one:
+\[
+T(n) = T(n/2) + A
+\]
+and here's another
+\[
+T(n) = 2T(n/2) + An + B
+\]
+There are also more complex ones like
+\[
+T(n) = f(n) + \frac{1}{n} \sum_{i=0}^{n-1} T(i)
+\]
+
+\begin{comment}
+\newpage
+\begin{ex}
+  \begin{tightlist}
+    \item
+    Let
+    \[
+    T(n) = T(\floor{n/2}) + 1
+    \]
+    and $T(n) = 1$ if $n \leq 1$.
+    Compute (by hand) and
+    write down the table for $T(n)$ for $n = 0, 1, 2, ..., 9$.
+    \item
+    Let
+    \[
+    T'(n) = T'(\ceiling{n/2}) + 1
+    \]
+    and $T'(n) = 1$ if $n \leq 1$.
+    Write down the table for $T'(n)$ for $n = 0, 1, 2, ..., 9$.
+  \end{tightlist}
+  Compute more values for $T(n)$ and $T'(n)$ ... as in \textit{lots} of $n$'s
+  and plot them.
+  Compare $T(n)$ and $T'(n)$ when $n$ is large.
+  Can you find good approximation for $T(n)$ and $T'(n)$?
+  (Here good mean functions such as $n^\alpha$, $\lg^\alpha n$,
+  $n^\alpha \lg^\beta n$, $c^n$, etc.
+  You'll see that asymptotically (when $n$ is large),
+  $T(n)$ and $T'(n)$ are about the same.
+  \qed
+\end{ex}
+
+
+\newpage
+\begin{ex}
+  \begin{tightlist}
+    \item
+    Let
+    \[
+    T(n) = 2 T(\floor{n/2}) + 1
+    \]
+    and $T(n) = 1$ if $n \leq 1$.
+    Compute (by hand) and
+    write down the table for $T(n)$ for $n = 0, 1, 2, ..., 9$.
+    \item
+    Let
+    \[
+    T'(n) = T'(\floor{n/2}) + T'(\ceiling{n/2}) + 1
+    \]
+    and $T'(n) = 1$ if $n \leq 1$.
+    Write down the table for $T'(n)$ for $n = 0, 1, 2, ..., 9$.
+  \end{tightlist}
+  Plot more values for $T(n)$ and $T'(n)$ ... as in \textit{lots} of $n$'s.
+  Compare $T(n)$ and $T'(n)$ when $n$ is large.
+  Can you find good approximation for $T(n)$ and $T'(n)$?
+  (Here good mean functions such as $n^\alpha$, $\lg^\alpha n$,
+  $n^\alpha \lg^\beta n$, $c^n$, etc.
+  You'll see that asymptotically (when $n$ is large),
+  $T(n)$ and $T'(n)$ are about the same.
+  \qed
+\end{ex}
+
+
+%{\small
+%\begin{python}
+%from latextool_basic import *
+%s = r'''
+%def a(n):
+%    if n in [0, 1]: return 1
+%    else:
+%        return 2 * a(n/2) + 1
+%def b(n):
+%    if n in [0, 1]: return 1
+%    else:
+%        return 2 * b(round(n/2.0)) + 1
+%        
+%for n in range(0, 9):
+%    print(n, a(n), b(n))
+%
+%for n in range(100000, 100011):
+%    print(n, float(a(n))/float(b(n)))
+%'''.strip()
+%print(console(s))
+%f = open('tmp1243525234.py', 'w').write(s)
+%print(shell('python tmp1243525234.py'))
+%\end{python}
+%}
+%
+\newpage
+\begin{ex}
+  \begin{tightlist}
+    \item
+    Let
+    \[
+    T(n) = T(\floor{n/2}) + T(n - \floor{n/2}) + n
+    \]
+    and $T(n) = 1$ if $n \leq 1$.
+    Compute (by hand) and
+    write down the table for $T(n)$ for $n = 0, 1, 2, ..., 9$.
+    \item
+    Let
+    \[
+    T'(n) = 2T'(n/2) + n
+    \]
+    and $T'(n) = 1$ if $n \leq 1$.
+    Compute (by hand) and
+    write down the table for $T'(n)$ for $n = 0, 1, 2, ..., 9$.
+    \item
+    Plot more values for $T(n)$ and $T'(n)$ ... as in \textit{lots} of $n$'s.
+    Can you find good approximation for $T(n)$?
+    (Here good mean functions such as $n^\alpha$, $\ln^\alpha n$,
+    $n^\alpha \ln^\beta n$, $c^n$, etc.
+  You'll see that asymptotically (when $n$ is large),
+  $T(n)$ and $T'(n)$ are about the same.
+  \end{tightlist}
+  \qed
+\end{ex}
+
+The above experiments will show you that for our recurrences,
+asymptotically (when $n$ is large),
+it doesn't matter if $n/2$ is replaced by $\floor{n/2}$ or
+$\ceiling{n/2}$ or
+when $n - \floor{n/2}$ or $n - \ceiling{n/2}$ is replaced by
+$n/2$.
+
+\end{comment}
+
+For the divide-and-conquer runtime recurrence,
+more generally, we are interested in recurrences like this:
+\[
+T(n) = a \cdot T(n/b) + f(n)
+\]
+where $a$ and $b$ are constants.
+For CISS350,
+the two cases you must be familiar with are
+
+\begin{thm}
+  \mbox{}
+  \begin{enumerate}[nosep]
+  \item[\textnormal{(a)}] If \[
+    T(n) = T(n/2) + A
+    \]
+    then
+    \[
+    T(n) = O(\lg n)
+    \]
+  \item[\textnormal{(b)}]
+    If
+    \[
+    T(n) = 2 T(n/2) + An + B 
+    \]
+    then
+    \[
+    T(n) = O(n \lg n)
+    \]
+  \end{enumerate}
+\end{thm}
+
+For a more general theorem, see the Master Theorem.
+
+\begin{eg}
+For instance let's consider the time complexity of the binary search.
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+def binarysearch(x, lower, upper, target):
+    if lower > upper: return None
+    else:
+        mid = (lower + upper) / 2
+        if x[mid] == target:
+            return i
+        elif x[mid] < target:
+            return binarysearch(x, mid + 1, upper, target)
+        else:
+            return binarysearch(x, lower, mid - 1, target)
+\end{Verbatim}
+If $T(n)$ is the runtime to perform binarysearch on an
+array of size $n$ (sorted of course), 
+then 
+\[
+T(n) = T(n/2) + A
+\]
+Note that to be really precise, the array
+\verb!x[0..n-1]! is cut up into
+\textit{three} parts:
+\verb!x[0..mid - 1]!, \,\,\,
+\verb!x[mid]!, \,\,\,
+\verb!x[m + 1..n - 1]!.
+But note that \verb!mid! is roughly \verb!n/2! and so
+\verb!mid! $\pm 1$ is roughly
+$n/2$.
+\qed
+\end{eg}
+
+
+\begin{eg}
+What about mergesort? The list continually split into two equal parts
+to be processed by mergesort. On return from mergesort, the two sublists
+are combined.
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+MERGESORT
+INPUT: x: an array
+       start, end: index values
+
+if start >= end:
+    return
+else:
+    mid = (start + end) / 2
+    MERGESORT(x, start, mid)
+    MERGESORT(x, mid + 1, end)
+    MERGE(x, start, mid, mid+1, end)
+\end{Verbatim}
+The runtime of MERGE is $O(n)$.
+The runtime for the computation of \verb!mid!
+is constant.
+So the runtime for MERGE and the computation of \verb!mid! is
+of the form $An + B$.
+Therefore
+\[
+T(n) = 2T(n/2) + An + B
+\]
+\end{eg}
+
+\begin{comment}
+Let's compute a closed form for $T(n)$.
+We can perform 
+\begin{align*}
+T(n)
+& = T(n/2) + c \\
+& = T(n/2^2) + 2c \\
+& = T(n/2^3) + 3c \\
+& = \cdots \\
+& = T(n/2^m) + mc \\
+\end{align*}
+At some point $n/2^m = 1$ and we reach
+\begin{align*}
+T(n) = T(1) + mc \\
+\end{align*}
+From $n / 2^m = 1$ we get
+\[
+n = 2^m
+\]
+Hence $m = \log_2 n$.
+Note we have
+\begin{align*}
+T(n)
+& = T(1) + c\log_2 n \\
+& = A\log_2 n + B
+\end{align*}
+for some constants $A$ and $B$.
+Therefore $T(n) = O(\log n)$.
+
+Hmmm ... I wonder if this can be generalized ...
+Well suppose
+\[
+T(n) = a(n/c_1) + c_2
+\]
+Doing the same computation I get
+\begin{align*}
+T(n) 
+&= T(n/c_1) + c_2 \\
+&= T(n/c_1^2) + 2c_2 \\
+&= T(n/c_1^3) + 3c_2 \\
+&= \ldots \\
+&= T(n/c_1^m) + mc_2 \\
+\end{align*}
+At some point $n/c_1^m = 1$ and hence
+\[
+m = \log_{c_1} n
+\]
+Therefore
+\begin{align*}
+T(n) 
+&= T(1) + c_2 \lg n\\
+&= A \log_{c_1} n + B\\
+\end{align*}
+for constants $A$ and $B$.
+
+Suppose a divide and conquer algorithm looks like this:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+ALGORITHM A
+INPUT: Some work w of size n
+
+Let w1,w2,...,wa be subwork of w of sizes n1,n2,...,na
+
+Pre-recursion work
+Perform A on w1
+Perform A on w2
+...
+Perform A on wa
+Post-recursion work
+\end{Verbatim}
+
+Let $T(n)$ be the time needed to perform the algorithm on a work of
+size $n$.
+Suppose the time take for non-recursion work is $f(n)$.
+Suppose that the non-recursive parts take $f(n)$ time.
+The total time is then
+\[
+T(n)
+= T(n_1) + \cdots + T(n_a) + f(n)
+\]
+Now I will assume that
+\[
+n_1 = n_2 = \ldots = n_a = n / b
+\]
+where $a \geq 1$ and $b > 1$.
+(See ??? for divide-and-conquer where the subwork has different sizes.)
+The above becomes
+\[
+T(n)
+= a T(n/b) + f(n)
+\]
+Now I want to know what's the big-O of $T(n)$.
+But before that ... here are some examples just to put things into
+context.
+I'm going to list some runtimes with the corresponding $a$ and $b$.
+
+\begin{eg}
+Consider the binary search algorithm on a sorted array.
+We have 
+\[
+T(n) = T(n/2) + A
+\]
+in the worst case when the target is not found.
+Of course when the target is at the middle of the array, the algorithm
+terminates right away -- this is of course not the worst case.
+So in this case,
+\[
+a = 1, \,\,\,\,\, b=2, \,\,\,\,\, f(n) = A = \Theta(1)
+\]
+\qed
+\end{eg}
+
+\begin{eg}
+Consider the mergesort algorithm on an array.
+We have 
+\[
+T(n) = 2T(n/2) + An + B
+\]
+So in this case,
+\[
+a = 2 = b, \,\,\,\,\, f(n) = An + B = \Theta(n)
+\]
+\qed
+\end{eg}
+
+
+Let's play around with the above runtime recurrence
+\[
+T(n)
+= a T(n/b) + f(n)
+\]
+It's going to be pretty ugly for a general $n$.
+Since we continually have to compute $n/b$, let's try it with $n = b^k$.
+Then
+\begin{align*}
+T(b^k)
+&= a T \left( b^{k-1} \right) + f(b^k) \\
+&= a \left( a T \left( b^{k-2} \right) + f(b^{k-1}) \right)+ f(b^k) \\ 
+&= a^2 T \left( b^{k-2} \right) + a f(b^{k-1}) + f(b^k) \\
+&= a^2 \left( a T \left( b^{k-3} \right) + f(b^{k-3}) \right) + a f(b^{k-1})
+   + f(b^k) \\ 
+&= a^3 T \left( b^{k-3} \right) + a^2 f(b^{k-2}) + a f(b^{k-1}) + f(b^k) \\
+&= \cdots \\
+&= a^k T \left( b^0 \right)
+   + \left( a^{k-1} f(b^1) + \cdots + a f(b^{k-1}) + f(b^k) \right)
+\end{align*}
+Now don't forget that I introduced $k$ just to make $n$ look like $b^k$.
+So when I need to, I have to wipe out $k$.
+This is easy:
+\[
+n = b^k \iff \log_b n = k
+\]
+In other words, later on, I have to replace $k$ by $\log_b n$.
+
+The resulting expression
+\[
+T(b^k)
+= a^k T \left( b^0 \right)
+   + \left( a^{k-1} f(b^1) + \cdots + a f(b^{k-1}) + f(b^k) \right)
+\]
+is a sum of two terms so it's a matter of
+which of the two, i.e.,
+\[
+a^k T \left( b^0 \right)
+\]
+or
+\[
+   a^{k-1} f(b^1) + \cdots + a f(b^{k-1}) + f(b^k) 
+\]
+is \lq\lq bigger'', asymptotically speaking.
+
+We can simplify the first term a little:
+\[
+a^k T \left( b^0 \right) = \Theta (a^k) = \Theta (a^{\log_b n})
+\]
+$a^{\log_b n}$ is kind of weird since it's not one of the
+standard representative asymptotic functions like $n^\alpha$
+or $\log^\alpha$ or $n^\alpha \log^\beta n$ or $c^n$ or etc.
+But note that
+\[
+a^{\log_b n} = n^{\log_b a}
+\]
+Why? Look at this:
+\begin{align*}
+(\log_b n)(\log_b a) &= (\log_b a)(\log_b n) \\
+\THEREFORE \log_b a^{\log_b n} &= \log_b n^{\log_b a} \\
+\THEREFORE a^{\log_b n} &= n^{\log_b a} 
+\end{align*}
+So the first term is
+\[
+a^k T \left( b^0 \right)
+= \Theta \left( a^{\log_b n} \right)
+= \Theta \left( n^{\log_b a} \right)
+\]
+
+The second term
+\[
+   a^{k-1} f(b^1) + \cdots + a f(b^{k-1}) + f(b^k)
+\]
+looks like a pain.
+But ... hmmm it sure looks like a geometric sum.
+Of course I can't say anything more. Why? Well ... there's just nothing to say
+because I don't have more information about the function $f(n)$.
+The sum clearly adds up the amount of work ($k$ pieces of work)
+which takes $f(n)$ time 
+for a bunch of values of $n$. 
+The question is of course: how much work is involved and therefore
+how much time, i.e., how big is $f(n)$?
+Now from some examples such as binary search, mergesort, etc.
+we can have
+\[
+f(n) = \Theta(1)
+\]
+(think binary search)
+or
+\[
+f(n) = \Theta(n)
+\]
+(think mergesort).
+So let's say we impose some condition to make $f(n)$ \lq\lq nice'':
+\[
+f(n) = \Theta(n^c)
+\]
+say
+\[
+f(n) = An^c
+\]
+to be concrete (ignoring unimportant terms in $f(n)$.)
+Then I can at least say that 
+\begin{align*}
+&a^{k-1} f(b^1) + \cdots + a f(b^{k-1}) + f(b^k) \\
+&= a^{k-1} \cdot A(b^1)^c
+   + \cdots
+   + a \cdot A (b^{k-1})^c
+   + a \cdot A (b^{k})^c \\
+&= A \left(
+   a^{k-1} (b^c)^{1}
+   \cdots
+   + a (b^c)^{k-1}
+   + (b^c)^{k}
+   \right)
+\end{align*}
+Well ... too bad ... it's still pretty yucky.
+It still looks somewhat like a geometric sum.
+We impose the condition $f(n) = \Theta(n^c)$ to make $f(n)$
+nice--looking.
+Let's make it even nicer.
+When I look at the term
+\[
+a^{k-1} (b^c)^{1}
+\]
+in the above sum (and also the rest), I see that if $b^c$ is an $a$--power,
+I would get a sum of $a$--powers.
+So how about I checkout the case when
+\[
+b^c = a
+\]
+This means
+\[
+c = \log_b a
+\]
+The above becomes
+\begin{align*}
+&a^{k-1} f(b^1) + \cdots + a f(b^{k-1}) + f(b^k) \\
+&= A \left(
+   a^{k-1} (b^c)^{1}
+   \cdots
+   + a (b^c)^{k-1}
+   + (b^c)^{k}
+   \right)
+   \\
+&= A \left(
+   a^{k-1} (a)^{1}
+   \cdots
+   + a (a)^{k-1}
+   + (a)^{k}
+   \right)
+   \\
+&= A ka^k
+\end{align*}
+OK, this is not a geometric sum ... but ... at least it's
+simplified!
+Since $k = \log_b n$,
+\begin{align*}
+&a^{k-1} f(b^1) + \cdots + a f(b^{k-1}) + f(b^k) \\
+&= A ka^k \\
+&= A \log_b n \cdot a^{\log_b n} \\
+&= \Theta \left( \log_b n \cdot  a^{\log_b n}\right)
+\end{align*}
+Don't forget that the awkward looking $a^{\log_b n}$ is
+the same as $n^{\log_b a}$.
+So
+\begin{align*}
+&a^{k-1} f(b^1) + \cdots + a f(b^{k-1}) + f(b^k) \\
+&= \Theta \left( \log_b n \cdot  a^{\log_b n}\right) \\
+&= \Theta \left( \log n \cdot  n^{\log_b a}\right)
+\end{align*}
+(The $\log_b n$ is replaced by $\log n$, since log bases are not
+important in big-O or big-$\Theta$.)
+
+Altogether we have the following.
+If $n = b^k$, then
+\[
+T(n) = a^k T \left( b^0 \right)
+ + a^{k-1} f(b^1) + \cdots + a f(b^{k-1}) + f(b^k)
+\]
+where
+\[
+a^k T \left( b^0 \right) = \Theta \left( n^{\log_b a} \right)
+\]
+and if $f(n) = \Theta(n^c)$ where $c = \log_b a$, then
+\[
+a^{k-1} f(b^1) + \cdots + a f(b^{k-1}) + f(b^k) =
+\Theta \left( \log n \cdot  n^{\log_b a}\right)
+\]
+I conclude that 
+\[
+T(n)
+=
+\Theta \left( n^{\log_b a} \log n \right)
+\]
+
+Before we celebrate, remember that I made the assumption
+\[
+f(n) = \Theta(n^c), \,\,\,\,\, c = \log_b a
+\]
+What if
+\[
+f(n) = \Theta(n^c), \,\,\,\,\, c \neq \log_b a
+\]
+We're missing the case $c < \log_b a$ and $c > \log_b a$.
+Also, what if $f(n) = O(n^c)$?
+Or what if $f(n) = O(\log n)$?
+Etc.
+
+Here's the famous \defterm{master theorem} ...
+
+\end{comment}
+
+Here's the Master Theorem which covers the two cases mentioned above:
+
+\begin{thm} \textsc{(Master theorem)}
+Let $T : \N \rightarrow \R$ be a function such that
+\[
+T(n)
+= a T \left( \frac{n}{b} \right) + f(n)
+\]
+where $a \geq 1$ and $b > 1$.
+\begin{myenum}
+  \item[(a)] If $f(n) = O(n^c)$ where $c <  \log_b a$, then
+  \[
+  T(n) = \Theta \left( n^{\log_b a} \right)
+  \]
+  
+  \item[(b)] If $f(n) = \Theta(n^c \log^k n)$ where $c = \log_b a$, then
+  \[
+  T(n) = \Theta \left( n^{\log_b a} \log^{k+1} n \right)
+  \]
+
+  \item[(c)] If $f(n) = \Omega(n^c)$ where $c > \log_b a$ and
+  there is a constant $k < 1$ such that  
+  \[
+  a f(n/b) \leq k f(n)
+  \]
+  for sufficiently large $n$, then
+  \[
+  T(n) = \Theta(f(n))
+  \]
+\end{myenum}
+\end{thm}
+
+\begin{eg}
+  For binary search, if we let $T(n)$ be the runtime, then
+  \[
+  T(n) = T(n/2) + A
+  \]
+  \[
+  a = 1, \,\,\, b = 2, \,\,\, f(n) = O(1) = O(n^0), \,\,\, c = 0
+  \]
+  Note that
+  \[
+  \log_b a = \log_2 1 = 0
+  \]
+  and
+  \[
+  c \not< \log_b a
+  \]
+  So case 1 of the master theorem does not apply.
+  Yikes. Now what?
+  
+  If you look at the second case, you see that
+  \[
+  0 = c = \log_b a
+  \]
+  Now note that $f(n)$ is in fact $\Theta(1)$, i.e., $f(n) = \Theta(n^c \log^k n)$
+  for $c = 0$ and $k = 0$.
+  Therefore,using case (b),
+  \[
+  T(n) = \Theta(n^0 \log^{0+1} n) = \Theta(\lg n)
+  \]
+  \qed
+\end{eg}
+\qed
+
+\begin{eg}
+  For mergesort
+  \[
+  a = 2, \,\,\,\,\, b = 2, \,\,\,\,\, f(n) = \Theta(n) = \Theta(n^c), c = 1
+  \]
+  Note that
+  \[
+  \log_b a = \log_2 2 = 1
+  \]
+  and
+  \[
+  c = \log_b a
+  \]
+  So case (b) of Master Theorem applies with $k = 0$.
+  This gives us
+  \[
+  T(n) = \Theta(n \log n)
+  \]
+  \qed
+\end{eg}
+
+\begin{eg}
+  Let $T(n) = 2T(n/2) + \Theta(n^2)$.
+  Then $a = 2 = b$ and $\log_b a = 1$.
+  Using (c) of Master Theorem, with $c = 2 > 1 = \log_b a$.
+  With $f(n) = n^2$,
+  \[
+  af(n/b) = 2 (n/2)^2 = n^2/2 \leq k n^2 = kf(n)
+  \]
+  for $k = 1/2 < 1$.
+  Then $T(n) = \Theta(n^2)$.
+  \qed
+\end{eg}
+
+
+\input{asymptotics/exercises/master-theorem-0/main.tex}
+
+
+\begin{ex}
+We have big-O concept for $a(n)$.
+Suppose $a(n) = O(b(n))$.
+Let
+\[
+f(x) = \sum_{n = 0}^\infty a(n) x^n
+\]
+and
+\[
+g(x) = \sum_{n = 0}^\infty b(n) x^n
+\]
+What can we say about the relationship between $f(x)$ and $g(x)$ and
+vice versa?
+Is it true that
+\[
+a(n) = O(b(n)) \iff f(x) = O(g(x))
+\]
+\qed
+\end{ex}

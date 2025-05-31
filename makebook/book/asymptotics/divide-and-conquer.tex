@@ -1,0 +1,554 @@
+%-*-latex-*-
+\sectionthree{Divide-and-conquer algorithms}
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+
+\newcommand\LEFT{\texttt{left}}
+\newcommand\MID{\texttt{mid}}
+\newcommand\RIGHT{\texttt{right}}
+\newcommand\TARGET{\texttt{target}}
+\newcommand\MERGESORT{\texttt{mergesort}}
+
+
+Another type of recursive runtime function looks like this:
+\[
+T(n) = T(n / 2) + A
+\]
+Such a recursion is called a \defone{divide-and-conquer recursion}.
+These are very different from linear recursion.
+An algorithm whose runtime is a divide-and-conquer recursive runtime function
+is called ... drumroll ... 
+\defterm{divide-and-conquer algorithm} ... (duh).
+
+
+The binary search algorithm (see CISS240 notes) 
+is an  algorithm with a runtime of 
+\[
+T(n) = 
+\begin{cases}
+A          & \text{if } n = 0 \\
+T(n/2) + B & \text{otherwise}
+\end{cases}
+\]
+
+More generally a divide-and-conquer runtime function looks like this:
+\[
+T(n) = 
+\begin{cases}
+A               & \text{for } n = 0, 1, 2, ..., B \\
+a T(n/b) + c(n) & \text{otherwise}
+\end{cases}
+\]
+for constants $A, B, a, b$. 
+Here $c(n)$ is a function of $n$ (it can be a constant of course).
+
+Mergesort (a sorting algorithm) has a runtime of 
+\[
+T(n) =
+\begin{cases}
+A            & \text{if $n = 0, 1$} \\
+2T(n/2) + Bn + C & \text{otherwise}
+\end{cases}
+\]
+
+Before analyzing some divide-and-conquer algorithms,
+let me give a high-level overview of such animals.
+Divide-and-conquer algorithms are easy to spot.
+
+Let's start with the binary search.
+(Again see CISS240 notes.)
+Suppose you're given a sorted (ascending) array of $n=10$ integers:
+\[
+\texttt{x} = \texttt{\{1, 3, 4, 6, 7, 8, 10, 12, 13, 17\}}
+\]
+The goal is to find \verb!target! in $x$, in the sense that
+the algorithm should compute the index where the value of 
+\verb!target! occurs in $x$.
+If that value is not found, then the algorithm returns 
+-1.
+
+Suppose $\TARGET = 7$.
+The idea behind the binary search is to look at 
+$\TARGET$ (or rather the value of $\TARGET$) in the 
+middle of $x$.
+The middle index is
+\[
+\MID = n/2 = 10/2 = 5
+\]
+Since 
+\[
+\texttt{x[\MID]} = 8 > \TARGET
+\]
+and since \verb!x! is sorted, $\TARGET$ must be in the left half
+of $x$ (if at all), before index $\MID$.
+Therefore I'm going to hunt for $\TARGET$ in 
+\[
+\texttt{x[0..4]} = \texttt{\{1, 3, 4, 6, 7\}}
+\]
+Note that the size of this new array is $n = 5$, half of the original.
+When I repeat the above I get
+\[
+\MID = n/2 = 5/2 = 2
+\]
+Since 
+\[
+\texttt{x[\MID]} = \texttt{x[2]} = \texttt{4} < \TARGET
+\]
+the $\TARGET$ must be in the right half of $x$, i.e., 
+past $\MID$.
+The new array is
+\[
+\texttt{x[3..4]} = \texttt{\{6, 7\}}
+\]
+which is about half of \verb!x[0..4]!.
+
+Note that the size of the array looks like this:
+\[
+10 \rightarrow 5 \rightarrow 2
+\]
+Each time, after looking at $\texttt{x[\MID]}$,
+you cut down the array by half: you work on the left half or the right half
+of $\texttt{x}$.
+
+Stepping back, you see that the size of work (approximately) halves each time.
+
+The above is the main idea behind the binary search.
+However note that it's a waste of time to create new arrays each time we
+make a recursive call since the array $x$ is \textit{not modified}.
+The correct thing to do is to use the same $x$, i.e.,
+pass $x$ by reference and 
+also pass two index variable $\LEFT$ and $\RIGHT$
+to tell the function where's the starting index and ending index
+of the current search.
+Initially of course $\LEFT = 0$ and $\RIGHT = n - 1$
+where $n$ is the size of the array $x$.
+
+See the section on the runtime analysis of the binary search.
+
+\input{asymptotics/exercises/recursion-0/main.tex}
+\input{asymptotics/exercises/recursion-1/main.tex}
+
+Now let's look at a high level overview of mergesort.
+It's easier to do an example by hand.
+The main idea when you call mergesort with an array $x$, is that
+the function splits $x$ into two arrays of about equal size,
+say we call them $y$ and $z$.
+Next, we call mergesort on $y$ and save the result in say $a$;
+this $a$ will be sorted.
+Third, we call mergesort on $z$ and save the result in say $b$;
+this $b$ is sorted.
+Fourth, we merge the sorted $a$ and $b$ into $c$ and return $c$.
+I'll talk about the merge operation in a bit.
+In mergesort, if the list $x$ has size 0 or 1, you just return $x$;
+this is the base case.
+
+Now for the merge operation.
+If you have two sorted arrays $a$ and $b$ and you want to 
+merge them into $c$,
+you just scan $a$ and $b$ left-to-right,
+picking the smallest to be placed into another array.
+Briefly, you put one finger at index $0$ of $a$ and 
+another at index $0$ of $b$.
+You then look at what you're pointing to,
+pick the smaller and dump it to array $c$,
+moving your finger past the smaller value.
+That's it.
+
+For instance if $a = [2,4,5]$ and $b=[1,2,3]$,
+you look at $a[0]$ and $b[0]$.
+Since $b[0]$ is smaller, you put $b[0]$ into $c[0]$.
+So $c[0] = 1$. $b[0]$ is done and you look at $b[1]$.
+We now compare $a[0]$ and $b[1]$. They are the same.
+I'll just choose $a[0]$ and put that into $c[1]$.
+So now $c[0]=1, c[1]=2$. We now move now to the next element in $a$,
+i.e., $a[1]$. We compare $a[1]$ and $b[1]$.
+Since $b[1]$ is smaller, I put that into $c[2]$.
+I now compare $a[1]$ and $b[2]$.
+Since $b[2]$ is smaller, I put that into $c[3]$.
+Once an array is finished (in this case $b$), I just put the rest
+of what remains in $a$ into $c$.
+
+
+\input{asymptotics/exercises/merge/main.tex}
+
+
+Suppose you're given this array:
+\[
+x = [3, 6, 4, 2, 7, 8, 12, 15, 1, 5]
+\]
+Let me call mergesort:
+
+\begin{Verbatim}[frame=single, fontsize=\footnotesize]
+STEP1. mergesort(x = [3, 6, 4, 2, 7, 8, 12, 15, 1, 5])
+First I divide x into two halves y and z and call mergesort(y).
+y = [3, 6, 4, 2, 7]
+z = [8, 12, 15, 1, 5]
+a = mergesort(y) ... WAITING FOR RETURN VALUE FROM STEP2
+b = ?
+c = ?
+\end{Verbatim}
+
+\begin{Verbatim}[frame=single, fontsize=\footnotesize]
+STEP2. mergesort(x = [3, 6, 4, 2, 7])
+I repeat the process on $x = [3, 6, 4, 2, 7]$.
+y = [3, 6]
+z = [4, 2, 7]
+a = mergesort(y) ... WAITING FOR RETURN VALUE FROM STEP3
+b = ?
+c = ?
+\end{Verbatim}
+
+\begin{Verbatim}[frame=single, fontsize=\footnotesize]
+STEP3. mergesort(x = [3, 6])
+I repeat the process on $[3, 6]$.
+y = [3]
+z = [6]
+a = mergesort(y) ... WAITING FOR RETURN VALUE FROM STEP4
+b = ?
+c = ?
+\end{Verbatim}
+
+\begin{Verbatim}[frame=single, fontsize=\footnotesize]
+STEP4. mergesort(x = [3])
+Since the size of x is 1, we are in the base case. 
+So I return [3] back to STEP3.
+\end{Verbatim}
+
+\begin{Verbatim}[frame=single, fontsize=\footnotesize]
+STEP3. mergesort(x=[3,6]) ... returning from STEP 4 ...
+The result of mergesort(y) is stored in a and we call mergesort(z) 
+y = [3]
+z = [6]
+a = [3]
+b = mergesort(z) ... WAITING FOR RETURN FROM STEP5 ...
+c = ?
+\end{Verbatim}
+
+\begin{Verbatim}[frame=single, fontsize=\footnotesize]
+STEP5. mergesort(x = [6])
+Since the size of x is 1, we are in the base case. 
+So I return [6] back to STEP3.
+\end{Verbatim}
+
+\begin{Verbatim}[frame=single, fontsize=\footnotesize]
+STEP3. mergesort(x=[3,6]) ... returning from STEP 5 ...
+The result of mergesort(z) is stored in b and we merge a, b and store in c 
+y = [3]
+z = [6]
+a = [3]
+b = [6]
+c = [3, 6]
+Return c to STEP2
+\end{Verbatim}
+
+\begin{Verbatim}[frame=single, fontsize=\footnotesize]
+STEP2. mergesort(x = [3, 6, 4, 2, 7])
+The return value from STEP3 is stored in a. Call mergesort(z)
+y = [3, 6]
+z = [4, 2, 7]
+a = [3, 6]
+b = mergesort(z) ... WAITING FOR RESULT FROM STEP6 ...
+c = ?
+\end{Verbatim}
+
+\begin{Verbatim}[frame=single, fontsize=\footnotesize]
+STEP6. mergesort(x = [4, 2, 7])
+y = [4]
+z = [2, 7]
+a = mergesort(y) ... WAITING FOR RESULT FROM STEP7
+b = ?
+c = ?
+\end{Verbatim}
+
+\begin{Verbatim}[frame=single, fontsize=\footnotesize]
+STEP7. mergesort([4])
+Return [4] back to STEP6.
+\end{Verbatim}
+
+\begin{Verbatim}[frame=single, fontsize=\footnotesize]
+STEP6. mergesort(x = [4, 2, 7])
+y = [4]
+z = [2, 7]
+a = [4]
+b = mergesort(z) ... WAITING FOR RESULT FROM STEP8 ...
+c = ? 
+\end{Verbatim}
+
+\begin{Verbatim}[frame=single, fontsize=\footnotesize]
+STEP8. mergesort(x = [2, 7])
+y = [2]
+z = [7]
+a = mergesort(y) ... WAITING FOR RESULT FROM STEP9
+b = ?
+c = ?
+\end{Verbatim}
+
+\begin{Verbatim}[frame=single, fontsize=\footnotesize]
+STEP9. mergesort(x = [2])
+Return [2] back to STEP8.
+\end{Verbatim}
+
+\begin{Verbatim}[frame=single, fontsize=\footnotesize]
+STEP8. mergesort(x = [2, 7])
+y = [2]
+z = [7]
+a = [2]
+b = mergesort(z) ... WAITING FOR RESULT FROM STEP10 ...
+c = ?
+\end{Verbatim}
+
+\begin{Verbatim}[frame=single, fontsize=\footnotesize]
+STEP10. mergesort(x = [7])
+Return [7] back to STEP8.
+\end{Verbatim}
+
+\begin{Verbatim}[frame=single, fontsize=\footnotesize]
+STEP8. mergesort(x = [2, 7])
+y = [2]
+z = [7]
+a = [2]
+b = [7]
+c = [2, 7]
+Return c to STEP6 
+\end{Verbatim}
+
+\begin{Verbatim}[frame=single, fontsize=\footnotesize]
+STEP6. mergesort(x = [4, 2, 7])
+y = [4]
+z = [2, 7]
+a = [4]
+b = [2, 7]
+c = [2, 4, 7]
+Return c to STEP2
+\end{Verbatim}
+
+\begin{Verbatim}[frame=single, fontsize=\footnotesize]
+STEP2. mergesort(x = [3, 6, 4, 2, 7])
+The return value from STEP3 is stored in a. Call mergesort(z)
+y = [3, 6]
+z = [4, 2, 7]
+a = [3, 6]
+b = [2, 4, 7]
+c = [2, 3, 4, 6, 7]
+Return c to STEP1
+\end{Verbatim}
+
+\begin{Verbatim}[frame=single, fontsize=\footnotesize]
+STEP1. mergesort(x = [3, 6, 4, 2, 7, 8, 12, 15, 1, 5])
+First I divide x into two halves y and z and call mergesort(y).
+y = [3, 6, 4, 2, 7]
+z = [8, 12, 15, 1, 5]
+a = [2, 3, 4, 6, 7]
+b = mergesort(z) ... WAITING FOR RESULT FROM STEP11 ...
+c = ?
+\end{Verbatim}
+
+\begin{ex}
+Finish the above execution by hand.
+\qed
+\end{ex}
+
+
+Informally, you see that if $T(n)$ is the time to execute
+mergesort with an array of size $n$, the function call
+will split the array into two pieces (this requires linear time)
+then call mergesort with these two halves (this requires $2T(n/2)$)
+and then merge the two return results (this requires linear time). 
+This results in a runtime of the form
+\[
+T(n) = 2T(n/2) + An + B
+\]
+for some constants $A,B$.
+
+Again, just like binary search, there are ways to prevent
+the over-creation of new arrays. 
+Therefore memory usage can be improved.
+But the above is the main idea behind mergesort.
+
+See later section on mergesort.
+
+As you can see, both binary search and mergesort involves
+splitting an array into two halves.
+\begin{itemize}
+\li In the case of binary search, the algorithm determines which
+half to continue with the search (the other is then thrown away), 
+resulting in a runtime that looks like
+$T(n) = T(n/2) + A$.
+\li In the case of mergesort, the mergesort then recursively
+work on each half (both halves are used), resulting in 
+a runtime that looks like
+$T(n) = 2T(n/2) + An + B$.
+\end{itemize}
+
+For binary search, of course if you have an array of size $n$, then
+in the next iteration of binary search, excluding the value at the \verb!mid! index,
+there are \verb!n - 1! values to analyze
+and the left and right subarray would have sizes of
+either
+$\floor{(n - 1)/2}$
+or
+$\ceiling{(n - 1)/2}$.
+But asymptotically when \verb!n! is large,
+it's enough to replace these by $n/2$.
+So instead of saying 
+\[
+T(n) = T(\floor{(n - 1)/2}) + A
+\]
+or
+\[
+T(n) = T(\ceiling{(n - 1)/2}) + A
+\]
+we just write the recurrence relation of $T(n)$ as
+\[
+T(n) = T(n/2) + A
+\]
+This is the same for the recurrence relation for mergesort.
+
+In general divide-and-conquer algorithms involve splitting
+up the work into roughly equal smaller pieces, recursively
+performing the algorithm on the smaller pieces
+and frequently combining the work done on the smaller pieces.
+The work done is either performed on data that is sent into
+the functions using pass-by-reference
+or through the function return values.
+
+\input{asymptotics/exercises/mergesort-3/main.tex}
+\input{asymptotics/exercises/dac-sum/main.tex}
+\input{asymptotics/exercises/dac-sum-array/main.tex}
+\input{asymptotics/exercises/dac-max/main.tex}
+\input{asymptotics/exercises/dac-count/main.tex}
+
+
+
+\begin{comment}
+Here's binary search for $\TARGET$ in a sorted array \verb!x!:
+\begin{Verbatim}[frame=single, fontsize=\footnotesize]
+left = 0
+right = n - 1
+while left <= right:
+    mid = (left + right) / 2
+    if x[mid] < target:
+        left = mid + 1
+    elif x[mid] > target:
+        right = mid - 1
+    else:
+        return mid
+return -1
+\end{Verbatim}
+
+Before I do that, let me rewrite the above in this form:
+\begin{Verbatim}[frame=single, fontsize=\footnotesize]
+left = 0
+right = n - 1
+
+while 1:
+    if left > right:
+        return -1
+    else:    
+        mid = (left + right) / 2
+        if x[mid] < target:
+            left = mid + 1
+        elif x[mid] > target:
+            right = mid - 1
+        else:
+            return mid
+\end{Verbatim}
+
+You can recast this as a recursion:
+\begin{Verbatim}[frame=single, fontsize=\footnotesize]
+def binarysearch(x, target, left=0, right=len(x) - 1):
+    if left > right:
+        return -1
+    else:
+        mid = (left + right) / 2
+        if x[mid] < target:
+            binarysearch(x, target, mid + 1, right)
+        elif x[mid] > target:
+            binarysearch(x, target, left, mid - 1)
+        else:
+            return mid
+\end{Verbatim}
+
+Let $T(n)$ be the runtime where $n$ is the index range that
+of the search. For instance in the call of
+\verb!binarysearch(x, target, 4, 10)!
+the value of $n$ is $10 - 4 + 1$.
+
+Let's compute the runtime.
+
+\begin{Verbatim}[frame=single, fontsize=\footnotesize]
+    if left > right:                                t1
+        return -1                                   t2
+    
+    mid = (left + right) / 2                        t3
+    if x[mid] < target:                             t4
+        binarysearch(x, target, mid + 1, right)     t5
+    elif x[mid] > target:                           t6
+        binarysearch(x, target, left, mid - 1)      t7
+    else:                                           t8
+        return mid                                  t9
+\end{Verbatim}
+
+
+First of all, our array \verb!x! is passed by reference.
+Each function call to \verb!binarysearch! works on 
+\[
+\verb!x[left]!, ...,
+\verb!x[right]!
+\]
+Therefore the size \verb!n! of the algorithm is 
+\[
+n = \RIGHT - \LEFT + 1
+\]
+The base case occurs when $\LEFT > \RIGHT$
+which is of course the same as
+\[
+n = 0
+\]
+which is the execution of this part of the function:
+\begin{Verbatim}[frame=single, fontsize=\footnotesize]
+...
+    if left > right:
+        return -1
+
+    ...       
+\end{Verbatim}
+Of course the runtime is constant.
+\[
+T(0) = A
+\]
+
+Otherwise we have the case
+$\LEFT \geq \RIGHT$
+which is the same as
+\[
+n \geq 1
+\]
+Note that
+\[
+\MID = \floor{\frac{\LEFT + \RIGHT}{2}} 
+\]
+
+This is the recursive part. 
+There are three cases. The first case results in 
+\begin{align*}
+T(n) 
+&= t1 + t3 + t4 + t5
+\end{align*}
+Everything is constant except for t5 which is
+\[
+T(m)
+\]
+where 
+\begin{align*}
+m
+&= \RIGHT - (\MID + 1) + 1 \\
+&= \RIGHT - \MID \\
+&= \RIGHT - \floor{\frac{\LEFT + \RIGHT}{2}} \\
+&\approx \RIGHT - \frac{\LEFT + \RIGHT}{2} \\
+&= \frac{\RIGHT - \LEFT}{2} \\
+&\approx \frac{n}{2} \\
+\end{align*}
+
+\end{comment}

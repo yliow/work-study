@@ -1,0 +1,179 @@
+\section{The Famous P = NP Problem}
+
+
+Now I'm going to described a very famous and unsolved problem
+in Computer Science and Mathematics:
+the $\POLY = \NP$ problem.
+This requires some definitions first.
+
+First I have to define $\POLY$.
+
+The class
+\[
+\TIME(n^d)
+\]
+is defined to be the collection of problems that can be solved by 
+an algorithm with a runtime of $O(n^d)$.
+For instance
+here's a problem:
+\[
+\SORTARRAY:
+\text{Sort an array in ascending order}
+\]
+For simplicity, 
+I will assume that the arrays always have distinct integer values.
+
+We know that an array can be sorted in $O(n \ln n)$ times
+(for instance using quicksort).
+Since $O(n \ln n) \subset O(n^2)$,
+we have
+\[
+\SORTARRAY \in \TIME(n^2)
+\]
+
+It's important to see the difference between 
+$\TIME(n^2)$ and 
+$O(n^2)$.
+$\TIME(n^2)$ is a collection of {\it problems}
+whereas $O(n^2)$ is a collection of {\it functions}.
+
+The $\POLY$ class is defined to the 
+collection of all problems that can be solved by 
+a polynomial time algorithm, i.e.,
+\[
+\POLY = \bigcup_{d = 0}^\infty \TIME(n^d)
+\]
+
+Now I'm going to define another collection of problems.
+The collection
+\[
+\NTIME(n^d)
+\]
+is the collection of problems where there is an algorithm
+with runtime of $O(n^d)$ that can check if a given solution to the 
+problem is actually a solution or not.
+
+To make sure you understand $\NTIME(n^d)$ let me give you an example.
+Let's look at our problem again:
+\[
+\SORTARRAY:
+\text{Sort an array in ascending order}
+\]
+Suppose I give you a problem in $\SORTARRAY$:
+\[
+\text{Sort $[6, 3, 2, 9, 8]$ in ascending order}
+\]
+Now, I'm not asking you to sort $[6,3,2,9,8]$.
+Rather, I'm going to give you another problem.
+I'm going to give you another an array 
+$[2,3,6,8,9]$ and you have to tell me
+this second array is the sorted version of the first
+array $[6,3,2,9,8]$.
+Here's an instance of this new problem:
+\[
+\text{VERIFY-SORT-ARRAY: 
+After $[6, 3, 2, 9, 8]$ is sorted, you get $[2,3,6,8,9]$}
+\]
+Of course your algorithm must say \lq\lq YES'' in this case.
+However if I give you {\it this} instance:
+\[
+\text{VERIFY-SORT-ARRAY: 
+After $[0, 3, 2, 4, 8]$ is sorted, you get $[8,2,3,4,0]$}
+\]
+your algorithm must say \lq\lq NO''.
+Your algorithm must also say \lq\lq NO'' to this instance:
+\[
+\text{VERIFY-SORT-ARRAY: 
+After $[0, 3, 2, 4, 8]$ is sorted, you get $[1,1,1]$}
+\]
+
+\begin{ex}
+Design an algorithm for VERIFY-SORT-ARRAY that runs in 
+polynomial (in fact quadratic) time.
+\qed
+\end{ex}
+
+Let me repeat that because that's lot to swallow.
+Suppose $P$ is a problem.
+Suppose that when given a specific problem instance $p$
+and a potential solution $s$,
+there is a verifying algorithm $V$ that takes $(p, s)$ and outputs 
+\lq\lq YES'' if $s$ is a solution of $p$
+and outputs \lq\lq NO'' if $s$ is not a solution of $p$,
+and furthermore if this verifying algorithm $V$ runs in polynomial time,
+then this problem $P$ is in $\NP$.
+
+
+Finally we define
+\[
+\NP = \bigcup_{d = 0}^\infty \NTIME(n^d)
+\]
+Informally, $\NP$ is the collection of problems that can be
+verified with solutions in polynomial time.
+
+The famous
+\[
+\POLY = \NP \text{ problem}
+\]
+or 
+\[
+\POLY \neq \NP \text{ problem}
+\]
+asks if the two collection of problem $\POLY$ and $\NP$ are the same.
+
+This is an extremely important question.
+Why?
+
+First of all, the problems in $\NP$ are known to have exponential runtime.
+Why is that?
+For instance in the case of $\SORTARRAY$ problem, we have a 
+verifying algorithm $V$ that runs in polynomial time.
+Now how do we solve $\SORTARRAY$ in exponential time?
+For each problem instance $p$, we continually generate all arrays
+$s_0, s_1, s_2, \ldots$ and feed $(p, s_i)$ into $V$.
+When $V(p, s_i)$ says \lq\lq YES'', then of course $s_i$ is the
+sorted array of the problem $p$.
+Why does this algorithm run in exponential time?
+Because it might take exponential time to reach the correct solution 
+$s_i$.
+Pictorially, suppose I want to sort $[10,3,5,2,4]$ using $V$,
+I would see this algorithm doing something like this:
+\begin{Verbatim}[frame=single]
+EXPONENTIAL-TIME-SORTING-ALGORITHM([10,3,5,2,4,6]):
+  V([10,3,5,2,4], [])           = NO  
+  V([10,3,5,2,4], [2])          = NO  
+  V([10,3,5,2,4], [5,7])        = NO  
+  V([10,3,5,2,4], [0,2,6,42])   = NO 
+  V([10,3,5,2,4], [9,17,2])     = NO 
+  ...
+  V([10,3,5,2,4], [2,3,4,5,10]) = YES 
+                        ---> OUTPUT [2,3,4,5,10]} 
+\end{Verbatim}
+As you can see, you might have to wait for a very long time for the 
+right array to appear!
+
+It's easy to see that 
+\[
+\POLY \subseteq \NP
+\]
+
+If 
+\[
+\POLY = \NP
+\]
+is true, this implies that problems with extremely bad exponential runtime
+algorithms actually has a polynomial runtime algorithm.
+It seems that most researchers working in areas related to 
+the $\POLY = \NP$ problem tend to believe
+\[
+\POLY \neq \NP
+\]
+The $\POLY = \NP$ and $\POLY \neq \NP$ problems are still unsolved.
+In fact there is a \$1M reward for solving either problem.
+(Google for \lq\lq millenium problems clay institute''.) 
+
+The above is only a very brief overview of the problem.
+To get a better understanding of this problem and other insanely fun
+stuff, you would have to 
+know topics like universal Turing machines, etc.
+(See CISS362, Theory of automata.)
