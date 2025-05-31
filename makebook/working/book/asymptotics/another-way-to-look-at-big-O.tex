@@ -1,0 +1,144 @@
+%-*-latex-*-
+\section{Another Way to Look at big-O}
+
+Recall that if I say \lq\lq $f = O(g)$'' I mean
+you can find $C$ and $N$ such that
+for $n \geq N$,
+\[
+|f(n)| \leq C \cdot |g(n)|
+\]
+
+In the above, $O(g)$ is purely symbolic.
+Like I said, when you see \lq\lq $f = O(g)$'',
+you just think of
+\lq\lq there exist $C$ and $N$ such that
+for $n \geq N$,
+$|f(n)| \leq C \cdot |g(n)|$''.
+
+Now I'm going to define $O(g)$ as a \textit{set} like this:
+\[
+O(g) = 
+\biggl\{
+f \,\biggl|\,
+\text{there is some $N$ and $C$ such that $|f(n)| \leq C\cdot |g(n)|$} 
+\biggr\}
+\]
+
+With this definition, I can say
+\[
+f \in O(g)
+\]
+This would be the say as saying
+\[
+f = O(g)
+\]
+in our previous definition.
+Whether you write \lq\lq $f = O(g)$ or
+\lq\lq $f \in O(g)$", they mean the same thing, i.e.,
+\[
+\text{there are $C$ and $N$ such that for $n \geq N$,
+$|f(n)| \leq C \cdot |g(n)|$}
+\]
+
+Besides seeing statements like
+\[
+f(n) \in O(g(n))
+\]
+or 
+\[
+f(n) = O(g(n))
+\]
+you might see something like this:
+\[
+   f(n) = 3n^2 + 4n + 5 + 6 \ln n = 3n^2 + O(n)
+\]
+or
+\[
+   f(n) = 3n^2 + 4n + 5 + 6 \ln n \in 3n^2 + O(n)
+\]
+What does this mean:
+\[
+3n^2 + O(n)
+\]
+Seems like the author is trying to add a
+function $3n^2$ with a set $O(n)$!!!
+
+Basically the author is trying
+to say that he cares only about $3n^2$ and the \textit{smaller terms} are
+bunched up as \textit{some} function in $O(n)$, i.e.,
+\[
+   f(n) = 3n^2 + 4n + 5 + 6 \ln n = 3n^2 + f_1(n) 
+   \text{ for some $f_1 \in O(n)$}
+\]
+
+If he wants to be more
+accurate he can also say
+\[
+  f(n) = 3n^2 + 4n + 5 + 6 \ln n = 3n^2 + 4n + O(\ln n)
+\]
+he meant that $f(n)$ is $3n^2 + 4n$ together with a smaller function
+$f_1(n)$ which is in $O(\ln n)$:
+\[
+  f(n) = 3n^2 + 4n + 5 + 6 \ln n = 3n^2 + 4n + f_1(n) 
+  \text{ for some $f_1(n) \in O(\ln n)$}
+\]
+
+[PUT STUFF BELOW IN ANOTHER SECTION]
+
+In general let's look at an expression of the form
+\[
+  f_1(n) + O(g_1(n)) = f_2(n) + O(g_2(n))
+\]
+First of all let's define $f_1(n) + O(g_1(n))$. This is the sum of
+a function and a set. Basically you just add $f_1$ to all the
+functions in $O(g_1(n))$. More generally if you have a function
+$f$ and a set of functions $S$, then we define
+\[
+ f + S = \{ f + g \,|\, g \in S \}
+\]
+
+With this definition,
+\[
+ f_1(n) + O(g_1(n)) = f_2(n) + O(g_2(n))
+\]
+is the same as saying
+\[
+ \biggl\{ f_1 + g \,\,\biggl|\,\, g \in O(g_1(n)) \biggr\}
+ \subseteq
+ \biggl\{ f_2 + g \,\,\biggl|\,\, g \in O(g_2(n)) \biggr\}
+\]
+Remember that when it comes to $O$ and $\Theta$ equations, $=$
+always means $\subseteq$!!
+
+
+If you stop to think about it, not only can you define $f + S$
+where $f$ is a function and $S$ is a set of functions, you can
+also define $S + f$ as $\{ g + f \,|\, g \in S \}$ too. Of course
+since $f+g = g + f$, we have $f + S = S + f$. Right? Furthermore,
+you can also define $fS$ and $Sf$.
+
+
+\begin{ex}
+Let $S, T, U$ be sets of functions and $f$ be a function. Equality
+here is really equality and not $\in$ or $\subseteq$.
+\begin{enumerate}
+ \item Define $S + T$ and prove that $S + T = T + S$ (duh) and
+ $(S+T)+U = S+(T+U)$ (duh).
+ Therefore we can write $S+T+U$ without fear of ambiguity or
+ lawsuits or flamemail. Of course with your definition we can just
+ define $f+S$ as ${f} + S$.
+ \item Define $fS$ and $Sf$. Prove that $fS = fS$ (duh).
+ \item Define $ST$. Prove that $ST = TS$ and $(ST)U = S(TU)$
+ (two duhs). So again we can write $STU$.
+\end{enumerate}
+\end{ex}
+
+
+\begin{ex}
+Try this out yourself: What does this means
+\[
+ f + O(g) + O(h) = a + O(b) + O(c)
+\]
+where $f,g,h,a,b,c,$ are functions. Don't forget that in this case
+$=$ means $\subseteq$.\end{ex}
+

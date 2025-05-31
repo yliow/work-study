@@ -1,4 +1,5 @@
 import os
+import glob
 import re
 import shutil
 
@@ -10,6 +11,105 @@ found_notes = []
 selected_notes = []
 processed_notes = []
 # new_dir_name = None
+
+#process selected notes
+def process_notes():
+    global selected_notes
+    wdir = os.getcwd()
+    if not selected_notes:
+        print("no notes selected for processing, make your selections first")
+    else:
+        makemakefile()
+        for i in selected_notes:
+            print(f'processing {i} ...')
+            moveother(i)
+            makefiles(i)
+            update_input_in_dir(i)
+            blot_out_makefile_command(i)
+        finishupfiles()
+
+def blot_out_makefile_command(i):
+    with open(new_dir + i + '/makefile', 'r') as f:
+        lines = f.readlines()
+
+    new_lines = [line for line in lines if "$(PDF)" not in line]
+
+    with open(new_dir + i + '/makefile', 'w') as f:
+        f.writelines(new_lines)
+
+
+def update_input_in_dir(i):
+    tex_files = glob.glob(os.path.join(new_dir + i, '*.tex'))
+
+    for filepath in tex_files:
+        with open(filepath, 'r') as f:
+            content = f.read()
+        new_content = content.replace(r"\input{", fr"\input{{{i}/")
+
+        with open(filepath, 'w') as f:
+            f.write(new_content)
+
+def finishupfiles():
+    with open(new_dir + 'makefile', 'a') as f:
+        f.write('''\t$(PDF)
+c:
+	$(LATEXRM)
+v:
+	$(OPEN) main.pdf''')
+    with open(new_dir + 'chap.tex', 'a') as f:
+        f.write(r'''\begin{python0}
+from solutions import *
+prepare_solutions()
+\end{python0}
+\input{solutions.tex}
+\begin{python0}
+from solutions import *
+clear()
+\end{python0}''')
+    with open(new_dir + 'main.tex', 'w') as f:
+        f.write('''%-*-latex-*-
+\input{thispreamble}
+\clearsolutions
+\input{chap.tex}
+\input{thispostamble}''')
+    copy_matching_files(selected_notes[0], "this*", new_dir)
+
+def makemakefile():
+    with open(new_dir + 'makefile', 'w') as f:
+        f.write(r'''OPEN = xdg-open
+PDF = rm -rf solutions.tex; touch solutions.tex; \
+	pdflatex --shell-escape -halt-on-error -interaction=nonstopmode -file-line-error $@.tex && \
+	pythontex main.tex && \
+        makeindex $@.idx && \
+        pdflatex --shell-escape $@.tex && \
+        $(OPEN) $@.pdf;
+LATEXRM = rm -f \
+        main.aux main.ilg main.log main.idx main.ind main.out \
+        main.py.err main.py.out \
+        comment.cut comment.err comment.out \
+        latex.py
+main:''')
+        f.write('\n')
+
+def makefiles(dr):
+    with open(old_dir + dr + "/chap.tex", 'r') as f:
+        lines = f.readlines()
+
+    moved_lines = []
+
+    pattern = re.compile(r"^[^%]*\\newpage\\input\{.*\}\s*$")
+
+    for line in lines:
+        if pattern.match(line):
+            moved_lines.append(line[:15] + dr + '/' + line[15:])
+
+    with open(new_dir + 'chap.tex', 'a') as f:
+        f.write(f'% notes for {dr}\n')
+        f.writelines(moved_lines)
+        f.write('\n\n')
+
+    with open(new_dir + 'makefile', 'a') as f:
+        f.write(f'\tcd {dr} ; make ; cd .. ; \n')
 
 # Here is where we make sure all necessary directories are present
 def check_dirs(dir_):
@@ -68,7 +168,11 @@ def check(dir_):
 
 #basic block text greeting
 def greeting():
-    print("█▀▄▀█ █▀▀█ █ █ █▀▀ █▀▀▄ █▀▀█ █▀▀█ █ █ \n█ ▀ █ █▄▄█ █▀▄ █▀▀ █▀▀▄ █  █ █  █ █▀▄ \n▀   ▀ ▀  ▀ ▀ ▀ ▀▀▀ ▀▀▀  ▀▀▀▀ ▀▀▀▀ ▀ ▀")
+    print('''
+█▀▄▀█ █▀▀█ █ █ █▀▀ █▀▀▄ █▀▀█ █▀▀█ █ █ 
+█ ▀ █ █▄▄█ █▀▄ █▀▀ █▀▀▄ █  █ █  █ █▀▄ 
+▀   ▀ ▀  ▀ ▀ ▀ ▀▀▀ ▀▀▀  ▀▀▀▀ ▀▀▀▀ ▀ ▀
+          ''')
     #update this as necessary
     print("Makebook v0.1, 2025")
     
@@ -150,16 +254,6 @@ def make_new_dir():
     make_new_book_dir()
     return
 
-#process selected notes
-def process_notes():
-    global selected_notes
-    wdir = os.getcwd()
-    if not selected_notes:
-        print("no notes selected for processing, make your selections first")
-    else:
-        for i in selected_notes:
-            print(f'processing {i} ...')
-            moveother(i)
     
 #process user selections
 def get_selection(selection):
@@ -235,6 +329,17 @@ def movestd(f):
 def moveother(f):
     print(f'copying over {f} to book/ ...')
     os.system('cp -r %s %s' % (old_dir + f, new_dir + f))
+
+def copy_matching_files(src_dir, pattern, dest_dir):
+    # Make sure destination directory exists
+    os.makedirs(dest_dir, exist_ok=True)
+
+    # Match files using glob
+    matching_files = glob.glob(os.path.join(src_dir, pattern))
+
+    for file in matching_files:
+        shutil.copy(file, dest_dir)
+        print(f"Copied {file} to {dest_dir}")
 
 menu_loop()
 goodbye()
