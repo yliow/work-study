@@ -2,6 +2,8 @@ import os
 import glob
 import re
 import shutil
+import subprocess
+from pathlib import Path
 
 old_dir = os.getcwd() + '/'    
 new_dir = os.getcwd() + '/book/'
@@ -20,12 +22,24 @@ def process_notes():
         print("no notes selected for processing, make your selections first")
     else:
         makemakefile()
+        shutil.copy(old_dir + selected_notes[0] + '/thismacros.tex', new_dir)
+        shutil.copy(old_dir + selected_notes[0] + '/thispackages.tex', new_dir)
+        shutil.copy(old_dir + selected_notes[0] + '/thispreamble.tex', new_dir)
+        shutil.copy(old_dir + selected_notes[0] + '/thispostamble.tex', new_dir)
+        shutil.copy(old_dir + selected_notes[0] + '/thistitle.tex', new_dir)
+        print("Copied prerequisite files to book directory ...\n")
         for i in selected_notes:
             print(f'processing {i} ...')
             moveother(i)
             makefiles(i)
             update_input_in_dir(i)
             blot_out_makefile_command(i)
+            subprocess.run(["rm", "-f", new_dir + i + '/main.tex'], check=True)
+        for path in Path(new_dir).rglob('*.cpp'):
+            shutil.copy(path, new_dir)
+        for path in Path(new_dir).rglob('*.py'):
+            shutil.copy(path, new_dir)
+        print('Copied all cpp and py files to book directory')
         finishupfiles()
 
 def blot_out_makefile_command(i):
@@ -39,7 +53,8 @@ def blot_out_makefile_command(i):
 
 
 def update_input_in_dir(i):
-    tex_files = glob.glob(os.path.join(new_dir + i, '*.tex'))
+    os.chdir(new_dir + i)
+    tex_files = glob.glob('**/*.tex', recursive=True)
 
     for filepath in tex_files:
         with open(filepath, 'r') as f:
@@ -72,7 +87,6 @@ clear()
 \clearsolutions
 \input{chap.tex}
 \input{thispostamble}''')
-    copy_matching_files(selected_notes[0], "this*", new_dir)
 
 def makemakefile():
     with open(new_dir + 'makefile', 'w') as f:
@@ -330,16 +344,6 @@ def moveother(f):
     print(f'copying over {f} to book/ ...')
     os.system('cp -r %s %s' % (old_dir + f, new_dir + f))
 
-def copy_matching_files(src_dir, pattern, dest_dir):
-    # Make sure destination directory exists
-    os.makedirs(dest_dir, exist_ok=True)
-
-    # Match files using glob
-    matching_files = glob.glob(os.path.join(src_dir, pattern))
-
-    for file in matching_files:
-        shutil.copy(file, dest_dir)
-        print(f"Copied {file} to {dest_dir}")
 
 menu_loop()
 goodbye()
