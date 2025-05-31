@@ -1,0 +1,978 @@
+%-*-latex-*-
+% https://www.cs.umd.edu/users/meesh/cmsc351/mount/lectures/lec15-quicksort.pdf
+\sectionthree{Randomized/probabilistic algorithms}
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+
+
+A
+\defone{randomized algorithm}
+or
+\defone{probabilistic algorithm}
+is an algorithm that uses
+randomization.
+
+There are two types of randomized/probabilistic algoroithms.
+
+A \defone{Las Vegas} randomized algorithm uses randomization of input.
+The output is correct.
+What is changed, because of the randomization of input, is the expected runtime.
+An example is randomized quicksort where the choice is pivot is randomized.
+
+A \defone{Monte Carlo} randomized algorithm might produce an incorrect result,
+but with a very small probability.
+An example is the Miller-Rabin primality testing algorithm.
+In the case of primality testing, several rounds of Miller-Rabin will lower
+the probability of incorrectness.
+
+Now let's consider quicksort.
+Let $T(n)$ be the runtime.
+Once a pivot is selected, recall that the
+pivot partitions the subarray the quicksort is working on
+into two parts (the left and right partitions),
+but in general you do not know the sizes of the two partitions.
+Therefore the runtime looks like this:
+\[
+  T(n) = T(0) + T(n - 1) + An + B
+\]
+or
+\[
+  T(n) = T(1) + T(n - 2) + An + B
+\]
+or
+\[
+  T(n) = T(2) + T(n - 3) + An + B
+\]
+or
+\[
+  ...
+\]
+or
+\[
+  T(n) = T(n - 1) + T(0) + An + B
+\]
+depending on how the pivot partitions.
+For instance for the first line above, the pivot lands in index 0,
+and therefore the left partition has size 0 and the right partition
+has size $n - 1$.
+Let's assume all the above cases are equally likely.
+Adding them up I get
+\[
+  nT(n) = 2 \cdot \sum_{i = 0}^{n - 1} T(i) + n(An + B)
+\]
+and therefore
+\[
+  T(n) = \frac{2}{n} \sum_{i = 0}^{n - 1} T(i) + An + B
+\]
+Note that technically the $T(n)$ here is the average $T(n)$.
+
+Now I want to show that the above average runtime is $O(n \lg n)$.
+
+Suppose $T(k) \leq k \lg k$ for $1 \leq k < n$.
+Then
+\begin{align*}
+  \frac{2}{n} \sum_{i = 1}^{n - 1} T(i)
+  &\leq \frac{2}{n} \sum_{i = 1}^{n - 1} i \lg i 
+  \\
+  &\leq \frac{2}{n} \sum_{i = 1}^{n - 1} n \lg i 
+  \\
+  &\leq 2 \sum_{i = 1}^{n - 1} \lg i 
+  \\
+  &\leq 2 \int_{1}^n \lg x \ dx
+  \\
+  &\leq 2 C \int_{1}^n x \ln x \ dx \hspace{1cm} \text{change of base}
+  \\
+  %&\leq 2 C \left( x\ln x \right|_{x=1}^{x=n} - \int_{1}^n x d(\ln x) \right)
+  %\\
+  %&\leq 2 C \left( n \ln n - \int_{1}^n x (1/x) dx \right)
+  %\\
+  %&\leq 2 C \left(  n \ln n  - \int_{1}^n 1 dx \right)
+  %\\
+  %&\leq 2 C \left( n \ln n - (n - 1) \right)
+\end{align*}
+\begin{comment}
+\begin{align*}
+  \frac{2}{n} \sum_{i = 1}^{n - 1} T(i)
+  &\leq \frac{2}{n} \sum_{i = 1}^{n - 1} i \lg i 
+  \\
+  &\leq 2 \sum_{i = 1}^{n - 1} \frac{i}{n} \lg i  
+  \\
+  &= 2 \sum_{i = 1}^{n - 1} \frac{i}{n} \lg \left( \frac{i}{n} \cdot n \right)
+  \\
+  &= 2 \sum_{i = 1}^{n - 1} \frac{i}{n} \left( \lg \frac{i}{n} + \lg n \right)
+  \\
+  &= 2 \sum_{i = 1}^{n - 1} \left( \frac{i}{n} \lg \frac{i}{n} + \frac{i}{n} \lg n \right)
+  \\
+  &= 2 \sum_{i = 1}^{n - 1} \frac{i}{n} \lg \frac{i}{n} + 2\sum_{i=1}^n \frac{i}{n} \lg n
+  \\
+  &= 2 \sum_{i = 1}^{n - 1} \frac{i}{n} \lg \frac{i}{n}
+    +
+    \frac{2 \lg n}{n}
+    \sum_{i=1}^n i
+  \\
+  &= 2 \sum_{i = 1}^{n - 1} \frac{i}{n} \lg \frac{i}{n}
+    +
+    \frac{2 \lg n}{n}
+    \cdot
+    \frac{n(n - 1)}{2}
+  \\
+  &= 2 \sum_{i = 1}^{n - 1} \frac{i}{n} \lg \frac{i}{n}
+    +
+    (\lg n)(n - 1)
+  \\
+  &= 2 \sum_{i = 1}^{n - 1} \frac{i}{n} \lg \frac{i}{n}
+    +
+    n\lg n - \lg n
+\end{align*}
+\end{comment}
+
+
+\subsection{Average runtime of quicksort using probability}
+
+Assume \verb!x[0..n-1]! values are distinct and I'm going to
+perform quicksort on it.
+I'm going to assume that the pivot selection is random.
+
+I'm using the partition method mentioned in my notes
+where the pivot is placed at the beginning of the
+subarray to be sorted.
+
+I'll compute the average runtime this way:
+I'm going to count the number of comparisons throughout the \textit{whole} quicksort process,
+instead of going through the
+stages of recursion.
+Again, as before, the above statement means \lq\lq I'm going to count
+the \textit{average} number of comparison".
+
+Let $X$ be number of comparisons during quicksort.
+So I'm aiming for $\E[X]$.
+Let's break it up.
+Let $X_{ab}$ be the number of comparison between \verb!a! and \verb!b!
+where \verb!a! and \verb!b! are values in the array \verb!x[0..n - 1]!
+that I'm sorting.
+Then
+\[
+  X =
+  \sum_{a,b \in \texttt{x[0..n-1]}} X_{ab}  
+\]
+and therefore
+\[
+  \E[X] =
+  \sum_{\texttt{a},\texttt{b} \in \texttt{x[0..n-1]}} \E \left[ X_{\texttt{ab}} \right]  
+\]
+
+
+Note that \verb!a! and \verb!b! is compared at most once.
+Why?
+Because values are compared \textit{against a pivot} and once a value is
+chosen as a pivot, you notice that work is never done on that pivot anymore -- because
+the pivot has found its right place during the partitioning algorithm.
+Of course it's also possible that \verb!a! and \verb!b! are never chosen as pivot.
+In that case the number of comparisong between \verb!a! and \verb!b! is 0.
+Therefore
+$X_{\texttt{ab}} = 1$ or $0$.
+In other words $X_{\texttt{ab}}$ is an indicator random variable.
+Therefore
+\begin{align*}
+  E[X]
+  &= \sum_{\texttt{a},\texttt{b} \in \texttt{x[0..n - 1]}} E \left[ X_{\texttt{ab}} \right]
+    \\
+  &= \sum_{\texttt{a},\texttt{b} \in \texttt{x[0..n - 1]}} \Pr \left[ X_{\texttt{ab}} = 1 \right]
+    \\
+  &= \sum_{\texttt{a},\texttt{b} \in \texttt{x[0..n - 1]}}
+    \text{(probability that \texttt{a} and \texttt{b} are compared)}
+\end{align*}
+
+Here's a diagram showing a sample execution of quicksort on \verb!x[0..n - 1]!, focusing on
+two elements \verb!x[i]! and \verb!x[j]! where \verb!x[i]! is ultimately
+chosen as a pivot:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+def cell(label='', background=''):
+    return Rect2(x0=0, y0=0, x1=0.8, y1=0.4, label=r'\scriptsize{\texttt{%s}}' % label, background=background)
+
+c = RectContainer(x=1, y=1)
+for i in range(10):
+    if i == 3:
+        c += cell('x[i]')
+    elif i == 7:
+        c += cell('x[j]')
+    else:
+        c += cell()
+
+p += c
+
+d = RectContainer(x=1, y=-1)
+for i in range(10):
+    if i == 8:
+        d += cell('x[i]')
+    elif i == 6:
+        d += cell('x[j]')
+    elif i == 2:
+        d += cell(r'$p_0$', background='black!10')    
+    else:
+        d += cell()
+
+p += d
+
+e = RectContainer(x=1, y=-3)
+for i in range(10):
+    if i == 3:
+        e += cell('x[i]')
+    elif i == 5:
+        e += cell('x[j]')
+    elif i == 2:
+        e += cell(r'$p_0$', background='black!10')    
+    elif i == 8:
+        e += cell(r'$p_1$', background='black!10')    
+    else:
+        e += cell()
+
+p += e
+
+f = RectContainer(x=1, y=-5)
+for i in range(10):
+    if i == 4:
+        f += cell('x[i]', background='black!10')
+    elif i == 7:
+        f += cell('x[j]')
+    elif i == 2:
+        f += cell(r'$p_0$', background='black!10')    
+    elif i == 8:
+        f += cell(r'$p_1$', background='black!10')    
+    else:
+        f += cell()
+
+p += f
+
+p += Line(points=[c[3].bottom(), d[8].top()], endstyle='>')
+p += Line(points=[d[8].bottom(), e[3].top()], endstyle='>')
+
+p += Line(points=[c[7].bottom(), d[6].top()], endstyle='>')
+p += Line(points=[d[6].bottom(), e[5].top()], endstyle='>')
+
+p += Line(points=[e[5].bottom(), f[7].top()], endstyle='>')
+p += Line(points=[e[3].bottom(), f[4].top()], endstyle='>')
+
+print(p)
+\end{python}
+
+After that \verb!x[j]! might change it's position.
+But it won't be compared against \verb!x[i]! anymore.
+The cells in grey are pivots after the partitioning steps and therefore
+will not take part in future partitioning steps.
+
+Here's the diagram of a more complete quicksort on an array of size 10.
+I'm drawing the array at the end of each pass, which includes the
+pivot selection and the partitioning step.
+The pivots are shaded.
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+def cell(label='', background=''):
+    return Rect2(x0=0, y0=0, x1=0.8, y1=0.4, label=r'\scriptsize{\texttt{%s}}' % label, background=background)
+
+c = RectContainer(x=1, y=1)
+for i in [5,3,7,2,1,9,4,0,6,8]:
+    c += cell(label=i)
+
+p += c
+
+d = RectContainer(x=1, y=0)
+for i in [5,3,2,1,4,0,6,7,9,8]:
+    if i == 7:
+         d += cell(label=i, background='black!10')
+    else:
+        d += cell(i)
+
+p += d
+
+e = RectContainer(x=1, y=-1)
+for i in [2,1,0,3,5,4,6,7,9,8]:
+    if i in [7,3]:
+        e += cell(i, background='black!10')
+    else:
+        e += cell(i)
+
+p += e
+
+f = RectContainer(x=1, y=-2)
+for i in [0,1,2,3,4,5,6,7,9,8]:
+    if i in [7,3,1,4]:
+        f += cell(i, background='black!10')
+    else:
+        f += cell(i)
+
+p += f
+
+g = RectContainer(x=1, y=-3)
+for i in [0,1,2,3,4,5,6,7,9,8]:
+    if i in [7,3,1,4,5]:
+        g += cell(i, background='black!10')
+    else:
+        g += cell(i)
+
+p += g
+
+h = RectContainer(x=1, y=-4)
+for i in [0,1,2,3,4,5,6,7,8,9]:
+    if i in [7,3,1,4,5,9]:
+        h += cell(i, background='black!10')
+    else:
+        h += cell(i)
+
+p += h
+
+#p += Line(points=[c[3].bottom(), d[8].top()], endstyle='>')
+#p += Line(points=[d[8].bottom(), e[3].top()], endstyle='>')
+
+#p += Line(points=[c[7].bottom(), d[6].top()], endstyle='>')
+#p += Line(points=[d[6].bottom(), e[5].top()], endstyle='>')
+
+#p += Line(points=[e[5].bottom(), f[7].top()], endstyle='>')
+#p += Line(points=[e[3].bottom(), f[4].top()], endstyle='>')
+
+print(p)
+\end{python}
+If you look at
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+def cell(label='', background=''):
+    return Rect2(x0=0, y0=0, x1=0.8, y1=0.4, label=r'\scriptsize{\texttt{%s}}' % label, background=background)
+
+
+h = RectContainer(x=1, y=-4)
+for i in [0,1,2,3,4,5,6,7,8,9]:
+    if i in [7,3,1,4,5,9]:
+        h += cell(i, background='black!10')
+    else:
+        h += cell(i)
+
+p += h
+
+print(p)
+\end{python}
+where the pivots are shaded, note that
+\verb!0! is compared against the nodes on the path from the root \verb!7!
+to \verb!0!, not including \verb!0!.
+
+Here's the binary tree corresponding to the quicksort where the parent nodes
+are the pivots:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+edges={'7':['3','9'],
+ '3':['1','4'],
+ '1':['0','2'],
+ '4':['5'],
+ '5':['','6'],
+ '9':['8']}
+pos = bintreepositions(edges=edges)
+
+Graph.r = 0.3
+for k,(x,y) in pos.items():
+    if k in edges.keys():
+        p += Graph.node(x=x, y=y, name=k, label=k)
+    else:
+        p += Graph.node(x=x, y=y, name=k, label=k, background='white')
+
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        p += Graph.arc(names=[k,x])
+print(p)
+\end{python}    
+The nodes which are shaded are the pivots.
+This tree diagram makes it easier to see that \verb!0!
+is compared against \verb!1!, \verb!3!, and \verb!7!.
+
+Altogether, the total number of comparisons is the sum of the lengths of all
+paths in the above tree.
+Therefore \verb!0! is compared against \verb!1!, \verb!3!, and \verb!7!.
+Altogether $X$ for this case is
+\begin{itemize}
+  \li Number of values compared against $7$: 9
+  \li Number of values compared against $3$: 6
+  \li Number of values compared against $1$: 2
+  \li Number of values compared against $4$: 2
+  \li Number of values compared against $5$: 1
+  \li Number of values compared against $9$: 1
+\end{itemize}
+Therefore the total number of comparisons is $21$.
+
+Here's a tree where pivots are chosen so that the tree is height-balanced:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+edges={'4':['1','7'],
+ '1':['0','2'],
+ '7':['5','8'],
+ '2':['3'],
+ '5':['6'],
+ '8':['9']}
+pos = bintreepositions(edges=edges)
+
+Graph.r = 0.3
+for k,(x,y) in pos.items():
+    if k in edges.keys():
+        p += Graph.node(x=x, y=y, name=k, label=k)
+    else:
+        p += Graph.node(x=x, y=y, name=k, label=k, background='white')
+
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        p += Graph.arc(names=[k,x])
+print(p)
+\end{python}
+The number of comparisons is 19.
+
+
+
+Analyzing
+\begin{align*}
+  \E[X]
+  = \sum_{\texttt{a},\texttt{b} \in \texttt{x[0..n - 1]}}
+    \text{(probability that \texttt{a} and \texttt{b} are compared)}
+\end{align*}
+where \verb!a! is (say) \verb!x[i]!
+and \verb!b! is \verb!x[j]! where \verb!x[0..n - 1]! is before
+the execution of quicksort is difficult.
+So (and this is important), I'm going to let \verb!x[0..n - 1]! be the
+array \textit{after} sorting is done.
+Note that
+\begin{align*}
+  \E[X]
+  = \sum_{\texttt{a},\texttt{b} \in \texttt{x[0..n - 1]}}
+  \text{(probability that \texttt{a} and \texttt{b} are compared)}
+\end{align*}
+does not depend on whether
+where \verb!a! = \verb!x[i]!
+and \verb!b! = \verb!x[j]! are values before or after quicksort.
+Remember what I said earlier: for \verb!a! and \verb!b! to be compared,
+either \verb!a! or \verb!b! has to be chosen as pivot.
+Also, recall that I'm using \verb!x[0..n - 1]! to denote our array
+after it is sorted.
+Here's the important
+observation:
+
+
+\textsc{Fact}.
+\verb!x[i]!, \verb!x[j]! are compared iff the first value in
+\verb!x[i..j]! to be chosen as pivot is either \verb!x[i]! or \verb!x[j]!.
+
+$(\impliedby)$:
+Easy.
+If \verb!x[i]! is the first in \verb!x[i..j]! to be selected as pivot,
+then \verb!x[j]! will be compared against \verb!x[i]!.
+Likewise if \verb!x[j]! in the first in \verb![i..j]! to be selected as
+pivot, then \verb!x[i]! will be compared against \verb!x[j]!.
+
+$(\implies)$:
+Assume some \verb!x[k]! where \verb!x[i]! $<$ \verb!x[k]! $<$ \verb!x[j]!
+is first selected as pivot among the values \verb!x[i..j]!.
+Then \verb!x[i]! and \verb![j]! would have landed in different partitions
+after \verb!x[k]! separates them.
+After that, they obviously will not be able to compare with each other.
+
+Hence, the probability that \verb!x[i]!
+and \verb!x[j]! are compared is the probability
+that
+the first value in
+\verb!x[i..j]! to be chosen as pivot is either \verb!x[i]! or \verb!x[j]!.
+There are $j - i + 1$ values in \verb!x[i..j]!.
+Assuming equal likelihood of choosing any value
+\verb!x[i..j]! to be a pivot,
+\begin{align*}
+  &\text{probability that \texttt{x[i]} or \texttt{x[j]} is first pivot chosen among \texttt{x[i..j]}}
+  \\
+  &= \frac{2}{j - i + 1}
+\end{align*}
+For instance the probability
+that \verb!x[i]! or \verb!x[i + 1]!
+is first pivot
+chosen as pivot along 
+\verb!x[i..i + 1]!
+is $2/(i + 1 - i + 1) = 2/2 = 1$.
+Hence
+\begin{align*}
+  \E[X]
+  &= \sum_{0 \leq i < j \leq n - 1} \frac{2}{j - i + 1}
+    \\
+  &= 2 \sum_{i = 0}^{n - 2} \sum_{j = i + 1}^{n - 1} \frac{1}{j - i + 1}
+    \\
+  &= 2 \sum_{i = 0}^{n - 2} \sum_{k = 2}^{n - i} \frac{1}{k} \hspace{1in} \text{(let $k = j - i + 1$)}
+    \\
+  &\leq 2 \sum_{i = 0}^{n - 2} \sum_{k = 1}^{n} \frac{1}{k}
+    \\
+  &= 2 \sum_{i = 0}^{n - 2} H_n
+    \\
+  &= 2 (n - 1) H_n
+    \\
+  &\leq 2 n H_n
+\end{align*}
+Since
+$\lim_{n \rightarrow \infty} (H_n - \ln n)
+= \gamma = 0.577...$,
+there is some $N$ such that for $n \geq N$, $H_n \leq \ln n + 1$.
+Hence
+$H_n = O(\ln n) = O(\lg n)$.
+Therefore
+\[
+\E[X] \leq 2n H_n = O(n \lg n)
+\]
+
+To make sure you understand the proof above,
+let me look at the quicksort from above:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+def cell(label='', background=''):
+    return Rect2(x0=0, y0=0, x1=0.8, y1=0.4, label=r'\scriptsize{\texttt{%s}}' % label, background=background)
+
+
+h = RectContainer(x=1, y=-4)
+for i in [0,1,2,3,4,5,6,7,8,9]:
+    if i in [7,3,1,4,5,9]:
+        h += cell(i, background='black!10')
+    else:
+        h += cell(i)
+
+p += h
+
+print(p)
+\end{python}
+and its tree:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+edges={'7':['3','9'],
+ '3':['1','4'],
+ '1':['0','2'],
+ '4':['5'],
+ '5':['','6'],
+ '9':['8']}
+pos = bintreepositions(edges=edges)
+
+Graph.r = 0.3
+for k,(x,y) in pos.items():
+    if k in edges.keys():
+        p += Graph.node(x=x, y=y, name=k, label=k)
+    else:
+        p += Graph.node(x=x, y=y, name=k, label=k, background='white')
+
+for k,v in edges.items():
+    for x in v:
+        if x in [None,'']: continue
+        p += Graph.arc(names=[k,x])
+print(p)
+\end{python}    
+
+The number of comparison involving \verb!0! is 3.
+The \textit{expected} number of comparisons involving \verb!0!
+(for all quicksorts) is
+given by
+\begin{longtable}{|c|c|l|c|}
+  \hline
+  $i$ & $j$ & \texttt{x[j]} compared $= 2/(i+j-1)$ & $X_{ij}$ \\
+  \hline
+  0 & 1 & $2/(1 - 0 + 1) = 2/2 = 1$         & 1 \\
+  0 & 2 & $2/(2 - 0 + 1) = 2/3 = 0.6666...$ & 0 \\
+  0 & 3 & $2/(3 - 0 + 1) = 2/4 = 0.5$       & 1 \\
+  0 & 4 & $2/(4 - 0 + 1) = 2/5 = 0.4$       & 0 \\
+  0 & 5 & $2/(5 - 0 + 1) = 2/6 = 0.3333...$ & 0 \\
+  0 & 6 & $2/(6 - 0 + 1) = 2/7 = 0.2857...$ & 0 \\
+  0 & 7 & $2/(7 - 0 + 1) = 2/8 = 0.25$      & 1 \\
+  0 & 8 & $2/(8 - 0 + 1) = 2/9 = 0.2222...$ & 0 \\
+  0 & 9 & $2/(9 - 0 + 1) = 2/10 = 0.2$      & 0 \\
+  \hline \hline
+    &   & \textsc{Sum} = $3.8579...$   & \textsc{Sum} = 3 \\
+  \hline
+\end{longtable}
+There are 3 comparisons involving 0 and
+the average number of comparisons (over all possible
+quicksort) is 3.8579...
+For $n = 10$, the expected number of comparisons is
+\[
+  \E[X] =
+  2\sum_{i=0}^{10-2} \sum_{k=2}^{10 - i} \frac{1}{k}  = 32.9
+\]
+
+%Mitzenmacher and Upfal
+\input{discrete-probability/exercises/discrete-probability/disc-prob-12/main.tex}
+
+\subsection{Average runtime without probability theory}
+Another way to compute the average runtime is to
+derive a closed form for $T(n)$ where
+\[
+  T(n) = \frac{2}{n} \sum_{i = 0}^{n - 1} T(i) + An + B
+\]
+for sufficiently large $n$.
+Here, sufficiently can be, say, $n > 1$, using
+$n = 0, 1$ as base case since there's no reason to
+use quicksort if the array has size 0 or 1.
+
+There are many ways to proceed from this point.
+
+\subsection{Method A: induction}
+
+The problem with induction is always that you need to know what you need to prove.
+In this case, I have to somehow suspect that
+$T(n) = O(n \lg n)$.
+This can be achieved by doing some timings.
+So say I claim that
+\[
+  T(n) = O(n \lg n)
+\]
+i.e., there is some $N$ and some $C$ such that
+\[
+  T(n) \leq Cn \lg n
+\]
+for $n \geq N$.
+
+
+Then assuming that
+\[
+  T(k) \leq C k \lg k
+\]
+for $k = N, N + 1, ..., n - 1$, I need to prove that
+\[
+  T(n) \leq C n \lg n
+\]
+I get
+\begin{align*}
+  T(n)
+  &= \frac{2}{n} \sum_{i = 0}^{n - 1} T(i) + An + B
+  \\
+  &\leq \frac{2}{n}
+    \left( T(0) + B + T(1) + A + B \right)
+    +
+    \frac{2}{n} \sum_{k = 2}^{n - 1} T(k)
+    + An + B
+  \\
+  &\leq \frac{2}{n}
+    \left( T(0) + T(1) + A + 2B \right)
+    +
+    \frac{2}{n} \sum_{k = 2}^{n - 1} C k \lg k
+    + An + B
+  \\
+  &\leq
+    \frac{2C}{n} \sum_{k = 2}^{n - 1} k \lg k
+    + \frac{2}{n}
+    \left( T(0) + T(1) + A + 2B \right)
+    +
+    An + B
+  \\
+\end{align*}
+The sum can be bounded this way (converting the sum to an
+area computation):
+\begin{align*}
+  \sum_{k = 2}^{n - 1} k \lg k
+  \leq
+  \int_{2}^n x \lg x \, dx
+\end{align*}
+Fortunately we do have a relevant integration formula for this case
+which you can find in a calculus book:
+\begin{align*}
+  \int x \ln x \ dx
+  &= \frac{1}{2}x^2 \ln x - \frac{1}{4}x^2 + C 
+\end{align*}
+Or you can derive the formula using integration-by-parts:
+\begin{align*}
+  \int x \ln x \ dx
+  &= \int \ln x \ d \left( \frac{1}{2} x^2  \right)
+  \\
+  &= \frac{1}{2}x^2 \ln x - \int \frac{1}{2}x^2 \ d( \ln x )
+  \\
+  &= \frac{1}{2}x^2 \ln x - \frac{1}{2} \int x^2 \frac{1}{x} \ dx
+  \\
+  &= \frac{1}{2}x^2 \ln x - \frac{1}{2} \int x \ dx
+  \\
+  &= \frac{1}{2}x^2 \ln x - \frac{1}{2} \cdot \frac{1}{2} x^2 + C 
+  \\
+  &= \frac{1}{2}x^2 \ln x - \frac{1}{4}x^2 + C 
+\end{align*}
+I do have to change the log to base 2:
+\begin{align*}
+  \int x \lg x \ dx
+  &= \frac{1}{2}x^2 \lg x - \frac{\alpha}{4}x^2 + C 
+\end{align*}
+where $\alpha = 1/\log_e 2$.
+Therefore I now have
+\begin{align*}
+  \sum_{k = 2}^{n - 1} k \lg k
+  &\leq
+    \int_{2}^n x \lg x \, dx
+  \\
+  &= \left( \frac{1}{2}x^2 \ln x - \frac{1}{4}x^2 \right)\biggl|_{x=2}^{x=n}
+  \\
+  &=
+    \left( \frac{1}{2}n^2 \ln n - \frac{1}{4}n^2 \right)
+    -
+    \left( \frac{1}{2}2^2 \lg 2 - \frac{\alpha}{4}2^2 \right) 
+  \\
+  &=
+    \left( \frac{1}{2}n^2 \lg n - \frac{1}{4}n^2 \right)
+    -
+    \left( 2 \lg 2 - \alpha \right) 
+\end{align*}
+
+Going back to $T(n)$:
+\begin{align*}
+  T(n)
+  &\leq
+    \frac{2C}{n} \sum_{k = 2}^{n - 1} k \lg k
+    + \frac{2}{n}
+    \left( T(0) + T(1) + A + 2B \right)
+    +
+    An + B
+  \\
+  &\leq
+    \frac{2C}{n}
+    \left(
+        \left( \frac{1}{2}n^2 \lg n - \frac{1}{4}n^2 \right)
+    -
+    \left( 2 \lg 2 - \alpha \right) 
+    \right)
+    + \frac{2}{n}
+    \left( T(0) + T(1) + A + 2B \right)
+    +
+    An + B
+  \\
+  &\leq
+    C n \lg n
+    + 
+    \frac{2C}{n}
+    \left(
+        \left( - \frac{1}{4}n^2 \right)
+    -
+    \left( 2 \lg 2 - \alpha \right) 
+    \right)
+    + \frac{2}{n}
+    \left( T(0) + T(1) + A + 2B \right)
+    +
+    An + B
+  \\
+\end{align*}
+The RHS is
+\[
+  \leq C n \lg n 
+\]
+if
+\[
+  \frac{2C}{n}
+    \left(
+        \left( - \frac{1}{4}n^2 \right)
+    -
+    \left( 2 \lg 2 - \alpha \right) 
+    \right)
+    + \frac{2}{n}
+    \left( T(0) + T(1) + A + 2B \right)
+    +
+    An + B
+\]
+is $\leq 0$.
+In other words, I need
+\[
+    \frac{2}{n}
+    \left( T(0) + T(1) + A + 2B \right)
+    +
+    An + B
+    \leq
+    \frac{2C}{n}
+    \left(
+        \left(\frac{1}{4}n^2 \right)
+    +
+    \left( 2 \lg 2 - \alpha \right) 
+  \right)
+\]
+i.e.,
+\[
+    {2}
+    \left( T(0) + T(1) + A + 2B \right)
+    +
+    An^2 + Bn
+    \leq
+    2C
+    \left(
+        \left(\frac{1}{4}n^2 \right)
+    +
+    \left( 2 \lg 2 - \alpha \right) 
+  \right)
+\]
+i.e.,
+\[
+  0
+  \leq
+  \left(\frac{C}{2} - A \right) n^2
+  - Bn
+  +
+  \beta
+\]
+where
+$\beta = 2C(2 \lg 2 - \alpha)
+- 2 \left( T(0) + T(1) + A + 2B \right)$.
+If I choose $C$ such that
+$C/2 - A > 0$, then the parabola
+function above $(C/2 - A)n^2 - Bn + \beta$
+will concave up and
+will be $> 0$ for $n > N_0$ for some $N_0$.
+
+Altogether, there is some $N$ and some $C$
+such that
+\[
+  T(n) \leq C n \lg n
+\]
+for $n \geq N$.
+
+\subsection{Method B: direct derivation}
+
+In the previous section, I have to make a
+guess
+that $T(n) = O(n \lg n)$.
+What if I want to derive the runtime without
+guessing?
+
+From the previous section, I have
+\[
+  T(n) = \frac{2}{n} \sum_{i = 0}^{n - 1} T(i) + An + B
+\]
+for $n > 1$.
+
+Suppose I want to derive the
+a closed-form for $T(n)$.
+I'm in trouble because the recursion
+is not a linear degree 2 recursion and it does not
+fit the form of the master theorem.
+Not only is it not degree 2, in fact, it's degree $n$ --
+i.e., the degree is not fixed.
+
+Don't panic. First do this:
+\[
+  nT(n) = 2\sum_{i = 0}^{n - 1} T(i) + An^2 + Bn
+\]
+Therefore, with $n$ replaced by $n - 1$, I get
+\[
+  (n-1)T(n-1) = 2\sum_{i = 0}^{n-2} T(i) + A(n-1)^2 + B(n-1)
+\]
+Subtracting:
+\[
+  nT(n) - (n-1)T(n-1)= 2T(n-1) + A(n^2 - (n - 1)^2) + B(n - (n - 1))
+\]
+
+So what? ... 
+well I have removed the $\sum$ so that I now have
+\begin{align*}
+  nT(n)
+  &= (n + 1)T(n - 1) + A(2n + 1) + B \\
+  &= (n + 1)T(n - 1) + 2An + (A + B) \\
+  &= (n + 1)T(n - 1) + A'n + B' \\
+    \THEREFORE
+  T(n)
+  &= \left( 1 + \frac{1}{n} \right) T(n - 1) + A' + \frac{B'}{n}
+\end{align*}
+which is a degree 1 recurrence, although unfortunately it's not
+linear.
+There are many ways to solve this ...
+
+\subsection{Method B1: telescoping trick}
+
+From the above, relation
+\begin{align*}
+  T(n)
+  &= \left( \frac{n + 1}{n} \right) T(n - 1) + A' + \frac{B'}{n}
+\end{align*}
+I get
+\begin{align*}
+  \frac{1}{n + 1}T(n)
+  &= \frac{1}{n}  T(n - 1) + \frac{A'}{n+1} + \frac{B'}{n(n + 1)}
+\end{align*}
+and therefore
+\begin{align*}
+  \frac{1}{n + 1} T(n) - \frac{1}{n}  T(n - 1) = \frac{A'}{n} + \frac{B'}{(n-1)n}
+\end{align*}
+
+Therefore I get
+\begin{align*}
+  \frac{1}{n + 1}T(n - 0) - \frac{1}{n - 0}  T(n - 1) &= \frac{A'}{n + 1} + \frac{B'}{(n-0)(n + 1)} \\
+  \frac{1}{n + 0}T(n-1)   - \frac{1}{n - 1}  T(n - 2) &= \frac{A'}{n + 0} + \frac{B'}{(n-1)(n + 0)} \\
+  \frac{1}{n + (-1)}T(n-2)  - \frac{1}{n - 2}  T(n - 3) &= \frac{A'}{n + (-1)} + \frac{B'}{(n-2)(n + (-1))} \\
+  \frac{1}{n + (-2)}T(n-3)  - \frac{1}{n - 3}  T(n - 4) &= \frac{A'}{n + (-2)} + \frac{B'}{(n-3)(n + (-2))} \\
+  &\vdots
+\end{align*}
+Adding these, I get
+\begin{align*}
+  \frac{1}{n + 1}T(n - 0) - \frac{1}{2}  T(1) &= A' \sum_{k=3}^{n+1} \frac{1}{k}
+                                                + B' \sum_{k=2}^n \frac{1}{k(k+1)}
+\end{align*}
+i.e.,
+\begin{align*}
+  T(n)
+  =
+  A'(n+1)\sum_{k=3}^{n+1} \frac{1}{k}
+  + \frac{n+1}{2}  T(1) + B' (n+1)\sum_{k=2}^n \frac{1}{k(k+1)}
+\end{align*}
+and you get $O(n \lg n)$.
+
+The telescoping trick above depends on the recursion on being degree 1 (but not necessarily
+linear) of the form
+\[
+  f(n) T(n) = f(n - 1) T(n - 1) + g(n)
+\]
+for $n \geq n_0$ 
+and therefore
+\[
+  f(n) T(n) - f(n - 1) T(n - 1) = g(n)
+\]
+Therefore
+\begin{align*}
+  f(n) T(n) - f(n - 1) T(n - 1) &= g(n) \\
+  f(n-1) T(n-1) - f(n - 2) T(n - 2) &= g(n-1) \\
+  f(n-2) T(n-2) - f(n - 3) T(n - 3) &= g(n-2) 
+\end{align*}
+etc.
+Therefore
+\[
+  f(n) T(n) - f(n_0 - 1) T(n_0 - 1) = g(n) + \cdots + g(n_0)
+\]
+and hence
+\[
+  T(n) = \frac{g(n) + \cdots + g(n_0)}{f(n)} + \frac{C}{f(n)}
+\]
+where $C = f(n_0 - 1) T(n_0 - 1)$.
+
+
+\subsection{Method B2: generating function and Bernoulli differential equation}
+
+From the previous section I have
+\[
+  T(n)
+  = \left( 1 + \frac{1}{n} \right) T(n - 1) + A' + \frac{B'}{n}
+\]
+for $n > 0$.
+Not all degree 1 non-linear can be put into a suitable form
+for telescoping.
+A more general method is the method of generating functions.
+Let
+\[
+  f(x) = \sum_{n = 0}^\infty T(n) x^n
+\]
+
+\input{discrete-probability/exercises/discrete-probability/disc-prob-13/main.tex}
+
+The equation above is an example of an integral equation.
+While a differential equation contains the differentiation operators,
+an integral equation contains the integration operations.
+
+\input{discrete-probability/exercises/discrete-probability/disc-prob-14/main.tex}
+\input{discrete-probability/exercises/discrete-probability/disc-prob-15/main.tex}
+\input{discrete-probability/exercises/discrete-probability/disc-prob-16/main.tex}

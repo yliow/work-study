@@ -1,0 +1,1049 @@
+\section{Insertion Sort}
+
+TODO: 
+Don't forget to add binary search for insert index in section 
+on sorted array.
+
+The idea behind the insertion sort is pretty simple.
+Suppose I have this bunch of numbers:
+
+\begin{python}
+from latextool_basic import *
+
+xs = [5,1,2,4,3,6]
+x = 0
+
+def left_right(xs, left_size):
+    """ returns the left and right array """
+    if left_size == 0:
+        left = Array2d(x=x, y=0, xs=[['']], width=0.1, height=0.7)
+    else:
+        left = Array2d(x=x, y=0, xs=[xs[left_size:]])
+    right = Array2d(x=x + 1 + left_size, y=0, xs=[xs[left_size:]], width=0.7, height=0.7)
+    return left, right
+
+left, right = left_right(xs, 0)
+p = Plot()
+p += right
+print p
+\end{python}
+
+Let me create a list of \textit{sorted} numbers on the left:
+
+\begin{python}
+from latextool_basic import *
+
+xs = [5,1,2,4,3,6]
+x = 0
+
+def left_right(xs, left_size):
+    """ returns the left and right array """
+    if left_size == 0:
+        left = Array2d(x=x, y=0, xs=[['']], width=0.1, height=0.7)
+    else:
+        left = Array2d(x=x, y=0, xs=[xs[left_size:]])
+    right = Array2d(x=x + 1 + left_size, y=0, xs=[xs[left_size:]], width=0.7, height=0.7)
+    return left, right
+
+left, right = left_right(xs, 0)
+p = Plot()
+p += left; p += right
+print p
+\end{python}
+
+Initially of course nothing is sorted: the list on the left is empty.
+So the list on the left is \lq\lq work done" and the list on the right
+is \lq\lq work to be done".
+
+\textsc{Step 1.}
+The first thing I'll do is to look at the first number from
+my pile of work to do (reading left-to-right), i.e., $5$.
+I remove $5$ from my pile of work to do (the right pile)
+and put $5$ immediately to my pile of \lq\lq work done'' (the left pile):
+
+\begin{python}
+from latextool_basic import *
+
+xs = [5,1,2,4,3,6]
+x = 0
+
+def left_right(xs, left_size):
+    """ returns the left and right array """
+    if left_size == 0:
+        left = Array2d(x=x, y=0, xs=[['']], width=0.1, height=0.7)
+    else:
+        left = Array2d(x=x, y=0, xs=[xs[:left_size]], width=0.7, height=0.7)
+    right = Array2d(x=x + 1 + left_size, y=0, xs=[xs[left_size:]], width=0.7, height=0.7)
+    return left, right
+
+left, right = left_right(xs, 0)
+p = Plot()
+p += left; p += right
+p0 = x0, y0 = right[0][0].top()
+p1 = x1, y1 = left[0][0].top()
+p2 = x2, y2 = x0, y0 + 0.5
+p3 = x3, y3 = x1, y1 + 0.5
+p += Line(points=[p0, p2, p3, p1], endstyle='->')
+print p
+\end{python}
+
+This is what I get:
+
+\begin{python}
+from latextool_basic import *
+
+xs = [5,1,2,4,3,6]
+x = 0
+
+def left_right(xs, left_size):
+    """ returns the left and right array """
+    if left_size == 0:
+        left = Array2d(x=x, y=0, xs=[['']], width=0.1, height=0.7)
+    else:
+        left = Array2d(x=x, y=0, xs=[sorted(xs[:left_size])], width=0.7, height=0.7)
+    right = Array2d(x=x + left_size + 1, y=0, xs=[xs[left_size:]], width=0.7, height=0.7)
+    return left, right
+
+left, right = left_right(xs, 1)
+p = Plot()
+p += left; p += right
+print p
+\end{python}
+
+\textsc{Step 2.}
+The next piece of work to do is the leftmost number in 
+the left pile, i.e., the number $1$.
+The number $1$ is put into the left pile so that the
+left pile is sorted:
+
+\begin{python}
+from latextool_basic import *
+
+xs = [5,1,2,4,3,6]
+x = 0
+
+def left_right(xs, left_size):
+    """ returns the left and right array """
+    if left_size == 0:
+        left = Array2d(x=x, y=0, xs=[['']], width=0.1, height=0.7)
+    else:
+        left = Array2d(x=x, y=0, xs=[sorted(xs[:left_size])], width=0.7, height=0.7)
+    right = Array2d(x=x + 1 + left_size, y=0, xs=[xs[left_size:]], width=0.7, height=0.7)
+    return left, right
+
+left, right = left_right(xs, 1)
+p = Plot()
+p += left; p += right
+p0 = x0, y0 = right[0][0].top()
+p1 = x1, y1 = left[0][0].topleft()
+p2 = x2, y2 = x0, y0 + 0.5
+p3 = x3, y3 = x1, y1 + 0.5
+p += Line(points=[p0, p2, p3, p1], endstyle='->')
+print p
+\end{python}
+
+This is what I get:
+
+\begin{python}
+from latextool_basic import *
+
+left3 = Array2d(x=-1, y=0, xs=[[1,5]], width=0.7, height=0.7)
+right3 = Array2d(x=2, y=0, xs=[[2,4,3,6]], width=0.7, height=0.7)
+
+p = Plot()
+p += left3; p += right3
+print p
+\end{python}
+
+Let's ignore how $1$ is placed in the left pile for the time being.
+I'll come back to that issue when we have more elements in the left
+pile.
+Anyway, let's do the next value, i.e., 2.
+
+\textsc{Step 3.}
+I remove $2$ from the right pile (the TODO pile), and put that into the 
+left pile (the DONE pile):
+
+\begin{python}
+from latextool_basic import *
+
+xs = [5,1,2,4,3,6]
+x = 0
+
+def left_right(xs, left_size):
+    """ returns the left and right array """
+    if left_size == 0:
+        left = Array2d(x=x, y=0, xs=[['']], width=0.1, height=0.7)
+    else:
+        left = Array2d(x=x, y=0, xs=[sorted(xs[:left_size])], width=0.7, height=0.7)
+    right = Array2d(x=x + 1 + left_size, y=0, xs=[xs[left_size:]], width=0.7, height=0.7)
+    return left, right
+
+left, right = left_right(xs, 2)
+p = Plot()
+p += left; p += right
+p0 = x0, y0 = right[0][0].top()
+p1 = x1, y1 = left[0][1].topleft()
+p2 = x2, y2 = x0, y0 + 0.5
+p3 = x3, y3 = x1, y1 + 0.5
+p += Line(points=[p0, p2, p3, p1], endstyle='->')
+print p
+\end{python}
+
+and get this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Array2d(x=3, y=0, xs=[[4,3,6]], width=0.7, height=0.7)
+p += Array2d(x=-1, y=0, xs=[[1,2,5]], width=0.7, height=0.7)
+print p
+\end{python}
+
+Notice that the left pile is sorted.
+
+\textsc{Step 4.}
+The next value remove from the right pile is $4$ and I want the
+left pile to be sorted. 
+
+\begin{python}
+from latextool_basic import *
+
+xs = [5,1,2,4,3,6]
+x = 0
+
+def left_right(xs, left_size):
+    """ returns the left and right array """
+    if left_size == 0:
+        left = Array2d(x=x, y=0, xs=[['']], width=0.1, height=0.7)
+    else:
+        left = Array2d(x=x, y=0, xs=[sorted(xs[:left_size])], width=0.7, height=0.7)
+    right = Array2d(x=x + 1 + left_size, y=0, xs=[xs[left_size:]], width=0.7, height=0.7)
+    return left, right
+
+left, right = left_right(xs, 3)
+p = Plot()
+p += left; p += right
+p0 = x0, y0 = right[0][0].top()
+p1 = x1, y1 = left[0][2].topleft()
+p2 = x2, y2 = x0, y0 + 0.5
+p3 = x3, y3 = x1, y1 + 0.5
+p += Line(points=[p0, p2, p3, p1], endstyle='->')
+print p
+\end{python}
+
+So the end result is
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Array2d(x=4, y=0, xs=[[3,6]], width=0.7, height=0.7)
+p += Array2d(x=-1, y=0, xs=[[1,2,4,5]], width=0.7, height=0.7)
+print p
+\end{python}
+
+OK. I think you get the general goal.
+Now let me show you how to \lq\lq insert''
+a value taken from the right pile
+into the left pile (that's why this is called the insertion
+sort ... duh).
+Let's rewind ...
+
+If you look at step 1: From
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Array2d(0, 0, [[5,1,2,4,3,6]], width=0.7, height=0.7)
+p += Array2d(-1, 0, xs=[['']], width=0.1, height=0.7)
+print p
+\end{python}
+
+to
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Array2d(x=1, y=0, xs=[[1,2,4,3,6]], width=0.7, height=0.7)
+p += Array2d(x=-1, y=0, xs=[[5]], width=0.7, height=0.7)
+print p
+\end{python}
+
+And from step 2 to 3, i.e.,
+to
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Array2d(x=2, y=0, xs=[[2,4,3,6]], width=0.7, height=0.7)
+p += Array2d(x=-1, y=0, xs=[[1,5]], width=0.7, height=0.7)
+print p
+\end{python}
+
+So how does \verb!1! find it's place?
+
+Here's a memory aid for the big picture:
+You think of two piles: the left and the right pile.
+The left pile is a queue of people getting ready to buy tickets at a 
+movie (the box office is not opened yet).
+People in the right pile leaves the right pile and get into the 
+ticket queue
+(i.e., the left pile).
+However these people are part of a mafia and they have ranks, 
+$1$ being rank 1 (the mafia boss), etc.
+So when a person leave the right pile and get into the queue (the left pile),
+he can jump over people to get to his right place based on his 
+mafia rank.
+
+OK ... back to the array of numbers (and not mafia members) ...
+
+First you realized in fact that all the computations can be done
+in a {\it single} array.
+To show you what I mean, let me put a $|$ to divide the
+{\it same} array into two parts, the left and the right parts.
+The above computations of insertion sort would look like these:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, cellheight=1,
+    arr=[[], [5,1,2,4,3,6]])
+p.add(s)
+print p
+\end{python}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, cellheight=1,
+    arr=[[5], [1,2,4,3,6]])
+p.add(s)
+print p
+\end{python}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, cellheight=1,
+    arr=[[1,5], [2,4,3,6]])
+p.add(s)
+print p
+\end{python}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, cellheight=1,
+    arr=[[1,2,5], [4,3,6]])
+p.add(s)
+print p
+\end{python}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, cellheight=1,
+    arr=[[1,2,4,5], [3,6]])
+p.add(s)
+print p
+\end{python}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, cellheight=1,
+    arr=[[1,2,3,4,5], [6]])
+p.add(s)
+print p
+\end{python}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, cellheight=1,
+    arr=[[1,2,3,4,5,6], []])
+p.add(s)
+print p
+\end{python}
+
+Of course there's no $|$ in arrays for any programming
+language. 
+However we can use a variable to tell us where the $|$ is.
+For instance
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, cellheight=1,
+    arr=[[], [5,1,2,4,3,6]])
+p.add(s)
+x,y = 0.5, -0.4
+p += Rect2(x0=x, y0=y, x1=x, y1=y, label = r"\verb!i = -1!", linewidth=0)
+print p
+\end{python}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, cellheight=1,
+    arr=[[5], [1,2,4,3,6]])
+p.add(s)
+x,y = 0.5, -0.4
+p += Rect2(x0=x, y0=y, x1=x, y1=y, label = r"\verb!i = 0!", linewidth=0)
+print p
+\end{python}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, cellheight=1,
+    arr=[[1,5], [2,4,3,6]])
+p.add(s)
+x,y = 0.5, -0.4
+p += Rect2(x0=x, y0=y, x1=x, y1=y, label = r"\verb!i = 1!", linewidth=0)
+print p
+\end{python}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, cellheight=1,
+    arr=[[1,2,5], [4,3,6]])
+p.add(s)
+x,y = 0.5, -0.4
+p += Rect2(x0=x, y0=y, x1=x, y1=y, label = r"\verb!i = 2!", linewidth=0)
+print p
+\end{python}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, cellheight=1,
+    arr=[[1,2,4,5], [3,6]])
+p.add(s)
+x,y = 0.5, -0.4
+p += Rect2(x0=x, y0=y, x1=x, y1=y, label = r"\verb!i = 3!", linewidth=0)
+print p
+\end{python}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, cellheight=1,
+    arr=[[1,2,3,4,5], [6]])
+p.add(s)
+x,y = 0.5, -0.4
+p += Rect2(x0=x, y0=y, x1=x, y1=y, label = r"\verb!i = 4!", linewidth=0)
+print p
+\end{python}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, cellheight=1,
+    arr=[[1,2,3,4,5,6], []])
+p.add(s)
+x,y = 0.5, -0.4
+p += Rect2(x0=x, y0=y, x1=x, y1=y, label = r"\verb!i = 5!", linewidth=0)
+print p
+\end{python}
+
+See that?
+Basically \verb!i! tells me what is the largest index value
+for the left part of the array.
+
+Now let's see how we take a value from the
+right pile (TODO pile) into the left pile (DONE pile).
+I'll use the case of putting $4$ in it's right place. 
+So we start with this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, cellheight=1,
+    arr=[[1,2,5], [4,3,6]])
+p.add(s)
+x,y = 0.5, -0.4
+p += Rect2(x0=x, y0=y, x1=x, y1=y, label = r"\verb!i = 2!", linewidth=0)
+print p
+\end{python}
+
+and get this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, cellheight=1,
+    arr=[[1,2,4,5], [3,6]])
+p.add(s)
+x,y = 0.5, -0.4
+p += Rect2(x0=x, y0=y, x1=x, y1=y, label = r"\verb!i = 3!", linewidth=0)
+print p
+\end{python}
+
+I start with this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, cellheight=1,
+    arr=[[1,2,5], [4,3,6]])
+p.add(s)
+x,y = 0.5, -0.4
+p += Rect2(x0=x, y0=y, x1=x, y1=y, label = r"\verb!i = 2!", linewidth=0)
+print p
+\end{python}
+
+and I move the \verb!4! to the left:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, cellheight=1,
+    arr=[[1,2,5,4], [3,6]])
+p.add(s)
+x,y = 0.5, -0.4
+p += Rect2(x0=x, y0=y, x1=x, y1=y, label = r"\verb!i = 3!", linewidth=0)
+print p
+\end{python}
+
+Note that \verb!i! has value \verb!3!.
+In the left pile, 
+everyone is in its correct place except for $4$, the newcomer
+to the left pile.
+Therefore $4$ has to {\it move past} values which are
+greater than \verb!4!.
+For instance \verb!5! is greater than \verb!4!. 
+So we move \verb!4! past \verb!5!, i.e., from
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, cellheight=1,
+    arr=[[1,2,5,4], [3,6]])
+p.add(s)
+x,y = 0.5, -0.4
+p += Rect2(x0=x, y0=y, x1=x, y1=y, label = r"\verb!i = 3!", linewidth=0)
+print p
+\end{python}
+
+we get this
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, cellheight=1,
+    arr=[[1,2,4,5], [3,6]])
+p.add(s)
+x,y = 0.5, -0.4
+p += Rect2(x0=x, y0=y, x1=x, y1=y, label = r"\verb!i = 3!", linewidth=0)
+print p
+\end{python}
+
+At this point, the value to the left of \verb!4! is \verb!2! which
+{\it is} smaller than or is equal to \verb!4!. 
+That tells me that \verb!4! has found its
+right place.
+
+So here's the meaning of \verb!i!:
+At the end of the \verb|i|--th  pass, 
+the values in \verb!x[0]!, ..., \verb!x[i]!
+are sorted.
+At the beginning of that pass, the value at \verb!x[i]! is the value
+that starts looking at its left neighbor
+and move past this neighbor if necessary to make the left pile sorted.
+
+Let me do one more: let's move \verb!3! from the right pile to the 
+left file.
+From this
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, cellheight=1,
+    arr=[[1,2,4,5], [3,6]])
+p.add(s)
+x,y = 0.5, -0.4
+p += Rect2(x0=x, y0=y, x1=x, y1=y, label = r"\verb!i = 3!", linewidth=0)
+print p
+\end{python}
+
+I get
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, cellheight=1,
+    arr=[[1,2,4,5,3], [6]])
+p.add(s)
+x,y = 0.5, -0.4
+p += Rect2(x0=x, y0=y, x1=x, y1=y, label = r"\verb!i = 4!", linewidth=0)
+print p
+\end{python}
+
+and then
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, cellheight=1,
+    arr=[[1,2,4,3,5], [6]])
+p.add(s)
+x,y = 0.5, -0.4
+p += Rect2(x0=x, y0=y, x1=x, y1=y, label = r"\verb!i = 4!", linewidth=0)
+print p
+\end{python}
+
+and finally this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, cellheight=1,
+    arr=[[1,2,3,4,5], [6]])
+p.add(s)
+x,y = 0.5, -0.4
+p += Rect2(x0=x, y0=y, x1=x, y1=y, label = r"\verb!i = 4!", linewidth=0)
+print p
+\end{python}
+At this point, the left neighbor of $3$ (i.e., $2$) is smaller than $3$. 
+So I stop.
+
+That's the main idea behind the insertion sort.
+
+\textbf{Initialization.}
+
+Now, let's think about the first two steps of the above
+insertion sort example:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, cellheight=1,
+    arr=[[], [5,1,2,4,3,6]])
+p.add(s)
+x,y = 0.5, -0.4
+p += Rect2(x0=x, y0=y, x1=x, y1=y, label = r"\verb!i = -1!", linewidth=0)
+print p
+\end{python}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, cellheight=1,
+    arr=[[5], [1,2,4,3,6]])
+p.add(s)
+x,y = 0.5, -0.4
+p += Rect2(x0=x, y0=y, x1=x, y1=y, label = r"\verb!i = 0!", linewidth=0)
+print p
+\end{python}
+
+Well ... nothing's really happening between the two diagrams.
+That's pretty obvious if you think about it.
+\verb!5! is the first person to join the ticket queue on the left ...
+so obviously \verb!5! is in the right spot because he's (it's?)
+the only person in the queue.
+To view it in another way, \verb!5! can't compare himself with his
+left neighbor because ... well ... he/it has no left neighbor!!!
+In other words, we might as well start off with this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, cellheight=1,
+    arr=[[5], [1,2,4,3,6]])
+p.add(s)
+x,y = 0.5, -0.4
+p += Rect2(x0=x, y0=y, x1=x, y1=y, label = r"\verb!i = 0!", linewidth=0)
+print p
+\end{python}
+
+
+\textbf{Moving a value in the left pile.}
+
+Now let me add something to the above computation.
+I need to keep track of the position of the value that is 
+moving left in each pass.
+
+Take a look at the case when \verb!x[4]! is added to the left pile
+and has to move to its right place:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, cellheight=1,
+    arr=[[1,2,4,5,3], [6]])
+p.add(s)
+x,y = 0.5, -0.4
+p += Rect2(x0=x, y0=y, x1=x, y1=y, label = r"\verb!i = 4!", linewidth=0)
+print p
+\end{python}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, cellheight=1,
+    arr=[[1,2,4,3,5], [6]])
+p.add(s)
+x,y = 0.5, -0.4
+p += Rect2(x0=x, y0=y, x1=x, y1=y, label = r"\verb!i = 4!", linewidth=0)
+print p
+\end{python}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, cellheight=1,
+    arr=[[1,2,3,4,5], [6]])
+p.add(s)
+x,y = 0.5, -0.4
+p += Rect2(x0=x, y0=y, x1=x, y1=y, label = r"\verb!i = 4!", linewidth=0)
+print p
+\end{python}
+
+Be careful! I can't use \verb!i! to follow the index of the 
+value \verb!3!
+that is slowly moving to its correct place.
+Why? Because the value in \verb!i! tells me what is the next value
+to add to the left pile.
+So I need {\it another} variable, say \verb!j!, that is initialized
+to \verb!i! and \verb!j! is the index position of the 
+value that is moving in the left pile to find its correct.
+To see \verb!j! in action, look at the case when \verb!i = 4!:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, cellheight=1,
+    arr=[[1,2,4,5,3], [6]])
+p.add(s)
+x,y = 0.5, -0.4
+p += Rect2(x0=x, y0=y, x1=x, y1=y, label = r"\verb!i = 4!", linewidth=0)
+p += Rect2(x0=x, y0=y-0.8, x1=x, y1=y, label = r"\verb!j = 4!", linewidth=0)
+print p
+\end{python}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, cellheight=1,
+    arr=[[1,2,4,3,5], [6]])
+p.add(s)
+x,y = 0.5, -0.4
+p += Rect2(x0=x, y0=y, x1=x, y1=y, label = r"\verb!i = 4!", linewidth=0)
+p += Rect2(x0=x, y0=y-0.8, x1=x, y1=y, label = r"\verb!j = 3!", linewidth=0)
+print p
+\end{python}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=1, cellheight=1,
+    arr=[[1,2,3,4,5], [6]])
+p.add(s)
+x,y = 0.5, -0.4
+p += Rect2(x0=x, y0=y, x1=x, y1=y, label = r"\verb!i = 4!", linewidth=0)
+p += Rect2(x0=x, y0=y-0.8, x1=x, y1=y, label = r"\verb!j = 2!", linewidth=0)
+print p
+\end{python}
+Do you see that \verb!3! going past \verb!4! and then \verb!5!?
+(Obviously there's a loop here for \verb!j!).
+Make sure you understand that!!!
+
+Of course when doing a loop, you always need to know the
+initial value of the index variable and when to stop.
+For \verb!i!, I will start with \verb!i = 1!.
+(Forget about \verb!i = 0! ... remember that when \verb!x[0]!
+enters the left pile, there's nothing to do since \verb!x[0]!
+would be the only guy in the left pile.)
+The last value for \verb!i! is of course \verb!n - 1!
+where \verb!n! is the size of the array.
+
+As for \verb!j!, you see from the above that \verb!j!
+starts with the value of \verb!i!.
+At each iteration of the \verb!j! loop,
+I compare \verb!x[j]! against \verb!x[j - 1]! and 
+swap their values if \verb!x[j]! is smaller than or equal to \verb!x[j - 1]!.
+When do I stop? 
+When \verb!x[j - 1]! is smaller than \verb!x[j]!.
+Right?
+There's one thing you have to be careful of:
+When \verb!j! is \verb!0! you cannot compare 
+\verb!x[j]! with \verb!x[j - 1]! since
+there's nothing to the left of \verb!x[0]!!!!
+So there are actually {\it two} termination
+condition for the \verb!j!--loop.
+
+Now we are ready to write the pseudocode:
+\begin{console}
+for i = 1, 2, 3, ..., n - 1: 
+    for j = i, i - 1, ..., 1: 
+        if x[j - 1] > x[j]:
+            swap x[j - 1] and x[j]
+        else:
+            break 
+\end{console}
+
+Remember that for the outer \verb!i!--loop, we start with 
+\verb!i = 1! because for the case of \verb!i = 0!,
+\verb!x[0]! has no left neighbor to compare against:
+For that pass, \verb!x[0]! is already at the right place.
+As for the \verb!j!-loop, the \verb!j! index
+basically follows the position of the value as it moves.
+In this case, we also stop at \verb!j = 1! for the same reason as above.
+So \verb!i! starts at \verb!1! and \verb!j! stops at 
+\verb!1! for pretty much the same reason.
+
+If you prefer not to have a break of course you can write this:
+\begin{console}
+for i = 1, 2, 3, ..., n - 1:
+    j = i
+    while j >= 1 and x[j - 1] > x[j]:
+        swap x[j - 1] and x[j]
+        j = j - 1
+\end{console}
+
+\textbf{Getting rid of the swap.}
+
+Notice that I can improve the code slightly by doing this:
+\begin{console}
+for i = 1, 2, 3, ..., n - 1:
+    t = x[i]
+    j = i
+    while j >= 1 and x[j - 1] > t:
+        x[j] = x[j - 1]
+        j = j - 1
+    x[j] = t
+\end{console}
+The point is this ...
+
+In the previous version, I keep swapping pairs of
+values in the array.
+However one of the values being swapped is always the value
+that I've just thrown into the left pile, i.e., 
+the value taken out of the 
+right pile and put into the left pile.
+So, at the beginning of each pass, I might as well just keep 
+the value initially in \verb!x[i]! in a variable \verb!t!
+and just move the values of \verb!x[i - 1]! into \verb!x[i]!,
+move \verb!x[i - 2]! into \verb!x[i - 1]!, etc.
+until a \lq\lq hole''
+ is created for me to drop the value of \verb!t! at
+the \lq\lq hole''.
+
+[INVARIANTS? PROOF OF CORRECTNESS BY INDUCTION?]
+
+\textbf{Runtime analysis.}
+Here's our insertion sort again:
+\begin{console}
+for i = 1, 2, 3, ..., n - 1:
+    t = x[i]
+    j = i
+    while j >= 1 and x[j - 1] > t:
+        x[j] = x[j - 1]
+        j = j - 1
+    x[j] = t
+\end{console}
+In the worse case, $j$ will run from $i$ to $1$.
+Therefore the inner loop has a runtime of $c \cdot i$.
+Altogether the worse runtime is
+\[
+T^{\text{\textsc{InsertionSort}}}_{\text{w}}(n) =
+c (1 + 2 + \cdots + n)
+= O(n^2)
+\]
+
+
+\newpage
+\begin{ex}
+Perform insertion sort on the 
+array
+\verb![1,3,5,2,4,6,0]!, 
+listing every state of the array in your computation,
+including the value of variables \verb!i!, \verb!j!, and \verb!t!.
+\qed
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Compute the best and worse runtime of the above version of
+insertion sort.
+\begin{tightlist}
+\item What scenario will give you the best runtime?
+\item What scenario will give you the worse runtime?
+\item What about the average?
+\end{tightlist}
+\qed
+\end{ex}
+
+{\it Solution.}
+We first measure the inner loop.
+The best case is when the condition of the while-loop is never 
+satisfied for each pass (i.e. for each \verb!i! value).
+This means that the while-loop is always $O(1)$.
+Therefore the body of the 
+\verb!i!--loop is also constant as a whole.
+Therefore for the whole algorithm, the runtime is
+of the form $A(n - 1)$ which is $O(n)$.
+This best case scenario occurs when the body of the 
+while-loop never executes, i.e., when the array is already sorted
+so that {\it no} value in the array moves past its left neighbor.
+
+The worse case scenario is when the array is in reverse, 
+i.e., the values are in descending order.
+
+Now for the average case.
+The number of times the \verb!i!--loop executes is the same.
+However the \verb!j!--loop can have an early or late termination.
+So assuming that the average case means that for the \verb!i!--th pass,
+the number of values to move left is half of the best and worse case,
+then the number of values moved in the \verb!i!--th pass is about 
+\verb!i/2! (ignoring floor and ceiling).
+Therefore the total runtime for this average case is
+$O \left( \sum_{i=1}^{n-1} i/2 \right) = 
+O \left( (1/2)\sum_{i=1}^{n-1} i \right) =
+O \left(\sum_{i=1}^{n-1} i \right) = O(n^2)$.
+\qed
+
+
+\newpage
+\begin{ex}
+Modify the insertion sort so that instead of moving the \verb!t!
+one step at a time, the algorithm first computes
+the index position it should go into (examining values
+going to the left of the of the value to be inserted), and {\it then}
+move a contiguous chunk of values to the right by one step, and then
+insert the value of \verb!t! at the right spot.
+Test your implementation. Compute the runtime.
+\qed
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Modify the previous implementation in the following way:
+There's no need to always scan right-to-left one step at at time
+in the left (sorted) pile.
+Why not left-to-right?
+Keep an average of the values in the sorted part of the array.
+If the value to be inserted is less than the average, 
+scan the 
+sorted part of the array left-to-right,
+and if the value to be inserted is at least the average,
+scan the sorted part of the array right-to-left.
+When the right index position is found, then move the relevant
+values to the right by one step and insert the value.
+Test your implementation.
+Compute the runtime.
+\qed
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Note that insertion sort continually moves a new element
+into its right place in the left subarrray which is already sorted.
+Since the left subarray is already sorted, it seems to be a smarter thing 
+to use some kind of binary search to find the right place.
+Implement this version of insertion sort. Test your code.
+Compute the big-O of this version.
+\qed
+\end{ex}
+
+
+\newpage
+\begin{ex}
+For the above versions, compare their wall-clock times for different
+\verb!n! and different scenarios including best and worse case.
+\qed
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Notice that the best case of the insertion sort occurs when
+the list is already sorted.
+Another way to think of it is that for an array insertion to the
+end of the array is cheap.
+The worse case is when inserting at the head of the array.
+(Actually the big-O of the runtime of the worse and the average
+are the same.)
+Here's an idea.
+Create an array that allows {\it negative} index values.
+This allows you to add a value to the left of index 0, i.e., at index $-1$;
+and then allows you to add a value to the left of index $-1$, i.e., 
+at index $-2$, etc.
+Of course C/C++ and most other language does not have this feature.
+You have to simulate this yourself.
+For instance if given an array \verb!x! of size 10, all you need to do is 
+to create an array \verb!y! of size 20 and start off your insertion 
+sort by putting \verb!x[0]! at \verb!y[10]!.
+You should be able to figure out the rest.
+[By the way, this tells you that you should implement a special array
+class that allows you to specific the starting index value and the
+ending index value. So if \verb!X! is the name of this class, then
+\verb!X(-10, 9)! will give you an array of size 20 with 
+index positions $-10, -9, ..., -1, 0, 1, ..., 9$.
+Once you have this class, re-implementing the above
+version of insertion sort is going to be a lot cleaner.]
+\qed
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Only if you know linked lists:
+Notice that the best case of the insertion sort occurs when
+the list is already sorted.
+Another way to think of it is that for an array insertion to the
+end of the array is cheap.
+The worse case is when inserting at the head of the array.
+(Actually the big-O of the runtime of the worse and the average
+are the same.)
+Well, if you're putting values into a doubly linked list,
+inserting at head and tail and anywhere in-between is cheap.
+Use this idea to implement the insertion sort.
+After sorting the values into the linked list, copy the values
+back to the array.
+Compute the runtime.
+\qed
+\end{ex}
+
+
+\newpage
+\begin{ex}
+Combine the \lq\lq average'' and linked list method, i.e.,
+keep an average of the sorted part of the list and determine whether to 
+scan from head or from tail based on the average.
+\qed
+\end{ex}
+
+\newpage
+\begin{ex}
+What about this variant of the insertion sort
+ that inserts a {\it chunk} of value? Suppose after
+you have found a place to insert a value, you insert a chunk
+of ascending values.
+For instance suppose you have the following scenario:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=0.8, cellheight=0.8,
+    arr=[[1,2,3,50,51,52],[10,11,15,5,2,1,42,34,24]])
+p.add(s)
+print p
+\end{python}
+
+Wouldn't it be better to move the whole chunk of \verb!10,11,15!
+between \verb!3! and \verb!50!? The result would be this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = chunkedarray(cellwidth=0.8, cellheight=0.8,
+    arr=[[1,2,3,10,11,15,50,51,52],[5,2,1,42,34,24]])
+p.add(s)
+print p
+\end{python}
+
+This seems to be best if the array has chunks of ascending values.
+For instance the following array is made up of ascending chunks of 
+length 3:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Array2d(0,0,xs=[[10,11,12,1,2,3,78,79,80,7,8,9,51,52,53]],
+             width=0.8, height=0.8, linewidth=0.05)
+print p
+\end{python}
+
+Design an algorithm for this chunk-based insertion sort,
+implement it and test it against the usual insertion sort with 
+test data with ascending chunks of length 10, 20, 30.
+Is it better than the usual insertion sort?
+\qed
+\end{ex}

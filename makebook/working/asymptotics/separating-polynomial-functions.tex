@@ -1,0 +1,295 @@
+%-*-latex-*-
+\sectionthree{Separating polynomial functions}
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+
+I'll be giving you the formal definition of big-O soon.
+But before that, I'm going to motivate the (formal) definition of big-O
+by talking about the way the graphs of polynomial climb.
+The rate at which they climb essentially tells you the story of big-O among 
+polynomials.
+This will give you the intuitive idea behind big-O before I hit you
+with the formal definition.
+
+In this section, I will show you that when you plot polynomial functions,
+they bunch up into groups.
+These groups are very well-defined and simple:
+they are determined by the \textit{degree} of polynomials.
+
+Look at this mess of 15 polynomial functions 
+(I won't give you the polynomials just yet):
+\input{separating_polynomial_functions_1.tex}
+
+This looks like wires from a behind a rack of servers.
+Now if I increase the domain up to $n = 10$, we see:
+\input{separating_polynomial_functions_2.tex}
+
+Notice that the growth behavior of these functions are now clearer.
+Now if I increase the domain to $0 \leq n \leq 100$, we see:
+\input{separating_polynomial_functions_3.tex}
+
+Five functions have separated away from the others.
+Now I reveal to you that these five functions are:
+\begin{align*}
+&n^4 \\
+&n^4 + n^2 - 20n - 9 \\
+&n^4 +  n^3 - 25n - 1 \\
+&n^4 - 15n^2 - 5n + 1 \\
+&n^4 - 2n^2 - 7n - 100
+\end{align*}
+
+Now I'm going to remove these 5 functions and plot the remaining 10:
+\input{separating_polynomial_functions_4.tex}
+
+The five functions which are higher up are:
+\begin{align*}
+&n^3 \\
+&n^3 + 3n^2 - 20n - 5 \\
+&n^3 +   n^2 - 25n - 15 \\
+&n^3 - 15n^2 - 5n + 1 \\
+&n^3 - 7n^2 + 5n - 100
+\end{align*}
+and the last group of five functions are:
+\begin{align*}
+&n^2 \\
+&n^2 + 2 \\
+&n^2 + 1 \\
+&n^2 + 5n - 5 \\
+&n^2 - 3n - 8
+\end{align*}
+
+As you can see, in terms of growth, for large values of $n$, the 15 functions
+\begin{align*}
+&n^4 \\
+&n^4 + n^2 - 20n - 9 \\
+&n^4 +  n^3 - 25n - 1 \\
+&n^4 - 15x^2 - 5n + 1 \\
+&n^4 - 2x^2 - 7m - 100 \\
+&n^3 \\
+&n^3 + 3n^2 - 20n - 5 \\
+&n^3 +   n^2 - 25n - 15 \\
+&n^3 - 15n^2 - 5n + 1 \\
+&n^3 - 7n^2 + 5n - 100 \\
+&n^2 \\
+&n^2 + 2 \\
+&n^2 + 1 \\
+&n^2 + 5n - 5 \\
+&n^2 - 3n - 8
+\end{align*}
+bunches themselves up into 3 groups determined by their degrees.
+You can think of the following as leaders in the three groups:
+\begin{align*}
+&n^4 \\
+&n^3 \\
+&n^2
+\end{align*}
+(because they are the simplest.)
+
+In general \textit{all} polynomial functions with 1 for the leading coefficient -- such polynomials
+are said to be \defterm{monic} polynomials -- 
+group themselves up into
+bunches led by the following leaders:
+\[
+1, \,\,\,\,\,
+n, \,\,\,\,\,
+n^2, \,\,\,\,\,
+n^3, \,\,\,\,\,
+n^4, \,\,\,\,\,
+n^5, \,\,\,\,\,
+n^6, \,\,\,\,\,
+\ldots
+\]
+The bunching up for large $n$ is due to the fact that they grow (or climb) at the same rate for large $n$.
+This means that the function
+\[
+n^2 - 42n + 691
+\]
+has the same growth rate as $n^2$ for large $n$.
+Graphically, this means that when you zoom out (i.e., when you draw their graph for a
+large domain), the graphs collapse into one.
+Intuitively, you can think of it this way:
+\[
+\text{$n^2 - 42n + 691$ \lq\lq roughly $=$" $n^2$ \,\,\,\,\ for large $n$}
+\]
+
+Now let's get back to big-O.
+Whereas the above examples talked about 
+\[
+\text{... \lq\lq roughly $=$'' ... \,\,\,\,\, for large $n$}
+\]
+big-O is more like
+\[
+\text{... \lq\lq roughly $\leq$'' ... \,\,\,\,\, for large $n$}
+\]
+Graphically, if the graph of $f(n)$ is \textit{below} the graph to $g(n)$
+\textit{for large $n$}, then we can say
+\[
+f(n) = O(g(n))
+\]
+Now, one of the above 15 functions is this:
+\[
+n^3 + 3n^2 - 20n - 5
+\]
+We have already seen that the graph of 
+$n^3 + 3n^2 - 20n - 5$
+is the same as the graph of $n^3$ for large $n$. 
+I can say
+\[
+n^3 + 3n^2 - 20n - 5 = O(n^3)
+\]
+\textit{But, there's more.}
+The graph of $n^3 + 3n^2 - 20n - 5$ is roughly the graph of $n^3$
+(for large $n$) and 
+is of course the graph of $n^3$ is below the graph of $n^4$.
+Therefore the graph of 
+$n^3 + 3n^2 - 20n - 5$
+is roughly below the graph of $n^4$ (for large $n$).
+Therefore I can also say
+\[
+n^3 + 3n^2 - 20n - 5 = O(n^4)
+\]
+Altogether I have
+\begin{align*}
+n^3 + 3n^2 - 20n - 5 &= O(n^3) \\
+n^3 + 3n^2 - 20n - 5 &= O(n^4)
+\end{align*}
+It is also true that
+\begin{align*}
+n^3 + 3n^2 - 20n - 5 &= O(n^3 + 1) \\
+n^3 + 3n^2 - 20n - 5 &= O(n^4 + 1)
+\end{align*}
+
+OK, let's try another function.
+Here's another function from the 15:
+\[
+n^2 + 5n - 5
+\]
+Using the same reasoning we have all the following:
+\begin{align*}
+n^2 + 5n - 5 &= O(n^2) \\
+n^2 + 5n - 5 &= O(n^3) \\
+n^2 + 5n - 5 &= O(n^4)
+\end{align*}
+
+
+But there's a little bit more to big-O.
+What about multiples of the above functions?
+Recall that in the previous section,
+I said that you should ignore multiples by replacing constants with 1.
+It seems to mean that constants don't determine function growth rate.
+Is that true?
+
+Here are the original 15 functions again:
+\begin{align*}
+&n^4 \\
+&n^4 + n^2 - 20n - 9 \\
+&n^4 +  n^3 - 25n - 1 \\
+&n^4 - 15x^2 - 5n + 1 \\
+&n^4 - 2x^2 - 7m - 100 \\
+&n^3 \\
+&n^3 + 3n^2 - 20n - 5 \\
+&n^3 +   n^2 - 25n - 15 \\
+&n^3 - 15n^2 - 5n + 1 \\
+&n^3 - 7n^2 + 5n - 100 \\
+&n^2 \\
+&n^2 + 2 \\
+&n^2 + 1 \\
+&n^2 + 5n - 5 \\
+&n^2 - 3n - 8
+\end{align*}
+and now I'm going change the leading coefficients
+\begin{align*}
+&n^4 \\
+&2n^4 + n^2 - 20n - 9 \\
+&3n^4 +  n^3 - 25n - 1 \\
+&4n^4 - 15x^2 - 5n + 1 \\
+&5n^4 - 2x^2 - 7m - 100 \\
+&6n^3 \\
+&7n^3 + 3n^2 - 20n - 5 \\
+&8n^3 +   n^2 - 25n - 15 \\
+&9n^3 - 15n^2 - 5n + 1 \\
+&10n^3 - 7n^2 + 5n - 100 \\
+&11n^2 \\
+&12n^2 + 2 \\
+&13n^2 + 1 \\
+&14n^2 + 5n - 5 \\
+&15n^2 - 3n - 8
+\end{align*}
+and then plot the new functions on the domain $0 \leq n \leq 100$:
+\input{separating_polynomial_functions_4.tex}
+
+The graphs have shifted vertically but the grouping is still somewhat visible.
+(Of course since the polynomials in each group differ by 
+multiples you would expect their graphs to separate a little.)
+Regardless of the shifts, you would notice one crucial thing:
+If you plot a large enough domain, regardless of the multiple,
+a degree 3 polynomial will not beat a degree 4 polynomial.
+
+Graphically, if you plot monic polynomials for a large enough domain,
+the polynomials bunches up and each bunch ultimately becomes a thin line.
+If you plot polynomials in general (not necessarily monic), then
+each group of polynomials occupy sort of a band.
+This means that a degree 3 polynomial cannot enter the band for the degree 4 
+polynomials for large $n$.
+
+So here's the definition of big-O if I use graphs.
+In order to say
+\[
+f(n) = O(g(n))
+\]
+I have to show that the graph of $f(n)$ is below a multiple of $g(n)$
+for large $n$.
+I'll give you more examples in the next section together with
+the formal definition of big-O that does not depends on graphs.
+
+The following summarizes what I have just said.
+I will prove the statement later.
+
+\begin{thm}
+Let $f(n)$ be a polynomial of degree $d$ and $g(n)$ be a polynomial
+of degree $e$.
+If $d \leq e$, then
+\[
+f(n) = O(g(n))
+\]
+In particular
+\[
+f(n) = O(n^d)
+\]
+If $d > e$, then
+\[
+f(n) \neq O(g(n))
+\]
+\qed
+\end{thm}
+
+\begin{eg}
+  Here are some examples that uses the above theorem.
+  \begin{enumerate}[nosep,label=(\alph*)]
+  \item $3n^3 + n + 1 = O(n^3)$
+  \item $3n^3 + n + 1 = O(n^4)$  
+  \item $3n^3 + n + 1 = O(n^{100})$
+  \item $3n^3 + n + 1 = O(2n^3 + n^2 + n - 1)$
+  \item $3n^3 + 1 \neq O(n^2)$
+  \item $3n^3 + 1 \neq O(n + 10000)$
+  \end{enumerate}
+\end{eg}
+
+Usually we will pick the simplest and \lq\lq smallest" $g(n)$
+for our big-O statement in
+\[
+f(n) = O(g(n))
+\]
+For instance if it is true that
+\[
+f(n) = O(n^3), \,\,\,
+f(n) = O(3n^3 - 10n + 1), \,\,\,
+f(n) = O(n^{1000})
+\]
+then we prefer
+\[
+f(n) = O(n^3)
+\]
+
+\newpage\input{exercises/big-O-of-functions/main.tex}

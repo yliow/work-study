@@ -1,0 +1,215 @@
+%-*-latex-*-
+\section{Quicksort: A
+Partition Strategy that is Reasonble, Short,
+and Completely Wrong}
+
+\textbf{PARTITION.}
+There are three issues to resolve.
+The first is to figure a way to not create new arrays all the time.
+The other two are related to the partition procedure/strategy.
+\begin{itemize}
+\li How to choose the pivot. This is easy. As I've mentioned to you,
+there are two standard way of choosing the pivot.
+The basic quicksort picks the first value of the array.
+The randomized quicksort picks a random element from the array.
+Done.
+\li The next is to decide where exactly to put values in the
+\verb!left! of the \verb!right! chunk.
+In the above long example, I form the \verb!left! chunk by 
+simply scanning the given array left-to-right and put a value into
+\verb!left! to the end of \verb!left!.
+Same for \verb!right!.
+Because I'm going to use the same array, the above
+does not work.
+I'll show you two ways of forming the \verb!left! and \verb!right!
+pile of values using the same array.
+\end{itemize}
+
+
+
+
+Let's try something just to get into the swing of things.
+Here's a naive way of getting an array partitioned.
+Suppose we have this array:
+\begin{python}
+from quicksort_init import *
+p = Plot()
+s = chunkedarray(cellwidth=cellwidth, 
+                 cellheight=cellheight,
+                 arr=[[3,1,6,2,4]],
+                 pipeheight=pipeheight,
+)
+p.add(s)
+print(p)
+\end{python}
+and suppose the pivot I choose is \verb!2!  at index 4.
+I now scan the array and put the values relative to the pivot ...
+and don't forget that I want to do this inplace, i.e., work on the 
+array directly and not use a separate temporary array.
+Scanning left-to-right the only reasonble first value to
+process is \verb!3!.
+Clearly \verb!3! must be on the right of the pivot \verb!2!.
+A reasonable thing to do is to swap \verb!3! and \verb!2!:
+\begin{python}
+from quicksort_init import *
+p = Plot()
+s = chunkedarray(x=0, y=0, cellwidth=cellwidth, 
+                   cellheight=cellheight,
+                   arr=[[3,1,6,2,4]],
+                   pipeheight=pipeheight,
+                   swaps=[(0,3)],
+)
+p.add(s)
+s = chunkedarray(x=0, y=-2, cellwidth=cellwidth, 
+                   cellheight=cellheight,
+                   arr=[[2,1,6,3,4]],
+                   pipeheight=pipeheight,
+)
+p.add(s)
+print(p)
+\end{python}
+
+
+
+
+Now the index of my pivot is 0.
+Next I swap \verb!1! to get to the left of the pivot:
+\begin{python}
+from quicksort_init import *
+p = Plot()
+s = chunkedarray(x=0, y=0, cellwidth=cellwidth, 
+                   cellheight=cellheight,
+                   arr=[[2,1,6,3,4]],
+                   pipeheight=pipeheight,
+                   swaps=[(0,1)],
+)
+p.add(s)
+s = chunkedarray(x=0, y=-2, cellwidth=cellwidth, 
+                   cellheight=cellheight,
+                   arr=[[1,2,6,3,4]],
+                   pipeheight=pipeheight,
+)
+p.add(s)
+print(p)
+\end{python}
+
+
+
+
+At this point, \verb!1! and \verb!3! are on the correct side of the 
+pivot \verb!2!.
+The next index position to process has value \verb!6! which is already
+on the correct side of the pivot so we don't do anything.
+The next value to process has value \verb!3! which
+was actually already processed, but if we loop over the values
+left-to-right without knowing which one is processed, we would have to 
+process this value anyway.
+Since \verb!3! is on the correct side we don't do anything.
+Same thing for \verb!4!.
+We're done.
+
+
+
+
+Hmmm ... it looks like the strategy works.
+The end result is:
+\begin{python}
+from quicksort_init import *
+p = Plot()
+s = chunkedarray(cellwidth=cellwidth, 
+                   cellheight=cellheight,
+                   arr=[[1],[2],[6,3,4]],
+                   pipeheight=pipeheight,
+                   chunklabels=[('left'),('pivot',1.2), ('right')],
+)
+p.add(s)
+print(p)
+\end{python}
+
+
+
+
+The algorithm should look like this:
+\begin{console}
+FUNCTION partition(x, pivot_index):
+    pivot = x[pivot_index]
+    for i = 0, 1, 2, ..., len(x) - 1:
+        if i is not pivot_index:
+            if x[i] <= pivot and i > pivot_index:
+                swap x[i] and x[pivot_index]
+                pivot_index = i
+            elif x[i] > pivot and i < pivot_index:
+                swap x[i] and x[pivot_index]
+                pivot_index = i
+\end{console}
+
+
+
+\newpage
+\begin{ex}
+Execute the above algorithm on this array
+with \verb!2! as the pivot:
+\begin{python}
+from quicksort_init import *
+p = Plot()
+s = chunkedarray(cellwidth=cellwidth, 
+                   cellheight=cellheight,
+                   arr=[[3,1,0,2,6,4]],
+                   pipeheight=pipeheight,
+)
+p.add(s)
+print(p)
+\end{python}
+Does the partition procedure partitioned the above correctly?
+\qed
+\end{ex}
+
+
+
+\newpage
+\begin{ex}
+Execute the above algorithm and this array
+with \verb!2! as the pivot:
+\begin{python}
+from quicksort_init import *
+p = Plot()
+s = chunkedarray(cellwidth=cellwidth, 
+                   cellheight=cellheight,
+                   arr=[[2,0,1,3,6,4]],
+                   pipeheight=pipeheight,
+)
+p.add(s)
+print(p)
+\end{python}
+Does the partition procedure partitioned the above correctly?
+\qed
+\end{ex}
+
+
+
+\newpage
+\begin{ex}
+Execute the above algorithm and this array
+with \verb!2! as the pivot:
+\begin{python}
+from quicksort_init import *
+p = Plot()
+s = chunkedarray(cellwidth=cellwidth, 
+                   cellheight=cellheight,
+                   arr=[[3,1,6,0,2,4]],
+                   pipeheight=pipeheight,
+)
+p.add(s)
+print(p)
+\end{python}
+Does the partition procedure really partitioned the above.
+\qed
+\end{ex}
+
+
+\newpage
+Now you see that our greedy and short-sighted approach 
+fails.
+In the next few sections, I'll show you different strategies that
+actually work.
+The key idea is to \textit{temporarily move the pivot out of the way}.

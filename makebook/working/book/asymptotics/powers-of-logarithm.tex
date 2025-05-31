@@ -1,0 +1,396 @@
+%-*-latex-*-
+\section{The big-O Classes: Logarithms and Their Powers}
+
+What about powers of $\lg n$ and also composition of the log function
+such as
+\[
+(\lg n)^2
+\]
+and
+\[
+\lg (\lg n)
+\]
+
+We define the following
+\begin{itemize}
+
+\li The $k$--th power of $\ln$ is
+\[
+\lg^k n = (\lg n)^k
+\]
+i.e., $\lg$ function to the power of $k$.
+For instance
+\[
+\lg^3 n = (\lg n)^3
+\]
+Note that the first power of $\lg$ is just $\lg$:
+\[
+\lg^1 n = \lg n
+\]
+
+\li The $k$--th composition of $\lg$ is
+\[
+\lg^{(k)} n = \lg(...(\lg k)...)
+\]
+i.e., composition of $\lg$ function $k$ times.
+For instance 
+\[
+\lg^{(3)} n = \lg(\lg(\lg n))
+\]
+
+\end{itemize}
+
+How does $\lg n$ (or $\lg^k n$) compare with powers of $n^d$?
+
+Here's $\lg n$ and $n$:
+
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(domain='0:3', vars=['n'])
+p.add('n', color='red', python=1, pin='left')
+p.add('log(n,2)', color='blue', python=1, pin='below', pin_message='\lg n')
+print(p)
+\end{python}
+
+The function $\lg n$ seems to bend downward.
+It actually grows unboundedly,
+i.e., 
+\[
+\lim_{n \rightarrow \infty} \lg n = \infty
+\]
+although it does grow rather slowly when compared to $n$.
+
+Here's the picture when for $1 \leq x \leq 50$:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(domain='1:100', vars=['n'])
+
+p.add('n', color='red', python=1, pin='above')
+p.add('log(n,2)', color='blue', python=1, pin='above', pin_message='\lg n')
+
+print(p)
+\end{python}
+
+From the graph you would guess
+\[
+\lg n = O(n)
+\]
+and that is in fact true: you can prove the above fact using l'H\^opital's 
+rule:
+\[
+\lim_{n \rightarrow \infty} \frac{\ln n}{n}
+= \lim_{n \rightarrow \infty} \frac{1/n}{1}
+= \lim_{n \rightarrow \infty} \frac{1}{n}
+= 0
+\]
+The above is for comparing $\ln n$ against $n$ (recall: $\ln n = \log_e n$).
+For $\lg_2 n$, we just use this:
+\[
+\lg_2 n = \frac{\log_e n}{\log_e 2}
+\]
+which implies that $\log_e n = (\log_2 n)(\log_e 2)$.
+So the above computation for $\log_2 n$ becomes
+\[
+\lim_{n \rightarrow \infty} \frac{\log_2 n}{n}
+= \lim_{n \rightarrow \infty} \frac{1}{\log_e 2}\frac{\log_e n}{n}
+\]
+and we would still get $0$.
+
+What if I beef up $\lg n$?
+Let's look at powers of $\lg^k n$ for $k = 1, 2, 3$.
+
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(domain='0:10', vars=['n'])
+p.add('n', color='red', python=1, pin='above', pin_message='', num_points=2)
+p.add('log(n,2)', color='blue', python=1, pin='below', pin_message='\lg n', num_points=300)
+p.add('log(n,2)**2', color='blue', python=1, pin='above', pin_message='')
+p.add('log(n,2)**3', color='blue', python=1, pin='above left', pin_message='\lg^3 n')
+print(p)
+\end{python}
+
+Looks like $\ln^3 n$ beats $n$.
+But you know that graphs cannot be trusted (I already told that, right?).
+So we check the graphs for $n$ up to 20:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(domain='0:20', vars=['n'])
+p.add('n', color='red', python=1, pin='above', pin_message='', num_points=2)
+p.add('log(n,2)', color='blue', python=1, pin='below', pin_message='\lg n')
+p.add('log(n,2)**2', color='blue', python=1, pin='above', pin_message='')
+p.add('log(n,2)**3', color='blue', python=1, pin='above', pin_message='\lg^3 n')
+print(p)
+\end{python}
+
+Phew! ... seems to be ok ... wait let's try up to $n = 30$:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(domain='0:30', vars=['n'])
+p.add('n', color='red', python=1, pin='above', pin_message='', num_points=2)
+p.add('log(n,2)', color='blue', python=1, pin='below', pin_message='')
+p.add('log(n,2)**2', color='blue', python=1, pin='above', pin_message='')
+p.add('log(n,2)**3', color='blue', python=1, pin='above', pin_message='\lg^3 n')
+print(p)
+\end{python}
+But now you begin to see something disturbing ... do you notice that
+the $\ln^3 n$ is bending ever so slightly download?
+Here's the graph up to $n = 50$:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(domain='0:50', vars=['n'])
+p.add('n', color='red', python=1, pin='above', pin_message='', num_points=2)
+p.add('log(n,2)', color='blue', python=1, pin='below', pin_message='')
+p.add('log(n,2)**2', color='blue', python=1, pin='above', pin_message='')
+p.add('log(n,2)**3', color='blue', python=1, pin='left', pin_message='\lg^3 n')
+print(p)
+\end{python}
+
+Now the concavity of $\lg^3 n$ becomes more pronounced!
+Oh no!
+Let's try up to $n = 200$:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(domain='0:200', vars=['n'])
+p.add('n', color='red', python=1, pin='above', pin_message='', num_points=2)
+p.add('log(n,2)', color='blue', python=1, pin='below', pin_message='')
+p.add('log(n,2)**2', color='blue', python=1, pin='above', pin_message='')
+p.add('log(n,2)**3', color='blue', python=1, pin='above', pin_message='\lg^3 n')
+print(p)
+\end{python}
+and up to $n = 500$:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(domain='0:1000', vars=['n'])
+p.add('n', color='red', python=1, pin='above', pin_message='', num_points=2)
+p.add('log(n,2)', color='blue', python=1, pin='below', pin_message='')
+p.add('log(n,2)**2', color='blue', python=1, pin='above', pin_message='')
+p.add('log(n,2)**3', color='blue', python=1, pin='above', pin_message='\lg^3 n')
+print(p)
+\end{python}
+Aarrghhhh! Even $\lg^3 n$ can't beat $n$
+
+When does $n$ beat $\lg^k n$?
+Well
+\begin{align*}
+                 & n \geq \lg^k n \\
+\iff \,\,\,\,\,\,& \lg n \geq \lg(\lg^k n) \\
+\iff \,\,\,\,\,\,& \lg n \geq k \lg(\lg n) \\
+\iff \,\,\,\,\,\,& \frac{\lg n}{\lg(\lg n)} \geq k \\
+\end{align*}
+Now why is the last fact a good fact (if it's true at all)?
+Because the left-hand-side is independent of $k$, that's why.
+It's a comparison of $\lg n$ and $\lg\lg n$.
+If you look at the above graph, you'd see that it's likely that 
+$\lg n/\lg\lg n$ grows unboundedly, i.e. we guess:
+\[
+\lim_{n \rightarrow \infty} \frac{\lg n}{\lg \lg n} = \infty
+\]
+This looks like a job for l'H\^opital's rule again.
+\[
+\lim_{n \rightarrow \infty} \frac{\lg n}{\lg \lg n}
+= \lim_{n \rightarrow \infty} \frac{1/n}{1/(\lg n) \cdot (1/n)}
+= \lim_{n \rightarrow \infty} \lg n
+= \infty
+\]
+
+This means that 
+\[
+\lg^k n = O(n)
+\]
+for all $k \geq 0$
+(for $k = 0$, $\lg^0 n = 1$ and for $k = 1$, $\lg^1 n = \lg n$.)
+Of course
+\[
+\lg^k n = O(\lg^{k+1} n)
+\]
+
+So to our complexity classes
+\[
+1 = O(n), 
+n = O(n^2) 
+n^2 = O(n^3) \cdots
+\]
+we can now add :
+\begin{align*}
+1 &= O(\lg n), \lg 2 = \lg^2 n, \lg^2 n = O(n) \\
+n &= O(n\lg n), n \lg n = O(n\ln^2 n),  n\ln^2 n = O(n^2) \\
+n^2 &= O(n^2\lg n), n^2 \lg n = O(n\ln^2 n),  n\ln^2 n = O(n^3) \\
+&\cdots \end{align*}
+In other words in $n^r =  O(n^{r+1})$ we expand to get
+\[
+n^r
+= O(n^r\lg n),
+n^r\lg n = O(n^r\ln^2 n),  
+n^r\ln^2 n = O(n^r\ln^3 n)
+\cdots 
+\]
+
+
+
+
+
+
+
+\begin{thm} \mbox{}
+ \begin{enumerate}
+  \item[(a)] $\log_a n = O(n)$.
+ \end{enumerate}
+\end{thm}
+
+\textit{Proof}
+
+
+(d) This following from l'H\^opitals rule:
+\[
+\lim_{x \rightarrow \infty} \frac{f(x)}{g(x)}
+= 
+\lim_{x \rightarrow \infty} \frac{f'(x)}{g'(x)}
+\]
+if the right hand side makes sense.
+Therefore
+\[
+\lim_{n \rightarrow \infty} \frac{\ln n}{n}
+= 
+\lim_{n \rightarrow \infty} \frac{1/n}{1}
+= 
+\lim_{n \rightarrow \infty} \frac{1}{n}
+= 0
+\]
+This implies that for any $\ep > 0$, there is some $N$ such that
+for $n \geq N$,
+$|(\ln n)/n| \leq \ep$, i.e.,
+\[
+|\ln n| \leq \ep |n|
+\]
+In particular, for $C = 1$, there is some $N$ such that
+for $n \geq N$
+\[
+|\ln n| \leq C|n|
+\]
+Hence $\ln n = O(n)$.
+Since 
+\[
+\log_a n = \frac{\ln n}{\ln a}
+\]
+we also have
+$\log_a n = O(n)$.
+\qed
+
+By the way, the proof technique using l'H\^opital's rule
+proves more generally that if 
+$f(n)$ and $g(n)$ are positively valued for all large $n$,
+and such that
+\[
+\lim_{n\rightarrow \infty} \frac{f(n)}{g(n)} = C
+\]
+for a constant $C$, then $f = O(g)$.
+Why?
+Because if that's the case, 
+then for every $\ep > 0$, 
+there is some $N$
+such that for $n \geq N$, we have
+\[
+\left|
+\frac{f(n)}{g(n)} - C
+\right| < \ep
+\]
+Therefore if we choose $\ep = 1$, then
+there is some $N$ such that
+for $n \geq N$,
+\[
+\left|
+\frac{f(n)}{g(n)} - C
+\right| < 1
+\]
+i.e.,
+\[
+-1 <
+\frac{f(n)}{g(n)} - C
+ < 1
+\]
+i.e.,
+\[
+\frac{f(n)}{g(n)} < C + 1
+\]
+and therefore
+\[
+f(n) < (C + 1) g(n)
+\]
+
+
+\begin{ex}
+Prove that $\ln (n^3) = O(\ln n)$. 
+\qed
+\end{ex}
+
+\begin{ex}
+Prove that $\ln (1000 + n^3) = O(\ln n)$. 
+\qed
+\end{ex}
+
+\begin{ex}
+Prove that $\ln (1000n + n^{1000}) = O(\ln n)$. 
+\qed
+\end{ex}
+
+\begin{ex}
+Prove that $\ln (n + 10^{10}) = O(\ln n)$. 
+\qed
+\end{ex}
+
+\begin{ex} 
+Find the best big-O in the form of $O(n^a\ln^b n)$ for the following function:
+$\ln (10^{42} n^{12})$
+\qed
+\end{ex}
+
+\begin{ex} 
+Find the best big-O in the form of $O(n^a\ln^b n)$ for the following function:
+$(n + 10)\ln (20 n^{12})$
+\qed
+\end{ex}
+
+\begin{ex}
+Find the best big-O in the form of $O(n^a\ln^b n)$ for the following function:
+$\ln (10^{42} n^{12} + n^5)$. 
+\qed
+\end{ex}
+
+\begin{ex}
+Find the best big-O in the form of $O(n^a\ln^b n)$ for the following function:
+$\ln (10^n + 4)$.
+\qed
+\end{ex}
+
+\begin{ex}
+Find the best big-O in the form of $O(n^a\ln^b n)$ for the following function:
+$\ln (n^{n + \ln n} + \ln n) + n^2$. 
+\qed
+\end{ex}
+
+\begin{ex}
+Find the best big-O in the form of $O(n^a\ln^b n)$ for the following function:
+$n^2 \ln (n^{n + 5} + 4)$. 
+\qed
+\end{ex}
+
+\begin{ex}
+Find the best big-O in the form of $O(n^a\ln^b n)$ for the following function:
+$n^2 \ln (n^{n + 5} + n^6) + n^3$. 
+\qed
+\end{ex}
+
+\begin{ex}
+The following are plots of $y = n^{0.1}$ and $y = \ln n$
+for $0 \leq n \leq 1000$:
+\begin{python}
+from latextool_basic import *
+p = FunctionPlot(domain='0:1000', vars=['n'])
+p.add('log(n,e)', color='blue', python=1, pin='below', pin_message='\ln n')
+p.add('n**0.1', color='red', python=1, pin='above', pin_message='n^{0.1}')
+print(p)
+\end{python}
+Prove or disprove $n^{0.1} = O(\ln n)$?
+\qed
+\end{ex}
+

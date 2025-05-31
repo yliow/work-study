@@ -1,0 +1,228 @@
+%-*-latex-*-
+\sectionthree{Floor and Ceiling}
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+
+No ... I'm not creating a diversion to building construction although
+what I'm going to talk about is analogous to what you're standing on
+and what's above your head.
+
+Given a real number $x$.
+The \defterm{floor} of $x$, 
+written $\floor{x}$ is $x$ if $x$ is an integer or the
+integer before $x$.
+For instance
+\[
+\floor{3} = 3, \,\,\,\,\, 
+\floor{1.7} = 1, \,\,\,\,\, 
+\floor{-2.3} = -3
+\]
+
+The \defterm{ceiling} of $x$, written $\ceiling{x}$ is $x$ if
+$x$ is an integer or the integer after $x$.
+For instance
+\[
+\ceiling{3} = 3, \,\,\,\,\, 
+\ceiling{1.7} = 2, \,\,\,\,\, 
+\ceiling{-2.3} = -2
+\]
+
+Note that in your C/C++ programs when you do something like
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+int y = 7;
+int x = y / 2;
+\end{Verbatim}
+you know that the \lq\lq\verb!/!'' is integer division because
+\verb!y! and \verb!2! are integers.
+Therefore \verb!x! has a value of \verb!3!.
+In mathematical notation, when you write $a/b$,
+the \lq\lq / '' is \textit{real} division
+regardless of whether $a$ and $b$ are real or integers.
+So if I convert the above to mathematical notation
+I would have to write
+\begin{align*}
+y &= 7 \\
+x &= \floor{y/2}
+\end{align*}
+
+\textit{When} (not if) 
+you want to make use of mathematical tools to study
+algorithms, you have to translate your algorithms into mathematical notation
+in order to move from the program world to the math world.
+Since the meaning of \lq\lq \verb!/!'' in a program might be different from
+the meaning of \lq\lq /'' in math, you have to be very careful.
+
+The point is that when you convert a \verb!double! value
+to \verb!int! value by type casting, 
+the \textit{fractional part} of the \verb!double!
+value is lost.
+Therefore for the following C/C++ code:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+double y = 3.14159;
+int x = y;
+\end{Verbatim}
+the value of \verb!x! is 3. 
+(This is old CISS240 stuff, right?)
+Therefore the integer cast is like the floor function in math.
+But that's only true for \textit{positive} value because for the following:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+double y = -3.14159;
+int x = y;
+\end{Verbatim}
+the value \verb!x! is \verb!-3! whereas, in math, 
+the floor of $-3.14159$ is $-4$.
+So remember the double-to-int cast (same for float-to-int of course)
+is like the floor only for values $\geq 0$.
+
+\begin{ex}\mbox{}
+\begin{tightlist}
+\item[(a)] Compute $\floor{3.5}$.
+\item[(b)] Compute $\ceiling{3.5}$.
+\item[(c)] Compute $\floor{3}$.
+\item[(d)] Compute $\ceiling{3}$.
+\end{tightlist}
+\qed
+\end{ex}
+
+\begin{ex}
+Let $x = 5$.
+Compute
+\[
+\floor{\frac{x + 0}{4}} 
++ \floor{\frac{x + 1}{4}}
++ \floor{\frac{x + 2}{4}}
++ \floor{\frac{x + 3}{4}}
+\]
+and
+\[
+\ceiling{\frac{x + 0}{4}} 
++ \ceiling{\frac{x + 1}{4}}
++ \ceiling{\frac{x + 2}{4}}
++ \ceiling{\frac{x + 3}{4}}
+\]
+
+\qed
+\end{ex}
+
+
+\begin{ex}
+Consider the following algorithm where \verb!x!, \verb!y!, and \verb!z!
+are arrays. \verb!x! has size \verb!n! = 25.
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+n0 = n / 3
+for i = 0, 1, 2, ..., n0 - 1:
+    y[i] = x[i]
+for i = n0, n0 + 1, ..., n - 1:
+    z[i - n0] = x[i]
+\end{Verbatim}
+\begin{tightlist}
+\item[(a)] How many values were copied over to \verb!y!?
+\item[(b)] How many values were copied over to \verb!z!?
+\item[(c)] If \verb!n! has value 26, 
+how many values were copied over to \verb!y!?
+\item[(d)] If \verb!n! has value 26,
+how many values were copied over to \verb!z!?
+\item[(e)] If \verb!n! has value 27, 
+how many values were copied over to \verb!y!?
+\item[(f)] If \verb!n! has value 27,
+how many values were copied over to \verb!z!?
+\end{tightlist}
+\end{ex}
+
+
+\begin{ex}
+Plot $y = \floor{x}$.
+\qed
+\end{ex}
+
+\begin{ex}
+Plot $y = \ceiling{x}$.
+\qed
+\end{ex}
+
+
+
+
+\begin{ex}
+Find all real numbers $x$ such that
+\[
+\floor{x} = 2
+\]
+\qed
+\end{ex}
+
+
+
+
+\begin{ex}
+  \mbox{}
+\begin{tightlist}
+\item Write a function in C/C++ that accepts a double \verb!x! and returns the
+ceiling of value of \verb!x!. Call your function \verb!ceiling!.
+(Test your code ... I don't have to tell you that, right?)
+\item Do the same for floor.
+\end{tightlist}
+\qed
+\end{ex}
+
+
+\begin{ex}
+Plot $y = \frac{\ceiling{x} + \floor{x}}{2}$.
+Solve
+\[
+\frac{\ceiling{x} + \floor{x}}{2} = x
+\]
+\qed
+\end{ex}
+
+
+\begin{ex}
+Plot $y = 2 \floor{\frac{x}{2}}$.
+Solve
+\[
+2 \floor{\frac{x}{2}} = x
+\]
+\qed
+\end{ex}
+
+\begin{ex}
+Plot $y = \ceiling{x/2} + \floor{x/2}$.
+Solve
+\[
+\ceiling{x/2} + \floor{x/2} = x
+\]
+\qed
+\end{ex}
+
+
+\begin{ex} Let $a \geq 0, b > 0, c > 0$ be integers.
+Write a program to check
+\[
+\floor{\floor{a/b}/c} = \floor{a/(bc)}
+\]
+for 
+$0 \leq a \leq 1000000$, 
+$1 \leq b \leq 1000000$, 
+and
+$1 \leq b \leq 1000000$.
+If the above is false, list a reasonably small counterexample.
+Otherwise prove it.
+\qed
+\end{ex}
+
+\begin{ex} Let $a \geq 0, b > 0, c > 0$ be integers.
+Write a program to check
+\[
+\ceiling{\ceiling{a/b}/c} = \ceiling{a/(bc)}
+\]
+for 
+$0 \leq a \leq 1000000$, 
+$1 \leq b \leq 1000000$, 
+and
+$1 \leq b \leq 1000000$.
+If the above is false, list a reasonably small counterexample.
+Otherwise prove it.
+\qed
+\end{ex}
+

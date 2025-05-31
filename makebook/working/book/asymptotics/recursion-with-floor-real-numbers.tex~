@@ -1,0 +1,401 @@
+\section{Recursion with Floors - Extending the 
+Domain to Real Numbers}
+
+Now I'm going to show you $T(n) \leq g(n) = n + n \log n + (n - 1)$
+in a different way.
+
+Notice that earlier when working for $f(n)$, I usually treat $n$
+as a variable that takes real values and not just integer values.
+(I extend the domain from positive integers to positive real nuimbers.)
+I'm going to use the same idea on $T(n)$.
+
+As before (see previous section) suppose I have
+\[
+T(n) 
+= 
+\begin{cases}
+A                        & \text{if $n = 0, 1$} \\
+2T(\floor{n/2}) + Bn + C & \text{otherwise}
+\end{cases}
+\]
+then the big-O of $T(n)$ is the same when you use this instead:
+\[
+T(n) = 2T(n/2) + Bn + C
+\]
+To be more precise, of course I meant that if I define another function
+with a domain of $[0, \infty)$ (not positive integers):
+\[
+S(n) 
+= 
+\begin{cases}
+A                & \text{if $n = 0, 1$} \\
+2S(n/2) + Bn + C & \text{otherwise}
+\end{cases}
+\]
+then
+\[
+T(n) = O(S(n))
+\]
+I hope you realize that the above definition of $S(n)$ has some problems.
+Here's the first problem:
+Is saying
+\[
+S(0) = A
+\]
+(the base case) good enough?
+Not quite!!! 
+(Are you awake yet???)
+
+Why?
+Because for any positive integer $n$, using the recurrence relations,
+the computation of $T(n)$ will ultimately arrive at $T(0)$.
+Not so for $S(n)$!!!
+For instance if I look at $S(3/2)$. 
+Then $S(3/2)$ is in terms of $S(3/4)$ which is in terms of 
+$S(3/8)$, etc.
+It never reaches $S(0)$!
+Well ... at least it's moving towards 0 (although never reaching it.)
+
+It's far worse for linear recurrence.
+Say
+\[
+T(n) = T(n - 1) + T(n - 2)
+\]
+with $T(0) = T(1) = 1$.
+If I extend $n$ to have a domain of real numbers, I would have
+problems with $T(3/2)$ ... it would ultimately skip $T(0)$ and $T(1)$ and shoot
+past $0$ and go on toward $-\infty$!!!
+
+So if given 
+\[
+T(n) 
+= 
+\begin{cases}
+A                        & \text{if $n = 0, 1$} \\
+2T(\floor{n/2}) + Bn + C & \text{otherwise}
+\end{cases}
+\]
+I define
+\[
+S(n)
+=
+\begin{cases}
+A                 & \text{if $0 \leq n \leq 1$} \\
+2S(n/2) + Bn + C  & \text{otherwise}
+\end{cases}
+\]
+(In fact because I only care for large $n$, I can even define
+$S(n) = A$ for $0 \leq n \leq 10$.
+It doesn't matter at all.)
+Let me plot $T(n)$ and $S(n)$ for the case of
+\[
+A = B = C = 1
+\]
+Here's the plot of $T(n)$ (blue) and $S(n)$ (red):
+\begin{python}
+from plot import *
+N = 33
+STEP = 1
+table = {}
+def t(n):
+    n = int(n)
+    if n <= 1: return 1
+    else:
+        if not table.has_key(n):
+            table[n] = 2 * t(n/2) + n + 1
+        return table[n]
+def s(x):
+    x = float(x)
+    if x <= 1: return 1
+    else:
+        return 2 * s(x/2.0) + x + 1
+
+p = Plot(domain="0:%s" % N)
+
+points = [(n, t(n)) for n in range(0, N + 1, STEP)]
+p.add(points, style='step', color='blue', python=1)
+
+points = [(n/50.0, s(n/50.0)) for n in range(0, N*50 + 1, STEP)]
+p.add(points, style='step', color='red', python=1)
+#p.add("s(x)", python=1, color='red', num_points=1000) #??? does not work
+
+print p
+\end{python}
+
+Note that at powers of $2$, there are sharps for both functions, 
+but it seems that $T(n)$ and $S(n)$ does not seem to be the same
+near powers of 2. Let me compute the function at $2^4$:
+\[
+T(16) = 95, \,\,\,\,\, S(16) = 95
+\]
+Now let's see what happens to $S(n)$ for $n$ just before and just after 16:
+\[
+S(15.9) = 94.6, \,\,\,\,\, S(16.1) = 143.5 
+\]
+
+
+\begin{ex}
+Compute $S(15.9), S(16), S(16.1)$ by hand.
+\qed
+\end{ex}
+
+
+As before, define
+\[
+g(n) = n + n \log_2 n + (n - 1)
+\]
+Recall that $T(n) \leq g(n)$.
+Let's plot that too (with green):
+
+\begin{python}
+from plot import *
+N = 1000
+STEP = 1
+table = {}
+def t(n):
+    n = int(n)
+    if n <= 1: return 1
+    else:
+        if not table.has_key(n):
+            table[n] = 2 * t(n/2) + n + 1
+        return table[n]
+def s(x):
+    x = float(x)
+    if x <= 1: return 1
+    else:
+        return 2 * s(x/2.0) + x + 1
+
+p = Plot(domain="0:%s" % N)
+
+points = [(n, t(n)) for n in range(0, N + 1, STEP)]
+p.add(points, style='step', color='blue', python=1)
+
+points = [(n, s(n)) for n in range(0, N + 1, STEP)]
+p.add(points, style='step', color='red', python=1)
+
+p.add("x + x*log(x, 2) + (x - 1)", color='green', python=1, num_points=1000)
+print p
+\end{python}
+
+And here's the plot for a large domain:
+\begin{python}
+from plot import *
+N = 1000000
+STEP = 2000
+table = {}
+def t(n):
+    n = int(n)
+    if n <= 1: return 1
+    else:
+        if not table.has_key(n):
+            table[n] = 2 * t(n/2) + n + 1
+        return table[n]
+def s(x):
+    x = float(x)
+    if x <= 1: return 1
+    else:
+        return 2 * s(x/2.0) + x + 1
+
+p = Plot(domain="0:%s" % N)
+
+points = [(n, t(n)) for n in range(0, N + 1, STEP)]
+p.add(points, style='step', color='blue', python=1)
+
+points = [(n, s(n)) for n in range(0, N + 1, STEP)]
+p.add(points, style='step', color='red', python=1)
+
+p.add("x + x*log(x, 2) + (x - 1)", color='green', python=1, num_points=1000)
+print p
+\end{python}
+and even large domain:
+\begin{python}
+from plot import *
+N = 100000000
+STEP = 200000
+table = {}
+def t(n):
+    n = int(n)
+    if n <= 1: return 1
+    else:
+        if not table.has_key(n):
+            table[n] = 2 * t(n/2) + n + 1
+        return table[n]
+def s(x):
+    x = float(x)
+    if x <= 1: return 1
+    else:
+        return 2 * s(x/2.0) + x + 1
+
+p = Plot(domain="0:%s" % N)
+
+points = [(n, float(t(n))) for n in range(0, N + 1, STEP)]
+p.add(points, style='step', color='blue', python=1)
+
+points = [(n, s(n)) for n in range(0, N + 1, STEP)]
+p.add(points, style='step', color='red', python=1)
+
+p.add("x + x*log(x, 2) + (x - 1)", color='green', python=1, num_points=1000)
+print p
+\end{python}
+
+We see that 
+\[
+T(n) \leq S(n) \leq g(n)
+\]
+with equality when $n$ is a power of $2$.
+
+
+
+\begin{ex}
+Compute $T(15)$, $T(16)$, and $T(17)$ by hand.
+\end{ex}
+
+Note that $S(n)$ is defined simply from $T(n)$
+by extending the domain from positive integer to real numbers.
+Now how come $S(n) : T(n)$ for $n > 1$.
+Let's try compute $S(17)$.
+\begin{align*}
+S(2^4 + 1) 
+&= 2S(2^3 + 1/2) + (2^4 + 1) + 1 \\
+&= 2(2S(2^2 + 1/4) + (2^3 + 1/2)1 + 1) + (2^4 + 1)1 + 1 \\
+&= 2^2 S(2^2 + 1/4) + 2(2^4 + 1)1 + (1 + 2 + 2^2)1 \\
+&= ... \\
+&= 2^4 S(2^0 + 1/16) + 4(2^4 + 1)1 + (1 + 2 + 2^3 + 2^4)1
+\end{align*}
+So you see that 
+\begin{align*}
+S(2^m + 1) &= 2^m S(2^0 + 1/2^m) + m(2^m + 1)1 + (2^m - 1)1 \\
+T(2^m + 1) &= 2^m T(2^0) + m(2^m + 1)1 + (2^m - 1)1 
+\end{align*}
+The point is that, for $S(n)$, since there is no floor,
+after $m$ substitutions of the recurrence relation,
+your $S(2^m)$ reached $S(1 + 1/2^m)$, and {\it not} $S(1)$, 
+which is not in the range 
+of $[0, 1]$ yet.
+This means that you need {\it one} more substitution of the 
+recurrence relation.
+So with one more recurrence on $S$ we get
+\begin{align*}
+S(2^m + 1) 
+&= 2^{m+1} S(2^{-1} + 1/(2^{m+1})) + (m+1)(2^{m+1} + 1) + (2^{m+1} - 1) \\
+&= 2^{m+1} + (m+1)(2^{m+1} + 1) + (2^{m+1} - 1)
+\end{align*}
+whereas
+\[
+T(2^m + 1) = 2^m  + m(2^m + 1) + (2^m - 1) 
+\]
+And if I express the above in terms of $n$ (i.e., $n = 2^m$):
+\begin{align*}
+S(n + 1) 
+&= 2n + (\log_2(n)+1)(2n + 1) + (2n - 1) \\
+T(n + 1) &= n  + \log_2(n) (n + 1) + (n - 1) 
+\end{align*}
+
+In general for $0 \leq x < 2^m$,
+\begin{align*}
+S(2^m + x) 
+&= 2^{m+1} S(2^{-1} + x/(2^{m+1})) + (m+1)(2^{m+1} + 1) + (2^{m+1} - 1) \\
+&= 2^{m+1} + (m+1)(2^{m+1} + 1) + (2^{m+1} - 1) 
+\end{align*}
+
+This explains the sudden jump in $S(n)$ immediately after powers of $2$.
+
+\begin{python}
+from plot import *
+N = 20
+STEP = 1
+table = {}
+def t(n):
+    n = int(n)
+    if n <= 1: return 1
+    else:
+        if not table.has_key(n):
+            table[n] = 2 * t(n/2) + n + 1
+        return table[n]
+def s(x):
+    x = float(x)
+    if x <= 1: return 1
+    else:
+        return 2 * s(x/2.0) + x + 1
+
+p = Plot(domain="0:%s" % N)
+
+points = [(n, t(n)) for n in range(0, N + 1, STEP)]
+p.add(points, style='step', color='blue', python=1)
+
+xs = [N * x/1000.0 for x in range(0, 1000)]
+points = [(n, s(n)) for n in xs]
+p.add(points, style='step', color='red', python=1)
+
+p.add("x + x*log(x, 2) + (x - 1)", color='green', python=1, num_points=1000)
+print p
+\end{python}
+
+Now I'm going to modify $S(n)$ so that the extra application of
+recurrence is not necessary.
+This means that I want $S(n)$ to satify
+\[
+S(n) = 
+\begin{cases}
+A               & \text{if $0 \leq n < 2$ (see the difference?)} \\
+S(n/2) + Bn + C &\text{otherwise} 
+\end{cases}
+\]
+Now I'm plot the graphs:
+
+\begin{python}
+from plot import *
+N = 20
+STEP = 1
+table = {}
+def t(n):
+    n = int(n)
+    if n <= 1: return 1
+    else:
+        if not table.has_key(n):
+            table[n] = 2 * t(n/2) + n + 1
+        return table[n]
+
+def s(x):
+    x = float(x)
+    if x < 2: return 1
+    else:
+        return 2 * s(x/2.0) + x + 1
+
+p = Plot(domain="0:%s" % N)
+
+points = [(n, t(n)) for n in range(0, N + 1, STEP)]
+p.add(points, style='step', color='blue', python=1)
+
+xs = [N * x/1000.0 for x in range(0, 1000)]
+points = [(n, s(n)) for n in xs]
+p.add(points, style='step', color='red', python=1)
+
+p.add("x + x*log(x, 2) + (x - 1)", color='green', python=1, num_points=1000)
+print p
+\end{python}
+
+Now $S(n)$ hugs $T(n)$ a lot closer.
+Furthermore, $S(n) \leq g(n)$.
+We have
+\[
+T(n) \leq S(n) \leq g(n)
+\]
+for $n \geq 1$ and they all agree at powers of $2$.
+
+Now instead of proving $T(n) = O(g)$, by showing $T(n) \leq g(n)$,
+I want to proving $T(n) \leq S(n)$ and then $S(n) \leq g(n)$.
+Why does one want to do that?
+Notice that that the function $S(n)$ is smoother.
+
+Now we know that 
+\[
+T(n) = S(n) = g(n)
+\]
+when $n$ is a power of $2$.
+Suppose we can show that for all integer $n$,
+\[
+T(n) \leq S(n)
+\]
+and furthermore we can show on all intervals $(2^m, 2^{m+1}]$
+$S(n)$ and $g(n)$ are increasing
