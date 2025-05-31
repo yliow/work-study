@@ -76,7 +76,7 @@ def goodbye():
     if processed_notes == None or len(processed_notes) <= 0:
         print("Closing Makebook, goodbye...")
     else:
-        print("Notes processed:\n", (print(i) for i in processed_notes), "Closing Makebook, goodbye...")
+        print("Notes processed:\n", (print(i) for i in processed_notes), "book made.\nClosing Makebook, goodbye...")
         
 #display options menu
 def menu():
@@ -159,7 +159,7 @@ def process_notes():
     else:
         for i in selected_notes:
             print(f'processing {i} ...')
-            make_book(i)
+            moveother(i)
     
 #process user selections
 def get_selection(selection):
@@ -233,11 +233,8 @@ def movestd(f):
 
 #moves files that are to be in the same level dir as makebook and the chaps
 def moveother(f):
-    os.system('cp %s %s' % (old_dir + f, new_dir + f))
-    
-def make_book(dir_):
-    print(f'making {dir_} ...')
-    # make_new_book_dir()
+    print(f'copying over {f} to book/ ...')
+    os.system('cp -r %s %s' % (old_dir + f, new_dir + f))
 
 menu_loop()
 goodbye()
