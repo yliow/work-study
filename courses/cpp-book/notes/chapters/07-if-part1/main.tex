@@ -1,0 +1,904 @@
+\tikzset{every picture/.append style={remember picture}}
+\EMPHASIZE{07.\texttt{if} and \texttt{if-else}: Part 1}
+
+\textbf{Objectives}
+\begin{tightlist}
+\li
+  Write if statements (including blocks)
+\li
+  Write if-else statements (including blocks)
+\li
+  Write nested if-else statements
+\end{tightlist}
+
+We will now talk about writing statements that make decisions. In other
+words, statements that decide whether to run other statements or not.
+
+This is significant \dots we are now embarking on writing program
+with intelligence \dots
+
+ONWARD!!!
+
+\newpage\EMPHASIZE{\texttt{if} statements}
+
+So far you know that C++ can do arithmetic, print integer values, print
+string values, accept integer values from the keyboards, create and
+update variables.
+
+You should expect more! (Otherwise C++ is pretty dumb.)
+
+For instance you would expect programs to make decisions. Now
+wouldn' t it be nice if C++ can do this:
+\begin{align*}
+&\texttt{if alien is killed:}\\
+& \tab[3em]{\texttt{score = score + 10}}\\
+\end{align*}
+or
+\begin{align*}
+&\texttt{if my ship' s energy is 0:}\\
+& \tab[3em]{\texttt{end the game}}\\
+\end{align*}
+or
+\begin{align*}
+&\texttt{if plane' s left engine has failed and }\\
+&\texttt{plane' s right engine has failed:}\\
+& \tab[3em]{\texttt{activate seat ejection!!!}}\\
+\end{align*}
+Note that for the first case, if the alien is not killed, you do
+\textit{not} want to execute the statement \verb!score = score + 10!.
+Otherwise everyone would keeping getting the same score! What kind of
+dumb game is that?
+
+In fact C++ \textit{does} understand the \verb!if! statement.
+
+Run this program\\
+\begin{console}
+int x = 0;
+std::cin >> x;
+if (x > 0)
+       std::cout << "spam!" << std::endl;
+std::cout << "eggs" << std::endl;
+\end{console}
+
+Run the program several time, entering different values for x. Note that
+the statement printing \verb@"spam!"@ is controlled by the \verb!if!.
+However the statement that prints \EMPHASIZE{"eggs"} is not.
+
+For readability, the if statement is written like this:\\
+\begin{console}[commandchars=\~\@\$]
+int x = 0;
+std::cin >> x;
+~textbf@if (x > 0)$
+   ~textbf@std::cout << "spam!" << std::endl;$
+std::cout << "eggs" << std::endl;
+\end{console}
+Big picture: The format of the \texttt{if} statement looks like this
+\begin{center}
+\EMPHASIZE{\textbf{if (}\textbf{[bool expr]}\textbf{)}}
+
+\EMPHASIZE{[stmt]}
+\end{center}
+where [\verb!bool expr!] is a \EMPHASIZE{boolean expression} -- this
+means that it's an expression that can be evaluated to a
+boolean value -- and [\verb!stmt!] is a C++ statement (of course
+there's a semi-colon at the end). Since we need boolean
+expressions it's a good time now to recall the
+following:
+\begin{align*}
+ & \texttt{!} & \text{"not"}\\
+ & \texttt{\&\&} & \text{"and"}\\
+ & \texttt{\textbar\textbar{}} & \text{"or"}\\
+ & \texttt{==} & \text{"is equal to"}\\
+ & \texttt{!=} & \text{"is not equal to"}\\
+ & \texttt{\textless{}} & \text{"is less than"}\\
+ & \texttt{\textless=} & \text{"is less than or equal to"}\\
+ & \texttt{>} & \text{"is greater than"}\\
+ & \texttt{>=} & \text{"is greater than or equal to"}\\
+\end{align*}
+An example of a boolean expression is
+
+\EMPHASIZE{[variable] [bool op] [value]}
+
+where [\verb!variable!] is a variable of int or double or float type, [\verb!bool op!] is one of the above boolean operators and [\verb!value!] is
+an int or double or float. Don' t forget that if there is
+a type mismatch, C++ will try to type promote one value to match the
+type of the other. For instance if \verb!x! is an \verb!int! variable
+and the boolean expression is
+
+\tab[3em]{\verb!x < 1.23!}
+
+then C++ will use the \verb!double! of \verb!x! (i.e., \verb!x! is
+automatically promoted to a \verb!double!):
+
+\tab[3em]{\verb!double(x) < 1.23!}
+
+\textbf{Exercise.} Modify the above program so that \verb~"spam!"~ is printed
+when the integer entered is 42. Test your program.
+
+\textbf{Exercise.} Modify the above program so that the program prompts the user
+for his/her favorite number and print \lq\lq you don' t like
+42?!?'' if the integer entered is not 42. Here' s an execution:
+\begin{console}[commandchars=\~\!\@]
+what' s your favorite number? ~textbf!42@ 
+\end{console}
+Here' s another:
+\begin{console}[commandchars=\~\@\$]
+what' s your favorite number? ~textbf@1$
+~textbf@you don't like 42?!?$  
+\end{console}
+
+\textbf{Exercise.} Write a program that prompts the user for an integer
+and prints \lq\lq That' s even. Am I smart?'' if the integer
+entered is even. Here' s an execution
+\begin{console}[commandchars=\~\!\@]
+~textbf!100@
+
+That' s even. Am I smart?
+\end{console}
+
+Here' s another
+\begin{console}
+101 
+\end{console}
+
+\textbf{Exercise.} Write a program that prompts the user for his/her age
+and prints \lq\lq You' re lying! Think you can fool me???'' if
+the value entered is less than 18. Here' s an execution:
+\begin{console}[commandchars=\~\@\$]
+Enter your age: ~textbf@16$
+You' re lying! Think you can fool me???
+\end{console}
+Here' s another:
+
+\begin{console}[commandchars=\~\!\@]
+Enter your age: textbf!100@
+\end{console}
+Of course this is another boolean expression:
+\begin{center}
+\EMPHASIZE{[var1] [bool op] [var2]}
+\end{center}
+In this case you' re comparing two (integer or double)
+variables.
+
+\textbf{Exercise.} Write a program that prompts the user for two integer
+values and prints \lq\lq First is bigger'' if the first integer entered is
+larger than the second. Here' s an execution of the
+program:
+\begin{console}[commandchars=\~\!\@]
+~textbf!1 2@
+\end{console}
+Here' s another
+
+\begin{console}[commandchars=\~\!\@]
+~textbf!2 -1@ 
+First is bigger
+\end{console}
+
+Here' s yet another boolean expression:
+
+\begin{center}
+\EMPHASIZE{[expr] [bool op] [value]}
+\end{center}
+
+where \verb![expr]! is an (integer or double) expression.
+
+\textbf{Exercise.} Write a program that prompts the user for his/her
+height (in ft) and weight (in lbs) and prints \lq\lq you will live more than
+100 years!!!'' if the product of the height and weight is at least
+200.45. (This is not supported by any form of research.)
+Here' s an execution of the program:
+\begin{console}[commandchars=\~\!\@]
+~textbf!6.1 180.180@
+\end{console}
+\begin{console}
+you will live more than 100 years!!!!
+\end{console}
+Here' s another
+\begin{console}[commandchars=\~\@\$]
+~textbf@3.4 23.4$
+\end{console}
+
+\textbf{Exercise.} Write a program that prompts the user for the year of
+his/her date of birth and the current year and prints his/her
+approximate age and then prints \lq\lq you must have watched lots of movies
+by now'' if the difference of the two values is at least 20.
+Here' s an execution:
+\begin{console}[commandchars=\~\@\$]
+~textbf@1900 2000$
+you are about 100 years old
+you must have watched lots of movies by now
+\end{console}
+
+Here' s another:
+\begin{console}[commandchars=\~\!\@]
+~textbf!2000 2006@
+you are about 6 years old
+\end{console}
+
+
+One last one ... here' s one more boolean expression:
+\begin{center}
+\EMPHASIZE{[expr1] [bool op] [expr2]}
+\end{center}
+
+Now, we're comparing two expressions.
+
+\textbf{Exercise.} Write a program that prompts the user for the month,
+day of his/her date of birth and also his/her height (in ft) and weight
+(in lbs). Print the approximate number of days from January 1 of the
+year he/she was born and the sum of his/her height and weight. If the
+first printed number is greater than the second, print \lq\lq According to
+the theory of relativity, you are going to win the next powerball.''.
+\begin{console}[commandchars=\~\!\@]
+Enter the month, day of your DOB: ~textbf!1 1@
+Enter your height and weight: ~textbf!6 100@
+1 106
+\end{console}
+Here' s another:
+\begin{console}[commandchars=\~\!\@]
+Enter the month, day of your DOB: ~textbf!12 25@
+Enter your height and weight: ~textbf!6 200@
+355 206
+According to the theory of relativity,
+you are going to win the next powerball.
+\end{console}
+(You may assume the number of days in a month is 30.)
+
+\textbf{Exercise.}Try this:\\
+\begin{console}[commandchars=\~\!\@]
+int numHeads = 0;
+std::cout << "How many heads do you have? ";
+std::cin >> numHeads;
+if (numHeads == 2)
+   std::cout << "Are you Zaphod?" << std::endl;
+\end{console}
+
+And then this:
+
+\begin{console}
+int numHeads = 0;
+std::cout << "How many heads do you have? ";
+std::cin >> numHeads;
+if (numHeads != 2)
+   std::cout << "You are not Zaphod" << std::endl;
+\end{console}
+
+Combine both into one program so that I get the following execution:\\
+\begin{console}[commandchars=\~\!\@]
+How many heads do you have?~textbf!1@
+You are not Zaphod
+\end{console}
+And here's an execution of the same program:\\
+\begin{console}[commandchars=\~\!\@]
+How many heads do you have?~textbf!2@
+Are you Zaphod?
+\end{console}
+Next modify the program so that, in addition to the above requirements,
+if the number of heads entered is greater than 2, the program prints "No
+kidding!". Finally, modify the program so that, in addition to the
+above, if the number of heads is 1, the program prints "Let me introduce
+you to our surgeons." Test your program by entering 0, 1, 2, 3.
+
+(There' s a better way to do this exercise ...)
+
+\newpage\EMPHASIZE{Mental picture: flow of execution for \texttt{if}}
+
+The \verb!if! statement is difficult for some beginning programmers
+because it alters the flow of execution of a program.
+
+Before this set of notes, C++ executes one statement at a time from top
+to bottom; it executes every statement.
+
+The \verb!if! statement is different because it has a statement
+\EMPHASIZE{inside} the \verb!if! statement.
+%ISSUE this text alignment in T1 needs to be corrected, i also need to figure out how to mess with font types/sizing
+\begin{python}
+from latextool_basic import *
+p = Plot()
+M = r'''
+int x = 0;
+std::cin >> x;
+                                                                          
+if (x > 0)
+    std::cout << "spam!" << std::endl;
+
+std::cout << "eggs" << std::endl;
+'''.strip()
+
+B0 = Rect(0, -4.5, 13, -2.5, linestyle= 'ultra thick', linecolor= 'red')
+T0 = Rect(6, -1, 10.5, 0.3,  linecolor= 'red', label = 'This is an if-statement', linewidth='0.2')
+L0 = Line(x0=8, y0=-1, x1=6, y1=-2.5, endstyle='>', linewidth='0.15', linecolor='red', bend_right = 30)
+
+B1 = Rect(1.3, -3.9, 12.5, -3.3, linestyle= 'ultra thick', linecolor= 'red')
+T1 = Rect(12, -1, 19, 0.5, linewidth='0.2', linecolor= 'red', s = 'This is a statement inside the if-statement', font = r'\large', innersep = 0.02)
+L1 = Line(x0=14.5, y0=-1, x1=12.5, y1=-3.6, endstyle='>', linewidth='0.15', linecolor='red', bend_left = 40)
+
+p += B0
+p += T0
+p += L0
+p += B1
+p += T1
+p += L1
+code(p, M, x=0, y=0, height=0.8, width=0.33, border_linewidth=0.01, innersep=0.8)
+print(p)
+\end{python}
+
+
+The statement in the \verb!if! statement is executed only when the
+\verb!x > 0! is true. If the condition is not true, the
+statement in the \verb!if! statement is not executed.
+
+In the following diagram, you can follow the arrows to get a sense of
+the flow of execution:
+%ISSUE fix the coordinate plots for the true/false flowchart labels
+\begin{python}
+from latextool_basic import *
+p = Plot()
+M = r'''
+int x = 0;
+
+std::cin >> x;
+                                                                          
+if (x > 0)
+
+   std::cout << "spam!" << std::endl;   
+
+std::cout << "eggs" << std::endl;
+'''.strip()
+
+points = [(-1.5, 0.72), (-1.5, -0.72), (13.7, -0.72), (13.7, -2.1), (-1.5, -2.1), (-1.5, -3.72), (13.7, -3.72), (13.7, -5.1), (-1.5, -5.1), (-1.5, -6.3), (-0.8, -6.3), (13, -9.7), (13.7, -9.7), (13.7, -11.72), (-1.5, -11.72), (-1.5, -12.72), (-0.8, -12.72)]
+
+p += Line(points = [(-1.5, 0.72), (-1.5, -0.72)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-1.5, -0.72), (-0.8, -0.72)], linewidth = 0.1, endstyle='>', linecolor='red')
+p += Line(points = [(13, -0.72), (13.7, -0.72)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(13.7, -0.72), (13.7, -2.1)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(13.7, -2.1), (-1.5, -2.1)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-1.5, -2.1), (-1.5, -3.72)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-1.5, -3.72), (-0.8, -3.72)], linewidth = 0.1, endstyle='>', linecolor='red')
+p += Line(points = [(13, -3.72), (13.7, -3.72)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(13.7, -3.72), (13.7, -5.1)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(13.7, -5.1), (-1.5, -5.1)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-1.5, -5.1), (-1.5, -6.3)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-1.5, -6.3),(-0.8, -6.3)], linewidth = 0.1, endstyle='>', linecolor='red')
+p += Line(points = [(13, -9), (13.7, -9)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(13.7, -9), (13.7, -11.72)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(13.7, -11.72), (-1.5, -11.72)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-1.5, -11.72), (-1.5, -12.72)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-1.5, -12.72), (-0.8, -12.72)], linewidth = 0.1, endstyle='>', linecolor='red')
+
+p += Line(points = [(2.5, -7.22), (2.5, -8.22)], linewidth=0.1, linecolor='red')
+p += Line(points = [(-0.1, -8.22), (13, -8.22)], endstyle='>', linewidth=0.1, linecolor='red')
+p += Line(points = [(-0.1, -8.22), (-0.1, -9.6)], linewidth=0.1, linecolor='red')
+p += Line(points = [(-0.1, -9.6), (0.45, -9.6)], endstyle='>', linewidth=0.1, linecolor='red')
+p += Line(points = [(12.2, -9.6), (13, -9.6)], endstyle='>', linewidth=0.1, linecolor='red')
+
+p += Rect(-0.8, -1.2, 13, -0.22, linecolor='red', linewidth=0.1, name='b1')
+p += Rect(-0.8, -4.2, 13, -3.22, linecolor='red', linewidth=0.1, name='b2')
+p += Rect(-0.8, -11.2, 13, -5.8, linecolor='red', linewidth=0.1, name='b3')
+p += Rect(0.8, -7.22, 3.5, -6.22, linecolor='red', linewidth=0.1, name='b4')
+p += Rect(0.45, -10.2, 12.2, -9.22, linecolor='red', linewidth=0.1, name='b5')
+p += Rect(-0.8, -13.2, 13, -12.22, linecolor='red', linewidth=0.1, name='b6')
+code(p, M, x=0, y=0, height=1.5, width=0.33, border_linewidth=0.01, innersep=0.8)
+
+print(p)
+\end{python}
+%% TR = coordinate(1, -7.6, label='true', anchor='left')
+%% FA = coordinate(3, -7.6, label='false', anchor='right')
+%% p += TR
+%% p += FA
+
+Of course the program is still executing one statement at a time from
+the top to the bottom if you view the if statement as a statement (i.e.
+forget about the internals of the if statement).
+
+Gotchas
+
+\textbf{Exercise.} Try this:\\
+\begin{console}
+int x = 0;
+std::cin >> x;
+if x > 0
+   std::cout << "spam!" << std::endl;
+std::cout << "eggs" << std::endl;
+\end{console}
+Fix it.
+
+
+\textbf{Exercise.} Try this:\\
+\begin{console}
+int x = 0;
+std::cin >> x;
+if (x > 0);
+   std::cout << "spam!" << std::endl;
+std::cout << "eggs" << std::endl;
+\end{console}
+What do you learn from this example?
+
+\textbf{Exercise.} Here' s another wacky example ...
+\begin{console}
+int x = 0;
+std::cin >> x;
+if (x > 0);
+std::cout << "eggs" << std::endl;
+\end{console}
+Multiplication game: Part 1
+
+\textbf{Exercise.} Write a program that tests if the user can do two digit
+multiplication. Right now we will just ask the one question: the product
+of 97 and 94. The program congratulates the user if the right answer is
+entered. Otherwise the program stops immediately. Here' s
+an execution of the program:\\
+\begin{console}[commandchars=\~\!\@]
+What is the product of 97 and 94? ~textbf!1@
+\end{console}
+Here' s another execution of the program:\\
+\begin{console}[commandchars=\~\@\$]
+What is the product of 97 and 94? ~textbf@9118$
+You smart dawg!
+\end{console}
+
+This is kind of a dumb program because it asks the same question again
+and again.
+
+Here' s the \EMPHASIZE{pseudocode} (pseudocode = informal
+description of steps in a program):
+\begin{align*}
+& \texttt{Declare integer variable guess}\\
+& \texttt{Print a prompt string to user}\\
+& \texttt{Prompt user for integer value for guess}\\
+& \texttt{If guess is 9118}\\
+& \tab[3em]{\texttt{print congratulatory message}}\\
+\end{align*}
+Note that this is not a C++ program yet!!! You can' t run
+it!!!
+
+Complete the program using the above pseudocode. Test your program.
+
+\newpage\EMPHASIZE{Blocks}
+
+What if you want to execute \EMPHASIZE{\textit{several}} statements when a
+boolean expression is true? Here's one way:\\
+\begin{console}[commandchars=\~\@\#]
+int x = 0;
+std::cin >> x;
+if (x > 0)
+   std::cout << "spam!" << std::endl;
+if (x > 0)
+   std::cout << "ham!" << std::endl;
+std::cout << "eggs" << std::endl;
+\end{console}
+
+It does work \dots but \dots that's the \EMPHASIZE{BAD}
+way of executing two statements when a condition holds.
+
+\EMPHASIZE{\textit{This}} is the right way:
+\begin{console}[commandchars=\~\@\#]
+int x = 0;
+std::cin >> x;
+if (x > 0)
+~textbf@{#
+        std::cout << "spam!" << std::endl;
+        std::cout << "ham!" << std::endl;
+~textbf@}#
+std::cout << "eggs" << std::endl;
+\end{console}
+
+The \EMPHASIZE{\{...\}} is called a \EMPHASIZE{block} or \EMPHASIZE{block of
+statements. }(You' ve actually seen this already. Look at
+your \texttt{main() \dots}) You can have as many statements as you like
+in a block, not just two.
+
+\textbf{Exercise.} Here' s part of a game that
+you're writing \dots complete it. If the missile hits the alien, increment the \verb!score! by 100, set \verb!play_explosion! to \verb`true`, increment your \verb!energy! by the alien's energy (i.e. \verb`alien_energy`), and set the alien's energy to 0. Test your code with different inputs.
+\begin{console}
+int score = 1234;
+int energy = 6789;
+int alien_energy = 42;
+bool play_explosion = false;
+bool missile_hit_alien;
+std::cin >> missile_hit_alien;
+
+
+std::cout << "score: " << score << '\n'
+          << "energy: " << energy << '\n'
+          << "alien_energy: " << alien_energy << '\n'
+          << "play_explosion: " << score << '\n';
+\end{console}
+\newpage\EMPHASIZE{Random integers}
+
+Generating a random integer occurs commonly in computer programs. For
+instance if you want to write a strategy role-playing game, you might
+have different rooms in a mansion and you want to put different things
+in different rooms. Suppose you have a magic potion in a bottle. Now
+suppose the rooms are numbered from 1 to 1000. You don' t
+want your magic potion bottle to be in room 5 whenever you start the
+game. You want each game to be different.
+
+At a more complex level you might want to randomly make doors between
+two rooms. This creates a random maze.
+
+So you' d better learn how to generate random things.
+
+Try this:
+\begin{console}[commandchars=\~\@\$]
+#include < iostream>
+
+int main()
+{
+std::cout << "the potion is in room " << ~textbf@rand()$
+          << std::endl;
+std::cout << "the potion is in room " << ~textbf@rand()$
+          << std::endl;
+std::cout << "the potion is in room "<< ~textbf@rand()$
+          << std::endl;
+std::cout << "total number of rooms: "
+          << ~textbf@RAND_MAX$ << std::endl;
+          
+return 0;
+} 
+\end{console}
+(Note: You might need \verb!#include <cstdlib>!\\just after \verb!#include <iostream>!. This depends on your compiler.)
+
+Looks like you' re getting random integers. But wait ...
+run the program a second time ... a third time ... a fourth time. Notice
+something?
+
+OK. Let' s modify the program:
+\begin{console}[commandchars=\~\@\$]
+#include <iostream>
+~textbf@#include <ctime>$
+int main()
+{
+~textbf@srand((unsigned int) time(NULL));$   
+std::cout << "the potion is in room " << rand()
+          << std::endl;
+std::cout << "the potion is in room " << rand()
+          << std::endl;
+std::cout << "the potion is in room " << rand()
+          << std::endl;
+std::cout << "total number of rooms: "
+          << RAND_MAX << std::endl;
+return 0;
+\end{console}
+
+Run this program several times. Notice that the room number is different
+each time you run the program.
+
+I will not go into details on the statement
+\begin{center}
+\texttt{srand((unsigned int) time(NULL));}
+\end{center}
+The only thing I will say is that it \lq\lq seeds'' the random generator so
+as to make it \lq\lq more random''. The important thing to remember is that
+you must execute this statement and furthermore you execute it
+\textbf{\underline{once}} (usually) and \textbf{\underline{before}} you call the \texttt{rand()} function. The standard practice is to execute the seeding
+in \texttt{main()} and at the beginning:
+\begin{console}[commandchars=\~\@\$]
+#include <iostream>
+~textbf@#include <ctime>$
+int main()
+{
+   ~textbf@srand((unsigned int) time(NULL));$
+   . . .
+   return 0;
+}
+\end{console}
+Since \verb!rand()! gives you a random number from \verb!0! to \verb!RAND_MAX!,
+\begin{center}
+\texttt{rand() / RAND\_MAX}
+\end{center}
+will give you a random \verb!double! between \verb!0.0! and \verb!1.0!.
+But this is not right because the / is an \textit{\textbf{integer}}
+division. Therefore we do this:
+\begin{center}
+\texttt{double(rand()) / RAND\_MAX}
+\end{center}
+to get a random double from 0.0 to 1.0.
+
+\textbf{Exercise.} Check that I was not lying by printing 10 random
+doubles from 1.0 to 0.0. By the way, if the numbers are truly random,
+you would expect their average to be close to 0.5. Check that too.
+
+There are times when you need to generate a random
+\textit{\textbf{integer}} between two bounds. For instance if you have a
+maze game and the rooms are numbered 1 to 100, you want a random room
+number for a magic potion. How many values are there from 1 to 100? You
+have 100. Since \texttt{rand()} gives you a random integer from 0 to
+\texttt{RAND\_MAX}, if you do
+
+\begin{center}
+        \texttt{rand() \% 100}
+\end{center}
+you get 100 numbers, from 0 to 99. You add 1 to it and you get a random
+integer from 1 to 100. In other words
+\begin{center}
+        \texttt{1 + rand() \% 100}
+\end{center}
+
+does the trick.
+
+\textbf{Exercise.} How do you generate random integers from 1,..., 6?
+(For instance to simulate a dice roll.) Verify with a C++ program.
+
+\textbf{Exercise.} How do you generate random integers from 1,..., 10?
+Verify with a C++ program.
+
+What about generating random integers from 5,..., 20? In this case the
+the lower bound is 5 and not 1. You use the same idea. Note that if you
+do something like
+\begin{center}
+\texttt{rand() \% 10}
+\end{center}
+or
+\begin{center}
+\texttt{rand() \% 18}
+\end{center}
+the range of numbers starts from 0. So if you want to generate random
+numbers in the range of 5,..., 20, the first thing you do is to think
+about the range
+\begin{center}
+0, \dots, 15
+\end{center}
+first. In other words move the given range 5, \ldots, 20 so that the
+lower bound of the range becomes 0. That means subtracting 5 from the
+range. To generate a number in the range of 0, \ldots, 15, you do
+\begin{center}
+\texttt{rand() \% 16}
+\end{center}
+This gives a number in the range 0, \ldots, 15. You then add 5 to it:
+\begin{center}
+\texttt{5 + rand() \% 10}
+\end{center}
+\textbf{Exercise.} Verify that the expression\\
+\begin{center}
+\texttt{5 + rand() \% 10}
+\end{center}
+does give you numbers in the range of 5, \dots, 20. .
+
+\textbf{Exercise.} How do you generate random integers from 9,...142?
+Verify with a C++ program.
+
+\textbf{Exercise.} How do you generate random integers from -5,...,5?
+Verify with a C++ program.
+
+\textbf{Exercise.} How do you generate random \verb`double` from
+0,...,2.0? Verify with a C++ program.
+
+\textbf{Exercise.} How do you generate random double from -1.0,...,1.0?
+Verify with a C++ program.
+
+\textbf{Exercise.} How do you generate random double from 0,...,3.5?
+Verify with a C++ program.
+
+\textbf{Exercise.} How do you generate random double from -2.0,...,2.0?
+Verify with a C++ program.
+
+\newpage\EMPHASIZE{The important swap \lq\lq trick''}
+
+Recall the following extremely important \lq\lq trick'' that you must know.
+It allows you to swap the values in two variables:
+\begin{console}
+int a = 42, b = 24;
+std::cout << a << " " << b << std::endl;
+int t = a;
+a = b;
+b = t;
+std::cout << a << " " << b << std::endl;
+\end{console}
+
+\textbf{Exercise.} Write a program that declares two doubles,
+initializing them with 1.234 and 4.567. Print the values of the
+variables. Swap their values. Print the values of the variables.
+
+\newpage\EMPHASIZE{First sorting example}
+
+Here's your first sorting problem:
+
+\begin{tightlist}
+\li
+  Prompt the user for two integer values and assign them to x and y.
+\li
+  Sort the values so that the value of x is less than or equal to the
+  value of y
+\end{tightlist}
+
+\textbf{Exercise.} Write the above program. Here are some test cases:
+
+Test 1
+\begin{console}[commandchars=\~\@\$]
+~textbf@1 2$
+1 2
+\end{console}
+
+Test 2
+\begin{console}[commandchars=\~\@\$]
+~textbf@2 1$
+1 2
+\end{console}
+
+Test 3
+\begin{console}[commandchars=\~\@\$]
+~textbf@-1 5$
+-1 5
+\end{console}
+
+Test 4
+\begin{console}[commandchars=\~\@\$]
+~textbf@5 -1$
+-1 5
+\end{console}
+
+Test 5
+\begin{console}[commandchars=\~\@\$]
+~textbf@2 2$
+2 2
+\end{console}
+
+\newpage\EMPHASIZE{More sorting examples: bubblesort}
+
+Now suppose you have three integer variables and you want to sort the
+values in the variables. What I mean is this. Suppose your variables are
+x, y, and z. After some operations you want
+
+\[x  <=  y\]  \&\&  \[y  <=  z\]
+
+to be true (NOT \[x <= y <= z\] !!! Remember???)
+
+Here' s the idea. First do this:\\
+\begin{tightlist}
+\li
+  Swap the values of x and y so that x <= y.
+\li
+  Swap the values of y and z so that y <= z.
+\end{tightlist}
+This will guarantee that z is the largest.
+
+\textbf{Exercise.} Take a piece of paper. And write down three integer
+values for x, y, and z and follow the above steps. Do you see that the
+largest will always be in variable z' s box?
+
+\textbf{Exercise.} Does this means that the smallest will be in x?
+
+The above two steps is said to be one \textit{\textbf{pass}} of this
+sorting process. Now do this:
+\begin{tightlist}
+\li
+  Swap (if necessary) the values of x and y so that x <= y.
+\end{tightlist}
+
+This will guarantee that the larger value between x and y will be in y.
+
+Now everything is in ascending order, i.e.
+
+\[x  <=  y\]  \&\&  \[y  <=  z\]
+
+Altogether these are the steps:
+
+\begin{quote}
+Pass 1: To get largest among x, y, z into z do this:
+\end{quote}
+\begin{tightlist}
+\li
+  \begin{quote}
+  Swap (if necessary) the values of x and y so that x <= y.
+  \end{quote}
+\li
+  \begin{quote}
+  Swap (if necessary) the values of y and z so that y <= z.
+  \end{quote}
+\end{tightlist}
+\begin{quote}
+Pass 2: To get largest among x, y into y
+\end{quote}
+\begin{tightlist}
+\li
+  \begin{quote}
+  Swap (if necessary) the values of x and y so that x <= y.
+  \end{quote}
+\end{tightlist}
+
+Such a \lq\lq recipe'' (a finite number of steps to achieve a goal) is called
+an \EMPHASIZE{algorithm}. This sorting algorithm is called
+\EMPHASIZE{bubblesort}. There are actually many different sorting
+algorithms.
+
+\textbf{Exercise.} Write a program that prompts the user for three
+integers and prints the three integers in ascending order. Here are some
+executions:
+\begin{console}[commandchars=\~\@\$]
+~textbf@1 2 3$
+1 2 3
+\end{console}
+\begin{console}[commandchars=\~\@\$]
+~textbf@1 3 2$
+1 2 3
+\end{console}
+\begin{console}[commandchars=\~\@\$]
+~textbf@2 1 3$
+1 2 3
+\end{console}
+\begin{console}[commandchars=\~\@\$]
+~textbf@2 3 1$
+1 2 3
+\end{console}
+\begin{console}[commandchars=\~\@\$]
+~textbf@3 1 2$
+1 2 3
+\end{console}
+\begin{console}[commandchars=\~\@\$]
+~textbf@3 2 1$
+1 2 3
+\end{console}
+
+What if you have 4 values to sort (in ascending order)? Say the values
+are stored in a, b, c, d. If you understood the above bubblesort for 3
+values, the bubblesort for 4 values is similar:
+
+\begin{quote}
+Pass 1: To get largest among a, b, c, d into d do this:
+\end{quote}
+\begin{tightlist}
+\li
+  \begin{quote}
+  Swap (if necessary) the values of a and b so that a <= b.
+  \end{quote}
+\li
+  \begin{quote}
+  Swap (if necessary) the values of b and c so that b <= c.
+  \end{quote}
+\li
+  \begin{quote}
+  Swap (if necessary) the values of c and d so that c <= d.
+  \end{quote}
+\end{tightlist}
+
+\begin{quote}
+Pass 2: To get largest among a, b, c into c
+\end{quote}
+\begin{tightlist}
+\li
+  \begin{quote}
+  Swap (if necessary) the values of a and b so that a <= b.
+  \end{quote}
+\li
+  \begin{quote}
+  Swap (if necessary) the values of b and c so that b <= c.
+  \end{quote}
+\end{tightlist}
+
+\begin{quote}
+Pass 3: To get largest among a, b into b
+\end{quote}
+\begin{tightlist}
+\li
+  \begin{quote}
+  Swap (if necessary) the values of a and b so that a <= b.
+  \end{quote}
+\end{tightlist}
+
+\textbf{Exercise. }Test the above bubblesort for 4 values: Write a
+program that prompts the user for 4 integers and prints the values in
+ascending order.
+
+\textbf{Exercise. }What if you have five variables a, b, c, d, e? How
+would you take the values from a, b, c, d, e sort them into ascending
+order, and put them into a, b, c, d, e?
+
+\textbf{Exercise.} Write a program that prompts the user for 4
+\texttt{\textbf{doubles}} and prints the \texttt{doubles} in ascending order.
+
+\textbf{Exercise. }Write a program that prompts the user for 4 integers
+and prints the integer values in \textbf{descending} order. (You need to
+modify the above bubblesort algorithm.)
+
+\textbf{Exercise.} Now, you have four variables a, b, c, d. You know
+that one pass of the bubblesort will put the largest value of a, b, c, d
+into d. What would you do if I ask you to write a program to prompt the
+user for four values and then print the second largest. Now write the
+program and test it. [Hint: You need \textbf{two} passes.]
+
+\textbf{Exercise.} Again suppose you have four variables a, b, c, d.
+Suppose during the second pass, you notice that no swap was performed.
+Do you see that you do not need to perform any more passes?
+
+You must memorize the bubblesort algorithm for any number of variables.

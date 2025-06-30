@@ -1,0 +1,786 @@
+\newpage\EMPHASIZE{09. switch}
+
+\textsc{Objectives}
+
+\begin{tightlist}
+\item
+  Write switch statements
+\item
+  Write switch statements where cases do not have breaks
+\item
+  Write switch statements where the default case is missing
+\end{tightlist}
+
+The if and if-else statements allow us to decide if we want to execute a
+statement. It allows us to write programs that can make decisions. There
+is another way of doing that.
+
+This is the switch statement.
+
+\newpage\EMPHASIZE{Diagram of flow of execution of \emph{if} statements}
+
+Here' s the big picture for if.
+
+Before the if statement, the code in main executes one statement at a
+time. For example:
+\begin{console}[commandchars=\~\@\$]
+~textbf@int x = 1;$
+~textbf@int y = 2;$
+~textbf@int z = x * y + 3;$
+\end{console}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+D = '''
+   int x = 1;
+
+
+int y = 2;
+
+
+int z = x * y + 3;
+'''.strip()
+p += Rect(-0.15, -0.5, 2.1, 0.2, linewidth = 0.1, linecolor='red')
+p += Rect(-0.15, -1.7, 2.1, -1.1, linewidth = 0.1, linecolor='red')
+p += Rect(-0.15, -2.95, 3.7, -2.2, linewidth = 0.1, linecolor='red')
+p += Line(points = [(-0.9, 0.5), (-0.9, -0.3)], linewidth=0.1, linecolor='red')
+p += Line(points = [(-0.9, -0.3), (-0.15, -0.3)], linewidth=0.1, linecolor='red', endstyle='>')
+p += Line(points = [(2.1, -0.3), (4.7, -0.3)], linewidth=0.1, linecolor='red')
+p += Line(points = [(4.7, -0.3),(4.7, -0.8)], linewidth=0.1, linecolor='red')
+p += Line(points = [(4.7, -0.8), (-0.9, -0.8)], linewidth=0.1, linecolor='red')
+p += Line(points = [(-0.9, -0.8), (-0.9, -1.4)], linewidth=0.1, linecolor='red')
+p += Line(points = [(-0.9, -1.4), (-0.15, -1.4)], linewidth=0.1, linecolor='red', endstyle='>')
+p += Line(points = [(2.1, -1.4), (4.7, -1.4)], linewidth=0.1, linecolor='red')
+p += Line(points = [(4.7, -1.4), (4.7, -2)], linewidth=0.1, linecolor='red')
+p += Line(points = [(4.7, -2), (-0.9, -2)], linewidth=0.1, linecolor='red')
+p += Line(points = [(-0.9, -2), (-0.9, -2.6)], linewidth=0.1, linecolor='red')
+p += Line(points = [(-0.9, -2.6), (-0.15, -2.6)], linewidth=0.1, linecolor='red')
+p += Line(points = [(3.7, -2.6),(4.7, -2.6)], linewidth=0.1, linecolor='red')
+p += Line(points = [(4.7, -2.6), (4.7, -3.5)], linewidth=0.1, linecolor='red', endstyle='>')
+code(p, D, x=0, y=0, innersep=0.8)
+print(p)
+\end{python}
+Now with the if statement we have:
+\begin{console}[commandchars=\~\@\$]
+~textbf@int x = 1;$
+~textbf@int y = 2;$
+~textbf@if (x + y < 10)$
+   ~textbf@y = 0;$
+~textbf@x = 3;$
+\end{console}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+D = '''
+int x = 1;
+
+
+int y = 2;
+
+
+if (x + y < 10)
+
+   true
+
+        y = 0;
+
+   false
+
+
+
+x = 3;
+'''.strip()
+p += Rect(-0.2, -0.5, 5, 0.2, linewidth = 0.1, linecolor='red')
+p += Rect(-0.2, -1.7, 5, -1.1, linewidth = 0.1, linecolor='red')
+p += Rect(-0.2, -5.76, 5, -2.2, linewidth = 0.1, linecolor='red')
+p += Rect(1.4, -4.5, 2.9, -3.9, linewidth = 0.1, linecolor='red')
+p += Rect(-0.2, -6.9, 5, -6.3, linewidth = 0.1, linecolor='red')
+
+p += Line(points = [(-0.9, 0.5), (-0.9, -0.3)], linewidth=0.1, linecolor='red')
+p += Line(points = [(-0.9, -0.3), (-0.2, -0.3)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(5, -0.3), (6, -0.3)], linewidth = 0.1, linecolor='red') 
+p += Line(points = [(6, -0.3), (6, -0.8)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(6, -0.8), (-0.9, -0.8)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-0.9, -0.8), (-0.9, -1.4)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-0.9, -1.4), (-0.2, -1.4)], linewidth = 0.1, linecolor='red', endstyle='>')
+p += Line(points = [(5, -1.4), (6, -1.4)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(6, -1.4), (6, -2)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(6, -2), (-0.9, -2)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-0.9, -2), (-0.9, -2.6)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-0.9, -2.6), (-0.2, -2.6)], linewidth = 0.1, linecolor='red', endstyle='>')
+p += Line(points = [(0.5, -2.9), (0.5, -5.3)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(0.5, -5.3), (5, -5.3)], linewidth = 0.1, linecolor='red', endstyle='>')
+p += Line(points = [(0.5, -4.3), (1.4, -4.3)], linewidth = 0.1, linecolor='red', endstyle='>')
+p += Line(points = [(2.9, -4.3), (5, -4.3)], linewidth = 0.1, linecolor='red', endstyle='>')
+p += Line(points = [(5, -5), (6, -5)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(6, -5), (6, -6)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(6, -6), (-0.9, -6)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-0.9, -6), (-0.9, -6.6)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-0.9, -6.6), (-0.2, -6.6)], linewidth = 0.1, linecolor='red', endstyle='>')
+p += Line(points = [(5, -6.6), (6, -6.6)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(6, -6.6), (6, -7.5)], linewidth = 0.1, linecolor='red', endstyle='>')
+
+code(p, D, x=0, y=0, innersep=0.8)
+print(p)
+\end{python}
+Of course it' s just as easy to visualize the flow of
+execution for if-else. If you have:
+\begin{console}[commandchars=\~\@\$]
+~textbf@int x = 1;$
+~textbf@int y = 2;$
+~textbf@int z = 0;$
+~textbf@if (x + y < 10)$
+~textbf@{$
+    ~textbf@y = 0;$
+~textbf@}$
+~textbf@else$
+~textbf@{$
+    ~textbf@y = 1;$
+~textbf@}$
+~textbf@x = 3;$
+\end{console}
+
+then
+\begin{python}
+from latextool_basic import *
+p = Plot()
+D = '''
+int x = 1;
+
+
+int y = 2;
+
+
+if (x + y < 10)
+
+     true
+
+          y = 0;
+else
+     false
+
+
+
+x = 3;
+'''.strip()
+p += Rect(-0.2, -0.5, 5, 0.2, linewidth = 0.1, linecolor='red')
+p += Rect(-0.2, -1.7, 5, -1.1, linewidth = 0.1, linecolor='red')
+p += Rect(-0.2, -5.76, 5, -2.2, linewidth = 0.1, linecolor='red')
+p += Rect(1.9, -4.6, 3.4, -3.9, linewidth = 0.1, linecolor='red')
+p += Rect(-0.2, -6.9, 5, -6.3, linewidth = 0.1, linecolor='red')
+
+p += Line(points = [(-0.9, 0.5), (-0.9, -0.3)], linewidth=0.1, linecolor='red')
+p += Line(points = [(-0.9, -0.3), (-0.2, -0.3)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(5, -0.3), (6, -0.3)], linewidth = 0.1, linecolor='red') 
+p += Line(points = [(6, -0.3), (6, -0.8)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(6, -0.8), (-0.9, -0.8)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-0.9, -0.8), (-0.9, -1.4)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-0.9, -1.4), (-0.2, -1.4)], linewidth = 0.1, linecolor='red', endstyle='>')
+p += Line(points = [(5, -1.4), (6, -1.4)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(6, -1.4), (6, -2)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(6, -2), (-0.9, -2)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-0.9, -2), (-0.9, -2.6)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-0.9, -2.6), (-0.2, -2.6)], linewidth = 0.1, linecolor='red', endstyle='>')
+p += Line(points = [(0.9, -2.9), (0.9, -5.3)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(0.9, -5.3), (5, -5.3)], linewidth = 0.1, linecolor='red', endstyle='>')
+p += Line(points = [(0.9, -4.3), (1.9, -4.3)], linewidth = 0.1, linecolor='red', endstyle='>')
+p += Line(points = [(3.4, -4.3), (5, -4.3)], linewidth = 0.1, linecolor='red', endstyle='>')
+p += Line(points = [(5, -5), (6, -5)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(6, -5), (6, -6)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(6, -6), (-0.9, -6)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-0.9, -6), (-0.9, -6.6)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-0.9, -6.6), (-0.2, -6.6)], linewidth = 0.1, linecolor='red', endstyle='>')
+p += Line(points = [(5, -6.6), (6, -6.6)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(6, -6.6), (6, -7.5)], linewidth = 0.1, linecolor='red', endstyle='>')
+
+code(p, D, x=0, y=0, innersep=0.8)
+print(p)
+\end{python}
+Note that the path of execution is determined by the \EMPHASIZE{boolean value} of a boolean expression.
+
+\newpage\EMPHASIZE{\texttt{switch}}
+
+Now I' ll show you something that' s very
+similar to the if and if-else statement. Watch out! There are
+\EMPHASIZE{subtle differences} ....
+
+OK. First run this:
+\begin{console}
+int x = 0;
+std::cin >> x;
+if (x == 1)
+{
+     std::cout << "yo" << std::endl;
+}
+else if (x == 2)
+{
+     std::cout << "right ..." << std::endl;
+}
+else if (x == 3)
+{
+     std::cout << "oh?" << std::endl;
+}
+else
+{
+     std::cout << "huh?" << std::endl;
+}
+std::cout << "out of if-else" << std::endl;
+\end{console}
+
+Run this with x = 0, x = 1, x = 2, x = 3, x = 4. No surprises right?
+
+Note that all the conditions uses the == boolean operator and it is used
+to compare integer values.
+
+Modify the above:
+
+\begin{console}[commandchars=\~\@\$]
+int x = 0;
+std::cin >> x;
+~textbf@switch (x)$
+~textbf@{$
+     ~textbf@case 1:$
+        std::cout << "yo" << std::endl;
+        ~textbf@break;$
+
+     ~textbf@case 2:$
+        std::cout << "right ..." << std::endl;
+        ~textbf@break;$
+        
+     ~textbf@case 3:$
+        std::cout << "oh?" << std::endl;
+        ~textbf@break;$
+        
+     ~textbf@default:$
+        std::cout << "huh?" << std::endl;
+~textbf@}$
+std::cout << "out of switch" << std::endl;
+\end{console}
+
+
+Run it again.
+
+The \texttt{switch} statement is like a switchboard, directing the flow of
+execution based on the integer value of a variable. The flow of
+execution is passed to the case whose value matches the value of the
+variable.
+
+Now modify it again by getting rid of the \texttt{break} statement in case 2:
+\begin{console}
+int x = 0;
+std::cin >> x;
+switch (x)
+{
+     case 1:
+        std::cout << "yo" << std::endl;
+        break;
+
+     case 2:
+        std::cout << "right ..." << std::endl;
+        
+     case 3:
+        std::cout << "oh?" << std::endl;
+        break;
+        
+     default:
+        std::cout << "huh?" << std::endl;
+}
+std::cout << "out of switch" << std::endl;
+\end{console}
+
+
+What does the \texttt{break} statement do? If you do \EMPHASIZE{not} have a
+\texttt{break} statement, execution will actually \EMPHASIZE{go to the statements of the next case without checking the value for that case!!!}
+
+There are \EMPHASIZE{two} ways to get \EMPHASIZE{out} of a \texttt{switch}:
+either through a \texttt{\textbf{break}} statement or when execution has
+reached the \EMPHASIZE{end of the \texttt{switch} block}.
+
+By now, I don' t have to tell you that you can put any
+statement in the switch statement. You can put an if or an if-else into
+the switch. You can put a switch into a switch. You can put a switch
+into an if-else, etc. Isn' t life ever so colorful?
+
+\newpage\EMPHASIZE{Why? Why? Why?}
+
+So why do we need the switch when it' s clear that a
+switch can be written as a nested if-else?
+
+The reason is because the switch statement is extremely fast when there
+are many cases when compared to the if-else statement.
+
+Note that for a nested if statement:
+\begin{console}
+int x = 0;
+std::cin >> x;
+if (x == 1)
+{
+     std::cout << "yo" << std::endl;
+}
+else if (x == 2)
+{
+     std::cout << "right ..." << std::endl;
+}
+else if (x == 3)
+{
+     std::cout << "oh?" << std::endl;
+}
+else
+{
+     std::cout << "huh?" << std::endl;
+}
+std::cout << "out of if-else" << std::endl;
+\end{console}
+
+each time a boolean condition is false you have to go to the nested
+level in the if-else stack. This means that for instance to go into the
+final else block, C++ must evaluate three boolean expressions.
+
+(One optimization trick used by C/C++ programmers is therefore to always
+put the most likely case first in the stack of if-else statements.)
+
+This is however not the case for the switch statement. If the above is
+converted to the switch statement, the time taken to get to any case is
+the same. Even if you have 100 cases, the time to get to the first case
+is usually the same as the time to get to the last.
+
+\newpage\EMPHASIZE{Combining cases}
+
+Now run this:
+\begin{console}
+int x = 0;
+std::cin >> x;
+switch (x)
+{
+     case 1:
+        std::cout << "what?" << std::endl;
+        break;
+        
+     case 2:
+     case 3:
+        std::cout << "oh?" << std::endl;
+        break;
+        
+     default:
+        std::cout << "huh?" << std::endl;
+}
+std::cout << "out of switch" << std::endl;
+\end{console}
+The above is a useful trick when two cases execute the same statements.
+The above has the same effect as the following (although the following
+is probably slower):
+\begin{console}
+int x = 0;
+std::cin >> x;
+
+if (x == 1)
+{
+     std::cout << "what?" << std::endl;
+}
+else if (x == 2 || x == 3)
+{
+     std::cout << "oh?" << std::endl;
+}
+else
+{
+     std::cout << "huh?" << std::endl;
+}
+std::cout << "out of nested if-else" << std::endl;
+\end{console}
+One more example to make sure you get it:
+\begin{console}
+int x = 0;
+std::cin >> x;
+switch (x)
+{
+     case 1:
+          std::cout << "what?" << std::endl;
+          break;
+          
+     case 2:
+     case 3:
+     case 4:
+     case 5:
+          std::cout << "oh?" << std::endl;
+          break;
+          
+     default:
+          std::cout << "huh?" << std::endl;
+}
+std::cout << "out of switch" << std::endl;
+\end{console}
+Run it with several values for \texttt{x}.
+
+\newpage\EMPHASIZE{No default}
+
+You can leave out the default case:
+\begin{console}
+int x = 0;
+std::cin >> x;
+
+switch (x)
+{
+     case 1:
+          std::cout << "yo" << std::endl;
+          break;
+          
+     case 2:
+          std::cout << "right ..." << std::endl;
+
+     case 3:
+          std::cout << "oh?" << std::endl;
+          break;
+}
+std::cout << "out of switch" << std::endl;
+\end{console}
+
+Run this with several values for x including for instance x = 0 and x =
+100.
+
+\newpage\EMPHASIZE{Gotchas}
+
+Here are some gotchas ... and good source of trick questions for the
+instructor :)
+
+Each of the following exercises shows you a gotcha for beginning C/C++
+programmer. Make sure you find it.
+
+\begin{ex}
+Find the bug:
+\begin{console}
+int x = 0;
+std::cin >> x;
+switch x
+{
+     case 1:
+          std::cout << "what?" << std::endl;
+          break;
+          
+     case 2:
+          std::cout << "oh?" << std::endl;
+          
+     case 3:
+          std::cout << "huh?" << std::endl;
+          break;
+}
+std::cout << "out of switch" << std::endl;
+\end{console}
+\end{ex}
+
+\begin{ex}
+Find the bug:
+\begin{console}
+int x = 0;
+std::cin >> x;
+switch (x)
+{
+        case < 1 :
+             std::cout << "what?" << std::endl;
+             break;
+             
+        case 2:
+             std::cout << "oh?" << std::endl;
+             
+        case 3:
+             std::cout << "huh?" << std::endl;
+             break;
+}
+std::cout << "out of switch" << std::endl;
+\end{console}
+\end{ex}
+
+
+\begin{ex}
+Bug, bug, bug! Find it! ...
+\begin{console}
+double x = 0;
+std::cin >> x;
+switch (x)
+{
+        case 1.1:
+             std::cout << "what?" << std::endl;
+             break;
+             
+        case 1.2:
+             std::cout << "oh?" << std::endl;
+        
+        case 1.3:
+             std::cout << "huh?" << std::endl;
+             break;
+}
+std::cout << "out of switch" << std::endl;
+\end{console}
+\end{ex}
+
+\begin{ex}
+Where's that sneaky bug??
+\begin{console}
+int x = 0;
+std::cin >> x;
+int y = 1;
+switch (x)
+{
+        case y:
+             std::cout << "what?" << std::endl;
+             break;
+
+        case 2:
+             std::cout << "oh?" << std::endl;
+
+        case default:
+             std::cout << "huh?" << std::endl;
+             break;
+}
+std::cout << "out of switch" << std::endl;
+\end{console}
+\end{ex}
+
+\begin{ex}
+Recall that a character is the ``atom'' of a string.
+The name of the character type is \texttt{char}. You can declare character
+variables, get character values from the keyboard, and print the
+character value of a character variable. Try this:
+\begin{console}
+char x = ' ';
+std::cin >> x;
+std::cout<< x << std::endl;
+\end{console}
+Now here' s the question: Can you use characters for the
+cases?
+\begin{console}
+int x, y;
+char op;
+std::cout << "x: ";
+std::cin >> x;
+std::cout << "y: ";
+std::cin >> y;
+std::cout << "operator (+ or -): ";
+std::cin >> op;
+switch (op)
+{
+        case '+':
+             std::cout<< x + y<< std::endl;
+             break;
+             
+        case '-':
+             std::cout<< x - y<< std::endl;
+             break;
+        
+        default:
+             std::cout<< "no such op<<
+             std::endl;
+             break;
+}
+std::cout<< "out of switch << std::endl; 
+\end{console}
+\end{ex}
+Add all the binary integer operators you know so far to the above
+program.
+
+\newpage\EMPHASIZE{Coding style}
+
+Good::
+\begin{console}
+switch (x)
+{
+        case 1:
+             std::cout << "what?" << std::endl;
+             break;
+             
+        case 2:
+        case 3:
+             std::cout << "oh?" << std::endl;
+             break;
+             
+        default:
+             std::cout << "huh?" << std::endl;
+}
+
+\end{console}
+This is also perfectly OK: :
+\begin{console}
+switch (x)
+{
+        case 1:
+        {
+             std::cout << "what?" << std::endl;
+             break;
+        }
+        
+        case 2:
+        case 3:
+        {
+             std::cout << "oh?" << std::endl;
+             break;
+        }
+        
+        default:
+        {
+             std::cout << "huh?" << std::endl;
+        }
+}
+\end{console}
+\newpage\EMPHASIZE{More information}
+
+Actually you can use the value of an \EMPHASIZE{integer expression} and not
+just a variable to determine the flow of execution:
+\begin{console}[commandchars=\~\@\$]
+int x = 0;
+std::cin >> x;
+int y = 1;
+switch (~textbf@x + y$)
+{
+        case 1:
+             std::cout << "yo" << std::endl;
+             break;
+        
+        case 2:
+             std::cout << "right ..." << std::endl;
+
+        case 3:
+             std::cout << "oh?" << std::endl;
+             break;
+}
+std::cout << "out of switch" << std::endl;
+\end{console}
+
+And although you cannot use variables for the case values, you can use
+\EMPHASIZE{integer constants} or even \EMPHASIZE{constant integer
+expressions:}
+
+\begin{console}[commandchars=\~\@\$]
+int x = 0;
+std::cin >> x;
+const int y = 1;
+const int z = 2;
+switch (x)
+{
+        case y + z + 1:
+             std::cout << "yo" << std::endl;
+             break;
+        
+        case 2:
+             std::cout << "right ..." << std::endl;
+
+        case 3:
+             std::cout << "oh?" << std::endl;
+             break;
+}
+std::cout << "out of switch" << std::endl;
+\end{console}
+
+\newpage\EMPHASIZE{Summary}
+
+The statement looks like this:
+
+switch (\texttt{{[}int expr{]}})
+
+\{
+
+case \texttt{{[}const int expr{]}}:
+
+\texttt{ {[}stmt{]}}
+
+...\\
+\}
+
+or
+
+switch (\texttt{{[}int expr{]}})
+
+\{
+
+case \texttt{{[}const int expr{]}}:
+
+\texttt{ {[}stmt{]}}
+
+...
+
+default:
+
+\texttt{ {[}stmt2{]}}\\
+\}
+
+where \texttt{{[}stmt{]}} and \texttt{{[}stmt2{]}} are either statements or
+blocks of statements. \texttt{{[}int expr{]}} is an expression that can be
+evaluated to an integer and \texttt{{[}const int expr{]}} is a constant
+integer expression.
+
+Once the flow of execution enters a case, it will execute all the
+statements in that case until a break or end of switch block is reached.
+If there is no break, execution will continue with the statements of the
+next case without checking the value for that case, if there is one.
+
+On executing the \texttt{break} statement in a \texttt{switch} statement,
+flow of control will resume to the statement immediately after the
+\texttt{switch} statement.
+
+\newpage\EMPHASIZE{Exercise.}
+
+\begin{ex}
+Q1. Read this program carefully. Determine which part of the program can
+be rewritten using the switch statement. Rewrite it and test it.
+\begin{console}
+int numHeads = 0;
+std::cout<< "How many heads do you have? ";
+std::cin >> numHeads;
+
+if (numHeads< 1)
+{
+    std::cout<< "Huh" << std::endl;
+}
+else
+{
+     if (numHeads == 1)
+     {
+         std::cout << "Let me introduce you to our << "surgeons"
+                   << std::endl;
+     }
+     else
+     {
+          if (numHeads == 2)
+          {
+              std::cout << "Are you Zaphod?";
+          }
+          else
+          {
+              std::cout << "You have way too many"
+                       << std::endl;
+          }
+     }
+}
+\end{console}
+\end{ex}
+
+\begin{ex}
+Q2. Rewrite the nested if-else statement using the switch statement:
+\begin{console}
+int x = 0;
+std::cin >> x;
+
+int y = 0;
+
+if (x == 0)
+{
+    y = 5;
+}
+else if (x == 1 || x == 2 || x == 3)
+{
+    y = 7;
+}
+else if (x == 6 || x == 7 || x = 42)
+{
+    y = 0;
+}
+std::cout << y << std::endl;
+\end{console}
+\end{ex}
+Avoid code duplication!
+\begin{ex}
+Q3. Write a program that declares four integer constants N, S, E, W.
+with values 0, 1, 2, 3 respectively. Generates a random integer from 0
+to 3. If the random integer is N, print ``go north''. If the random
+integer is S, print ``go south''. If the random integer is E, print ``go
+east''. If the random integer is W, print ``go west''. Use a
+\texttt{switch} statement.
+\end{ex}

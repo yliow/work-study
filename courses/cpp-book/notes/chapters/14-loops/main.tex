@@ -1,0 +1,1102 @@
+\newpage\EMPHASIZE{14. Loops}
+
+Objectives
+
+Don't worry \ldots I won't be
+introducing more loop syntax.
+
+In this section we'll look at more examples.
+Ill also give some general comments, suggestions,techniques, warnings etc.
+
+We'll start off with two reviews \ldots general advice
+on when you should use a for-loop and when you should use \texttt{while}-loop ...
+
+\newpage\EMPHASIZE{When do I use the \texttt{for}-Loop?}
+
+I've already shown you that you can always rewrite a \texttt{for}-loop into a \texttt{while}-loop and vice versa.
+
+So ... how do you choose which type of loop to use?
+
+The general advice is simple: If your loop has a control (index or
+counter) variable that runs across a sequence of values without user
+intervention and the control variable changes in a predictable way, you
+should use the for-loop. The user might need to ``configure'' this
+sequence: for instance, by specifying a starting value and an ending
+value and how to step through the intermediate values. But once
+that's done, the control variable in the for-loop should
+run without user intervention.
+
+Otherwise you should use the \texttt{while}-loop.
+
+Look at this familiar example:
+\begin{console}
+int start = 0, end = 0, step = 0;
+std::cin >> start >> end >> step;
+
+int sum = 0;
+for (int i = start; i <= end; i += step)
+{   
+    sum += i;
+}
+std::cout << sum << std::endl; 
+\end{console}
+
+Note that the loop is controlled by \texttt{i} and \texttt{i} steps through
+a sequence with the starting and ending values known before the loop
+starts.
+
+Note that the control variable is only used in loop through some
+statements to achieve a goal. Look at the above example: The control
+variable is defined within the for-loop. After the for-loop, the control
+variable is destroyed.
+
+The next section shows you a situation where the data to process is
+entered by the user and hence cannot be predicted ahead of time.
+
+\newpage\EMPHASIZE{When do I use the \texttt{while}-Loop?}
+
+Suppose you want to write a program that adds numbers for a user but you
+do not know in advance how many numbers to add. Of course you need to
+give the user an opportunity to stop the adding process! There are two
+ways of doing this. Either you can ask the user each time if he/she
+wants to enter a number to add or to stop, or ... you can use a
+\EMPHASIZE{sentinel value}. This is a special value entered by the user to
+indicate that the processing loop should stop.
+
+Let's try the simplest possible example. This program
+prompts the user until he/she enters a sentinel value.
+I'm choosing -1 to be the sentinel value.
+
+
+\EMPHASIZE{i dont know how to properly format this right now}
+prompt user for data
+while value of data is not sentinel value:
+process data
+prompt user for data
+Note that there is code duplication:
+prompt user for data
+while value of data is not sentinel value:
+process data
+prompt user for data
+
+\EMPHASIZE{Removing Duplication in the sentinel \texttt{while}-loop}
+
+Look at the sentinel while-loop again:
+
+\EMPHASIZE{i dont know how to properly format this right now}
+prompt user for data
+while value of data is not sentinel value:
+process data
+prompt user for data
+
+Remember that there is code duplication. If you want to get rid of code
+duplication, you can do this:
+
+while (1): // don't forget that 1 is type cast to true
+prompt user for data
+if value is the sentinel value:
+break
+process data
+
+Note that some people do not like \texttt{break}s because
+it's harder to tell when you get out of a loop because
+you can issue a \texttt{break} statement anywhere in the body of the
+\texttt{while} loop. They prefer the exit condition in the header of the
+\texttt{while} loop so that visually one can tell quickly when you get out
+of the loop.
+
+Using the above technique, the following program:
+
+\begin{console}[commandchars=\~\@\$]
+int i = 0, sum = 0;
+
+~textbf@std::cout << "gimme a number: "; // INPUT$
+~textbf@std::cin >> i;$
+while (~textbf@i != -1$) ~textbf@// CONDITION TO REPEAT LOOP$
+{     
+      sum += i;
+      
+      ~textbf@std::cout << "gimme a number: "; // INPUT$
+      ~textbf@std::cin >> i;$
+}
+std::cout << "sum: " << sum << std::endl;
+\end{console}
+becomes:
+\begin{console}[commandchars=\~\@\$]
+int i = 0, sum = 0;
+while (1)
+{     
+      ~textbf@std::cout << "gimme a number: "; // INPUT$
+      ~textbf@std::cin >> i;$
+      ~textbf@if (i == -1) break; // CONDITION TO EXIT LOOP$
+      
+      sum += i;
+}
+std::cout << "sum: " << sum << std::endl;
+\end{console}
+Make sure you study this program carefully!!!
+
+\begin{ex}
+Rewrite the above program so that in addition to exiting the
+loop when the term entered in 0 (i.e., use a sentinel value of 0), the
+program also exits the loop when the sum exceeds 10.
+\end{ex}
+\begin{ex}
+Using this structure of the while-loop for data processing,
+rewrite your previous program that computes the product of integers
+entered by the user. Use a sentinel value of 0.
+\end{ex}
+\newpage\EMPHASIZE{Example: sentinel value}
+
+Here's an easy example. Write a simple cash register program. The program prompts the cashier for the number of items and the unit price per line item (yes, it's a lousy point-of-sale program). There is a tax of 20\% (this is probably in New York).
+
+\begin{console}
+const double TAX = 0.2;
+double total = 0.0;
+double price = 0.0;
+int num = 0;
+
+while (1)
+{     
+      std::cout << "units: ";
+      std::cin >> num;
+
+      std::cout << "unit price: ";
+      std::cin >> price;
+
+      double cost = num * price * (1 + TAX);
+      std::cout << "please pay " << cost
+                << std::endl;
+} 
+\end{console}
+
+The problem is that the program doesn't stop!!!
+
+\begin{ex}
+Add code to this program so that when the cashier
+enters 0 for number of items, the program gets out of the loop.
+\end{ex}
+\begin{ex} Add code to print the warning ``units cannot be
+negative'' and \texttt{continue} when \texttt{num} is negative.
+\end{ex}
+\begin{ex} Add code to print the warning ``unit price cannot be
+negative'' and \texttt{continue} when \texttt{price} is negative.
+\end{ex}
+\begin{ex} Add a running total so that the cashier can double
+check the amount in the till at the end of the day.
+\end{ex}
+Of course for a real business application, the POS register would be
+networked to a database server containing the product catalog and you
+simply scan the UPC to retrieve the unit price. The data computed is
+stored in a database directly. And of course you can have more than one
+line item per sale.
+
+Note that with multiple \texttt{continue}s, it makes the program harder to
+read. This is similar to the situation where there are multiple breaks
+in the body of the while-loop. Can you rewrite the above program so that
+there are no continues?
+
+\newpage\EMPHASIZE{Other conditions}
+
+So far we have seen two different ways for a loop to terminate:
+
+\begin{itemize}
+\item
+  when a control variable has finished running over it's
+  sequence (for-loop)
+\item
+  when a data input is a sentinel value (while-loop)
+\end{itemize}
+
+Of course loops can terminate based on other types of conditions.
+It's impossible to list all possible cases!!! You have
+to analyze each case carefully to see what's the right
+thing to do.
+
+\newpage\EMPHASIZE{Example: counting digits}
+
+Here's a problem where the condition does not depend on
+continually prompting the user for an input. Therefore there is
+\EMPHASIZE{no sentinel value}. You will see that there is also no control
+variable -- so you definitely should not expect a for-loop.
+
+Pay attention to the way I slowly work through the problem until I see
+the loop.
+
+Suppose the user enters an integer and you want to count the number of
+digits in that integer.
+
+For instance if the user enters 134, your program must display 3. If the
+user enters 97531, your program must display 5.
+
+So how do you do that? If you count the digits from the right to left,
+you can think of moving a finger one digit at a time and counting each
+digit your finger passed by:
+
+%ISSUE: whatever the best way of actually displaying ^ is can be found later when less important things need to be done
+\tab[3em]{97531\^{}}\\
+\tab[3em]{9753\^{}$^{1}$\tab[3em]{1 digit}}\\
+\tab[3em]{975\^{}$^{31}$ \tab[3em]{2 digits}}\\
+\tab[3em]{97\^{}$^{531}$   \tab[3em]{3 digits}}\\
+\tab[3em]{9\^{}$^{7531}$     \tab[3em]{4 digits}}\\
+\tab[3em]{\^{}$^{97531}$      \tab[3em]{5 digits}}\\
+\tab[3em]{(\scalebox{2}{$^{}$} = your finger.)}\\
+
+Now you notice that the digits you've passed does not
+affect the rest of your digit-counting process. So let's
+throw them away:\\
+\tab[3em]{97531\^{}}\\
+\tab[3em]{9753\^{}\tab[3em]{1 digit}}\\
+\tab[3em]{975\^{} \tab[3em]{2 digits}}\\
+\tab[3em]{97\^{}   \tab[3em]{3 digits}}\\
+\tab[3em]{9\^{}     \tab[3em]{4 digits}}\\
+\tab[3em]{\^{}      \tab[3em]{5 digits}}\\
+
+Now, the symbol for our finger doesn't help.
+Let's get rid of that too:\\
+
+\begin{align*}
+97531\\
+9753 &\quad\text{1 digit}\\
+975 &\quad\text{2 digits}\\
+97 &\quad\text{3 digits}\\
+9 &\quad\text{4 digits}\\
+\end{align*}
+Well ... that sure looks like removing the rightmost digit (one at a
+time) to me. And we already know how to do that: just do integer
+division by 10!!! If we do that, then the last number should be zero:\\
+\begin{align*}
+97531\\
+9753 &\quad\text{1 digit}\\
+975 &\quad\text{2 digits}\\
+97 &\quad\text{3 digits}\\
+9 &\quad\text{4 digits}\\
+0 &\quad\text{5 digits}\\
+\end{align*}
+Of course the number that is going up (the 1, 2, 3, 4, 5) requires a
+variable. Let's call it x. And let's say
+the number we're working on (the number entered by the
+user) is placed in variable n.
+
+Now when does the process \EMPHASIZE{stop}? When we see a zero in the left
+column of the above simulation, right? So the process seems to be this:
+\begin{align*}
+\text{prompt user for integer n}\\
+\text{if n is not zero, n = n / 10 and x = 1}\\
+\text{if n is not zero, n = n / 10 and x = 2}\\
+\text{if n is not zero, n = n / 10 and x = 3}\\
+\text{if n is not zero, n = n / 10 and x = 4}\\
+\text{if n is not zero, n = n / 10 and x = 5}\\
+\text{n is zero. Stop.}\\
+\end{align*}
+We need to write this as an algorithm. Obviously there's
+a loop here!!! You want the statements
+\begin{align*}
+\text{if n is not zero, n = n / 10 and x = 1}\\
+\text{if n is not zero, n = n / 10 and x = 2}\\
+\text{if n is not zero, n = n / 10 and x = 3}\\
+\text{if n is not zero, n = n / 10 and x = 4}\\
+\text{if n is not zero, n = n / 10 and x = 5}\\
+\end{align*}
+to be replaced by one statement. You can ``combine'' them like this:
+
+\begin{align*}
+\text{if n is not zero, n = n / 10 and x = x + 1}\\
+\text{if n is not zero, n = n / 10 and x = x + 1}\\
+\text{if n is not zero, n = n / 10 and x = x + 1}\\
+\text{if n is not zero, n = n / 10 and x = x + 1}\\
+\text{if n is not zero, n = n / 10 and x = x + 1}\\
+\end{align*}
+
+AHA! They are all the same! Of course x does not have an initial value.
+You need to initialize it. And based on the above example, you can see
+that x should be initialized to 0. Now you can write the following very
+easily:
+\begin{align*}
+\text{while n is not 0:}\\
+&\quad\text{n = n / 10}\\
+&\quad\text{x = x + 1}\\
+\end{align*}
+Here's the code:
+
+\begin{console}
+int n = 97531;
+int numDigits = 0;
+
+while (n != 0)
+{     
+      n /= 10;
+      ++numDigits;
+      std::cout << n << ' '<< numDigits << std::endl;
+}
+
+std::cout << numDigits << std::endl; 
+\end{console}
+
+I've inserted print statements to get the program to show us the intermediate steps. And instead of \texttt{x}, I'm using \texttt{numDigits} which is a lot more descriptive.
+
+Yes, of course you can rewrite the while-loop as a for-loop:
+
+\begin{console}
+int numDigits;
+
+for (numDigits = 0; n != 0; ++numDigits)
+{   
+    n /= 10;
+    std::cout << n << ' ' << numDigits << std::endl;
+} 
+\end{console}
+
+Although it's not wrong, note that the for-loop does not really use a control variable: the variable updated (i.e. numDigits) is the variable in the boolean expression (i.e. n). This is an indication that the while-loop is probably best.
+
+Remember: If the loop doesn't look like a for-loop
+(i.e., there's no single variable that runs across a
+sequence of values), then don't use it. Use the
+while-loop instead.
+
+\begin{ex} There's just one problem. Run it with
+n = 0. What do you get? How many digit(s) do you see in the number 0? Of
+course the number 0 has 1 digit. This is a special case. So the
+pseudocode looks like this:
+
+\begin{console}
+if n is 0:
+   numDigits = _____             
+else
+   use the above digit removing algorithm to compute numDigits 
+\end{console}
+Correct the program. Test your program thoroughly.
+\end{ex}
+\newpage\EMPHASIZE{Error-checking for a sentinel while-loop}
+
+The following is a structure for the while-loop that includes checks for
+breaking and data validation:
+\begin{align*}
+\text{some initialization}\\
+\text{while (1):}\\
+&\text{get data}\\
+&\text{if data is sentinel value:}\\
+&\tab[3em]{\text{break}}\\
+&\text{if data is not valid:}\\
+&\tab[3em]{\text{print warning}}\\
+&\tab[3em]{\text{continue}}\\
+&\text{process data}\\
+\end{align*}
+OR
+\begin{align*}
+\text{some initialization}\\
+\text{while (1):}\\
+&\text{get data}\\
+&\text{if data is sentinel value:}\\
+&\tab[3em]{\text{break}}\\
+&\text{if data is not valid:}\\
+&\tab[3em]{\text{print warning}}\\
+&\text{else:}\\
+&\tab[3em]{\text{process data}}\\
+\end{align*}
+The second version removes the presence of \texttt{continue}. Make sure
+you understand that they work the same!!! You can use either version in
+your programs.
+
+\begin{ex} Write a program that prompts the user for positive
+integers and computes the sum of the square root of the integers entered
+by the user. Of course, you can't compute the square
+root of a negative number, right? The program terminates when the user
+enters 0. The program prints a warning when a negative value is entered.
+\end{ex}
+
+Although this is usually not mentioned in most textbooks, the above is a
+very standard structure of the loop used in the industry, if you need to
+use it at all. In general, alternative flow of execution must be bunched
+up together in a spot which is easy to find. We won't
+have time to talk too much about this topic, but in writing robust
+software there are concepts such as assertions, exceptions,
+pre-conditions, post-conditions, etc. which are all related to catching
+or verification of error conditions. They are all related to flow of
+control. These controls are also usually placed at the ``usual'' places,
+near the top or the bottom of certain structures. I
+won't elaborate on ``assertions, exceptions,
+pre-conditions, post-conditions'' -- you will learn some of these in
+future classes.
+
+\newpage\EMPHASIZE{Avoiding break and continue}
+
+The basic principle in programming is simple: don't do
+crazy things!
+
+In other words, don't try to surprise the reader
+(including yourself). Writing crazy stuff throws people off. It makes
+debugging really difficult -- that includes yourself!!!
+
+One corollary is that you should limit the number of exit points for
+your loops. This means not having too many \texttt{break}s in your loops.
+Likewise limit the number of \texttt{continue}s.
+
+\begin{ex}
+Rewrite this without the break.
+\begin{console}[commandchars=\~\@\$]
+int prod = 1;
+for (int i = 1; i <= 10; i++)
+{   
+    ~textbf@if (i == 5) break;$
+    prod *= i;
+}
+\end{console}
+\end{ex}
+
+\begin{ex} Rewrite the above without the \texttt{continue}.
+\begin{console}[commandchars=\~\@\$]
+int prod = 1;
+for (int i = 1; i <= 10; i++)
+{   
+    ~textbf@if (i == 5) continue;$
+    prod *= i;
+}
+\end{console}
+\end{ex}
+
+\newpage\EMPHASIZE{``Pushing'' the Control/Index/Counter Variable in the \texttt{for}-Loop (DIY)}
+
+Here's the program from the previous section:
+\begin{console}[commandchars=\~\@\$]
+int prod = 1;
+for (int i = 1; i <= 10; i++)
+{   
+    ~textbf@if (i == 5) continue;$
+    prod *= i;
+}
+\end{console}
+
+One method of terminating a for-loop early is what I call ``pushing the
+control variable'' . It looks like this:
+\begin{console}[commandchars=\~\@\$]
+int prod = 1;
+for (int i = 1; i <= 10; i++)
+{   
+    ~textbf@if (i == 5)$
+    ~textbf@{$
+        ~textbf@i == 11; // force i to have value to stop$
+                 ~textbf@// the for-loop$
+        ~textbf@continue;$
+    ~textbf@}$
+    prod *= i;
+}
+\end{console}
+
+
+Unfortunately this method requires knowing the bound of the values
+assumed by i and hence can be dangerous. Therefore ...
+DON'T DO IT!
+
+In fact, the general advice is this: \EMPHASIZE{A much as possible, do not
+modify the control/index/counter variable in the body of the for-loop.}
+
+\newpage\EMPHASIZE{WARNING: \texttt{break} and \texttt{continue} are shallow!}
+
+It's very important to remember that the break statement
+only breaks out of the loop the program is \EMPHASIZE{currently} in!!!
+
+\begin{console}
+for (int i = 0; i < 5; i++)
+{   
+    std::cout << "i: " << i << std::endl;
+    for (int j = 0; j < 5; i++)
+    {
+        if (j == 3) break; // WHERE DO YOU GO?
+        std::cout << " j: " << j << std::endl;
+    }
+}
+\end{console}
+
+Likewise continue only applies to the current loop:
+
+\begin{console}
+for (int i = 0; i < 5; i++)
+{   
+    std::cout << i << std::endl;
+    for (int j = 0; j < 5; i++)
+    {
+        if (j == 3) continue; // WHERE DO YOU GO?
+        std::cout << j << std::endl;
+} 
+\end{console}
+
+This is the same for nested while-loops or a for-loop containing a
+while-loop.
+
+\newpage\EMPHASIZE{Breaking out of Deeply Nested Loops}
+
+Now what if the break in the above example is really meant to break out
+of BOTH for-loops?
+
+One way to accomplish this would be to use a special boolean flag to
+indicate that a complete break is needed. Here's an
+example. Suppose you have this code:
+\begin{console}
+for (int i = 0; i < 10; i++)
+{   
+    ... SOME STATEMENTS ...
+    for (int j = 0; j < i; j++)
+    {   
+        if (j == 3)
+        {
+            // WANT TO BREAK OUT OF *BOTH* LOOPS
+        }
+    }
+    ... SOME STATEMENTS ...
+}
+\end{console}
+
+You modify it in this manner:
+\begin{console}[commandchars=\~\@\$]
+for (int i = 0; i < 10 && !stop; i++)
+{   
+    ... SOME STATEMENTS ...
+    ~textbf@bool stop = false;$
+    for (int j = 0; j < i; j++)
+    {
+        if ( j == 3 )
+        {  
+           ~textbf@stop = true;$
+           ~textbf@break; // break of of inner loop$
+        }
+    }
+    ~textbf@if (stop) break; // break out of outer loop$
+
+    ... SOME STATEMENTS ...
+}
+\end{console}           
+
+So in general (i.e. for both the for-loop and the while-loop) you have
+something like this:
+\begin{console}
+begin of loop1
+
+      bool stop = false
+      begin of loop2
+           if ([bool expr]):
+               stop = true
+               break
+      end of loop2
+end of loop1 
+\end{console}
+
+As you can see things can go \EMPHASIZE{pretty ugly}. The best is to try to
+simplify the actual for-loop or even the whole program whenever possible
+rather than trying to insert controls to break out in the middle of the
+for-loop (or while-loop).
+
+\begin{ex} Here's a simple drill. You own a
+certain number of banks (at most 100) and each bank has a certain number
+of accounts (at most 1000). This program helps you calculate how much
+you have altogether in the banks. When entering the amount in each
+account at a bank, if you enter 0, you will immediately go to the next
+bank and if you enter -1, the program will print the total and stop.
+Complete the program!
+
+\begin{console}
+double total = 0;
+for (int bank = 0; bank < 100; ++bank)
+{   
+    std::cout << "bank #" << i << '\n';
+    for (int account = 0; account <= 1000; ++account)
+    {   
+        std::cout << "account #" << account << "\n";
+        std::cout << "amount (0:next bank, -1:exit)";
+        double amount = 0;
+        std::cin >> amount;
+        if (amount == 0)
+        {  
+           // exit this for-loop and go to
+           // next bank
+        }
+        if (amount == -1)
+        {  
+           // exit both for-loops and go to
+           // print total
+        }
+        total += amount;
+     }
+}
+
+// print total
+std::cout << total << '\n'; 
+\end{console}
+\end{ex}
+\newpage\EMPHASIZE{Numerical Approximation}
+
+Look at this sum:
+
+\tab[6em]{\texttt{\ \ \ \ \ \ 1\ \ \ \ \ \ \ 1\ \ \ \ \ \ \ 1\ \ \ \ \ \ \ 1\ \ \ \ \ \ \ 1}}\\
+\tab[6em]{\texttt{t = ----- + ----- + ----- + ----- + -----}}\\
+\tab[6em]{\texttt{\ \ \ \ 1 * 1\ \ \ 2 * 2\ \ \ 3 * 3\ \ \ 4 * 4\ \ \ 5 * 5}}\\
+
+This is a sum of 5 terms. It's easy to write a program
+to compute the sum -- you have seen similar examples before.
+
+\begin{ex} Write a program that computes t. Should you use a
+for-loop or a while-loop? The value you get should be approximately
+1.46361.
+\end{ex}
+%if you had a gun to my head and told me to figure out why this doesnt correctly tab before 1*1 but does afterwards or i die i would pull the trigger for you
+\begin{ex} Now modify the above program to compute
+
+\texttt{\ \ \ \ \ \ 1\ \ \ \ \ \ \ 1\ \ \ \ \ \ \ 1\ \ \ \ \ \ \ 1\ \ \ \ \ \ \ 1\ \ \ \ \ \ \ \ 1}\\
+\texttt{t = ----- + ----- + ----- + ----- + ----- + -----}\\
+\texttt{\ \ \ \ 1 * 1\ \ \ 2 * 2\ \ \ 3 * 3\ \ \ 4 * 4\ \ \ 5 * 5\ \ \ 6 * 6}\\
+
+The value should be 1.49139. (If you get 1 then you know
+you're wrong.)
+\end{ex}
+
+\begin{ex} The first program of this section computes a sum of 5
+terms. The second computes a sum of six terms. Now do the obvious:
+Rewrite your program so that it prompts the user how many terms to use
+in the sum. Let's say the variable for the number of
+terms is n.
+\end{ex}
+\begin{ex} Modify your program to print the following values:
+\begin{console}
+  1
+-----
+1 * 1
+
+  1       1
+----- + -----
+1 * 1   2 * 2
+
+  1       1       1
+----- + ----- + -----
+1 * 1   2 * 2   3 * 3
+
+1         1       1       1
+----- + ----- + ----- + -----
+1 * 1   2 * 2   3 * 3   4 * 4
+
+  1       1       1       1       1
+----- + ----- + ----- + ----- + -----
+1 * 1   2 * 2   3 * 3   4 * 4   5 * 5
+
+up to
+
+  1       1       1              1
+----- + ----- + ----- + ... + -------
+1 * 1   2 * 2   3 * 3         10 * 10
+\end{console}
+You should get this:
+
+\begin{console}
+1
+1.25
+1.36111
+1.42361
+1.46361
+1.49139
+1.5118
+1.52742
+1.53977
+1.54977 
+\end{console}
+\end{ex}
+
+Now let the printout go up to a sum of 20 terms, then 30 terms, etc.
+Keep going until the first 5 decimal places stops changing.
+
+Basically, what you're doing in the previous exercises
+is to compute the approximations to
+\begin{console}
+      1       1       1       1       1
+s = ----- + ----- + ----- + ----- + ----- + ...
+    1 * 1   2 * 2   3 * 3   4 * 4   5 * 5
+\end{console}
+Note that this goes on forever. The reason why it stops changing after a
+while is that the term you're adding to the sum gets
+smaller and smaller ``very quickly'' :
+\tab[9em]{\texttt{
+\ \ 1
+-----
+i * i
+}}
+If you want to know more, you should take Calc 2. This is not a Calc
+class.
+
+(To the math folks: If you keep going forever you get
+
+\tab[9em]{$\frac{\pi^2}{6}$}
+
+correct?)
+
+Computations of approximations is important for many kinds of
+applications including scientific, mathematical, and business
+applications.
+
+Now suppose you work for NASA and you need to compute the above sum
+\begin{console}
+      1       1       1       1       1
+s = ----- + ----- + ----- + ----- + ----- + ...
+    1 * 1   2 * 2   3 * 3   4 * 4   5 * 5
+\end{console}
+(which goes on forever) up to 10 decimal places. You can do what we did
+early: Keep including more and more terms. You need to get C++ to reveal
+more decimal places (use \texttt{std::setprecision()}). That would be
+really time consuming.
+
+Another way is to let the for-loop run without an upper limit for i (how
+would you do that?) and when you see the first 10 decimal places not
+changing you can write it down (if you can see it scrolling by) and stop
+the program manually. But this might take a while and if you go out to
+lunch, the for-loop keeps running even after the first 10 decimal places
+stop changing. This is a waste of CPU time.
+
+We need to figure out how to stop the loop AUTOMATICALLY.
+
+By the way if you look at the term:
+\tab[3em]{\texttt{
+\ \ 1
+-----
+i * i
+}}
+obviously you want to avoid integer division. So in C++ you should do
+\begin{center}
+    \texttt{1.0 / (i * i)}
+\end{center}
+But besides fixing the division problem, you have another: recall that
+an int value in C++ does not go on forever. If you want to represent
+bigger numbers, you should do
+\begin{center}
+    \texttt{1.0 / (double(i) * i)}
+\end{center}
+i.e. even the denominator multiplication should be ``doubled'' -up.
+
+\begin{ex}
+Repeat the above example with this:
+\begin{console}
+      1       1       1       1       1
+s = ----- + ----- + ----- + ----- + ----- + ...
+    1*1*1   2*2*2   3*3*3   4*4*4   5*5*5
+\end{console}
+\end{ex}
+\begin{ex}
+Repeat the above example with this:
+\begin{console}
+      1       1       1 
+s = ----- + ----- + ----- + ...
+    1 * 1   3 * 3   5 * 5
+\end{console}
+\end{ex}
+\begin{ex}
+Repeat the above example with this:
+\begin{console}
+      1       1       1       1
+s = ----- - ----- + ----- - ----- ...
+    1 * 1   3 * 3   5 * 5   7 * 7
+\end{console}
+(WARNING: Note the alternating + and -- signs.)
+\end{ex}
+\begin{ex}
+Repeat the above example with this:
+\begin{console}
+    1    1      1        1          1
+s = - + --- + ----- + ------- + --------- + ...
+    1   1*2   1*2*3   1*2*3*4   1*2*3*4*5
+\end{console}
+\end{ex}
+
+\newpage\EMPHASIZE{Numerical Approximation: Stopping the Approximation Process}
+
+To really answer the last question, you need to know a little more math.
+So I'm going to simplify the problem.
+
+Instead of stopping the computation when the further computations will
+not change the first 10 decimal places, I'll replace the
+stopping condition with this: Stop the approximation process when the
+\EMPHASIZE{first 5 decimal places of two consecutive approximations are the
+same}. I'll give you the code structure for the general
+problem.
+
+What I mean is this. Suppose the following are values from an
+approximation and you want to stop when two consecutive approximations
+have the same first 3 decimal places:
+\begin{center}
+1.1 1.123 1.1345 1.1355 \textbf{1.1356} 1.1357
+\end{center}
+You should stop at the number in bold: Look at its first 3 decimal
+places and the first decimal places of the previous number. Get it?
+
+OK. Let's do it.
+
+Note that since you need to compare \EMPHASIZE{two consecutive
+approximations}, that tells you that the computer is thinking about two
+approximations at the same time: You need two variables to hold
+consecutive approximations. Let's use the previous
+values as a simulation. The values computed are:
+\begin{center}
+1.1 1.123 1.1345 1.1355 \textbf{1.1356} 1.1357
+\end{center}
+Let's call the two approximation variables a0, a1. You
+can also think of a0 and a1 scanning over the above numbers
+hand-in-hand:
+\begin{align*}
+1.1 &1.123 &1.1345 &1.1355 &\textbf{1.1356} &1.1357\\
+a0 &a1\\
+1.1 &1.123 &1.1345 &1.1355 &\textbf{1.1356} &1.1357\\
+&a0 &&a1\\
+1.1 &1.123 &1.1345 &1.1355 &\textbf{1.1356} &1.1357\\
+&&a0 &&&a1\\
+1.1 &1.123 &1.1345 &1.1355 &\textbf{1.1356} &1.1357\\
+&&&a0 &&&&a1\\
+\end{align*}
+and we stop at this point because the first three decimal places of a0
+and a1 at this point are the same.
+
+Hmmm ... it seems like we need to initialize a0 and a1 with the first
+two approximations. But there's something about the loop
+.... Look at the first two lines.
+\begin{align*}
+1.1 &1.123 &1.1345 &1.1355 &\textbf{1.1356} &1.1357\\
+a0 &a1\\
+1.1 &1.123 &1.1345 &1.1355 &\textbf{1.1356} &1.1357\\
+&a0 &&a1\\
+\end{align*}
+The pseudocode for the above two data lines looks like this:
+\begin{align*}
+&\text{compute first approximation and put into a0}\\
+&\text{compute second approximation and put in to a1}\\
+&\text{compute second approximation and put into a0}\\
+&\text{compute third approximation and put in to a1}\\
+\end{align*}
+But a better way is this:
+\begin{align*}
+&\text{compute first approximation and put into a0}\\
+&\text{compute second approximation and put in to a1}\\
+&\textbf{a0 = a1}\\
+&\text{compute third approximation and put in to a1}\\
+\end{align*}
+
+See it? By the way, note that the computation of the next (third)
+approximation should depend on the current (second) approximation. You
+don't have to do it from scratch. For instance, to
+compute
+\begin{console}
+  1       1       1
+----- + ----- + -----
+1 * 1   2 * 2   3 * 3
+\end{console}
+you just need to add \texttt{1.0/(3*3)} to
+\begin{console}
+  1       1
+----- + -----
+1 * 1   2 * 2
+\end{console}
+What about the ending condition? The right thing to do is to first
+compute the new approximation and then terminate the loop if a0 and a1
+are close enough, say they are less than 0.0001 apart. What does that
+mean? That means we stop the loop if either
+\[a0 -- a1 < 0.0001\]
+or
+\[a1 -- a0 < 0.0001\]
+In other words we stop if mathematically
+\[
+| a1 -- a0 | < 0.0001
+\]
+where $|$ ... $|$ means ``the absolute value of'' . In C++ the absolute value is given by the \texttt{abs()} function for integer values and \texttt{fabs()} for double. The above becomes
+\[
+fabs(a0 -- a1) < 0.0001
+\]
+You might need to \texttt{\#include <cmath>} to use the \texttt{abs()} or \texttt{fabs()} function.
+
+\begin{ex} Review \ldots try this:
+\begin{console}
+std::cout << abs(5) << std::endl;
+std::cout << abs(-5) << std::endl;
+std::cout << fabs(12.34) << std::endl;
+std::cout << fabs(-12.34) << std::endl; 
+\end{console}
+
+The pseudocode looks something like this:
+\begin{console}
+error = 0.00001
+approx0 = [some value]
+approx1 = [another value]
+while (|approx0 -- approx1| >= error):
+      approx1 = approx0
+      compute approx1 
+\end{console}
+\end{ex}
+This is correct but we can simplify the code. Look at the previous
+simulation:
+
+%% \begin{alignat*}{5}
+%% 1.1 &&1.123 &&1.1345 &&1.1355 &&\textbf{1.1356} &&1.1357\\
+%% a0 &a1\\
+%% 1.1 &1.123 &1.1345 &1.1355 &\textbf{1.1356} &1.1357\\
+%% a0 &a1\\
+%% 1.1 &1.123 &1.1345 &1.1355 &\textbf{1.1356} &1.1357\\
+%% a0 &a1\\
+%% 1.1 &1.123 &1.1345 &1.1355 &\textbf{1.1356} &1.1357\\
+%% a0 &a1\\
+%% \end{alignat*}
+
+It requires initializing a0 and a1 with the first two approximations.
+But I can initialize a0 with a dummy value say 0:
+
+
+As long as a1 is far enough from a0, I'm guaranteed that
+the approximation will be the same as the previous code.
+%% \begin{align*}
+%% 0.0 &1.1 &1.123 &1.1345 &1.1355 &\textbf{1.1356} &1.1357\\
+%% a0 &a1\\
+%% 0.0 &1.1 &1.123 &1.1345 &1.1355 &\textbf{1.1356} &1.1357\\
+%% 0.0 &a0 &&a1\\
+%% 0.0 &1.1 &1.123 &1.1345 &1.1355 &\textbf{1.1356} &1.1357\\
+%% 0.0 &&a0 &&&a1\\
+%% 0.0 &1.1 &1.123 &1.1345 &1.1355 &\textbf{1.1356} &1.1357\\
+%% &&&a0 &&&&a1\\
+%% \end{align*}
+
+For the above problem we have the following code:
+\begin{console}
+double error = 0.00001;
+double approx0 = 0.0;
+double approx1 = 1.0; // i.e. 1.0 / (1 * 1)
+int i = 1;
+while (abs(approx0 - approx1) >= error)
+{     
+      approx0 = approx1;
+      i++;
+      approx1 += 1.0 / (i * i);
+      std::cout << approx1 << std::endl;
+}
+\end{console}
+
+Verify by hand that your program works. For instance, use a calculator
+to compute 1 + 1/4 + 1/9 and look for this number in your output.
+
+Here's a curious problem. Look at the following sequence
+of numbers:
+
+\includegraphics[width=1.7228in,height=3.8689in]{Pictures/20000007000011180000266272DF6A152180D46C.svm}
+
+etc. Write a program to compute an approximation of this number.
+
+Stop the loop when consecutive approximations differ by at most 0.0001.
+
+Hint: What's the relationship between the last and the
+second last expressions above? If \texttt{x} is the second last, then the
+last is
+\tab[3em]{\texttt{
+\ \ \ \ \ \ 1
+1 + -----
+\ \ \ \ 1 + x
+}}
+See it?
+
+Here's the code:
+\begin{console}
+double error = 0.00001;
+double x = 0;
+double nextx = 1;
+while (fabs(x -- nextx) >= error)
+{     
+      x = nextx;
+      nextx = 1 + 1/(1 + x);
+}
+\end{console}
+
+For the math geeks: What number is it? Recognize it?
+
+\begin{ex} Here's an ancient algorithm for computing
+square roots known to the Babylonians. Suppose S is given and you want
+to compute the square root of S.
+
+\begin{enumerate}
+\item
+  Start with an arbitrary positive start value \texttt{x}_{0}
+  (the closer to the root, the better).
+\item
+  Let \texttt{x}_{\texttt{n}+1} be the average of
+  \texttt{x}_{\texttt{n}} and
+  \texttt{S}/\texttt{x}_{\texttt{n }}i.e.
+
+  \texttt{x}_{\texttt{n}+1} =
+  (1/2)(\texttt{x}_{\texttt{n}} +
+  \texttt{S}/\texttt{x}_{\texttt{n }})
+\item
+  Repeat step 2, until the desired accuracy is achieved.
+\end{enumerate}
+\end{ex}
+In other words, if you repeat the above algorithm, the sequence of
+values \texttt{x}_{\texttt{0 ,
+}}\texttt{x}_{\texttt{1,
+}}\texttt{x}_{\texttt{2}},\ldots, will get closer and closer to
+the actual square root of S.
+
+To understand how it works, try to run this algorithm with S = 1 and
+\texttt{x}_{0} = 1 to compute approximations to the square
+root of 1. Next try it with S = 2 and \texttt{x}_{0} =1 to
+compute the square root of 2.
+
+Write a program that prompts the user for an integer value S and
+computes an approximation. To start off, your first approximation
+\texttt{x}_{\texttt{0}} should be computed as follows:
+\texttt{x}_{\texttt{0 }}is the integer such that
+
+\texttt{x}_{\texttt{0}}^{\texttt{2}}_{\texttt{
+}}<= S <=
+(\texttt{x}_{\texttt{0}}+1)^{\texttt{2}}
+
+(Use a for-loop.) You should stop when two consecutive approximations
+agree up to 5 decimal places. [Obviously you should not use the pow()
+or sqrt() function for this problem!!!]
+
+\begin{ex} Here's another curious one: Design an
+approximation to this:
+
+REMEMBER TO UNCOMMENT INCLUDED GRAPHICS DURING SUBMISSION
+%\includegraphics[width=1.6437in,height=1.772in]{Pictures/2000000700001050000011952734137C967E276A.svm}
+
+if you go on forever.
+
+[Hint: If x is
+
+\includegraphics[width=0.9752in,height=0.3252in]{Pictures/20000007000009AC0000033A336371184F71CA60.svm}
+
+what is
+
+\includegraphics[width=1.2508in,height=0.3839in]{Pictures/2000000700000C68000003D0CD34451144393396.svm}
+
+in terms of x?]
+
+\newpage\EMPHASIZE{Queue}
+
+Look at our first example on approximations again. Once again we have
+two variables a0 and a1 and they scan over a bunch of values.
+
+%copy the other table above when its fixed
+
+You can also think about it this way: Think of a data structure (i.e.
+something that contains data and comes with operations):
+%make tikz table diagram here
+and data goes in at one end and comes out from the other end.
+%TIKZ DIAGRAM HERE
+The structure you see, as a blackbox, can keep two values. There are
+also operations on this structure: You can take things out of the
+structure and you can put things into this structure. The important
+thing is that the thing you take out is also the thing that has been in
+there the longest. Such a structure is called a
+\EMPHASIZE{first-in-first-out (FIFO)} data structure, also known as a
+\EMPHASIZE{queue}.
+
+\newpage\EMPHASIZE{Exercises}
+
+Q1. Recall that we already have a way of determining when a positive
+integer is prime. Write a program that prints the following
+\begin{center}
+n primes from 2 to n (primes from 2 to n) / n
+\end{center}
+where n runs from 1 to 100. This prints the so-called density of primes.
+If you make a plot of n and (primes from 2 to n) / n, you will see an
+interesting pattern.
+
+Q2. Modify the previous program so that you only print n when n is 100,
+200, 300, etc. Let n run up to 1000000.

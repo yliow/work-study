@@ -1,0 +1,1934 @@
+\newpage\EMPHASIZE{11. for Loops: Part 2}
+
+This is a continuation of our discussion of for-loops ...
+
+The three parts of the for-loop
+%TIKZ DIAGRAM GOES HERE
+
+Look at the structure of the for-loop:
+
+The statement looks like this:
+\begin{center}
+\EMPHASIZE{\texttt{for} (\texttt{[stmt1]}; \texttt{[bexpr]}; \texttt{[stmt2]})}
+\tab[1em]{\EMPHASIZE{\texttt{[stmt3]}}}
+\end{center}
+where \texttt{[stmt1], [stmt2], [stmt3]} are statements; \texttt{[stmt1]} and \texttt{[stmt2]} are written without a `;' since it's included in the above notation.
+
+\texttt{[stmt1]} is executed \EMPHASIZE{first} and it's executed exactly \EMPHASIZE{once}.
+
+After executing \texttt{[stmt1], [bexpr]} is evaluated.
+
+If the resulting value is \texttt{true}, \texttt{[stmt3]} is executed.
+After that \texttt{[stmt2]} is executed. And after that we repeat by
+evaluating \texttt{[bexpr].}
+
+If the resulting value of the \texttt{[bexpr]} is \texttt{false}, the
+program exits the \texttt{for}-loop and executes the statement after the
+\texttt{for}-loop.
+
+By the way, sometimes \texttt{[stmt1]} is sometimes called the \EMPHASIZE{initialization} statement of the for-loop while \texttt{[stmt2]} is called the \EMPHASIZE{update} statement. For the following code:
+\begin{console}
+for (int i = 0; i < 100; i++)
+{   
+    std::cout << i << std::endl;
+}
+\end{console}
+\texttt{i} is called the \EMPHASIZE{index or counter variable} of the
+for-loop.
+
+Two final terms:
+%TIKZ DIAGRAM HERE
+
+\newpage\EMPHASIZE{Leaving things out}
+
+Refer to the diagram from the previous section.
+
+Actually it turns out that you can leave out \texttt{[stmt1]}. Try this
+\begin{console}
+for (int i = 0; i < 5; i++)
+{   
+    std::cout << "i have " << i
+              << " head(s)"
+              << std::endl;
+}
+\end{console}
+And now modify it as follows:
+\begin{console}
+int i = 0;
+for (; i < 5; i++)
+{   
+    std::cout << "i have " << i
+              << " head(s)"
+              << std::endl;
+}
+\end{console}
+You can also leave the third part out as well!!!
+\begin{console}
+int i = 0;
+for (; i < 5;)
+{   
+    std::cout << "i have " << i
+              << " head(s)"
+              << std::endl;
+    i++;
+}
+\end{console}
+What if the second part is blank? Try this:
+\begin{console}
+int i = 0;
+for (;;)
+{   
+    std::cout << "i have " << i
+              << " head(s)"
+              << std::endl;
+    i++;
+}
+\end{console}
+(Pretty gross, isn't it? ...)
+
+This tells you that if the boolean expression is missing, C++ will
+assume you want the boolean value to be \EMPHASIZE{\texttt{true}}. Remember
+what I said before: you have to pay attention whenever C++ does
+something for you automatically.
+
+By the way, the above program is executing an \EMPHASIZE{infinite loop}
+(because it doesn't stop). This format of the for-loop is sometimes used in writing games, although we'll see that there's another type of loop called the
+\EMPHASIZE{\texttt{while-loop}} that is frequently used instead. Although in the above
+
+\tab[3em]{\texttt{for (;;)}}\\
+\tab[3em]{...}
+
+it seems like you can't get out of the loop. But, in fact, \EMPHASIZE{you
+can get out of the loop in another way}. We'll talk
+about it later.
+
+\newpage\EMPHASIZE{Why scopes?}
+
+Compare the following programs:
+\begin{console}
+int i = 0;
+int sum = 0;
+
+for (i = 0; i < 10; i++)
+{   
+    sum += i;
+}
+
+std::cout << sum << std::endl;
+\end{console}
+
+\begin{console}
+int sum = 0;
+
+for (int i = 1; i < 11; i++)
+{   
+    sum += i;
+}
+
+std::cout << sum << std::endl;
+\end{console}
+
+Their goals are the same: To compute and print the sum of integers from
+1 to 10.
+
+The only difference is in the scope of variable \texttt{i}. The scope of
+\texttt{i} is a lot smaller in the second program.
+
+If you think about it, the variable \texttt{i} is sort of like a
+``scratch''variable when compared to \texttt{sum}. You
+don't really need it once the computation of \texttt{sum}
+is completed. When you read the second program, you can very easily
+deduce the fact that \texttt{i} is a ``scratch'' variable from
+it's scope: it exists only in the \texttt{for}-loop.
+
+A complex problem is solved by breaking the problem into smaller and
+simpler subproblems. Once that's done you solve the
+simpler subproblems and put these subsolutions together to solve the big
+problem. One should be careful of the unintended effects of a
+subsolution -- a small piece of the solution overall -- on another.
+
+Here's an example. This program prints the sum from 1 to
+10 and then the sum from 1 to 100:
+\begin{console}
+int i;
+int sum = 0;
+
+for (i = 1; i < 11; i++)
+{   
+    sum += i;
+}
+
+// Print sum from 1 to 10
+std::cout << sum << std::endl;
+
+// Continue the summing process
+for (; i < 101; i++)
+{   
+    sum += i;
+}
+
+std::cout << sum << std::endl;
+\end{console}
+If you're working on a project with someone and you both
+have agreed that i is a scratch variable, he might use it like this in a
+computation of a formula involving \texttt{a, b, c, d, e, f}
+\begin{console}
+i = a + b;
+result = i + c + d + e + f;
+\end{console}
+He might just insert this into your code:
+\begin{console}[commandchars=\~\@\$]
+int i;
+int sum = 0;
+
+for (i = 1; i < 11; i++)
+{   
+    sum += i;
+}
+
+std::cout << sum << std::endl;
+
+~textbf@i = a + b;$
+~textbf@result = i + c + d + e + f;$
+
+for (; i < 101; i++)
+{   
+    sum += i;
+}
+
+std::cout << sum << std::endl;
+\end{console}
+
+Do you see how his work has now destroyed your computation?
+
+In general you want to have as little ``communication''as possible
+between your subsolutions when they are meant to be independent.
+
+One way to achieve that is to use small scopes. Look at this:
+\begin{console}[commandchars=\~\@\$]
+~EMPHASIZE@int i$;
+int sum = 0;
+
+for (~EMPHASIZE@int i = $}; i < 11; i++)
+{   
+    sum += i;
+}
+
+std::cout << sum << std::endl;
+
+i = a + b;
+result = i + c + d + e + f;
+
+for (~EMPHASIZE@int i = 1$; i < 101; i++)
+{   
+    sum += i;
+}
+
+std::cout << sum << std::endl;
+\end{console}
+
+There are really 3 i's. The first is outside both
+for-loops. The second is created only when you enter the first for-loop;
+this is destroyed when you exit the first for-loop. The third is created
+only when you enter the second for-loop; this is destroyed when you exit
+the second for-loop. They all live in different ``places''.
+
+\newpage\EMPHASIZE{Even more examples}
+
+Now for examples where the body of the \texttt{for}-loop is more complicated.
+
+Of course you can put \texttt{if}-statements in the \texttt{for}-loop. Run this:
+\begin{console}
+int sum = 0;
+for (int i = 1; i <= 10; ++i)
+{   
+    if (i == 3 || i > 7)
+    {
+        sum += i;
+        std::cout << i << " " << sum << std::endl;
+    }
+}
+\end{console}
+
+\begin{ex}
+Modify the above program by adding an else statement to the if
+statement that prints \texttt{i} and \texttt{" is not included"}.
+\end{ex}
+
+\begin{ex}
+Write a program that randomly generates 20 integers
+between 0 and 3.
+\end{ex}
+
+\begin{ex}
+Write a program that randomly generates 20 integers
+between 10 and 20 and continually sums up all of them, printing the sum
+in each iteration.
+\end{ex}
+\newpage\EMPHASIZE{Mixing two for-loops}
+
+Of course you can put a \texttt{for}-loop in a \texttt{for}-loop to get a double \texttt{for}-loop:
+\begin{console}
+for (int i = 0; i < 5; i++)
+{   
+    std::cout << "i:" << i << std::endl;
+    for (int j = 0; j < 3; j++)
+    {   
+        std::cout << " j:" << j << std::endl;
+    }
+}
+\end{console}
+Read the output very carefully!!!
+
+\begin{ex}
+Write a program that has a double for-loop and prints
+this
+\begin{console}
+3
+  1 2 3
+4
+  1 2 3
+5
+  1 2 3 
+\end{console}
+\end{ex}
+
+\begin{ex}
+Write a program that has a double \texttt{for}-loop and prints this
+\begin{console}
+3
+  0 1 2 3
+4
+  0 1 2 3 4
+5
+  0 1 2 3 4 5
+\end{console}
+\end{ex}
+
+\begin{ex} Write a program that has a double for-loop and prints
+this
+\begin{console}
+3
+  0 1 2
+4
+  0 1 2 3
+5
+  0 1 2 3 4
+\end{console}
+\end{ex}
+\begin{ex}
+Write a program that has a double for-loop and prints this
+\begin{console}
+3
+  0 1 2 3 4 5 6
+4
+  0 1 2 3 4 5 6 7 8
+5
+  0 1 2 3 4 5 6 7 8 9 10
+\end{console}
+\end{ex}
+
+\begin{ex}
+Write a program that has a double for-loop and prints
+this
+\begin{console}
+3
+  3 4 5 6
+4
+  4 5 6 7 8
+5
+  5 6 7 8 9 10
+\end{console}
+\end{ex}
+\begin{ex}
+Write the following program that prints a calendar
+month. The program prompts the user for three integers: the month, the
+year, and the day-of-week for the first day of the month (with 0
+representing Sunday, 1 representing Monday, etc.),. For instance, if the
+user entered
+\begin{console}[commandchars=\~\@\$]
+~textbf@3 2008 6$
+\end{console}
+It means that he/she wants the calendar for March 2008 and the first day
+of the month is a Saturday. The output is
+\begin{console}[commandchars=\~\@\$]
+March 2008
+--------------------
+Su Mo Tu We Th Fr Sa
+                   1
+ 2  3  4  5  6  7  8
+ 9 10 11 12 13 14 15
+16 17 18 19 20 21 22
+23 24 25 26 27 28 29
+30 31
+\end{console}
+Here's another test case:
+
+\begin{console}[commandchars=\~\@\$]
+~textbf@3 2008 4$
+March 2008
+--------------------
+
+Su Mo Tu We Th Fr Sa
+               1 2 3
+ 4  5  6  7  8  9 10
+11 12 13 14 15 16 17
+18 19 20 21 22 23 24
+25 26 27 28 29 30 31
+\end{console}
+Of course your program should be smart enough to compute the number of
+days in the month (including leap year cases for the month of February.)
+\end{ex}
+\newpage\EMPHASIZE{Some ASCII art}
+
+Now for some (silly) ASCII art.
+
+Try this:
+\begin{console}
+int numSpaces = 0;
+std::cout << "How far away is the star? ";
+std::cin >> numSpaces;
+
+for (int i = 0; i < numSpaces; i++)
+{   
+    std::cout << ' ';
+}
+std::cout << '*' << std::endl;
+\end{console}
+
+And this:
+\begin{console}
+int numStars = 0;
+std::cout << "How many stars? ";
+std::cin >> numStars;
+
+for (int i = 0; i < numStars; i++)
+{   
+    std::cout << '*';
+}
+std::cout << std::endl;
+\end{console}
+
+\newpage\EMPHASIZE{And more ASCII art}
+
+It can only get worse ...
+
+I want to draw a square of *. The square has width 5 and height 3. First
+I draw a horizontal line:
+\begin{console}
+// Draw horizontal line
+for (int i = 0; i < 5; i++)
+{   
+    std::cout << '*';
+}
+\end{console}
+
+OK. Now, I just draw the horizontal line 3 times:
+\begin{console}
+for (int j = 0; j < 3; j++)
+{   
+    // Draw horizontal line
+    for (int i = 0; i < 5; i++)
+    {   
+        std::cout << '*';
+    }
+}
+\end{console}
+
+Oops! How come I get a straight line??? Well, of course after drawing a
+horizontal line, I need to skip my cursor to the next line:
+\begin{console}
+for (int j = 0; j < 3; j++)
+{   
+    // Draw horizontal line
+    for (int i = 0; i < 5; i++)
+    {   
+        std::cout << '*';
+    }
+    std::cout << std::endl;
+}
+\end{console}
+
+
+The boolean condition in the for-loop can be any boolean expression. So
+instead of drawing 3 lines, you can prompt the user for number of lines
+to draw instead.
+\begin{console}[commandchars=\~\@\$]
+~textbf@int height = 0;$
+~textbf@std::cin >> height;$
+for (int j = 0; j < ~textbf@height$; j++)
+{   
+    // Draw horizontal line
+    for (int i = 0; i < 5; i++)
+    {   
+        std::cout << '*';
+    }
+    std::cout << std::endl;
+}
+\end{console}
+
+
+\begin{ex}
+Now modify the program so that it prompts the user for the
+width of the square. (Obviously you must draw the square with that
+width).
+\end{ex}
+
+\newpage\EMPHASIZE{Unrolling the \texttt{for}-loop: How to see the \texttt{for}-loop}
+
+Sometimes it's hard to come up with the appropriate for-loop. In that case it's always easier to \EMPHASIZE{``unroll''} the for-loop for several special cases by hand. Unrolling a for-loop is just writing down what the program executes without using the for-loop. For instance, unrolling the following:
+\begin{console}
+for (int i = 0; i < 3; i++)
+{   
+    std::cout << i << std::endl;
+}
+
+gives us
+\begin{console}
+std::cout << 0 << std::endl;
+std::cout << 1 << std::endl;
+std::cout << 2 << std::endl;
+\end{console}
+For instance, suppose you want the program to draw this:
+\begin{console}
+*
+**
+***
+****
+\end{console}
+if the user enters 4 (this is a triangle). And if he enters 3, the
+program draws:
+\begin{console}
+*
+**
+***
+\end{console}
+So just take a special case, say when the user enters 3, and write the
+pseudocode \EMPHASIZE{without the for-loop}:
+\begin{console}
+draw a line of length 1
+draw a line of length 2
+draw a line of length 3
+\end{console}
+The pseudocode for height 4 is
+\begin{console}
+draw a line of length 1
+draw a line of length 2
+draw a line of length 3
+draw a line of length 4
+\end{console}
+Of course you want to write one program and not two! The program must
+work for both cases. We must find a way to ``combine''them.
+
+The first pseudocode ... \EMPHASIZE{NOT C++!!!} ... can be written:
+\begin{console}
+for i = 1, 2, 3:
+           draw a line of length i
+\end{console}
+and the second can be written:
+\begin{console}
+for i = 1, 2, 3, 4:
+           draw a line of length i
+\end{console}
+
+Now they are almost the same! If the height entered by the user is kept
+in variable h, then the pseudocode is
+\begin{console}
+for i = 1, 2, ..., h:
+           draw a line of length i
+\end{console}
+AHA! \EMPHASIZE{This pseudocode works for both!!!}
+
+Of course you already know how to draw a line (of stars) of length i. So
+altogether the pseudocode becomes:
+\begin{console}
+for i = 1, 2, ..., h:
+         for j = 1, 2, ..., i:
+                 draw a star
+         go to the next line
+\end{console}
+
+And finally a straightforward translation to C++ gives:
+\begin{console}
+for (int i = 1; i <= h; i++)
+{   
+    for (int j = 1; j <= i; j++)
+    {
+        std::cout << '*';
+    }
+    std::cout << std::endl;
+}
+\end{console}
+Now we add the icing by prompting the user for h:
+\begin{console}
+int h = 0;
+std::cin >> h;
+for (int i = 1; i <= h; i++)
+{   
+    for (int j = 1; j <= i; j++)
+    {   
+        std::cout << '*';
+    }
+std::cout << std::endl;
+}
+\end{console}
+
+\newpage\EMPHASIZE{Unrolling the for-loop: Another example}
+
+What about this? If the user enters 3 your program has to draw:
+\begin{console}
+  ***
+ ***
+***
+\end{console}
+If the user enters 4 your program has to draw
+\begin{console}
+   ****
+  ****
+ ****
+****
+\end{console}
+The pseudocode for the case when the user enters 3 is (without using the
+for-loop):
+\begin{console}
+draw 2 spaces
+draw 3 stars
+draw 1 space
+draw 3 stars
+draw 3 stars
+\end{console}
+The trick is to make everything as uniform as possible. So write this:
+\begin{console}[commandchars=\~\@\$]
+draw 2 spaces
+draw 3 stars
+draw 1 space
+draw 3 stars
+~textbf@draw 0 space$
+draw 3 stars
+\end{console}
+See the pattern yet? No?
+
+The interleaving of two different things is confusing. Rewrite this as:
+\begin{console}
+draw 2 spaces; draw 3 stars
+draw 1 space; draw 3 stars
+draw 0 space; draw 3 stars
+\end{console}
+What if the user enters 4? The pseudocode becomes
+\begin{console}
+draw 3 spaces; draw 4 stars
+draw 2 spaces; draw 4 stars
+draw 1 space; draw 4 stars
+draw 0 space; draw 4 stars
+\end{console}
+How do you combine the above cases into one common pseudocode?
+
+The first is
+\begin{console}
+for i = 2, 1, 0:
+        draw i spaces; draw 3 stars
+\end{console}
+The second is
+\begin{console}
+for i = 3, 2, 1, 0:
+        draw i spaces; draw 4 stars
+\end{console}
+
+Now both pseudocodes are almost the same!!! Suppose the value entered by
+the user is kept in a variable n. Then you can (finally!) combine both
+pseudocodes into one:
+\begin{console}
+for i = n-1, ..., 0:
+        draw i spaces; draw n stars
+\end{console}
+
+Now you add in the details:
+\begin{console}
+for i = n-1, ..., 0:
+      // draw i spaces
+      for j = 1, ..., i
+          draw a space
+      // draw n stars
+      for j = 1, ..., n
+          draw a star
+      go to next line
+\end{console}
+
+And finally a straightforward translation to C++ yields:
+\begin{console}
+for (int i = n - 1; i >= 0; i--)
+{   
+    for (int j = 1; j <= i; j++)
+    {
+        std::cout << ' ';
+    }
+    for (int j = 1; j <= n; j++)
+    {
+        std::cout << '*';
+    }
+    std::cout << std::endl;
+}
+\end{console}
+Adding the prompt (and some comments) we get:
+\begin{console}
+int n = 0;
+std::cin >> n;
+for (int i = n-1; i >= 0; i--)
+{   
+    // Print i spaces
+    for (int j = 1; j <= i; j++)
+    {
+        std::cout << ' ';
+    }
+    // Print n stars
+    for (int j = 1; j <= n; j++)
+    {
+        std::cout << '*';
+    }
+    std::cout << std::endl;
+}
+\end{console}
+\begin{ex} Write a program that draws the following figure when
+the user enters 3
+\begin{console}
+***
+* *
+***
+\end{console}
+and when the user enters 4 it draws
+\begin{console}
+****
+*  *
+*  *
+****
+\end{console}
+\end{ex}
+
+[See next page for hints.]
+
+\begin{ex}
+Write a program that draws the following figure when
+the user enters 3
+\begin{console}
+  *
+ ***
+*****
+\end{console}
+and this when the user enters 4
+\begin{console}
+   *
+  ***
+ *****
+*******
+\end{console}
+\end{ex}
+[See next page for hints.]
+
+WARNING: SPOILERS!!!
+
+Here are the pseudocode (with explanations) for the last two ASCII art
+problems from the previous section.
+
+Here's the first problem \ldots
+
+\begin{ex}
+Write a program that draws the following figure when
+the user enters 3
+\begin{console}
+***
+* *
+***
+\end{console}
+and when the user enters 4 it draws
+\begin{console}
+****
+*  *
+*  *
+****
+\end{console}
+and here's the pseudocode with explanation:
+%begin solution?
+\begin{flalign*}
+\text{For n = 4:}\\
+&    \text{4 stars}\\
+&    \text{1 star, 2 spaces, 1 star}\\
+&    \text{1 star, 2 spaces, 1 star}\\
+&    \text{4 stars}\\    
+\text{For n = 5:}\\      
+&\text{5 stars}\\
+&    \text{1 star, 3 spaces, 1 star}\\
+&    \text{1 star, 3 spaces, 1 star}\\
+&    \text{1 star, 3 spaces, 1 star}\\
+&    \text{5 stars}\\
+\end{flalign*}
+In general, we have:\\
+\tab[3em]{\text{n stars}}\\
+\tab[3em]{\text{n-2 of [1 star, n-2 stars, 1 star]}}\\
+\tab[3em]{\text{n stars}}\\
+Therefore, the pseudocode is:
+\begin{flalign*}
+\text{print n stars}\\
+\text{print newline}\\
+\text{for i = 1,..., n-2}\\
+& \text{print 1 star}\\
+& \text{print n-2 stars}\\
+& \text{print 1 star}\\
+& \text{print newline}\\
+\text{print n stars}\\
+\end{flalign*}
+And after expanding some of the print statements we get:
+\begin{flalign*}
+\text{//print n stars}\\
+\text{for i=1 ,..., n: print '*'}\\
+\text{print newline}\\
+\text{for i = 1, ..., n-2}\\
+&\text{print '*'}\\
+&\text{//print n-2 stars}\\
+&\text{for j=1,..., n-2: print '*'}\\
+&\text{print '*'}\\
+&\text{print newline}\\
+\text{//print n stars}\\
+\text{for i=1, ..., n: print '*'}\\
+\end{flalign*}
+\end{ex}
+\begin{ex} Write a program that draws the following figure when
+the user enters 3:
+\begin{console}
+  *
+ ***
+*****
+\end{console}
+and this when the user enters 4:
+\begin{console}
+   *
+  ***
+ *****
+*******
+\end{console}
+\begin{align*}
+\text{When n = 3:}\\
+&     \text{2 spaces, 1 star}\\
+&     \text{1 space, 3 stars}\\
+&     \text{0 space, 5 stars}\\\\
+\text{When n = 4:}\\
+&     \text{3 spaces, 1 star}\\
+&     \text{2 spaces, 3 stars}\\
+&     \text{1 space, 5 stars}\\
+&     \text{0 space, 7 stars}\\
+\end{align*}
+There are two columns of numbers to handle. In other words, each line
+(which is the body of a loop) has two numbers. The first column is easy - it's just from n-1 to 0. So the pseudocode looks like this:
+\begin{align*}
+    \text{for i = n-1 to 0}\\
+&          \text{i spaces, ??? stars}\\
+\end{align*}
+What about the second? The relationship between the second number and i
+is not so direct. But note that it starts with 1 and always goes up by 2
+after each iteration. So the pseudocode looks like
+\begin{align*}     
+      \text{numStars = 1}\\
+      \text{for i = n-1 to 0}\\
+&              \text{i spaces, numStars stars}\\
+&              \text{numStars = numStars + 2}\\
+\end{align*}
+In more details:
+\begin{align*}
+      \text{numStars = 1}\\
+      \text{for i = n-1 to 0}\\
+&          \text{print i spaces}\\
+&          \text{print numStars stars}\\
+&          \text{print newline}\\
+&          \text{numStars = numStars + 2}\\
+\end{align*}
+And after expanding some print statements we get
+\begin{align*}
+      \text{numStars = 1}\\
+      \text{for i = n-1 to 0}\\
+&            \text{//print i spaces}\\
+&            \text{for j=1, \ldots, i: print ''}\\
+&            \text{// print numStars stars}\\
+&            \text{for j=1, \ldots, numStars: print '*'}\\
+&            \text{print newline}\\
+&            \text{numStars = numStars + 2}\\
+\end{align*}
+\end{ex}
+\newpage\EMPHASIZE{break}
+
+Remember \texttt{break} from the \texttt{switch} statement? If you execute
+\texttt{break}, you immediately go out of the \texttt{switch} block.
+\texttt{break} can also be used in a \texttt{for}-loop.
+\begin{console}
+First run this:
+for (int i = 0; i < 1000; i += 2)
+{
+std::cout << "entered body of for-loop \n";
+std::cout << i << std::endl;
+std::cout << "exiting body of for-loop \n";
+} 
+\end{console}
+Now run this:
+\begin{console}[commandchars=\~\@\$]
+for (int i = 0; i < 1000; i += 2)
+{   
+    std::cout << "entered body of for-loop\n";
+    std::cout << i << std::endl;
+    ~textbf@if (i == 100) break;$
+    std::cout << "exiting body of for-loop\n";
+}
+\end{console}
+See the point of \texttt{break}?
+
+The \texttt{break} when executed in a \texttt{for}-loop will get out of that \texttt{for}-loop. That's all there is to it.
+
+Of course some times you can avoid the break. For the above program you
+can rewrite it as
+\begin{console}
+for (int i = 0; i < 101; i += 2)
+{   
+    std::cout << i << std::endl;
+}
+\end{console}
+There's a general principle (or good practice) that you
+should \EMPHASIZE{avoid having too many exit points out of a loop}. Too
+many exit points make the code difficult to trace.
+
+%TIKZ DIAGRAM HERE
+
+It's very important to note that the execution of break
+only exits the current for-loop. Make sure you trace and run try this:
+\begin{console}
+for (int i = 0; i < 5; i++)
+{   
+    std::cout << "A: " << i << std::endl;
+    for (int j = 0; j < 5; j++)
+    {   
+        std::cout << "B: " << j << std::endl;
+        if (j == 1) break;
+        std::cout << "C: " << j << std::endl;
+    }
+    std::cout << "D: " << i << std::endl;
+}
+
+\newpage\EMPHASIZE{continue}
+
+Another way to control the flow of execution in a for-loop is by using
+the \texttt{continue} statement. Try this and tell me what it does:
+\begin{console}
+for (int i = 0; i < 101; i += 2)
+{   
+    std::cout << "top of loop" << std::endl;
+    std::cout << i << std::endl;
+    if (i > 10) continue;
+    std::cout << "bottom of loop" << std::endl;
+}
+\end{console}
+A picture tells a thousand words:
+%TIKZ DIAGRAM HERE
+
+\begin{ex}
+Write a program that prompts the user for \texttt{start}, \texttt{end}, and \texttt{skip} (altogether there are three integers) and prints the sum of all integers from start to end except for \texttt{skip}. Here's the skeleton
+\begin{console}
+int start = 0, skip = 0, end = 0;
+std::cin >> start >> end >> skip;
+int sum = 0;
+for (         ;          ;          )
+{   
+    if (          )          ;
+    sum +=          ;
+}
+std::cout << sum << std::endl;
+\end{console}
+For instance, if \texttt{start} is -5, \texttt{end} is 10, and \texttt{skip}
+is 7, then your program should compute the sum of integers from -5 to 10
+(inclusive) except for 7.
+\end{ex}
+
+\newpage\EMPHASIZE{Divisors and primes}
+
+Quick review of divisors and primes (See previous notes on integers for
+more information.)
+
+Let n be a positive integer at least 1 and let d be a positive integer
+greater than 0. We say that d \EMPHASIZE{divides} n or that d is a
+\EMPHASIZE{divisor} of n if you can find an integer x such that dx = n.
+(Yes, we've seen this before, in earlier notes and also
+in the prerequisite math courses.) You already know that the statement
+\begin{center}
+``d divides n''
+\end{center}
+in C++ is
+
+\[n \% d == 0\]
+
+Of course for d to be a divisor of n, d must be at most n.
+
+\begin{ex}
+Write a program that prompts the user for n and
+prints all the (positive) divisors of a given positive integer n. For
+instance, if the user entered 10 for n, the program should print
+\begin{console}
+1
+2
+5
+10
+\end{console}
+If the user entered 11, the program should print
+\begin{console}
+1
+11
+\end{console}
+Don't forget that when the user entered 1 for n, your
+program should print only one 1:
+\begin{console}
+1
+\end{console}
+Once you're done with your program, modify it so that if
+the user entered an integer less than or equal to 0, it prints
+\begin{console}
+Wrong input. Run again and enter a positive int.
+\end{console}
+\end{ex}
+A \EMPHASIZE{prime} is a positive integer which is greater than 1 and is
+divisible by only 1 and itself.
+
+Let's try to get C++ to list primes.
+
+Look at the statement: ``A prime is a positive integer which is greater
+than 1 and is divisible by only 1 and itself.''
+
+Let's say the value of the integer is in variable n.
+There are two conditions to check on n
+
+\begin{itemize}
+\item
+  \begin{quote}
+  n greater than 1
+  \end{quote}
+\item
+  \begin{quote}
+  n is divisible by only 1 and itself
+  \end{quote}
+\end{itemize}
+
+The first condition is easy. The second one is tricky. But its not too
+bad.
+
+Suppose n has value 7. We just need to check that 2, 3, 4, 5, and 6
+cannot divide 7 to conclude that 7 is a prime.
+
+Hmmm .... ``2, 3, 4, 5, and 6''... sure sounds like a for-loop.
+
+What about ``cannot divide''??? Well ``i divides n''is the same as
+saying n \% i is zero. So for ``i does not divide n'', the remainder
+when you divide n by i must be nonzero, i.e. n \% i is not zero. (Duh.)
+
+Try this:
+\begin{console}
+int n = 7;
+for (int i = 2; i < n; ++i)
+{   
+    std::cout << i << ' '<< n % i << std::endl;
+}
+\end{console}
+Now try this:
+\begin{console}
+int n = 25;
+for (int i = 2; i < n; i++)
+{   
+    std::cout << i << ' '<< n % i << std::endl;
+}
+\end{console}
+AHA! If you do get a nonzero value, it's not a prime and
+you can stop the check right?
+\begin{console}
+int n = 25;
+for (int i = 2; i < n; ++i)
+{   
+    std::cout << n % i << std::endl;
+    if (n % i == 0) break;
+}
+\end{console}
+But \ldots of course you still need to know if your \texttt{n} is a
+prime!!! You can't tell from the above code. Why?
+Because it's possible to get out of the loop in
+\EMPHASIZE{two} different ways:
+
+\begin{itemize}
+\item
+  you could have gotten out of the loop because \texttt{i} reached
+  \texttt{n} (therefore \texttt{n} is a prime); or
+\item
+  \texttt{break} was executed (therefore \texttt{n} is not a prime)
+\end{itemize}
+
+We need to \EMPHASIZE{disambiguate} the exit condition of the for-loop!!!
+
+To do that, we create a variable that tells us why we are out of the
+for-loop. Let's call it \texttt{flag}.
+I'll let our program get the value of \texttt{n} from us
+so that it's easier to test the program:
+\begin{console}
+int n;
+std::cin >> n;
+int flag;
+for (int i = 2; i < n; ++i)
+{   
+    std::cout << n % i << std::endl;
+    if (n % i == 0)
+    {
+        flag = 1; // flag equals 1 means n not prime
+        break;
+    }
+}
+\end{console}
+
+But what if \texttt{n} is indeed a prime? It would pass all the tests
+(i.e.the body of the if statement will not execute). In that case
+\texttt{flag} will not be assigned a value!!! We had better give
+\texttt{flag} an initial value:
+\begin{console}
+int n = 25;
+int flag = 0; // flag equals 0 means n is prime
+for (int i = 2; i < n; ++i)
+{   
+    std::cout << n % i << std::endl;
+    if (n % i == 0)
+    {
+        flag = 1; // flag equals 1 means n not prime
+        break;
+    }
+}
+// At this point ...
+// if flag is 0, then n is prime
+// if flag is 1, then n is not prime \\
+\end{console}
+Let's insert a print statement after the loop:
+\begin{console}
+int n = 25;
+int flag = 0; // flag equals 0 means n is prime
+for (int i = 2; i < n; ++i)
+{   
+    std::cout << n % i << std::endl;
+    if (n % i == 0)
+    {
+        flag = 1; // flag equals 1 means n not prime
+        break;
+    }
+}
+
+std::cout << (flag == 0 ? "prime" : "not prime")
+          << std::endl;
+\end{console}
+(Review the ternary operator if you have forgotten about it.)
+
+Go ahead and test your program with a couple of values for n.
+
+Note that \texttt{flag} only needs to have two possible values because the
+only purpose of \texttt{flag} is to tell us why we exit the loop and there
+are only two reasons for exiting the for-loop. Although the program
+works, the variable \EMPHASIZE{name} \texttt{flag} can be better. The
+\EMPHASIZE{purpose} of \texttt{flag} is to tell if \texttt{n} is a
+\texttt{prime}. So ...
+
+I will use a \texttt{\EMPHASIZE{bool}} variable \texttt{\EMPHASIZE{isprime}}
+instead. Why boolean? Because this variable only needs to take on
+\EMPHASIZE{two possible values}. Of course if there are three exit points
+in the for-loop, then you should not use a boolean variable.
+\begin{console}
+int n = 25;
+bool isprime = true;
+for (int i = 2; i < n; ++i)
+{   
+    std::cout << n % i << std::endl;
+    if (n % i == 0)
+    {  
+        isprime = false;
+        break;
+    }
+}
+std::cout << (isprime ? "prime" : "not prime") << std::endl;
+\end{console}
+Let us now remove the print statement in the for-loop:
+\begin{console}
+int n = 25;
+bool isprime = true;
+for (int i = 2; i < n; ++i)
+{   
+    if (n % i == 0)
+    {
+        isprime = false;
+        break;
+    }
+}
+
+std::cout << (isprime ? "prime" : "not prime")
+          << std::endl;
+\end{console}
+Study the above program very carefully. Make sure you see that the
+choice of the name of the variable \texttt{isprime} makes the program
+easier to understand.
+
+Note that it's possible to remove the \texttt{break}
+statement; study this program very carefully:
+\begin{console}
+bool isprime = true;
+for (int i = 2; i < n && isprime; i++)
+{   
+    if (n % i == 0)
+    {
+        isprime = false;
+    }
+}
+
+std::cout << (isprime ? "prime" : "not prime")
+          << std::endl;
+\end{console}
+
+Note that the loop keeps running as long as
+\begin{center}
+\texttt{i < n \&\& isprime}
+\end{center}
+is \texttt{true}. The only way to get out of the for-loop is when the
+boolean expression
+\begin{center}
+\texttt{i < n \&\& isprime}
+\end{center}
+evaluates to false which is when \texttt{i} reaches \texttt{n} or when
+\texttt{isprime} is \texttt{false}.
+
+\begin{ex} Print all the primes from 2 to 100. (Recall that 1 is
+not a prime.) The pseudocode is
+\begin{console}
+for n running from 2 to 100:
+    if n is prime, print n
+\end{console}
+(Don't forget that a C++ int variable can take values up
+to about 2 billion.) And of course you know how to check ``n is prime''
+using the code I've shown you above. Rework your program
+so that it prompts the users for int values for int variables a and b
+and prints the primes from a to b. Run your program, listing the primes
+in the range from 1,000,000,000 to 2,000,000,000. Observe the
+speed/performance of your program.
+\end{ex}
+Note that it's obvious that, for instance when
+you're testing if n = 87 is a prime, you need
+\EMPHASIZE{not} test if 86 is a divisor of n = 87. 86 is obviously too big
+to divide 87!!!
+
+It can be proven that instead of testing i from 2 to n - 1, you really only need to test up to the \underline{\textbf{square root of n}}. (I won't prove this. You can take, for instance, a class on cryptography to find out why.)
+\begin{console}[commandchars=\~\@\$]
+bool isprime = true;
+for (int i = 2; i ~textbf@<= sqrt(n)$ && isprime; ++i)
+{   
+    if (n % i == 0)
+    {
+        isprime = false;
+    }
+}
+
+std::cout << (isprime ? "prime" : "not prime")
+          << std::endl;
+\end{console}
+(Don't forget: if you want to use the \texttt{sqrt} function, you must add \texttt{\#include < cmath>} at the top of your code. Also don't forget that if you're using MS VS, you might need to convert the value of \texttt{n} to a \texttt{double}, i.e. you should use \texttt{sqrt(double(n))} instead of \texttt{sqrt(n)}.)
+
+Now, for instance when you test if 1023457 is prime, your program will
+run \texttt{i} from 2 to 1011 instead of from 2 to 1023456.
+That's quite a lot of CPU time saved!!!
+
+\begin{ex}
+Redo your earlier primes printing program using this
+improved algorithm. Run your program, listing the primes in the range
+from 1,000,000,000 to 2,000,000,000. Observe the improved
+speed/performance of your program.
+\end{ex}
+But there's still something else you can do. Note that
+\texttt{sqrt(n)} is computed many times, once every time the boolean
+expression in the for-loop is evaluated. We can compute and store the
+square root of n to avoid recomputation:
+\begin{console}[commandchars=\~\@\$]
+bool isprime = true;
+~textbf@int sqrtn = sqrt(n);$
+for (int i = 2; i ~textbf@<= sqrtn$ && isprime; ++i)
+{   
+    if (n % i == 0)
+    {
+        isprime = false;
+    }
+}
+
+std::cout << (isprime ? "prime" : "not prime")
+          << std::endl;
+\end{console}
+\begin{ex}
+Redo your earlier primes printing program using this
+improved algorithm. Run your program, listing the primes in the range
+from 1,000,000,000 to 2,000,000,000. Observe the improved
+speed/performance of your program.
+\end{ex}
+There's yet another thing we can do. Note that \texttt{sqrtn} is used only in the for-loop. We can actually declare \texttt{sqrtn} at the initialization part of the for-loop so that the scope of \texttt{sqrtn} stays inside the loop:
+\begin{console}[commandchars=\~\@\$]
+bool isprime = true;
+for (int i = 2~textbf@, sqrtn = sqrt(n)$; i <= sqrtn && isprime; ++i)
+{   
+    if (n % i == 0)
+    {
+        isprime = false;
+    }
+}
+
+std::cout << (isprime ? "prime" : "not prime")
+          << std::endl;
+\end{console}
+Note that this does not improve the speed of your program. It simply
+shrinks the scope of variable \texttt{sqrtn}.
+
+\begin{ex}
+Write a program that prompts the user for n and
+prints p and p + 2 where p and p + 2 are both primes and at most n. For
+instance, if the user entered 20 your program should print
+\begin{console}
+1. 3 5
+2. 5 7
+3. 11 13
+4. 17 19
+\end{console}
+For instance, note that 5 and 7 are both primes and 7 is 5 + 2. Note
+however that 7 and 9 are not printed since 9 is not a prime. These pairs
+of primes are called ``twin primes''. It has been conjectured for more
+than 150 years that there are infinitely many twin primes. This is one
+of the most famous open questions in Math. The largest known twin primes
+(as of 2010) have more than 100000 decimal digits. If you find something
+bigger than that let me know. Don't forget that with
+what you know now, you can't handle integers
+significantly larger than 2 billion, i.e. your int variables
+can't handle more than 10 digits!!!
+\end{ex}
+\begin{ex}
+Write a program that prompts the user for n and
+prints the longest chain of consecutive composite integers at most n. A
+composite integer is an integer greater than 1 that is not a prime. For
+instance, if the user entered 10 for n, then the following are the
+numbers from 2 to n with the composites underlined:
+\begin{center}
+2, 3, \underline{4,} 5, \underline{6,} 7, \underline{8, 9, 10}
+\end{center}
+The longest chain of composites is 8, 9, 10. Therefore your program
+should print
+\begin{console}
+8 9 10
+\end{console}
+\end{ex}
+
+\newpage\EMPHASIZE{Brute force search}
+
+Computer Science, like Mathematics, seeks to find solutions to problems.
+One way to look for solutions is through ``brute-force''search. This
+means going over all possible candidates and seeing which ones are the
+right solutions.
+
+Let's try one. Suppose you want to find \textbf{integer} solution(s) to this equation:
+\begin{center}
+x$^{3}$ = 729
+\end{center}
+If x is a negative integer, x$^{3}$ is negative. So we are definitely only interested in positive integers. Furthermore x must be less than 729 (well ... a lot less!). So we can try x = 0, 1, 2, ..., 729 and see which one satisfies the above equation.
+
+WHOA!!!
+
+That sure looks suspiciously like a for-loop to me ...
+
+\begin{ex}
+Write a for-loop with an index variable running from
+0 to 729 to find (and print ... of course!) solution(s) to the equation
+
+\begin{center}
+x$^{3}$ = 729
+\end{center}
+\end{ex}
+Well \ldots the above example is kind of silly since we could have
+computed the cube root of 729 and see if it's an integer
+value \ldots but what if you have \textit{\textbf{two}} variables in the
+equation? Suppose you want to solve for positive integers x and y
+satisfying
+
+\begin{center}
+x$^{2}$ + y$^{2}$= 13$^{2}$
+\end{center}
+
+Well first of all each x and y must be at most 13, right? So all you
+need to do is to check all possible 0, ..., 13 for x and 0, ..., 13 for
+y. In other words you need to check all the following cases:
+
+x = 0, y = 0\\
+x = 0, y = 1\\
+x = 0, y = 2\\
+...\\
+x = 0, y = 13\\
+x = 1, y = 0\\
+x = 1, y = 1\\
+x = 1, y = 2\\
+...\\
+x = 1, y = 13\\
+x = 2, y = 0\\
+x = 2, y = 1\\
+x = 2, y = 2\\
+...\\
+x = 2, y = 13\\
+...\\
+...\\
+...\\
+x = 13, y = 13\\
+
+That sure looks like a double-nested for-loop to me!
+Here's the program:
+\begin{console}
+for (int x = 0; x <= 13; ++x)
+{   
+    for (int y = 0; y <= 13; ++y)
+    {
+        if (x * x + y * y == 13 * 13)
+        {  
+           std::cout << x << ',' << y << '\n';
+        }
+    }
+}
+\end{console}
+Now note that you see some ``repetitions''. I'm saying
+that if x = a, y = b is a solution, then x = b, y = a is also a solution
+because in the equation above, you can switch x and y. What if you do
+not want to include such repetitions? One way would be to ensure x
+<= y. In other words you try to get your program to run through
+these values of x,y:
+
+x = 0, y = 0\\
+x = 0, y = 1\\
+x = 0, y = 2\\
+...\\
+x = 0, y = 13\\
+x = 1, y = 1 (note that y starts with 1 and not 0)\\
+x = 1, y = 2\\
+x = 1, y = 3\\
+...\\
+x = 1, y = 13\\
+x = 2, y = 2 (note that y starts with 2 and not 0)\\
+x = 2, y = 3\\
+x = 2, y = 4\\
+...\\
+x = 2, y = 13\\
+...\\
+...\\
+...\\
+x = 13, y = 13\\
+\begin{console}[commandchars=\~\@\$]
+for (int x = 0; x <= 13; ++x)
+{   
+    for (int y = ~textbf@x$; y <= 13; ++y)
+    {
+        if (x * x + y * y == 13 * 13)
+        {  
+           std::cout << x << ',' << y << '\n';
+        }
+    }
+}
+\end{console}
+Of course you realize that x$^2$ + y$^2$ = 13$^2$ gives the solution of the right-angle triangle with hypotenuse of length 13 and integer sides. Why not find all such triangles with hypotenuse from 1 to 100??? This means solving
+
+\begin{center}
+x$^2$ + y$^2$ = z$^2$
+\end{center}
+
+where 1 <= z <= 100.
+
+\begin{console}[commandchars=\~\@\$]
+~textbf@for (int z = 1; z <= 100; ++z)$
+~textbf@{$   
+    for (int x = 0; x <= z; ++x)
+    {   
+        for (int y = x; y <= z; ++y)
+        {   
+            if (x * x + y * y == z * z)
+            {  
+               std::cout << x << ','
+                         << y << ','
+                         << z << '\n';
+            }
+        }
+    }
+~textbf@}$
+\end{console}
+
+This prints the sides of all right angle triangles with integer sides
+where the hypotenuse is between 1 to 100.
+
+\begin{ex}
+Can you improve the performance of the above program?
+\end{ex}
+\begin{ex}
+Find all integer solutions to the equation
+\begin{center}
+x$^{4}$ + 2y$^{4}$ = 10001
+\end{center}
+\end{ex}
+\begin{ex}
+Here's something from wikipedia.org:
+\begin{console}[commandchars=\~\@\$]
+~textbf@1729$ is known as the ~textbf@Hardy-Ramanujan number$, after a
+famous anecdote of the British mathematician
+~href@http://en.wikipedia.org/wiki/G._H._Hardy$@G. H. Hardy$ regarding a
+hospital visit to the Indian mathematician
+~href@http://en.wikipedia.org/wiki/Srinivasa_Ramanujan$@Srinivasa
+Ramanujan$. In Hardy's words:
+
+~lq~lq I remember once going to see him when he was ill at
+~href@http://en.wikipedia.org/wiki/Putney$@Putney$. I had ridden in taxi cab number 1729
+and remarked that the number seemed to me rather a dull
+one, and that I hoped it was not an unfavorable ~href@http://en.wikipedia.org/wiki/Omen$@omen$.
+"No," he replied, "it is a very interesting number;
+~textbf@it is the smallest number expressible as the sum of two$
+~textbf@cubes in two different ways."$
+
+The quotation is sometimes expressed using the
+term "positive cubes", as the admission of negative
+perfect cubes (the cube of a ~href@http://en.wikipedia.org/wiki/Negative_and_non-negative_numbers$@negative$ ~href@http://en.wikipedia.org/wiki/Integer$@integer$) gives
+the smallest solution as ~href@http://en.wikipedia.org/wiki/91_%28number%29$@91$ (which is a factor of 1729):
+
+~tab[3em]@91 = 6^3 + (-5)^3 =$
+~tab[3em]@4^3 + 3^3$
+
+Of course, equating "smallest" with "most negative", as
+opposed to "closest to zero" gives rise to solutions
+like -91, -189, -1729, and further negative numbers.
+This ambiguity is eliminated by the term "positive cubes".
+
+Numbers such as
+
+~tab[3em]@1729 = 1^3 + 12^3 =$
+~tab[3em]@9^3 + 10^3$
+
+that are the smallest number that can be expressed as the
+sum of two cubes in ~texttt@n$ distinct ways have been dubbed
+~href@http://en.wikipedia.org/wiki/Taxicab_number$@taxicab numbers$. 1729 is the second taxicab number (the
+first is 2 = 1^3 + 1^3). The number was also found in one
+of Ramanujan's notebooks dated years before the incident.
+\end{console}
+Find all positive integer solutions to the equation
+\begin{center}
+x$^3$ + y$^3$ = 1729
+\end{center}
+(Hint: Write a double for-loop.)
+\end{ex}
+\begin{ex} The above exercise verified that there are exactly
+two integer solutions. It does not verify that 1729 is the
+``\textbf{smallest number expressible as the sum of two cubes in two
+different ways}''. To do that you need to solve this:
+\begin{center}
+x$^3$ + y$^3$ = z
+\end{center}
+Of course you should print out x, y, and z. Look at all the solutions
+and find the value of z with exactly two integer solutions. Is it 1729?
+(Or is Ramanujan totally wrong all these years ...)
+\end{ex}
+\begin{ex}
+Write a program that prints all positive fractions m/n from 0
+to 5 where m and n are positive and at most 10. The fractions need not
+be reduced or in any particular order or unique.
+\end{ex}
+
+\newpage\EMPHASIZE{Brute force search: polynomial factorization}
+
+Here's another brute force search program.
+Let's write a program to factorize a degree 2 polynomial
+into two polynomials with integer coefficients. For instance
+\begin{center}
+x$^2$ - 1 = (x + 1)(x - 1)
+\end{center}
+Therefore when the user enters 1 0 -1 for polynomial
+x$^2$ - 1, the program produces (x + 1)(x - 1).
+Here's an execution of the program:
+\begin{console}[commandchars=\~\@\$]
+~textbf@1 0 -1$
+1x^2 + 0x + -1 = (1x + 1)(1x + -1)
+\end{console}
+Assume that your program will only handle coefficients from -20 to 20.
+
+We know that
+\begin{center}
+(ax + b)(cx + d) = acx$^2$ + (ad + bc)x + bd
+\end{center}
+Suppose the user entered A, B, C for polynomial
+\begin{center}
+Ax$^2$ + Bx + C
+\end{center}
+then we basically want to find a, b, c, d such that
+\begin{center}
+(ax + b)(cx + d) = acx$^2$ + (ad + bc)x + bd = Ax$^2$ + Bx + C
+\end{center}
+which is the same as saying:
+%WHY IS ALIGN LIKE THIS. WHY DID THEY MAKE IT LIKE THIS. WHY CANT ANYTHING LATEX FUNCTION NORMALLY. WHY DOES EVERY TYPE OF ALIGN NOT ALIGN LEFT. WHAT IS EVEN GOING ON ANYMORE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+\begin{flalign*}
+&&\text{A = ac} &\\
+&&\text{B = ad + bc} &\\
+&&\text{C = bd} &\\
+\end{flalign*}
+For instance in the case of the polynomial x$^{2}$ - 1, we
+want to find a, b, c, d such that
+\begin{align*}
+\text{1 = a * c}\\
+\text{0 = a * d + b * c}\\
+\text{-1 = b * d}\\
+\end{align*}
+Here's the program:
+\begin{console}
+int A, B, C;
+std::cin >> A >> B >> C;
+
+int a, b, c, d;
+
+bool found = false;
+
+for (a = -20; a <= 20 && !found; ++a)
+{   
+    for (b = -20; b <= 20 && !found; ++b)
+    {   
+        for (c = -20; c <= 20 && !found; ++c)
+        {
+        for (d = -20; d <= 20 && !found; ++d)
+        {
+            if (a * c == A
+                 && B == a * d + b * c
+                 && b * d == C)
+            {  
+                    found = true;
+            }
+        }
+     }
+}
+if (found)
+{  
+   std::cout << a << ' '<< b
+             << ' ' << c << ' '<< d << '\n';
+}
+}
+\end{console}
+Of course you can change the range of values for a, b, c, d if you like.
+In fact, it's a good idea to create a constant, say N,
+for 20 in the above program so that a, b, c, d ranges from -N to N and
+you can change the value of N easily.
+
+Note that this is a \EMPHASIZE{brute force} search for a factorization of
+the given polynomial because it's \EMPHASIZE{not smart}.
+For instance, if the given polynomial is
+\begin{center}
+15x$^{2}$ + \ldots
+\end{center}
+then since you want
+\begin{center}
+15x$^{2}$ + \ldots = (ax + b)(cx + d) = acx$^2$ + (ad + bc)x + bd
+\end{center}
+then of course
+\begin{center}
+15 = ac
+\end{center}
+and the right thing to do is to factorize 15. You would get 15 = 1x15 =
+3x5 = 5x3 = 15x1 = -1x-15 = -3x-5 = -5x-3 and then a and c can only be
+\begin{align*}
+\text{a = 1, c = 15}\\
+\text{a = 3, c = 5}\\
+\text{a = 5, c = 3}\\
+\text{a = 15, c = 1}\\
+\text{a = -1, c = -15}\\
+\text{a = -3, c = -5}\\
+\text{a = -5, c = -3}\\
+\text{a = -15, c = -1}\\
+\end{align*}
+The above program however tries 41 possible values for a (i.e., from -20
+to 20) and also 41 possible values for c. This means that the program
+actually tries 41 x 41 possible cases for a and c. Including b and d,
+the program tries
+\begin{center}
+41 x 41 x 41 x 41 = 2825761
+\end{center}
+cases!!! This is no big deal for a modern-day computer of course. But if
+we want to allow more values for a, b, c, d, say from -100 to 100, then
+there are about
+\begin{center}
+201 x 201 x 201 x 201 = 1632240801
+\end{center}
+You can try this range of values for the above program.
+You'll see that the program will run very slowly. Brute
+force algorithms are not smart at all.
+
+\begin{ex} Write a program that prompts the user for n and if n
+is even, attempts to rewrite n as a sum of at most two primes. For
+instance if the user entered 2, the program prints:
+\begin{console}[commandchars=\~\@\$]
+~textbf@2$
+2
+\end{console}
+If the user entered 4 the program prints
+\begin{console}[commandchars=\~\@\$]
+~textbf@4$
+2 + 2 
+\end{console}
+If the user entered 12, the program prints
+\begin{console}[commandchars=\~\@\$]
+~textbf@12$
+5 + 7
+\end{console}
+\end{ex}
+Using your program, attempt to answer this question: Are there even
+integers which are not a sum of at most two primes? (For more
+information, google for ``Goldbach conjecture''. This is also a very
+famous conjecture in Math that is as yet unproven.)
+
+\newpage\EMPHASIZE{Summary}
+
+The following summarizes the pre- and post-increment operators:
+\begin{align*}
+\texttt{++i} &\text{increments the value of} \texttt{i}\\
+\texttt{i++} &\text{increments the value of} \texttt{i}\\
+\texttt{j = (++i)} &\text{increments the value of i and then assign new value of
+\texttt{i} to \texttt{j}}\\
+\texttt{j = (i++)} &\text{give the value of \texttt{i} to \texttt{j} and then
+increments the value of \texttt{I}}\\
+\end{align*}
+The following summarizes the pre- and post-decrement operators
+\begin{align*}
+\texttt{--i} &\text{decrements the value of \texttt{i}}\\
+\texttt{i--} &\text{decrements the value of \texttt{i}}\\
+\texttt{j = (--i)} &\text{decrements the value of i and then assign new value
+of \texttt{i} to \texttt{j}}\\
+\texttt{j = (i--)} &\text{give the value of \texttt{i} to \texttt{j} and then
+decrements the value of \texttt{i}}\\
+\end{align*}
+The following summarizes the augmented assignment operators: suppose
+\texttt{[op]} is an operator such as +, -, *, /, \%, then
+\begin{center}
+\texttt{x [op]= y}     is the same as      \texttt{x = x [op] y}
+\end{center}
+For instance x += y is the same as x = x + y. The augmented assignment
+operator returns the new augmented value. For instance:
+\begin{center}
+\texttt{z = (x += y)}
+\end{center}
+The for-loop statement looks like this:
+\begin{align*}
+\EMPHASIZE{for (\texttt{[stmt1]}; \texttt{[bool expr]}; \texttt{[stmt2]})}
+&\texttt{[stmt3]}
+\end{align*}
+where \texttt{[stmt3]} can be either a statement of a block of
+statements. The for-loop statement executes as follows:
+
+\begin{enumerate}
+\item
+  Execute \texttt{[stmt1]}, go to 2.
+\item
+  If the \texttt{[bool expr]} is true, go to 3, otherwise goto 5
+\item
+  Execute \texttt{[stmt3]}, go to 4.
+\item
+  Execute \texttt{[stmt2]}, go to 2.
+\item
+  Exit the \texttt{for}-loop statement to the statement after the for-loop.
+\end{enumerate}
+
+Of course since \texttt{[stmt3]} can be any statement or a block, a
+for-loop can contain an if statement, if-else statement, a switch-case
+statement, or even a for-loop.
+
+The scope of a variable is from its point of declaration to the end of
+the smallest block where it was declared.
+
+\newpage\EMPHASIZE{Exercises}
+
+Q1. Find all positive integer solutions to the equation
+\begin{center}
+x$^{3}$ + y$^{4}$ = 1729
+\end{center}
+(Hint: Write a double for-loop.)
+
+Q2. Write a program that draws the following figure when the user enters 3
+\begin{console}
+  *
+ **
+***
+\end{console}
+and when the user enters 4 it draws
+\begin{console}
+   *
+  **
+ ***
+****
+\end{console}
+Q3. Write a program that draws the following figure when the user enters
+3
+\begin{console}
+*
+ **
+***
+\end{console}
+and this when the user enters 5
+\begin{console}
+*
+  **
+***
+ ****
+*****
+\end{console}
+and this when the user enters 6
+\begin{console}
+*
+     **
+***
+   ****
+******
+*******
+\end{console}
+Q4. Write a program that draws the following figure when the user enters
+3
+\begin{console}
+***
+* *
+***
+\end{console}
+and when the user enters 5 it draws
+\begin{console}
+*****
+*   *
+* * *
+*   *
+*****
+\end{console}
+and when the user enters 7 the program draws this:
+\begin{console}
+*******
+*     *
+* *** *
+* * * *
+* *** *
+*     *
+*******
+\end{console}
+and when the user enters 9 the program draws this:
+\begin{console}
+*********
+*       *
+* ***** *
+* *   * *
+* * * * *
+* *   * *
+* ***** *
+*       *
+*********
+\end{console}
+Etc.
+
+Q5. Write a program that draws the following figure when the user enters
+3
+\begin{console}
+ +
+/ \
+| |
+---
+\end{console}
+and when the user enters 5 it draws
+\begin{console}
+  +
+ |
+ / \
+/   \
+|   |
+|   |
+-----
+\end{console}
+and when the user enters 7 the program draws this:
+\begin{console}
+   +
+   |
+   |
+  / \
+ /   \
+/     \          
+|     |
+|     |
+|     |           
+-------
+\end{console}
+Etc.
+
+Q6. Write a program that draws the following figure when the user enters
+7 it draws
+\begin{console}
+ ** **
+*******
+*******
+ *****
+  ***
+   *
+\end{console}
+and when the user enters 9 it draws
+\begin{console}
+ *** ***
+*********
+*********
+ *******
+  *****
+   ***
+    *
+\end{console}
+and when the user enters 11 it draws
+\begin{console}
+ **** ****
+***********
+***********
+ *********
+  *******
+   *****
+    ***
+     *
+\end{console}
+Q7. Write a program that draws the following given 2 and 2:
+\begin{console}
+**********
+*        *
+* X      *
+*        *
+*        *
+*        *
+*        *
+*        *
+*        *
+**********
+\end{console}
+and this when the user enters 7 and 3:
+\begin{console}
+**********
+*        *
+*        *
+*        *
+*        *
+*        *
+*        *
+*  X     *
+*        *
+**********
+\end{console}
+Q8. Write a program that prompts the user for n and computes
+
+\begin{center}
+1 + 1/(1) + 1/(1x2) + 1/(1x2x3) + 1/(1x2x3x4) + \ldots + 1/(1x2x3x...xn)
+\end{center}
+
+Q9. Write a program that prompts the user for a double d and computes
+the largest n such that n$^{2}$ + n is at most d.
+
+Q10. Write a program that prompts the user for an integer n and displays
+all the non-squares from 1 to n and print the number of these integers.
+(An integer is a non-square if it is not the square of another integer.
+For instance 9 is a square since it is the square of 3, however 6 is not
+a square.)
+
+Q11. A number n is said to be perfect if it is the sum of all its
+divisors less then n. For instance 6 is perfect since the divisors of 6
+are 1, 2, 3, 6 and the sum of the divisors less than 6 is 1 + 2 + 3 = 6.
+Write a program that prompts the user for n and prints all perfect
+numbers from 1 to n.
