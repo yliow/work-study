@@ -1,0 +1,337 @@
+\newpage\TEXTTTASIZE{70. C++ \texttt{string} class}
+
+\textsc{Objectives}
+
+\begin{itemize}
+\item
+  Learn about C strings.
+\item
+  Learn about the \texttt{string} class from the C++ standard library.
+\end{itemize}
+
+\newpage\EMPHASIZE{Review: C-strings}
+
+You already know that a string is an array of \texttt{char} terminated by '\0'. '\0' has numeric value 0. Here's an example:
+
+\begin{console}
+char x[] = "abc"; // same as {'a', 'b', 'c', '\0'}
+\end{console}
+
+These are called C-strings, i.e., C-strings are character arrays
+containing the null character.
+
+There are some useful functions to work with C strings of which some are
+listed below (see CISS240):
+
+\begin{console}
+strcpy(s1, s2) // copy
+strcmp(s1, s2) // compare
+strcat(s1, s2) // concat
+strlen(s1) // string length
+\end{console}
+
+Note that in order to work with the above functions, you must include
+the header \texttt{cstring} like so:
+
+\begin{console}
+#include <cstring>
+\end{console}
+
+Note that the relational operators ==, !=, etc. don't work with the string content but rather with the pointer to the first value the array. In particular, note that \texttt{s1 == s2} compares the addresses of \texttt{s1} and \texttt{s2}. In other words, it does not compare the contents of the arrays. Likewise for $!=$, $<$, etc.
+
+\newpage\EMPHASIZE{The \texttt{std::string} class in C++}
+
+You can use C-strings just fine in C++ but C++ also provides a
+\texttt{string} class as part of it's standard library
+that can be easier to work with. The \texttt{string} class in C++ is
+defined under the \texttt{std} namespace like the rest of the standard
+library and provides the usual operations you would expect with strings
+packaged together as a first class object.
+
+Some major features of the C++ \texttt{string} class are outline below:
+\begin{console}
+string(const char *)    // constructor that lets you
+                        // build a C++ string object
+                        // from a C-string
+
+=                       // assign a string to another
+                        // works even with C strings
+==     !=               // compare C++ string objects
+
+>      <                // relate C++ string objects
+
++=     +                // concatenate string objects
+
+[int]  at(int)          // access characters at a
+                        // particular index
+
+substr(int)             // Get substrings at particular
+substr(int, int)        // locations in the string
+
+length()                // Get the length of the string
+
+empty()                 // Check if the string is empty
+
+swap(string &)          // swap two string values\
+\end{console}
+
+Check C++ references online for more.
+
+Here's a sample \texttt{main.cpp} that shows most of the
+above in action. Ask yourself what the output should be then verify by
+running it.
+
+\begin{console}
+#include <iostream>
+#include <string>
+
+int main()
+{   
+    std::string s1("Hello, World!"), s2("");
+    std::string s3("Hello, World!");
+    std::cout << "1:" << s1 << "\n";
+    std::cout << "2:" << s1.length() << "\n";
+    std::cout << "3:[" << s2 << "]\n";
+    std::cout << "4:" << s2.length() << "\n";
+    std::cout << "5:" << (s1 != s2) << "\n";
+    std::cout << "6:" << (s1 == s2) << "\n";
+    std::cout << "7:" << (s2.empty()) << "\n";
+    std::cout << "8:" << (s2 == "") << "\n";
+    s2 = "!!";
+    std::cout << "9:" << s1 + s2 << "\n";
+    std::cout << "10:" << s1 + "!!" << "\n";
+    s1 += s3;
+    std::cout << "11:" << s1 << "\n";
+    s1 += "???";
+    std::cout << "12:" << s1 << "\n";
+    std::cout << "13:" << s1.substr(3) << "\n";
+    std::cout << "14:" << s1.substr(3, 1) << "\n";
+    std::cout << "15:" << s1[2] << "\n";
+    s1[2] = 'X';
+    std::cout << "16:" << s1 << "\n";
+    return 0;
+}
+\end{console}
+
+\newpage\EMPHASIZE{Searching for substrings}
+
+You can use the methods \texttt{find()} and \texttt{rfind()} provided by the
+string library to search for substrings within a \texttt{string} object.
+Use \texttt{find()} to search from the left side of the string and
+\texttt{rfind()} to search from the right side instead. You can use both
+C++ \texttt{string} objects and C strings as the substring values to
+search for.
+
+Example.
+
+\begin{console}
+std::string s1 = "01234567890123456789";
+std::string s2 = "23";
+std::cout << "1." << s1.find(s2) << "\n";
+std::cout << "2." << s1.find("23") << "\n";
+std::cout << "3." << s1.find("$") << "\n";
+std::cout << "4." << s1.rfind("23") << "\n"; \\
+\end{console}
+
+Both \texttt{find()} and \texttt{rfind()} return the index where the
+substring first occurs. If the substring isn't found,
+\texttt{std::string::npos} is returned which is the same as -1 but as an
+\texttt{unsigned int}.
+
+\newpage\EMPHASIZE{Searching for characters}
+
+The standard \texttt{string} library provides the following methods to
+search for characters in a string:
+
+\begin{itemize}
+\item
+  \texttt{find_first_of()} which takes in a character, a C-string or a
+  \texttt{string} object as its argument and finds the first index from
+  the left side in the invoking \texttt{string} object where any of the
+  characters in the argument occur.
+\item
+  \texttt{find_last_of()} which is similar to \texttt{find_first_of()}
+  except it searches from the right side instead.
+\item
+  \texttt{find_first_not_of()} which also takes in a character, a C
+  string or a \texttt{string} object as argument but finds the index of
+  the first character in the invoking \texttt{string} object that
+  isn't also in the argument provided to the method.
+\item
+  \texttt{find_last_not_of()} which is similar to
+  \texttt{find_first_not_of()} except that it searches from the right
+  side instead.
+\end{itemize}
+
+\textbf{Example.}
+
+\begin{console}
+std::string s = "01234567890123456789";
+std::string t = "23";
+std::cout << "1." << s.find_first_of(t) <<"\n";
+std::cout << "2." << s.find_first_not_of("01") << "\n";
+std::cout << "3." << s.find_last_of("012") << "\n";
+std::cout << "4." << s.find_last_not_of("012") << "\n";
+\end{console}
+
+As with substring search, if nothing is found, \texttt{std::string::npos}
+is returned which is the same as -1 but as an \texttt{unsigned int}.
+
+\newpage\EMPHASIZE{Replacement}
+
+You can use the \texttt{replace()} method to replace the contents of a
+string with the content of another. You need to specify indices to
+replace for the \texttt{string} object invoking the method but if you
+want, you can also specify the portion of the string passed in as the
+argument to use for the replacement.
+
+\textbf{Example.}
+
+\begin{console}
+#include <iostream>
+#include <string>
+
+int main()
+{   
+    std::string s1("0123456789");
+    std::string s2("abcdef");
+    s1.replace(3, 2, s2);
+    std::cout << s1 << "\n";
+    s1 = "0123456789";
+    s1.replace(3, 2, s2, 1, 3);
+    std::cout << s1 << "\n";
+    return 0;
+} 
+\end{console}
+
+There are still other forms of \texttt{replace()} available which can take
+in C strings or characters or even let you repeat a character a certain
+number of times. Research using Google when you have free time.
+
+\newpage\EMPHASIZE{Insertion}
+
+You can use the \texttt{insert()} method to insert the contents of a
+string into another. You need to specify the index of the invoking
+\texttt{string} object to insert at but you can also specify the portion
+of the string passed in as the argument to insert.
+
+\textbf{Example.}
+
+\begin{console}
+#include <iostream>
+#include <string>
+
+int main()
+{   
+    std::string s1("0123456789");
+    std::string s2("abcdef");
+    s1.insert(3, s2);
+    std::cout << s1 << "\n";
+    s1 = "0123456789";
+    s1.insert(3, s2, 2, 3);
+    std::cout << s1 << "\n";
+    return 0;
+} 
+\end{console}
+
+Even more method signatures of \texttt{insert()} exist as well.
+
+\newpage\EMPHASIZE{Type conversion}
+
+Given a C++ string object, you can get a C string with the same content
+using the \texttt{c_str()} method.
+
+\textbf{Example.}
+
+\begin{console}
+#include <iostream>
+int main()
+{   
+    std::string s1 = "Hi!";
+    const char * s2;
+    s2 = s1.c_str();
+    std::cout << s2 << "\n";
+    return 0;
+}
+\end{console}
+
+You can use a regular constant character pointer to bind to the C-string returned but you \EMPHASIZE{shouldn't delete the pointer} if you do since the pointer will be pointing to the C-string content of the C++ \texttt{string} object.
+
+\begin{console}
+const char * s2;
+s2 = s1.c_str();
+std::cout << s2 << "\n";
+delete [] s2; // BAD!!!
+\end{console}
+
+Since the C-string returned is a constant pointer to a character array,
+you \EMPHASIZE{can't change its content} through simple
+assignment.
+
+\begin{console}
+const char * s2;
+s2 = s1.c_str();
+s2[1] = '$'; // BAD!!! \\
+\end{console}
+
+\newpage\EMPHASIZE{External Resources}
+
+There are many resources available to you to learn more if you are
+interested.
+
+Most textbooks contain some information on the \texttt{std::string} class.
+
+The internet is full of websites containing a detailed reference to the
+C++ standard library. The following are two good ones, just Google for
+more:
+
+\begin{itemize}
+\item
+  \href{http://www.cplusplus.com/}{http://www.cplusplus.com}
+\item
+  \href{http://en.cppreference.com/}{http://en.cppreference.com}
+\end{itemize}
+
+You should get used to researching content online. When you have
+questions, you are more than likely running into an issue that other
+people also have run into in the past. Leverage their experience. Find
+and join a good C++ forum. At the very least, join the following
+discussion websites meant for programmers:
+
+\begin{itemize}
+\item
+  \url{http://stackoverflow.com/}
+\item
+  \url{http://programmers.stackexchange.com/}
+\end{itemize}
+
+Of course you shouldn't outright plagiarize content you find online. It won't really help you much to just copy-paste code in anyway.
+
+\newpage\EMPHASIZE{Exercises}
+
+\begin{ex}
+Do an experiment to verify that \texttt{operator>>} (i.e., input) is overloaded to work with \texttt{std::string} objects. Note that a whitespace will terminate an input.
+\end{ex}
+\begin{ex}
+Write a program that does the following: Declare a
+\texttt{std::string} object and initialize it with a string. Create an
+array of \texttt{std::string} objects from the words in the first string.
+The separator of words include the space and the period. Print all the
+words in the first string, each on a separate line. Print the total
+number of words and the average number of characters per word.
+\end{ex}
+\begin{ex}
+Write a program that prompts the user for a string
+and prints ``integer'' if the string is made up of digit characters
+where the first is not `0'; otherwise the program prints ``not
+integer''.
+\end{ex}
+\begin{ex}
+Write a function that accepts a \texttt{std::string}
+object and returns the string with words capitalized. In other words, if
+the object passed in is \texttt{std::string("hello world")}, then
+\texttt{std::string"Hello World")} is returned; if the object passed in is
+\texttt{std::string("ok. that's great!")}, then \texttt{std::string("Ok.
+That's great!")} is returned. Assume that the only word separators are
+the space, the period, and the exclamation mark.
+\end{ex}

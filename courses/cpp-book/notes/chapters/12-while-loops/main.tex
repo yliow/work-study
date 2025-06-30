@@ -1,0 +1,474 @@
+\newpage\EMPHASIZE{12. while Loops}
+
+Objectives
+
+\begin{itemize}
+\item
+  Write while-loops
+\item
+  Use sentinel values to exit a while-loop
+\end{itemize}
+
+Like the \texttt{for}-loop, the purpose of the \texttt{while}-loop is to
+repeat a block of statements (or just a statement). While there is a
+difference, once you know how the \texttt{for}-loop works, the while-loop
+is easy: the \texttt{while}-loop is a simplification of the
+\texttt{for}-loop.
+
+\newpage\EMPHASIZE{\texttt{while}-loop}
+
+First run this. I' m not going to explain it since this
+is old stuff.
+\begin{console}
+int sum = 0;
+for (int i = 1; i <= 10; i++)
+{   
+    sum += i;
+    std::cout << "i:" << i << " sum:" << sum
+              << std::endl;
+}
+std::cout << "sum:" << sum << std::endl;
+\end{console}
+Now try this:
+\begin{console}[commandchars=\~\@\$]
+int sum = 0;
+~textbf@int i = 1;$
+
+~textbf@for (; i <= 10;)$
+{   
+    sum += i;
+    std::cout << "i:" << i << " sum:" << sum
+              << std::endl;
+    ~textbf@i++;$
+}
+std::cout << "sum:" << sum << std::endl;
+\end{console}
+The program works the same right? One final modification:
+\begin{console}[commandchars=\~\@\$]
+int sum = 0;
+int i = 1;
+~textbf@while (i <= 10)$
+{    
+     sum += i;
+     std::cout << "i:" << i << " sum:" << sum
+               << std::endl;
+i++;
+}
+std::cout << "sum:" << sum << std::endl;
+\end{console}
+\begin{quote}
+That's all there is to it.
+\end{quote}
+
+\begin{quote}
+\end{quote}
+
+The \texttt{while}-loop is just the \texttt{for}-loop without the
+initialization and the update part; the \texttt{while}-loop only has the
+boolean condition from the \texttt{for}-loop. So if a \texttt{while}-loop
+must perform an initialization and/or an update, you can put them in the
+following spots:
+\begin{console}[commandchars=\~\@\$]
+int sum = 0;
+~textbf@int i = 1;$              ~textbf@// INITIALIZATION$
+while (~textbf@i <= 10$)         ~textbf@// BOOLEAN CONDITION$
+{
+    sum += i;
+    i++;                ~textbf@// UPDATE$
+}
+\end{console}
+By the way, there is a slight difference between the \texttt{while}-loop
+and \texttt{for}-loop. The difference has nothing to do with the flow of
+execution. It has to do with where we declare variables in loops. (This
+was already mentioned earlier in the notes on \texttt{for}-loops).
+
+Look at these:
+\begin{console}[commandchars=\~\@\$]
+int sum = 0;
+for (int i = 1; i <= 10; i++)
+{   
+    sum += i;
+    std::cout << "i:" << i << " sum:" << sum
+              << std::endl;
+}
+~textbf@std::cout << "i:" << i << " sum:" << sum$
+          ~textbf@<< std::endl;$
+\end{console}
+\begin{console}[commandchars=\~\@\$]
+int sum = 0;
+int i = 1;
+while (i <= 10)
+{     
+      sum += i;
+      std::cout << "i:" << i << " sum:" << sum <<
+      std::endl;
+      i++;
+}
+~textbf@std::cout << "i:" << i << " sum:" << sum$
+          ~textbf@<< std::endl;$
+\end{console}
+Because the variable \texttt{i} in the second example is declared outside
+the \texttt{while}-loop, it is still available after exiting the
+\texttt{while}-loop. In the case of the \texttt{for}-loop, the variable
+\texttt{i} is destroyed when you exit the \texttt{for}-loop.
+
+\newpage\EMPHASIZE{Flow of execution in a \texttt{while} loop}
+
+Recall that the flow of execution for the for-loop looks like this:
+%TIKZ DIAGRAM UNTIL NEXT PAGE
+for ( ; ; )
+
+true
+
+false
+
+Here's the flow of execution of the while-loop:
+
+while ( )
+
+true
+
+false
+
+\newpage\EMPHASIZE{More Examples}
+
+Here's a typical example that uses the \texttt{while}-loop.
+\begin{console}
+int i = 0;
+std::cout << "gimme a number ...";
+std::cin >> i;
+while (i != 42)
+{     
+      std::cout << "so 42 is not your fav number?";
+                << std::endl;
+      std::cout << "gimme a number ...";
+      std::cin >> i;
+}
+\end{console}
+
+Notice something about this \texttt{while}-loop?
+
+Hmmmm ....there is \EMPHASIZE{no control variable} unlike our \texttt{for}-loop examples. Now try this:
+\begin{console}[commandchars=\~\@\$]
+~textbf@int sum = 0;$
+int i = 0;
+std::cout << "gimme a number ...";
+std::cin >> i;
+while (i != 42)
+{     
+      ~textbf@sum += i;$
+      std::cout << "sum: " << sum
+                << std::endl;
+      std::cout << "gimme a number ...";
+      std::cin >> i;
+}
+std::cout << "final sum: " << sum << std::endl;
+\end{console}
+
+In general, if you want to process a bunch of numbers, you can run over
+these numbers in two different ways: Either the program knows how to
+compute them (example: the numbers are 1, 2, 3, 4, 5, 6, 7, 8, 9, 10) or
+the program does not (example: it's based on user
+input).
+
+For the first case, you should use the \EMPHASIZE{for-loop} with a
+\EMPHASIZE{control or index or counter variable} running over the values.
+
+For the second case, you should use the \EMPHASIZE{while-loop}. To let the
+user stop the data processing, you have to pick a special value for the
+user to use to indicate end-of-data. This special value is called the
+\EMPHASIZE{sentinel value}.
+
+Now I want you to step back and look at the ``structure''of the above
+program:
+\begin{align*}
+\text{initialization}\\
+\text{prompt user for data}\\
+\text{while value of data is not sentinel value:}\\
+&\text{process data}\\
+&\text{prompt user for data}\\
+\end{align*}
+Note that there is code duplication:
+\begin{align*}
+\text{initialization}\\
+\textbf{prompt user for data}\\
+\text{while value of data is not sentinel value:}\\
+&\text{process data}\\
+&\textbf{prompt user for data}\\
+\end{align*}
+
+\begin{ex}
+Write a program that continually ``rolls a die''and prints
+the face value of the die until 6 is reached. (Use rand() to generate a
+random integer between 1 and 6.)
+\end{ex}
+\begin{ex} Write a program that computes the product of integers entered
+by the user. Use a sentinel value of 0 to indicate the end of data.
+Here's the skeleton code:
+\begin{console}[commandchars=\~\@\$]
+~textbf@int product = _____;$
+int i = 0;
+
+std::cout << "gimme a number ...";
+std::cin >> i;
+~textbf@while (__________)$
+{    
+     _____________________;
+     std::cout << "product: " << product
+               << std::endl;
+     std::cout << "gimme a number ...";
+     std::cin >> i;
+}
+std::cout << "final product: " << product << std::endl;
+\end{console}
+\end{ex}
+
+\begin{ex} Write a program that computes the cost of head grafting
+surgery. Each head costs \$100.42. Display the total number of heads
+requested. The program exits the loop when the number of heads requested
+is zero. Here is the skeleton code:
+\begin{console}[commandchars=\~\@\$]
+int heads = 0;
+double cost = 0.0;
+int totalHeads = _____;
+double totalCost = _____;
+
+std::cout << "how many heads? ";
+std::cin >> heads;
+~textbf@while (__________)$
+{     
+      cost = ________________________________;
+      totalHeads = ______________________________;
+      totalCost = ______________________________;
+      std::cout << "total heads requested: "
+                << totalHeads << std::endl
+                << "total cost: "
+                << totalHeads <<
+                '\n' << std::endl;
+      // prompt for heads
+}
+
+std::cout << "your final bill:" << totalCost << '\n'
+          << "i hope you enjoy your extra "
+          << totalHeads << " heads" << std::endl;
+\end{console}
+\end{ex}
+
+\begin{ex}
+Due to popular demand and lack of staff and surgeons
+(and donors), we have to limit the number of extra heads per visit.
+Modify the above program so that the program exits the while-loop when
+the number of heads requested is zero or when the total number of heads
+requested exceeds 42.
+\end{ex}
+\begin{ex} Write a simple number guessing game. The program
+generates a random integer from 1 to 10 (inclusive), and continually
+prompts the user to guess the number until the correct answer is given.
+When you're done with that, get the program to print the
+number of tries.
+\end{ex}
+\begin{ex} Modify our multiplication game so that it keeps
+posing questions until the user answers 5 questions correctly. While
+prompting the user, print the number of correct answers. (Once
+you're done with that, make a slight modification to
+prompt the user for the number of correct answers before terminating the
+program.)
+\end{ex}
+\begin{ex} Modify the above program so that the program
+terminates when 5 \texttt{\textbf{consecutive}} correct answers are given.
+\end{ex}
+\newpage\EMPHASIZE{break}
+
+Fortunately the \texttt{break} statement works the same way for the
+\texttt{while}-loop as it does for the for-loop.
+%TIKZ DIAGRAM HERE
+\begin{console}
+int i = 0;
+while (i < 1000)
+{     
+      std::cout << i << std::endl;
+      if (i == 100) break;
+      i++;
+}
+std::cout << "out ... " << i << std::endl;
+\end{console}
+
+Again, the same advice for using the \texttt{break} statement in the
+\texttt{for}-loop applies: Don't overuse it.
+
+\begin{ex}
+What is the output? Work it out by hand and then
+check it by running the program.
+\begin{console}
+int i = 0;
+while (i <= 10)
+{     
+      std::cout << "A " << i << ' ';
+      i += 2;
+      std::cout << "B " << i << ' ';
+      if (i > 5) break;
+      std::cout << "C " << i << ' ';
+      i += 3;
+      std::cout << "D " << i << '\n';
+}
+std::cout << i << std::endl;
+\end{console}
+\end{ex}
+
+\newpage\EMPHASIZE{continue}
+
+Recall that this is the flow of execution for \texttt{continue} in the \texttt{for}-loop:
+%TIKZ DIAGRAM HERE
+The \texttt{continue} statement works like this for the \texttt{while}-loop:
+%TIKZ DIAGRAM HERE
+
+\begin{ex}
+What is the output? Work it out by hand and then check it by running the program.
+\begin{console}
+int i = 0;
+while (i <= 10)
+{     
+      i += 5;
+      if (i > 5) continue;
+      i += 3;
+}
+std::cout << i << std::endl;
+\end{console}
+\end{ex}
+\begin{ex}
+Here's an example. Run it.
+\begin{console}
+int numHeads = 0;
+std::cout << "how many heads do you have? ";
+std::cin >> numHeads;
+while (numHeads != 0)
+{     
+      std::cout << "cool!" << std::endl;
+      std::cout << "how many heads do you have?";
+      std::cin >> numHeads;
+}
+\end{console}
+
+Now insert code that prints ``rubbish''and \texttt{continue} to the next
+iteration of the loop if \texttt{numHeads} is negative:
+\begin{console}
+int numHeads = 0;
+std::cout << "how many heads do you have? ";
+std::cin >> numHeads;
+while (numHeads != 0)
+{     
+      // INSERT CODE HERE
+      std::cout << "cool!" << std::endl;
+      std::cout << "how many heads do you have?";
+      std::cin >> numHeads;
+}
+\end{console}
+\end{ex}
+\newpage\EMPHASIZE{More examples}
+
+Remember our example on computing the maximum of a list of values?
+\begin{console}
+int x, y, z;
+std::cin >> x >> y >> z;
+
+int max = x;
+if (max < y) max = y;
+if (max < z) max = z;
+std::cout << max << std::endl;
+\end{console}
+
+Let's write a program that prompts the user for integers
+and computes the maximum of all integers entered. The program stops
+prompting when the user enters -99999. Here's the
+skeleton code:
+\begin{console}[commandchars=\~\@\$]
+int x = 0;
+std::cin >> x;
+int max = x;
+
+while (x != -99999)
+{     
+      // process x
+      std::cout << max << std::endl;
+      std::cin >> x;
+}
+std::cout << "final max: " << max
+          << std::endl;
+\end{console}
+
+Note that we need a ``special value''of -99999 to stop the loop. What
+do we do with x? We check if it's larger than what we
+have in max:
+\begin{console}[commandchars=\~\@\$]
+int x = 0;
+std::cin >> x;
+int max = x;
+
+while (x != -99999)
+{     
+      ~textbf@if (max < x) max = x;$
+      std::cout << max << std::endl;
+      std::cin >> x;
+}
+std::cout << "final max: " << max << std::endl;
+\end{console}
+
+\begin{ex}
+Modify the above program so that it computes the
+minimum instead of the maximum.
+\end{ex}
+
+\begin{ex} Modify the above program so that it computes the sum
+of all values entered by the user until 0 is entered. When 0 is entered,
+the program prints the final sum and stops.
+\end{ex}
+\begin{ex}
+Write a program that continually prompts the user
+for numbers and prints the running average. The program stops prompting
+when the user enters \texttt{-99999}.
+\end{ex}
+\newpage\EMPHASIZE{Summary}
+
+The format of the while-loop looks like this:
+\begin{center}
+while (\texttt{[bool expr]})\\
+\texttt{[stmt]}
+\end{center}
+where \texttt{[bool expr]} is a boolean expression and \texttt{[stmt]} is a single statement or a block of statements.
+
+The \texttt{while}-loop is just the \texttt{for}-loop without the
+initialization and the update parts.
+
+In general, if your loop requires a variable that runs over a sequence
+of numbers that can be computed by the program, you should use the
+\texttt{for}-loop. Otherwise you should use the \texttt{while}-loop. (There
+are exceptions. But this advice will do for now).
+
+The \texttt{break} statement, if executed in the body of the
+\texttt{while}-loop, will exit the \texttt{while}-loop and continues with
+the execution of the statement immediately after the \texttt{while}-loop.
+
+The \texttt{continue} statement, if executed in the body of the
+\texttt{while}-loop, will immediately bring the execution to the boolean
+condition of the \texttt{while}-loop.
+
+\newpage\EMPHASIZE{Exercises}
+
+
+Q1. Write a program that computes the gas mileage of a car. The program
+continually prompts the user for the relevant data. In each iteration of
+the loop, the program prompts the user for the miles traveled and the
+gas used. When the user entered 0 for miles, the program stops prompting
+the user, and displays the gas mileage (i.e. total miles divided by the
+total gas usage).
+
+Q2. Modify our multiplication game so that it keeps posing questions
+until the user answers 80\% of the questions correctly. While prompting
+the user, print the percentage of his/her correct answers.
+
+Q3. Investigate the following problem: How many die rolls do you need to
+get the value 6? What about two 6's? What about three
+6's? ... What is the likelihood of getting a 6? What is
+the likelihood of getting two 6's? ... What about the
+case of two consecutive 6's? Three consecutive
+6's?

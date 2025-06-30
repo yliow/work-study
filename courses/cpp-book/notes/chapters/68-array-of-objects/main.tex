@@ -1,0 +1,631 @@
+\newpage\EMPHASIZE{68. Array of Objects}
+
+\textsc{Objectives}
+
+\begin{itemize}
+\item
+  Review Array and pointer
+\item
+  Use Arrays to store objects
+\item
+  Build static sized Array Objects
+\item
+  Build static sized Array Object Pointers
+\item
+  Build dynamic sized Array Object
+\item
+  Build dynamic sized Array Object Pointers
+\end{itemize}
+
+\newpage\EMPHASIZE{Review}
+
+As you know, the size of the array is fixed:
+\begin{console}
+const int SIZE = 5;
+int x[2 * SIZE];        // OK
+int y[42];              // OK
+int i = 5;
+int z[i];               // WRONG!!!
+\end{console}
+For a ``dynamic'' array, i.e., an array whose size can be variable, you
+can use a pointer.
+\begin{console}
+int * p = new int[5];         // OK
+const int SIZE = 5;
+int * q = new int [2 * SIZE]; // OK
+int i = 5;
+int * r = new int[i]; // OK!!!
+\end{console}
+Memory allocated to a pointer must be de-allocated by the programmer:
+
+\begin{console}
+int i = 5;
+int * r = new int[i];
+// do something with r[0],...,r[i -- 1]
+delete [] r;
+\end{console}
+Memory can be allocated to a pointer more than once. The sizes can be
+different.
+
+\begin{console}
+int * r = new int[5];
+// ... do something with r[0],...,r[4]
+delete [] r;
+...
+r = new int;
+// ... do something with *r;
+delete r;
+...
+r = new int[10];
+// ... do something with r[0],...,r[9]
+delete [] r;
+\end{console}
+Like a pointer to a structure variable, if p points to an object with
+instance variable \texttt{x}, then
+\begin{center}
+\verb!(*p).x! is the same as \verb!p-> x!
+\end{center}
+Similarly if the object has method \texttt{m()}, then invoking
+\begin{center}
+\texttt{(*p).m()} is the same as \texttt{p-> m()}
+\end{center}
+Use \texttt{-> }instead of \texttt{*.}
+
+\newpage\EMPHASIZE{Array of Objects}
+
+So far objects are created individually.
+
+What if you want to create an array of objects
+\begin{center}
+\texttt{C obj[10];}
+\end{center}
+where \texttt{C} is the class?
+
+Try the following example:
+\begin{console}
+// Int.h
+#include <iostream>
+class Int
+{     
+public:
+        Int(int x=0)
+           : x_(x)
+        {
+             std::cout << "Int ... x_: " << x_
+                       << std::endl;
+        }
+private:
+        int x_;
+};
+\end{console}
+\begin{console}
+#include "Int.h"
+int main()
+{   
+    Int a[10];
+    return 0;
+}
+\end{console}
+\EMPHASIZE{The Point:} Each \texttt{a[i] (i=0,...,9)} is constructed using the
+default constructor. When you declare an array of objects each object in
+the array calls the \EMPHASIZE{default constructor}.
+
+You \EMPHASIZE{must} have a default constructor if you want to have an
+array of objects. (Don' t forget that if you
+don' t specify any constructor, C++ will give you a
+default constructor.)
+
+Of course you can still call the constructor one at a time like this if
+you wish:
+\begin{center}
+\texttt{Int a[3] = {Int(3), Int(-1), Int(42)};}
+\end{center}
+Now try to run this (why does it not work):
+\begin{console}
+// vec2d.h
+#include < iostream>
+class vec2d
+{
+public:
+        vec2d(double x, double y)
+                : x_(x), y_(y)
+                {}
+private:
+        double x_, y_;
+};
+\end{console}
+\begin{console}
+#include "vec2d.h"
+
+int main()
+{   
+    vec2d v[10];
+    return 0;
+}
+\end{console}
+\EMPHASIZE{The point:} Each of the \texttt{v[0],...,v[9]} calls \texttt{vec2d()}
+(the default constructor) to initialize itself. But there is no default
+constructor in \texttt{vec2d}. There' s only one
+constructor and it must receive two doubles.
+
+Remember that! If you want to declare an array of objects without an
+initializer list, you \EMPHASIZE{MUST} have the default constructor used to
+construct the objects in the array.
+
+\begin{ex}
+Fix the following class so that an array of
+\texttt{WeatherControl} objects can be created with all instance variables
+initialized to 10.
+\begin{console}
+// WeatherCtrl.h
+#ifndef WEATHERCTRL_H
+#define WEATHERCTRL_H
+
+class WeatherCtrl
+{
+public:
+        WeatherCtrl(double temp, double pressure)
+        : temp_(temp), pressure_(pressure)
+        {}
+        double get_temp() const { return temp_; }
+        double get_pressure() const { return pressure_; }
+        void set_temp(double);
+        void set_pressure(double);
+private:
+        double temp_;
+        double pressure_;
+};
+
+#endif
+\end{console}
+\end{ex}
+Suppose we have the following class:
+
+\begin{console}
+class Int
+{
+public:
+        Int(int x)
+        : x_(x)
+        {}
+private:
+        int x_;
+};
+\end{console}
+Now suppose you want to create an array of \texttt{Int} objects with
+\begin{center}
+\texttt{Int a[10]; // want a[i].x = i}
+\end{center}
+First Method:
+%TIKZ DIAGRAMS AND ARROWS HERE
+\begin{console}
+class Int
+{
+public:
+        Int (int x = 0)
+        : x_(x) {}
+        void set(int a) {x_ = a;}
+private:
+        int x_;
+};
+int main()
+{   
+    Int a[10];
+    for (int i = 0; i < 10; i++)
+        a[i].set(i);
+...
+}
+\end{console}
+So note that in the above each \texttt{a[i].x} was first set to
+\texttt{0} by the constructor ... then \texttt{a[i].x} was set to
+\texttt{i}.
+
+\EMPHASIZE{The Point:} \texttt{a[i].x} was set two values.
+
+This is no big deal for the \texttt{Int} class because not a lot of work
+was done in the constructor. But... what if a certain class \texttt{C}
+does a lot of work in the constructor? Example: \texttt{C} has
+\texttt{1000000} member variables and the default constructor sets all to
+\texttt{0} and then you need to set them all to \texttt{i}?
+
+Second method:
+%TIKZ DIAGRAMS AND ARROWS HERE
+\begin{console}
+int main()
+{   
+    Int * a[10];
+    for (int i = 0; i < 10; ++i)
+        a[i] = new Int(i);
+    // do something with *(a[i])
+    ...
+}
+\end{console}
+\EMPHASIZE{The point:} Each \texttt{a[i]} is not an object, but a pointer
+to an object. We can then construct the object in the heap with whatever
+constructor call that we choose and then point \texttt{a[i]} to the
+object.
+
+\EMPHASIZE{The point:}There is no constructor call when you do
+\begin{center}
+\texttt{Int * a[10];}
+\end{center}
+or when you do
+\begin{center}
+\texttt{Int * p;}
+\end{center}
+\EMPHASIZE{The point:} There is no ``default constructor call'' for
+pointers. Pointers are not objects.
+
+Let's compare the two methods.
+
+In the first method, when we create an array of objects the default
+constructor is called for each object.
+
+In the second method, for the array of pointers to objects, you can call
+a constructor for each object in the heap that each pointer of the array
+points to.
+
+How do you deallocate memory correctly for the second method?
+
+\begin{console}
+Int * a[10];
+for (int i = 0; i < 10; ++i)
+    a[i] = new Int(i);
+// do something with *(a[i])
+for (int i = 0; i < 10; ++i)
+    delete a[i];
+\end{console}
+Compare the above with this:
+\begin{console}
+Int * a = new Int[10];
+for (int i = 0; i < 10; ++i)
+    a[i].set(i);
+delete [] a;
+\end{console}
+Make sure you see the difference between
+
+\begin{itemize}
+\item
+  Array of Pointers
+\item
+  Pointer to an Array
+\end{itemize}
+
+Note that for the second method:
+
+\begin{console}
+int main()
+{   
+    Int * a[10];
+    for (int i = 0; i < 10; ++i)
+        a[i] = new Int(i);
+    // do something with *(a[i])
+}
+\end{console}
+The size of the array is fixed. To have a ``dynamic'' array where the
+size can change, you can use a pointer.
+\begin{console}
+int size;
+std::cin >> size; // enter integer > 0
+Int ** a = new Int*[size];
+for (int i = 0; i < 10; ++i)
+    a[i] = new Int(i);
+...
+// Exercise on pointers to objects:
+// Assign 43 to x of Int object a[0]
+// is point to.
+\end{console}
+The above is analogous to this:
+\begin{console}
+int size;
+std::cin >> size; // enter integer > 0
+Int ** a = new Int*[size];
+for (int i = 0; i < 10; ++i)
+    a[i] = new Int(i);
+    // ... do something with *a[i]
+for (int i = 0; i < size; ++i)
+    delete a[i];
+\end{console}
+Note:
+\begin{center}
+\texttt{Int ** a = new Int*[size];}
+\texttt{Int ** b = new (Int*)[size];} \textbf{//WRONG!!!}
+\end{center}
+Comparison:
+\begin{align*}
+\texttt{Int a[10]; //Fixed size, default constructor}\\
+\texttt{Int * b[10]; //Fixed, can call constructor}\\
+\texttt{Int ** c = new Int*[size]; // variable size and can}\\
+\text{                     }\texttt{// call constructor.}
+\end{align*}
+What if you want to do this:
+\begin{center}
+\texttt{Date a[10]; // all 10 initialized to 12/25/2009}\\
+\texttt{Date b[20]; // all 20 initialized to 12/25/2010}\\
+\end{center}
+Keep default year, month, day values in Date class for initialization
+purposes. Allow defaults to be changed. But default values for the
+constructor is fixed.
+
+See notes on Static for details. Such values are more associated with
+the class than with individual objects.
+
+\begin{ex}
+Write a program that does this:
+
+\begin{itemize}
+\item
+  Prompt the user for s.
+\item
+  Create a dynamic array of size s of Int objects initializing them so
+  that you get a Fibonacci sequence.
+\item
+  For instance if you enter 7 the integers modeled in the array are:
+\end{itemize}
+\begin{center}
+1, 1, 2, 3, 5, 8, 13
+\end{center}
+You can also have 2-dim array of objects.
+
+Example:
+\begin{console}
+Int a[5][6]; // default constructor called on each
+             // a[i][j]
+for (int i = 0; i < 5; i++)
+    for (int j = 0; j < 6; j++)
+        a[i][j].set(42);
+\end{console}
+\end{ex}
+In this example, the array has fixed sizes, and you lose control over
+the constructor call.
+
+Use an array of object pointers to control constructor call
+\begin{console}
+Int * a[5][6]; // 5-by-6 array of Int *
+for (int i = 0; i < 5; i++)
+    for (int j = 0; j < 6; j++)
+        a[i][j] = new Int(42);
+
+// do something useful with *(a[i][j])
+
+for (int i = 0; i < 5; i++)
+    for (int j = 0; j < 6; j++)
+        delete a[i][j];
+\end{console}
+The above is an array of \EMPHASIZE{fixed} sizes.
+
+So... what if you want the sizes to be dynamic?
+\begin{console}
+int rows, columns;
+// ... prompt user for rows columns
+Int * a[rows][columns]; // WRONG!!!
+\end{console}
+The following is a 2-dimensional dynamic array of objects, i.e., the row
+and column size can be variables. However, the value in the array are
+objects (not pointers yet \ldots we' ll get to that in
+a bit...)
+\begin{console}
+int rows = 5, columns = 6;
+Int ** a = new Int*[rows]; // a[0], ..., a[rows-1]
+                           // are all Int * values
+for (int i = 0; i < rows; ++i)
+{   
+    a[i] = new Int[columns]; // a[i][j] for j = 0,...,
+                             // columns-1 are Int
+    for (int j = 0; j < columns; ++j)
+        a[i][j] = 42;
+}
+int rows = 5, columns = 6;
+Int ** a = new Int*[rows]; // a[0], ..., a[rows-1]
+                           // are all Int * values
+for (int i = 0; i < rows; ++i)
+{   
+    a[i] = new Int[columns]; // a[i][j] for j = 0,...,
+                             // columns-1 are Int
+    for (int j = 0; j < columns; ++j)
+        a[i][j] = 42;
+}
+// do something with a[i][j]
+// De-allocate memory used by a[0], \ldots, a[rows-1] and a
+for (int i = 0; i < rows; i++)
+    delete [] a[i];
+delete [] a;
+\end{console}
+\begin{ex}
+Write a program that does this:
+\begin{itemize}
+\item
+  prompts the user for the row and column size of a 2-dim array of
+  integer values. (Just the regular int).
+\item
+  Fill the 2-dim array with random integers.
+\item
+  Print the values in the array in a 2-dim grid.
+\item
+  Compute the row, column, and overall average of all the values (up to
+  1 decimal place).
+\item
+  Deallocate Memory used.
+\item
+  Here is what a 3 by 3 case looks like
+\end{itemize}
+
+\begin{console}
+0    3   3 |2.0
+2    9   0 |3.6
+8    2   6 |5.3
+-----------+
+
+3.3 4.6 3.0 3.6
+\end{console}
+\end{ex}
+
+\begin{ex}Run this program. Explain why it does not work.
+\begin{console}
+int floors = 3, rooms_per_floor = 10;
+WeatherControl ** wc = new WeatherControl*[floors];
+for (int floor = 0; floor < floors; ++floor)
+{   
+    wc[floor] = new WeatherControl[rooms_per_floor];
+}
+delete [] wc;
+for (int floor = 0; floor < floors; ++floor)
+{   
+    delete [] wc[floor];
+}
+\end{console}
+From previous example, each \texttt{a[i][j]} is an \texttt{Int}
+object. You lose control over calling constructor.
+\end{ex}
+Now we want the row and column sizes to be dynamic and the values in the
+array to be pointers so that we can call the constructor for each
+pointer\ldots
+%TIKZ DIAGRAMS OVER THIS CONSOLE ENV AND BOXES WITH ARROWS ON SIDE
+\begin{console}
+int rows = 5, columns = 6;
+Int *** a = new Int**[rows];
+for (int i = 0; i < rows; i++)
+{
+a[i] = new Int*[columns];
+for (int j = 0; j < columns; j++)
+a[i][j] = new Int(42);
+}
+// do something with (*a)[i][j]
+for (int i = 0; i < rows; i++)
+{             
+for (int j = 0; j < columns; j++)
+delete a[i][j];
+delete [] a[i];
+}           
+delete [] a;
+\end{console}
+Here a summary:
+
+\begin{itemize}
+\item
+  For a static sized 2-dim array of \texttt{Int} objects:
+\end{itemize}
+\begin{center} 
+\texttt{Int a[3][5]}
+\end{center}
+\begin{itemize}
+\item
+  For a static sized 2-dim array of \texttt{Int} pointers:
+\end{itemize}
+\begin{center}
+\texttt{Int * a[3][5]}
+\end{center}
+\begin{itemize}
+\item
+  For a dynamic sized 2-dim array of \texttt{Int} objects:
+\end{itemize}
+\begin{center}
+\texttt{Int ** a}
+\end{center}
+\begin{itemize}
+\item
+  For a dynamic sized 2-dim array of \texttt{Int} pointers:
+\end{itemize}
+\begin{center}
+\texttt{Int *** a}
+\end{center}
+The point:
+\begin{center}
+\EMPHASIZE{\texttt{Int *** a}}
+\end{center}
+\begin{ex}
+
+\begin{itemize}
+\item
+  Create a 2-dim (dynamic) array of \texttt{Int} object pointers. The size
+  of the first and second dim is randomly chosen from integer
+  1,2,...,10.
+\item
+  Initialize the pointers by allocating memory for \texttt{Int} objects
+  and initializing the \texttt{Int} objects with integers randomly chosen
+  from 1,2,...,10
+\item
+  Print all the integer values ``in'' this array in a 2-dim grid.
+\end{itemize}
+
+All the arrays up to this point have been rectangular, i.e., the arrays
+as a container values look like this.
+\begin{table}
+%% & & \\
+%% & & \\
+%% & & \\
+\end{table}
+Create an array that is triangular, i.e. for row 0
+
+there are 3 columns, for row 1 there are 2 columns, etc. (They are
+called jagged arrays.)
+\begin{table}
+%% & & \\
+%% & & \\
+%% & & \\
+\end{table}
+For the static size 3-dim array of \texttt{Int} objects:
+\begin{center}
+\texttt{Int a[3][6][4]}
+\end{center}
+For the static size 3-dim array of \texttt{Int} pointers:
+\begin{center}
+\texttt{Int * a[3][6][4]}
+\end{center}
+For the dynamic size 3-dim array of \texttt{Int} objects:
+\begin{center}
+\texttt{Int *** a}
+\end{center}
+For the dynamic size 3-dim array of \texttt{Int} pointers:
+\begin{center}
+\texttt{Int **** a}
+\end{center}
+Phew!!!!
+\end{ex}
+
+\begin{ex} In a function \texttt{f(a, b, c)} create a dynamic
+array of \texttt{Int} pointers with sizes \texttt{a, b, c}. Initialize all
+the pointers by allocating the memory and initializing the objects the
+pointer points to with a random integer. Make sure you de-allocate
+memory used.
+
+In your \texttt{main()}, write a \texttt{for} loop that calls \texttt{f(10,
+10, 10)} and print a message for each iteration of the loop. If the
+printing of the messages slows down, it tells you that you probably have
+a memory leak.
+\end{ex}
+\begin{ex}Write a class that models a dynamic 2-dim array of
+integers. The following usage will tell you how it works:
+\begin{console}
+IntDynArr a(5,6); // 5-by-6 int array
+a(1, 2) = 42;     // set ``a[1][2]'' to 42
+std::cout << a(1, 2) << std::endl;
+\end{console}
+Hint: \texttt{a(1, 2)} is \texttt{a.operator()(1, 2)}. You need to define
+\texttt{int \& operator(int, int)}.
+\end{ex}
+\begin{ex} Rewrite your class so you can execute this:
+\begin{console}
+IntDynArr a(5, 6);
+a[1][2] = 42;
+\end{console}
+Hint: Note that
+\begin{console}
+a[1][2]
+\end{console}          
+Is not \texttt{a.operator[][](1,2)} because there is no
+\texttt{[][]} operator!!! Instead \texttt{a[1][2]} is
+\texttt{a.operator[](1).operator[](2)}
+\end{ex}
+
+\newpage\EMPHASIZE{Summary}
+
+The objects in an array are initialized using the default constructor.
+
+If you want to get away from using the default constructor (i.e., you
+want to explicitly call the constructor) but still want a static sized
+array, you can use an array of pointers.
+
+If you want to get away from using the default constructor (i.e., you
+want to explicitly call the constructor) and you want to get away from a
+static sized array, you can use a pointer to an array of pointers.
