@@ -2,7 +2,7 @@
 
 \textsc{Objectives}
 
-\begin{tightlist}
+\begin{itemize}
 \item
   Understand inheritance
 \item
@@ -30,7 +30,7 @@
   Understand protected members
 \item
   Understand public, protected, and private inheritance
-\end{tightlist}
+\end{itemize}
 
 \newpage\EMPHASIZE{The problem}
 
@@ -38,33 +38,27 @@ Instead of working with classes (and their objects) alone, we can work
 with a hierarchy of classes. Why do we want to do this? To improve
 ``re-use''.
 
-For instance: Suppose you have an \texttt{Employee} class and you want to
-create a \texttt{Manager} class. A manager \EMPHASIZE{is an} employee -\/-
-everything in the \texttt{Employee} class should be in the \texttt{Manager}
-class. For instance an \texttt{Employee} might have a last name,
-\texttt{Manager} should have a last name too.
+For instance: Suppose you have an \texttt{Employee} class and you want to create a \texttt{Manager} class. A manager \EMPHASIZE{is an} employee -- everything in the \texttt{Employee} class should be in the \texttt{Manager} class. For instance an \texttt{Employee} might have a last name, \texttt{Manager} should have a last name too.
 
-You basically want the \texttt{Manager} class to have all the member
-variables and methods of the \texttt{Employee} class. Of course you can
-copy-and-paste the code from the \texttt{Employee }class into the
-\texttt{Manager} class:
-\begin{console}
+You basically want the \texttt{Manager} class to have all the member variables and methods of the \texttt{Employee} class. Of course you can copy-and-paste the code from the \texttt{Employee} class into the \texttt{Manager} class:
+
+\begin{console}[commandchars=\~\@\$]
 class Employee
 {
 public:
         ...
-        std::string get_firstname();
+        std::string get_firstname();~tikzmark@emplinestart$                ~tikzmark@emplinebendST$
         void set_firstname(const std::string &);
 private:
         std::string firstname;
         ...
 };
-
+~sidebox@empcopybox$@Copy-and-paste??$
 class Manager
 {
 public:
         ...
-        std::string get_firstname();
+        std::string get_firstname();~tikzmark@emplineend$                 ~tikzmark@emplinebendED$
         void set_firstname(const std::string &);
         // other stuff not from Employee class
         ...
@@ -74,7 +68,7 @@ private:
         ...
 }; 
 \end{console}
-
+\DrawArrowPoints[red,thick]{emplinestart}{emplineend}{-- ++(2,0) -- ++(2,0) --++ (0,-4.6)}
 Of course you would expect the \texttt{Manager} class to contain more
 things than the \texttt{Employee} class. For instance in the company where
 the above software is written, a manager might have a secretary while
@@ -137,12 +131,13 @@ important principles when working with inheritance.
 \end{itemize}
 
 I don' t have to tell you ... run it.
-%sidenote tikzbox here
-\begin{console}
+
+\begin{console}[commandchars=\~\@\$]
 #include <iostream>
 
 class P
 {
+~sidebox@methodbox$@~textbf@I'm putting the methods in one line so that we don't have to page up and down.$$
 public:
         P() : x_(1) {}
         int get_x() const { return x_; }
@@ -243,40 +238,76 @@ from latextool_basic import *
 p = Plot()
 pbox = Rect(0, 0, 2, 2, label='P', linewidth=0.1)
 cbox = Rect(0,-4,2,-2, label='C', linewidth=0.1)
-c2p = Line(points=[(cbox.center, cbox.top),(pbox.center, pbox.bottom)], linewidth=0.1, endstyle='>')
+c2p = Line(points=[cbox.top(), pbox.bottom()], linewidth=0.1, endstyle='>')
 p += pbox
 p += cbox
 p += c2p
+print(p)
 \end{python}
 Each box represents the class. The arrow describes the inheritance
 relationship between the two classes. (This is the so-called class
 diagram from UML. I'm simplifying it a little -- see previous notes for
 details on what to draw inside the boxes.) We created an object \verb!c!
 from class \verb!C!. So informally I'll draw it this way:
-%% \begin{python}
-%% from latextool_basic import *
-%% p = Plot()
-%% p += Rect(0, 0, 1, 1, name='a')
-%% p += Rect(2, 0, 3, 1, name='b')
-%% p += ellipse(center=(5,2), width=2, height=1, name='c')
-%% p += fit(name='X', names=['a', 'b', 'c'], linecolor='red')
-%% print(p)
-%% \end{python}
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+p = Plot()
+#p += Grid(x0=-5,y0=-5,x1=10,y1=5)
+pbox = Rect(0, 0, 2, 2, label='P', linewidth=0.1)
+cbox = Rect(0,-4,2,-2, label='C', linewidth=0.1)
+c2p = Line(points=[cbox.top(), pbox.bottom()], linewidth=0.1, endstyle='>')
+p += pbox
+p += cbox
+p += c2p
+mthdel = ellipse(center=(7,-2), width=6, height=3, linewidth=0.1)
+c2mthd = Line(points=[cbox.right(), (7,-2)], linewidth=0.1)
+p += c2mthd
+p += mthdel
+mthd0 = POINT(x=6, y=-1.7, r=0, label=r'\verb!y_!')
+mthd1 = POINT(x=9, y=-1.5, r=0, label=r'\verb!set_y!')
+mthd2 = POINT(x=8, y=-3, r=0, label=r'\verb!get_y!')
+p += str(mthd0)
+p += str(mthd1)
+p += str(mthd2)
+print(p)
+\end{python}
 We also know that through inheritance, \verb!c! also has \verb!x_!,
 \verb!get_x!, and \verb!set_x!. So where's \verb!c.x_!,
 \verb!c.get_x!, and \verb!c.set_x!?
 
 Now if you think of \verb!c.x_!, \verb!c.get_x!, and \verb!c.set_x!
 in the same bag of things like this:
-%% \begin{python}
-%% from latextool_basic import *
-%% p = Plot()
-%% p += Rect(0, 0, 1, 1, name='a')
-%% p += Rect(2, 0, 3, 1, name='b')
-%% p += ellipse(center=(5,2), width=2, height=1, name='c')
-%% p += fit(name='X', names=['a', 'b', 'c'], linecolor='red')
-%% print(p)
-%% \end{python}
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+p = Plot()
+#p += Grid(x0=-5,y0=-5,x1=10,y1=5)
+pbox = Rect(0, 0, 2, 2, label='P', linewidth=0.1)
+cbox = Rect(0,-4,2,-2, label='C', linewidth=0.1)
+c2p = Line(points=[cbox.top(), pbox.bottom()], linewidth=0.1, endstyle='>')
+p += pbox
+p += cbox
+p += c2p
+mthdel = ellipse(center=(7,-2), width=6, height=3, linewidth=0.1)
+c2mthd = Line(points=[cbox.right(), (7,-2)], linewidth=0.1)
+p += c2mthd
+p += mthdel
+mthd0 = POINT(x=6, y=-1.7, r=0, label=r'\verb!y_!')
+mthd1 = POINT(x=9, y=-1.5, r=0, label=r'\verb!set_y!')
+mthd2 = POINT(x=8, y=-3, r=0, label=r'\verb!get_y!')
+mthd3 = POINT(x=6, y=-2.5, r=0, label=r'\verb!x_!')
+mthd4 = POINT(x=8.5, y=-2.5, r=0, label=r'\verb!set_x!')
+mthd5 = POINT(x=7, y=-1, r=0, label=r'\verb!get_x!')
+
+p += str(mthd0)
+p += str(mthd1)
+p += str(mthd2)
+p += str(mthd3)
+p += str(mthd4)
+p += str(mthd5)
+print(p)
+\end{python}
 then you would be surprised by the following experiment: Add an integer
 member variable to class \verb!C!:
 
@@ -315,15 +346,46 @@ int main()
 
 The program does compile. But this means that \verb!c_! now has two
 \verb!x_!'s!!!
-%% \begin{python}
-%% from latextool_basic import *
-%% p = Plot()
-%% p += Rect(0,0,1,1,name='a')
-%% p += Rect(2,0,3,1,name='b')
-%% p += ellipse(center=(5,2), width=2, height=1, name='c')
-%% p += fit(name='X', names=['a', 'b', 'c'], linecolor='red')
-%% print(p)
-%% \end{python}
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+p = Plot()
+#p += Grid(x0=-5,y0=-5,x1=10,y1=5)
+pbox = Rect(0, 0, 2, 2, label='P', linewidth=0.1)
+cbox = Rect(0,-4,2,-2, label='C', linewidth=0.1)
+c2p = Line(points=[cbox.top(), pbox.bottom()], linewidth=0.1, endstyle='>')
+p += pbox
+p += cbox
+p += c2p
+mthdel = ellipse(center=(7,-2), width=6, height=3, linewidth=0.1)
+c2mthd = Line(points=[cbox.right(), (7,-2)], linewidth=0.1)
+p += c2mthd
+p += mthdel
+mthd0 = POINT(x=6, y=-1.7, r=0, label=r'\verb!y_!')
+mthd1 = POINT(x=9, y=-1.5, r=0, label=r'\verb!set_y!')
+mthd2 = POINT(x=8, y=-3, r=0, label=r'\verb!get_y!')
+mthd3 = POINT(x=6, y=-2.5, r=0, label=r'\verb!x_!')
+mthd4 = POINT(x=8.5, y=-2.5, r=0, label=r'\verb!set_x!')
+mthd5 = POINT(x=7, y=-1, r=0, label=r'\verb!get_x!')
+mthd6 = POINT(x=7, y=-2.2, r=0, label=r'\verb!x_!')
+
+p += str(mthd0)
+p += str(mthd1)
+p += str(mthd2)
+p += str(mthd3)
+p += str(mthd4)
+p += str(mthd5)
+p += str(mthd6)
+yikesbox = Rect(4, 1, 6, 3, linewidth=0.1, linecolor='red', label=r'\textbf\redtext{Yikes}')
+p += yikesbox
+yikesL0 = Line(points=[yikesbox.bottomright(), (mthd6.x() - 0.5, mthd6.y() + 0.3)], linewidth=0.05, linecolor='red', endstyle='>')
+yikesL1 = Line(points=[yikesbox.bottomleft(), (mthd3.x() - 0.5, mthd3.y() + 0.3)], linewidth=0.05, linecolor='red', endstyle='>')
+
+p += yikesL0
+p += yikesL1
+
+print(p)
+\end{python}
 When you call upon \verb!c.x_! which one is it??? Why does the compiler
 allow this?
 
@@ -332,15 +394,53 @@ which \verb!x_! is used if you access \verb!c.x_! in \verb!main()!?
 \end{ex}
 You really want to think of the members (member variables as well as
 methods) as being organized into two different scopes:
-%% \begin{python}
-%% from latextool_basic import *
-%% p = Plot()
-%% p += Rect(0,0,1,1,name='a')
-%% p += Rect(2,0,3,1,name='b')
-%% p += ellipse(center=(5,2), width=2, height=1, name='c')
-%% p += fit(name='X', names=['a', 'b', 'c'], linecolor='red')
-%% print(p)
-%% \end{python}
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+p = Plot()
+#p += Grid(x0=-5,y0=-5,x1=10,y1=5)
+pbox = Rect(0, 0, 2, 2, label='P', linewidth=0.1)
+cbox = Rect(0,-4,2,-2, label='C', linewidth=0.1)
+
+c2p = Line(points=[cbox.top(), pbox.bottom()], linewidth=0.1, endstyle='>')
+
+p += pbox
+p += cbox
+p += c2p
+
+mthdel0 = ellipse(center=(7,-4), width=6, height=3, linewidth=0.1)
+mthdel1 = ellipse(center=(7,2), width=6, height=3, linewidth=0.1)
+
+c2mthd = Line(points=[cbox.right(), (7,-4)], linewidth=0.1)
+p2mthd = Line(points=[pbox.right(), (7, 2)], linewidth=0.1)
+mthd2mthd = Line(points=[(7,-4), (7, 2)], linewidth=0.1)
+
+p += c2mthd
+p += p2mthd
+p += mthd2mthd
+p += mthdel0
+p += mthdel1
+
+mthd0 = POINT(x=6, y=-3.7, r=0, label=r'\verb!y_!')
+mthd1 = POINT(x=9, y=-3.5, r=0, label=r'\verb!set_y!')
+mthd2 = POINT(x=8, y=-5, r=0, label=r'\verb!get_y!')
+mthd3 = POINT(x=6, y=2.5, r=0, label=r'\verb!x_!')
+mthd4 = POINT(x=6, y=-2.1, r=0, label=r'\large\verb!c!')
+mthd5 = POINT(x=8.5, y=2.8, r=0, label=r'\verb!set_x!')
+mthd6 = POINT(x=7, y=-3, r=0, label=r'\verb!x_!')
+mthd7 = POINT(x=7.3, y=1.5, r=0, label=r'\verb!get_x!')
+
+p += str(mthd0)
+p += str(mthd1)
+p += str(mthd2)
+p += str(mthd3)
+p += str(mthd4)
+p += str(mthd5)
+p += str(mthd6)
+p += str(mthd7)
+
+print(p)
+\end{python}
 The members of \verb!c! that are due to inheritance is at the top while
 the members declared in class \verb!C! are at the bottom. In particular
 the \verb!x_! declared in class \verb!C! is at the bottom.
@@ -355,15 +455,59 @@ the two bags (bottom and top) and you can think of the two bags as
 scopes. You can in fact specify the scopes when you access a member of
 \verb!c!. First of all the scopes have names: they are \verb!C! and
 \verb!P!, i.e., the names of the classes:
-%% \begin{python}
-%% from latextool_basic import *
-%% p = Plot()
-%% p += Rect(0,0,1,1,name='a')
-%% p += Rect(2,0,3,1,name='b')
-%% p += ellipse(center=(5,2), width=2, height=1, name='c')
-%% p += fit(name='X', names=['a', 'b', 'c'], linecolor='red')
-%% print(p)
-%% \end{python}
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+p = Plot()
+#p += Grid(x0=-5,y0=-5,x1=10,y1=5)
+pbox = Rect(0, 0, 2, 2, label='P', linewidth=0.1)
+cbox = Rect(0,-4,2,-2, label='C', linewidth=0.1)
+
+c2p = Line(points=[cbox.top(), pbox.bottom()], linewidth=0.1, endstyle='>')
+
+p += pbox
+p += cbox
+p += c2p
+
+mthdel0 = ellipse(center=(7,-4), width=6, height=3, linewidth=0.1)
+mthdel1 = ellipse(center=(7,2), width=6, height=3, linewidth=0.1)
+
+c2mthd = Line(points=[cbox.right(), (7,-4)], linewidth=0.1)
+p2mthd = Line(points=[pbox.right(), (7, 2)], linewidth=0.1)
+mthd2mthd = Line(points=[(7,-4), (7, 2)], linewidth=0.1)
+
+p += c2mthd
+p += p2mthd
+p += mthd2mthd
+p += mthdel0
+p += mthdel1
+
+mthd0 = POINT(x=6, y=-3.7, r=0, label=r'\verb!y_!')
+mthd1 = POINT(x=9, y=-3.5, r=0, label=r'\verb!set_y!')
+mthd2 = POINT(x=8, y=-5, r=0, label=r'\verb!get_y!')
+mthd3 = POINT(x=6, y=2.5, r=0, label=r'\verb!x_!')
+mthd4 = POINT(x=6, y=-2.1, r=0, label=r'\large\verb!c!')
+mthd5 = POINT(x=8.5, y=2.8, r=0, label=r'\verb!set_x!')
+mthd6 = POINT(x=7, y=-3, r=0, label=r'\verb!x_!')
+mthd7 = POINT(x=7.3, y=1.5, r=0, label=r'\verb!get_x!')
+mthd8 = POINT(x=6, y=0.2, r=0, label=r'\large\verb!P!')
+mthd9 = POINT(x=6, y=-2.1, r=0, label=r'\large\verb!C!')
+mthd10 = POINT(x=6.2, y=-1.6, r=0, label=r'\large\verb!c!')
+
+p += str(mthd0)
+p += str(mthd1)
+p += str(mthd2)
+p += str(mthd3)
+p += str(mthd4)
+p += str(mthd5)
+p += str(mthd6)
+p += str(mthd7)
+p += str(mthd8)
+p += str(mthd9)
+p += str(mthd10)
+
+print(p)
+\end{python}
 You can actually address a particular member by prepending it with
 \verb!C::! or \verb!P::! if you want to be specific. Try the following:
 \begin{console}[commandchars=\~\@\$]
@@ -679,17 +823,9 @@ Now what if you want to choose how to initialize the parent part of the
 \verb!c! object? How do you explicitly call the parent's constructor?
 Let's add a new constructor in \verb!P!, one that accepts an integer
 value and get the \verb!C!'s constructor to call \verb!P::P(int):!
-%this doesnt line up perfectly, need to fix this with a different approach
-%python cmds dont work with \texttt or \ttfamily as the macro commands #, _, < or > cause issues with code() and the raw string when applied as a label or string in a Rect() object
-\sidenote{
-  \begin{tikzpicture}
-  \node[draw=red,text width=4cm,minimum height=2cm,minimum width=2cm, line width=0.1cm, inner sep=0.3cm,anchor=north east] (a) at (2,-2) 
-       {\tikzmark{start42} \normalsize{ Call parent's constructor explicitly in the initializer list}};
-\end{tikzpicture}
-}
 \begin{console}[commandchars=\~\@\$]
 #include <iostream>
-
+~sidebox@parentctor$@~textbf@Call parent's constructor explicitly in the initializer list$$
 class P
 {
 public:
@@ -723,28 +859,13 @@ int main()
     return 0;
 }
 \end{console}
-\DrawArrow[red, thick]{start42}{end42}
+\DrawArrow[red, thick]{parentctor.south west}{end42}
 
 \begin{ex} You are given this incomplete code. Add to the
 constructor of \verb!Car! and \verb!Motorcycle! so that a \verb!Car!
 object is initialized to have 4 wheels and a \verb!Motorcycle! object is
 initialized to have 2 wheels.
-%ISSUE not sure why there are gaps in the diagram between the car and mcycle boxes, will fix in the future
-\sidenote{
-  \begin{tikzpicture}
-  \node[draw,text width=2cm,minimum height=2cm, line width=0.05cm, inner sep=0.3cm, anchor=center] (car) at (1,-2) 
-       {\tikzmark{c} \normalsize\texttt{Car}};
-  \node[draw,text width=2cm,minimum height=2cm, line width=0.05cm, inner sep=0.3cm, anchor=center] (mcycle) at (4,-2) 
-       {\tikzmark{m} \normalsize\texttt{Motor-\\ cycle}};
-  \node[draw,text width=2cm,minimum height=2cm,minimum width=2cm, line width=0.05cm, inner sep=0.3cm, anchor=base] (vehicle) at (2.5,1) 
-       {\tikzmark{v} \normalsize\texttt{Vehicle}};
-  \node[above=4mm of car.north] (Lstart){};
-  \node[above=4mm of mcycle.north] (Lend){};
-  \node[below=6mm of vehicle.south] (Lmid){};
-  \draw[ultra thick]        (car.north)   -- (Lstart) -- (Lend) -- (mcycle.north);
-  \draw[ultra thick, ->]        (Lmid)   -- (vehicle.south);
-\end{tikzpicture}
-}
+
 \begin{console}
 class Vehicle
 {
@@ -788,6 +909,22 @@ int main()
     return 0;
 }
 \end{console}
+\sidenote{
+  \begin{tikzpicture}
+  \node[draw,text width=2cm,minimum height=2cm, line width=0.05cm, inner sep=0.3cm, anchor=center] (car) at (1,-2) 
+       {\tikzmark{c} \normalsize\texttt{Car}};
+  \node[draw,text width=2cm,minimum height=2cm, line width=0.05cm, inner sep=0.3cm, anchor=center] (mcycle) at (4,-2) 
+       {\tikzmark{m} \normalsize\texttt{Motor-\\ cycle}};
+  \node[draw,text width=2cm,minimum height=2cm,minimum width=2cm, line width=0.05cm, inner sep=0.3cm, anchor=base] (vehicle) at (2.5,1) 
+       {\tikzmark{v} \normalsize\texttt{Vehicle}};
+  \node[above=4mm of car.north] (Lstart){};
+  \node[above=4mm of mcycle.north] (Lend){};
+  \node[below=6mm of vehicle.south] (Lmid){};
+  \draw[ultra thick]        (car.north)   -- (Lstart) -- (Lend) -- (mcycle.north);
+  \draw[ultra thick, ->]        (Lmid)   -- (vehicle.south);
+\end{tikzpicture}
+}
+
 \end{ex}
 \begin{ex}
 This is an incomplete piece of code:
@@ -964,13 +1101,7 @@ There are two ways to reuse \verb!P!:
 
 Look at the following example carefully. Make sure you understand what
 is happening.
-
-\sidenote{
-  \begin{tikzpicture}
-  \node[draw=red,text width=3cm,minimum height=2cm,minimum width=2cm, line width=0.1cm, inner sep=0.3cm,anchor=north east] (dtor) at (2,-2) 
-       {\tikzmark{startdtor} \normalsize{D has a P object}};
-\end{tikzpicture}
-}
+%this line goes off the page for some reason? cant figure out a quick fix atm
 \begin{console}[commandchars=\!\@\$]
 #include <iostream>
 
@@ -1004,15 +1135,17 @@ private:
 !textbf@public:$
         !textbf@D() : p_(42), x_(3), y_(2)$
         !textbf@{ std::cout << "D::D()"; }$
-        !textbf@~D() { std::cout << "D::~D()\n"; }$
+        !textbf@~D() { std::cout << "D::~D()\n"; }$ !sidebox@pobject$@D has a P object$
         !textbf@int get_y() const { return y_; }$
         !textbf@void set_y(int y) { y_ = y; }$
 !textbf@private:$
-        !textbf@P p_;$ !tikzmark@enddtor$
+        !textbf@P p_;$ !tikzmark@enddtor$ 
         !textbf@int x_;$
         !textbf@int y_;$
 !textbf@};$
-
+\end{console}
+\DrawArrowVH[red, thick]{pobject}{enddtor}
+\begin{console}[commandchars=\~\@\$]    
 int main()
 {   
     C c;
@@ -1028,8 +1161,6 @@ int main()
     return 0;
 } 
 \end{console}
-
-\DrawArrow[red, thick]{startdtor}{enddtor}
 
 Study the above carefully. The \verb!c! object has its own \verb!x_!
 and \verb!y_! and the \verb!get_y! and \verb!set_y! methods. It also
@@ -1395,9 +1526,9 @@ P0 = Rect(-3, -1, -0.5, 1, linewidth=0.05, font=r'\huge', label=r'\texttt{P0}')
 P1 = Rect(0.5, -1, 3, 1, linewidth=0.05, font=r'\huge', label=r'\texttt{P1}')
 C = Rect(-1, -5, 1, -3, linewidth=0.05, font=r'\huge', label=r'\texttt{C}')
 
-points_bottom = [(P0.bottom()), (-2, P0.bottomy()), (2, P1.bottomy()), P1.bottom(), (2, P1.bottomy()), (0, -2), (C.top())]
+#points_bottom = [(P0.bottom()), (-2, P0.bottomy()), (2, P1.bottomy()), P1.bottom(), (2, P1.bottomy()), (0, -2), (C.top())]
 
-print(points_bottom)
+#print(points_bottom)
 
 p += Line(points=[(-2,-1),(-2,-2),(2,-2),(2,-1),(2,-2),(0,-2),(C.top())], linewidth=0.05)
 p += Line(points=[(-2,-2),(-2,-1)], linewidth=0.05, endstyle='>')
@@ -1439,7 +1570,51 @@ with \verb!C! is done one class at a time going up -- there are
 ``synchronize'' with each other: the creation of objects along the two
 inheritance paths is independent. This means that there are \EMPHASIZE{two}
 objects created with class G for \verb!c!!!!
-%BIG TIKZ DIAGRAM
+\begin{python}
+from latextool_basic import *
+p = Plot()
+#p += Grid(x0=-3,y0=-10,x1=15,y1=5)
+
+G = Rect(-1, 3, 1, 5, linewidth=0.05, font=r'\huge', label=r'\texttt{G}')
+P0 = Rect(-3, -1, -0.5, 1, linewidth=0.05, font=r'\huge', label=r'\texttt{P0}')
+P1 = Rect(0.5, -1, 3, 1, linewidth=0.05, font=r'\huge', label=r'\texttt{P1}')
+C = Rect(-1, -5, 1, -3, linewidth=0.05, font=r'\huge', label=r'\texttt{C}')
+
+p += Line(points=[(-2,-1),(-2,-2),(2,-2),(2,-1),(2,-2),(0,-2),(C.top())], linewidth=0.05)
+p += Line(points=[(-2,-2),(-2,-1)], linewidth=0.05, endstyle='>')
+p += Line(points=[(2,-2),(2,-1)], linewidth=0.05, endstyle='>')
+p += Line(points=[(-2,1),(-2,2),(2,2),(2,1),(2,1),(2,2),(0,2),(G.bottom())], linewidth=0.05, endstyle='>')
+
+E0 = ellipse(5,0,8,2, linewidth=0.1)
+E1 = ellipse(9,0,12,2, linewidth=0.1)
+E2 = ellipse(5,-3,8,-1, linewidth=0.1)
+E3 = ellipse(9,-3,12,-1, linewidth=0.1)
+E4 = ellipse(7,-6,10,-4, linewidth=0.1)
+p += Line(points=[(6.5,1), (6.5,-2), (8.5,-5), (10.5,-2), (10.5,1)], linewidth=0.1)
+
+p += G
+p += Line(points=[G.right(),(6.5,1)], linewidth=0.05)
+p += Line(points=[G.right(),(10.5,1)], linewidth=0.05)
+
+p += P0
+p += Line(points=[P0.bottomright(),(6.5,-2)], linewidth=0.05)
+
+p += P1
+p += Line(points=[P1.right(),(10.5,-2)], linewidth=0.05)
+
+p += C
+p += Line(points=[C.right(),(8.5,-5)], linewidth=0.05)
+
+
+p += E0
+p += E1
+p += E2
+p += E3
+p += E4
+
+print(p)
+\end{python}
+
 To verify, first do this:
 \begin{console}
 #include <iostream>
@@ -1467,9 +1642,54 @@ int main()
     return 0;
 }
 \end{console}
-%THE OTHER BIG TIKZ DIAGRAM COPY
 The object \verb!c! has two \verb!x_!'s. We print the address of the
 two \verb!x_!'s, which of course are different:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+#p += Grid(x0=-3,y0=-10,x1=15,y1=5)
+
+G = Rect(-1, 3, 1, 5, linewidth=0.05, font=r'\huge', label=r'\texttt{G}')
+P0 = Rect(-3, -1, -0.5, 1, linewidth=0.05, font=r'\huge', label=r'\texttt{P0}')
+P1 = Rect(0.5, -1, 3, 1, linewidth=0.05, font=r'\huge', label=r'\texttt{P1}')
+C = Rect(-1, -5, 1, -3, linewidth=0.05, font=r'\huge', label=r'\texttt{C}')
+
+p += Line(points=[(-2,-1),(-2,-2),(2,-2),(2,-1),(2,-2),(0,-2),(C.top())], linewidth=0.05)
+p += Line(points=[(-2,-2),(-2,-1)], linewidth=0.05, endstyle='>')
+p += Line(points=[(2,-2),(2,-1)], linewidth=0.05, endstyle='>')
+p += Line(points=[(-2,1),(-2,2),(2,2),(2,1),(2,1),(2,2),(0,2),(G.bottom())], linewidth=0.05, endstyle='>')
+
+E0 = ellipse(5,0,8,2, linewidth=0.1, label=r'x\_')
+E1 = ellipse(9,0,12,2, linewidth=0.1, label=r'x\_')
+E2 = ellipse(5,-3,8,-1, linewidth=0.1)
+E3 = ellipse(9,-3,12,-1, linewidth=0.1)
+E4 = ellipse(7,-6,10,-4, linewidth=0.1)
+p += Line(points=[(6.5,1), (6.5,-2), (8.5,-5), (10.5,-2), (10.5,1)], linewidth=0.1)
+
+p += G
+p += Line(points=[G.right(),(6.5,1)], linewidth=0.05)
+p += Line(points=[G.right(),(10.5,1)], linewidth=0.05)
+
+p += P0
+p += Line(points=[P0.bottomright(),(6.5,-2)], linewidth=0.05)
+
+p += P1
+p += Line(points=[P1.right(),(10.5,-2)], linewidth=0.05)
+
+p += C
+p += Line(points=[C.right(),(8.5,-5)], linewidth=0.05)
+
+
+p += E0
+p += E1
+p += E2
+p += E3
+p += E4
+
+print(p)
+\end{python}
+
 \begin{console}
 #include <iostream>
 
