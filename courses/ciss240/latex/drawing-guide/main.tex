@@ -1,0 +1,638 @@
+%-*-latex-*-
+%
+% https://tex.stackexchange.com/questions/216245/tikz-node-as-character-in-text
+
+\documentclass[a4paper,
+               openany,oneside,chapterprefix,
+               12pt,
+               parskip=full]
+              {scrbook}              
+\setlength{\textwidth}{5in}
+\setlength{\hoffset}{-0.25in}
+\setlength{\marginparwidth}{2in}
+
+\newcommand\helvetica{\renewcommand{\familydefault}{phv}}
+\helvetica
+\usepackage{showframe} % added to make it easier to see the layout
+
+\usepackage{fancyvrb}
+\usepackage{listings}
+
+\usepackage{marginnote}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usetikzlibrary{fit}
+\usetikzlibrary{tikzmark}
+\usetikzlibrary{calc}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{calc}
+\usepackage{tikzpagenodes}
+
+\DefineVerbatimEnvironment%
+ {console}{Verbatim}
+ {frame=single,fontsize=\footnotesize}
+
+\tikzset{%
+  tikzmarknode plain/.style={inner sep=0pt,rounded corners=0.0pt, thick},
+  tikzmarknode red/.style={inner sep=2pt,thick, draw=red},
+  tikzmarknode thickred/.style={inner sep=2pt,line width=0.1cm, draw=red},  
+  tikzmarknode roundedthickred/.style={inner sep=2pt,rounded corners=2.0pt, line width=0.1cm, draw=red},
+  every tikzmarknode/.append style={tikzmarknode plain},
+}
+
+\newcommand\bstt{\texttt{\char`\\}}
+
+\newcommand\sidebox[3][0cm]{
+  \renewcommand*{\marginfont}{\normalsize}
+  \marginpar{\centering%
+      \vspace{#1} % <<< ADDED FOR VERTICAL SHIFT
+      \begin{tikzpicture}[overlay,remember picture, baseline=(#2.base)]
+        \node[rectangle, draw=red, text width=4cm, minimum width=2cm, line width=0.1cm, inner sep=0.2cm, name=#2] (#2) 
+             {
+               \begin{minipage}[t]{4.0cm}
+                 {#3}
+               \end{minipage}
+             };
+      \end{tikzpicture}
+    \renewcommand*{\marginfont}{\tiny}
+}}
+
+\lstnewenvironment{consolethree}[1][]
+{
+  \lstset{
+    basicstyle=\ttfamily\footnotesize,
+    breaklines=true,
+    columns=fullflexible,
+    keepspaces=true,
+    frame=single,
+    xleftmargin=3.4pt,
+    xrightmargin=3.4pt,
+    #1
+  }%
+}{}%
+
+\newcommand*{\DrawArrow}[3][red]{%
+    % #1 = draw options
+    % #2 = left node
+    % #3 = right node
+  \begin{tikzpicture}[overlay,remember picture]
+    \draw [-latex, #1, line width=0.1cm] (#2) to (#3);
+  \end{tikzpicture}%
+}
+\newcommand*{\DrawArrowH}[3][red]{%
+    % #1 = draw options
+    % #2 = left node
+    % #3 = right node
+  \begin{tikzpicture}[overlay,remember picture]
+    \draw [-latex, #1, line width=0.1cm] (#2.west |- #3) -- (#3);
+  \end{tikzpicture}%
+}
+\newcommand*{\DrawArrowVH}[3][red]{%
+    % #1 = draw options
+    % #2 = left node
+    % #3 = right node
+  \begin{tikzpicture}[overlay,remember picture]
+    \draw [-latex, #1, line width=0.1cm] (#2) |- (#3.east);
+  \end{tikzpicture}%
+}
+\newcommand*{\DrawArrowHV}[3][red]{%
+  \begin{tikzpicture}[overlay,remember picture]
+    \draw [-latex, #1, line width=0.1cm] (#2.west) -| (#3);
+  \end{tikzpicture}%
+}
+\newcommand*{\DrawArrowPoints}[4][red]{%
+  \begin{tikzpicture}[overlay,remember picture]
+    \draw [-latex, #1, line width=0.1cm] (#2) #4 to (#3);
+  \end{tikzpicture}%
+}
+
+
+
+\begin{document}
+
+\section{Creating a node in the main text body}
+
+Here's a node: \tikzmarknode{end2}{DEFGHI}.
+\\
+I used \verb!\tikzmarknode{a}{DEFGHI}!.
+The name of the node is \verb!a!.
+
+Here's a node: \tikzmarknode[tikzmarknode red]{a}{DEFGHI}.
+\\
+I used \verb!\tikzmarknode[tikzmarknode red]{a}{DEFGHI}!.
+
+Here's a node: \tikzmarknode[tikzmarknode thickred]{a}{DEFGHI}.
+\\
+I used \verb!\tikzmarknode[tikzmarknode thickred]{a}{DEFGHI}!.
+
+Here's a node: \tikzmarknode[tikzmarknode roundedthickred]{a}{DEFGHI}.
+\\
+I used \verb!\tikzmarknode[tikzmarknode roundedthickred]{a}{DEFGHI}!.
+ 
+Here's a node: \tikzmarknode{a}{{\textcolor{red}{\textbf{\Huge DEFGHI}}}}.
+\\
+I used \verb!\tikzmarknode{a}{{\textcolor{red}{\textbf{\Huge DEFGHI}}}}!.
+
+
+\newpage
+\section{Create a node in the margin with boxed text}
+
+I'm going to create a tikz node in the margin using with a boxed text.\sidebox{b}{ABCDEF}
+\\
+I used \verb!\sidebox{b}{ABCDEF}!.
+This is a tikz node named \verb!b!.
+
+Here's how to create paragraphs.\sidebox{b}{ABCDEF \\ \\ GHIJKL}
+\\
+I used \verb!\sidebox{b}{ABCDEF \\ \\ GHIJKL}!.
+
+\mbox{}\vspace{1in}
+TEST TEST TEST:
+
+I'm going to create a tikz node in the margin using with a boxed text.\sidebox{b}{ABCDEF}
+
+\mbox{}\vspace{1in}
+TEST TEST TEST:
+I'm going to create a tikz node in the margin using with a boxed text.\sidebox[-1cm]{b}{ABCDEF}
+
+\newpage
+\section{Draw arrow}
+
+Here's a node: \tikzmarknode{a}{ABCDEF}.\sidebox{b}{Point to ABCDEF}
+\DrawArrow{b}{a}
+\\
+There's a sidebox pointing to the above node.
+The \verb!\DrawArrow{b}{a}! draws an arrow from node \verb!b! to node \verb!a!.
+\\
+\LaTeX:\vspace{-0.3cm}
+\begin{console}
+Here's a node: \tikzmarknode{a}{ABCDEF}.\sidebox{b}{Point to ABCDEF}
+\DrawArrow{b}{a} 
+\end{console}
+
+\newpage
+\textbf{Example.} Sidebox is lower.
+\\
+\tikzmarknode{a}{ABCDEF}
+dummy text dummy text dummy text dummy text dummy text dummy text 
+dummy text dummy text dummy text dummy text dummy text dummy text 
+dummy text dummy text dummy text dummy text dummy text dummy text 
+\sidebox{b}{Point to ABCDEF}\DrawArrow{b}{a}
+\\
+\LaTeX:\vspace{-0.3cm}
+\begin{console}
+\tikzmarknode{a}{ABCDEF}
+dummy text dummy text dummy text dummy text dummy text dummy text 
+dummy text dummy text dummy text dummy text dummy text dummy text 
+dummy text dummy text dummy text dummy text dummy text dummy text 
+\sidebox{b}{Point to ABCDEF}\DrawArrow{b}{a}
+\end{console}
+
+\newpage
+\textbf{Example.} Sidebox is higher.
+\\
+\sidebox{b}{Point to ABCDEF}
+dummy text dummy text dummy text dummy text dummy text dummy text 
+dummy text dummy text dummy text dummy text dummy text dummy text 
+dummy text dummy text dummy text dummy text dummy text dummy text 
+\tikzmarknode{a}{ABCDEF}\DrawArrow{b}{a}
+\\
+\LaTeX:\vspace{-0.3cm}
+\begin{console}
+\tikzmarknode{a}{ABCDEF}
+dummy text dummy text dummy text dummy text dummy text dummy text 
+dummy text dummy text dummy text dummy text dummy text dummy text 
+dummy text dummy text dummy text dummy text dummy text dummy text 
+\sidebox{b}{Point to ABCDEF}\DrawArrow{b}{a}
+\end{console}
+
+\newpage
+\textbf{Example.} Sidebox is tall.
+\\
+\tikzmarknode{a}{ABCDEF}\sidebox{b}{Point to ABCDEF. dummy text dummy text dummy text}
+\DrawArrow{b}{a}
+
+dummy text dummy text
+
+You can force the arrow to be horizontal using \verb!DrawArrowH!
+
+\tikzmarknode{a}{ABCDEF}\sidebox{b}{Point to ABCDEF. dummy text dummy text dummy text}
+\DrawArrowH{b}{a}
+\\
+\LaTeX:\vspace{-0.3cm}
+\begin{console}
+\tikzmarknode{a}{ABCDEF}\sidebox{b}{Point to ABCDEF. dummy text dummy text dummy text}
+\DrawArrowH{b}{a}
+\end{console}
+
+\newpage
+\textbf{Example.} You can draw an arrow vertical-then-horizontal.
+
+\sidebox{a}{Point to ABCDEF}
+
+dummy text dummy text dummy text dummy text
+dummy text dummy text dummy text dummy text
+dummy text dummy text dummy text dummy text
+
+Here's a node: \tikzmarknode{b}{ABCDEF}.
+\DrawArrowVH{a}{b}
+\\
+\LaTeX:\vspace{-0.3cm}
+\begin{console}
+\sidebox{a}{Point to ABCDEF}
+
+dummy text dummy text dummy text dummy text
+dummy text dummy text dummy text dummy text
+dummy text dummy text dummy text dummy text
+
+Here's a node: \tikzmarknode{b}{ABCDEF}.
+\DrawArrowVH{a}{b}
+\end{console}
+
+\newpage
+\textbf{Example.} You can draw an arrow horizontal-then-vertical.
+
+\sidebox{a}{Point to ABCDEF}
+
+dummy text dummy text dummy text dummy text
+dummy text dummy text dummy text dummy text
+dummy text dummy text dummy text dummy text
+
+Here's a node: \tikzmarknode{b}{ABCDEF}.
+\DrawArrowHV{a}{b}
+\\
+\LaTeX:\vspace{-0.3cm}
+\begin{console}
+\sidebox{a}{Point to ABCDEF}
+
+dummy text dummy text dummy text dummy text
+dummy text dummy text dummy text dummy text
+dummy text dummy text dummy text dummy text
+
+Here's a node: \tikzmarknode{b}{ABCDEF}.
+\DrawArrowHV{a}{b}
+\end{console}
+
+
+\newpage
+\textbf{Example.}
+You can specify displacement points for the arrow to follow using \verb!DrawArrowPoints!.
+Here's an example:
+
+Here's a node: \tikzmarknode{cccc}{CCCC}.\sidebox{dddd}{DDDD}
+\DrawArrowPoints{dddd}{cccc}{-- ++(1,2.5) -- ++(-1.5,-1)}
+
+\LaTeX:\vspace{-0.3cm}
+\begin{console}
+Here's a node: \tikzmarknode{cccc}{CCCC}.\sidebox{dddd}{DDDD}
+\DrawArrowPoints{dddd}{cccc}{-- ++(1,2.5) -- ++(-1.5,-1)}
+\end{console}
+
+The \verb!--! means \lq\lq line".
+The \verb!++! means \lq\lq displace by".
+The \verb!-- ++(1,2.5)! means \lq\lq draw a line up to a point that is $(1,2.5)$ from
+the previous point".
+
+Instead of displacements, the points can be nodes.
+Here's an example:
+
+Here's a node: \tikzmarknode{cccc}{CCCC}.
+
+Here's another node .................... \tikzmarknode{eeee}{EEEE}.
+
+And another node \tikzmarknode{ffff}{FFFF}.
+
+\sidebox{dddd}{DDDD}
+\DrawArrowPoints{dddd}{cccc}{-- ++(1,2.5) -- (eeee) -- (ffff)}
+
+\LaTeX:\vspace{-0.3cm}
+\begin{console}
+Here's a node: \tikzmarknode{cccc}{CCCC}.
+
+Here's another node .................... \tikzmarknode{eeee}{EEEE}.
+
+And another node \tikzmarknode{ffff}{FFFF}.\sidebox{dddd}{DDDD}
+\DrawArrowPoints{dddd}{cccc}{-- ++(1,2.5) -- (eeee) -- (ffff)}
+\end{console}
+
+\newpage
+\textbf{Example.}
+You can have multiple sideboxes pointing to one node.
+
+Here's a node: \tikzmarknode{a}{A}.\sidebox{b}{B}
+
+dummy text
+
+\sidebox{c}{C}
+
+dummy text
+
+\sidebox{d}{D}
+
+\DrawArrow{b}{a}
+\DrawArrow{c}{a}
+\DrawArrowHV{d}{a}
+\\
+\LaTeX:\vspace{-0.3cm}
+\begin{console}
+Here's a node: \tikzmarknode{a}{A}.\sidebox{b}{B}
+
+dummy text
+
+\sidebox{c}{C}
+
+dummy text
+
+\sidebox{d}{D}
+
+\DrawArrow{b}{a}
+\DrawArrow{c}{a}
+\DrawArrowHV{d}{a}
+\end{console}
+
+\newpage
+\textbf{Example.}
+You can have a sidebox pointing to multiple nodes.
+
+Here are some nodes:
+\tikzmarknode{a}{A}
+
+\tikzmarknode{b}{B}\sidebox{c}{C}
+
+\tikzmarknode{d}{D}
+\DrawArrow{c}{a}
+\DrawArrow{c}{b}
+\DrawArrow{c}{d}
+\\
+\LaTeX:\vspace{-0.3cm}
+\begin{console}
+Here are some nodes:
+\tikzmarknode{a}{A}
+
+\tikzmarknode{b}{B}\sidebox{c}{B}
+
+\tikzmarknode{c}{C}.
+\DrawArrow{c}{b}
+\DrawArrow{c}{d}
+\end{console}
+
+
+
+
+\newpage
+\section{Tikz node inside code}
+Here's an example where the tikz node is inside code:
+\sidebox{b}{CCC}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int main()  
+{
+    |\tikzmarknode{a}{return}| 0; // a is a node containing return
+}
+\end{consolethree}
+\DrawArrow{b}{a}%
+\LaTeX:\vspace{-0.3cm}
+\begin{console}
+\sidebox{b}{CCC}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int main()  
+{
+    |\tikzmarknode{a}{return}| 0; // a is a node containing return
+}
+\end{consolethree}
+\DrawArrow{b}{a}
+\end{consolethree}
+\DrawArrow[red]{start12}{end12}
+\end{console}
+
+NOTE: \verb!console! and \verb!Verbatim! cannot be used.
+\verb!consolethree! uses the \verb!listings! package.
+The \verb!escapeinside||! basically means whatever is within \verb!|...|!
+is treated as latex command.
+If the C\texttt{++} or python code contains \verb!|!, use another
+pair of characters.
+
+\newpage
+\textbf{Example:}
+Here's an example with tikz node inside code and the node
+contains a backslash character:
+\sidebox{start13}{Point to a string}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int main()  
+{
+    std::cout << |\tikzmarknode[tikzmarknode thickred]{end13}{"hello world\char`\\n"}|;
+    return 0;
+}
+\end{consolethree}
+\DrawArrow[red]{start13}{end13}
+\LaTeX:\vspace{-0.3cm}
+\begin{console}
+\sidebox{a}{Point to a string}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int main()  
+{
+    std::cout << |\tikzmarknode[tikzmarknode thickred]{b}{"hello world\char`\\n"}|;
+    return 0;
+}
+\end{consolethree}
+\DrawArrow{a}{b}
+\end{console}
+
+Note the proper way of inserting the backslash character for the newline character.
+
+To make it easier, I have a macro for the backslash using typewriter font: \verb!\bstt!
+(memory aid: bstt = backslash typewriter text).
+
+\textbf{Example.} ABC\bstt DEF is done using \verb!ABC\bstt DEF!.
+
+\newpage
+\textbf{Example:}
+Here's the earlier example using the \verb!\bstt! macro:
+
+\sidebox{a}{Point to a string}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int main()  
+{
+    std::cout << |\tikzmarknode[tikzmarknode thickred]{b}{"hello world\bstt n"}|;
+    return 0;
+}
+\end{consolethree}
+\DrawArrow{a}{b}
+\LaTeX:\vspace{-0.3cm}
+\begin{console}
+\sidebox{a}{Point to a string}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int main()  
+{
+    std::cout << |\tikzmarknode[tikzmarknode thickred]{b}{"hello world\bstt n"}|;
+    return 0;
+}
+\end{consolethree}
+\DrawArrow[{a}{b}
+\end{console}
+
+
+\newpage
+\textbf{Example:}
+You might want to align a sidebox with a specific line of code.
+The best is to put the sidebox next to that line
+(and maybe put the draw arrow there as well).
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int main()  
+{
+    std::cout << |\tikzmarknode[tikzmarknode thickred]{b}{"hello world\bstt n"};||\sidebox{a}{Point to a string}|
+    return 0;
+}
+\end{consolethree}
+\DrawArrow{a}{b}
+\\
+\LaTeX:\vspace{-0.3cm}
+\begin{console}[fontsize=\tiny]
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int main()  
+{
+    std::cout << |\tikzmarknode[tikzmarknode thickred]{b}{"hello world\bstt n"};||\sidebox{a}{Point to a string}|
+    return 0;
+}
+\end{consolethree}
+\DrawArrow{a}{b}
+\end{console}
+It might not be completely aligned. You can then shift the sidebox vertically -- see next section.
+
+Also, note that since the sidebox is drawn inside \verb!consolethree!, the font used is typewriter font.
+In the sidebox, you switch to normal font using \verb!\textnormal!.
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int main()  
+{
+    std::cout << |\tikzmarknode[tikzmarknode thickred]{b}{"hello world\bstt n"}\sidebox{a}{\textnormal{Point to a string}}|;
+    return 0;
+}
+\end{consolethree}
+\DrawArrow{a}{b}
+\\
+\LaTeX:\vspace{-0.3cm}
+\begin{console}[fontsize=\tiny]
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int main()  
+{
+    std::cout << |\tikzmarknode[tikzmarknode thickred]{b}{"hello world\bstt n"}\sidebox{a}{\textnormal{Point to a string}}|;
+    return 0;
+}
+\end{consolethree}
+\DrawArrow{a}{b}
+\end{console}
+
+
+\newpage
+\section{Shift sidebox vertically}
+You can move the sidebox vertically.
+Here's an example where the sidebox is not shifted:
+
+Here's a node \tikzmarknode{b}{AAAA}.\sidebox{a}{BBBB}
+\DrawArrow{a}{b}
+
+dummy text dummy text dummy text dummy text
+dummy text dummy text dummy text dummy text
+dummy text dummy text dummy text dummy text
+
+Here's the same example where the sidebox moved up by 1.5cm.
+
+Here's a node \tikzmarknode{b}{AAAA}.\sidebox[-1.5cm]{a}{BBBB}
+\DrawArrow{a}{b}
+
+\LaTeX:\vspace{-0.3cm}
+\begin{console}
+Here's a node \tikzmarknode{b}{AAAA}\sidebox[-1.5cm]{a}{BBBB}.
+\DrawArrow{a}{b}
+\end{console}
+\DrawArrow{a}{b}
+Note the \verb![-1.5cm]!.
+
+\newpage
+\textbf{Example:}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int main()  
+{
+    std::cout << |\tikzmarknode[tikzmarknode thickred]{b}{"hello world\bstt n"}|;|\sidebox[-0.2cm]{a}{\textnormal{Point to a string}}|
+    return 0;
+}
+\end{consolethree}
+\DrawArrow{a}{b}
+\\
+\LaTeX:\vspace{-0.3cm}
+\begin{console}[fontsize=\tiny]
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int main()  
+{
+    std::cout << |\tikzmarknode[tikzmarknode thickred]{b}{"hello world\bstt n"}\sidebox[-0.5cm]{a}{\textnormal{Point to a string}}|;
+    return 0;
+}
+\end{consolethree}
+\DrawArrow{a}{b}
+\end{console}
+
+\newpage
+\section{Reuse tikz node names}
+
+You can reuse tikz node names.
+
+
+\newpage
+\section{Warning on disappearing tikz diagrams}
+
+Watch out: if a tikz diagram is too small and too close to the bottom of a page,
+the diagram might be accidentally truncated/removed by latex.
+
+
+\newpage
+\section{Minor variations on draw arrow}
+
+
+\tikzmarknode{b}{B}\sidebox{a}{A}\DrawArrow[dashed]{a}{b}
+\\
+\LaTeX:\vspace{-0.3cm}
+\begin{console}
+\tikzmarknode{b}{B}\sidebox{a}{B}\DrawArrow[dashed]{a}{b}
+\end{console}
+
+\tikzmarknode{b}{B}\sidebox{a}{A}\DrawArrow[dashed, red]{a}{b}
+\\
+\LaTeX:\vspace{-0.3cm}
+\begin{console}
+\tikzmarknode{b}{B}\sidebox{a}{A}\DrawArrow[dashed, red]{a}{b}
+\end{console}
+
+\tikzmarknode{b}{A}\sidebox{a}{A}\DrawArrow[blue]{a}{b}
+\\
+\LaTeX:\vspace{-0.3cm}
+\begin{console}
+\tikzmarknode{b}{A}\sidebox{a}{A}\DrawArrow[blue]{a}{b}
+\end{console}
+
+
+\end{document}
+
