@@ -13,8 +13,8 @@
 
 \newcommand\helvetica{\renewcommand{\familydefault}{phv}}
 \helvetica
-\usepackage{showframe} % added to make it easier to see the layout
-
+%\usepackage{showframe} % added to make it easier to see the layout
+\usepackage{xargs}
 \usepackage{fancyvrb}
 \usepackage{listings}
 
@@ -56,6 +56,46 @@
       \end{tikzpicture}
     \renewcommand*{\marginfont}{\tiny}
 }}
+
+\newcommand\sideboxtwo[3][0cm]{
+  \renewcommand*{\marginfont}{\normalsize}
+  \marginpar{\centering%
+      \vspace{#1} % <<< ADDED FOR VERTICAL SHIFT
+      \begin{tikzpicture}[overlay,remember picture, baseline=(#2.base)]
+        \node[rectangle, draw=red, text width=4cm, minimum width=2cm, line width=0.1cm, inner sep=0.2cm, xshift=-1cm, name=#2] (#2) 
+             {
+               \begin{minipage}[t]{4.0cm}
+                 {#3}
+               \end{minipage}
+             };
+      \end{tikzpicture}
+    \renewcommand*{\marginfont}{\tiny}
+}}
+
+\newcommandx\foobar[4][1=AAA, 3=BBB]{ ... #1 ... #2 ... #3 ... #4 ... }
+\newcommand\xxsidebox[5][1=0cm, 4=0cm, 5=0cm]{}
+
+\newcommandx\xsidebox[5][1=0cm, 2=0cm, 3=]{
+  % #1 xshift           -- optional (default 0cm)
+  % #2 yshift           -- optional (default 0cm)
+  % #3 node attributes  -- optional empty string
+  % #4 node name
+  % #5 node text
+  % \xsidebar[1cm][2cm][blue]{a}{AAA}
+  \renewcommand*{\marginfont}{\normalsize}
+  \marginpar{\centering%
+    \vspace{#1} % <<< ADDED FOR VERTICAL SHIFT
+      \begin{tikzpicture}[overlay,remember picture, baseline=(#4.base)]
+        \node[rectangle, draw=red, text width=4cm, minimum width=2cm, line width=0.1cm, inner sep=0.2cm, name=#4, xshift=#1, yshift=#2, #3] (#4) 
+             {
+               \begin{minipage}[t]{4.0cm}
+                 {#5}
+               \end{minipage}
+             };
+      \end{tikzpicture}
+    \renewcommand*{\marginfont}{\tiny}
+  }
+}
 
 \lstnewenvironment{consolethree}[1][]
 {
@@ -575,7 +615,7 @@ Note the \verb![-1.5cm]!.
 
 int main()  
 {
-    std::cout << |\tikzmarknode[tikzmarknode thickred]{b}{"hello world\bstt n"}|;|\sidebox[-0.2cm]{a}{\textnormal{Point to a string}}|
+    std::cout << |\tikzmarknode[tikzmarknode thickred]{b}{"hello world\bstt n"}|;|\sidebox{a}{\textnormal{Point to a string}}| 
     return 0;
 }
 \end{consolethree}
@@ -631,6 +671,96 @@ the diagram might be accidentally truncated/removed by latex.
 \LaTeX:\vspace{-0.3cm}
 \begin{console}
 \tikzmarknode{b}{A}\sidebox{a}{A}\DrawArrow[blue]{a}{b}
+\end{console}
+
+
+\newpage
+\section{xsidebox}
+
+The \verb!\xsidebox! macro allows you to specify x and y shifts and
+some node attributes.
+
+Sometimes it's difficult/impossible to shift the node. There's some kind of
+constraint on the position.
+
+\newpage
+\textbf{Example:} Some text. Some text. Some text.
+
+\verb!\xsidebox{a}{A}! is the same as \verb!\sidebox{a}{A}!
+
+\tikzmarknode{a}{A}\xsidebox{b}{B}
+
+\tikzmarknode{c}{C}\xsidebox{d}{D}
+
+\LaTeX
+\begin{console}
+\tikzmarknode{a}{A}\xsidebox{b}{B}
+
+\tikzmarknode{c}{C}\xsidebox{d}{D}
+\end{console}
+
+
+\newpage
+\textbf{Example:} Some text. Some text. Some text.
+
+\verb!\xsidebox{a}{A}[1cm]! is the same as \verb!\sidebox{a}{A}! but
+shifted by 1cm on $x$--axis.
+
+\tikzmarknode{a}{A}\xsidebox{b}{B}
+
+\tikzmarknode{c}{C}\xsidebox[-1cm]{d}{D}
+
+\LaTeX
+\begin{console}
+\tikzmarknode{a}{A}\xsidebox{b}{B}
+
+\tikzmarknode{c}{C}\xsidebox[-1cm]{d}{D}
+\end{console}
+
+
+\newpage
+\textbf{Example:} Some text. Some text. Some text.
+
+\verb!\xsidebox[1cm][2cm]{a}{A}! is the same as \verb!sidebox{a}{A}! but
+shifted by 1cm on $x$--axis and 2cm on the $y$--axis.
+
+\tikzmarknode{a}{A}\xsidebox{b}{B}
+
+\tikzmarknode{c}{C}\xsidebox[-1cm][1cm]{d}{D}
+
+\LaTeX
+\begin{console}
+\tikzmarknode{a}{A}\xsidebox{b}{B}
+
+\tikzmarknode{c}{C}\xsidebox[-1cm][1cm]{d}{D}
+\end{console}
+
+\newpage
+\textbf{Example:} Some text. Some text. Some text.
+
+\verb!\xsidebox[1cm][2cm]{a}{A}! is the same as \verb!sidebox{a}{A}! but
+shifted by 1cm on $x$--axis and 2cm on the $y$--axis.
+
+\tikzmarknode{a}{A}\xsidebox{b}{B}
+
+\tikzmarknode{c}{C}\xsidebox[-1cm][1cm]{d}{D}
+
+\newpage
+\textbf{Example:} Some text. Some text. Some text.
+
+\verb!\xsidebox[1cm][2cm][blue]{a}{A}! is the same as \verb!sidebox{a}{A}! but
+shifted by 1cm on $x$--axis and 2cm on the $y$--axis
+and add \verb!blue! to node attributes.
+
+\tikzmarknode{a}{A}\xsidebox{b}{B}
+
+\tikzmarknode{c}{C}\xsidebox[-1cm][1cm][blue]{d}{D}
+
+\LaTeX
+\begin{console}
+\tikzmarknode{a}{A}\xsidebox{b}{B}
+
+\tikzmarknode{c}{C}\xsidebox[-1cm][1cm][blue]{d}{D}
 \end{console}
 
 
