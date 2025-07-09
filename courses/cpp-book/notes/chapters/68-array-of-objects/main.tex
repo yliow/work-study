@@ -221,6 +221,30 @@ int main()
 \DrawArrow{[xshift=-3.2cm]force.west}{intxpoint}
 \DrawArrow{[xshift=-3.65cm]construct.west}{a10point}
 \DrawArrow{[xshift=-4.7cm]seteach.west}{setipoint}
+%% \begin{consolethree}[escapeinside=!!]
+%%  !\sidebox{force}{\textnormal{1. Forced to have a default constructor.}}\sidebox[1.5cm]{construct}{\textnormal{2. Construct each \texttt{a[i]} with default constructor.}}!
+%% class Int
+%% {
+%% public:
+%%         Int (int x = 0) !\tikzmark{intxpoint}!
+%%             : x_(x) {}
+%%             void set(int a) { x_ = a; }
+%% private:                    
+%%         int x_;
+%% };!\sidebox[0.5cm]{importancebox}{\textnormal{Important point: \EMPHASIZE{Two} methods called for each object to set the initial values.}}!
+%% int main()
+%% {               
+%%     !\tikzmark{a10point}{Int a[10];}!
+%%     for (int i = 0; i < 10; ++i)
+%%         a[i].set[i]; !\tikzmark{setipoint}! 
+%%     ... !\sidebox[2cm]{seteach}{\textnormal{3. set each object.}}!
+%% }
+%% \end{consolethree}
+%% \DrawArrow{[xshift=-3.2cm]importancebox.north}{[xshift=-3.2cm]construct.south}
+%% \DrawArrow{[xshift=-3.2cm]importancebox.south}{[xshift=-3.6cm]seteach.north}
+%% \DrawArrow{[xshift=-3.2cm]force.west}{intxpoint}
+%% \DrawArrow{[xshift=-3.65cm]construct.west}{a10point}
+%% \DrawArrow{[xshift=-4.7cm]seteach.west}{setipoint}
 %ISSUE this is a temporary fix, the bottom-most line crosses over the line of text below when drawn, just one or two newlines would mitigate this and not require a \newpage
 \newpage So note that in the above each \texttt{a[i].x} was first set to \texttt{0} by the constructor ... then \texttt{a[i].x} was set to \texttt{i}.
 
@@ -233,16 +257,27 @@ does a lot of work in the constructor? Example: \texttt{C} has
 \texttt{0} and then you need to set them all to \texttt{i}?
 
 Second method:
-\begin{console}[commandchars=\~\@\$]
+\begin{consolethree}[escapeinside=!!]
 int main()
-{   ~sidebox@ptrbx1$@~textnormal@1. Declare array of ~EMPHASIZE@pointers.$$$
-    Int * a[10];~tikzmark@arrpntr$ 
+{   !\sidebox{ptrbx1}{\textnormal{1. Declare array of \EMPHASIZE{pointers.}}}!
+    Int * a[10];!\tikzmarknode[tikzmarknode thickred]{arrpntr}{arrpntr}! 
     for (int i = 0; i < 10; ++i)
-        a[i] = new Int(i);~tikzmark@ctrpntr$
+        a[i] = new Int(i);!\tikzmark{ctrpntr}!
     // do something with *(a[i])
-    ... ~sidebox@ptrbx2$@~textnormal@2. Call constructor to construct object in the heap and return pointer$$
+    ... !\sidebox{ptrbx2}{\textnormal{2. Call constructor to construct object in the heap and return pointer}}!
 }
-\end{console}
+\end{consolethree}
+
+%% \begin{console}[commandchars=\~\@\$]
+%% int main()
+%% {   ~sidebox@ptrbx1$@~textnormal@1. Declare array of ~EMPHASIZE@pointers.$$$
+%%     Int * a[10];~tikzmark@arrpntr$ 
+%%     for (int i = 0; i < 10; ++i)
+%%         a[i] = new Int(i);~tikzmark@ctrpntr$
+%%     // do something with *(a[i])
+%%     ... ~sidebox@ptrbx2$@~textnormal@2. Call constructor to construct object in the heap and return pointer$$
+%% }
+%% \end{console}
 \DrawArrow{[xshift=-3.9cm]ptrbx1.west}{arrpntr}
 \DrawArrow{[xshift=-4.7cm,yshift=1cm]ptrbx2.west}{ctrpntr}
 \EMPHASIZE{The point:} Each \texttt{a[i]} is not an object, but a pointer
@@ -576,20 +611,18 @@ print(p)
 
 All the arrays up to this point have been rectangular, i.e., the arrays
 as a container values look like this.
-\begin{table}
-%% & & \\
-%% & & \\
-%% & & \\
-\end{table}
+\begin{python}
+from latextool_basic import table
+print(table([('', '', ''), ('', '', ''), ('', '','')]))
+\end{python}
 Create an array that is triangular, i.e. for row 0
 
 there are 3 columns, for row 1 there are 2 columns, etc. (They are
 called jagged arrays.)
-\begin{table}
-%% & & \\
-%% & & \\
-%% & & \\
-\end{table}
+\begin{python}
+from latextool_basic import table
+print(table([('','',''), ('',''), ('')]))
+\end{python}
 For the static size 3-dim array of \texttt{Int} objects:
 \begin{center}
 \texttt{Int a[3][6][4]}
