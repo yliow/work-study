@@ -96,9 +96,7 @@ int main()
 }
 \end{console}
 
-Run the following programs/experiments and \EMPHASIZE{trace their
-execution}. That is in fact the reason for exceptions: they alter the
-flow of normal program execution.
+Run the following programs/experiments and \EMPHASIZE{trace their execution}. That is in fact the reason for exceptions: they alter the flow of normal program execution.
 
 \newpage\EMPHASIZE{Program 1. A Simple Example}
 
@@ -196,48 +194,48 @@ error code must pass from \texttt{i} to \texttt{h}, \texttt{h} must pass the
 error code to \texttt{g}, and \texttt{g} must pass the error code to
 \texttt{f}:
 
-\begin{console}[commandchars=\~\@\$]
-~EMPHASIZE@int$ i()
+\begin{consolethree}[escapeinside=||]%[commandchars=\~\@\$]
+|\EMPHASIZE{int}| i()
 {    
      ...
      // return 1 if there's an error
-     ~EMPHASIZE@if (y == 0) $
-         return 1;
+     |\EMPHASIZE{if (y == 0)}|
+         |\EMPHASIZE{return 1;}|
 
      z = x / y; // oops what if y is zero???
 
      ...
 
-  ~EMPHASIZE@return 0;  // return 0 if there's no error$
+  |\EMPHASIZE{return 0;}|  // return 0 if there's no error
 }
 
-~EMPHASIZE@int$ h()
+|\EMPHASIZE{int}| h()
 {    
      ...
-     ~EMPHASIZE@if (i() != 0) return 1;$
+     |\EMPHASIZE{if (i() != 0) return 1;}|
      ...
-     ~EMPHASIZE@return 0;$
+     |\EMPHASIZE{return 0;}|
 }
 
-~EMPHASIZE@int$ g()
+|\EMPHASIZE{int}| g()
 {    
      ...
-     ~EMPHASIZE@if (h() != 0) return 1;$
+     |\EMPHASIZE{if (h() != 0) return 1;}|
      ...
-  ~EMPHASIZE@return 0;$
+  |\EMPHASIZE{return 0;}|
 }
 
 void f()
-{    
+{
      ...
-     ~EMPHASIZE@if (g() != 0)$
+     |\EMPHASIZE{if (g() != 0)}|
      {
-          ~EMPHASIZE@// ... do some error$
-          ~EMPHASIZE@// handling ...
+        |\EMPHASIZE{// ... do some error}|
+        |\EMPHASIZE{// handling ...}|
      }
-  ...
+     ...
 }
-\end{console}
+\end{consolethree}
 
 Boy ... what a pain!!! Look at the amount of changes you need to make!!!
 Not to worry ... exceptions to the rescue ...
@@ -246,7 +244,7 @@ Not to worry ... exceptions to the rescue ...
 void i()
 {    
      ...
-     ~EMPHASIZE@if (y == 0) throw exception();
+     ~EMPHASIZE@if (y == 0) throw exception();$
      z = x / y; // oops what if y is zero???
      ...
 }
@@ -609,7 +607,7 @@ Get it?
 You know that if the system is not able to allocate memory for a
 pointer,
 \begin{center}
-\texttt{int * p = new int[some_big_number];}
+\verb!int * p = new int[some_big_number];!
 \end{center}
 the program might (1) crash and stop or (2) the pointer value returned
 is 0. (For the case of g++, when the requested memory cannot be
@@ -637,7 +635,7 @@ In case (1) where the system crashes and stop, it actually throws an
 exception. (For newer C++ compilers (1) is actually the norm.) The
 reason why the program crashes and stops is because the exception is not
 caught. The exception object thrown is from the class
-\texttt{std::bad_alloc}. Run this:
+\verb!std::bad_alloc!. Run this:
 
 \begin{console}[commandchars=\~\@\$]
 #include <iostream>
@@ -676,7 +674,7 @@ Next modify it like so ...
 
 ... and system is bound to run out of memory for allocation.
 
-So in the case where your C++ compiler throws a \texttt{std::bad_alloc}
+So in the case where your C++ compiler throws a \verb!std::bad_alloc!
 exception when the new operator cannot be satisfied, you can do this:
 
 \begin{console}
@@ -705,9 +703,9 @@ return 0;
 But ...
 
 What if the compiler you're using is older and does not
-thrown a \texttt{std::bad_alloc} object when there's not
+thrown a \verb!std::bad_alloc! object when there's not
 enough memory or for some reason you do not want the compiler to throw a
-\texttt{std::bad_alloc} object when the new operator cannot be satisfied?
+\verb!std::bad_alloc! object when the new operator cannot be satisfied?
 
 First of all you can disable throwing. Try this:
 
@@ -1072,5 +1070,5 @@ compile with assertions turned off so as not to waste CPU cycles.
 By the way, \texttt{assert} is not a function. It's a
 macro. See notes on preprocessor directives.
 
-(There's also a \texttt{static_assert()} that checks a
+(There's also a \verb!static_assert()! that checks a
 boolean condition that can be evaluated during compile time.)
