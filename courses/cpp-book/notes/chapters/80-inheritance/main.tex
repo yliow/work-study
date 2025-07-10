@@ -1,8 +1,83 @@
-\newpage\EMPHASIZE{80. Inheritance}
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\ifLuaTeX
+  \usepackage{luacolor}
+  \usepackage[soul]{lua-ul}
+\else
+  \usepackage{soul}
+\fi
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
 
-\textsc{Objectives}
+\author{}
+\date{}
+
+\begin{document}
+
+80. Inheritance
+
+Objectives
 
 \begin{itemize}
+\tightlist
+\item
 \item
   Understand inheritance
 \item
@@ -32,597 +107,641 @@
   Understand public, protected, and private inheritance
 \end{itemize}
 
-\newpage\EMPHASIZE{The problem}
+The problem
 
 Instead of working with classes (and their objects) alone, we can work
 with a hierarchy of classes. Why do we want to do this? To improve
 ``re-use''.
 
-For instance: Suppose you have an \texttt{Employee} class and you want to create a \texttt{Manager} class. A manager \EMPHASIZE{is an} employee -- everything in the \texttt{Employee} class should be in the \texttt{Manager} class. For instance an \texttt{Employee} might have a last name, \texttt{Manager} should have a last name too.
+For instance: Suppose you have an \emph{Employee} class and you want to
+create a \emph{Manager} class. A manager \textbf{is an} employee -\/-
+everything in the \emph{Employee} class should be in the \emph{Manager}
+class. For instance an \emph{Employee} might have a last name,
+\emph{Manager} should have a last name too.
 
-You basically want the \texttt{Manager} class to have all the member variables and methods of the \texttt{Employee} class. Of course you can copy-and-paste the code from the \texttt{Employee} class into the \texttt{Manager} class:
+You basically want the \emph{Manager} class to have all the member
+variables and methods of the \emph{Employee} class. Of course you can
+copy-and-paste the code from the \emph{Employee }class into the
+\emph{Manager }class:
 
-\begin{console}[commandchars=\~\@\$]
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
 class Employee
-{
+
+\{
+
 public:
-        ...
-        std::string get_firstname();~tikzmark@emplinestart$                ~tikzmark@emplinebendST$
-        void set_firstname(const std::string &);
+
+...
+
+std::string get\_firstname();
+
+void set\_firstname(const std::string \&);
+
 private:
-        std::string firstname;
-        ...
-};
-~sidebox@empcopybox$@Copy-and-paste??$
+
+std::string firstname;
+
+...
+
+\};
+
 class Manager
-{
+
+\{
+
 public:
-        ...
-        std::string get_firstname();~tikzmark@emplineend$                 ~tikzmark@emplinebendED$
-        void set_firstname(const std::string &);
-        // other stuff not from Employee class
-        ...
+
+...
+
+std::string get\_firstname();
+
+void set\_firstname(const std::string \&);
+
+// other stuff not from Employee class
+
+...
+
 private:
-        std::string firstname;
-        // other stuff not from Employee class
-        ...
-}; 
-\end{console}
-\DrawArrowPoints[red,thick]{emplinestart}{emplineend}{-- ++(2,0) -- ++(2,0) --++ (0,-4.6)}
-Of course you would expect the \texttt{Manager} class to contain more
-things than the \texttt{Employee} class. For instance in the company where
+
+std::string firstname;
+
+// other stuff not from Employee class
+
+...
+
+\}; \\
+\end{longtable}
+
+Of course you would expect the \emph{Manager} class to contain more
+things than the \emph{Employee} class. For instance in the company where
 the above software is written, a manager might have a secretary while
 non-managers do not.
 
 We don't like to duplicate code. If you need to modify the code from the
-\texttt{Employee} class, then you also need to modify the same code in the
-\texttt{Manager} class. And if code in the \texttt{Employee} class is used
+\emph{Employee} class, then you also need to modify the same code in the
+\emph{Manager} class. And if code in the \emph{Employee} class is used
 in 10 other classes, the maintenance work on code would be horrific.
 
 What should we do?
 
-\newpage\EMPHASIZE{Inheritance}
+Inheritance
 
-The solution is to use \EMPHASIZE{inheritance}!!!
+The solution is to use \textbf{inheritance}!!!
 
 The general idea is very simple: Basically C++ allows you to define a
 class so that it will have all the ``features'' of another.
 
-That's all. BUT ... there is \EMPHASIZE{a lot} of details beyond the
-general idea of inheritance. So \EMPHASIZE{pay attention}.
+That's all. BUT \ldots{} there is \textbf{a lot} of details beyond the
+general idea of inheritance. So \textbf{pay attention}.
 
 Here is the basic syntax to get a class to inherit ``features'' from
 another class:
-\begin{console}[commandchars=\~\@\$]
-class Employee
-{ ... };
-class Manager: ~EMPHASIZE@public Employee$
-{ ... }; 
-\end{console}
 
-This is called \EMPHASIZE{public inheritance}, i.e., the \texttt{Manager}
-class \EMPHASIZE{inherits} everything (i.e. member variables and methods)
-of the \texttt{Employee} class in the sense that the \texttt{Manager} class
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+class Employee
+
+\{ ... \};
+
+class Manager: \textbf{public Employee}
+
+\{ ... \}; \\
+\end{longtable}
+
+This is called \textbf{public inheritance}, i.e., the \emph{Manager}
+class \textbf{inherits} everything (i.e. member variables and methods)
+of the \emph{Employee} class in the sense that the \emph{Manager} class
 will have all the features (member variables and methods) from the
-\texttt{Employee} class.
+\emph{Employee} class.
 
 Here is some basic terminology that you must know:
 
 \begin{itemize}
+\tightlist
 \item
-  \texttt{Employee} is the \EMPHASIZE{parent class} or the
-  \EMPHASIZE{superclass} and \texttt{Manager} is the \EMPHASIZE{child class} or
-  the \EMPHASIZE{subclass}.
+  \emph{Employee} is the \textbf{parent class} or the
+  \textbf{superclass} and \emph{Manager} is the \textbf{child class} or
+  the \textbf{subclass}.
 \item
-  \texttt{Manager} is \EMPHASIZE{derived} from \texttt{Employee} or
-  \texttt{Manager} is a \EMPHASIZE{derived subclass} of \texttt{Employee}.
+  \emph{Manager} is \textbf{derived} from \emph{Employee} or
+  \emph{Manager} is a \textbf{derived subclass} of \emph{Employee}.
 \end{itemize}
 
 I'm going to use the following very simple example to illustrate
 important principles when working with inheritance.
 
 \begin{itemize}
+\tightlist
 \item
-  The parent class \texttt{P} has the integer member \verb!x_! together
-  with \verb!get_x! and \verb!set_x! methods.
+  The parent class \emph{P} has the integer member \emph{x\_} together
+  with \emph{get\_x} and \emph{set\_x} methods.
 \item
-  The child class \texttt{C} has an integer member \verb!y_! together
-  with \verb!get_y! and \verb!set_y! methods.
+  The child class \emph{C} has an integer member \emph{y\_} together
+  with \emph{get\_y} and \emph{set\_y} methods.
 \end{itemize}
 
-I don' t have to tell you ... run it.
+I don\textquotesingle t have to tell you ... run it.
 
-\begin{console}[commandchars=\~\@\$]
-#include <iostream>
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\#include < iostream\textgreater{}
 
 class P
-{
-~sidebox@methodbox$@~textbf@I'm putting the methods in one line so that we don't have to page up and down.$$
+
+\{
+
 public:
-        P() : x_(1) {}
-        int get_x() const { return x_; }
-        void set_x(int x) { x_ = x; }
+
+P() : x\_(1) \{\}
+
+int get\_x() const \{ return x\_; \}
+
+void set\_x(int x) \{ x\_ = x; \}
+
 private:
-        int x_;
-};
+
+int x\_;
+
+\};
 
 class C : public P
-{
+
+\{
+
 public:
-        C() : y_(2) {}
-        int get_y() const { return y_; }
-        void set_y(int y) { y_ = y; }
+
+C() : y\_(2) \{\}
+
+int get\_y() const \{ return y\_; \}
+
+void set\_y(int y) \{ y\_ = y; \}
+
 private:
-        int y_;
-};
+
+int y\_;
+
+\};
 
 int main()
-{   
-    C c;
-    std::cout << "c.x_ =" << c.get_x() << ", "
-              << "c.y_ =" << c.get_y() << '\n';
+
+\{
+
+C c;
+
+std::cout <<{} "c.x\_ =" <<{} c.get\_x()
+<<{} ", "
+
+<<{} "c.y\_ =" <<{} c.get\_y()
+<<{} \textquotesingle\textbackslash n\textquotesingle;
+
 return 0;
 
-} 
-\end{console}
+\} \\
+\end{longtable}
 
-Notice that the \texttt{c} object of class \texttt{C} inherits \verb!x_!,
-\verb!get_x!, and \verb!set_x! from \texttt{P}. That's why you can
-execute \verb!c.get_x()! even though class \texttt{C} does not have a
-\verb!get_x()! method.
+Notice that the \emph{c} object of class \emph{C} inherits \emph{x\_},
+\emph{get\_x}, and \emph{set\_x} from \emph{P}. That's why you can
+execute \emph{c.get\_x()} even though class \emph{C} does not have a
+\emph{get\_x()} method.
 
 Make sure you keep the above code handy since I'll be using this again
 and again in this set of notes. I'm going to call the above program our
 ``Basic Example''.
 
-\begin{ex} Get rid of the inheritance clause in our Basic Example:
-\begin{console}[commandchars=\~\@\!]
+\textbf{Exercise.} Get rid of the inheritance clause in our Basic
+Example:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
 ...
+
 class P
-{
-      ...
-};
-class C : ~EMPHASIZE@~redtext@~sout@public P!!!
-{     
-      ...
-};
-\end{console}
-and compile your code again. See the error? Now you cannot execute \verb!c.get_x()!. READ the error message carefully. So we see that object \verb!c! does seem to have the \verb!get_x! method! (Put the ``\verb!: public P!'' back into the code after you're done with this exercise.)
-\end{ex}
 
-\begin{ex} Does \verb!c! have the \verb!set_x}! method? How
+\{
+
+...
+
+\};
+
+class C \textbf{\st{: public P}}
+
+\{
+
+...
+
+\}; \\
+\end{longtable}
+
+and compile your code again. See the error? Now you cannot execute
+\emph{c.get\_x()}. READ the error message carefully. So we see that
+object \emph{c} does seem to have the \emph{get\_x} method! (Put the
+``\emph{: public P}'' back into the code after you're done with this
+exercise.)
+
+\textbf{Exercise.} Does \emph{c} have the \emph{set\_x} method? How
 would you check that?
-\end{ex}
 
-\begin{ex} Does \verb!c! have the \verb!x_! member variable?
-How would you check that? (Make \verb!x_! public and print \verb!c.x_! in \verb!main()!.)
-\end{ex}
+\textbf{Exercise.} Does \emph{c} have the \emph{x\_} member variable?
+How would you check that? (Make \emph{x\_} public and print \emph{c.x\_}
+in \emph{main()}.)
 
-So \verb!C! seems to have a ``copy'' of \verb!P!'s
+So \emph{C} seems to have a ``copy'' of \emph{P}\textquotesingle s
 declaration in it. Is that so? There are lots of other questions:
 
 \begin{itemize}
+\tightlist
 \item
-  What about the private section of \verb!P!? Can \verb!C! define
-  methods to access the private members of \verb!P!? If inheritance is a
-  message to the compiler to ``copy-and-paste'' code from \verb!P! to
-  \verb!C!, then surely methods in \verb!C! can access the private
-  members of \verb!P!. Is that so?
+  What about the private section of \emph{P}? Can \emph{C} define
+  methods to access the private members of \emph{P}? If inheritance is a
+  message to the compiler to ``copy-and-paste'' code from \emph{P }to
+  \emph{C}, then surely methods in \emph{C }can access the private
+  members of \emph{P}. Is that so?
 \item
-  Also, what if \verb!C! uses some features of \verb!P! but not all --
+  Also, what if \emph{C} uses some features of \emph{P} but not all --
   and in fact some features need to be modified. What can we do?
 \item
-  What about constructor? Clearly \verb!P::P()! constructor was called
-  since in the above experiment \verb!x_! is clearly 1. Can we call a
+  What about constructor? Clearly \emph{P::P()} constructor was called
+  since in the above experiment \emph{x\_ }is clearly 1. Can we call a
   parent constructor explicitly so that we can initialize the
-  \verb!x_!?
+  \emph{x\_}?
 \item
   What about object destruction?
 \item
   Etc., etc., etc.!!!
 \end{itemize}
 
-\begin{ex}
-The inheritance stack can be as tall as you like. Create a class \verb!G! (``grandparent'') with integer member \verb!z_! and with \verb!get_z! and \verb!set_z! method. Let the default constructor of \verb!G! initialize \verb!z_! to \verb!42!. Let class \verb!P! inherit class \verb!G!. In \verb!main()!, print the value of \verb!c.z_!.
-\end{ex}
+\textbf{Exercise.} The inheritance stack can be as tall as you like.
+Create a class \emph{G} (``grandparent'') with integer member \emph{z\_}
+and with \emph{get\_z} and \emph{set\_z} method. Let the default
+constructor of \emph{G} initialize \emph{z\_} to \emph{42}. Let class
+\emph{P} inherit class \emph{G}. In \emph{main()}, print the value of
+\emph{c.z\_}.
 
-\newpage\EMPHASIZE{Inheritance is not copy-and-paste of code!}
+Inheritance is not copy-and-paste of code!
 
-It's really important to understand that inheritance is not a copy-and-paste of code from the parent class to the child class. Inheritance is not like your \lq\lq \verb!#include!'' business.
+It's really important to understand that inheritance is not a
+copy-and-paste of code from the parent class to the child class.
+Inheritance is not like your ``\emph{\#include}'' business.
 
-Here's how you should visualize objects created from a class that's a child class. Look at our Basic Example code again. We have a \verb!c! object declared with class \verb!C! which inherits class \verb!P!. The object \verb!c! has member \verb!y_!, \verb!get_y!, and \verb!set_y! since the type of \verb!c! is class \verb!C!. From the experiments in the previous section, we see that \verb!c! also has \verb!gx_!, \verb!get_x!, and \verb!set_x! from its parent \verb!P!.
+Here's how you should visualize objects created from a class that's a
+child class. Look at our Basic Example code again. We have a \emph{c}
+object declared with class \emph{C} which inherits class \emph{P}. The
+object \emph{c} has member \emph{y\_}, \emph{get\_y}, and \emph{set\_y}
+since the type of \emph{c} is class \emph{C}. From the experiments in
+the previous section, we see that \emph{c} also has \emph{gx\_},
+\emph{get\_x}, and \emph{set\_x} from its parent \emph{P}.
 
 Here's a picture to keep in mind. First here's a diagram of our classes:
-\begin{python}
-from latextool_basic import *
-p = Plot()
-pbox = Rect(0, 0, 2, 2, label='P', linewidth=0.1)
-cbox = Rect(0,-4,2,-2, label='C', linewidth=0.1)
-c2p = Line(points=[cbox.top(), pbox.bottom()], linewidth=0.1, endstyle='>')
-p += pbox
-p += cbox
-p += c2p
-print(p)
-\end{python}
+
 Each box represents the class. The arrow describes the inheritance
 relationship between the two classes. (This is the so-called class
 diagram from UML. I'm simplifying it a little -- see previous notes for
-details on what to draw inside the boxes.) We created an object \verb!c!
-from class \verb!C!. So informally I'll draw it this way:
-\begin{python}
-from latextool_basic import *
-from latexcircuit import *
-p = Plot()
-#p += Grid(x0=-5,y0=-5,x1=10,y1=5)
-pbox = Rect(0, 0, 2, 2, label='P', linewidth=0.1)
-cbox = Rect(0,-4,2,-2, label='C', linewidth=0.1)
-c2p = Line(points=[cbox.top(), pbox.bottom()], linewidth=0.1, endstyle='>')
-p += pbox
-p += cbox
-p += c2p
-mthdel = ellipse(center=(7,-2), width=6, height=3, linewidth=0.1)
-c2mthd = Line(points=[cbox.right(), (7,-2)], linewidth=0.1)
-p += c2mthd
-p += mthdel
-mthd0 = POINT(x=6, y=-1.7, r=0, label=r'\verb!y_!')
-mthd1 = POINT(x=9, y=-1.5, r=0, label=r'\verb!set_y!')
-mthd2 = POINT(x=8, y=-3, r=0, label=r'\verb!get_y!')
-p += str(mthd0)
-p += str(mthd1)
-p += str(mthd2)
-print(p)
-\end{python}
-We also know that through inheritance, \verb!c! also has \verb!x_!,
-\verb!get_x!, and \verb!set_x!. So where's \verb!c.x_!,
-\verb!c.get_x!, and \verb!c.set_x!?
+details on what to draw inside the boxes.) We created an object \emph{c}
+from class \emph{C}. So informally I'll draw it this way:
 
-Now if you think of \verb!c.x_!, \verb!c.get_x!, and \verb!c.set_x!
+We also know that through inheritance, \emph{c} also has \emph{x\_},
+\emph{get\_x}, and \emph{set\_x}. So where's \emph{c.x\_},
+\emph{c.get\_x}, and \emph{c.set\_x}?
+
+Now if you think of \emph{c.x\_}, \emph{c.get\_x}, and \emph{c.set\_x}
 in the same bag of things like this:
-\begin{python}
-from latextool_basic import *
-from latexcircuit import *
-p = Plot()
-#p += Grid(x0=-5,y0=-5,x1=10,y1=5)
-pbox = Rect(0, 0, 2, 2, label='P', linewidth=0.1)
-cbox = Rect(0,-4,2,-2, label='C', linewidth=0.1)
-c2p = Line(points=[cbox.top(), pbox.bottom()], linewidth=0.1, endstyle='>')
-p += pbox
-p += cbox
-p += c2p
-mthdel = ellipse(center=(7,-2), width=6, height=3, linewidth=0.1)
-c2mthd = Line(points=[cbox.right(), (7,-2)], linewidth=0.1)
-p += c2mthd
-p += mthdel
-mthd0 = POINT(x=6, y=-1.7, r=0, label=r'\verb!y_!')
-mthd1 = POINT(x=9, y=-1.5, r=0, label=r'\verb!set_y!')
-mthd2 = POINT(x=8, y=-3, r=0, label=r'\verb!get_y!')
-mthd3 = POINT(x=6, y=-2.5, r=0, label=r'\verb!x_!')
-mthd4 = POINT(x=8.5, y=-2.5, r=0, label=r'\verb!set_x!')
-mthd5 = POINT(x=7, y=-1, r=0, label=r'\verb!get_x!')
 
-p += str(mthd0)
-p += str(mthd1)
-p += str(mthd2)
-p += str(mthd3)
-p += str(mthd4)
-p += str(mthd5)
-print(p)
-\end{python}
 then you would be surprised by the following experiment: Add an integer
-member variable to class \verb!C!:
+member variable to class \emph{C}:
 
-\begin{console}[commandchars=\~\@\$]
-#include <iostream>
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\#include < iostream\textgreater{}
 
 class P
-{
+
+\{
+
 public:
-        P() : x_(1) {}
-        int get_x() const { return x_; }
-        void set_x(int x) { x_ = x; }
+
+P() : x\_(1) \{\}
+
+int get\_x() const \{ return x\_; \}
+
+void set\_x(int x) \{ x\_ = x; \}
+
 private:
-        int x_;
-};
+
+int x\_;
+
+\};
 
 class C : public P
-{
+
+\{
+
 public:
-        C() : y_(2) {}
-        int get_y() const { return y_; }
-        void set_y(int y) { y_ = y; }
+
+C() : y\_(2) \{\}
+
+int get\_y() const \{ return y\_; \}
+
+void set\_y(int y) \{ y\_ = y; \}
+
 private:
-        ~EMPHASIZE@~redtext@int x_;$$
-        int y_;
-};
+
+\textbf{int x\_;}
+
+int y\_;
+
+\};
 
 int main()
-{   
-    C c;
-    std::cout << "c.x_ =" << c.get_x() << ", "
-              << "c.y_ =" << c.get_y() << '\n';
-    return 0;
-}
-\end{console}
 
-The program does compile. But this means that \verb!c_! now has two
-\verb!x_!'s!!!
-\begin{python}
-from latextool_basic import *
-from latexcircuit import *
-p = Plot()
-#p += Grid(x0=-5,y0=-5,x1=10,y1=5)
-pbox = Rect(0, 0, 2, 2, label='P', linewidth=0.1)
-cbox = Rect(0,-4,2,-2, label='C', linewidth=0.1)
-c2p = Line(points=[cbox.top(), pbox.bottom()], linewidth=0.1, endstyle='>')
-p += pbox
-p += cbox
-p += c2p
-mthdel = ellipse(center=(7,-2), width=6, height=3, linewidth=0.1)
-c2mthd = Line(points=[cbox.right(), (7,-2)], linewidth=0.1)
-p += c2mthd
-p += mthdel
-mthd0 = POINT(x=6, y=-1.7, r=0, label=r'\verb!y_!')
-mthd1 = POINT(x=9, y=-1.5, r=0, label=r'\verb!set_y!')
-mthd2 = POINT(x=8, y=-3, r=0, label=r'\verb!get_y!')
-mthd3 = POINT(x=6, y=-2.5, r=0, label=r'\verb!x_!')
-mthd4 = POINT(x=8.5, y=-2.5, r=0, label=r'\verb!set_x!')
-mthd5 = POINT(x=7, y=-1, r=0, label=r'\verb!get_x!')
-mthd6 = POINT(x=7, y=-2.2, r=0, label=r'\verb!x_!')
+\{
 
-p += str(mthd0)
-p += str(mthd1)
-p += str(mthd2)
-p += str(mthd3)
-p += str(mthd4)
-p += str(mthd5)
-p += str(mthd6)
-yikesbox = Rect(4, 1, 6, 3, linewidth=0.1, linecolor='red', label=r'\textbf\redtext{Yikes}')
-p += yikesbox
-yikesL0 = Line(points=[yikesbox.bottomright(), (mthd6.x() - 0.5, mthd6.y() + 0.3)], linewidth=0.05, linecolor='red', endstyle='>')
-yikesL1 = Line(points=[yikesbox.bottomleft(), (mthd3.x() - 0.5, mthd3.y() + 0.3)], linewidth=0.05, linecolor='red', endstyle='>')
+C c;
 
-p += yikesL0
-p += yikesL1
+std::cout <<{} "c.x\_ =" <<{} c.get\_x()
+<<{} ", "
 
-print(p)
-\end{python}
-When you call upon \verb!c.x_! which one is it??? Why does the compiler
+<<{} "c.y\_ =" <<{} c.get\_y()
+<<{} \textquotesingle\textbackslash n\textquotesingle;
+
+return 0;
+
+\} \\
+\end{longtable}
+
+The program does compile. But this means that \emph{c\_} now has two
+\emph{x\_}'s!!!
+
+When you call upon \emph{c.x\_} which one is it??? Why does the compiler
 allow this?
 
-\begin{ex} Can you think of an experiment that can tell you
-which \verb!x_! is used if you access \verb!c.x_! in \verb!main()!?
-\end{ex}
+\textbf{Exercise.} Can you think of an experiment that can tell you
+which \emph{x\_} is used if you access \emph{c.x\_} in \emph{main()}?
+
 You really want to think of the members (member variables as well as
 methods) as being organized into two different scopes:
-\begin{python}
-from latextool_basic import *
-from latexcircuit import *
-p = Plot()
-#p += Grid(x0=-5,y0=-5,x1=10,y1=5)
-pbox = Rect(0, 0, 2, 2, label='P', linewidth=0.1)
-cbox = Rect(0,-4,2,-2, label='C', linewidth=0.1)
 
-c2p = Line(points=[cbox.top(), pbox.bottom()], linewidth=0.1, endstyle='>')
+The members of \emph{c} that are due to inheritance is at the top while
+the members declared in class \emph{C} are at the bottom. In particular
+the \emph{x\_} declared in class \emph{C} is at the bottom.
 
-p += pbox
-p += cbox
-p += c2p
-
-mthdel0 = ellipse(center=(7,-4), width=6, height=3, linewidth=0.1)
-mthdel1 = ellipse(center=(7,2), width=6, height=3, linewidth=0.1)
-
-c2mthd = Line(points=[cbox.right(), (7,-4)], linewidth=0.1)
-p2mthd = Line(points=[pbox.right(), (7, 2)], linewidth=0.1)
-mthd2mthd = Line(points=[(7,-4), (7, 2)], linewidth=0.1)
-
-p += c2mthd
-p += p2mthd
-p += mthd2mthd
-p += mthdel0
-p += mthdel1
-
-mthd0 = POINT(x=6, y=-3.7, r=0, label=r'\verb!y_!')
-mthd1 = POINT(x=9, y=-3.5, r=0, label=r'\verb!set_y!')
-mthd2 = POINT(x=8, y=-5, r=0, label=r'\verb!get_y!')
-mthd3 = POINT(x=6, y=2.5, r=0, label=r'\verb!x_!')
-mthd4 = POINT(x=6, y=-2.1, r=0, label=r'\large\verb!c!')
-mthd5 = POINT(x=8.5, y=2.8, r=0, label=r'\verb!set_x!')
-mthd6 = POINT(x=7, y=-3, r=0, label=r'\verb!x_!')
-mthd7 = POINT(x=7.3, y=1.5, r=0, label=r'\verb!get_x!')
-
-p += str(mthd0)
-p += str(mthd1)
-p += str(mthd2)
-p += str(mthd3)
-p += str(mthd4)
-p += str(mthd5)
-p += str(mthd6)
-p += str(mthd7)
-
-print(p)
-\end{python}
-The members of \verb!c! that are due to inheritance is at the top while
-the members declared in class \verb!C! are at the bottom. In particular
-the \verb!x_! declared in class \verb!C! is at the bottom.
-
-The name \verb!c.x_! refers to the \verb!x_! at the bottom, i.e., the
-\verb!x_! due to the class \verb!C!. Of course now you have a problem:
-what if in \verb!main()!, you want to access the \verb!x_! at the
+The name \emph{c.x\_} refers to the \emph{x\_} at the bottom, i.e., the
+\emph{x\_} due to the class \emph{C}. Of course now you have a problem:
+what if in \emph{main()}, you want to access the \emph{x\_} at the
 top???
 
-In fact to be very precise, each member of \verb!c! belongs to one of
+In fact to be very precise, each member of \emph{c} belongs to one of
 the two bags (bottom and top) and you can think of the two bags as
 scopes. You can in fact specify the scopes when you access a member of
-\verb!c!. First of all the scopes have names: they are \verb!C! and
-\verb!P!, i.e., the names of the classes:
-\begin{python}
-from latextool_basic import *
-from latexcircuit import *
-p = Plot()
-#p += Grid(x0=-5,y0=-5,x1=10,y1=5)
-pbox = Rect(0, 0, 2, 2, label='P', linewidth=0.1)
-cbox = Rect(0,-4,2,-2, label='C', linewidth=0.1)
+\emph{c}. First of all the scopes have names: they are \emph{C} and
+\emph{P}, i.e., the names of the classes:
 
-c2p = Line(points=[cbox.top(), pbox.bottom()], linewidth=0.1, endstyle='>')
-
-p += pbox
-p += cbox
-p += c2p
-
-mthdel0 = ellipse(center=(7,-4), width=6, height=3, linewidth=0.1)
-mthdel1 = ellipse(center=(7,2), width=6, height=3, linewidth=0.1)
-
-c2mthd = Line(points=[cbox.right(), (7,-4)], linewidth=0.1)
-p2mthd = Line(points=[pbox.right(), (7, 2)], linewidth=0.1)
-mthd2mthd = Line(points=[(7,-4), (7, 2)], linewidth=0.1)
-
-p += c2mthd
-p += p2mthd
-p += mthd2mthd
-p += mthdel0
-p += mthdel1
-
-mthd0 = POINT(x=6, y=-3.7, r=0, label=r'\verb!y_!')
-mthd1 = POINT(x=9, y=-3.5, r=0, label=r'\verb!set_y!')
-mthd2 = POINT(x=8, y=-5, r=0, label=r'\verb!get_y!')
-mthd3 = POINT(x=6, y=2.5, r=0, label=r'\verb!x_!')
-mthd4 = POINT(x=6, y=-2.1, r=0, label=r'\large\verb!c!')
-mthd5 = POINT(x=8.5, y=2.8, r=0, label=r'\verb!set_x!')
-mthd6 = POINT(x=7, y=-3, r=0, label=r'\verb!x_!')
-mthd7 = POINT(x=7.3, y=1.5, r=0, label=r'\verb!get_x!')
-mthd8 = POINT(x=6, y=0.2, r=0, label=r'\large\verb!P!')
-mthd9 = POINT(x=6, y=-2.1, r=0, label=r'\large\verb!C!')
-mthd10 = POINT(x=6.2, y=-1.6, r=0, label=r'\large\verb!c!')
-
-p += str(mthd0)
-p += str(mthd1)
-p += str(mthd2)
-p += str(mthd3)
-p += str(mthd4)
-p += str(mthd5)
-p += str(mthd6)
-p += str(mthd7)
-p += str(mthd8)
-p += str(mthd9)
-p += str(mthd10)
-
-print(p)
-\end{python}
 You can actually address a particular member by prepending it with
-\verb!C::! or \verb!P::! if you want to be specific. Try the following:
-\begin{console}[commandchars=\~\@\$]
-#include < iostream>
+\emph{C::} or \emph{P::} if you want to be specific. Try the following:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\#include < iostream\textgreater{}
 
 class P
-{
+
+\{
+
 public:
-        P() : x_(1) {}
-        int get_x() const { return x_; }
-        void set_x(int x) { x_ = x; }
+
+P() : x\_(1) \{\}
+
+int get\_x() const \{ return x\_; \}
+
+void set\_x(int x) \{ x\_ = x; \}
+
 private:
-        int x_;
-};
+
+int x\_;
+
+\};
 
 class C : public P
-{
+
+\{
+
 public:
-        C() : y_(2) {}
-        int get_y() const { return y_; }
-        void set_y(int y) { y_ = y; }
+
+C() : y\_(2) \{\}
+
+int get\_y() const \{ return y\_; \}
+
+void set\_y(int y) \{ y\_ = y; \}
+
 private:
-        int x_;
-        int y_;
-};
+
+int x\_;
+
+int y\_;
+
+\};
 
 int main()
-{   
-    C c;        
-    std::cout << "c.x_ =" << c.get_x() << ", "
-              << "c.y_ =" << c.get_y() << '\n';
-    std::cout << "c.x_ =" << c.~EMPHASIZE@~redtext@P::$$get_x() << ", "
-              << "c.y_ =" << c.~EMPHASIZE@~redtext@C::$$get_y() << '\n';
+
+\{
+
+C c;
+
+std::cout <<{} "c.x\_ =" <<{} c.get\_x()
+<<{} ", "
+
+<<{} "c.y\_ =" <<{} c.get\_y()
+<<{} \textquotesingle\textbackslash n\textquotesingle;
+
+std::cout <<{} "c.x\_ =" <<{}
+c.\textbf{P::}get\_x() <<{} ", "
+
+<<{} "c.y\_ =" <<{}
+c.\textbf{C::}get\_y() <<{}
+\textquotesingle\textbackslash n\textquotesingle;
+
 return 0;
 
-}
-\end{console}
+\} \\
+\end{longtable}
 
-We also have two \verb!x_!'s in \verb!c!. Let's temporarily make them
+We also have two \emph{x\_}'s in \emph{c}. Let's temporarily make them
 public and then access them:
-\begin{console}[commandchars=\~\@\$]
-#include < iostream>
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\#include < iostream\textgreater{}
+
 class P
-{
+
+\{
+
 public:
-        P() : x_(1) {}
-        int get_x() const { return x_; }
-        void set_x(int x) { x_ = x; }
-~EMPHASIZE@~redtext@public:$$
-        int x_;
-};
+
+P() : x\_(1) \{\}
+
+int get\_x() const \{ return x\_; \}
+
+void set\_x(int x) \{ x\_ = x; \}
+
+public:
+
+int x\_;
+
+\};
 
 class C : public P
-{
+
+\{
+
 public:
-        C() : y_(2) {}
-        int get_y() const { return y_; }
-        void set_y(int y) { y_ = y; }
-~EMPHASIZE@~redtext@public:$$
-        int x_;
-        int y_;
-};
+
+C() : y\_(2) \{\}
+
+int get\_y() const \{ return y\_; \}
+
+void set\_y(int y) \{ y\_ = y; \}
+
+public:
+
+int x\_;
+
+int y\_;
+
+\};
 
 int main()
-{   
-    C c;
-    std::cout << "c.x_ =" << c.get_x() << ", "
-              << "c.y_ =" << c.get_y() << '\n';
-    std::cout << "c.x_ =" << c.P::get_x() << ", "
-              << "c.y_ =" << c.C::get_y() << '\n';
-    std::cout << "c.x_ (in C) =" << c.~EMPHASIZE@~redtext@P::x_$$ << ", "
-              << "c.x_ (in P) =" << c.~EMPHASIZE@~redtext@C::x_$$ << '\n';
+
+\{
+
+C c;
+
+std::cout <<{} "c.x\_ =" <<{} c.get\_x()
+<<{} ", "
+
+<<{} "c.y\_ =" <<{} c.get\_y()
+<<{} \textquotesingle\textbackslash n\textquotesingle;
+
+std::cout <<{} "c.x\_ =" <<{}
+c.P::get\_x() <<{} ", "
+
+<<{} "c.y\_ =" <<{} c.C::get\_y()
+<<{} \textquotesingle\textbackslash n\textquotesingle;
+
+std::cout <<{} "c.x\_ (in C) =" <<{}
+c.\textbf{P::x\_} <<{} ", "
+
+<<{} "c.x\_ (in P) =" <<{}
+c.\textbf{C::x\_}
+
+<<{} \textquotesingle\textbackslash n\textquotesingle;
 
 return 0;
 
-}
-\end{console}
+\} \\
+\end{longtable}
 
-NOTE: Since \verb!c.C::x_! is not initialized, your C++ compiler will
+NOTE: Since \emph{c.C::x\_} is not initialized, your C++ compiler will
 give you a warning. In that case, just do this (duh):
-\begin{console}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
 ...
 
 class C : public P
-{
+
+\{
+
 public:
-        C() : ~EMPHASIZE@~redtext@x_(3),$$ y_(2) {}
-        ...
-~EMPHASIZE@~redtext@public:$$
-        int x_;
-        int y_;
-};
 
-... 
-\end{console}
+C() : \textbf{x\_(3), }y\_(2) \{\}
 
-Note that in \verb!main()!, \verb!c.x_! by default refers to the \verb!x_! in \verb!C! and not the \verb!x_! of \verb!P!. Sometimes we say that the \verb!x_! in \verb!C! \EMPHASIZE{hides} the \verb!x_! in \verb!P!.
+...
 
-After the above experiments, change the \lq\lq \verb!public:!'' back to \lq\lq \verb!private:!'' and make the appropriate changes.
+public:
 
-In general, here's how your C++ compiler hunts down a name (member variable or method) or an object. Say your code has \verb!c.x_!.
+int x\_;
+
+int y\_;
+
+\};
+
+... \\
+\end{longtable}
+
+Note that in \emph{main()}, \emph{c.x\_} by default refers to the
+\emph{x\_} in \emph{C} and not the \emph{x\_} of \emph{P}. Sometimes we
+say that the \emph{x\_} in \emph{C} \textbf{hides} the \emph{x\_} in
+\emph{P}.
+
+After the above experiments, change the ``\emph{public:}'' back to
+``\emph{private:}'' and make the appropriate changes.
+
+In general, here's how your C++ compiler hunts down a name (member
+variable or method) or an object. Say your code has \emph{c.x\_}.
 
 \begin{itemize}
+\tightlist
 \item
   The compiler starts with the class used to declare the object. If
-  there's an \verb!x_! in that class, that's the one used.
+  there's an \emph{x\_} in that class, that's the one used.
 \item
-  If the class used to declare \verb!c! does not have \verb!x_!, your
+  If the class used to declare \emph{c} does not have \emph{x\_}, your
   compiler will look at the parent class. If the parent has an
-  \verb!x_!, then that's the one used.
+  \emph{x\_}, then that's the one used.
 \item
-  If the parent class does not have \verb!x_!, and if the parent class
+  If the parent class does not have \emph{x\_}, and if the parent class
   inheritance from another class (that would be a grandparent class of
-  the class of \verb!c!), then the compiler will look for \verb!x_! in
-  the grandparent class of \verb!C!.
+  the class of \emph{c}), then the compiler will look for \emph{x\_} in
+  the grandparent class of \emph{C}.
 \item
   Etc.
 \item
@@ -630,559 +749,967 @@ In general, here's how your C++ compiler hunts down a name (member variable or m
   C++ compiler will yell at you.
 \end{itemize}
 
-If a class scope was specified, say you call upon \verb!c.P::x_!, then
-the search for \verb!x_! starts at class \verb!P! proceeds upward
+If a class scope was specified, say you call upon \emph{c.P::x\_}, then
+the search for \emph{x\_} starts at class \emph{P} proceeds upward
 through the inheritance hierarchy until it's found.
 
-Note that the search for a name goes \EMPHASIZE{up} the inheritance
+Note that the search for a name goes \textbf{up} the inheritance
 hierarchy. Add the following to our Basic Example:
-\begin{console}[commandchars=\~\@\$]
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
 ...
+
 class P
-{
+
+\{
+
 public:
-        ...
-        ~EMPHASIZE@~redtext@void b() { std::cout <<$$ 
-                   ~EMPHASIZE@~redtext@"P::b()\n"; }$$
-        ...
-};
+
+...
+
+\textbf{void b() \{ std::cout <<{} }
+
+\textbf{ "P::b()\textbackslash n"; \}}
+
+...
+
+\};
 
 class C : public P
-{
+
+\{
+
 public:
-        ...
-        ~EMPHASIZE@~redtext@void a() { std::cout <<$$ 
-                   ~EMPHASIZE@~redtext@"C::a()\n";$$
-                   ~EMPHASIZE@~redtext@b();  }$$
-        ...
-};
+
+...
+
+\textbf{void a() \{ std::cout <<{} }
+
+\textbf{ "C::a()\textbackslash n";}
+
+\textbf{ b(); \} }
+
+...
+
+\};
 
 int main()
-{   
-    ...
-    ~EMPHASIZE@~redtext@c.a();$$
-    return 0;
-}
-\end{console}
 
-\begin{ex} What is the output? Or is there an error? The
+\{
+
+...
+
+\textbf{c.a();}
+
+return 0;
+
+\} \\
+\end{longtable}
+
+\textbf{Exercise.} What is the output? Or is there an error? The
 following is obtained by adding code to our Basic Example:
-\begin{console}[commandchars=\~\@\$]
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
 ...
 
 class P
-{
+
+\{
+
 public:
-        ...
-        ~textbf@void c() { std::cout << "P::c()\n"; d(); }$
-        ...
-};
+
+...
+
+\textbf{void c() \{ std::cout <<{}
+"P::c()\textbackslash n"; d(); \}}
+
+...
+
+\};
 
 class C : public P
-{
+
+\{
+
 public:
-        ...
-        ~textbf@void d() { std::cout << "C::c()\n"; }$
-        ...
-};
+
+...
+
+\textbf{void d() \{ std::cout <<{}
+"C::c()\textbackslash n"; \}}
+
+...
+
+\};
 
 int main()
-{   
-    ...
-    ~textbf@c.c();$
-    return 0;
-}
-\end{console}
-\end{ex}
-\newpage\EMPHASIZE{Private members of the parent class}
+
+\{
+
+...
+
+\textbf{c.c();}
+
+return 0;
+
+\} \\
+\end{longtable}
+
+Private members of the parent class
 
 For public inheritance, a child cannot access private member variables
 or private methods of parent. Let's do an experiment to verify this.
 Here's our Basic Example:
-\begin{console}
-#include <iostream>
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\#include < iostream\textgreater{}
 
 class P
-{
+
+\{
+
 public:
-        P() : x_(1) {}
-        int get_x() const { return x_; }
-        void set_x(int x) { x_ = x; }
+
+P() : x\_(1) \{\}
+
+int get\_x() const \{ return x\_; \}
+
+void set\_x(int x) \{ x\_ = x; \}
+
 private:
-        int x_;
-};
+
+int x\_;
+
+\};
 
 class C: public P
-{
+
+\{
+
 public:
-        C() : x_(3), y_(2) {}
-        int get_y() const { return y_; }
-        void set_y(int y) { y_ = y; }
+
+C() : x\_(3), y\_(2) \{\}
+
+int get\_y() const \{ return y\_; \}
+
+void set\_y(int y) \{ y\_ = y; \}
+
 private:
-        int x_;
-        int y_;
-};
+
+int x\_;
+
+int y\_;
+
+\};
 
 int main()
-{   
-    C c;
-    std::cout << "c.x_ =" << c.get_x() << ", "
-              << "c.y_ =" << c.get_y() << '\n';
-    std::cout << "c.x_ =" << c.P::get_x() << ", "
-              << "c.y_ =" << c.C::get_y() << '\n';
+
+\{
+
+C c;
+
+std::cout <<{} "c.x\_ =" <<{} c.get\_x()
+<<{} ", "
+
+<<{} "c.y\_ =" <<{} c.get\_y()
+<<{} \textquotesingle\textbackslash n\textquotesingle;
+
+std::cout <<{} "c.x\_ =" <<{}
+c.P::get\_x() <<{} ", "
+
+<<{} "c.y\_ =" <<{} c.C::get\_y()
+<<{} \textquotesingle\textbackslash n\textquotesingle;
+
 return 0;
-}
-\end{console}
 
-Now let's create a method in \verb!C! to access a private member of
-\verb!P!:
-\begin{console}[commandchars=\~\@\$]
+\} \\
+\end{longtable}
+
+Now let's create a method in \emph{C} to access a private member of
+\emph{P}:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
 ...
-class C : public P
-{
-public:
-        ...
-        ~EMPHASIZE@~redtext@void m() { P::x_ = 42; }$$
-private:
-        int x_;
-        int y_;
-};
 
-... 
-\end{console}
+class C : public P
+
+\{
+
+public:
+
+...
+
+\textbf{void m() \{ P::x\_ = 42; \}}
+
+private:
+
+int x\_;
+
+int y\_;
+
+\};
+
+... \\
+\end{longtable}
 
 You will get an error when you compile your program -- make sure you
 read the error message. This is the same for private method in the
 parent:
-\begin{console}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
 ...
 
 class P
-{     
+
+\{
+
 ...
+
 private:
-        ~EMPHASIZE@~redtext@void m() {}$$
-        int x_;
-};
+
+\textbf{void m() \{\}}
+
+int x\_;
+
+\};
 
 class C: public P
-{
+
+\{
+
 public:
-        ...
-        ~EMPHASIZE@~redtext@void n() { m(); }$$
-        ...
-};
 
 ...
-\end{console}
 
-\newpage\EMPHASIZE{Constructor}
+\textbf{void n() \{ m(); \}}
+
+...
+
+\};
+
+... \\
+\end{longtable}
+
+Constructor
 
 Now add some print statements in the parent and child constructor:
-\begin{console}[commandchars=\~\@\$]
-#include <iostream>
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\#include < iostream\textgreater{}
 
 class P
-{
+
+\{
+
 public:
-        P() : x_(1) { ~textbf@std::cout << "P::P()\n"; $}
-        int get_x() const { return x_; }
-        void set_x(int x) { x_ = x; }
+
+P() : x\_(1) \{ \textbf{std::cout <<{}
+"P::P()\textbackslash n"; }\}
+
+int get\_x() const \{ return x\_; \}
+
+void set\_x(int x) \{ x\_ = x; \}
+
 private:
-        int x_;
-};
+
+int x\_;
+
+\};
 
 class C: public P
-{
+
+\{
+
 public:
-        C() : x_(3), y_(2) { ~textbf@std::cout << "C::C()";$ }
-        int get_y() const { return y_; }       
-        void set_y(int y) { y_ = y; }
+
+C() : x\_(3), y\_(2) \{ \textbf{std::cout <<{}
+"C::C()";} \}
+
+int get\_y() const \{ return y\_; \}
+
+void set\_y(int y) \{ y\_ = y; \}
+
 private:
-        int x_;
-        int y_;
-};
+
+int x\_;
+
+int y\_;
+
+\};
 
 int main()
-{   
-    C c;
-    std::cout << "c.x_ =" << c.get_x() << ", "
-              << "c.y_ =" << c.get_y() << '\n';
-    std::cout << "c.x_ =" << c.P::get_x() << ", "
-              << "c.y_ =" << c.C::get_y() << '\n';
+
+\{
+
+C c;
+
+std::cout <<{} "c.x\_ =" <<{} c.get\_x()
+<<{} ", "
+
+<<{} "c.y\_ =" <<{} c.get\_y()
+<<{} \textquotesingle\textbackslash n\textquotesingle;
+
+std::cout <<{} "c.x\_ =" <<{}
+c.P::get\_x() <<{} ", "
+
+<<{} "c.y\_ =" <<{} c.C::get\_y()
+<<{} \textquotesingle\textbackslash n\textquotesingle;
+
 return 0;
 
-}
-\end{console}
+\} \\
+\end{longtable}
 
-Run it. You'll see that the parent constructor is indeed executed. This means that the child constructor actually called the parent's constructor.
+Run it. You'll see that the parent constructor is indeed executed. This
+means that the child constructor actually called the parent's
+constructor.
 
-Note that the \EMPHASIZE{parent constructor} was \EMPHASIZE{called before} the \EMPHASIZE{child constructor.} Why is that? Because during child construction, you may use data already constructed in the parent. You cannot do the opposite.
+Note that the \textbf{parent constructor }was \textbf{called before
+}the\textbf{ child constructor.} Why is that? Because during child
+construction, you may use data already constructed in the parent. You
+cannot do the opposite.
 
 Now what if you want to choose how to initialize the parent part of the
-\verb!c! object? How do you explicitly call the parent's constructor?
-Let's add a new constructor in \verb!P!, one that accepts an integer
-value and get the \verb!C!'s constructor to call \verb!P::P(int):!
-\begin{console}[commandchars=\~\@\$]
-#include <iostream>
-~sidebox@parentctor$@~textbf@Call parent's constructor explicitly in the initializer list$$
+\emph{c} object? How do you explicitly call the parent's constructor?
+Let's add a new constructor in \emph{P}, one that accepts an integer
+value and get the \emph{C}'s constructor to call \emph{P::P(int):}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\#include < iostream\textgreater{}
+
 class P
-{
+
+\{
+
 public:
-        P() : x_(1) { std::cout << "P::P()\n"; }
-        ~textbf@P(int x) : x_(x) { std::cout << "P::P(int)\n"; }$
-        int get_x() const { return x_; }
-        void set_x(int x) { x_ = x; }
+
+P() : x\_(1) \{ std::cout <<{} "P::P()\textbackslash n";
+\}
+
+\textbf{P(int x) : x\_(x) \{ std::cout <<{}
+"P::P(int)\textbackslash n"; \}}
+
+int get\_x() const \{ return x\_; \}
+
+void set\_x(int x) \{ x\_ = x; \}
+
 private:
-        int x_;
-};
+
+int x\_;
+
+\};
 
 class C: public P
-{
+
+\{
+
 public:
-        C() : ~EMPHASIZE@P(42)$~tikzmark@end42$, x_(3), y_(2)
-                     { std::cout << "C::C()"; }
-        int get_y() const { return y_; }
-        void set_y(int y) { y_ = y; }
+
+C() : \textbf{P(42),} x\_(3), y\_(2)
+
+\{ std::cout <<{} "C::C()"; \}
+
+int get\_y() const \{ return y\_; \}
+
+void set\_y(int y) \{ y\_ = y; \}
+
 private:
-        int x_;
-        int y_;
-};
+
+int x\_;
+
+int y\_;
+
+\};
 
 int main()
-{   
-    C c;
-    std::cout << "c.x_ =" << c.get_x() << ", "
-              << "c.y_ =" << c.get_y() << '\n';
-    std::cout << "c.x_ =" << c.P::get_x() << ", "
-              << "c.y_ =" << c.C::get_y() << '\n';
-    return 0;
-}
-\end{console}
-\DrawArrow[red, thick]{parentctor.south west}{end42}
 
-\begin{ex} You are given this incomplete code. Add to the
-constructor of \verb!Car! and \verb!Motorcycle! so that a \verb!Car!
-object is initialized to have 4 wheels and a \verb!Motorcycle! object is
+\{
+
+C c;
+
+std::cout <<{} "c.x\_ =" <<{} c.get\_x()
+<<{} ", "
+
+<<{} "c.y\_ =" <<{} c.get\_y()
+<<{} \textquotesingle\textbackslash n\textquotesingle;
+
+std::cout <<{} "c.x\_ =" <<{}
+c.P::get\_x() <<{} ", "
+
+<<{} "c.y\_ =" <<{} c.C::get\_y()
+<<{} \textquotesingle\textbackslash n\textquotesingle;
+
+return 0;
+
+\} \\
+\end{longtable}
+
+\textbf{Exercise.} You are given this incomplete code. Add to the
+constructor of \emph{Car} and \emph{Motorcycle} so that a \emph{Car}
+object is initialized to have 4 wheels and a \emph{Motorcycle} object is
 initialized to have 2 wheels.
 
-\begin{console}
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
 class Vehicle
-{
+
+\{
+
 public:
-        Vehicle(int numWheels)
-           : numWheels_(numWheels)
-        {}
-        int numWheels() const { return numWheels_; }
+
+Vehicle(int numWheels)
+
+: numWheels\_(numWheels)
+
+\{\}
+
+int numWheels() const \{ return numWheels\_; \}
+
 private:
-        int numWheels_;
-};
+
+int numWheels\_;
+
+\};
 
 class Car: public Vehicle
-{
+
+\{
+
 public:
-        Car(bool keyless_entry)
-           : keyless_entry_(keyless_entry)
-        {}
+
+Car(bool keyless\_entry)
+
+: keyless\_entry\_(keyless\_entry)
+
+\{\}
+
 private:
-        bool keyless_entry_;
-};
+
+bool keyless\_entry\_;
+
+\};
 
 class Motorcycle: public Vehicle
-{
+
+\{
+
 public:
-        Motorcycle()
-            :
-        {}
-};
+
+Motorcycle()
+
+:
+
+\{\}
+
+\};
 
 int main()
-{   
-    Car aCar;               // aCar has 4 wheels
-    Motorcycle aMotorcycle; // aMotorcycle has 2
-                            // wheels
-    std::cout << "aCar has "
-              << aCar.numWheels() << " wheels\n";
-    std::cout << "aMotorcycle has "
-              << aMotorcycle.numWheels()
-              << " wheels\n";
-    return 0;
-}
-\end{console}
-\sidenote{
-  \begin{tikzpicture}
-  \node[draw,text width=2cm,minimum height=2cm, line width=0.05cm, inner sep=0.3cm, anchor=center] (car) at (1,-2) 
-       {\tikzmark{c} \normalsize\texttt{Car}};
-  \node[draw,text width=2cm,minimum height=2cm, line width=0.05cm, inner sep=0.3cm, anchor=center] (mcycle) at (4,-2) 
-       {\tikzmark{m} \normalsize\texttt{Motor-\\ cycle}};
-  \node[draw,text width=2cm,minimum height=2cm,minimum width=2cm, line width=0.05cm, inner sep=0.3cm, anchor=base] (vehicle) at (2.5,1) 
-       {\tikzmark{v} \normalsize\texttt{Vehicle}};
-  \node[above=4mm of car.north] (Lstart){};
-  \node[above=4mm of mcycle.north] (Lend){};
-  \node[below=6mm of vehicle.south] (Lmid){};
-  \draw[ultra thick]        (car.north)   -- (Lstart) -- (Lend) -- (mcycle.north);
-  \draw[ultra thick, ->]        (Lmid)   -- (vehicle.south);
-\end{tikzpicture}
-}
 
-\end{ex}
-\begin{ex}
-This is an incomplete piece of code:
-\begin{console}
+\{
+
+Car aCar; // aCar has 4 wheels
+
+Motorcycle aMotorcycle; // aMotorcycle has 2
+
+// wheels
+
+std::cout <<{} "aCar has "
+
+<<{} aCar.numWheels() <<{} "
+wheels\textbackslash n";
+
+std::cout <<{} "aMotorcycle has "
+
+<<{} aMotorcycle.numWheels()
+
+<<{} " wheels\textbackslash n";
+
+return 0;
+
+\} \\
+\end{longtable}
+
+\textbf{Exercise.} This is an incomplete piece of code:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
 class GameObject
-{
+
+\{
+
 private:
-        bool is_alive_;
-        int x_;
-        int y_;
-};
+
+bool is\_alive\_;
+
+int x\_;
+
+int y\_;
+
+\};
 
 class Laser: public GameObject
-{
-};
+
+\{
+
+\};
 
 class Alien: public GameObject
-{
-};
-\end{console}
-\end{ex}
-Add code so that during the initialization of a \verb!Laser! object, the
-\verb!is_alive_! is set to \verb!false! and during the initialization
-of an \verb!Alien! object, the \verb!is_alive_! is set to \verb!true!.
 
-\newpage\EMPHASIZE{Destructor}
+\{
+
+\}; \\
+\end{longtable}
+
+Add code so that during the initialization of a \emph{Laser} object, the
+\emph{is\_alive\_} is set to \emph{false} and during the initialization
+of an \emph{Alien} object, the \emph{is\_alive\_} is set to \emph{true}.
+
+Destructor
 
 Now let's analyze what happens when a child object is destroyed. Of
 course the child object will call it's destructor. What about the
 parent's destructor?
 
 Run the following:
-\begin{console}[commandchars=\!\@\$]
-#include <iostream>
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\#include < iostream\textgreater{}
 
 class P
-{
+
+\{
+
 public:
-        P() : x_(1) { std::cout << "P::P()\n"; }
-        !textbf@~P() { std::cout << "P::~P()\n"; }$
-        int get_x() const { return x_; }
-        void set_x(int x) { x_ = x; }
+
+P() : x\_(1) \{ std::cout <<{} "P::P()\textbackslash n";
+\}
+
+\textbf{\textasciitilde{}P() \{ std::cout <<{}
+"P::\textasciitilde P()\textbackslash n"; \}}
+
+int get\_x() const \{ return x\_; \}
+
+void set\_x(int x) \{ x\_ = x; \}
+
 private:
-        int x_;
-};
+
+int x\_;
+
+\};
 
 class C: public P
-{
+
+\{
+
 public:
-        C() : x_(3), y_(2) { std::cout << "C::C()"; }
-        !textbf@~C() { std::cout << "C::~C()\n"; }$
-        int get_y() const { return y_; }
-        void set_y(int y) { y_ = y; }
+
+C() : x\_(3), y\_(2) \{ std::cout <<{} "C::C()"; \}
+
+\textbf{\textasciitilde{}C() \{ std::cout <<{}
+"C::\textasciitilde C()\textbackslash n"; \}}
+
+int get\_y() const \{ return y\_; \}
+
+void set\_y(int y) \{ y\_ = y; \}
+
 private:
-        int x_;
-        int y_;
-};
+
+int x\_;
+
+int y\_;
+
+\};
 
 int main()
-{   
-    C c;
-    std::cout << "c.x_ =" << c.get_x() << ", "
-              << "c.y_ =" << c.get_y() << '\n';
-    std::cout << "c.x_ =" << c.P::get_x() << ", "
-              << "c.y_ =" << c.C::get_y() << '\n';
-return 0;
-} 
-\end{console}
 
-Note that the \EMPHASIZE{child destructor} was called \EMPHASIZE{before} the
-\EMPHASIZE{parent destructor}. So:
+\{
+
+C c;
+
+std::cout <<{} "c.x\_ =" <<{} c.get\_x()
+<<{} ", "
+
+<<{} "c.y\_ =" <<{} c.get\_y()
+<<{} \textquotesingle\textbackslash n\textquotesingle;
+
+std::cout <<{} "c.x\_ =" <<{}
+c.P::get\_x() <<{} ", "
+
+<<{} "c.y\_ =" <<{} c.C::get\_y()
+<<{} \textquotesingle\textbackslash n\textquotesingle;
+
+return 0;
+
+\} \\
+\end{longtable}
+
+Note that the \textbf{child destructor} was called \textbf{before} the
+\textbf{parent destructor}. So:
+
 \begin{itemize}
+\tightlist
 \item
   Constructor: Parent's constructor called before child's constructor
 \item
   Destructor: Child's destructor called before parent's destructor
 \end{itemize}
 
-\newpage\EMPHASIZE{Assignment operator}
+Assignment operator
 
-If \verb!c! is a \verb!C! object and \verb!p! is a \verb!P! object, and
-\verb!C! is derived from \verb!P!, can we do the following:
-\begin{center}
-\texttt{c = p; ???}\\
-\texttt{p = c; ???}
-\end{center}
+If \emph{c} is a \emph{C} object and \emph{p} is a \emph{P} object, and
+\emph{C} is derived from \emph{P}, can we do the following:
 
-\begin{console}[commandchars=\!\@\$]
-#include <iostream>
+c = p; ???
+
+\emph{p = c; ???}\\
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\#include < iostream\textgreater{}
 
 class P
-{
+
+\{
+
 public:
-        P() : x_(1) { std::cout << "P::P()\n"; }
-        P(int x) : x_(x) { std::cout << "P::P(int)\n"; }
-        ~P() { std::cout << "P::~P()\n"; }
-        int get_x() const { return x_; }
-        void set_x(int x) { x_ = x; }
+
+P() : x\_(1) \{ std::cout <<{} "P::P()\textbackslash n";
+\}
+
+P(int x) : x\_(x) \{ std::cout <<{}
+"P::P(int)\textbackslash n"; \}
+
+\textasciitilde P() \{ std::cout <<{}
+"P::\textasciitilde P()\textbackslash n"; \}
+
+int get\_x() const \{ return x\_; \}
+
+void set\_x(int x) \{ x\_ = x; \}
+
 private:
-        int x_;
-};
+
+int x\_;
+
+\};
 
 class C: public P
-{
+
+\{
+
 public:
-        C() : P(42), x_(3), y_(2)
-        { std::cout << "C::C()"; }
-        ~C() { std::cout << "C::~C()\n"; }
-        int get_y() const { return y_; }
-        void set_y(int y) { y_ = y; }
+
+C() : P(42), x\_(3), y\_(2)
+
+\{ std::cout <<{} "C::C()"; \}
+
+\textasciitilde C() \{ std::cout <<{}
+"C::\textasciitilde C()\textbackslash n"; \}
+
+int get\_y() const \{ return y\_; \}
+
+void set\_y(int y) \{ y\_ = y; \}
+
 private:
-        int x_;
-        int y_;
-};
+
+int x\_;
+
+int y\_;
+
+\};
 
 int main()
-{   
-    C c;
-    std::cout << "c.x_ =" << c.get_x() << ", "
-              << "c.y_ =" << c.get_y() << '\n';
-    std::cout << "c.x_ =" << c.P::get_x() << ", "
-              << "c.y_ =" << c.C::get_y() << '\n';
-    P p;
 
-    !textbf@// Which one works?$
-    !textbf@c = p;$
-    !textbf@p = c;$
+\{
 
-    return 0;
-} 
-\end{console}
-So if C is derived from \verb!P!, \verb!c! is a \verb!C! object and
-\verb!p! is a \verb!P! object, then \verb!p = c;! is valid. Why?
+C c;
 
-Think about it. A \verb!C! object has more ``features'', so you can copy
-those features to a \verb!P! object.
+std::cout <<{} "c.x\_ =" <<{} c.get\_x()
+<<{} ", "
+
+<<{} "c.y\_ =" <<{} c.get\_y()
+<<{} \textquotesingle\textbackslash n\textquotesingle;
+
+std::cout <<{} "c.x\_ =" <<{}
+c.P::get\_x() <<{} ", "
+
+<<{} "c.y\_ =" <<{} c.C::get\_y()
+<<{} \textquotesingle\textbackslash n\textquotesingle;
+
+P p;
+
+// Which one works?
+
+c = p;
+
+p = c;
+
+return 0;
+
+\} \\
+\end{longtable}
+
+So if C is derived from \emph{P}, \emph{c} is a \emph{C} object and
+\emph{p} is a \emph{P} object, then \emph{p = c;} is valid. Why?
+
+Think about it. A \emph{C} object has more ``features'', so you can copy
+those features to a \emph{P} object.
 
 For instance suppose a child class object c has member variables c.w,
 c.x, c.y, c.x and a parent class object p has member variables p.w, p.x,
 then when you perform
-\begin{center}
-\texttt{p = c;}
-\end{center}
-this would happen:
-\begin{center}
-\texttt{p.w = c.w;}\\
-\texttt{p.x = c.x;}
-\end{center}
-But if you attempt to do
-\begin{center}
-\texttt{c = p;}
-\end{center}
-then it's not clear what should be done for the last two assignments:
-\begin{center}
-\texttt{c.w = p.w;}\\
-\texttt{c.x = p.x;}\\
-\texttt{c.y = ????}\\
-\texttt{c.z = ????}
-\end{center}
 
-\newpage\EMPHASIZE{Class Reuse: ``has-a'' and ``is-a''}
+p = c;
+
+this would happen:
+
+p.w = c.w;
+
+p.x = c.x;
+
+But if you attempt to do
+
+\emph{c = p;}
+
+then it's not clear what should be done for the last two assignments:
+
+c.w = p.w;
+
+c.x = p.x;
+
+c.y = ????
+
+c.z = ????
+
+\textbf{Class Reuse: ``has-a'' and ``is-a''}
 
 Do not confuse inheritance and composition. They re-use old classes in
-different ways. Suppose \verb!P! is a class.
+different ways. Suppose \emph{P} is a class.
 
-There are two ways to reuse \verb!P!:
+There are two ways to reuse \emph{P}:
 
 \begin{itemize}
+\tightlist
 \item
-  Using inheritance: \verb!C! inherits from \verb!P!
+  Using inheritance: \emph{C} inherits from \emph{P}
 \item
-  Using composition: \verb!C! contains a member that is of type \verb!P!
+  Using composition:\emph{ C} contains a member that is of type \emph{P}
 \end{itemize}
 
 Look at the following example carefully. Make sure you understand what
 is happening.
-%this line goes off the page for some reason? cant figure out a quick fix atm
-\begin{console}[commandchars=\!\@\$]
-#include <iostream>
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\#include < iostream\textgreater{}
 
 class P
-{
+
+\{
+
 public:
-        P() : x_(1) { std::cout << "P::P()\n"; }
-        P(int x) : x_(x) { std::cout << "P::P(int)\n"; }
-        ~P() { std::cout << "P::~P()\n"; }
-        int get_x() const { return x_; }
-        void set_x(int x) { x_ = x; }
+
+P() : x\_(1) \{ std::cout <<{} "P::P()\textbackslash n";
+\}
+
+P(int x) : x\_(x) \{ std::cout <<{}
+"P::P(int)\textbackslash n"; \}
+
+\textasciitilde P() \{ std::cout <<{}
+"P::\textasciitilde P()\textbackslash n"; \}
+
+int get\_x() const \{ return x\_; \}
+
+void set\_x(int x) \{ x\_ = x; \}
+
 private:
-        int x_;
-};
+
+int x\_;
+
+\};
 
 class C: public P
-{
+
+\{
+
 public:
-        C() : P(42), x_(3), y_(2)
-        { std::cout << "C::C()"; }
-        ~C() { std::cout << "C::~C()\n"; }
-        int get_y() const { return y_; }
-        void set_y(int y) { y_ = y; }
+
+C() : P(42), x\_(3), y\_(2)
+
+\{ std::cout <<{} "C::C()"; \}
+
+\textasciitilde C() \{ std::cout <<{}
+"C::\textasciitilde C()\textbackslash n"; \}
+
+int get\_y() const \{ return y\_; \}
+
+void set\_y(int y) \{ y\_ = y; \}
+
 private:
-        int x_;
-        int y_;
-};
 
-!textbf@class D$
-!textbf@{$
-!textbf@public:$
-        !textbf@D() : p_(42), x_(3), y_(2)$
-        !textbf@{ std::cout << "D::D()"; }$
-        !textbf@~D() { std::cout << "D::~D()\n"; }$ !sidebox@pobject$@D has a P object$
-        !textbf@int get_y() const { return y_; }$
-        !textbf@void set_y(int y) { y_ = y; }$
-!textbf@private:$
-        !textbf@P p_;$ !tikzmark@enddtor$ 
-        !textbf@int x_;$
-        !textbf@int y_;$
-!textbf@};$
-\end{console}
-\DrawArrowVH[red, thick]{pobject}{enddtor}
-\begin{console}[commandchars=\~\@\$]    
+int x\_;
+
+int y\_;
+
+\};
+
+class D
+
+\{
+
+public:
+
+D() : p\_(42), x\_(3), y\_(2)
+
+\{ std::cout <<{} "D::D()"; \}
+
+\textasciitilde D() \{ std::cout <<{}
+"D::\textasciitilde D()\textbackslash n"; \}
+
+int get\_y() const \{ return y\_; \}
+
+void set\_y(int y) \{ y\_ = y; \}
+
+private:
+
+P p\_;
+
+int x\_;
+
+int y\_;
+
+\};
+
 int main()
-{   
-    C c;
-    std::cout << "c.x_ =" << c.get_x() << ", "
-              << "c.y_ =" << c.get_y() << '\n';
-    std::cout << "c.x_ =" << c.P::get_x() << ", "
-              << "c.y_ =" << c.C::get_y() << '\n';
-    P p;
-    p = c;
-    
-    !textbf@D d;$
 
-    return 0;
-} 
-\end{console}
+\{
 
-Study the above carefully. The \verb!c! object has its own \verb!x_!
-and \verb!y_! and the \verb!get_y! and \verb!set_y! methods. It also
-has (through inheritance) its \verb!P::x_! and method \verb!P::get_x!
-and \verb!P::set_x!. The object \verb!d! also has \verb!x_! and
-\verb!y_! and the \verb!get_x! and \verb!set_x! and it also has
-\verb!p_.x_! and \verb!p_.get_x! and \verb!p_.set_x!. In some
-sense both \verb!c! and \verb!d! have the same ``features''.
+C c;
 
-\verb!c! has \verb!P!'s features by inheritance while \verb!d! has
-\verb!P!'s features through composition.
+std::cout <<{} "c.x\_ =" <<{} c.get\_x()
+<<{} ", "
+
+<<{} "c.y\_ =" <<{} c.get\_y()
+<<{} \textquotesingle\textbackslash n\textquotesingle;
+
+std::cout <<{} "c.x\_ =" <<{}
+c.P::get\_x() <<{} ", "
+
+<<{} "c.y\_ =" <<{} c.C::get\_y()
+<<{} \textquotesingle\textbackslash n\textquotesingle;
+
+P p;
+
+p = c;
+
+D d;
+
+return 0;
+
+\} \\
+\end{longtable}
+
+Study the above carefully. The \emph{c} object has its own \emph{x\_}
+and \emph{y\_} and the \emph{get\_y} and \emph{set\_y} methods. It also
+has (through inheritance) its \emph{P::x\_} and method \emph{P::get\_x}
+and \emph{P::set\_x}. The object \emph{d} also has \emph{x\_} and
+\emph{y\_} and the \emph{get\_x} and \emph{set\_x} and it also has
+\emph{p\_.x}\_ and \emph{p\_.get\_x }and \emph{p\_.set\_x}. In some
+sense both \emph{c} and \emph{d} have the same ``features''.
+
+\emph{c} has \emph{P}'s features by inheritance while \emph{d} has
+\emph{P}'s features through composition.
 
 If what you want in a class can be found in another class, should you
 use composition or inheritance?
 
 Look at ``is-a'' and ``has-a'' relationships between concepts.
 
-Suppose you have a \verb!Vehicle! class. You want to build a \verb!Car!
+Suppose you have a \emph{Vehicle} class. You want to build a \emph{Car}
 class. Think about the relationship between the concept of a car and a
 vehicle. Which one sounds right:
 
 \begin{itemize}
+\tightlist
 \item
   A car ``is a'' vehicle or a vehicle ``is a'' car
 \item
@@ -1192,21 +1719,32 @@ vehicle. Which one sounds right:
 Clearly this one sounds better.
 
 \begin{itemize}
+\tightlist
 \item
   A car ``is a'' vehicle
 \end{itemize}
 
 This tells you that you should probably use inheritance:
-\begin{console}
-class Vehicle {...};
-class Car: public Vehicle {...};
-\end{console}
 
-Suppose you have an \verb!Engine! class. You want to build a \verb!Car!
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+class Vehicle \{...\};
+
+class Car: public Vehicle \{...\}; \\
+\end{longtable}
+
+Suppose you have an \emph{Engine} class. You want to build a \emph{Car}
 class. What is the relationship between an engine and a car? Which one
 sounds right:
 
 \begin{itemize}
+\tightlist
 \item
   An engine ``is a'' car or an engine ``is a'' car
 \item
@@ -1214,73 +1752,148 @@ sounds right:
 \end{itemize}
 
 Clearly this is the best:
+
 \begin{itemize}
+\tightlist
 \item
   A vehicle ``has an'' engine
 \end{itemize}
 
 This tells you that you should probably use composition:
-\begin{console}
-class Engine {...};
-class Car {
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+class Engine \{...\};
+
+class Car \{
+
 ...
+
 private:
-        Engine anEngine;
-        ...
-};
-\end{console}
+
+Engine anEngine;
+
+...
+
+\}; \\
+\end{longtable}
 
 For composition, you want to create methods for methods in the instance
 members (delegation):
-\begin{console}
-class Engine {
-public:
-        void start();
-};
 
-class Car {
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+class Engine \{
+
 public:
-        void start() { anEngine.start(); }
+
+void start();
+
+\};
+
+class Car \{
+
+public:
+
+void start() \{ anEngine.start(); \}
+
 private:
-        Engine anEngine;
-};
-\end{console}
+
+Engine anEngine;
+
+\}; \\
+\end{longtable}
 
 Users can then do this:
-\begin{console}
-Car honda_civic;
-honda_civic.start();
-// i.e., honda_civic.start() actually
-// executes honda_civic.anEngine.start()
-// i.e., honda_civic delegates the work of
-// "start" to it' s engine
-\end{console}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Car honda\_civic;
+
+honda\_civic.start();
+
+// i.e., honda\_civic.start() actually
+
+// executes honda\_civic.anEngine.start()
+
+// i.e., honda\_civic delegates the work of
+
+// "start" to it\textquotesingle s engine \\
+\end{longtable}
 
 Otherwise you would need this:
-\begin{console}
-class Engine {
-public:
-        void start();
-};
 
-class Car {
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+class Engine \{
+
 public:
-        Engine & get_engine() { return anEngine; }
+
+void start();
+
+\};
+
+class Car \{
+
+public:
+
+Engine \& get\_engine() \{ return anEngine; \}
+
 private:
-        Engine anEngine;
-};
-\end{console}
+
+Engine anEngine;
+
+\}; \\
+\end{longtable}
 
 And users would have to do this:
-\begin{console}
-Car honda_civic;
-honda_civic.get_engine().start();
-\end{console}
 
-This is \EMPHASIZE{not} so good. Why? Because you want to \EMPHASIZE{hide lower level details (engines)} and let users of your \verb!Car! class focus on higher level details (cars) which in this case is to ``start a car'' and not ``start the engine of a car''.
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Car honda\_civic;
+
+honda\_civic.get\_engine().start(); \\
+\end{longtable}
+
+This is \textbf{not} so good. Why? Because you want to \textbf{hide
+lower level details (engines)} and let users of your \emph{Car} class
+focus on higher level details (cars) which in this case is to ``start a
+car'' and not ``start the engine of a car''.
 
 In terms of re-use of code:
+
 \begin{itemize}
+\tightlist
 \item
   Derivation/inheritance is a form of white-box re-use
 \item
@@ -1288,740 +1901,1108 @@ In terms of re-use of code:
 \end{itemize}
 
 So in summary make sure you remember this:
+
 \begin{itemize}
+\tightlist
 \item
   ``is a'' -- inheritance
 \item
-  ``has a'' -- composition
+  ``h as a'' -- composition
 \end{itemize}
 
-\begin{ex}
-You want to write the Geometry Wars 2D game. You want
+\textbf{Exercise. }You want to write the Geometry Wars 2D game. You want
 different shapes with different colors. To get a feel for the problem,
 you want to focus on circles and squares. Circles have colors. Squares
-have colors. In fact ... every shape has a color. Therefore create
-a \verb!Shape! class containing color, i.e., R, G, B (\verb!int! instance variables). A circle has a radius. (HINT: Not all shapes have radius -- squares do not have radii. The location of a circle is determined by the center of the circle. A square has a width and height which are the same in value. The location of the square is determined by the coordinates of the top-left corner. A rectangle is similar to the square except that the width and height need not be the same. Write relevant classes so that if you execute this:
-\begin{console}
+have colors. In fact \ldots{} every shape has a color. Therefore create
+a \emph{Shape} class containing color, i.e., R, G, B (\emph{int}
+instance variables). A circle has a radius. (HINT: Not all shapes have
+radius -- squares do not have radii. The location of a circle is
+determined by the center of the circle. A square has a width and height
+which are the same in value. The location of the square is determined by
+the coordinates of the top-left corner. A rectangle is similar to the
+square except that the width and height need not be the same. Write
+relevant classes so that if you execute this:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
 // white circle at (2,5) of radius 3
+
 Circle circle(2, 5, 3, 255, 255, 255);
 
 // red square with top-left corner at (6, 7) with
+
 // sides of length 8.
+
 Square square(6, 7, 8, 255, 0, 0);
 
 // green rectangle with top-left corner at (9, 10)
+
 // with width 11 and height 12.
-Rect rect(9, 10, 11, 12, 0, 255, 0);
-\end{console}
-\end{ex}
-\newpage\EMPHASIZE{Type conversion}
+
+Rect rect(9, 10, 11, 12, 0, 255, 0); \\
+\end{longtable}
+
+Type conversion
 
 Add the following to our Basic Example:
-\begin{console}[commandchars=\~\@\$]
-#include <iostream>
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\#include < iostream\textgreater{}
 
 class P
-{     
-      ...
-};
+
+\{
+
+...
+
+\};
 
 class C: public P
-{
-        ...
-};
+
+\{
+
+...
+
+\};
 
 int main()
-{   
-    C c;
-    ...
-    P p;
-    ...
-    
-    ~textbf@C c0(p); // This does not work!!!$
-    ~textbf@P p0(c); // This works$
 
-    return 0;
-}
-\end{console}
+\{
 
-This tells you that if \verb!C! is a subclass of \verb!P!, then automatically, \verb!P! has a constructor of the form
-\begin{console}
+C c;
+
+...
+
+P p;
+
+...
+
+C c0(p); // This does not work!!!
+
+P p0(c); // This works
+
+return 0;
+
+\} \\
+\end{longtable}
+
+This tells you that if \emph{C} is a subclass of \emph{P}, then
+automatically, \emph{P} has a constructor of the form
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
 class P
-{     
-      ...
-      P(const C &);
-      ...
-};
-\end{console}
+
+\{
+
+...
+
+P(const C \&);
+
+...
+
+\}; \\
+\end{longtable}
 
 The default behavior of this constructor is to copy relevant values from
-a \verb!C! object to the \verb!P! object that is being initialized.
+a \emph{C} object to the \emph{P} object that is being initialized.
 
 This acts as a type conversion operator.
 
 The idea is very similar to the assignment operator between objects of
-\verb!C! and objects or \verb!P!. And the reason that
-\begin{console}
-C c0(p);
-\end{console}
+\emph{C} and objects or \emph{P}. And the reason that
+
+\begin{longtable}[]{@{}l@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+C c0(p); \\
+\end{longtable}
 
 does NOT work is similar.
 
-\newpage\EMPHASIZE{Multiple inheritance}
+Multiple inheritance
 
 A class can be the child class of more than one parent class.
 
-Suppose we have a \verb!Vehicle! class and a \verb!Ship! class. Then \verb!AmphibiousVehicle! is a child of both \verb!Vehicle! and \verb!Ship! class.
+Suppose we have a \emph{Vehicle} class and a \emph{Ship} class. Then
+\emph{AmphibiousVehicle} is a child of both \emph{Vehicle} and
+\emph{Ship} class.
 
 Syntax for multiple inheritance using public inheritance is simply:
 
-\begin{console}
-class P0 {};
-class P1 {};
-class C: public P0, public P1 {}; 
-\end{console}
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+class P0 \{\};
 
-\sidenote{
-  \begin{tikzpicture}
-  \node[draw,text width=2cm,minimum height=2cm, line width=0.05cm, inner sep=0.3cm, anchor=center] (P0) at (1,1) 
-       {\normalsize\texttt{P0}};
-  \node[draw,text width=2cm,minimum height=2cm, line width=0.05cm, inner sep=0.3cm, anchor=center] (P1) at (4,1) 
-       {\normalsize\texttt{P1}};
-  \node[draw,text width=2cm,minimum height=2cm,minimum width=2cm, line width=0.05cm, inner sep=0.3cm, anchor=north] (C) at (2.5,-2) 
-       {\normalsize\texttt{C}};
-  \node[below=8mm of P0.south] (MILstart){};
-  \node[below=8mm of P1.south] (MILend){};
-  \node[above=11mm of C.north] (MILmid){};
-  \draw[ultra thick] (MILstart) -- (MILend);
-  \draw[ultra thick, ->] (MILend) -- (P1.south);
-  \draw[ultra thick, <-] (P0.south) -- (MILstart);
-  \draw[ultra thick] (MILmid) -- (C.north);
-\end{tikzpicture}
-}
+class P1 \{\};
+
+class C: public P0, public P1 \{\}; \\
+\end{longtable}
+
 Some programming languages do not allow multiple inheritance. Why?
 
-Well, suppose class \verb!C0! is derived from \verb!P0!, \verb!P1! and both \verb!P0!, \verb!P1! have \verb!f()!. If \verb!c! is a \verb!C! object, then \verb!c.f()! is ambiguous. MAKE SURE you run the following:
-\begin{console}
-#include <iostream>
+Well, suppose class \emph{C0} is derived from \emph{P0}, \emph{P1} and
+both \emph{P0}, \emph{P1} have \emph{f()}. If \emph{c} is a \emph{C}
+object, then \emph{c.f()} is ambiguous. MAKE SURE you run the following:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\#include < iostream\textgreater{}
 
 class P0
-{
+
+\{
+
 public:
-        void f() {}
-};
+
+void f() \{\}
+
+\};
 
 class P1
-{
+
+\{
+
 public:
-        void f() {}
-};
+
+void f() \{\}
+
+\};
 
 class C: public P0, public P1
-{};
+
+\{\};
 
 int main()
-{   
-    C c;
-    c.f(); // which one!?!?!
-    return 0;
-}
-\end{console}
+
+\{
+
+C c;
+
+c.f(); // which one!?!?!
+
+return 0;
+
+\} \\
+\end{longtable}
 
 Your C++ compiler will probably yell at you and say you have an
 ambiguous invocation. This is of course the same for ambiguous member
 variables:
-\begin{console}
-#include <iostream>
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\#include < iostream\textgreater{}
 
 class P0
-{
+
+\{
+
 public:
-        int x_;
-};
+
+int x\_;
+
+\};
 
 class P1
-{
+
+\{
+
 public:
-        int x_;
-};
+
+int x\_;
+
+\};
 
 class C: public P0, public P1
-{};
+
+\{\};
 
 int main()
-{   
-    C c;
-    c.x_; // which one!?!?!
-    return 0;
-}
-\end{console}
+
+\{
+
+C c;
+
+c.x\_; // which one!?!?!
+
+return 0;
+
+\} \\
+\end{longtable}
 
 However note that if you have two members in both parents with the same
 name but you never call upon that name, your C++ will \textbf{not}
 complain. For instance
-\begin{console}
-#include <iostream>
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\#include < iostream\textgreater{}
 
 class P0
-{
+
+\{
+
 public:
-        int x_;
-};
+
+int x\_;
+
+\};
 
 class P1
-{
+
+\{
+
 public:
-        int x_;
-};
+
+int x\_;
+
+\};
 
 class C: public P0, public P1
-{};
+
+\{\};
 
 int main()
-{   
-    C c;
-    return 0;
-}
-\end{console}
 
-will compile. If \verb!P0! has a method that works with \verb!P0::x_! and \verb!P1! has a method that works with \verb!P1::x_!, that wouldn't be a problem:
-\begin{console}
-#include <iostream>
+\{
+
+C c;
+
+return 0;
+
+\} \\
+\end{longtable}
+
+will compile. If \emph{P0} has a method that works with \emph{P0::x\_}
+and \emph{P1} has a method that works with \emph{P1::x\_}, that wouldn't
+be a problem:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\#include < iostream\textgreater{}
 
 class P0
-{
+
+\{
+
 public:
-        void f0() { std::cout << x_ << '\n'; }
-        int x_;
-};
+
+void f0() \{ std::cout <<{} x\_ <<{}
+\textquotesingle\textbackslash n\textquotesingle; \}
+
+int x\_;
+
+\};
 
 class P1
-{
+
+\{
+
 public:
-        void f1() { std::cout << x_ << '\n'; }
-        int x_;
-};
+
+void f1() \{ std::cout <<{} x\_ <<{}
+\textquotesingle\textbackslash n\textquotesingle; \}
+
+int x\_;
+
+\};
 
 class C: public P0, public P1
-{};
+
+\{\};
 
 int main()
-{   
-    C c;
-    c.f0();
-    c.f1();
-    return 0;
-}
-\end{console}
+
+\{
+
+C c;
+
+c.f0();
+
+c.f1();
+
+return 0;
+
+\} \\
+\end{longtable}
 
 Another situation where multiple inheritance might cause a problem is
-when, further up, \verb!P0! and \verb!P1! inherits from a common class:
-\begin{python}
-from latextool_basic import *
-p = Plot()
-#p += Grid(x0=-3,y0=-5,x1=3,y1=5)
+when, further up, \emph{P0} and \emph{P1} inherits from a common class:
 
-G = Rect(-1, 3, 1, 5, linewidth=0.05, font=r'\huge', label=r'\texttt{G}')
-P0 = Rect(-3, -1, -0.5, 1, linewidth=0.05, font=r'\huge', label=r'\texttt{P0}')
-P1 = Rect(0.5, -1, 3, 1, linewidth=0.05, font=r'\huge', label=r'\texttt{P1}')
-C = Rect(-1, -5, 1, -3, linewidth=0.05, font=r'\huge', label=r'\texttt{C}')
-
-#points_bottom = [(P0.bottom()), (-2, P0.bottomy()), (2, P1.bottomy()), P1.bottom(), (2, P1.bottomy()), (0, -2), (C.top())]
-
-#print(points_bottom)
-
-p += Line(points=[(-2,-1),(-2,-2),(2,-2),(2,-1),(2,-2),(0,-2),(C.top())], linewidth=0.05)
-p += Line(points=[(-2,-2),(-2,-1)], linewidth=0.05, endstyle='>')
-p += Line(points=[(2,-2),(2,-1)], linewidth=0.05, endstyle='>')
-p += Line(points=[(-2,1),(-2,2),(2,2),(2,1),(2,1),(2,2),(0,2),(G.bottom())], linewidth=0.05, endstyle='>')
-
-
-p += G
-p += P0
-p += P1
-p += C
-print(p)
-\end{python}
-\begin{console}
-#include <iostream>
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\#include < iostream\textgreater{}
 
 class G
-{};
+
+\{\};
 
 class P0: public G
-{};
+
+\{\};
 
 class P1: public G
-{};
+
+\{\};
 
 class C: public P0, public P1
-{};
+
+\{\};
 
 int main()
-{   
-    C c;
-    return 0;
-}
-\end{console}
+
+\{
+
+C c;
+
+return 0;
+
+\} \\
+\end{longtable}
 
 The important thing to realize is that the object constructions starting
-with \verb!C! is done one class at a time going up -- there are
-\EMPHASIZE{two paths} in this case. The two paths don't really
+with \emph{C} is done one class at a time going up -- there are
+\textbf{two paths} in this case. The two paths don't really
 ``synchronize'' with each other: the creation of objects along the two
-inheritance paths is independent. This means that there are \EMPHASIZE{two}
-objects created with class G for \verb!c!!!!
-\begin{python}
-from latextool_basic import *
-p = Plot()
-#p += Grid(x0=-3,y0=-10,x1=15,y1=5)
-
-G = Rect(-1, 3, 1, 5, linewidth=0.05, font=r'\huge', label=r'\texttt{G}')
-P0 = Rect(-3, -1, -0.5, 1, linewidth=0.05, font=r'\huge', label=r'\texttt{P0}')
-P1 = Rect(0.5, -1, 3, 1, linewidth=0.05, font=r'\huge', label=r'\texttt{P1}')
-C = Rect(-1, -5, 1, -3, linewidth=0.05, font=r'\huge', label=r'\texttt{C}')
-
-p += Line(points=[(-2,-1),(-2,-2),(2,-2),(2,-1),(2,-2),(0,-2),(C.top())], linewidth=0.05)
-p += Line(points=[(-2,-2),(-2,-1)], linewidth=0.05, endstyle='>')
-p += Line(points=[(2,-2),(2,-1)], linewidth=0.05, endstyle='>')
-p += Line(points=[(-2,1),(-2,2),(2,2),(2,1),(2,1),(2,2),(0,2),(G.bottom())], linewidth=0.05, endstyle='>')
-
-E0 = ellipse(5,0,8,2, linewidth=0.1)
-E1 = ellipse(9,0,12,2, linewidth=0.1)
-E2 = ellipse(5,-3,8,-1, linewidth=0.1)
-E3 = ellipse(9,-3,12,-1, linewidth=0.1)
-E4 = ellipse(7,-6,10,-4, linewidth=0.1)
-p += Line(points=[(6.5,1), (6.5,-2), (8.5,-5), (10.5,-2), (10.5,1)], linewidth=0.1)
-
-p += G
-p += Line(points=[G.right(),(6.5,1)], linewidth=0.05)
-p += Line(points=[G.right(),(10.5,1)], linewidth=0.05)
-
-p += P0
-p += Line(points=[P0.bottomright(),(6.5,-2)], linewidth=0.05)
-
-p += P1
-p += Line(points=[P1.right(),(10.5,-2)], linewidth=0.05)
-
-p += C
-p += Line(points=[C.right(),(8.5,-5)], linewidth=0.05)
-
-
-p += E0
-p += E1
-p += E2
-p += E3
-p += E4
-
-print(p)
-\end{python}
+inheritance paths is independent. This means that there are \textbf{two}
+objects created with class G for \emph{c}!!!
 
 To verify, first do this:
-\begin{console}
-#include <iostream>
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\#include < iostream\textgreater{}
 
 class G
-{
+
+\{
+
 public:
-        int x_;
-};
+
+int x\_;
+
+\};
 
 class P0: public G
-{};
+
+\{\};
 
 class P1: public G
-{};
+
+\{\};
 
 class C: public P0, public P1
-{};
+
+\{\};
 
 int main()
-{   
-    C c;
-    std::cout << &(c.P0::x_) << '\n';
-    std::cout << &(c.P1::x_) << '\n';
-    return 0;
-}
-\end{console}
-The object \verb!c! has two \verb!x_!'s. We print the address of the
-two \verb!x_!'s, which of course are different:
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
-#p += Grid(x0=-3,y0=-10,x1=15,y1=5)
+\{
 
-G = Rect(-1, 3, 1, 5, linewidth=0.05, font=r'\huge', label=r'\texttt{G}')
-P0 = Rect(-3, -1, -0.5, 1, linewidth=0.05, font=r'\huge', label=r'\texttt{P0}')
-P1 = Rect(0.5, -1, 3, 1, linewidth=0.05, font=r'\huge', label=r'\texttt{P1}')
-C = Rect(-1, -5, 1, -3, linewidth=0.05, font=r'\huge', label=r'\texttt{C}')
+C c;
 
-p += Line(points=[(-2,-1),(-2,-2),(2,-2),(2,-1),(2,-2),(0,-2),(C.top())], linewidth=0.05)
-p += Line(points=[(-2,-2),(-2,-1)], linewidth=0.05, endstyle='>')
-p += Line(points=[(2,-2),(2,-1)], linewidth=0.05, endstyle='>')
-p += Line(points=[(-2,1),(-2,2),(2,2),(2,1),(2,1),(2,2),(0,2),(G.bottom())], linewidth=0.05, endstyle='>')
+std::cout <<{} \&(c.P0::x\_) <<{}
+\textquotesingle\textbackslash n\textquotesingle;
 
-E0 = ellipse(5,0,8,2, linewidth=0.1, label=r'x\_')
-E1 = ellipse(9,0,12,2, linewidth=0.1, label=r'x\_')
-E2 = ellipse(5,-3,8,-1, linewidth=0.1)
-E3 = ellipse(9,-3,12,-1, linewidth=0.1)
-E4 = ellipse(7,-6,10,-4, linewidth=0.1)
-p += Line(points=[(6.5,1), (6.5,-2), (8.5,-5), (10.5,-2), (10.5,1)], linewidth=0.1)
+std::cout <<{} \&(c.P1::x\_) <<{}
+\textquotesingle\textbackslash n\textquotesingle;
 
-p += G
-p += Line(points=[G.right(),(6.5,1)], linewidth=0.05)
-p += Line(points=[G.right(),(10.5,1)], linewidth=0.05)
+return 0;
 
-p += P0
-p += Line(points=[P0.bottomright(),(6.5,-2)], linewidth=0.05)
+\} \\
+\end{longtable}
 
-p += P1
-p += Line(points=[P1.right(),(10.5,-2)], linewidth=0.05)
+The object \emph{c} has two \emph{x\_}'s. We print the address of the
+two \emph{x\_}'s, which of course are different:
 
-p += C
-p += Line(points=[C.right(),(8.5,-5)], linewidth=0.05)
-
-
-p += E0
-p += E1
-p += E2
-p += E3
-p += E4
-
-print(p)
-\end{python}
-
-\begin{console}
-#include <iostream>
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\#include < iostream\textgreater{}
 
 class G
-{
+
+\{
+
 public:
-        int x_;
-};
+
+int x\_;
+
+\};
 
 class P0: public G
-{};
+
+\{\};
 
 class P1: public G
-{};
+
+\{\};
 
 class C: public P0, public P1
-{};
+
+\{\};
 
 int main()
-{   
-    C c;
-    std::cout << &(c.P0::x_) << '\n';
-    std::cout << &(c.P1::x_) << '\n';
-    return 0;
-}
-\end{console}
+
+\{
+
+C c;
+
+std::cout <<{} \&(c.P0::x\_) <<{}
+\textquotesingle\textbackslash n\textquotesingle;
+
+std::cout <<{} \&(c.P1::x\_) <<{}
+\textquotesingle\textbackslash n\textquotesingle;
+
+return 0;
+
+\} \\
+\end{longtable}
 
 Suppose you have a game of shapes. The Shape class describes (with its
 subclasses) how to draw the shape. You have another class PointMass that
 computes how the shapes moves as a physical point mass. You can have:
-\begin{console}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
 class PhysicalShape: public Shape, PointMass
-{...};
-\end{console}
+
+\{...\}; \\
+\end{longtable}
 
 This separates out the (motion) physics of object as a point mass from
 the drawing of the object.
 
 \begin{itemize}
+\tightlist
 \item
-  If there's a draw method: it's
-  probably from the \verb!Shape! class.
+  If there\textquotesingle s a draw method: it\textquotesingle s
+  probably from the \emph{Shape} class.
 \item
-  If there's a move method: it's
-  probably from the \verb!PointMass! class
+  If there\textquotesingle s a move method: it\textquotesingle s
+  probably from the \emph{PointMass} class
 \end{itemize}
 
-\newpage\EMPHASIZE{Public inheritance: protected member from the parent class}
+Public inheritance: protected member from the parent class
 
 Recall that our child class cannot access private members in the parent
 class. (Remember that we're doing public inheritance.)
 
-A \EMPHASIZE{protected member} (either a member variable or method) is
+A \textbf{protected member} (either a member variable or method) is
 accessible by a subclass. Run the following:
-\begin{console}[commandchars=\~\@\$]
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
 class P
-{
+
+\{
+
 public: int x;
-~EMPHASIZE@protected: int y_;$
-private: int z_;
-};
+
+protected: int y\_;
+
+private: int z\_;
+
+\};
 
 class C: public P
-{
+
+\{
+
 public:
-void f() { y_++; } // OK
-};
+
+void f() \{ y\_++; \} // OK
+
+\};
 
 int main()
-{   
-    C c;
-    ~EMPHASIZE@c.y_++;$ // WRONG!!! Will not compile!!!
-    return 0;
-}
-\end{console}
 
-\newpage\EMPHASIZE{Public, protected, and private}
+\{
+
+C c;
+
+\textbf{c.y\_++;} // WRONG!!! Will not compile!!!
+
+return 0;
+
+\} \\
+\end{longtable}
+
+Public, protected, and private
 
 So far you have seen public inheritance:
-\begin{console}[commandchars=\~\@\$]
-class P
-{ ... };
-class C: ~textbf@public$ P
-{ ... }; 
-\end{console}
 
-There are two other types of inheritance: \EMPHASIZE{protected and private inheritance}. Suppose you have a class \verb!P!. Now define the following child classes:
-\begin{console}
-class CPublic: public P {};
-class CProtected: protected P {};
-class CPrivate: private P {}; 
-\end{console}
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+class P
+
+\{ ... \};
+
+class C: \textbf{public} P
+
+\{ ... \}; \\
+\end{longtable}
+
+There are two other types of inheritance: \textbf{protected and private
+inheritance}. Suppose you have a class \emph{P}. Now define the
+following child classes:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+class CPublic: public P \{\};
+
+class CProtected: protected P \{\};
+
+class CPrivate: private P \{\}; \\
+\end{longtable}
 
 \begin{itemize}
+\tightlist
 \item
-  The private members of \verb!P! stay private in \verb!CPublic!,
-  \verb!CProtected!, \verb!CPrivate!.
+  The private members of \emph{P} stay private in \emph{CPublic},
+  \emph{CProtected}, \emph{CPrivate}.
 \item
-  \verb!CPublic!: public of \verb!P! are public, protected of \verb!P!
+  \emph{CPublic}: public of \emph{P} are public, protected of \emph{P}
   are protected
 \item
-  \verb!CProtected!: public and protected of \verb!P! are protected
+  \emph{CProtected}: public and protected of \emph{P} are protected
 \item
-  \verb!CPrivate!: public, protected, and private of \verb!P! are
+  \emph{CPrivate}: public, protected, and private of \emph{P} are
   private.
 \end{itemize}
-\begin{console}[commandchars=\~\@\$]
-class P
-{
-~EMPHASIZE@public: int x;$
-protected: int y_;
-private: int z_;
-};
 
-class C: ~EMPHASIZE@public P$
-{
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+class P
+
+\{
+
+public: int x;
+
+protected: int y\_;
+
+private: int z\_;
+
+\};
+
+class C: \textbf{public P}
+
+\{
+
 public:
-void f() { y_++; } // OK
-};
+
+void f() \{ y\_++; \} // OK
+
+\};
 
 int main()
-{   
-    C c;
-    ~EMPHASIZE@c.x_++;$ // OK
-    return 0;
-}
-\end{console}
-\begin{console}[commandchars=\~\@\$]
-class P
-{
-~EMPHASIZE@public: int x_;$
-protected: int y_;
-private: int z_;
-};
 
-class C: ~EMPHASIZE@protected P$
-{
+\{
+
+C c;
+
+\textbf{c.x\_++;} // OK
+
+return 0;
+
+\} \\
+\end{longtable}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+class P
+
+\{
+
+public: int x\_;
+
+protected: int y\_;
+
+private: int z\_;
+
+\};
+
+class C: \textbf{protected P}
+
+\{
+
 public:
-        void f() { y_++; } // OK
-};
+
+void f() \{ y\_++; \} // OK
+
+\};
 
 int main()
-{   
-    C c;
-    ~EMPHASIZE@c.x_++;$ // WRONG!!! Public x in P becomes
-            // protected in C so that only subclass
-            // can access x
-    return 0;
 
-}
-\end{console}
-\begin{console}[commandchars=\~\@\$]
+\{
+
+C c;
+
+\textbf{c.x\_++;} // WRONG!!! Public x in P becomes
+
+// protected in C so that only subclass
+
+// can access x
+
+return 0;
+
+\} \\
+\end{longtable}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
 class P
-{
-~EMPHASIZE@public: int x_;$
-protected: int y_;
-private: int z_;
-};
 
-class C: ~EMPHASIZE@protected P$
+\{
 
-{
+public: int x\_;
+
+protected: int y\_;
+
+private: int z\_;
+
+\};
+
+class C: \textbf{protected P}
+
+\{
 
 public:
 
-void f() { y_++; } // OK
+void f() \{ y\_++; \} // OK
 
-};
+\};
 
 class C0: public C
 
-{
+\{
 
 public:
 
-void f() { ~EMPHASIZE@x_++;$ } // OK. Public x becomes
-                   // protected in C which
-                   // is accessible in CO
-};
+void f() \{ \textbf{x\_++;} \} // OK. Public x becomes
+
+// protected in C which
+
+// is accessible in CO
+
+\};
 
 int main()
-{   
-    return 0;
-}
-\end{console}
 
-In summary, suppose \verb!C! is a protected subclass of \verb!P!, and \verb!x_! is a public member of \verb!P!.
+\{
+
+return 0;
+
+\} \\
+\end{longtable}
+
+In summary, suppose \emph{C} is a protected subclass of \emph{P}, and
+\emph{x\_} is a public member of \emph{P}.
 
 \begin{itemize}
+\tightlist
 \item
-  \verb!x_! is accessible in \verb!C!. (Any method in \verb!C! can
-  access member \verb!x_!)
+  \emph{x\_} is accessible in \emph{C}. (Any method in \emph{C} can
+  access member \emph{x\_})
 \item
-  \verb!x_! becomes protected in \verb!C!. Functions outside of
-  \verb!C! cannot access \verb!obj.x_! if \verb!obj! is an object of
-  \verb!C!.
+  \emph{x\_} becomes protected in \emph{C}. Functions outside of
+  \emph{C} cannot access \emph{obj.x\_} if \emph{obj} is an object of
+  \emph{C}.
 \end{itemize}
 
-Note that \verb!p! is an object of \verb!P!, the \verb!p.x_! is still public.
-\begin{console}[commandchars=\~\@\$]
-class P
-{
-~EMPHASIZE@public: int x_;$
-protected: int y_;
-private: int z_;
-};
+Note that \emph{p} is an object of \emph{P}, the \emph{p.x\_} is still
+public.
 
-class C: ~EMPHASIZE@private P$ // public x_ in P becomes
-                   // private in C.
-{
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+class P
+
+\{
+
+public: int x\_;
+
+protected: int y\_;
+
+private: int z\_;
+
+\};
+
+class C: \textbf{private P }// public x\_ in P becomes
+
+// private in C.
+
+\{
+
 public:
-        void f() { y_++; } // OK
-};
+
+void f() \{ y\_++; \} // OK
+
+\};
 
 class C0: public C
-{
+
+\{
+
 public:
-        void f() { ~EMPHASIZE@x_++;$ } // WRONG!!! x_ is now private
-};
+
+void f() \{ \textbf{x\_++;} \} // WRONG!!! x\_ is now private
+
+\};
 
 int main()
-{   
-    return 0;
-}
-\end{console}
+
+\{
+
+return 0;
+
+\} \\
+\end{longtable}
 
 You can have as many layers of inheritance as you like:
-\begin{console}
-class GameObject { ... };
 
-class Weapon: public GameObject { ... };
-class Laser: public Weapon { ... };
-class Rocket: public Weapon { ... };
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+class GameObject \{ ... \};
 
-class Spaceship: public GameObject { ... };
-class AlienSoldierShip: public Spaceship { ... };
-class AlienCommanderShip: public Spaceship { ... };
-\end{console}
+class Weapon: public GameObject \{ ... \};
+
+class Laser: public Weapon \{ ... \};
+
+class Rocket: public Weapon \{ ... \};
+
+class Spaceship: public GameObject \{ ... \};
+
+class AlienSoldierShip: public Spaceship \{ ... \};
+
+class AlienCommanderShip: public Spaceship \{ ... \}; \\
+\end{longtable}
 
 Obviously create a new class only when there are member variables and/or
 methods which cannot be combined.
 
 For instance if the following
-\begin{console}
-Class AlienWorth10Points {...};
-class AlienWorth20Points {...};
-\end{console}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Class AlienWorth10Points \{...\};
+
+class AlienWorth20Points \{...\}; \\
+\end{longtable}
 
 have exactly the same member variables and methods except that when
 objects of these types are destroyed in a gameplay, the points earned
 are different, then you should have combined the two as...
-\begin{console}
-class Alien
-{
-...
-    int points;
-}; 
-\end{console}
 
-\newpage\EMPHASIZE{Template inheritance}
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+class Alien
+
+\{
+
+...
+
+int points;
+
+\}; \\
+\end{longtable}
+
+Template inheritance
 
 Now I want to show you how to do template inheritance. Try the following
 exercise:
 
-\begin{ex}
-Write a class \texttt{\textbf{C< T >}} to be a subclass of \texttt{\textbf{P< T >}}. The class \texttt{\textbf{P< T >}} has a member variable \texttt{\textbf{x}} and method \texttt{\textbf{m()}}. The class \texttt{\textbf{C< T >}}\textbf{ }will have a member variable named \texttt{\textbf{y}} and method \texttt{\textbf{n()}}. In \texttt{\textbf{C< T >::n()}} and \texttt{\textbf{P< T >::m()}} try to access the \texttt{\textbf{x}} defined in \texttt{\textbf{P< T >}}. For simplicity make all members public.
-\end{ex}
+\textbf{Exercise.} Write a class \emph{\textbf{C<{} T
+\textgreater{}}} to be a subclass of \emph{\textbf{P<{} T
+\textgreater{}}}. The class \emph{\textbf{P<{} T
+\textgreater{}}} has a member variable \emph{\textbf{x}} and method
+\emph{\textbf{m()}}. The class \emph{\textbf{C<{} T
+\textgreater{}}}\textbf{ }will have a member variable named
+\emph{\textbf{y}} and method \emph{\textbf{n()}}. In
+\emph{\textbf{C<{} }\textbf{T \textgreater{}}\textbf{::n()}}
+and\emph{\textbf{ P}\textbf{<{} }\textbf{T
+\textgreater{}}\textbf{::}\textbf{m}\textbf{()}} try to access the
+\emph{\textbf{x}} defined in \emph{\textbf{P<{} T
+\textgreater{}}}. For simplicity make all members public.
+
 Here's the obvious first attempt at the above exercise. Run it.
-\begin{console}
-#include <iostream>
 
-template < typename T >
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\#include < iostream\textgreater{}
+
+template <{} typename T \textgreater{}
+
 class P
-{
-public:
-        void m()
-        {
-              x = 42;
-              std::cout << "P::m() ... " << x << '\n';
-        }
-        T x;
-};
 
-template < typename T >
+\{
 
-class C: public P< T >
-{
 public:
-        void n()
-        {
-             std::cout << "C::n() ... \n";
-             x = 43;
-             std::cout << x << '\n';
-             std::cout << y << '\n';
-        }
-        T y;
-};
+
+void m()
+
+\{
+
+x = 42;
+
+std::cout <<{} "P::m() ... " <<{} x
+<<{} \textquotesingle\textbackslash n\textquotesingle;
+
+\}
+
+T x;
+
+\};
+
+template <{} typename T \textgreater{}
+
+class C: public P<{} T \textgreater{}
+
+\{
+
+public:
+
+void n()
+
+\{
+
+std::cout <<{} "C::n() ... \textbackslash n";
+
+x = 43;
+
+std::cout <<{} x <<{}
+\textquotesingle\textbackslash n\textquotesingle;
+
+std::cout <<{} y <<{}
+\textquotesingle\textbackslash n\textquotesingle;
+
+\}
+
+T y;
+
+\};
 
 int main()
-{   
-    C< int > c;
-    c.n();
-    c.m();
-    return 0;
-}
-\end{console}
+
+\{
+
+C<{} int \textgreater{} c;
+
+c.n();
+
+c.m();
+
+return 0;
+
+\} \\
+\end{longtable}
 
 But there's an error! Here's the error message (if you are using g++):
-\begin{console}
-main.cpp: In member function 'void C< T>::n()':
-main.cpp:22:9: error: ' x'{} was not declared in this
-scope
-22 |         x = 43;
-   |         ^ 
-\end{console}
 
-Written this way, \texttt{\textbf{C< T >}} is not able to access the \texttt{\textbf{x}} member variable of \texttt{\textbf{P< T >}}. Try this:
-\begin{console}[commandchars=\~\@\$]
-// ... as above ...
-template < typename T >
-class C: public P< T >
-{
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+main.cpp: In member function \textquotesingle void
+C< T\textgreater::n()\textquotesingle:
+
+main.cpp:22:9: error: \textquotesingle x\textquotesingle{} was not
+declared in this scope
+
+22 \textbar{} x = 43;
+
+\textbar{} \^{} \\
+\end{longtable}
+
+Written this way, \emph{\textbf{C<{} T \textgreater{}}} is not
+able to access the \emph{\textbf{x}} member variable of
+\emph{\textbf{P<{} T \textgreater{}}}. Try this:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+// ... as above \ldots{}
+
+template <{} typename T \textgreater{}
+
+class C: public P<{} T \textgreater{}
+
+\{
+
 public:
-        void n()
-        {
-             std::cout << "C::n() ... \n";
-             ~EMPHASIZE@this->$x = 43;
-             std::cout << ~EMPHASIZE@this->$x << '\n';
-             std::cout << y << '\n';
-        }
-        T y;
-};
 
-// ... as above ...
-\end{console}
+void n()
+
+\{
+
+std::cout <<{} "C::n() ... \textbackslash n";
+
+\textbf{this-\textgreater{}}x = 43;
+
+std::cout <<{} \textbf{this-\textgreater{}}x
+<<{} \textquotesingle\textbackslash n\textquotesingle;
+
+std::cout <<{} y <<{}
+\textquotesingle\textbackslash n\textquotesingle;
+
+\}
+
+T y;
+
+\};
+
+// ... as above ... \\
+\end{longtable}
+
+\end{document}
