@@ -197,28 +197,30 @@ Now suppose you want to create an array of \texttt{Int} objects with
 \texttt{Int a[10]; // want a[i].x = i}
 \end{center}
 First Method:
-%TIKZ DIAGRAMS AND ARROWS HERE
-\begin{console}
+\begin{consolethree}[escapeinside=||]
 class Int
 {
 public:
-        Int (int x = 0)
+    Int (int x = 0)|\tikzmark{i}||\xsidebox[1cm]{f}{1. Forced to have a default constructor.}|
+    |\DrawArrow{f}{i}|   
         : x_(x) {}
-        void set(int a) {x_ = a;}
-private:
-        int x_;
+    void set(int a)
+    {
+        x_ = a;
+    }
+private:                    
+    int x_;
 };
+|\xsidebox[-0.75cm]{t}{\textnormal{Important point: \EMPHASIZE{Two} methods called for each object to set the initial values.}}|
 int main()
-{   
-    Int a[10];
-    for (int i = 0; i < 10; i++)
-        a[i].set(i);
-...
+{               
+    |Int a[10];\tikzmark{a}||\xsidebox[-4.5cm]{c}{\textnormal{2. Construct each \texttt{a[i]} with default constructor.}}||\DrawArrow{c}{a}|
+    for (int i = 0; i < 10; ++i)
+        |a[i].set[i];\tikzmark{i}||\xsidebox[0.5cm]{s}{\textnormal{3. set each object.}}||\DrawArrow{s}{i}|
+    ... |\DrawArrow[red, dashed]{t}{c}||\DrawArrow[red, dashed]{t}{s}|
 }
-\end{console}
-So note that in the above each \texttt{a[i].x} was first set to
-\texttt{0} by the constructor ... then \texttt{a[i].x} was set to
-\texttt{i}.
+\end{consolethree}
+\newpage So note that in the above each \texttt{a[i].x} was first set to \texttt{0} by the constructor ... then \texttt{a[i].x} was set to \texttt{i}.
 
 \EMPHASIZE{The Point:} \texttt{a[i].x} was set two values.
 
@@ -229,17 +231,29 @@ does a lot of work in the constructor? Example: \texttt{C} has
 \texttt{0} and then you need to set them all to \texttt{i}?
 
 Second method:
-%TIKZ DIAGRAMS AND ARROWS HERE
-\begin{console}
+\begin{consolethree}[escapeinside=!!]
 int main()
-{   
-    Int * a[10];
+{   !\sidebox{ptrbx1}{\textnormal{1. Declare array of \EMPHASIZE{pointers.}}}!
+    Int * a[10];!\tikzmark[tikzmarknode thickred]{arrpntr}{arrpntr}! 
     for (int i = 0; i < 10; ++i)
-        a[i] = new Int(i);
+        a[i] = new Int(i);!\tikzmark{ctrpntr}!
     // do something with *(a[i])
-    ...
+    ... !\sidebox{ptrbx2}{\textnormal{2. Call constructor to construct object in the heap and return pointer}}!
+}
+\end{consolethree}
+
+\begin{console}[commandchars=\~\@\$]
+int main()
+{   ~sidebox@ptrbx1$@~textnormal@1. Declare array of ~EMPHASIZE@pointers.$$$
+    Int * a[10];~tikzmark@arrpntr$ 
+    for (int i = 0; i < 10; ++i)
+        a[i] = new Int(i);~tikzmark@ctrpntr$
+    // do something with *(a[i])
+    ... ~sidebox@ptrbx2$@~textnormal@2. Call constructor to construct object in the heap and return pointer$$
 }
 \end{console}
+\DrawArrow{[xshift=-3.9cm]ptrbx1.west}{arrpntr}
+\DrawArrow{[xshift=-4.7cm,yshift=1cm]ptrbx2.west}{ctrpntr}
 \EMPHASIZE{The point:} Each \texttt{a[i]} is not an object, but a pointer
 to an object. We can then construct the object in the heap with whatever
 constructor call that we choose and then point \texttt{a[i]} to the
@@ -327,22 +341,22 @@ for (int i = 0; i < size; ++i)
     delete a[i];
 \end{console}
 Note:
-\begin{center}
-\texttt{Int ** a = new Int*[size];}
-\texttt{Int ** b = new (Int*)[size];} \textbf{//WRONG!!!}
-\end{center}
+\begin{console}[commandchars=\~\@\$]
+Int ** a = new Int*[size];
+Int ** b = new (Int*)[size]; ~textbf@//WRONG!!!$
+\end{console}
 Comparison:
-\begin{align*}
-\texttt{Int a[10]; //Fixed size, default constructor}\\
-\texttt{Int * b[10]; //Fixed, can call constructor}\\
-\texttt{Int ** c = new Int*[size]; // variable size and can}\\
-\text{                     }\texttt{// call constructor.}
-\end{align*}
+\begin{console}
+Int a[10];        // Fixed size, default constructor
+Int * b[10];      // Fixed, can call constructor
+Int ** c = new Int*[size]; // variable size and can
+                           // call constructor.
+\end{console}
 What if you want to do this:
-\begin{center}
-\texttt{Date a[10]; // all 10 initialized to 12/25/2009}\\
-\texttt{Date b[20]; // all 20 initialized to 12/25/2010}\\
-\end{center}
+\begin{console}
+Date a[10]; // all 10 initialized to 12/25/2009
+Date b[20]; // all 20 initialized to 12/25/2010
+\end{console}
 Keep default year, month, day values in Date class for initialization
 purposes. Allow defaults to be changed. But default values for the
 constructor is fixed.
@@ -477,28 +491,30 @@ for (int floor = 0; floor < floors; ++floor)
 From previous example, each \texttt{a[i][j]} is an \texttt{Int}
 object. You lose control over calling constructor.
 \end{ex}
-Now we want the row and column sizes to be dynamic and the values in the
-array to be pointers so that we can call the constructor for each
-pointer\ldots
-%TIKZ DIAGRAMS OVER THIS CONSOLE ENV AND BOXES WITH ARROWS ON SIDE
-\begin{console}
+Now we want the row and column sizes to be dynamic \EMPHASIZE{and} the values in the array to be pointers so that we can call the constructor for each pointer \ldots
+
+\begin{consolethree}[escapeinside=||]%[commandchars=\~\@\$]
 int rows = 5, columns = 6;
 Int *** a = new Int**[rows];
+
 for (int i = 0; i < rows; i++)
-{
-a[i] = new Int*[columns];
-for (int j = 0; j < columns; j++)
-a[i][j] = new Int(42);
+{   
+    a[i] = new Int*[columns];
+    for (int j = 0; j < columns; j++)
+        a[i][j] = new Int(42);
 }
+
 // do something with (*a)[i][j]
+
 for (int i = 0; i < rows; i++)
-{             
-for (int j = 0; j < columns; j++)
-delete a[i][j];
-delete [] a[i];
+{   
+    for (int j = 0; j < columns; j++)
+    delete a[i][j];
+    delete [] a[i];
 }           
 delete [] a;
-\end{console}
+\end{consolethree}
+
 Here a summary:
 
 \begin{itemize}
@@ -530,9 +546,28 @@ Here a summary:
 \texttt{Int *** a}
 \end{center}
 The point:
-\begin{center}
-\EMPHASIZE{\texttt{Int *** a}}
-\end{center}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+#p += Grid(x0=-2,y0=-5, x1=10, y1=3)
+R0 = Rect(6, -2, 15, 0.1, label =r'To make the first dimension dynamic.', linewidth=0.1, linecolor='red')
+R1 = Rect(6, -4, 15, -2, label =r'To make the second dimension dynamic', linewidth=0.1, linecolor='red')
+R2 = Rect(6, -6.1, 15, -4.1, label =r'To make the value in the 2-d array dynamic', linewidth=0.1, linecolor='red')
+L0 = Line(points=[R0.left(),(3.05,-1),(3.05,0.8)], linewidth=0.1, linecolor='red', endstyle='>')
+L1 = Line(points=[R1.left(),(2.5, R1.centery()),(2.5, float(R1.centery()) + 3.8)], linewidth=0.1, linecolor='red', endstyle='>')
+L2 = Line(points=[R2.left(),(2, R2.centery()),(2,float(R2.centery()) + 5.9)], linewidth=0.1, linecolor='red', endstyle='>')
+textbox = Rect(0, 0, 4, 2, label = r'\huge\texttt{Int *** a}', linewidth=0)
+
+p += R0
+p += R1
+p += R2
+p += L0
+p += L1
+p += L2
+p += textbox
+
+print(p)
+\end{python}
 \begin{ex}
 
 \begin{itemize}
@@ -550,20 +585,18 @@ The point:
 
 All the arrays up to this point have been rectangular, i.e., the arrays
 as a container values look like this.
-\begin{table}
-%% & & \\
-%% & & \\
-%% & & \\
-\end{table}
+\begin{python}
+from latextool_basic import table
+print(table([('', '', ''), ('', '', ''), ('', '','')]))
+\end{python}
 Create an array that is triangular, i.e. for row 0
 
 there are 3 columns, for row 1 there are 2 columns, etc. (They are
 called jagged arrays.)
-\begin{table}
-%% & & \\
-%% & & \\
-%% & & \\
-\end{table}
+\begin{python}
+from latextool_basic import table
+print(table([('','',''), ('',''), ('')]))
+\end{python}
 For the static size 3-dim array of \texttt{Int} objects:
 \begin{center}
 \texttt{Int a[3][6][4]}
