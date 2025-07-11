@@ -96,9 +96,7 @@ int main()
 }
 \end{console}
 
-Run the following programs/experiments and \EMPHASIZE{trace their
-execution}. That is in fact the reason for exceptions: they alter the
-flow of normal program execution.
+Run the following programs/experiments and \EMPHASIZE{trace their execution}. That is in fact the reason for exceptions: they alter the flow of normal program execution.
 
 \newpage\EMPHASIZE{Program 1. A Simple Example}
 
@@ -201,14 +199,14 @@ error code to \texttt{g}, and \texttt{g} must pass the error code to
 {    
      ...
      // return 1 if there's an error
-     ~EMPHASIZE@if (y == 0) $
-         return 1;
+     ~EMPHASIZE@if (y == 0)$
+         ~EMPHASIZE@return 1;$
 
      z = x / y; // oops what if y is zero???
 
      ...
 
-  ~EMPHASIZE@return 0;  // return 0 if there's no error$
+     ~EMPHASIZE@return 0;$ // return 0 if there's no error
 }
 
 ~EMPHASIZE@int$ h()
@@ -224,7 +222,7 @@ error code to \texttt{g}, and \texttt{g} must pass the error code to
      ...
      ~EMPHASIZE@if (h() != 0) return 1;$
      ...
-  ~EMPHASIZE@return 0;$
+     ~EMPHASIZE@return 0;$
 }
 
 void f()
@@ -233,20 +231,20 @@ void f()
      ~EMPHASIZE@if (g() != 0)$
      {
           ~EMPHASIZE@// ... do some error$
-          ~EMPHASIZE@// handling ...
+          ~EMPHASIZE@// handling ...$
      }
-  ...
+     ...
 }
 \end{console}
 
 Boy ... what a pain!!! Look at the amount of changes you need to make!!!
 Not to worry ... exceptions to the rescue ...
 
-\begin{console}[commandchars=\~\@\$]
+\begin{consolethree}[escapeinside=||]%[commandchars=\~\@\$]
 void i()
 {    
      ...
-     ~EMPHASIZE@if (y == 0) throw exception();
+     |\EMPHASIZE{if (y == 0) throw exception();}|
      z = x / y; // oops what if y is zero???
      ...
 }
@@ -268,18 +266,18 @@ void g()
 void f()
 {    
      ...
-     ~EMPHASIZE@try$
-     ~EMPHASIZE@{$
+     |\EMPHASIZE{try}|
+     |\EMPHASIZE{\{}|
           g();
-     ~EMPHASIZE@}$
-     ~EMPHASIZE@catch (exception & e)$
-     ~EMPHASIZE@{
-          ~EMPHASIZE@ // ... do some error$
-          ~EMPHASIZE@ // handling ...$
-     ~EMPHASIZE@}$
+     |\EMPHASIZE{\}}|
+     |\EMPHASIZE{catch (exception \& e)}|
+     |\EMPHASIZE{\{}|
+          |\EMPHASIZE{// ... do some error}|
+          |\EMPHASIZE{// handling ...}|
+     |\EMPHASIZE{\}}|
      ...
 }
-\end{console}
+\end{consolethree}
 
 Much cleaner!!!
 
@@ -405,6 +403,7 @@ int main()
     return 0;
 }
 \end{console}
+
 \begin{ex}
 Write a \texttt{Stack} class to contain integers;
 suppose the maximum capacity of the stack is 5 (example: you use an
@@ -516,7 +515,7 @@ following show you that a function, in the example that would be
 \begin{ex}
 Recall a previous exercise:
 
-\begin{console}[commanchars=\~\@\$]
+\begin{console}[commandchars=\~\@\$]
 #include <iostream>
 #include <cmath>
 #include <ctime>
@@ -575,7 +574,7 @@ Modify the program by replacing StackException with two new classes,
 \texttt{StackOverflowException} and \texttt{StackUnderflowException}, to
 handle the two different errors. The code in \texttt{main()} should catch
 both errors.
-
+\end{ex}
 By the way it's a good idea to keep exceptions which are
 thrown only in a class together with the class itself in the same header
 file. It makes the exception class easier to find.
@@ -609,7 +608,7 @@ Get it?
 You know that if the system is not able to allocate memory for a
 pointer,
 \begin{center}
-\texttt{int * p = new int[some_big_number];}
+\verb!int * p = new int[some_big_number];!
 \end{center}
 the program might (1) crash and stop or (2) the pointer value returned
 is 0. (For the case of g++, when the requested memory cannot be
@@ -637,7 +636,7 @@ In case (1) where the system crashes and stop, it actually throws an
 exception. (For newer C++ compilers (1) is actually the norm.) The
 reason why the program crashes and stops is because the exception is not
 caught. The exception object thrown is from the class
-\texttt{std::bad_alloc}. Run this:
+\verb!std::bad_alloc!. Run this:
 
 \begin{console}[commandchars=\~\@\$]
 #include <iostream>
@@ -676,10 +675,10 @@ Next modify it like so ...
 
 ... and system is bound to run out of memory for allocation.
 
-So in the case where your C++ compiler throws a \texttt{std::bad_alloc}
+So in the case where your C++ compiler throws a \verb!std::bad_alloc!
 exception when the new operator cannot be satisfied, you can do this:
 
-\begin{console}
+\begin{console}[commandchars=\~\@\$]
 #include <iostream>
 #include <exception>
 
@@ -705,9 +704,9 @@ return 0;
 But ...
 
 What if the compiler you're using is older and does not
-thrown a \texttt{std::bad_alloc} object when there's not
+thrown a \verb!std::bad_alloc! object when there's not
 enough memory or for some reason you do not want the compiler to throw a
-\texttt{std::bad_alloc} object when the new operator cannot be satisfied?
+\verb!std::bad_alloc! object when the new operator cannot be satisfied?
 
 First of all you can disable throwing. Try this:
 
@@ -994,13 +993,13 @@ Aborted (core dumped)
 \end{console}
 
 Now compile and run it this way:
-\begin{console}[commandchars=\~\@\!]
-[student@localhost assert]$ g++ *.cpp ~textbf@-DNDEBUG!
+\begin{consolethree}[escapeinside=||]%[commandchars=\~\@\!]
+[student@localhost assert]$ g++ *.cpp |\EMPHASIZE{-DNDEBUG}|
 [student@localhost assert]$ ./a.out
 1
 Floating point exception (core dumped)
 [student@localhost assert]$ 
-\end{console}
+\end{consolethree}
 
 Assertions are also used to catch errors. You can turn on or off
 assertion checking. In the second execution above, when you turn off
@@ -1072,5 +1071,5 @@ compile with assertions turned off so as not to waste CPU cycles.
 By the way, \texttt{assert} is not a function. It's a
 macro. See notes on preprocessor directives.
 
-(There's also a \texttt{static_assert()} that checks a
+(There's also a \verb!static_assert()! that checks a
 boolean condition that can be evaluated during compile time.)

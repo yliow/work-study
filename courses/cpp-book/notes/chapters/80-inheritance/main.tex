@@ -42,23 +42,23 @@ For instance: Suppose you have an \texttt{Employee} class and you want to create
 
 You basically want the \texttt{Manager} class to have all the member variables and methods of the \texttt{Employee} class. Of course you can copy-and-paste the code from the \texttt{Employee} class into the \texttt{Manager} class:
 
-\begin{console}[commandchars=\~\@\$]
+\begin{consolethree}[escapeinside=||]
 class Employee
 {
 public:
         ...
-        std::string get_firstname();~tikzmark@emplinestart$                ~tikzmark@emplinebendST$
+        std::string get_firstname();|\tikzmark{emplinestart}|                |\tikzmark{emplinebendST}|
         void set_firstname(const std::string &);
 private:
         std::string firstname;
         ...
 };
-~sidebox@empcopybox$@Copy-and-paste??$
+|\sidebox{empcopybox}{Copy-and-paste??}|
 class Manager
 {
 public:
         ...
-        std::string get_firstname();~tikzmark@emplineend$                 ~tikzmark@emplinebendED$
+        std::string get_firstname();|\tikzmark{emplineend}|                 |\tikzmark{emplinebendED}|
         void set_firstname(const std::string &);
         // other stuff not from Employee class
         ...
@@ -67,7 +67,7 @@ private:
         // other stuff not from Employee class
         ...
 }; 
-\end{console}
+\end{consolethree}
 \DrawArrowPoints[red,thick]{emplinestart}{emplineend}{-- ++(2,0) -- ++(2,0) --++ (0,-4.6)}
 Of course you would expect the \texttt{Manager} class to contain more
 things than the \texttt{Employee} class. For instance in the company where
@@ -132,12 +132,12 @@ important principles when working with inheritance.
 
 I don' t have to tell you ... run it.
 
-\begin{console}[commandchars=\~\@\$]
+\begin{consolethree}[escapeinside=||]
 #include <iostream>
 
 class P
 {
-~sidebox@methodbox$@~textbf@I'm putting the methods in one line so that we don't have to page up and down.$$
+|\sidebox{methodbox}{\textbf{I'm putting the methods in one line so that we don't have to page up and down.}}|
 public:
         P() : x_(1) {}
         int get_x() const { return x_; }
@@ -164,7 +164,7 @@ int main()
 return 0;
 
 } 
-\end{console}
+\end{consolethree}
 
 Notice that the \texttt{c} object of class \texttt{C} inherits \verb!x_!,
 \verb!get_x!, and \verb!set_x! from \texttt{P}. That's why you can
@@ -376,7 +376,7 @@ p += str(mthd3)
 p += str(mthd4)
 p += str(mthd5)
 p += str(mthd6)
-yikesbox = Rect(4, 1, 6, 3, linewidth=0.1, linecolor='red', label=r'\textbf\redtext{Yikes}')
+yikesbox = Rect(4, 1, 6, 3, linewidth=0.1, linecolor='red', , label=r'Yikes')
 p += yikesbox
 yikesL0 = Line(points=[yikesbox.bottomright(), (mthd6.x() - 0.5, mthd6.y() + 0.3)], linewidth=0.05, linecolor='red', endstyle='>')
 yikesL1 = Line(points=[yikesbox.bottomleft(), (mthd3.x() - 0.5, mthd3.y() + 0.3)], linewidth=0.05, linecolor='red', endstyle='>')
@@ -823,14 +823,14 @@ Now what if you want to choose how to initialize the parent part of the
 \verb!c! object? How do you explicitly call the parent's constructor?
 Let's add a new constructor in \verb!P!, one that accepts an integer
 value and get the \verb!C!'s constructor to call \verb!P::P(int):!
-\begin{console}[commandchars=\~\@\$]
+\begin{consolethree}[escapeinside=||]
 #include <iostream>
-~sidebox@parentctor$@~textbf@Call parent's constructor explicitly in the initializer list$$
+|\sidebox{parentctor}{\textbf{Call parent's constructor explicitly in the initializer list}}|
 class P
 {
 public:
         P() : x_(1) { std::cout << "P::P()\n"; }
-        ~textbf@P(int x) : x_(x) { std::cout << "P::P(int)\n"; }$
+        |\textbf{P(int x) : x\_(x) \{ std::cout << "P::P(int)"}||\verb!\n"; }!|
         int get_x() const { return x_; }
         void set_x(int x) { x_ = x; }
 private:
@@ -840,7 +840,7 @@ private:
 class C: public P
 {
 public:
-        C() : ~EMPHASIZE@P(42)$~tikzmark@end42$, x_(3), y_(2)
+        C() : |\EMPHASIZE{P(42)}||\tikzmark{end42}|, x_(3), y_(2)
                      { std::cout << "C::C()"; }
         int get_y() const { return y_; }
         void set_y(int y) { y_ = y; }
@@ -858,7 +858,7 @@ int main()
               << "c.y_ =" << c.C::get_y() << '\n';
     return 0;
 }
-\end{console}
+\end{consolethree}
 \DrawArrow[red, thick]{parentctor.south west}{end42}
 
 \begin{ex} You are given this incomplete code. Add to the
@@ -1102,7 +1102,7 @@ There are two ways to reuse \verb!P!:
 Look at the following example carefully. Make sure you understand what
 is happening.
 %this line goes off the page for some reason? cant figure out a quick fix atm
-\begin{console}[commandchars=\!\@\$]
+\begin{console}
 #include <iostream>
 
 class P
@@ -1129,21 +1129,24 @@ private:
         int x_;
         int y_;
 };
-
-!textbf@class D$
-!textbf@{$
-!textbf@public:$
-        !textbf@D() : p_(42), x_(3), y_(2)$
-        !textbf@{ std::cout << "D::D()"; }$
-        !textbf@~D() { std::cout << "D::~D()\n"; }$ !sidebox@pobject$@D has a P object$
-        !textbf@int get_y() const { return y_; }$
-        !textbf@void set_y(int y) { y_ = y; }$
-!textbf@private:$
-        !textbf@P p_;$ !tikzmark@enddtor$ 
-        !textbf@int x_;$
-        !textbf@int y_;$
-!textbf@};$
 \end{console}
+
+\newpage\begin{consolethree}[escapeinside=||]
+...
+|\textbf{class D}|
+|\textbf{\{}|
+|\textbf{public:}|
+        |\textbf{D() : p\_(42), x\_(3), y\_(2)}|
+        |\textbf{\{ std::cout << "D::D()"; \}}|
+        |\textbf{~D() \{ std::cout << "D::~D()\textbackslash n"; \}} \sidebox{pobject}{D has a P object}|
+        |\textbf{int get\_y() const \{ return y\_; \}}|
+        |\textbf{void set\_y(int y) \{ y\_ = y; \}}|
+|\textbf{private:}|
+        |\textbf{P p\_;} \tikzmark{enddtor}| 
+        |\textbf{int x\_;}|
+        |\textbf{int y\_;}|
+|\textbf{\};}|
+\end{consolethree}
 \DrawArrowVH[red, thick]{pobject}{enddtor}
 \begin{console}[commandchars=\~\@\$]    
 int main()
