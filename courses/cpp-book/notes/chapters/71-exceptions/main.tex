@@ -194,57 +194,57 @@ error code must pass from \texttt{i} to \texttt{h}, \texttt{h} must pass the
 error code to \texttt{g}, and \texttt{g} must pass the error code to
 \texttt{f}:
 
-\begin{consolethree}[escapeinside=||]%[commandchars=\~\@\$]
-|\EMPHASIZE{int}| i()
+\begin{console}[commandchars=\~\@\$]
+~EMPHASIZE@int$ i()
 {    
      ...
      // return 1 if there's an error
-     |\EMPHASIZE{if (y == 0)}|
-         |\EMPHASIZE{return 1;}|
+     ~EMPHASIZE@if (y == 0)$
+         ~EMPHASIZE@return 1;$
 
      z = x / y; // oops what if y is zero???
 
      ...
 
-  |\EMPHASIZE{return 0;}|  // return 0 if there's no error
+     ~EMPHASIZE@return 0;$ // return 0 if there's no error
 }
 
-|\EMPHASIZE{int}| h()
+~EMPHASIZE@int$ h()
 {    
      ...
-     |\EMPHASIZE{if (i() != 0) return 1;}|
+     ~EMPHASIZE@if (i() != 0) return 1;$
      ...
-     |\EMPHASIZE{return 0;}|
+     ~EMPHASIZE@return 0;$
 }
 
-|\EMPHASIZE{int}| g()
+~EMPHASIZE@int$ g()
 {    
      ...
-     |\EMPHASIZE{if (h() != 0) return 1;}|
+     ~EMPHASIZE@if (h() != 0) return 1;$
      ...
-  |\EMPHASIZE{return 0;}|
+     ~EMPHASIZE@return 0;$
 }
 
 void f()
-{
+{    
      ...
-     |\EMPHASIZE{if (g() != 0)}|
+     ~EMPHASIZE@if (g() != 0)$
      {
-        |\EMPHASIZE{// ... do some error}|
-        |\EMPHASIZE{// handling ...}|
+          ~EMPHASIZE@// ... do some error$
+          ~EMPHASIZE@// handling ...$
      }
      ...
 }
-\end{consolethree}
+\end{console}
 
 Boy ... what a pain!!! Look at the amount of changes you need to make!!!
 Not to worry ... exceptions to the rescue ...
 
-\begin{console}[commandchars=\~\@\$]
+\begin{consolethree}[escapeinside=||]%[commandchars=\~\@\$]
 void i()
 {    
      ...
-     ~EMPHASIZE@if (y == 0) throw exception();$
+     |\EMPHASIZE{if (y == 0) throw exception();}|
      z = x / y; // oops what if y is zero???
      ...
 }
@@ -266,18 +266,18 @@ void g()
 void f()
 {    
      ...
-     ~EMPHASIZE@try$
-     ~EMPHASIZE@{$
+     |\EMPHASIZE{try}|
+     |\EMPHASIZE{\{}|
           g();
-     ~EMPHASIZE@}$
-     ~EMPHASIZE@catch (exception & e)$
-     ~EMPHASIZE@{
-          ~EMPHASIZE@ // ... do some error$
-          ~EMPHASIZE@ // handling ...$
-     ~EMPHASIZE@}$
+     |\EMPHASIZE{\}}|
+     |\EMPHASIZE{catch (exception \& e)}|
+     |\EMPHASIZE{\{}|
+          |\EMPHASIZE{// ... do some error}|
+          |\EMPHASIZE{// handling ...}|
+     |\EMPHASIZE{\}}|
      ...
 }
-\end{console}
+\end{consolethree}
 
 Much cleaner!!!
 
@@ -403,6 +403,7 @@ int main()
     return 0;
 }
 \end{console}
+
 \begin{ex}
 Write a \texttt{Stack} class to contain integers;
 suppose the maximum capacity of the stack is 5 (example: you use an
@@ -514,7 +515,7 @@ following show you that a function, in the example that would be
 \begin{ex}
 Recall a previous exercise:
 
-\begin{console}[commanchars=\~\@\$]
+\begin{console}[commandchars=\~\@\$]
 #include <iostream>
 #include <cmath>
 #include <ctime>
@@ -573,7 +574,7 @@ Modify the program by replacing StackException with two new classes,
 \texttt{StackOverflowException} and \texttt{StackUnderflowException}, to
 handle the two different errors. The code in \texttt{main()} should catch
 both errors.
-
+\end{ex}
 By the way it's a good idea to keep exceptions which are
 thrown only in a class together with the class itself in the same header
 file. It makes the exception class easier to find.
@@ -677,7 +678,7 @@ Next modify it like so ...
 So in the case where your C++ compiler throws a \verb!std::bad_alloc!
 exception when the new operator cannot be satisfied, you can do this:
 
-\begin{console}
+\begin{console}[commandchars=\~\@\$]
 #include <iostream>
 #include <exception>
 
@@ -992,13 +993,13 @@ Aborted (core dumped)
 \end{console}
 
 Now compile and run it this way:
-\begin{console}[commandchars=\~\@\!]
-[student@localhost assert]$ g++ *.cpp ~textbf@-DNDEBUG!
+\begin{consolethree}[escapeinside=||]%[commandchars=\~\@\!]
+[student@localhost assert]$ g++ *.cpp |\EMPHASIZE{-DNDEBUG}|
 [student@localhost assert]$ ./a.out
 1
 Floating point exception (core dumped)
 [student@localhost assert]$ 
-\end{console}
+\end{consolethree}
 
 Assertions are also used to catch errors. You can turn on or off
 assertion checking. In the second execution above, when you turn off
