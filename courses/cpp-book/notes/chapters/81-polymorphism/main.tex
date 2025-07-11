@@ -1,76 +1,8 @@
-% Options for packages loaded elsewhere
-\PassOptionsToPackage{unicode}{hyperref}
-\PassOptionsToPackage{hyphens}{url}
-%
-\documentclass[
-]{article}
-\usepackage{amsmath,amssymb}
-\usepackage{iftex}
-\ifPDFTeX
-  \usepackage[T1]{fontenc}
-  \usepackage[utf8]{inputenc}
-  \usepackage{textcomp} % provide euro and other symbols
-\else % if luatex or xetex
-  \usepackage{unicode-math} % this also loads fontspec
-  \defaultfontfeatures{Scale=MatchLowercase}
-  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
-\fi
-\usepackage{lmodern}
-\ifPDFTeX\else
-  % xetex/luatex font selection
-\fi
-% Use upquote if available, for straight quotes in verbatim environments
-\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
-\IfFileExists{microtype.sty}{% use microtype if available
-  \usepackage[]{microtype}
-  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
-}{}
-\makeatletter
-\@ifundefined{KOMAClassName}{% if non-KOMA class
-  \IfFileExists{parskip.sty}{%
-    \usepackage{parskip}
-  }{% else
-    \setlength{\parindent}{0pt}
-    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
-}{% if KOMA class
-  \KOMAoptions{parskip=half}}
-\makeatother
-\usepackage{xcolor}
-\usepackage{longtable,booktabs,array}
-\usepackage{calc} % for calculating minipage widths
-% Correct order of tables after \paragraph or \subparagraph
-\usepackage{etoolbox}
-\makeatletter
-\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
-\makeatother
-% Allow footnotes in longtable head/foot
-\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
-\makesavenoteenv{longtable}
-\setlength{\emergencystretch}{3em} % prevent overfull lines
-\providecommand{\tightlist}{%
-  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
-\ifLuaTeX
-  \usepackage{selnolig}  % disable illegal ligatures
-\fi
-\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
-\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
-\urlstyle{same}
-\hypersetup{
-  hidelinks,
-  pdfcreator={LaTeX via pandoc}}
+\newpage\EMPHASIZE{81. Polymorphism}
 
-\author{}
-\date{}
-
-\begin{document}
-
-81. Polymorphism
-
-Objectives
+\textsc{Objectives}
 
 \begin{itemize}
-\tightlist
 \item
   Write virtual methods
 \item
@@ -79,43 +11,43 @@ Objectives
   Understand and use virtual destructor
 \end{itemize}
 
-Constructor
+\newpage\EMPHASIZE{Constructor}
 
 \textbf{Polymorphism} = ``many forms''
 
 VERY IMPORTANT!!! LISTEN!!!
 
-Suppose class \emph{C} is a subclass of \emph{P}. You already know that
+Suppose class \texttt{C} is a subclass of \texttt{P}. You already know that
 the following is valid:
 
-\emph{C c; }
+\texttt{C c; }
 
-\emph{ P p;}
+\texttt{ P p;}
 
 p = c;
 
 However the following will not compile:
 
-\emph{c = p;}
+\texttt{c = p;}
 
 In particular the following is also valid:
 
-\emph{C c; }
+\texttt{C c; }
 
 P * p = \&c; // p points to c
 
 And this is also valid:
 
-\emph{C c; }
+\texttt{C c; }
 
 P \& ref = c; // ref references c
 
-Suppose both \emph{P} and \emph{C} have methods \emph{f()}. If I call
+Suppose both \texttt{P} and \texttt{C} have methods \texttt{f()}. If I call
 
-\emph{p-\textgreater f();}
+\texttt{p-\textgreater f();}
 
-which \emph{f()} is invoked? (or \emph{ref.f()} in the case where
-\emph{ref} is a reference).
+which \texttt{f()} is invoked? (or \texttt{ref.f()} in the case where
+\texttt{ref} is a reference).
 
 All you need to do is to do this experiment:
 
@@ -127,43 +59,43 @@ All you need to do is to do this experiment:
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\#include \textless iostream\textgreater{}
+\#include < iostream\textgreater{}
 
 class P
 
-\{
+{
 
 public:
 
 void f()
 
-\{
+{
 
-std::cout \textless\textless{} "P::f\textbackslash n";
+std::cout <<{} "P::f\textbackslash n";
 
-\}
+}
 
-\};
+};
 
 class C: public P
 
-\{
+{
 
 public:
 
 void f()
 
-\{
+{
 
-std::cout \textless\textless{} "C::f\textbackslash n";
+std::cout <<{} "C::f\textbackslash n";
 
-\}
+}
 
-\};
+};
 
 int main()
 
-\{
+{
 
 C c;
 
@@ -173,7 +105,7 @@ p→f(); // parent's f
 
 return 0;
 
-\} \\
+} \\
 \end{longtable}
 
 AHA! \ldots{} the parent\textquotesingle s f() is called! This should be
@@ -233,11 +165,11 @@ Exercise. Suppose G is the parent class of P (using public inheritance)
 and P is the parent class of C (using public inheritance). Suppose in G,
 P, and C classes, there is a method
 
-\emph{void m() \{ \ldots{} \}}
+\texttt{void m() { \ldots{} }}
 
 Suppose have this code fragment:
 
-\emph{G * p;}
+\texttt{G * p;}
 
 C c;
 
@@ -245,7 +177,7 @@ p = \&c;
 
 p-\textgreater m();
 
-Which \emph{m()} was called?
+Which \texttt{m()} was called?
 
 Virtual Methods
 
@@ -259,43 +191,43 @@ Recall that we have this
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\#include \textless iostream\textgreater{}
+\#include < iostream\textgreater{}
 
 class P
 
-\{
+{
 
 public:
 
 void f()
 
-\{
+{
 
-std::cout \textless\textless{} "P::f\textbackslash n";
+std::cout <<{} "P::f\textbackslash n";
 
-\}
+}
 
-\};
+};
 
 class C: public P
 
-\{
+{
 
 public:
 
 void f()
 
-\{
+{
 
-std::cout \textless\textless{} "C::f\textbackslash n";
+std::cout <<{} "C::f\textbackslash n";
 
-\}
+}
 
-\};
+};
 
 int main()
 
-\{
+{
 
 C c;
 
@@ -305,7 +237,7 @@ p-\textgreater f();
 
 return 0;
 
-\} \\
+} \\
 \end{longtable}
 
 The f() that is called is P::f().
@@ -322,30 +254,30 @@ Now we declare a method to be \textbf{virtual} in the base class.
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\#include \textless iostream\textgreater{}
+\#include < iostream\textgreater{}
 
-class P\{
+class P{
 
 public:
 
-\textbf{virtual} void f() \{ std::cout \textless\textless{}
-"D::f\textbackslash n"; \}
+\textbf{virtual} void f() { std::cout <<{}
+"D::f\textbackslash n"; }
 
-\};
+};
 
 class C: public P
 
-\{
+{
 
 public:
 
-void f() \{ std::cout \textless\textless{} "C::f\textbackslash n"; \}
+void f() { std::cout <<{} "C::f\textbackslash n"; }
 
-\};
+};
 
 int main()
 
-\{
+{
 
 C c;
 
@@ -355,7 +287,7 @@ p-\textgreater f();
 
 return 0;
 
-\} \\
+} \\
 \end{longtable}
 
 We say that P::f() is \textbf{virtual}.
@@ -391,25 +323,25 @@ virtual next to the f() in C as well:
 \endlastfoot
 class P
 
-\{
+{
 
 public:
 
-virtual void f() \{ std::cout \textless\textless{}
-"P::f\textbackslash n"; \}
+virtual void f() { std::cout <<{}
+"P::f\textbackslash n"; }
 
-\};
+};
 
 class C : public P
 
-\{
+{
 
 public:
 
-\textbf{ virtual }void f() \{ std::cout \textless\textless{}
-"C::f\textbackslash n"; \}
+\textbf{ virtual }void f() { std::cout <<{}
+"C::f\textbackslash n"; }
 
-\}; \\
+}; \\
 \end{longtable}
 
 Dynamic \& Static Binding
@@ -448,44 +380,44 @@ defined in P, C0, C1.
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\#include \textless iostream\textgreater{}
+\#include < iostream\textgreater{}
 
 class P
 
-\{
+{
 
 public:
 
-virtual void f() \{ std::cout \textless\textless{}
-"P::f\textbackslash n"; \}
+virtual void f() { std::cout <<{}
+"P::f\textbackslash n"; }
 
-\};
+};
 
 class C: public P
 
-\{
+{
 
 public:
 
-virtual void f() \{ std::cout \textless\textless{}
-"C::f\textbackslash n"; \}
+virtual void f() { std::cout <<{}
+"C::f\textbackslash n"; }
 
-\};
+};
 
 class C1: public P
 
-\{
+{
 
 public:
 
-virtual void f() \{ std::cout \textless\textless{}
-"C1::f\textbackslash n"; \}
+virtual void f() { std::cout <<{}
+"C1::f\textbackslash n"; }
 
-\};
+};
 
 int main()
 
-\{
+{
 
 P * p;
 
@@ -495,31 +427,31 @@ C1 c1;
 
 int i;
 
-std::cout \textless\textless{} "Do you want C or C1? (0 or 1) ";
+std::cout <<{} "Do you want C or C1? (0 or 1) ";
 
 std::cin \textgreater\textgreater{} i;
 
 if (i == 0)
 
-\{
+{
 
 p = \&c;
 
-\}
+}
 
 else
 
-\{
+{
 
 p = \&c1;
 
-\}
+}
 
 p-\textgreater f();
 
 return 0;
 
-\} \\
+} \\
 \end{longtable}
 
 In the above, the decision of which f() (C::f() or C1::f()) to use is
@@ -566,36 +498,36 @@ inheritance hierarchy like this:
 \endlastfoot
 class P
 
-\{
+{
 
 public:
 
-virtual void f() \{ std::cout \textless\textless{}
-"P::f\textbackslash n"; \}
+virtual void f() { std::cout <<{}
+"P::f\textbackslash n"; }
 
-\};
+};
 
 class C: public P
 
-\{
+{
 
 public:
 
-virtual void f() \{ std::cout \textless\textless{}
-"C::f\textbackslash n"; \}
+virtual void f() { std::cout <<{}
+"C::f\textbackslash n"; }
 
-\};
+};
 
 class C1: public C
 
-\{
+{
 
 public:
 
-virtual void f() \{ std::cout \textless\textless{}
-"C1::f\textbackslash n"; \}
+virtual void f() { std::cout <<{}
+"C1::f\textbackslash n"; }
 
-\}; \\
+}; \\
 \end{longtable}
 
 and you have
@@ -633,33 +565,33 @@ inheritance hierarchy like this:
 \endlastfoot
 class P
 
-\{
+{
 
 public:
 
-virtual void f() \{ std::cout \textless\textless{}
-"P::f\textbackslash n"; \}
+virtual void f() { std::cout <<{}
+"P::f\textbackslash n"; }
 
-\};
+};
 
 class C: public P
 
-\{
+{
 
 public:
 
-virtual void f() \{ std::cout \textless\textless{}
-"C::f\textbackslash n"; \}
+virtual void f() { std::cout <<{}
+"C::f\textbackslash n"; }
 
-\};
+};
 
 class C1: public C
 
-\{
+{
 
 public:
 
-\}; \\
+}; \\
 \end{longtable}
 
 and you have
@@ -702,7 +634,7 @@ C1 c1;
 
 int i;
 
-std::cout \textless\textless{} "Do you want C0 or C1? (0 or 1) ";
+std::cout <<{} "Do you want C0 or C1? (0 or 1) ";
 
 std::cin \textgreater\textgreater{} i;
 
@@ -729,31 +661,31 @@ virtual keyword:
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\#include \textless iostream\textgreater{}
+\#include < iostream\textgreater{}
 
 class P
 
-\{
+{
 
 public:
 
-void f() \{ std::cout \textless\textless{} "P::f()\textbackslash n"; \}
+void f() { std::cout <<{} "P::f()\textbackslash n"; }
 
-\};
+};
 
 class C: public P
 
-\{
+{
 
 public:
 
-void f() \{ std::cout \textless\textless{} "C::f()\textbackslash n"; \}
+void f() { std::cout <<{} "C::f()\textbackslash n"; }
 
-\};
+};
 
 int main()
 
-\{
+{
 
 C c;
 
@@ -763,10 +695,10 @@ p-\textgreater f();
 
 return 0;
 
-\} \\
+} \\
 \end{longtable}
 
-How can we ``reach'' \emph{C::f()}??
+How can we ``reach'' \texttt{C::f()}??
 
 We add a field to keep track of the class an object comes from and
 
@@ -782,7 +714,7 @@ instead of calling we create a function that accepts and determine
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\#include \textless iostream\textgreater{}
+\#include < iostream\textgreater{}
 
 const int PTYPE = 0;
 
@@ -790,43 +722,43 @@ const int CTYPE = 1;
 
 class P
 
-\{
+{
 
 public:
 
-P() : type\_(PTYPE) \{\}
+P() : type_(PTYPE) {}
 
-void f() \{ std::cout \textless\textless{} "P::f()\textbackslash n"; \}
+void f() { std::cout <<{} "P::f()\textbackslash n"; }
 
-void set\_type(int t0) \{ type\_ = t0; \}
+void set_type(int t0) { type_ = t0; }
 
-int get\_type() \{ return type\_; \}
+int get_type() { return type_; }
 
 private:
 
-int type\_;
+int type_;
 
-\};
+};
 
 class C : public P
 
-\{
+{
 
 public:
 
-C() \{ set\_type(CTYPE); \}
+C() { set_type(CTYPE); }
 
-void f() \{ std::cout \textless\textless{} "C::f()\textbackslash n"; \}
+void f() { std::cout <<{} "C::f()\textbackslash n"; }
 
-\};
+};
 
 void f(const P * p)
 
-\{
+{
 
-switch (p-\textgreater get\_type())
+switch (p-\textgreater get_type())
 
-\{
+{
 
 case PTYPE:
 
@@ -842,13 +774,13 @@ q-\textgreater f();
 
 break;
 
-\}
+}
 
-\}
+}
 
 int main()
 
-\{
+{
 
 C c;
 
@@ -858,7 +790,7 @@ f(p);
 
 return 0;
 
-\} \\
+} \\
 \end{longtable}
 
 Why is it important? Polymorphism
@@ -889,35 +821,35 @@ BasicSpaceShip * s = new BasicSpaceShip*{[}100{]};
 
 int M = randint(); // random int from 0 to 99
 
-for (int i = 0; i \textless{} M; i++)
+for (int i = 0; i <{} M; i++)
 
-\{
+{
 
 s{[}i{]} = new SpecialSpaceShip();
 
-\}
+}
 
-for (int i = M; i \textless{} 100; i++)
+for (int i = M; i <{} 100; i++)
 
-\{
+{
 
 s{[}i{]} = new BasicSpaceShip();
 
-\}
+}
 
 while (1)
 
-\{
+{
 
-for (int i = 0; i \textless{} 100; i++)
+for (int i = 0; i <{} 100; i++)
 
-\{
+{
 
 s{[}i{]}-\textgreater update();
 
-\}
+}
 
-\} \\
+} \\
 \end{longtable}
 
 Note that in the while-loop:
@@ -932,17 +864,17 @@ Note that in the while-loop:
 \endlastfoot
 while (1)
 
-\{
+{
 
-for (int i = 0; i \textless{} 100; i++)
+for (int i = 0; i <{} 100; i++)
 
-\{
+{
 
 s{[}i{]}-\textgreater update();
 
-\}
+}
 
-\} \\
+} \\
 \end{longtable}
 
 You do not know what type of spaceship is\textbf{ }s{[}3{]} and
@@ -968,29 +900,29 @@ BasicSpaceShip * s = new BasicSpaceShip*{[}100{]};
 
 int M = randint(); // rand int from 0 to 99
 
-for (int i = 0; i \textless{} M/2; i++)
+for (int i = 0; i <{} M/2; i++)
 
-\{
+{
 
 s{[}i{]} = new SpecialSpaceShip();
 
-\}
+}
 
-for (int i = M/2; i \textless{} M; i++)
+for (int i = M/2; i <{} M; i++)
 
-\{
+{
 
 s{[}i{]} = new BasicSpaceShip();
 
-\}
+}
 
-for (int i = M; i \textless{} 100; i++)
+for (int i = M; i <{} 100; i++)
 
-\{
+{
 
 s{[}i{]} = new VeryBasicSpaceShip();
 
-\} \\
+} \\
 \end{longtable}
 
 This means that the while loop does not need to change:
@@ -1005,17 +937,17 @@ This means that the while loop does not need to change:
 \endlastfoot
 while (1)
 
-\{
+{
 
-for (int i = 0; i \textless{} M; i++)
+for (int i = 0; i <{} M; i++)
 
-\{
+{
 
 s{[}i{]}-\textgreater update();
 
-\}
+}
 
-\} \\
+} \\
 \end{longtable}
 
 In fact s{[}3{]} can even point to something different within the loop
@@ -1033,21 +965,21 @@ everything still works:
 \endlastfoot
 while (1)
 
-\{
+{
 
-for (int i = 0; i \textless{} M; i++)
+for (int i = 0; i <{} M; i++)
 
-\{
+{
 
 s{[}i{]}-\textgreater update();
 
-\}
+}
 
 delete s{[}3{]};
 
 switch (rand() \% 3)
 
-\{
+{
 
 case 0: s{[}3{]} = new SpecialSpaceShip(); break;
 
@@ -1055,9 +987,9 @@ case 1: s{[}3{]} = new BasicSpaceShip(); break;
 
 case 2: s{[}3{]} = new VeryBasicSpaceShip(); break;
 
-\}
+}
 
-\} \\
+} \\
 \end{longtable}
 
 Or for instance in your simulation, if s{[}3{]} is initially pointing to
@@ -1111,31 +1043,31 @@ generally as possible, the while loop might look something like this:
 \endlastfoot
 while (1)
 
-\{
+{
 
-for (int i = 0; i \textless{} M; i++) ship{[}i{]}-\textgreater move();
+for (int i = 0; i <{} M; i++) ship{[}i{]}-\textgreater move();
 
-for (int i = 0; i \textless{} M; i++)
+for (int i = 0; i <{} M; i++)
 
-\{
+{
 
-for (int j = i+1; j \textless{} M; j++)
+for (int j = i+1; j <{} M; j++)
 
 if (ship{[}i{]}-\textgreater collideswith(ship{[}j{]}))
 
-\{
+{
 
 ship{[}i{]}-\textgreater dies();
 
 ship{[}j{]}-\textgreater dies();
 
-\}
+}
 
-\}
+}
 
-for (int i = 0; i \textless{} M; i++) ship{[}i{]}-\textgreater draw();
+for (int i = 0; i <{} M; i++) ship{[}i{]}-\textgreater draw();
 
-\} \\
+} \\
 \end{longtable}
 
 This tells you that the parent class must have the following methods
@@ -1154,7 +1086,7 @@ which the specific child classes must overwrite:
   draw
 \end{itemize}
 
-In the initialization, as long as the pointers \emph{ship{[}i{]}} point
+In the initialization, as long as the pointers \texttt{ship{[}i{]}} point
 to a class that
 
 subclasses the parent class, the program would work. In particular
@@ -1191,23 +1123,23 @@ draw) might do nothing:
 \endlastfoot
 class BasicSpaceShip
 
-\{
+{
 
 public:
 
-void draw() \{\} // empty body
+void draw() {} // empty body
 
-\};
+};
 
 class SpecialSpaceShip
 
-\{
+{
 
 public:
 
-void draw() \{ /* actual drawing code */ \}
+void draw() { /* actual drawing code */ }
 
-\}; \\
+}; \\
 \end{longtable}
 
 This might be the case where every subclass of BasicSpaceShip has their
@@ -1242,8 +1174,8 @@ P * p;
 
 one would say that is polymorphic, or the object pointed to is
 
-polymorphic, i.e., sometimes \emph{p} points to a class \emph{C0} object
-and sometimes it points to a class \emph{C1} object.
+polymorphic, i.e., sometimes \texttt{p} points to a class \texttt{C0} object
+and sometimes it points to a class \texttt{C1} object.
 
 Some people also say the class in this case is a polymorphic type.
 
@@ -1270,33 +1202,33 @@ Constructors cannot be virtual \ldots{} try this:
 \endlastfoot
 class P
 
-\{
+{
 
 public:
 
-virtual P() \{\}
+virtual P() {}
 
-\};
+};
 
 class C: public P
 
-\{
+{
 
 public:
 
-virtual C() \{\}
+virtual C() {}
 
-\};
+};
 
 int main()
 
-\{
+{
 
 P * p = new C;
 
 return 0;
 
-\} \\
+} \\
 \end{longtable}
 
 A virtual function is about choosing the right method when an object
@@ -1332,43 +1264,43 @@ following problem. Make sure you run it!
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\#include \textless iostream\textgreater{}
+\#include < iostream\textgreater{}
 
 class P
 
-\{
+{
 
 public:
 
-P() : p(new int) \{\}
+P() : p(new int) {}
 
-\textasciitilde P() \{ std::cout \textless\textless{}
-"P::\textasciitilde P()\textbackslash n"; \}
+~ P() { std::cout <<{}
+"P::~ P()\textbackslash n"; }
 
 private:
 
 int * p;
 
-\};
+};
 
 class C: public P
 
-\{
+{
 
 public:
 
-C() : q(new int) \{\}
+C() : q(new int) {}
 
-\textasciitilde C() \{ std::cout \textless\textless{}
-"C::\textasciitilde C()\textbackslash n"; delete q; \}
+~ C() { std::cout <<{}
+"C::~ C()\textbackslash n"; delete q; }
 
 int * q;
 
-\};
+};
 
 int main()
 
-\{
+{
 
 P * p = new C;
 
@@ -1376,7 +1308,7 @@ delete p;
 
 return 0;
 
-\} \\
+} \\
 \end{longtable}
 
 Read the output very carefully.
@@ -1401,43 +1333,43 @@ Now try this:
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\#include \textless iostream\textgreater{}
+\#include < iostream\textgreater{}
 
 class P
 
-\{
+{
 
 public:
 
-P() : p(new int) \{\}
+P() : p(new int) {}
 
-\textbf{ virtual }\textasciitilde P() \{ std::cout \textless\textless{}
-"P::\textasciitilde P()\textbackslash n"; \}
+\textbf{ virtual }~ P() { std::cout <<{}
+"P::~ P()\textbackslash n"; }
 
 private:
 
 int * p;
 
-\};
+};
 
 class C: public P
 
-\{
+{
 
 public:
 
-C() : q(new int) \{\}
+C() : q(new int) {}
 
-\textasciitilde C() \{ std::cout \textless\textless{}
-"C::\textasciitilde C()\textbackslash n"; delete q; \}
+~ C() { std::cout <<{}
+"C::~ C()\textbackslash n"; delete q; }
 
 int * q;
 
-\};
+};
 
 int main()
 
-\{
+{
 
 P * p = new C;
 
@@ -1445,7 +1377,7 @@ delete p;
 
 return 0;
 
-\} \\
+} \\
 \end{longtable}
 
 You should see two outputs. Why? Because of polymorphism, when you
@@ -1454,13 +1386,13 @@ do
 
 delete p;
 
-the destructor used is C::\textasciitilde C(). But remember from the
+the destructor used is C::~ C(). But remember from the
 notes on
 
-inheritance that this would execute the body of C::\textasciitilde C()
+inheritance that this would execute the body of C::~ C()
 and then
 
-P::\textasciitilde P() would be executed.
+P::~ P() would be executed.
 
 Therefore \ldots{} \textbf{if you plan to use polymorphism}
 
@@ -1479,13 +1411,13 @@ deallocation. For instance
 
 if (true)
 
-\{
+{
 
 C c;
 
 P * p = \&c;
 
-\} // c goes out of scope and called c::\textasciitilde C()
+} // c goes out of scope and called c::~ C()
 
 Packaging auto destructor
 
@@ -1499,43 +1431,43 @@ Now look at this:
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\#include \textless iostream\textgreater{}
+\#include < iostream\textgreater{}
 
 class P
 
-\{
+{
 
 public:
 
-\textbf{ }virtual \textasciitilde P() \{ std::cout \textless\textless{}
-"P::\textasciitilde P()\textbackslash n"; \}
+\textbf{ }virtual ~ P() { std::cout <<{}
+"P::~ P()\textbackslash n"; }
 
-void m() \{ std::cout \textless\textless{} "P::m()\textbackslash n"; \}
+void m() { std::cout <<{} "P::m()\textbackslash n"; }
 
 private:
 
-\};
+};
 
 class C: public P
 
-\{
+{
 
 public:
 
-C() : q(new int) \{\}
+C() : q(new int) {}
 
-\textasciitilde C() \{ std::cout \textless\textless{}
-"C::\textasciitilde C()\textbackslash n"; delete q; \}
+~ C() { std::cout <<{}
+"C::~ C()\textbackslash n"; delete q; }
 
-void m() \{ std::cout \textless\textless{} "C::m()\textbackslash n"; \}
+void m() { std::cout <<{} "C::m()\textbackslash n"; }
 
 int * q;
 
-\};
+};
 
 int main()
 
-\{
+{
 
 P * p = new C;
 
@@ -1545,14 +1477,14 @@ delete p;
 
 return 0;
 
-\} \\
+} \\
 \end{longtable}
 
 This allows us to work with objects through polymorphism. But this is
 achieved through pointers. Recall a benefit of classes -- you can auto
 execute the destructor when an object is going out of scope. In the
 above example, we have to remember to deallocate the memory used by the
-object that \emph{p} points to:
+object that \texttt{p} points to:
 
 delete p;
 
@@ -1566,67 +1498,67 @@ Using the idea in the chapter on destructor, we do this:
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\#include \textless iostream\textgreater{}
+\#include < iostream\textgreater{}
 
 class P
 
-\{
+{
 
 public:
 
-\textbf{ }virtual \textasciitilde P() \{ std::cout \textless\textless{}
-"P::\textasciitilde P()\textbackslash n"; \}
+\textbf{ }virtual ~ P() { std::cout <<{}
+"P::~ P()\textbackslash n"; }
 
-void m() \{ std::cout \textless\textless{} "P::m()\textbackslash n"; \}
+void m() { std::cout <<{} "P::m()\textbackslash n"; }
 
 private:
 
-\};
+};
 
 class C: public P
 
-\{
+{
 
 public:
 
-C() : q(new int) \{\}
+C() : q(new int) {}
 
-\textasciitilde C() \{ std::cout \textless\textless{}
-"C::\textasciitilde C()\textbackslash n"; delete q; \}
+~ C() { std::cout <<{}
+"C::~ C()\textbackslash n"; delete q; }
 
-void m() \{ std::cout \textless\textless{} "C::m()\textbackslash n"; \}
+void m() { std::cout <<{} "C::m()\textbackslash n"; }
 
 int * q;
 
-\};
+};
 
 class autoP
 
-\{
+{
 
 public:
 
 autoP()
 
-: p\_(new C)
+: p_(new C)
 
-\{\}
+{}
 
-\textasciitilde autoP()
+~ autoP()
 
-\{ delete p\_; \}
+{ delete p_; }
 
-void m() \{ p\_-\textgreater m(); \}
+void m() { p_-\textgreater m(); }
 
 private:
 
-P * p\_;
+P * p_;
 
-\};
+};
 
 int main()
 
-\{
+{
 
 autoP p;
 
@@ -1634,12 +1566,12 @@ p.m();
 
 return 0;
 
-\} \\
+} \\
 \end{longtable}
 
 Of course we need to figure out what to do with the copy constructor and
-\emph{operator=}. If you don't plan to do that, you can put the
-prototypes in the \emph{private} section.
+\texttt{operator=}. If you don't plan to do that, you can put the
+prototypes in the \texttt{private} section.
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
@@ -1649,61 +1581,61 @@ prototypes in the \emph{private} section.
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\#include \textless iostream\textgreater{}
+\#include < iostream\textgreater{}
 
 class P
 
-\{
+{
 
 public:
 
-P() : p(new int) \{\}
+P() : p(new int) {}
 
-\textbf{ }virtual \textasciitilde P() \{ std::cout \textless\textless{}
-"P::\textasciitilde P()\textbackslash n"; \}
+\textbf{ }virtual ~ P() { std::cout <<{}
+"P::~ P()\textbackslash n"; }
 
-void m() \{ std::cout \textless\textless{} "P::m()\textbackslash n"; \}
+void m() { std::cout <<{} "P::m()\textbackslash n"; }
 
 private:
 
 int * p;
 
-\};
+};
 
 class C: public P
 
-\{
+{
 
 public:
 
-C() : q(new int) \{\}
+C() : q(new int) {}
 
-\textasciitilde C() \{ std::cout \textless\textless{}
-"C::\textasciitilde C()\textbackslash n"; delete q; \}
+~ C() { std::cout <<{}
+"C::~ C()\textbackslash n"; delete q; }
 
-void m() \{ std::cout \textless\textless{} "C::m()\textbackslash n"; \}
+void m() { std::cout <<{} "C::m()\textbackslash n"; }
 
 int * q;
 
-\};
+};
 
 class autoP
 
-\{
+{
 
 public:
 
 autoP()
 
-: p\_(new C)
+: p_(new C)
 
-\{\}
+{}
 
-\textasciitilde autoP()
+~ autoP()
 
-\{ delete p\_; \}
+{ delete p_; }
 
-void m() \{ p\_-\textgreater m(); \}
+void m() { p_-\textgreater m(); }
 
 private:
 
@@ -1711,13 +1643,13 @@ autoP(const autoP \& p);
 
 const auto P \& operator=(const autoP \&);
 
-P * p\_;
+P * p_;
 
-\};
+};
 
 int main()
 
-\{
+{
 
 autoP p;
 
@@ -1725,10 +1657,10 @@ p.m();
 
 return 0;
 
-\} \\
+} \\
 \end{longtable}
 
-If you do want to allow copy constructor and \emph{operator=}, you have
+If you do want to allow copy constructor and \texttt{operator=}, you have
 to decide on what they should do, i.e., after
 
 autoP p0;
@@ -1737,9 +1669,9 @@ autoP p1;
 
 p1 = p0;
 
-does \emph{p1} points to the same object that \emph{p0} points to or is
-the object that \emph{p1} points to have the same values as the object
-that \emph{p0} points to (i.e., it's a copy)?
+does \texttt{p1} points to the same object that \texttt{p0} points to or is
+the object that \texttt{p1} points to have the same values as the object
+that \texttt{p0} points to (i.e., it's a copy)?
 
 By the way, since the parent destructor is virtual, calling delete in
 autoP will execute the destructor in the child class. But what is the
@@ -1753,43 +1685,43 @@ parent also has some memory allocation in its constructor like this:
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\#include \textless iostream\textgreater{}
+\#include < iostream\textgreater{}
 
 class P
 
-\{
+{
 
 public:
 
-P() : p(new int) \{\}
+P() : p(new int) {}
 
-\textbf{ }virtual \textasciitilde P() \{ std::cout \textless\textless{}
-"P::\textasciitilde P()\textbackslash n"; \}
+\textbf{ }virtual ~ P() { std::cout <<{}
+"P::~ P()\textbackslash n"; }
 
-void m() \{ std::cout \textless\textless{} "P::m()\textbackslash n"; \}
+void m() { std::cout <<{} "P::m()\textbackslash n"; }
 
 private:
 
 int * p;
 
-\};
+};
 
 class C: public P
 
-\{
+{
 
 public:
 
-C() : q(new int) \{\}
+C() : q(new int) {}
 
-\textasciitilde C() \{ std::cout \textless\textless{}
-"C::\textasciitilde C()\textbackslash n"; delete q; \}
+~ C() { std::cout <<{}
+"C::~ C()\textbackslash n"; delete q; }
 
-void m() \{ std::cout \textless\textless{} "C::m()\textbackslash n"; \}
+void m() { std::cout <<{} "C::m()\textbackslash n"; }
 
 int * q;
 
-\};
+};
 
 ... \\
 \end{longtable}
@@ -1806,54 +1738,54 @@ this:
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\#include \textless iostream\textgreater{}
+\#include < iostream\textgreater{}
 
 class P
 
-\{
+{
 
 public:
 
-P() : p(new int) \{\}
+P() : p(new int) {}
 
-\textbf{ }virtual \textasciitilde P() \{ std::cout \textless\textless{}
-"P::\textasciitilde P()\textbackslash n"; \}
+\textbf{ }virtual ~ P() { std::cout <<{}
+"P::~ P()\textbackslash n"; }
 
-void m() \{ std::cout \textless\textless{} "P::m()\textbackslash n"; \}
+void m() { std::cout <<{} "P::m()\textbackslash n"; }
 
-void deallocate() \{ delete p; \}
+void deallocate() { delete p; }
 
 private:
 
 int * p;
 
-\};
+};
 
 class C: public P
 
-\{
+{
 
 public:
 
-C() : q(new int) \{\}
+C() : q(new int) {}
 
-\textasciitilde C()
+~ C()
 
-\{
+{
 
-std::cout \textless\textless{} "C::\textasciitilde C()\textbackslash n";
+std::cout <<{} "C::~ C()\textbackslash n";
 
 deallocate();
 
 delete q;
 
-\}
+}
 
-void m() \{ std::cout \textless\textless{} "C::m()\textbackslash n"; \}
+void m() { std::cout <<{} "C::m()\textbackslash n"; }
 
 int * q;
 
-\};
+};
 
 ... \\
 \end{longtable}
@@ -1868,104 +1800,104 @@ Why is that?
 The reason is because \textbf{inheritance cannot be changed during
 runtime}.
 
-Abstractly speaking if class \emph{C} is a subclass of \emph{D}, then a
-\emph{C} object \emph{c} has
+Abstractly speaking if class \texttt{C} is a subclass of \texttt{D}, then a
+\texttt{C} object \texttt{c} has
 
-\emph{c.D::x}
+\texttt{c.D::x}
 
-where \emph{x} is a member (whether it is a member variable or a
-method). That cannot be changed. However if \emph{C} has a pointer
-\emph{x} that can point to either \emph{D} or \emph{E}, at one point in
+where \texttt{x} is a member (whether it is a member variable or a
+method). That cannot be changed. However if \texttt{C} has a pointer
+\texttt{x} that can point to either \texttt{D} or \texttt{E}, at one point in
 time, you can have
 
-\emph{c.x} points to a \emph{D} object
+\texttt{c.x} points to a \texttt{D} object
 
 and at another time
 
-\emph{c.x} points to an \emph{E} object
+\texttt{c.x} points to an \texttt{E} object
 
-This is possible if \emph{c.x} is a \emph{P} pointer where \emph{P} is a
-parent of both \emph{D} and E.
+This is possible if \texttt{c.x} is a \texttt{P} pointer where \texttt{P} is a
+parent of both \texttt{D} and E.
 
 As an example, suppose you have
 
 class Car
 
-\{
+{
 
 private:
 
-SteeringWheel steering\_wheel\_;
+SteeringWheel steering_wheel_;
 
-\};
+};
 
-\emph{SelfDrivingCar} wants to have a steering wheel and since a self
+\texttt{SelfDrivingCar} wants to have a steering wheel and since a self
 driving car is a car, you would do this:
 
 class Car
 
-\{
+{
 
 private:
 
-SteeringWheel steering\_wheel\_;
+SteeringWheel steering_wheel_;
 
-\};
+};
 
 class SelfDrivingCar: public Car
 
-\{
+{
 
-\};
+};
 
 But what if you want to model a self driving car that has a joystick
 instead of a steering wheel? Then you can't. Unless you do
 
 class Car
 
-\{
+{
 
 private:
 
-SteeringWheel steering\_wheel\_;
+SteeringWheel steering_wheel_;
 
-\};
+};
 
 class SelfDrivingCar: public Car
 
-\{
+{
 
 private:
 
-SteeringJoystick * steering\_joystick\_;
+SteeringJoystick * steering_joystick_;
 
-\};
+};
 
-If a self driving car \emph{self-driving\_car} wants a steering
+If a self driving car \texttt{self-driving_car} wants a steering
 joystick, the object would then create a steering jobstick object from
 
 class SteeringJoystick
 
-\{ ... \};
+{ ... };
 
-on the heap and point it's \emph{steering\_joystick\_} pointer to this
+on the heap and point it's \texttt{steering_joystick_} pointer to this
 object.
 
-BUT \ldots{} then the \emph{self-driving\_car} object would have a
+BUT \ldots{} then the \texttt{self-driving_car} object would have a
 steering wheel:
 
-self-driving\_car.steering\_wheel\_
+self-driving_car.steering_wheel_
 
 and a steering joystick as well:
 
-*(self-driving\_car.steering\_joystick\_)
+*(self-driving_car.steering_joystick_)
 
 Assuming you only want one steering device, this would be a waste of
 memory, and plus it would open up lots of confusion and incorrect code
 in the future. Redundant data is always bad.
 
-The point is that your self driving car is of type \emph{SelfDrivingCar}
-and it has inherited a steering wheel from the \emph{Car} class. This
+The point is that your self driving car is of type \texttt{SelfDrivingCar}
+and it has inherited a steering wheel from the \texttt{Car} class. This
 cannot change unless you change the code.
 
 How would we solve this problem where a self driving car can have either
@@ -1976,30 +1908,30 @@ First you do this:
 
 class SteeringDevice
 
-\{ \ldots{} \};
+{ \ldots{} };
 
 class SteeringWheel: public SteeringDevice
 
-\{ \ldots{} \};
+{ \ldots{} };
 
 class SteeringJoystick: public SteeringDevice
 
-\{ \ldots{} \};
+{ \ldots{} };
 
 This combines steering wheels and steering joysticks under a common
 ``concept'' or class. You can then do this:
 
 class Car
 
-\{
+{
 
 public:
 
 Car():
 
-: steering\_device\_(new SteeringWheel)
+: steering_device_(new SteeringWheel)
 
-\{\}
+{}
 
 // Of course you need to overload the // destructor, copy constructor,
 and
@@ -2008,40 +1940,40 @@ and
 
 private:
 
-SteeringDevice * steering\_device\_;
+SteeringDevice * steering_device_;
 
-\};
+};
 
 Now a car can have the choice of changing its steering device to either
 a steering wheel or a steering joystick during runtime:
 
 class Car
 
-\{
+{
 
 public:
 
 ...
 
-void set\_to\_steering\_joystick()
+void set_to_steering_joystick()
 
-\{
+{
 
-delete steering\_device\_;
+delete steering_device_;
 
-steering\_device\_ = new SteeringJoystick;
+steering_device_ = new SteeringJoystick;
 
-\}
+}
 
 private:
 
-SteeringDevice * steering\_device\_;
+SteeringDevice * steering_device_;
 
-\};
+};
 
 class SelfDrivingCar: public Car
 
-\{\};
+{};
 
 Then you can do
 
@@ -2049,7 +1981,7 @@ SelfDrivingCar tesla;
 
 ... drive with steering wheel ...
 
-tesla.set\_to\_steering\_joystick();
+tesla.set_to_steering_joystick();
 
 ... drive with steering joystick ...
 
@@ -2061,37 +1993,37 @@ joysticks:
 
 class Car
 
-\{
+{
 
 public:
 
-Car(int steering\_type=0)
+Car(int steering_type=0)
 
-\{
+{
 
-if (steering\_type == 0)
+if (steering_type == 0)
 
-steering\_device\_ =
+steering_device_ =
 
 new SteeringWheel;
 
 else:
 
-steering\_device\_ =
+steering_device_ =
 
 new SteeringJoystick;
 
-\}
+}
 
 private:
 
-SteeringDevice * steering\_device\_;
+SteeringDevice * steering_device_;
 
-\};
+};
 
 class SelfDrivingCar: public Car
 
-\{
+{
 
 public:
 
@@ -2099,9 +2031,9 @@ SelfDrivingCar()
 
 : Car(1)
 
-\{\}
+{}
 
-\};
+};
 
 But of course in this case again inheritance seems to be useless again
 since you can do
