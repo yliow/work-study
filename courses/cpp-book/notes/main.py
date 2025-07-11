@@ -1,43 +1,20 @@
 from latextool_basic import *
+from latexcircuit import *
 p = Plot()
-#p += Grid(x0=-3,y0=-10,x1=15,y1=5)
 
-G = Rect(-1, 3, 1, 5, linewidth=0.05, font=r'\huge', label=r'\texttt{G}')
-P0 = Rect(-3, -1, -0.5, 1, linewidth=0.05, font=r'\huge', label=r'\texttt{P0}')
-P1 = Rect(0.5, -1, 3, 1, linewidth=0.05, font=r'\huge', label=r'\texttt{P1}')
-C = Rect(-1, -5, 1, -3, linewidth=0.05, font=r'\huge', label=r'\texttt{C}')
+#p += Grid(x0=-5, y0=-5, x1=5, y1=5)
 
-p += Line(points=[(-2,-1),(-2,-2),(2,-2),(2,-1),(2,-2),(0,-2),(C.top())], linewidth=0.05)
-p += Line(points=[(-2,-2),(-2,-1)], linewidth=0.05, endstyle='>')
-p += Line(points=[(2,-2),(2,-1)], linewidth=0.05, endstyle='>')
-p += Line(points=[(-2,1),(-2,2),(2,2),(2,1),(2,1),(2,2),(0,2),(G.bottom())], linewidth=0.05, endstyle='>')
+p += Rect(1, 2, 9, 5, s=r"If \texttt{f()} is not virtual, the decision of which \texttt{f()} to use is based on the pointer's type P.\\ \textbf{Static/early binding.}", linewidth=0.1, linecolor='red', innersep=0.3)
 
-E0 = ellipse(5,0,8,2, linewidth=0.1, label=r'x\_')
-E1 = ellipse(9,0,12,2, linewidth=0.1, label=r'x\_')
-E2 = ellipse(5,-3,8,-1, linewidth=0.1)
-E3 = ellipse(9,-3,12,-1, linewidth=0.1)
-E4 = ellipse(7,-6,10,-4, linewidth=0.1)
-p += Line(points=[(6.5,1), (6.5,-2), (8.5,-5), (10.5,-2), (10.5,1)], linewidth=0.1)
-
-p += G
-p += Line(points=[G.right(),(6.5,1)], linewidth=0.05)
-p += Line(points=[G.right(),(10.5,1)], linewidth=0.05)
-
-p += P0
-p += Line(points=[P0.bottomright(),(6.5,-2)], linewidth=0.05)
-
-p += P1
-p += Line(points=[P1.right(),(10.5,-2)], linewidth=0.05)
-
-p += C
-p += Line(points=[C.right(),(8.5,-5)], linewidth=0.05)
-
-
-p += E0
-p += E1
-p += E2
-p += E3
-p += E4
-
+p += Rect(1, -2, 9, 1, s=r"If \texttt{f()} not virtual, the decision of which \texttt{f()} to use is based on the object's class C.\\ \textbf{Dynamic/late binding.}", linewidth=0.1, linecolor='red', innersep=0.3)
+p += Rect(-3.5,2.5,-2.5,4.5,linewidth=0.05)
+p += Line(points=[(-2.5,3.5),(1,3.5)], linestyle='dashed',linecolor='red',linewidth=0.1)
+p += Line(points=[(-2.5,-0.5),(1,-0.5)], linestyle='dashed',linecolor='red',linewidth=0.1)
+p += Line(points=[(-3,3.5),(-3,0.5)], endstyle='>',linewidth=0.05)
+p += ellipse(center=(-3,-0.5), height=2,width=3,linewidth=0.05)
+X = POINT(x=-3.9, y=3.5, r=0, label='pointer to object')
+Y = POINT(x=-4.9, y=-0.5, r=0, label='object')
+p += str(X)
+p += str(Y)
 print(p)
 
