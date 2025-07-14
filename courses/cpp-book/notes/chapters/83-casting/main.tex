@@ -1,76 +1,8 @@
-% Options for packages loaded elsewhere
-\PassOptionsToPackage{unicode}{hyperref}
-\PassOptionsToPackage{hyphens}{url}
-%
-\documentclass[
-]{article}
-\usepackage{amsmath,amssymb}
-\usepackage{iftex}
-\ifPDFTeX
-  \usepackage[T1]{fontenc}
-  \usepackage[utf8]{inputenc}
-  \usepackage{textcomp} % provide euro and other symbols
-\else % if luatex or xetex
-  \usepackage{unicode-math} % this also loads fontspec
-  \defaultfontfeatures{Scale=MatchLowercase}
-  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
-\fi
-\usepackage{lmodern}
-\ifPDFTeX\else
-  % xetex/luatex font selection
-\fi
-% Use upquote if available, for straight quotes in verbatim environments
-\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
-\IfFileExists{microtype.sty}{% use microtype if available
-  \usepackage[]{microtype}
-  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
-}{}
-\makeatletter
-\@ifundefined{KOMAClassName}{% if non-KOMA class
-  \IfFileExists{parskip.sty}{%
-    \usepackage{parskip}
-  }{% else
-    \setlength{\parindent}{0pt}
-    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
-}{% if KOMA class
-  \KOMAoptions{parskip=half}}
-\makeatother
-\usepackage{xcolor}
-\usepackage{longtable,booktabs,array}
-\usepackage{calc} % for calculating minipage widths
-% Correct order of tables after \paragraph or \subparagraph
-\usepackage{etoolbox}
-\makeatletter
-\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
-\makeatother
-% Allow footnotes in longtable head/foot
-\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
-\makesavenoteenv{longtable}
-\setlength{\emergencystretch}{3em} % prevent overfull lines
-\providecommand{\tightlist}{%
-  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
-\ifLuaTeX
-  \usepackage{selnolig}  % disable illegal ligatures
-\fi
-\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
-\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
-\urlstyle{same}
-\hypersetup{
-  hidelinks,
-  pdfcreator={LaTeX via pandoc}}
+\newpage\EMPHASIZE{83. Casting}
 
-\author{}
-\date{}
-
-\begin{document}
-
-83. Casting
-
-Objectives
+\textsc{Objectives}
 
 \begin{itemize}
-\tightlist
 \item
   Static casting
 \item
@@ -81,43 +13,38 @@ Objectives
   Dynamic cast
 \end{itemize}
 
-Casting
+\newpage\EMPHASIZE{Casting}
 
-\begin{quote}
-\end{quote}
+Recall that from CISS240, you can typecast an \texttt{int} to a \texttt{double}, a \texttt{double} to an \texttt{int}, a \texttt{char} to an \texttt{int}, an \texttt{int} to a \texttt{char}, etc.:
+\begin{console}
+int i = 42;
+double d = 3.14;
+char c = 'A';
+int flag = 1;
 
-\begin{quote}
-Recall that from CISS240, you can typecast an \emph{int} to a
-\emph{double}, a \emph{double} to an \emph{int}, a \emph{char} to an
-\emph{int}, an \emph{int} to a \emph{char}, etc.:
-\end{quote}
+double j = double(i); // or (double) i
+int e = int(d); // or (int) d
+int f = int(c); // or (int) c
+bool flag2 = bool(flag);
 
-\begin{longtable}[]{@{}@{}}
-\toprule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\end{longtable}
+// ...
+\end{console}
 
 Recall from the notes on pointers, you cannot assign pointer values to a
 pointer variable if the pointer types are not the same:
+\begin{console}
+int i = 42;
+int * p = &i; // OK
+double * q = &i; // BAD!!!
+\end{console}
 
-\begin{longtable}[]{@{}@{}}
-\toprule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\end{longtable}
-
-But in fact you can \ldots{} if you perform an explicit typecast:
-
-\begin{longtable}[]{@{}@{}}
-\toprule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\end{longtable}
-
+But in fact you can \ldots if you perform an explicit typecast:
+\begin{console}
+int i = 42;
+int * p = &i; // OK
+double * q = (double *)i; // OK ... but probably a
+                          // bad idea ...
+\end{console}
 In general, it's a good idea to think carefully before you typecast.
 
 The above typecast has been around since C (the parent language of C++
@@ -126,102 +53,106 @@ are available in C++. C++ has also introduced it's own casting
 mechanisms through four different casting operators:
 
 \begin{itemize}
-\tightlist
 \item
-  static\_cast
+  \verb!static_cast!
 \item
-  const\_cast
+  \verb!const_cast!
 \item
-  reinterpret\_cast
+  \verb!reinterpret_cast!
 \item
-  \emph{dynamic\_cast}
+  \verb!dynamic_cast!
 \end{itemize}
 
-static\_cast
+\newpage\EMPHASIZE{static\_cast}
 
-The \emph{\textbf{static\_cast}} is most similar to the basic
+The \texttt{\textbf{static\_cast}} is most similar to the basic
 typecasting of types which are very similar or only result in loss of
 precision, i.e., casting such as
+\begin{console}
+int i = 42;
+double d = 3.14;
+char c = 'A';
+bool flag = true;
 
-\begin{longtable}[]{@{}@{}}
-\toprule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\end{longtable}
+double j = double(i);        // or (double) i
+int e = int(d);              // or (int) i
+int d = int(c);              // or (int) c
+int flag2 = bool(flag);      // or (int) flag
 
-All the above can be executed using \emph{\textbf{static\_cast}}:
+// ...
+\end{console}
+All the above can be executed using \textbf{\texttt{static\_cast}}:
 
-\begin{longtable}[]{@{}@{}}
-\toprule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\end{longtable}
+\begin{console}
+int i = 42;
+double d = 3.14;
+char c = 'A';
+bool flag = true;
+
+double i1 = static_cast< double >(i);
+int d1 = static_cast< int >(d);
+int c1 = static_cast< int >(c);
+bool flag1 = static_cast< bool> (flag);
+
+// ...
+\end{console}
 
 In general static cast is allowed when automatic typecasting is allowed.
 For instance
 
-\begin{longtable}[]{@{}@{}}
-\toprule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\end{longtable}
+\begin{console}
+int i = 42;
+double i1 = i;                        // automatic
+double i2 = double(i);                // OK
+double i3 = static_cast< double >(i); // OK
+\end{console}
 
 However this is not allowed:
 
-\begin{longtable}[]{@{}@{}}
-\toprule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\end{longtable}
+\begin{console}
+int i = 42;
+double * p = &i;
+\end{console}
 
 Therefore this will not compile:
 
-\begin{longtable}[]{@{}@{}}
-\toprule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\end{longtable}
+\begin{console}
+int i = 42;
+double * p = static_cast< double *>(&i); // BAD!!!
+\end{console}
 
 Of course C-style casting allows you to do this:
 
-\begin{longtable}[]{@{}@{}}
-\toprule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\end{longtable}
+\begin{console}
+int i = 42;
+double * p = (double *)(&i);
+\end{console}
 
-And this is \textbf{the whole point of C++ typecasting}. It's to
-subdivide C style castings into various kinds of C++ type casting so as
-to provide finer control and to provide more warnings.
+And this is \EMPHASIZE{the whole point of C++ typecasting}. It's to subdivide C style castings into various kinds of C++ type casting so as to provide finer control and to provide more warnings.
 
-That being said, note that in many areas of C++ programming, as long as
-you know what you are doing, i.e., you are only typecasting when
-automatic typecasting is allowed (and not crazy typecasting between
-pointers of different types), then you'll see that C-style typecasting
-is still used when writing C++ code.
+That being said, note that in many areas of C++ programming, as long as you know what you are doing, i.e., you are only typecasting when automatic typecasting is allowed (and not crazy typecasting between pointers of different types), then you'll see that C-style typecasting is still used when writing C++ code.
 
-For instance when you look OpenCV programs (CV = computer vision, OpenCV
-is a very famous open source CV library written in C/C++), it's very
-common to see C-style typecasting rather than C++ style typecasting.
-Also, OpenGL C++ program (for computer graphics) tend to use C-style
-typecasting.
+For instance when you look OpenCV programs (CV = computer vision, OpenCV is a very famous open source CV library written in C/C++), it's very common to see C-style typecasting rather than C++ style typecasting. Also, OpenGL C++ program (for computer graphics) tend to use C-style typecasting.
 
-const\_cast
+\newpage\EMPHASIZE{\texttt{const\_cast}}
 
 Look at this program:
 
-\begin{longtable}[]{@{}@{}}
-\toprule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\end{longtable}
+\begin{console}
+void g(int & y)
+{}
+
+void f(const int & x)
+{   
+    g(x);
+}
+
+int main()
+{   
+    f(42);
+    return 0;
+}
+\end{console}
 
 Will it compile? (I'll give you 5 seconds.) Next, try to compile it.
 
@@ -230,143 +161,225 @@ Of course it won't.
 If you did not answer the above question correctly, you should review
 notes on references and also on pointers right away because the above is
 similar to
+\begin{console}
+void g(int * y)
+{}
 
-\begin{longtable}[]{@{}@{}}
-\toprule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\end{longtable}
+void f(const int * x)
+{    
+     g(x);
+}
+
+int main()
+{   
+    int i = 42;
+    f(&i);
+    return 0;
+}
+\end{console}
+
 
 In particular look at constantness of pointers (and of references).
 
 This will not compile
 
-\begin{longtable}[]{@{}@{}}
-\toprule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\end{longtable}
+\begin{console}
+void g(int & y)
+{}
 
-because the \emph{y} of \emph{g()} references the \emph{x} of
-\emph{f()}, but\emph{ y} is a reference while \emph{x} is a reference to
-a constant. This means that \emph{x} cannot change the value it is
-referencing and yet \emph{x} wants to allow \emph{y} to reference that
-value with the power to change it. That's not possible. This is similar
-to this issue (for references):
+void f(const int & x)
+{    
+     g(x);
+}
 
-\begin{longtable}[]{@{}@{}}
-\toprule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\end{longtable}
+int main()
+{   
+    int i = 42;
+    f(i);
+    return 0;
+}
+\end{console}
+
+
+because the \texttt{y} of \texttt{g()} references the \texttt{x} of
+\texttt{f()}, but\texttt{y} is a reference while \texttt{x} is a reference to
+a constant. This means that \EMPHASIZE{x cannot change the value it is referencing} and yet \texttt{x} wants to \EMPHASIZE{allow y to reference that value with the power to change it.} That's \EMPHASIZE{not possible.} This is similar to this issue (for references):
+
+\begin{console}
+int i = 42;
+const int & x = i;   // x is weak ... change change i
+int & y = x;         // y wants to be strong and wants
+                     // to change i, through x. NOPE!!!
+\end{console}
 
 which has the same issue as this (for pointers):
 
-\begin{longtable}[]{@{}@{}}
-\toprule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\end{longtable}
+\begin{console}
+int i = 42;
+const int * x = &i;
+int * y = x;
+\end{console}
 
 Going back to
 
-\begin{longtable}[]{@{}@{}}
-\toprule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\end{longtable}
+\begin{console}
+void g(int & y)
+{}
 
-The issue is the \emph{x} in \emph{g(x)} cannot be referencing a
-constant \emph{int}, i.e., you want to remove the constantness of the
-\emph{x}:
+void f(const int & x)
+{    
+     g(x);
+}
 
-\begin{longtable}[]{@{}@{}}
-\toprule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\end{longtable}
+int main()
+{   
+    f(42);
+    return 0;
+}
+\end{console}
+
+The issue is the \texttt{x} in \texttt{g(x)} \EMPHASIZE{cannot} be referencing a constant \texttt{int}, i.e., you want to \EMPHASIZE{remove the constantness} of the \texttt{x}:
+
+\begin{consolethree}[escapeinside=||]
+void g(int & y)
+{}
+
+void f (|\EMPHASIZE{const}| int & x)
+{    
+     g(x);
+}
+int main()
+{   
+    f(42);
+    return 0;
+}
+\end{consolethree}
 
 Of course one solution is this:
+\begin{consolethree}[escapeinside=||]
+void g(|\EMPHASIZE{const}| int & y)
+{}
 
-\begin{longtable}[]{@{}@{}}
-\toprule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\end{longtable}
+void f (const int & x)
+{    
+     g(x);
+}
+int main()
+{   
+    f(42);
+    return 0;
+}
+\end{consolethree}
+Then everything works. But if the function \texttt{g()} was written by someone else and you cannot change the source code, then what are you doing to do? (This does happen. For instance \texttt{g()} might be a function in a library that someone else wrote and you only have the header file and the compiled binary code, but not the source file. This means that although you can change the prototype in the header file it won't help because you cannot change \texttt{g()} in the cpp file.)
 
-Then everything works. But if the function \emph{g()} was written by
-someone else and you cannot change the source code, then what are you
-doing to do? (This does happen. For instance \emph{g()} might be a
-function in a library that someone else wrote and you only have the
-header file and the compiled binary code, but not the source file. This
-means that although you can change the prototype in the header file it
-won't help because you cannot change \emph{g()} in the cpp file.)
+You can remove the constantness of the \texttt{x} in \texttt{f()}:
 
-You can remove the constantness of the \emph{x} in \emph{f()}:
+\begin{consolethree}[escapeinside=||]
+void g(int & y)
+{}
 
-\begin{longtable}[]{@{}@{}}
-\toprule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\end{longtable}
+void f(|\EMPHASIZE\sout\redtext{const}| int & x)
+{    
+     g(x);
+}
 
-But what if the function \emph{f()} should not change the value that
-\emph{x} references? For instance what if \emph{f()} is a printing
-function? Then \emph{x} should be a constant reference \ldots{} except
-when calling \emph{g()}. In other words, you only want to remove the
-constantness of \emph{x} temporarily. Then you can use the constant
-cast:
+int main()
+{   
+    f(42);
+    return 0;
+}
+\end{console}
 
-\begin{longtable}[]{@{}@{}}
-\toprule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\end{longtable}
+But what if the function \texttt{f()} should not change the value that \texttt{x} references? For instance what if \texttt{f()} is a printing function? Then \texttt{x} should be a constant reference \ldots \EMPHASIZE{except when calling \texttt{g()}}. In other words, you only want to remove the constantness of \texttt{x} \EMPHASIZE{temporarily.} Then you can use the constant cast:
+
+\begin{consolethree}[escapeinside=||]
+void g(int & y)
+{}
+
+void f(const int & x)
+{    
+     g(|\EMPHASIZE\texttt{const\_cast< int \& >}|(x));
+}
+int main()
+{   
+    f(42);
+    return 0;
+}
+\end{consolethree}
 
 Go ahead and compile it now.
 
-NOTE: This is (in my opinion) a wrong name. Because it makes you think
-that you are making something constant. In fact the point of this cast
-is to remove the constantness. A better name would be
-``remove\_const\_cast''!!!
+NOTE: This is (in my opinion) a wrong name. Because it makes you think that you are making something constant. In fact the point of this cast is to \EMPHASIZE{remove} the constantness. A better name would be ``remove\_const\_cast''!!!
 
-This can happen in the following scenario. Suppose in your \emph{Date}
-class, you forgot to make the \emph{get\_year()} method constant. Then
-this will not compile:
+This can happen in the following scenario. Suppose in your \texttt{Date} class, you forgot to make the \texttt{get\_year()} method constant. Then this will not compile:
 
-\begin{longtable}[]{@{}@{}}
-\toprule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\end{longtable}
+\begin{console}
+class Date
+{
+public:
+     ...
+     int get_yyyy() // OOPS ... forgot to make method
+                    // constant!!!
+     {
+          return yyyy_;
+     }
+     ...
+};
 
-\textbf{Exercise.} Make sure you complete the above example to see the
+std::ostream & operator<<(std::ostream & cout,
+                          const Date & date)
+{    
+     cout << date.get_yyyy()
+          << ...
+     return cout;
+}
+
+int main()
+{   
+    f(42);
+    return 0;
+}
+\end{console}
+
+\begin{ex}Make sure you complete the above example to see the
 compilation error message from your compiler!!! The correct thing is to
-make the \emph{get\_yyyy()} constant. But suppose you can't. Then you
+make the \texttt{get\_yyyy()} constant. But suppose you can't. Then you
 would have to resort to this:
 
-\begin{longtable}[]{@{}@{}}
-\toprule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\end{longtable}
+\begin{consolethree}[escapeinside=||]
+class Date
+{
+public:
+     ...
+     int get_yyyy() // OOPS ... forgot to make method
+                    // constant!!!
+     {    
+          return yyyy_;
+     }
+     ...
+};
+
+std::ostream & operator<<(std::ostream & cout,
+                          const Date & date)
+{    
+     cout << |\redtext{const\_cast< Date \& >(date)}.get\_yyyy()
+          << ...
+          return cout;
+}
+
+int main()
+{   
+    f(42);
+    return 0;
+}
+\end{consolethree}
 
 Get it?
+\end{ex}
 
-In general, use of \emph{const\_cast} indicates an issue with the design
+In general, use of \texttt{const\_cast} indicates an issue with the design
 of the code (just like the above scenario) -- the issue is really that
-\emph{get\_yyyy()} should be made constant. But there are times when you
+\texttt{get\_yyyy()} should be made constant. But there are times when you
 have no choice when you don't have access to the source cpp file and the
 definition of the function/method is in the cpp file and not in the
 header file.
@@ -374,233 +387,257 @@ header file.
 For the analogous pointer case, you can also use constant cast to
 resolve the issue:
 
-\begin{longtable}[]{@{}@{}}
-\toprule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\end{longtable}
+\begin{consolethree}[escapeinside=||]
+void g(int * x)
+{}
 
-reinterpret\_cast and void *
+void f(const int * x)
+{    
+     g(|\EMPHASIZE\redtext{const\_cast< int * >(x)}|);
+}
+
+int main()
+{   
+    int i = 42;
+    f(&i);
+
+    return 0;
+}
+\end{consolethree}
+
+\newpage\EMPHASIZE{reinterpret\_cast and void *}
 
 Recall that while you can do C-style casting for pointer types:
 
-\begin{longtable}[]{@{}@{}}
-\toprule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\end{longtable}
+\begin{console}
+int i = 42;
+float * p = (float *)(&i);
+\end{console}
 
-Using C++ typecasting, the above is done using the
-\emph{reinterpret\_cast}. Try this:
+Using C++ typecasting, the above is done using the \texttt{reinterpret\_cast}. Try this:
 
-\begin{longtable}[]{@{}@{}}
-\toprule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\end{longtable}
+\begin{console}
+int i = 42;
+float * p = reinterpret_cast< float * >(&i);
+\end{console}
 
-You should try to do the above with \emph{\textbf{static\_cast}} and
-\emph{\textbf{const\_cast}} to check that neither of them works.
+You should try to do the above with \texttt{\EMPHASIZE{static\_cast}} and \texttt{\EMPHASIZE{const\_cast}} to check that neither of them works.
 
 You should try this:
 
-\begin{longtable}[]{@{}@{}}
-\toprule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\end{longtable}
+\begin{console}
+#include <iostream>
 
-The second output is \emph{1078523331}. Why? Because the bit pattern for
-\emph{3.14f} happens to be the bit pattern of the integer
-\emph{1078523331}.
+int main()
+{   
+    int i = 42;
+    float * p = reinterpret_cast< float * >(&i);
+    *p = 0.0f;
+    std::cout << i << '\n'; // you get 0 because the
+                            // bit pattern of 0.0f
+                            // happens to be the same
+                            // bit pattern of 0.
+    *p = 3.14f;
+    std::cout << i << '\n'; // you do NOT get 3
+                            // because the bit
+                            // pattern of 3.14f is
+                            // NOT 3.
+    return 0;
+}
+\end{console}
 
-In general you should probably not use \emph{reinterpret\_cast} of
-pointers until you have taken CISS360 where you will learn more about
-bit representations and C/C++ bit programming.
+The second output is \texttt{1078523331}. Why? Because the bit pattern for \texttt{3.14f} happens to be the bit pattern of the integer \texttt{1078523331}.
 
-Note that in the above \emph{p} points to a \emph{float} (the smaller
-version of \emph{double}). So C++ will treat \emph{*p} is a
-\emph{float}. Sometimes (in the future), you might simply want an
-address and you don't really want to interpret the value at that address
-as an \emph{int} or \emph{double} or \emph{float} or \emph{char} or
-\emph{bool} or anything at all. In that case, the pointer type you want
-is called
+In general you should probably not use \texttt{reinterpret\_cast} of pointers until you have taken CISS360 where you will learn more about bit representations and C/C++ bit programming.
 
-void *
+Note that in the above \texttt{p} points to a \texttt{float} (the smaller version of \texttt{double}). So C++ will treat \texttt{*p} is a \texttt{float}. Sometimes (in the future), you might simply \EMPHASIZE{want an address} and you \EMPHASIZE{don't really want to interpret the value at that address} as an \texttt{int} or \texttt{double} or \texttt{float} or \texttt{char} or \texttt{bool} or anything at all. In that case, the pointer type you want is called
 
-Of course if \emph{q} is a \emph{void *}, you can print the address
-stored in \emph{q}, you can give that address value to another pointer
-variable. But you should not work with \emph{*q} since C++ does not know
+\begin{center}
+\EMPHASIZE{void *}
+\end{center}
+
+Of course if \texttt{q} is a \texttt{void *}, you can print the address
+stored in \texttt{q}, you can give that address value to another pointer
+variable. But you should not work with \texttt{*q} since C++ does not know
 how to interpret the bits at that address. Run this:
 
-\begin{longtable}[]{@{}@{}}
-\toprule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\end{longtable}
+\begin{console}
+int i = 42;
+float * p = reinterpret_cast< float * >(&i);
+*p = 0.0f;
+std::cout << i << '\n';
+*p = 3.14f;
+std::cout << i << '\n';
 
-Run this too where you store an \emph{int*} value in a \emph{void*}
-pointer, pass the value of the pointer to another \emph{void*} pointer,
-cast the \emph{void*} value to a \emph{double*}:
+void * q = reinterpret_cast< float * >(&i);
+std::cout << q << '\n';    // OK
+std::cout << (*q) << '\n'; // ARGH!!!! WRONG!!!
+\end{console}
 
-\begin{longtable}[]{@{}@{}}
-\toprule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\end{longtable}
+Run this too where you store an \texttt{int*} value in a \texttt{void*} pointer, pass the value of the pointer to another \texttt{void*} pointer, cast the \texttt{void*} value to a \texttt{double*}:
+
+\begin{console}
+int * p0 = new int;
+void * p1 = p0;
+void * p2 = reinterpret_cast< void * >(p0);
+double * p3 = reinterpret_cast< double * >(p2);
+std::cout << p0 << ' ' << p1 << ' ' << p2 << ' '
+          << p3 << '\n';
+\end{console}
 
 As I mentioned earlier, in the area of OpenCV and OpenGL, you'll see
 that many software engineers do not use the C++ style casting. For
 instance one function in OpenGL is
-
-void glVertexAttribPointer(GLuint index,
-
-GLint size,
-
-GLenum type,
-
-GLboolean normalized,
-
-GLsizei stride,
-
-const void * pointer);
-
+\begin{center}
+\verb!void glVertexAttribPointer(GLuint index,                                                                   GLint size,                                                                     GLenum type,                                                                    GLboolean normalized,                                                           GLsizei stride,                                                                 const void * pointer);!
+\end{center}
 and you'll see that most OpenGL programmers will simply use the simple
 C/C++ cast like this to call the above function:
-
-glVertexAttribPointer(0,
-
-3,
-
-GL\_FLOAT,
-
-GL\_FALSE,
-
-5 * sizeof(GLfloat),
-
-(GLvoid*) 0);
+\begin{center}
+\verb!glVertexAttribPointer(0,                                                                              3,                                                                       GL_FLOAT,                                                                       GL_FALSE,                                                           5 * sizeof (GLfloat),                                                                   (GLvoid*) 0);!
+\end{center}
 
 (note: GLvoid is just a typedef of void.)
 
-dynamic\_cast
+\newpage\EMPHASIZE{\texttt{dynamic\_cast}}
 
-Run the following \textbf{very important} example and read the code very
-slowly and very carefully:
+Run the following \EMPHASIZE{very important} example and read the code very slowly and very carefully:
 
-\begin{longtable}[]{@{}@{}}
-\toprule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\end{longtable}
+\begin{console}
+#include <iostream>
+
+class C4
+{
+public:
+     virtual ~C4() {}
+     virtual void f() { std::cout << "C4::f()\n"; }
+     void g() { std::cout << "C4::g()\n"; }
+};
+
+class C3: public C4
+{
+public:
+     virtual void f() { std::cout << "C3::f()\n"; }
+     void g() { std::cout << "C3::g()\n"; }
+};
+
+class C2: public C3
+{
+public:
+     virtual void f() { std::cout << "C2::f()\n"; }
+     void g() { std::cout << "C2::g()\n"; }
+};
+
+class C1: public C2
+{
+public:
+     virtual void f() { std::cout << "C1::f()\n"; }
+     void g() { std::cout << "C1::g()\n"; }
+};
+
+class C0: public C1
+{
+public:
+     virtual void f() { std::cout << "C0::f()\n"; }
+     void g() { std::cout << "C0::g()\n"; }
+};
+
+class X {}; // X is NOT in the inheritance hierarchy C0,..,C4
+
+int main()
+{   
+    C3 * p = new C1;
+    C3 * q = dynamic_cast< C3 * >(p);
+    C2 * r = dynamic_cast< C2 * >(p);
+    C1 * t = dynamic_cast< C1 * >(p);
+    C0 * u = dynamic_cast< C0 * >(p);
+    C4 * v = dynamic_cast< C4 * >(p);
+    X * w = dynamic_cast< X * >(p);
+    
+    std::cout << "p:" << p << '\n'; p->f(); p->g();
+    std::cout << "q:" << q << '\n'; q->f(); q->g();
+    std::cout << "r:" << r << '\n'; r->f(); r->g();
+    std::cout << "t:" << t << '\n'; t->f(); t->g();
+    std::cout << "u:" << u << '\n';
+    std::cout << "v:" << v << '\n'; v->f(); v->g();
+    std::cout << "w:" << w << '\n';
+
+    delete p;
+    return 0;
+}
+\end{console}
 
 Here's my output
 
-\begin{longtable}[]{@{}@{}}
-\toprule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\end{longtable}
+\begin{console}
+p:0x605eb0
+C1::f()
+C3::g()
+q:0x605eb0
+C1::f()
+C3::g()
+r:0x605eb0
+C1::f()
+C2::g()
+t:0x605eb0
+C1::f()
+C1::g()
+u:0
+v:0x605eb0
+C1::f()
+C4::g()
+w:0
+\end{console}
 
 Note that some of the dynamic casts resulting in
-\emph{\textbf{NULL}}\textbf{ pointers}. That's when \textbf{dynamic
-casting fails}.
+\texttt{\EMPHASIZE{NULL}}\EMPHASIZE{pointers}. That's when \EMPHASIZE{dynamic casting fails}.
 
-Note that \emph{p} was declared like this:
+Note that \texttt{p} was declared like this:
 
-C3 * p = new C1;
+\tab[3em]{\verb!C3 * p = new C1;!}\\
 
-You can cast \emph{p} as pointer to the classes from \emph{C0 }to
-\emph{C4}. However casting to \emph{C0 }(i.e., below \emph{C1}) will
-give you a \emph{NULL} pointer. This allows you to access methods from
-\emph{C1} to \emph{C4}, although if the method is \textbf{virtual}, the
-search for this method starts at the ``bottom'' at \emph{C1}. This is
-the case for \emph{f()}. However \emph{g()} is \textbf{not virtual}.
-Therefore
+You can cast \texttt{p} as pointer to the classes from \texttt{C0} to \texttt{C4}. However casting to \texttt{C0 }(i.e., below \texttt{C1}) will give you a \texttt{NULL} pointer. This allows you to access methods from \texttt{C1} to \texttt{C4}, although if the method is \EMPHASIZE{virtual}, the search for this method starts at the ``bottom'' at \texttt{C1}. This is the case for \texttt{f()}. However \texttt{g()} is \EMPHASIZE{not virtual}. Therefore
 
-dynamic\_cast\textless{} C2 * \textgreater(p).g();
+\tab[3em]{\verb!dynamic_cast< C2 * >(p).g();!}\\
 
-will execute the \emph{C2::g()} method.
+will execute the \texttt{C2::g()} method.
 
-Also, note that you can try to cast to a pointer to a class that is
-\textbf{not in the inheritance hierarchy} (look at the class \emph{X}),
-but in that case you'll get \emph{\textbf{NULL}}.
+Also, note that you can try to cast to a pointer to a class that is \EMPHASIZE{not in the inheritance hierarchy} (look at the class \texttt{X}), but in that case you'll get \texttt{\EMPHASIZE{NULL}}.
 
-The \textbf{main reason} for dynamic cast is to \textbf{typecast a
-pointer from a class to a subclass}. Dynamic cast will give you a NULL
-if the typecast attempts to change the point type to a non-subclass
-type. So if you have
+The \EMPHASIZE{main reason} for dynamic cast is to \EMPHASIZE{typecast a pointer from a class to a subclass}. Dynamic cast will give you a NULL if the typecast attempts to change the point type to a non-subclass type. So if you have
 
-Z * p = new X;
+\tab[3em]{\verb!Z * p = new X;!}\\
+\tab[3em]{\verb!dynamic_cast< Y * >(p).m();!}\\
 
-dynamic\_cast\textless{} Y * \textgreater(p).m();
-
-where \emph{X}, \ldots, \emph{Y}, \ldots, \emph{Z} is an inheritance
-hierarchy, then
+where \texttt{X}, \ldots, \texttt{Y}, \ldots, \texttt{Z} is an inheritance hierarchy, then
 
 \begin{itemize}
-\tightlist
 \item
-  If \emph{\textbf{m}}\textbf{ is virtual}, the search for \emph{m}
-  \textbf{starts at }\emph{\textbf{X}} and proceeds up the hierarchy
-  until it's found.
+  If \EMPHASIZE{mis virtual}, the search for \texttt{m} \EMPHASIZE{starts at X} and proceeds up the hierarchy until it's found.
 \item
-  If \emph{\textbf{m}}\textbf{ is nonvirtual}, the search for \emph{m}
-  \textbf{starts at }\emph{\textbf{Y}} and proceeds up the hierarchy
-  until it's found.
+  If \EMPHASIZE{m is nonvirtual}, the search for \texttt{m} \EMPHASIZE{starts at Y} and proceeds up the hierarchy until it's found.
 \end{itemize}
 
-Note that if \emph{m} is virtual, then the dynamic cast is actually
-redundant (i.e. \emph{Y} is ignored since the search for \emph{m} starts
-at \emph{X} anyway),
+Note that if \texttt{m} is virtual, then the dynamic cast is actually redundant (i.e. \texttt{Y} is ignored since the search for \texttt{m} starts
+at \texttt{X} anyway),
 
-And if Y is a \textbf{subclass of X (or even further below)} or if Y is
-\textbf{not between X and Z} (in the inheritance hierarchy, the dynamic
-cast \textbf{fails} (i.e., it gives you \emph{NULL}).
+And if Y is a \EMPHASIZE{subclass of X (or even further below)} or if Y is \EMPHASIZE{not between X and Z} (in the inheritance hierarchy, the dynamic cast \EMPHASIZE{fails} (i.e., it gives you \texttt{NULL}).
 
-Here's another very important thing: in the above example, try to make
-all the \emph{f()} non-virtual. When you compile, you'll get an error.
-In other words, \textbf{dynamic casting is allowed only when there is at
-least one virtual method} in the classes involved. (I'm not going to
-explain this other than the fact that when the classes involved are
-polymorphic with at least one virtual method, some extra information is
-included in the classes involved which is needed for dynamic casting to
-work.)
+Here's another very important thing: in the above example, try to make all the \texttt{f()} non-virtual. When you compile, you'll get an error. In other words, \EMPHASIZE{dynamic casting is allowed only when there is at least one virtual method} in the classes involved. (I'm not going to explain this other than the fact that when the classes involved are polymorphic with at least one virtual method, some extra information is included in the classes involved which is needed for dynamic casting to work.)
 
 In general, the benefit of this cast is this: If you intend to cast a
 pointer along a class hierachy, then by doing
 
-dynamic\_cast\textless{} Y * \textgreater(p)
+\tab[3em]{\verb!dynamic_cast< Y * >(p)!}\\
 
-will remind you that \emph{Y} is in the class hierarchy (usually) below
-the type used to declare \emph{p}, i.e., the declaration of \emph{p} is
+will remind you that \texttt{Y} is in the class hierarchy (usually) below the type used to declare \texttt{p}, i.e., the declaration of \texttt{p} is
 
-Z * p;
+\tab[3em]{\verb!Z * p;!}\\
 
-and \emph{Z} is an ancestor class of \emph{Y}. If you accidentally
-change the \emph{Y} to a class that is \textbf{not} under \emph{Z}:
+and \texttt{Z} is an ancestor class of \texttt{Y}. If you accidentally change the \texttt{Y} to a class that is \textbf{not} under \texttt{Z}:
 
-dynamic\_cast\textless{} \textbf{A} * \textgreater(p) // ooops ...
+\tab[3em]{\verb!dynamic_cast< !\EMPHASIZE{A}\verb! * >(p) // ooops ...!}\\
 
-then the resulting pointer is \emph{NULL} and will probably trigger an
-error later on when you dereference \emph{p}. Of course if you are
-cautious and you know what you are doing (i.e., please don't cast to
-\emph{A *}), then the dynamic cast is not necessary.
+then the resulting pointer is \texttt{NULL} and will probably trigger an error later on when you dereference \texttt{p}. Of course if you are cautious and you know what you are doing (i.e., please don't cast to \texttt{A *}), then the dynamic cast is not necessary.
 
-Now, if you need to down cast (i.e., cast to a lower level subclass) to
-execute a non-virtual method in that class, then you might as well make
-that method virtual and use polymorphism to detect that method. So
-frequently (but not always), dynamic cast is a sign of bad design.
-However there are cases where it cannot be avoided. In any case, C++ is
-a language that gives you maximum freedom: you can use polymorphism to
-choose which virtual method to execute, or you can manually cast to the
-right class and then execute the non-virtual method.
-
-\end{document}
+Now, if you need to down cast (i.e., cast to a lower level subclass) to execute a non-virtual method in that class, then you might as well make that method virtual and use polymorphism to detect that method. So frequently (but not always), dynamic cast is a sign of bad design. However there are cases where it cannot be avoided. In any case, C++ is a language that gives you maximum freedom: you can use polymorphism to choose which virtual method to execute, or you can manually cast to the right class and then execute the non-virtual method.
