@@ -19,992 +19,575 @@ VERY IMPORTANT!!! LISTEN!!!
 
 Suppose class \texttt{C} is a subclass of \texttt{P}. You already know that
 the following is valid:
-
-\texttt{C c; }
-
-\texttt{ P p;}
-
-p = c;
-
+\begin{center}
+\verb!C c;!\\
+\verb!P p;!\\
+\verb!p = c!;\\
+\end{center}
 However the following will not compile:
-
+\begin{center}
 \texttt{c = p;}
-
+\end{center}
 In particular the following is also valid:
 
-\texttt{C c; }
-
-P * p = \&c; // p points to c
+\tab[5em]{\verb!C c;!}\\
+\tab[5em]{\verb!P * p = &c; // p points to c!}\\
 
 And this is also valid:
 
-\texttt{C c; }
-
-P \& ref = c; // ref references c
+\tab[5em]{\texttt{C c; }}\\
+\tab[5em]{\verb!P & ref = c; // ref references c!}\\
 
 Suppose both \texttt{P} and \texttt{C} have methods \texttt{f()}. If I call
 
-\texttt{p-\textgreater f();}
+\tab[5em]{\texttt{p-> f();}}\\
 
 which \texttt{f()} is invoked? (or \texttt{ref.f()} in the case where
 \texttt{ref} is a reference).
 
 All you need to do is to do this experiment:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include < iostream\textgreater{}
+\begin{console}
+#include <iostream>
 
 class P
-
-{
-
+{   
 public:
-
-void f()
-
-{
-
-std::cout <<{} "P::f\textbackslash n";
-
-}
-
+     void f()
+     {    
+          std::cout << "P::f\ n";
+     }
 };
 
 class C: public P
-
 {
-
 public:
-
-void f()
-
-{
-
-std::cout <<{} "C::f\textbackslash n";
-
-}
-
+     void f()
+     {    
+          std::cout << "C::f\ n";
+     }
 };
 
 int main()
+{   
+    C c;
+    P * p = &c;
+    p->f(); // parent's f
+    return 0;
+}
+\end{console}
 
-{
-
-C c;
-
-P * p = \&c;
-
-p→f(); // parent's f
-
-return 0;
-
-} \\
-\end{longtable}
-
-AHA! \ldots{} the parent\textquotesingle s f() is called! This should be
-a surprise to you.
+AHA! \ldots the parent's f() is called! This should be a surprise to you.
 
 After all we always think of
 
-p-\textgreater f();
+\tab[5em]{\verb!p-> f();!}\\
 
 as
 
-(*p).f();
+\tab[5em]{\verb!(*p).f();!}\\
 
-and since (*p) is the object c, then should the above be
+and since \verb!(*p)! is the object \verb!c!, then should the above be
 
-c.f();
+\tab[5em]{\verb!c.f();!}\\
 
-and therefore should the code be calling the f() in C. But remember that
+and therefore should the code be calling the \verb!f()! in \verb!C!. But remember that from the previous set of notes on inheritance, when you perform
 
-from the previous set of notes on inheritance, when you perform
+\tab[5em]{\verb!p = c;!}\\
 
-p = c;
+what happens is that there's type conversion happening
+behind your back:
 
-what happens is that there\textquotesingle s type conversion happening
-behind your
+\tab[5em]{\verb!p = P(c);!}\\
 
-back:
+so that the information in \verb!C! and not in \verb!P! is in fact lost.
+That's one way of
 
-p = P(c);
+remembering that the \verb!f()! called is \verb!P::f()!.
 
-so that the information in C and not in P is in fact lost.
-That\textquotesingle s one way of
+Summary time \ldots so remember that our \verb!p!
 
-remembering that the f() called is P::f().
+\tab[5em]{\verb!P * p = &c;!}\\
 
-Summary time \ldots{} so remember that our p
-
-P * p = \&c;
-
-is very special. In a sense it has \textbf{two natures}:
+is very special. In a sense it has \EMPHASIZE{two natures}:
 
 \begin{itemize}
 \item
-  From the type in the declaration P * p, p is related to type P.
+  From the type in the declaration \verb!P * p!, \verb!p! is related to type \verb!P!.
 \item
-  However from the value that p points to, p = \&c, p is related to
-  value of type C.
+  However from the value that \verb!p! points to, \verb!p = &c!, \verb!p! is related to value of type \verb!C!.
 \end{itemize}
 
-And for the choice of method f(),
+And for the choice of method \verb!f()!,
 
-p-\textgreater f();
+\tab[5em]{\verb!p-> f();!}\\
 
 the method in the parent is chosen.
 
-Exercise. Suppose G is the parent class of P (using public inheritance)
-and P is the parent class of C (using public inheritance). Suppose in G,
-P, and C classes, there is a method
+\begin{ex} Suppose \verb!G! is the parent class of \verb!P! (using public inheritance) and \verb!P! is the parent class of \verb!C1! (using public inheritance). Suppose in \verb!G!, \verb!P!, and \verb!C! classes, there is a method
 
-\texttt{void m() { \ldots{} }}
+\tab[5em]{\verb!void m() ...!}\\
 
 Suppose have this code fragment:
-
-\texttt{G * p;}
-
+\begin{console}
+G * p;
 C c;
-
-p = \&c;
-
-p-\textgreater m();
-
+p = &c;
+p-> m();
+\end{console}
 Which \texttt{m()} was called?
-
-Virtual Methods
+\end{ex}
+\newpage\EMPHASIZE{Virtual Methods}
 
 Recall that we have this
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include < iostream\textgreater{}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
 
 class P
-
 {
-
 public:
-
-void f()
-
-{
-
-std::cout <<{} "P::f\textbackslash n";
-
-}
-
+     void f()
+     {    
+          std::cout << "P::f\ n";
+     }
 };
 
 class C: public P
-
 {
-
 public:
-
-void f()
-
-{
-
-std::cout <<{} "C::f\textbackslash n";
-
-}
-
+     void f()
+     {    
+          std::cout << "C::f\ n";
+     }
 };
 
 int main()
+{   
+    C c;
+    P * p = &c;
+    p-> f();|\tikzmark{f}\sidebox{fbox}{Parent's \texttt{f()} called}\DrawArrow{fbox}{f}|
+    return 0;
 
-{
+}
+\end{consolethree}
 
-C c;
+The \verb!f()! that is called is \verb!P::f()!.
 
-P * p = \&c;
+Now what if I actually want \verb!C::f()!, i.e., the \verb!f()! in the child class?
 
-p-\textgreater f();
+Now we declare a method to be \EMPHASIZE{virtual} in the base class.
 
-return 0;
-
-} \\
-\end{longtable}
-
-The f() that is called is P::f().
-
-Now what if I actually want C::f(), i.e., the f() in the child class?
-
-Now we declare a method to be \textbf{virtual} in the base class.
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include < iostream\textgreater{}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
 
 class P{
-
 public:
-
-\textbf{virtual} void f() { std::cout <<{}
-"D::f\textbackslash n"; }
+     |\EMPHASIZE{virtual}| void f() { std::cout << "D::f\ n"; }
 
 };
 
 class C: public P
-
 {
-
 public:
-
-void f() { std::cout <<{} "C::f\textbackslash n"; }
-
+     void f() { std::cout << "C::f\ n"; }
 };
 
 int main()
+{   
+    C c;
+    D * p = &c;
+    p-> f();|\tikzmark{childf}\sidebox{childfbox}{Child's \texttt{f()} called}\DrawArrow{childfbox}{childf}|
+    return 0;
+}
+\end{consolethree}
 
-{
+We say that \verb!P::f()! is \EMPHASIZE{virtual}.
 
-C c;
+The fact that \verb!P::f()! is virtual also makes \verb!C::f()! virtual as well. This means that if \verb!C1! is a subclass of \verb!C! and we do
 
-D * p = \&c;
+\tab[5em]{\verb!C c;!}\\
+\tab[5em]{\verb!C1 c1;!}\\
+\tab[5em]{\verb!P * p = c;!}\\
+\tab[5em]{\verb!p-> f(); // C::f() is called!}\\
+\tab[5em]{\verb!P * p1 = c1;!}\\
+\tab[5em]{\verb!p1-> f(); // C1::f() is called!}\\
 
-p-\textgreater f();
+Because of that, although it's not necessary, it's common to put the word virtual next to the \verb!f()! in \verb!C! as well:
 
-return 0;
-
-} \\
-\end{longtable}
-
-We say that P::f() is \textbf{virtual}.
-
-The fact that P::f()is virtual also makes C::f() virtual as well. This
-
-means that if C1 is a subclass of C and we do
-
-C c;
-
-C1 c1;
-
-P * p = c;
-
-p-\textgreater f(); // C::f() is called
-
-P * p1 = c1;
-
-p1-\textgreater f(); // C1::f() is called
-
-Because of that, although it\textquotesingle s not necessary,
-it\textquotesingle s common to put the word
-
-virtual next to the f() in C as well:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 class P
-
 {
-
 public:
-
-virtual void f() { std::cout <<{}
-"P::f\textbackslash n"; }
-
+     virtual void f() { std::cout << "P::f\ n"; }
 };
 
 class C : public P
-
 {
-
 public:
+     |\EMPHASIZE{ virtual }| void f() { std::cout << "C::f\ n"; }
+}; 
+\end{consolethree}
 
-\textbf{ virtual }void f() { std::cout <<{}
-"C::f\textbackslash n"; }
+\newpage\EMPHASIZE{Dynamic \& Static Binding}
 
-}; \\
-\end{longtable}
+In the earlier sections, we saw that there are two ways to choose the \verb!f()! to execute, either \verb!P::f()! or \verb!C::f()!.
 
-Dynamic \& Static Binding
+\EMPHASIZE{Dynamic binding} refers to the choice of method (between the parent method and the child method with the same name) where the method is virtual. This is also called \EMPHASIZE{late binding.}
 
-In the earlier sections, we saw that there are two ways to choose the
-f()
+\EMPHASIZE{Static binding} refers to the choice of method (between the parent method and the child method with the same name) where the method is not virtual. This is also known as \EMPHASIZE{early binding.}
 
-to execute, either P::f() or C::f().
-
-\textbf{Dynamic binding }refers to the choice of method (between
-
-the parent method and the child method with the same name) where the
-
-method is virtual. This is also called \textbf{late binding}
-
-\textbf{Static binding }refers to the choice of method (between the
-parent method and the child method with the same name) where the method
-is not virtual. This is also known as \textbf{early binding}.
-
-C c;
-
-P * p = c;
+\tab[5em]{\verb!C c;!}\\
+\tab[5em]{\verb!P * p = c;!}\\
 
 Why is it called dynamic (or late) or static (or early)?
 
-Make sure you run the following really important example \ldots{}
+Make sure you run the following really important example \ldots
 
-Suppose C0 and C1 are both subclass of P. There are virtual functions f
-defined in P, C0, C1.
+Suppose \verb!C0! and \verb!C1! are both subclass of \verb!P!. There are virtual functions \verb!f! defined in \verb!P!, \verb!C0!, \verb!C1!.
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include < iostream\textgreater{}
+\begin{console}
+#include < iostream>
 
 class P
-
 {
-
 public:
-
-virtual void f() { std::cout <<{}
-"P::f\textbackslash n"; }
-
+     virtual void f() { std::cout << "P::f\ n"; }
 };
 
 class C: public P
-
 {
-
 public:
-
-virtual void f() { std::cout <<{}
-"C::f\textbackslash n"; }
-
+     virtual void f() { std::cout << "C::f\ n"; }
 };
 
 class C1: public P
-
 {
-
 public:
-
-virtual void f() { std::cout <<{}
-"C1::f\textbackslash n"; }
-
+     virtual void f() { std::cout << "C1::f\ n"; }
 };
 
 int main()
-
-{
-
-P * p;
-
-C c;
-
-C1 c1;
-
-int i;
-
-std::cout <<{} "Do you want C or C1? (0 or 1) ";
-
-std::cin \textgreater\textgreater{} i;
-
-if (i == 0)
-
-{
-
-p = \&c;
-
+{   
+    P * p;
+    C c;
+    C1 c1;
+    int i;
+    std::cout << "Do you want C or C1? (0 or 1) ";
+    std::cin >> i;
+    if (i == 0)
+    {    
+         p = &c;
+    }
+    else
+    {
+         p = &c1;
+    }
+    p-> f();
+    
+    return 0;
 }
+\end{console}
 
-else
+In the above, the decision of which \verb!f()! (\verb!C::f()! or \verb!C1::f()!) to use is \EMPHASIZE{not known during compilation} but is known \EMPHASIZE{only during runtime},. Therefore the binding is \EMPHASIZE{late} and is \EMPHASIZE{dynamic} (depending on runtime situation).
 
-{
+On the other hand, if \verb!f()! is not virtual -- remove the virtual keyword -- and no matter what you enter, you always execute \verb!P::f()!. Therefore which \verb!f()! is used is known during compilation (it's \verb!P::f()!) -- it' s known even before you execute the program since it' s already known during compile time. Therefore the decision is \EMPHASIZE{early}. After the program is compiled, you \EMPHASIZE{cannot} change the \verb!f()! -- the choice of \verb!f()! is \EMPHASIZE{static} and \EMPHASIZE{not dynamic.}
+\newpage
+\tab[6em]{\large\verb!P * p;!}\\
+\tab[6em]{\large\verb!C c;!}\\
+\tab[6em]{\large\verb!p = &c;!}
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+p = Plot()
 
-p = \&c1;
+#p += Grid(x0=-5, y0=-5, x1=5, y1=5)
 
-}
+p += Rect(1, 2, 9, 5, s=r"If \texttt{f()} is not virtual, the decision of which \texttt{f()} to use is based on the pointer's type P.\\ \textbf{Static/early binding.}", linewidth=0.1, linecolor='red', innersep=0.3)
 
-p-\textgreater f();
+p += Rect(1, -2, 9, 1, s=r"If \texttt{f()} not virtual, the decision of which \texttt{f()} to use is based on the object's class C.\\ \textbf{Dynamic/late binding.}", linewidth=0.1, linecolor='red', innersep=0.3)
+p += Rect(-3.5,2.5,-2.5,4.5,linewidth=0.05)
+p += Line(points=[(-2.5,3.5),(1,3.5)], linestyle='dashed',linecolor='red',linewidth=0.1)
+p += Line(points=[(-2.5,-0.5),(1,-0.5)], linestyle='dashed',linecolor='red',linewidth=0.1)
+p += Line(points=[(-3,3.5),(-3,0.5)], endstyle='>',linewidth=0.05)
+p += ellipse(center=(-3,-0.5), height=2,width=3,linewidth=0.05)
+X = POINT(x=-3.9, y=3.5, r=0, label='pointer to object')
+Y = POINT(x=-4.9, y=-0.5, r=0, label='object')
+p += str(X)
+p += str(Y)
+print(p)
+\end{python}
+WARNING: Static here refers to static \EMPHASIZE{binding}, i.e., which \verb!f()! is the p-> f() bound to. Do not be confused with static members!!!
 
-return 0;
+\textbf{Make sure you do the following exercises!}
 
-} \\
-\end{longtable}
-
-In the above, the decision of which f() (C::f() or C1::f()) to use is
-
-\textbf{not known during compilation }but is known \textbf{only during
-runtime},. Therefore the binding is \textbf{late }and is \textbf{dynamic
-}(depending on runtime situation).
-
-On the other hand, if f() is not virtual -- remove the virtual keyword
--- and no matter what you enter, you always execute P::f(). Therefore
-
-which f() is used is known during compilation (it\textquotesingle s
-P::f()) -- it\textquotesingle s known even before you execute the
-program since it\textquotesingle s already known during compile time.
-Therefore the decision is \textbf{early}. After the program is compiled,
-you \textbf{cannot }change the f() -- the choice of f() is
-\textbf{static }and \textbf{not dynamic.}
-
-\textbf{ }P * p;
-
-C c;
-
-p = \&c;
-
-WARNING: Static here refers to static \textbf{binding}, i.e., which f()
-is
-
-the p-\textgreater f() bound to. Do not be confused with static
-members!!!
-
-Make sure you do the following exercises!
-
-\textbf{Exercise. }What will happen if you have a stack of classes in an
+\begin{ex}What will happen if you have a stack of classes in an
 
 inheritance hierarchy like this:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{console}
 class P
-
 {
-
 public:
-
-virtual void f() { std::cout <<{}
-"P::f\textbackslash n"; }
-
+     virtual void f() { std::cout << "P::f\ n"; }
 };
 
 class C: public P
-
 {
-
 public:
-
-virtual void f() { std::cout <<{}
-"C::f\textbackslash n"; }
-
+     virtual void f() { std::cout << "C::f\ n"; }
 };
 
 class C1: public C
-
 {
-
 public:
-
-virtual void f() { std::cout <<{}
-"C1::f\textbackslash n"; }
-
-}; \\
-\end{longtable}
+     virtual void f() { std::cout << "C1::f\ n"; }
+};
+\end{console}
 
 and you have
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{console}
 C1 c1;
-
 P * p;
-
-p = \&c1;
-
-p-\textgreater f(); \\
-\end{longtable}
+p = &c1;
+p-> f();
+\end{console}
 
 What is the output? (Or is there a compilation or runtime error?)
+\end{ex}
+\begin{ex}What will happen if you have a stack of classes in an inheritance hierarchy like this:
 
-\textbf{Exercise. }What will happen if you have a stack of classes in an
-
-inheritance hierarchy like this:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{console}
 class P
-
 {
-
 public:
-
-virtual void f() { std::cout <<{}
-"P::f\textbackslash n"; }
-
+     virtual void f() { std::cout << "P::f\ n"; }
 };
 
 class C: public P
-
 {
-
 public:
-
-virtual void f() { std::cout <<{}
-"C::f\textbackslash n"; }
-
+     virtual void f() { std::cout << "C::f\ n"; }
 };
 
 class C1: public C
-
 {
-
 public:
-
-}; \\
-\end{longtable}
+};
+\end{console}
 
 and you have
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{console}
 C1 c1;
-
 P * p;
-
-p = \&c1;
-
-p-\textgreater f(); \\
-\end{longtable}
+p = &c1;
+p-> f();
+\end{console}
 
 What is the output? (Or is there a compilation or runtime error?)
-
-\textbf{Exercise. }Continuing with the above classes, can you run this
+\end{ex}
+\begin{ex}Continuing with the above classes, can you run this
 program with input of 0? What is the output?
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{console}
 P * p;
-
 C c0;
-
 C1 c1;
-
 int i;
+std::cout << "Do you want C0 or C1? (0 or 1) ";
+std::cin >> i;
+p = (i == 0 ? &c0 : &c1);
+p-> f();
+\end{console}
+\end{ex}
 
-std::cout <<{} "Do you want C0 or C1? (0 or 1) ";
+\newpage\EMPHASIZE{No virtual ... or what if there are no virtual methods}
 
-std::cin \textgreater\textgreater{} i;
+What if C++ does not have dynamic binding? You're forced to write ugly code, placing some method selection computation within your code. This is sometimes known as the \EMPHASIZE{``type field''} method.
 
-p = (i == 0 ? \&c0 : \&c1);
+Here's the code from before where we avoid using the virtual keyword:
 
-p-\textgreater f(); \\
-\end{longtable}
-
-No virtual \ldots{} or what if there are no virtual methods
-
-What if C++ does not have dynamic binding? You're forced to write ugly
-code, placing some method selection computation within your code. This
-
-is sometimes known as the \textbf{``type field''} method.
-
-Here\textquotesingle s the code from before where we avoid using the
-virtual keyword:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include < iostream\textgreater{}
+\begin{console}
+#include <iostream>
 
 class P
-
 {
-
 public:
-
-void f() { std::cout <<{} "P::f()\textbackslash n"; }
-
+     void f() { std::cout << "P::f()\ n"; }
 };
 
 class C: public P
-
 {
-
 public:
-
-void f() { std::cout <<{} "C::f()\textbackslash n"; }
-
+     void f() { std::cout << "C::f()\ n"; }
 };
 
 int main()
-
-{
-
-C c;
-
-P * p = \&c;
-
-p-\textgreater f();
-
-return 0;
-
-} \\
-\end{longtable}
+{   
+    C c;
+    P * p = &c;
+    p-> f();
+    return 0;
+}
+\end{console}
 
 How can we ``reach'' \texttt{C::f()}??
 
-We add a field to keep track of the class an object comes from and
+We add a field to keep track of the class an object comes from and instead of calling we create a function that accepts and determine (based on the type field) which to execute.
 
-instead of calling we create a function that accepts and determine
-
-(based on the type field) which to execute.
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include < iostream\textgreater{}
+\begin{console}
+#include <iostream>
 
 const int PTYPE = 0;
-
 const int CTYPE = 1;
 
 class P
-
 {
-
 public:
-
-P() : type_(PTYPE) {}
-
-void f() { std::cout <<{} "P::f()\textbackslash n"; }
-
-void set_type(int t0) { type_ = t0; }
-
-int get_type() { return type_; }
-
+     P() : type_(PTYPE) {}
+     void f() { std::cout << "P::f()\ n"; }
+     void set_type(int t0) { type_ = t0; }
+     int get_type() { return type_; }
+     
 private:
-
-int type_;
+     int type_;
 
 };
 
 class C : public P
-
 {
-
 public:
-
-C() { set_type(CTYPE); }
-
-void f() { std::cout <<{} "C::f()\textbackslash n"; }
+     C() { set_type(CTYPE); }
+     void f() { std::cout << "C::f()\ n"; }
 
 };
 
 void f(const P * p)
-
-{
-
-switch (p-\textgreater get_type())
-
-{
-
-case PTYPE:
-
-p-\textgreater f();
-
-break;
-
-case CTYPE:
-
-const C * q = (const C *)(p);
-
-q-\textgreater f();
-
-break;
-
-}
-
+{    
+     switch (p-> get_type())
+     {    
+          case PTYPE:
+               p-> f();
+               break;
+          case CTYPE:
+               const C * q = (const C *)(p);
+               q-> f();
+               break;
+     }
 }
 
 int main()
+{   
+    C c;
+    P * p = &c;
+    f(p);
+    return 0;
+}
+\end{console}
 
-{
+\newpage\EMPHASIZE{Why is it important? Polymorphism}
 
-C c;
+Whenever you have an object with methods with a similar name and you can't decide which one method to call until during runtime, then you will need polymorphism.
 
-P * p = \&c;
+Suppose you have an array of pointers to the \verb!BasicSpaceship! class.
+Also, \verb!SpecialSpaceship! is a subclass of \verb!BasicSpaceship!. In both classes you have an \verb!update()! method. The \verb!update()! method is different for the two classes: the method basically moves the objects to a new position on the screen.
 
-f(p);
-
-return 0;
-
-} \\
-\end{longtable}
-
-Why is it important? Polymorphism
-
-Whenever you have an object with methods with a similar name and you
-
-can't decide which one method to call until during runtime, then you
-will
-
-need polymorphism.
-
-Suppose you have an array of pointers to the BasicSpaceship class.
-
-Also, SpecialSpaceship is a subclss of BasicSpaceship. In both classes
-you have an update() method. The update() method is different for the
-two classes: the method basically moves the objects to a new position on
-the screen.
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-BasicSpaceShip * s = new BasicSpaceShip*{[}100{]};
-
+\begin{console}
+BasicSpaceShip * s = new BasicSpaceShip*[100];
 int M = randint(); // random int from 0 to 99
-
-for (int i = 0; i <{} M; i++)
-
-{
-
-s{[}i{]} = new SpecialSpaceShip();
-
+for (int i = 0; i < M; i++)
+{   
+    s[i] = new SpecialSpaceShip();
 }
 
-for (int i = M; i <{} 100; i++)
-
-{
-
-s{[}i{]} = new BasicSpaceShip();
-
+for (int i = M; i < 100; i++)
+{   
+    s[i] = new BasicSpaceShip();
 }
 
 while (1)
-
-{
-
-for (int i = 0; i <{} 100; i++)
-
-{
-
-s{[}i{]}-\textgreater update();
-
+{   
+    for (int i = 0; i < 100; i++)
+    {   
+        s[i]-> update();
+    }
 }
-
-} \\
-\end{longtable}
+\end{console}
 
 Note that in the while-loop:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{console}
 while (1)
-
-{
-
-for (int i = 0; i <{} 100; i++)
-
-{
-
-s{[}i{]}-\textgreater update();
-
+{   
+    for (int i = 0; i < 100; i++)
+    {
+        s[i]-> update();
+    }
 }
+\end{console}
 
-} \\
-\end{longtable}
+You do not know what type of spaceship is \verb!s[3]! and therefore you do not know which update method was invoked. The update method is selected during runtime.
 
-You do not know what type of spaceship is\textbf{ }s{[}3{]} and
-therefore you do
+Why is this important? Because if one day you want to add another type of spaceship:
 
-not know which update method was invoked. The update method is
-
-selected during runtime.
-
-Why is this important? Because if one day you want to add another type
-
-of spaceship:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-BasicSpaceShip * s = new BasicSpaceShip*{[}100{]};
-
+\begin{console}
+BasicSpaceShip * s = new BasicSpaceShip*[100];
 int M = randint(); // rand int from 0 to 99
-
-for (int i = 0; i <{} M/2; i++)
-
-{
-
-s{[}i{]} = new SpecialSpaceShip();
-
+for (int i = 0; i < M/2; i++)
+{   
+    s[i] = new SpecialSpaceShip();
 }
-
-for (int i = M/2; i <{} M; i++)
-
-{
-
-s{[}i{]} = new BasicSpaceShip();
-
+for (int i = M/2; i < M; i++)
+{   
+    s[i] = new BasicSpaceShip();
 }
-
-for (int i = M; i <{} 100; i++)
-
-{
-
-s{[}i{]} = new VeryBasicSpaceShip();
-
-} \\
-\end{longtable}
+for (int i = M; i < 100; i++)
+{   
+    s[i] = new VeryBasicSpaceShip();
+}
+\end{console}
 
 This means that the while loop does not need to change:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{console}
 while (1)
-
-{
-
-for (int i = 0; i <{} M; i++)
-
-{
-
-s{[}i{]}-\textgreater update();
-
+{   
+    for (int i = 0; i < M; i++)
+    {   
+        s[i]-> update();
+    }
 }
+\end{console}
 
-} \\
-\end{longtable}
+In fact \verb!s[3]! can even point to something different within the loop
+and everything still works:
 
-In fact s{[}3{]} can even point to something different within the loop
-and
-
-everything still works:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{console}
 while (1)
-
-{
-
-for (int i = 0; i <{} M; i++)
-
-{
-
-s{[}i{]}-\textgreater update();
-
+{   
+    for (int i = 0; i < M; i++)
+    {   
+        s[i]-> update();
+    }
+    delete s[3];
+    switch (rand() % 3)
+    {   
+        case 0: s[3] = new SpecialSpaceShip(); break;
+        case 1: s[3] = new BasicSpaceShip(); break;
+        case 2: s[3] = new VeryBasicSpaceShip(); break;
+    }
 }
+\end{console}
 
-delete s{[}3{]};
+Or for instance in your simulation, if \verb!s[3]! is initially pointing to a \verb!SuperShip object! but when hit, it points to a \verb!VeryBasicShip! object.
 
-switch (rand() \% 3)
-
-{
-
-case 0: s{[}3{]} = new SpecialSpaceShip(); break;
-
-case 1: s{[}3{]} = new BasicSpaceShip(); break;
-
-case 2: s{[}3{]} = new VeryBasicSpaceShip(); break;
-
-}
-
-} \\
-\end{longtable}
-
-Or for instance in your simulation, if s{[}3{]} is initially pointing to
-a
-
-SuperShip object but when hit, it points to a VeryBasicShip object.
-
-As long as s{[}3{]} points to a subclass of BasicSpaceShip that has an
-
-update() method, the while loop will work.
+As long as \verb!s[3]! points to a subclass of BasicSpaceShip that has an update() method, the while loop will work.
 
 In general:
 
 \begin{itemize}
-\tightlist
 \item
   You analyze a system and look for objects and classify them into
   classes.
@@ -1019,7 +602,6 @@ In general:
 In your main program:
 
 \begin{itemize}
-\tightlist
 \item
   In the initialization, you might have pointers (or references) to
   refer to specific children
@@ -1028,1020 +610,574 @@ In your main program:
   methods in the parents
 \end{itemize}
 
-Going back to the simple game. Suppose game objects (spaceships)
+Going back to the simple game. Suppose game objects (spaceships) move about on their own, and dies when they collide. Thinking as generally as possible, the while loop might look something like this:
 
-move about on their own, and dies when they collide. Thinking as
-generally as possible, the while loop might look something like this:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{console}
 while (1)
+{   
+    for (int i = 0; i < M; i++) ship[i]-> move();
+    for (int i = 0; i < M; i++)
+    {
+        for (int j = i+1; j < M; j++)
+        if (ship[i]-> collideswith(ship[j]))
+        {   
+            ship[i]-> dies();
+            ship[j]-> dies();
+        }
+    }
+    for (int i = 0; i < M; i++) ship[i]-> draw();
+} 
+\end{console}
 
-{
-
-for (int i = 0; i <{} M; i++) ship{[}i{]}-\textgreater move();
-
-for (int i = 0; i <{} M; i++)
-
-{
-
-for (int j = i+1; j <{} M; j++)
-
-if (ship{[}i{]}-\textgreater collideswith(ship{[}j{]}))
-
-{
-
-ship{[}i{]}-\textgreater dies();
-
-ship{[}j{]}-\textgreater dies();
-
-}
-
-}
-
-for (int i = 0; i <{} M; i++) ship{[}i{]}-\textgreater draw();
-
-} \\
-\end{longtable}
-
-This tells you that the parent class must have the following methods
-
-which the specific child classes must overwrite:
+This tells you that the parent class must have the following methods which the specific child classes must overwrite:
 
 \begin{itemize}
-\tightlist
 \item
-  move
+  \verb!move!
 \item
-  collideswith
+  \verb!collideswith!
 \item
-  dies
+  \verb!dies!
 \item
-  draw
+  \verb!draw!
 \end{itemize}
 
-In the initialization, as long as the pointers \texttt{ship{[}i{]}} point
-to a class that
-
-subclasses the parent class, the program would work. In particular
+In the initialization, as long as the pointers \texttt{ship[i]} point to a class that subclasses the parent class, the program would work. In particular
 
 \begin{itemize}
-\tightlist
 \item
   You can switch out subclasses
 \item
-  You can add new subclasses (as long as they subclass the parent class
-  and has the above four methods)
+  You can add new subclasses (as long as they subclass the parent class and has the above four methods)
 \end{itemize}
 
-This is a simple example where there\textquotesingle s only one main
-parent class. In
+This is a simple example where there' s only one main
+parent class. In general there are (of course) many parent classes. For more complicated examples you would have to do into OO analysis/design and design patterns. Take CISS438.
 
-general there are (of course) many parent classes.
+Note from the above example, the methods of the parent class (example: draw) might do nothing:
 
-For more complicated examples you would have to do into OO
-
-analysis/design and design patterns. Take CISS438.
-
-Note from the above example, the methods of the parent class (example:
-
-draw) might do nothing:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{console}
 class BasicSpaceShip
-
 {
-
 public:
-
-void draw() {} // empty body
-
+     void draw() {} // empty body
 };
 
 class SpecialSpaceShip
-
 {
-
 public:
+     void draw() { /* actual drawing code */ }
+};
+\end{console}
 
-void draw() { /* actual drawing code */ }
+This might be the case where every subclass of \verb!BasicSpaceShip! has their own \verb!draw()! method, which means that the \verb!draw()! of \verb!BasicSpaceShip! class is never used anyway.
 
-}; \\
-\end{longtable}
+The only purpose of the draw method in the parent is to allow polymorphism to select the child' s draw method. There' s a way to tell C++ that a method in a parent is meant to be empty and to be fulfilled by a child -- see the next section on pure virtual method and abstract base class. Abstract base class are abstract in the sense that you cannot use them to instantiate objects. Their purpose is only to act as a parent for subclasses so that you can perform polymorphism.
 
-This might be the case where every subclass of BasicSpaceShip has their
-own draw() method, which means that the draw() of
+This style of programming is called polymorphism. One would say the code is polymorphic. Or, if the pointer points to the child but was declared as a pointer to a parent class:
 
-BasicSpaceShip class is never used anyway.
+\tab[5em]{\verb!P * p;!}\\
 
-The only purpose of the draw method in the parent is to allow
-
-polymorphism to select the child\textquotesingle s draw method.
-
-There\textquotesingle s a way to tell C++ that a method in a parent is
-meant to be empty
-
-and to be fulfilled by a child -- see the next section on pure virtual
-method
-
-and abstract base class. Abstract base class are abstract in the sense
-
-that you cannot use them to instantiate objects. Their purpose is only
-to
-
-act as a parent for subclasses so that you can perform polymorphism.
-
-This style of programming is called polymorphism. One would say the
-
-code is polymorphic. Or, if the pointer points to the child but was
-
-declared as a pointer to a parent class:
-
-P * p;
-
-one would say that is polymorphic, or the object pointed to is
-
-polymorphic, i.e., sometimes \texttt{p} points to a class \texttt{C0} object
-and sometimes it points to a class \texttt{C1} object.
+one would say that is polymorphic, or the object pointed to is polymorphic, i.e., sometimes \texttt{p} points to a class \texttt{C0} object and sometimes it points to a class \texttt{C1} object.
 
 Some people also say the class in this case is a polymorphic type.
 
-Don\textquotesingle t forget that I mentioned earlier that you can also
-use reference for
+Don' t forget that I mentioned earlier that you can also use reference for polymorphic programming:
 
-polymorphic programming:
+\tab[5em]{\verb!P & ref = c0;!}\\
 
-P \& ref = c0;
+In this case you would say \verb!ref! is polymorphic.
 
-In this case you would say ref is polymorphic.
+\newpage\EMPHASIZE{Virtual constructors and destructors}
 
-Virtual constructors and destructors
+Constructors cannot be virtual \ldots try this:
 
-Constructors cannot be virtual \ldots{} try this:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{console}
 class P
-
 {
-
 public:
-
-virtual P() {}
-
+     virtual P() {}
 };
 
 class C: public P
-
 {
-
 public:
-
-virtual C() {}
-
+     virtual C() {}
 };
 
 int main()
-
-{
-
-P * p = new C;
-
-return 0;
-
-} \\
-\end{longtable}
+{   
+    P * p = new C;
+    return 0;
+}
+\end{console}
 
 A virtual function is about choosing the right method when an object
 
-invokes the method. But that implies that the object exists. In the
-above:
+invokes the method. But that implies that the object exists. In the above:
+\begin{console}
+    P * p = new C;
+\end{console}
 
-\begin{longtable}[]{@{}l@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-P * p = new C; \\
-\end{longtable}
+has nothing to do with executing a method through \verb!p!.
 
-has nothing to do with executing a method through p.
+Therefore \ldots \EMPHASIZE{if you plan to use polymorphism, make sure your constructors are not virtual}.
 
-Therefore \ldots{} \textbf{if you plan to use polymorphism, make sure
-your constructors are not virtual}.
+The above can be caught by the compiler. So it's not as serious as the following problem. Make sure you run it!
 
-The above can be caught by the compiler. So it\textquotesingle s not as
-serious as the
-
-following problem. Make sure you run it!
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include < iostream\textgreater{}
+\begin{console}
+#include <iostream>
 
 class P
-
 {
-
 public:
-
-P() : p(new int) {}
-
-~ P() { std::cout <<{}
-"P::~ P()\textbackslash n"; }
-
+     P() : p(new int) {}
+     ~ P() { std::cout << "P::~ P()\ n"; }
+     
 private:
-
-int * p;
-
+     int * p;
 };
 
 class C: public P
-
 {
-
 public:
-
-C() : q(new int) {}
-
-~ C() { std::cout <<{}
-"C::~ C()\textbackslash n"; delete q; }
-
-int * q;
-
+     C() : q(new int) {}
+     ~ C() { std::cout << "C::~ C()\ n"; delete q; }
+     int * q;
 };
 
 int main()
-
-{
-
-P * p = new C;
-
-delete p;
-
-return 0;
-
-} \\
-\end{longtable}
+{   
+    P * p = new C;
+    delete p;
+    return 0;
+}
+\end{console}
 
 Read the output very carefully.
 
-Why is this a problem? The destructor called is the destructor in the
-
-parent. Of course the object to destroy is a child class object (which
-
-includes a parent part), not just the parent class object. The above
-code
-
-therefore will cause a \textbf{memory leak }because the resource used by
-the child class is not released.
+Why is this a problem? The destructor called is the destructor in the parent. Of course the object to destroy is a child class object (which includes a parent part), not just the parent class object. The above code therefore will cause a \EMPHASIZE{memory leak} because the resource used by the child class is not released.
 
 Now try this:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include < iostream\textgreater{}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
 
 class P
-
 {
-
 public:
-
-P() : p(new int) {}
-
-\textbf{ virtual }~ P() { std::cout <<{}
-"P::~ P()\textbackslash n"; }
+     P() : p(new int) {}
+     |\textbf{ virtual }|~ P() { std::cout << "P::~ P()\ n"; }
 
 private:
-
-int * p;
-
+     int * p;
 };
 
 class C: public P
-
 {
-
 public:
-
-C() : q(new int) {}
-
-~ C() { std::cout <<{}
-"C::~ C()\textbackslash n"; delete q; }
-
-int * q;
-
+     C() : q(new int) {}
+     ~ C() { std::cout << "C::~ C()\ n"; delete q; }
+     int * q;
 };
 
 int main()
+{   
+    P * p = new C;
+    delete p;
+    return 0;
+}
+\end{consolethree}
 
-{
+You should see two outputs. Why? Because of polymorphism, when you do
 
-P * p = new C;
+\tab[5em]{\verb!delete p;!}\\
 
-delete p;
+the destructor used is \verb!C::~ C()!. But remember from the notes on inheritance that this would execute the body of \verb!C::~ C()! and then \verb!P::~ P()! would be executed.
 
-return 0;
-
-} \\
-\end{longtable}
-
-You should see two outputs. Why? Because of polymorphism, when you
-
-do
-
-delete p;
-
-the destructor used is C::~ C(). But remember from the
-notes on
-
-inheritance that this would execute the body of C::~ C()
-and then
-
-P::~ P() would be executed.
-
-Therefore \ldots{} \textbf{if you plan to use polymorphism}
-
-with your (parent) class, and you perform
-
-\textbf{delete on your pointer, you must have a public virtual
-destructor.}
+Therefore \ldots \EMPHASIZE{if you plan to use polymorphism with your (parent) class, and you perform delete on your pointer, you must have a public virtual destructor.}
 
 Of course if the child object executes its destructor on its own, then
-that
-
-would be a different story since the pointer is then not responsible for
-the
-
-deallocation. For instance
-
+that would be a different story since the pointer is then not responsible for
+the deallocation. For instance
+\begin{console}
 if (true)
+{   
+    C c;
+    P * p = &c;
+}   // c goes out of scope and called c::~ C()
 
-{
-
-C c;
-
-P * p = \&c;
-
-} // c goes out of scope and called c::~ C()
-
-Packaging auto destructor
+\newpage\EMPHASIZE{Packaging auto destructor}
 
 Now look at this:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include < iostream\textgreater{}
+\begin{console}
+#include <iostream>
 
 class P
-
 {
-
 public:
-
-\textbf{ }virtual ~ P() { std::cout <<{}
-"P::~ P()\textbackslash n"; }
-
-void m() { std::cout <<{} "P::m()\textbackslash n"; }
-
+     virtual ~ P() { std::cout << "P::~ P()\ n"; }
+     void m() { std::cout << "P::m()\ n"; }
+     
 private:
-
 };
 
 class C: public P
-
 {
-
 public:
-
-C() : q(new int) {}
-
-~ C() { std::cout <<{}
-"C::~ C()\textbackslash n"; delete q; }
-
-void m() { std::cout <<{} "C::m()\textbackslash n"; }
-
-int * q;
-
+     C() : q(new int) {}
+     ~ C() { std::cout <<
+     "C::~ C()\ n"; delete q; }
+     void m() { std::cout << "C::m()\ n"; }
+     int * q;
 };
 
 int main()
+{   
+    P * p = new C;
+    p-> m();
+    delete p;
+    return 0;
+}
+\end{console}
 
-{
+This allows us to work with objects through polymorphism. But this is achieved through pointers. Recall a benefit of classes -- you can auto execute the destructor when an object is going out of scope. In the above example, we have to remember to deallocate the memory used by the object that \texttt{p} points to:
 
-P * p = new C;
-
-p-\textgreater m();
-
-delete p;
-
-return 0;
-
-} \\
-\end{longtable}
-
-This allows us to work with objects through polymorphism. But this is
-achieved through pointers. Recall a benefit of classes -- you can auto
-execute the destructor when an object is going out of scope. In the
-above example, we have to remember to deallocate the memory used by the
-object that \texttt{p} points to:
-
-delete p;
+\tab[5em]{\verb!delete p;!}\\
 
 Using the idea in the chapter on destructor, we do this:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include < iostream\textgreater{}
+\begin{console}
+#include <iostream>
 
 class P
-
 {
-
 public:
-
-\textbf{ }virtual ~ P() { std::cout <<{}
-"P::~ P()\textbackslash n"; }
-
-void m() { std::cout <<{} "P::m()\textbackslash n"; }
-
+     virtual ~ P() { std::cout << "P::~ P()\ n"; }
+     void m() { std::cout << "P::m()\ n"; }
 private:
-
 };
 
 class C: public P
-
 {
-
 public:
-
-C() : q(new int) {}
-
-~ C() { std::cout <<{}
-"C::~ C()\textbackslash n"; delete q; }
-
-void m() { std::cout <<{} "C::m()\textbackslash n"; }
-
-int * q;
-
+     C() : q(new int) {}
+     ~ C() { std::cout << "C::~ C()\ n"; delete q; }
+     void m() { std::cout << "C::m()\ n"; }
+     int * q;
 };
 
 class autoP
-
 {
-
 public:
-
-autoP()
-
-: p_(new C)
-
-{}
-
-~ autoP()
-
-{ delete p_; }
-
-void m() { p_-\textgreater m(); }
-
+     autoP()
+         : p_(new C)
+     {}
+     ~ autoP()
+     { delete p_; }
+     void m() { p_-> m(); }
+     
 private:
-
-P * p_;
-
+     P * p_;
 };
 
 int main()
+{   
+    autoP p;
+    p.m();
+    return 0;
+}
+\end{console}
 
-{
+Of course we need to figure out what to do with the copy constructor and \texttt{operator=}. If you don't plan to do that, you can put the prototypes in the \texttt{private} section.
 
-autoP p;
-
-p.m();
-
-return 0;
-
-} \\
-\end{longtable}
-
-Of course we need to figure out what to do with the copy constructor and
-\texttt{operator=}. If you don't plan to do that, you can put the
-prototypes in the \texttt{private} section.
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include < iostream\textgreater{}
+\begin{console}
+#include <iostream>
 
 class P
-
 {
-
 public:
-
-P() : p(new int) {}
-
-\textbf{ }virtual ~ P() { std::cout <<{}
-"P::~ P()\textbackslash n"; }
-
-void m() { std::cout <<{} "P::m()\textbackslash n"; }
-
+     P() : p(new int) {}
+     virtual ~ P() { std::cout << "P::~ P()\ n"; }
+     void m() { std::cout << "P::m()\ n"; }
+     
 private:
-
-int * p;
-
+     int * p;
 };
 
 class C: public P
-
 {
-
 public:
-
-C() : q(new int) {}
-
-~ C() { std::cout <<{}
-"C::~ C()\textbackslash n"; delete q; }
-
-void m() { std::cout <<{} "C::m()\textbackslash n"; }
-
-int * q;
-
+     C() : q(new int) {}
+     ~ C() { std::cout << "C::~ C()\ n"; delete q; }
+     void m() { std::cout << "C::m()\ n"; }
+     int * q;
 };
 
 class autoP
-
 {
-
 public:
-
-autoP()
-
-: p_(new C)
-
-{}
-
-~ autoP()
-
-{ delete p_; }
-
-void m() { p_-\textgreater m(); }
-
+     autoP()
+         : p_(new C)
+     {}
+     ~ autoP()
+     { delete p_; }
+     void m() { p_->m(); }
+     
 private:
-
-autoP(const autoP \& p);
-
-const auto P \& operator=(const autoP \&);
-
-P * p_;
-
+     autoP(const autoP & p);
+     const auto P & operator=(const autoP &);
+     P * p_;
 };
 
 int main()
+{   
+    autoP p;
+    p.m();
+    return 0;
+}
+\end{console}
 
-{
+If you do want to allow copy constructor and \texttt{operator=}, you have to decide on what they should do, i.e., after
 
-autoP p;
+\tab[5em]{\verb!autoP p0;!}\\
+\tab[5em]{\verb!autoP p1;!}\\
+\tab[5em]{\verb!p1 = p0;!}\\
 
-p.m();
+does \texttt{p1} points to the same object that \texttt{p0} points to or is the object that \texttt{p1} points to have the same values as the object that \texttt{p0} points to (i.e., it's a copy)?
 
-return 0;
+By the way, since the parent destructor is virtual, calling delete in autoP will execute the destructor in the child class. But what is the parent also has some memory allocation in its constructor like this:
 
-} \\
-\end{longtable}
-
-If you do want to allow copy constructor and \texttt{operator=}, you have
-to decide on what they should do, i.e., after
-
-autoP p0;
-
-autoP p1;
-
-p1 = p0;
-
-does \texttt{p1} points to the same object that \texttt{p0} points to or is
-the object that \texttt{p1} points to have the same values as the object
-that \texttt{p0} points to (i.e., it's a copy)?
-
-By the way, since the parent destructor is virtual, calling delete in
-autoP will execute the destructor in the child class. But what is the
-parent also has some memory allocation in its constructor like this:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include < iostream\textgreater{}
+\begin{console}
+#include <iostream>
 
 class P
-
 {
-
 public:
-
-P() : p(new int) {}
-
-\textbf{ }virtual ~ P() { std::cout <<{}
-"P::~ P()\textbackslash n"; }
-
-void m() { std::cout <<{} "P::m()\textbackslash n"; }
+     P() : p(new int) {}
+     virtual ~ P() { std::cout << "P::~ P()\ n"; }
+     void m() { std::cout << "P::m()\ n"; }
 
 private:
-
-int * p;
-
+     int * p;
 };
 
 class C: public P
-
 {
-
 public:
-
-C() : q(new int) {}
-
-~ C() { std::cout <<{}
-"C::~ C()\textbackslash n"; delete q; }
-
-void m() { std::cout <<{} "C::m()\textbackslash n"; }
-
-int * q;
-
+     C() : q(new int) {}
+     ~ C() { std::cout << "C::~ C()\ n"; delete q; }
+     void m() { std::cout << "C::m()\ n"; }
+     int * q;
 };
-
-... \\
-\end{longtable}
+... 
+\end{console}
 
 Then the child has to deallocate the memory allocation in the parent.
 Assuming the pointer in the parent is private, one might want to do
 this:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include < iostream\textgreater{}
+\begin{console}
+#include <iostream>
 
 class P
-
 {
-
 public:
-
-P() : p(new int) {}
-
-\textbf{ }virtual ~ P() { std::cout <<{}
-"P::~ P()\textbackslash n"; }
-
-void m() { std::cout <<{} "P::m()\textbackslash n"; }
-
-void deallocate() { delete p; }
-
+     P() : p(new int) {}
+     virtual ~ P() { std::cout << "P::~ P()\ n"; }
+     void m() { std::cout << "P::m()\ n"; }
+     void deallocate() { delete p; }
+     
 private:
-
-int * p;
-
+     int * p;
 };
 
 class C: public P
-
 {
-
 public:
-
-C() : q(new int) {}
-
-~ C()
-
-{
-
-std::cout <<{} "C::~ C()\textbackslash n";
-
-deallocate();
-
-delete q;
-
-}
-
-void m() { std::cout <<{} "C::m()\textbackslash n"; }
-
-int * q;
-
+     C() : q(new int) {}
+     ~ C()
+     {
+         std::cout << "C::~ C()\ n";
+         deallocate();
+         delete q;
+     }   
+     void m() { std::cout << "C::m()\ n"; }
+     int * q;
 };
+... 
+\end{console}
 
-... \\
-\end{longtable}
+\newpage\EMPHASIZE{Why is inheritance ``less flexible'' than object composition?}
 
-Why is inheritance ``less flexible'' than object composition?
-
-You will see, after you have written more programs using OOP, that
-inheritance is not as flexible as object composition.
+You will see, after you have written more programs using OOP, that inheritance is not as flexible as object composition.
 
 Why is that?
 
-The reason is because \textbf{inheritance cannot be changed during
-runtime}.
+The reason is because \EMPHASIZE{inheritance cannot be changed during runtime}.
 
 Abstractly speaking if class \texttt{C} is a subclass of \texttt{D}, then a
 \texttt{C} object \texttt{c} has
 
-\texttt{c.D::x}
+\tab[5em]{\texttt{c.D::x}}\\
 
 where \texttt{x} is a member (whether it is a member variable or a
 method). That cannot be changed. However if \texttt{C} has a pointer
 \texttt{x} that can point to either \texttt{D} or \texttt{E}, at one point in
 time, you can have
 
-\texttt{c.x} points to a \texttt{D} object
+\tab[5em]{\texttt{c.x} points to a \texttt{D} object}\\
 
 and at another time
 
-\texttt{c.x} points to an \texttt{E} object
+\tab[5em]{\texttt{c.x} points to an \texttt{E} object}\\
 
 This is possible if \texttt{c.x} is a \texttt{P} pointer where \texttt{P} is a
 parent of both \texttt{D} and E.
 
 As an example, suppose you have
-
+\begin{console}
 class Car
-
 {
-
 private:
-
-SteeringWheel steering_wheel_;
-
+     SteeringWheel steering_wheel_;
 };
-
-\texttt{SelfDrivingCar} wants to have a steering wheel and since a self
-driving car is a car, you would do this:
-
+\end{console}
+\texttt{SelfDrivingCar} wants to have a steering wheel and since a self driving car is a car, you would do this:
+\begin{console}
 class Car
-
 {
-
 private:
-
-SteeringWheel steering_wheel_;
-
+     SteeringWheel steering_wheel_;
 };
 
 class SelfDrivingCar: public Car
-
 {
-
 };
-
+\end{console}
 But what if you want to model a self driving car that has a joystick
 instead of a steering wheel? Then you can't. Unless you do
-
+\begin{console}
 class Car
-
 {
-
 private:
-
-SteeringWheel steering_wheel_;
-
+     SteeringWheel steering_wheel_;
 };
 
 class SelfDrivingCar: public Car
-
 {
-
 private:
-
-SteeringJoystick * steering_joystick_;
-
+     SteeringJoystick * steering_joystick_;
 };
-
-If a self driving car \texttt{self-driving_car} wants a steering
-joystick, the object would then create a steering jobstick object from
-
+\end{console}
+If a self driving car \verb!self-driving_car! wants a steering joystick, the object would then create a steering jobstick object from
+\begin{console}
 class SteeringJoystick
-
 { ... };
+\end{console}
+on the heap and point it's \verb!steering_joystick_! pointer to this object.
 
-on the heap and point it's \texttt{steering_joystick_} pointer to this
-object.
+BUT \ldots then the \verb!self-driving_car! object would have a steering wheel:
 
-BUT \ldots{} then the \texttt{self-driving_car} object would have a
-steering wheel:
-
-self-driving_car.steering_wheel_
+\tab[5em]{\verb!self-driving_car.steering_wheel_!}\\
 
 and a steering joystick as well:
 
-*(self-driving_car.steering_joystick_)
+\tab[5em]{\verb!*(self-driving_car.steering_joystick_)!}\\
 
-Assuming you only want one steering device, this would be a waste of
-memory, and plus it would open up lots of confusion and incorrect code
-in the future. Redundant data is always bad.
+Assuming you only want one steering device, this would be a waste of memory, and plus it would open up lots of confusion and incorrect code in the future. Redundant data is always bad.
 
-The point is that your self driving car is of type \texttt{SelfDrivingCar}
-and it has inherited a steering wheel from the \texttt{Car} class. This
-cannot change unless you change the code.
+The point is that your self driving car is of type \texttt{SelfDrivingCar} and it has inherited a steering wheel from the \texttt{Car} class. This cannot change unless you change the code.
 
-How would we solve this problem where a self driving car can have either
-a steering wheel or a steering joystick? Furthermore you want the
-flexibility of changing it during your program's runtime (dynamic).
+How would we solve this problem where a self driving car can have either a steering wheel or a steering joystick? Furthermore you want the flexibility of changing it during your program's runtime (dynamic).
 
 First you do this:
-
+\begin{console}
 class SteeringDevice
-
-{ \ldots{} };
+{ ... };
 
 class SteeringWheel: public SteeringDevice
-
-{ \ldots{} };
+{ ... };
 
 class SteeringJoystick: public SteeringDevice
-
-{ \ldots{} };
-
-This combines steering wheels and steering joysticks under a common
-``concept'' or class. You can then do this:
-
+{ ... };
+\end{console}
+This combines steering wheels and steering joysticks under a common ``concept'' or class. You can then do this:
+\begin{console}
 class Car
-
 {
-
 public:
-
-Car():
-
-: steering_device_(new SteeringWheel)
-
-{}
-
-// Of course you need to overload the // destructor, copy constructor,
-and
-
-// operator=.
+     Car():
+        : steering_device_(new SteeringWheel)
+     {}
+     // Of course you need to overload the
+     // destructor, copy constructor, and
+     // operator=.
 
 private:
-
-SteeringDevice * steering_device_;
-
+     SteeringDevice * steering_device_;
 };
-
+\end{console}
 Now a car can have the choice of changing its steering device to either
 a steering wheel or a steering joystick during runtime:
-
+\begin{console}
 class Car
-
 {
-
 public:
-
-...
-
-void set_to_steering_joystick()
-
-{
-
-delete steering_device_;
-
-steering_device_ = new SteeringJoystick;
-
-}
+     ...
+     void set_to_steering_joystick()
+     {   
+         delete steering_device_;
+         steering_device_ = new SteeringJoystick;
+     }
 
 private:
-
-SteeringDevice * steering_device_;
-
+     SteeringDevice * steering_device_;
 };
 
 class SelfDrivingCar: public Car
-
 {};
-
+\end{console}
 Then you can do
 
-SelfDrivingCar tesla;
+\tab[5em]{\verb!SelfDrivingCar tesla;!}\\
+\tab[5em]{\verb!... drive with steering wheel ...!}\\
+\tab[5em]{\verb!tesla.set_to_steering_joystick();!}\\
+\tab[5em]{\verb!... drive with steering joystick ...!}\\
 
-... drive with steering wheel ...
-
-tesla.set_to_steering_joystick();
-
-... drive with steering joystick ...
-
-But wait a minute \ldots{} at least with respect to the steering device,
-do you see that inheritance is not even necessary!!! Of course if you
-don't want the program to be too dynamic you can always fix the steering
-device during constructor call. So suppose all self-driving cars now use
-joysticks:
-
+But wait a minute \ldots at least with respect to the steering device, do you see that inheritance is not even necessary!!! Of course if you don't want the program to be too dynamic you can always fix the steering device during constructor call. So suppose all self-driving cars now use joysticks:
+\begin{console}
 class Car
-
 {
-
 public:
-
-Car(int steering_type=0)
-
-{
-
-if (steering_type == 0)
-
-steering_device_ =
-
-new SteeringWheel;
-
-else:
-
-steering_device_ =
-
-new SteeringJoystick;
-
-}
+     Car(int steering_type=0)
+     {   
+         if (steering_type == 0)
+            steering_device_ =
+                new SteeringWheel;
+         else:
+            steering_device_ =
+                new SteeringJoystick;
+     }
 
 private:
-
-SteeringDevice * steering_device_;
+     SteeringDevice * steering_device_;
 
 };
 
 class SelfDrivingCar: public Car
-
 {
 
 public:
-
-SelfDrivingCar()
-
-: Car(1)
-
-{}
-
+     SelfDrivingCar()
+     : Car(1)
+     {}
 };
-
+\end{console}
 But of course in this case again inheritance seems to be useless again
 since you can do
 
-Car car(1);
+\tab[5em]{\verb!Car car(1);!}\\
 
-to get a car with joystick. Therefore there must be other factors
-specific to self driving cars not present in cars to warrant a class
-just for self-driving cars.
-
-\end{document}
+to get a car with joystick. Therefore there must be other factors specific to self driving cars not present in cars to warrant a class just for self-driving cars.
