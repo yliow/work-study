@@ -1,76 +1,8 @@
-% Options for packages loaded elsewhere
-\PassOptionsToPackage{unicode}{hyperref}
-\PassOptionsToPackage{hyphens}{url}
-%
-\documentclass[
-]{article}
-\usepackage{amsmath,amssymb}
-\usepackage{iftex}
-\ifPDFTeX
-  \usepackage[T1]{fontenc}
-  \usepackage[utf8]{inputenc}
-  \usepackage{textcomp} % provide euro and other symbols
-\else % if luatex or xetex
-  \usepackage{unicode-math} % this also loads fontspec
-  \defaultfontfeatures{Scale=MatchLowercase}
-  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
-\fi
-\usepackage{lmodern}
-\ifPDFTeX\else
-  % xetex/luatex font selection
-\fi
-% Use upquote if available, for straight quotes in verbatim environments
-\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
-\IfFileExists{microtype.sty}{% use microtype if available
-  \usepackage[]{microtype}
-  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
-}{}
-\makeatletter
-\@ifundefined{KOMAClassName}{% if non-KOMA class
-  \IfFileExists{parskip.sty}{%
-    \usepackage{parskip}
-  }{% else
-    \setlength{\parindent}{0pt}
-    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
-}{% if KOMA class
-  \KOMAoptions{parskip=half}}
-\makeatother
-\usepackage{xcolor}
-\usepackage{longtable,booktabs,array}
-\usepackage{calc} % for calculating minipage widths
-% Correct order of tables after \paragraph or \subparagraph
-\usepackage{etoolbox}
-\makeatletter
-\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
-\makeatother
-% Allow footnotes in longtable head/foot
-\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
-\makesavenoteenv{longtable}
-\setlength{\emergencystretch}{3em} % prevent overfull lines
-\providecommand{\tightlist}{%
-  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
-\ifLuaTeX
-  \usepackage{selnolig}  % disable illegal ligatures
-\fi
-\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
-\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
-\urlstyle{same}
-\hypersetup{
-  hidelinks,
-  pdfcreator={LaTeX via pandoc}}
+\newpage\EMPHASIZE{90. File I/O}
 
-\author{}
-\date{}
-
-\begin{document}
-
-90. File I/O
-
-Objectives
+\textsc{Objectives}
 
 \begin{itemize}
-\tightlist
 \item
   Read a file
 \item
@@ -81,1523 +13,860 @@ As you know values in variables/objects are lost when you close a
 program. But there are times when you want to save their values. For
 instance if a player reaches a new high score, you might want to save
 his/her high score (and his/her name -- or he/she would not be happy...)
-and then print that person\textquotesingle s name and high score every
-time that game runs. In this set of notes, I\textquotesingle ll show you
+and then print that person's name and high score every
+time that game runs. In this set of notes, I'll show you
 how to save data into text files.
 
-Writing to a File
-
-\begin{quote}
-\end{quote}
+\newpage\EMPHASIZE{Writing to a File}
 
 Run this:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless iostream\textgreater{}
-
-\#include \textless fstream\textgreater{}
+\begin{console}
+#include <iostream>
+#include <fstream>
 
 int main()
+{   
+    std::ofstream f("hw.txt", std::ios::out);
 
-\{
+    f << "hello world" <<std::endl;
+    int x = 0;
+    double y = 3.14;
+    char z[] = "c++ rules";
+    f << x << ' '<< y << std::endl;
+    f << z <<std::endl;
 
-std::ofstream f("hw.txt", std::ios::out);
+    f.close();
 
-f \textless\textless{} "hello world" \textless\textless{} std::endl;
+    return 0;
+}
+\end{console}
 
-int x = 0;
+Now look for the file \texttt{"hw.txt"} (without the quotes of course!). If you're using MS VS .NET if should be in your project folder (in your solution folder). If you're using my linux virtual machine, it will be the folder/directory where you run your program. In general, it's where you run the executable.
 
-double y = 3.14;
+The \texttt{f} in your code is actually a file object:
 
-char z{[}{]} = "c++ rules";
+\begin{center}
+\verb!std::ofstream f("hw.txt", std::ios::out);!
+\end{center}
 
-f \textless\textless{} x \textless\textless{} \textquotesingle{}
-\textquotesingle{} \textless\textless{} y \textless\textless{}
-std::endl;
+The name of the file is of course \texttt{hw.txt}. The second argument \texttt{std::ios::out} tells C++ that you want to create a file object for writing (i.e., output). Of course the class of this object is \texttt{ofstream} and it's in the \texttt{std} namespace and the header file for this class is kept in \texttt{fstream.h} which is why we have to \verb!#include <fstream>!.
 
-f \textless\textless{} z \textless\textless{} std::endl;
+Note that the \texttt{operator<<} is used to push contents to the file. So it's really easy: it's just like input and output since day one of programming. In fact the \texttt{std::cout} is also a file except that it's a file associated with the console window.
 
-f.close();
-
-return 0;
-
-\} \\
-\end{longtable}
-
-Now look for the file \emph{"hw.txt"} (without the quotes of course!).
-If you\textquotesingle re using MS VS .NET if should be in your project
-folder (in your solution folder). If you\textquotesingle re using my
-linux virtual machine, it will be the folder/directory where you run
-your program. In general, it\textquotesingle s where you run the
-executable.
-
-The \emph{f} in your code is actually a file object:
-
-std::ofstream f("hw.txt", std::ios::out);
-
-The name of the file is of course \emph{hw.txt}. The second argument
-\emph{std::ios::out} tells C++ that you want to create a file object for
-writing (i.e., output). Of course the class of this object is
-\emph{ofstream} and it\textquotesingle s in the \emph{std} namespace and
-the header file for this class is kept in \emph{fstream.h} which is why
-we have to \emph{\#include \textless fstream\textgreater{}}.
-
-Note that the \emph{operator\textless\textless{}} is used to push
-contents to the file. So it\textquotesingle s really easy:
-it\textquotesingle s just like input and output since day one of
-programming. In fact the \emph{std::cout} is also a file except that
-it\textquotesingle s a file associated with the console window.
-
-Exercise. First try to guess what the file \emph{hw.txt} looks like when
+\begin{ex} First try to guess what the file \texttt{hw.txt} looks like when
 you run this program:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless iostream\textgreater{}
-
-\#include \textless fstream\textgreater{}
+\begin{console}
+#include <iostream>
+#include <fstream>
 
 int main()
+{   
+    std::ofstream f("hw.txt", std::ios::out);
+    f << "hello world ... again" << std::endl;
+    int x = 0;
+    double y = 3.14;
+    f << 42 << ' '<< x << ' '<< x + 1 <<std::endl;
+    f << y <<std::endl;
+    f.close();
 
-\{
-
-std::ofstream f("hw.txt", std::ios::out);
-
-f \textless\textless{} "hello world ... again" \textless\textless{}
-std::endl;
-
-int x = 0;
-
-double y = 3.14;
-
-f \textless\textless{} 42 \textless\textless{} \textquotesingle{}
-\textquotesingle{} \textless\textless{} x \textless\textless{}
-\textquotesingle{} \textquotesingle{} \textless\textless{} x + 1
-\textless\textless{} std::endl;
-
-f \textless\textless{} y \textless\textless{} std::endl;
-
-f.close();
-
-return 0;
-
-\} \\
-\end{longtable}
+    return 0;
+}
+\end{console}
 
 Next, check the file and verify your guess.
+\end{ex}
 
-Note that in the exercise the previous \emph{"hello world"} is wiped
-out. \textbf{Therefore opening a file for writing with
-}\emph{\textbf{std::ios::out }}\textbf{will wipe out the previous
-content.}
+Note that in the exercise the previous \texttt{"hello world"} is wiped out. \textbf{Therefore opening a file for writing with }\texttt{\textbf{std::ios::out }}\textbf{will wipe out the previous content.}
 
-Exercise. Run this program and verify that the previous \emph{hw.txt} is
-wiped out:
+\begin{ex}
+Run this program and verify that the previous \texttt{hw.txt} is wiped out:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless iostream\textgreater{}
-
-\#include \textless fstream\textgreater{}
+\begin{console}
+#include <iostream>
+#include <fstream>
 
 int main()
+{   
+    std::ofstream f("hw.txt", std::ios::out);
+    f << std::endl;
+    f.close();
 
-\{
+    return 0;
 
-std::ofstream f("hw.txt", std::ios::out);
+}
+\end{console}
+\end{ex}
 
-f \textless\textless{} std::endl;
+\newpage\EMPHASIZE{Reading From a File}
 
-f.close();
+First create a file \texttt{hw.txt} with the following data:
 
-return 0;
-
-\} \\
-\end{longtable}
-
-\begin{quote}
-\end{quote}
-
-\begin{quote}
-\end{quote}
-
-\begin{quote}
-\end{quote}
-
-Reading From a File
-
-First create a file \emph{hw.txt} with the following data:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{console}
 hello world
-
 0 3.14
-
-42 \\
-\end{longtable}
+42
+\end{console}
 
 Now run this program:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless iostream\textgreater{}
-
-\#include \textless fstream\textgreater{}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <fstream>
 
 int main()
+{   
+    std::|\EMPHASIZE{ifstream}| f("hw.txt", std::ios::|\EMPHASIZE{in}|);
+    int x;
+    double y;
+    char z[100];
+    
+    f >> z;
+    std::cout << "z: " << z << std::endl;
+    
+    f >> z;
+    std::cout << "z: " << z << std::endl;
+    
+    f >> x;
+    std::cout << "x: " << x << std::endl;
 
-\{
+    f >> y;
+    std::cout << "y: " << y << std::endl;
 
-std::\textbf{ifstream} f("hw.txt", std::ios::\textbf{in});
+    f >> y;
+    std::cout << "y: " << y << std::endl;
+    
+    f.close();
+    
+    return 0;
+}
+\end{console}
 
-int x;
+\newpage\EMPHASIZE{Appending to a File}
 
-double y;
+First create a file \texttt{hw.txt} with the following data:
 
-char z{[}100{]};
-
-f \textgreater\textgreater{} z;
-
-std::cout \textless\textless{} "z: " \textless\textless{} z
-\textless\textless{} std::endl;
-
-f \textgreater\textgreater{} z;
-
-std::cout \textless\textless{} "z: " \textless\textless{} z
-\textless\textless{} std::endl;
-
-f \textgreater\textgreater{} x;
-
-std::cout \textless\textless{} "x: " \textless\textless{} x
-\textless\textless{} std::endl;
-
-f \textgreater\textgreater{} y;
-
-std::cout \textless\textless{} "y: " \textless\textless{} y
-\textless\textless{} std::endl;
-
-f \textgreater\textgreater{} y;
-
-std::cout \textless\textless{} "y: " \textless\textless{} y
-\textless\textless{} std::endl;
-
-f.close();
-
-return 0;
-
-\} \\
-\end{longtable}
-
-Appending to a File
-
-First create a file \emph{hw.txt} with the following data:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{console}
 hello world
-
 0 3.14
-
-42 \\
-\end{longtable}
+42 
+\end{console}
 
 Now run this:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless iostream\textgreater{}
-
-\#include \textless fstream\textgreater{}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <fstream>
 
 int main()
+{   
+    std::|\EMPHASIZE{ofstream}| f("hw.txt", std::ios::|\EMPHASIZE{app}|);
 
-\{
+    f << "hello world" << std::endl;
+    int x = 0;
+    double y = 3.14;
+    char z[] = "c++ rules";
+    f << x << ' '<< y << std::endl;
+    f << z << std::endl;
 
-std::\textbf{ofstream} f("hw.txt", std::ios::\textbf{app});
+    f.close();
 
-f \textless\textless{} "hello world" \textless\textless{} std::endl;
-
-int x = 0;
-
-double y = 3.14;
-
-char z{[}{]} = "c++ rules";
-
-f \textless\textless{} x \textless\textless{} \textquotesingle{}
-\textquotesingle{} \textless\textless{} y \textless\textless{}
-std::endl;
-
-f \textless\textless{} z \textless\textless{} std::endl;
-
-f.close();
-
-return 0;
-
-\} \\
-\end{longtable}
+    return 0;
+}
+\end{consolethree}
 
 Note that this is the same program as the first ... except for this:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 ...
 
-std::ofstream f("hw.txt", std::ios::\textbf{app});
+std::ofstream f("hw.txt", std::ios::|\EMPHASIZE{app}|);
 
-... \\
-\end{longtable}
+... 
+\end{consolethree}
 
 You are now opening the file in append mode.
 
-If you run the program, you will see that contents is \textbf{appended}
-to the end of the original file.
+If you run the program, you will see that contents is \EMPHASIZE{appended} to the end of the original file.
 
-Flushing the File and std::endl
+\newpage\EMPHASIZE{Flushing the File and std::endl}
 
-The write operations you make to a file does not add contents to the
-file immediately. Your OS (operating system) actually provides the file
-operations and in many cases, the I/O (input/output) is buffered,
-meaning to say that the contents during I/O is temporarily kept in
-memory.
+The write operations you make to a file does not add contents to the file immediately. Your OS (operating system) actually provides the file operations and in many cases, the I/O (input/output) is buffered, meaning to say that the contents during I/O is temporarily kept in memory.
 
 Why?
 
-For performance reasons. Because the OS is in charge of deciding
-when\textquotesingle s the best time to perform certain operations. In
-the case of a file, accessing a hard drive slows down the system. So the
-OS will keep the contents to be written in memory and wait till
-there\textquotesingle s a certain amount to write to the hard drive
-before doing a real write to the hard drive. It\textquotesingle s the
-same like you would keep a bunch of checks to cash in your wallet and
-visit your bank only once a week.
+For performance reasons. Because the OS is in charge of deciding when's the best time to perform certain operations. In the case of a file, accessing a hard drive slows down the system. So the OS will keep the contents to be written in memory and wait till there's a certain amount to write to the hard drive before doing a real write to the hard drive. It's the same like you would keep a bunch of checks to cash in your wallet and visit your bank only once a week.
 
-This means that if you write 42 to a file, the actual file on your
-harddrive might not have a 42 in it immediately.
+This means that if you write 42 to a file, the actual file on your harddrive might not have a 42 in it immediately.
 
-You can however \textbf{force} the contents to be written
-\textbf{immediately} using the \textbf{flush} method in the file object
-like this:
+You can however \EMPHASIZE{force} the contents to be written \EMPHASIZE{immediately} using the \EMPHASIZE{flush} method in the file object like this:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless iostream\textgreater{}
-
-\#include \textless fstream\textgreater{}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <fstream>
 
 int main()
+{   
+    std::ofstream f("hw.txt", std::ios::app);
 
-\{
+    f << "hello world" << '\n';
+    |\EMPHASIZE{f.flush();}|
 
-std::ofstream f("hw.txt", std::ios::app);
+    int x = 0;
+    double y = 3.14;
+    char z[] = "c++ rules";
 
-f \textless\textless{} "hello world" \textless\textless{}
-\textquotesingle\textbackslash n\textquotesingle;
+    f << x << ' ' << y << '\n';
+    |\EMPHASIZE{f.flush();}|
 
-\textbf{f.flush()};
+    f << z << '\n';
+    |\EMPHASIZE{f.flush();}|
 
-int x = 0;
+    f.close();
 
-double y = 3.14;
+    return 0;
 
-char z{[}{]} = "c++ rules";
+}
+\end{consolethree}
 
-f \textless\textless{} x \textless\textless{} \textquotesingle{}
-\textquotesingle{} \textless\textless{} y \textless\textless{}
-\textquotesingle\textbackslash n\textquotesingle;
+This is helpful if you want to synchronize (a little better) the actions in the program with your file on the harddrive. For instance if you're writing a game, you might want to have lots of print statements for debugging. If the print statements are delayed and there's a program error, the program might crash before the output is sent, therefore making your debugging difficult.
 
-\textbf{f.flush()};
+You can also flush your \texttt{std::cout}:
 
-f \textless\textless{} z \textless\textless{}
-\textquotesingle\textbackslash n\textquotesingle;
-
-\textbf{f.flush()};
-
-f.close();
-
-return 0;
-
-\} \\
-\end{longtable}
-
-This is helpful if you want to synchronize (a little better) the actions
-in the program with your file on the harddrive. For instance if
-you\textquotesingle re writing a game, you might want to have lots of
-print statements for debugging. If the print statements are delayed and
-there\textquotesingle s a program error, the program might crash before
-the output is sent, therefore making your debugging difficult.
-
-You can also flush your \emph{std::cout}:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-std::cout \textless\textless{} "hello world";
-
-std::cout.flush(); \\
-\end{longtable}
+\begin{console}
+std::cout <<"hello world";
+std::cout.flush();
+\end{console}
 
 Note that you already know from day 1 of programming that another way to
 print a newline character to the console output is
 
-\begin{longtable}[]{@{}l@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-std::cout \textless\textless{} "hello world" \textless\textless{}
-std::endl; \\
-\end{longtable}
+\begin{console}
+std::cout << "hello world" << std::endl;
+\end{console}
 
 Of course you can also do that for a file.
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-f \textless\textless{} "hello world" \textless\textless{} std::endl; //
-f opened for
+\begin{console}
+f << "hello world" << std::endl; // f opened for
+                                 // writing 
+\end{console}
 
-// writing  \\
-\end{longtable}
+Now it turns out that when you send \texttt{std::endl} to a file of \texttt{std::cout}, not only is a newline sent, in fact there's a flush. This means that
 
-Now it turns out that when you send \emph{std::endl} to a file of
-\emph{std::cout}, not only is a newline sent, in fact
-there\textquotesingle s a flush. This means that
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-f \textless\textless{} "hello world" \textless\textless{}
-\textquotesingle\textbackslash n\textquotesingle;
-
-f.flush()  \\
-\end{longtable}
+\begin{console}
+f << "hello world" << '\n';
+f.flush() 
+\end{console}
 
 Is really the same as
 
-\begin{longtable}[]{@{}l@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-f \textless\textless{} "hello world" \textless\textless{} std::endl; \\
-\end{longtable}
+\begin{console}
+f <<"hello world" <<std::endl;
+\end{console}
 
 and
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-std::cout \textless\textless{} "hello world" \textless\textless{}
-\textquotesingle\textbackslash n\textquotesingle;
-
-std::cout.flush(); \\
-\end{longtable}
+\begin{console}
+std::cout << "hello world" << '\n';
+std::cout.flush();
+\end{console}
 
 is the same as
 
-\begin{longtable}[]{@{}l@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-std::cout \textless\textless{} "hello world" \textless\textless{}
-std::endl; \\
-\end{longtable}
+\begin{console} 
+std::cout << "hello world" << std::endl;
+\end{console}
 
-The close operation also causes a flush to occur. Therefore you need not
-issue a flush when you\textquotesingle re about to issue a close.
+The close operation also causes a flush to occur. Therefore you need not issue a flush when you're about to issue a close.
 
-By the way, when you use \emph{std::cout} you are using an output file
-too (in most cases the file is tied to your console window). This output
-file is usually called "stdout". When you do
+By the way, when you use \texttt{std::cout} you are using an output file too (in most cases the file is tied to your console window). This output file is usually called "stdout". When you do
 
-\emph{std::cout \textless\textless{} std::endl;}
+\begin{center}
+\texttt{std::cout << std::endl;}
+\end{center}
 
-you are printing a newline \textbf{and then flushing your stdout}. This
-ensures that whatever you have just printed is printed immediately
-without delay. If you\textquotesingle re debugging a program and there
-are memory leaks, frequently the you want to print print statements to
-help with your debugging. The problem is that the program can crash
-before what you are printing appears. So in such cases, you want to
-flush your stdout as frequently as possible. So if
-you\textquotesingle re trying to verify if the program crashed in
-function f(), you should do this:
+you are printing a newline \EMPHASIZE{and then flushing your stdout}. This ensures that whatever you have just printed is printed immediately without delay. If you're debugging a program and there are memory leaks, frequently the you want to print print statements to help with your debugging. The problem is that the program can crash before what you are printing appears. So in such cases, you want to flush your stdout as frequently as possible. So if you're trying to verify if the program crashed in function f(), you should do this:
 
-\emph{std::cout \textless\textless{} "before calling f()"
-\textless\textless{} std::endl;}
+\tab[3em]{\verb!std::cout << "before calling f()" << std::endl;!}\\
+\tab[3em]{\verb!f(); // might be buggy!}\\
+\tab[3em]{\verb!std::cout << "after calling f()" << std::endl;!}\\
 
-f(); // might be buggy
-
-\emph{std::cout \textless\textless{} "after calling f()"
-\textless\textless{} std::endl;}
-
-The File Cursor/Pointer
+\newpage\EMPHASIZE{The File Cursor/Pointer}
 
 Recall that when you were reading the file
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{console}
 hello world
-
 0 3.14
-
-42 \\
-\end{longtable}
+42
+\end{console}
 
 with this program
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless iostream\textgreater{}
-
-\#include \textless fstream\textgreater{}
+\begin{console}
+#include <iostream>
+#include <fstream>
 
 int main()
+{   
+    std::ofstream f("hw.txt", std::ios::app);
 
-\{
+    f << "hello world" << std::endl;
+    int x = 0;
+    double y = 3.14;
+    char z[] = "c++ rules";
+    f << x << ' ' << y << std::endl;
+    f << z << std::endl;
 
-std::ofstream f("hw.txt", std::ios::app);
+    f.close();
 
-f \textless\textless{} "hello world" \textless\textless{} std::endl;
+    return 0;
+}
+\end{console}
 
-int x = 0;
+The reading of data for each variable stops at a whitespace (space, tab, newline). The next read will continue where it previous stopped.
 
-double y = 3.14;
+This tells you that each file remembers where the previous read stopped. This is called a file cursor.
 
-char z{[}{]} = "c++ rules";
+When you open a file, the cursor points to the first character in the file. As you read, the cursor moves forward.
 
-f \textless\textless{} x \textless\textless{} \textquotesingle{}
-\textquotesingle{} \textless\textless{} y \textless\textless{}
-std::endl;
+Let's look at the above file:
 
-f \textless\textless{} z \textless\textless{} std::endl;
-
-f.close();
-
-return 0;
-
-\} \\
-\end{longtable}
-
-The reading of data for each variable stops at a whitespace (space, tab,
-newline). The next read will continue where it previous stopped.
-
-This tells you that each file remembers where the previous read stopped.
-This is called a file cursor.
-
-When you open a file, the cursor points to the first character in the
-file. As you read, the cursor moves forward.
-
-Let\textquotesingle s look at the above file:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{console}
 hello world
-
 0 3.14
+42 
+\end{console}
 
-42 \\
-\end{longtable}
+It looks like there are three "lines" in this file. Actually a file is made up of a bunch of bytes (or characters if you like). On the harddrive (or some other storage device), the above data might look like this on the device:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = array(x0=0.5, y0=0.5, width=0.6, height=1.2, xs=['h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd', r'\textbackslash n', 0, ' ', 3, '.', 1, 4, r'\textbackslash  n', 4, 2, ' ',' ',' ',' ',' ',' ',' ',' '], celllinewidth=0.05)
+p.add(s)
+p += Rect(13.1, 0.51, 13.7, 1.69, background='black')
+#p+= Grid(x0=-1, y0=-2, x1=15, y1=5)
+#p += Line(points=[(0.85,-1),(0.85,0.5)], linewidth=0.3, endstyle='>')
+print(p)
+\end{python}
 
-It looks like there are three "lines" in this file. Actually a file is
-made up of a bunch of bytes (or characters if you like). On the
-harddrive (or some other storage device), the above data might look like
-this on the device:
+(It's actually a lot more complex than this but this is enough.)
 
-\begin{longtable}[]{@{}llllllllllllllllllllllllllllll@{}}
-\toprule\noalign{}
-& & & & & & & & & & & & & & & & & & & & & & & & & & & & & \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-h & e & l & l & o & & w & o & r & l & d & \textbackslash n & 0 & & 3 & .
-& 1 & 4 & \textbackslash n & 4 & 2 & & & & & & & & & \\
-\end{longtable}
+Each square in the above is a "slot" in your storage device to store a byte (or character) of data. You can think of your storage device as a pretty huge array if you like. The black square denotes the "end of the file" -- EOF. Initially, when the file is opened, its file cursor points to the first byte, i.e.the character h:
 
-(It\textquotesingle s actually a lot more complex than this but this is
-enough.)
-
-Each square in the above is a "slot" in your storage device to store a
-byte (or character) of data. You can think of your storage device as a
-pretty huge array if you like. The black square denotes the "end of the
-file" -- EOF. Initially, when the file is opened, its file cursor points
-to the first byte, i.e.the character h:
-
-\begin{longtable}[]{@{}llllllllllllllllllllllllllllll@{}}
-\toprule\noalign{}
-& & & & & & & & & & & & & & & & & & & & & & & & & & & & & \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-h & e & l & l & o & & w & o & r & l & d & \textbackslash n & 0 & & 3 & .
-& 1 & 4 & \textbackslash n & 4 & 2 & & & & & & & & & \\
-\end{longtable}
-
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = array(x0=0.5, y0=0.5, width=0.6, height=1.2, xs=['h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd', r'\textbackslash n', 0, ' ', 3, '.', 1, 4, r'\textbackslash  n', 4, 2, ' ',' ',' ',' ',' ',' ',' ',' '], celllinewidth=0.05)
+p.add(s)
+p += Rect(13.1, 0.51, 13.7, 1.69, background='black')
+#p+= Grid(x0=-1, y0=-2, x1=15, y1=5)
+p += Line(points=[(0.85,-1),(0.85,0.5)], linewidth=0.3, endstyle='>')
+print(p)
+\end{python}
 If you execute this:
 
-char x{[}100{]};
+\tab[3em]{\verb!char x[100];!}\\
+\tab[3em]{\verb!f >> x;!}\\
 
-f \textgreater\textgreater{} x;
+the characters starting from the character where the file cursor points to is read and put into array \texttt{x} until a whitespace is reached:
 
-the characters starting from the character where the file cursor points
-to is read and put into array \emph{x} until a whitespace is reached:
-
-\begin{longtable}[]{@{}llllllllllllllllllllllllllllll@{}}
-\toprule\noalign{}
-& & & & & & & & & & & & & & & & & & & & & & & & & & & & & \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-h & e & l & l & o & & w & o & r & l & d & \textbackslash n & 0 & & 3 & .
-& 1 & 4 & \textbackslash n & 4 & 2 & & & & & & & & & \\
-\end{longtable}
-
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = array(x0=0.5, y0=0.5, width=0.6, height=1.2, xs=['h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd', r'\textbackslash n', 0, ' ', 3, '.', 1, 4, r'\textbackslash  n', 4, 2, ' ',' ',' ',' ',' ',' ',' ',' '], celllinewidth=0.05)
+p.add(s)
+p += Rect(13.1, 0.51, 13.7, 1.69, background='black')
+#p+= Grid(x0=-1, y0=-2, x1=15, y1=5)
+p += Line(points=[(3.85,-1),(3.85,0.5)], linewidth=0.3, endstyle='>')
+print(p)
+\end{python}
 If you do this again:
 
-\emph{f \textgreater\textgreater{} x;}
+\tab[3em]{\texttt{f >> x;}}\\
 
 the file cursor will read and ignore whitespaces (spaces, tabs,
 newlines) until it sees a non-whitespace
 
-\begin{longtable}[]{@{}llllllllllllllllllllllllllllll@{}}
-\toprule\noalign{}
-& & & & & & & & & & & & & & & & & & & & & & & & & & & & & \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-h & e & l & l & o & & w & o & r & l & d & \textbackslash n & 0 & & 3 & .
-& 1 & 4 & \textbackslash n & 4 & 2 & & & & & & & & & \\
-\end{longtable}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = array(x0=0.5, y0=0.5, width=0.6, height=1.2, xs=['h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd', r'\textbackslash n', 0, ' ', 3, '.', 1, 4, r'\textbackslash  n', 4, 2, ' ',' ',' ',' ',' ',' ',' ',' '], celllinewidth=0.05)
+p.add(s)
+p += Rect(13.1, 0.51, 13.7, 1.69, background='black')
+#p+= Grid(x0=-1, y0=-2, x1=15, y1=5)
+p += Line(points=[(4.45,-1),(4.45,0.5)], linewidth=0.3, endstyle='>')
+print(p)
+\end{python}
+and then read the data, putting the characters into \texttt{x}, until it sees a whitespace:
 
-and then read the data, putting the characters into \emph{x}, until it
-sees a whitespace:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = array(x0=0.5, y0=0.5, width=0.6, height=1.2, xs=['h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd', r'\textbackslash n', 0, ' ', 3, '.', 1, 4, r'\textbackslash  n', 4, 2, ' ',' ',' ',' ',' ',' ',' ',' '], celllinewidth=0.05)
+p.add(s)
+p += Rect(13.1, 0.51, 13.7, 1.69, background='black')
+#p+= Grid(x0=-1, y0=-2, x1=15, y1=5)
+p += Line(points=[(7.45,-1),(7.45,0.5)], linewidth=0.3, endstyle='>')
+print(p)
+\end{python}
+The next time you read the file and put the data into an integer variable, the integer 0 will be placed in the variable, and the pointer moves to this point:
 
-\begin{longtable}[]{@{}llllllllllllllllllllllllllllll@{}}
-\toprule\noalign{}
-& & & & & & & & & & & & & & & & & & & & & & & & & & & & & \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-h & e & l & l & o & & w & o & r & l & d & \textbackslash n & 0 & & 3 & .
-& 1 & 4 & \textbackslash n & 4 & 2 & & & & & & & & & \\
-\end{longtable}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = array(x0=0.5, y0=0.5, width=0.6, height=1.2, xs=['h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd', r'\textbackslash n', 0, ' ', 3, '.', 1, 4, r'\textbackslash  n', 4, 2, ' ',' ',' ',' ',' ',' ',' ',' '], celllinewidth=0.05)
+p.add(s)
+p += Rect(13.1, 0.51, 13.7, 1.69, background='black')
+#p+= Grid(x0=-1, y0=-2, x1=15, y1=5)
+p += Line(points=[(8.65,-1),(8.65,0.5)], linewidth=0.3, endstyle='>')
+print(p)
+\end{python}
 
-The next time you read the file and put the data into an integer
-variable, the integer 0 will be placed in the variable, and the pointer
-moves to this point:
+And after reading a \texttt{double} into a \texttt{double} variable
+it's here:
 
-\begin{longtable}[]{@{}llllllllllllllllllllllllllllll@{}}
-\toprule\noalign{}
-& & & & & & & & & & & & & & & & & & & & & & & & & & & & & \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-h & e & l & l & o & & w & o & r & l & d & \textbackslash n & 0 & & 3 & .
-& 1 & 4 & \textbackslash n & 4 & 2 & & & & & & & & & \\
-\end{longtable}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = array(x0=0.5, y0=0.5, width=0.6, height=1.2, xs=['h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd', r'\textbackslash n', 0, ' ', 3, '.', 1, 4, r'\textbackslash  n', 4, 2, ' ',' ',' ',' ',' ',' ',' ',' '], celllinewidth=0.05)
+p.add(s)
+p += Rect(13.1, 0.51, 13.7, 1.69, background='black')
+#p+= Grid(x0=-1, y0=-2, x1=15, y1=5)
+p += Line(points=[(12.25,-1),(12.25,0.5)], linewidth=0.3, endstyle='>')
+print(p)
+\end{python}
+And finally after reading an \texttt{int} value it's here:
 
-And after reading a \emph{double} into a \emph{double} variable
-it\textquotesingle s here:
-
-\begin{longtable}[]{@{}llllllllllllllllllllllllllllll@{}}
-\toprule\noalign{}
-& & & & & & & & & & & & & & & & & & & & & & & & & & & & & \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-h & e & l & l & o & & w & o & r & l & d & \textbackslash n & 0 & & 3 & .
-& 1 & 4 & \textbackslash n & 4 & 2 & & & & & & & & & \\
-\end{longtable}
-
-And finally after reading an \emph{int} value it\textquotesingle s here:
-
-\begin{longtable}[]{@{}llllllllllllllllllllllllllllll@{}}
-\toprule\noalign{}
-& & & & & & & & & & & & & & & & & & & & & & & & & & & & & \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-h & e & l & l & o & & w & o & r & l & d & \textbackslash n & 0 & & 3 & .
-& 1 & 4 & \textbackslash n & 4 & 2 & & & & & & & & & \\
-\end{longtable}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+s = array(x0=0.5, y0=0.5, width=0.6, height=1.2, xs=['h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd', r'\textbackslash n', 0, ' ', 3, '.', 1, 4, r'\textbackslash  n', 4, 2, ' ',' ',' ',' ',' ',' ',' ',' '], celllinewidth=0.05)
+p.add(s)
+p += Rect(13.1, 0.51, 13.7, 1.69, background='black')
+#p+= Grid(x0=-1, y0=-2, x1=15, y1=5)
+p += Line(points=[(13.45,-1),(13.45,0.5)], linewidth=0.3, endstyle='>')
+print(p)
+\end{python}
 
 The file cursor has reached the end-of-file.
 
-End-of-FIle
+\newpage\EMPHASIZE{End-of-FIle}
 
 In all the previous examples up to this point, I know how much data
 there is to read. There are cases when you do not. For instance suppose
 you have a file of employee name and salary and there is no fixed number
 of employees. For instance on Monday it might be like this:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{console}
 John 1234.56
-
 Susan 1234.56
-
 Tom 2345.67
-
-Jane 2345.67 \\
-\end{longtable}
+Jane 2345.67
+\end{console}
 
 On Tuesday a new employee joins the company and it becomes this:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{console}
 John 1234.56
-
 Susan 1234.56
-
 Tom 2345.67
-
 Jane 2345.67
+Harry 3456.78
+\end{console}
 
-Harry 3456.78 \\
-\end{longtable}
+In that case, you need to "continue to read till you reach the \lq\lq end-of-file''. What happens is this ...
 
-In that case, you need to "continue to read till you reach the
-end-of-file". What happens is this ...
+As you read the data from the file, the cursor moves. You can check if the cursor has moved just beyond the last readable data in the file.
 
-As you read the data from the file, the cursor moves. You can check if
-the cursor has moved just beyond the last readable data in the file.
-Let\textquotesingle s try it.
+Let's try it.
 
-First rewrite \emph{hw.txt} so that it contains the following data:
+First rewrite \texttt{hw.txt} so that it contains the following data:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{console}
 2 3 5 7
-
 11
-
 13
-
 17
-
 19
-
 23
-
-29 \\
-\end{longtable}
+29
+\end{console}
 
 Run this program:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless iostream\textgreater{}
-
-\#include \textless fstream\textgreater{}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <fstream>
 
 int main()
+{   
+    std::ifstream f("hw.txt", std::ios::in);    
+    while (!|\EMPHASIZE{f.eof()}|)
+    {     
+         int x;
+         f >> x;
+         std::cout << "read ... x: " << x
+                   << std::endl;
+    }
 
-\{
+    f.close();
 
-std::ifstream f("hw.txt", std::ios::in);
+    return 0;
+}
+\end{consolethree}
 
-while (!\textbf{f.eof()})
+\texttt{f.eof()} returns true if the file cursor has reached the \EMPHASIZE{end-of-file}.
 
-\{
+\newpage\EMPHASIZE{Oh no .... Errors!!!}
 
-int x;
-
-f \textgreater\textgreater{} x;
-
-std::cout \textless\textless{} "read ... x: " \textless\textless{} x
-
-\textless\textless{} std::endl;
-
-\}
-
-f.close();
-
-return 0;
-
-\} \\
-\end{longtable}
-
-\emph{f.eof()} returns true if the file cursor has reached the
-\textbf{end-of-file}.\\
-
-Oh no .... Errors!!!
-
-In this section, I\textquotesingle ll show you some of the ways to check
+In this section, I'll show you some of the ways to check
 for errors.
 
 Many things can go wrong when it comes to file I/O (well ... many things
 can go wrong in general). For instance
 
 \begin{itemize}
-\tightlist
 \item
-  When you open the file ... it\textquotesingle s not there!
+  When you open the file ... it's not there!
 \item
-  When you read/write to the file ... there\textquotesingle s a hardware
-  failure!
+  When you read/write to the file ... there's a hardware failure!
 \item
-  When you read/write to the file ... the USB connection of the external
-  HD was accidentally unplugged!
+  When you read/write to the file ... the USB connection of the external HD was accidentally unplugged!
 \item
   When you write to the file ... the HD ran out of space!
 \item
-  The file is corrupted and when you\textquotesingle re reading input
-  into an integer variable, the data contains
-  \textquotesingle z\textquotesingle!
+  The file is corrupted and when you're reading input into an integer variable, the data contains 'z'!
 \item
   Etc!!!!!
 \end{itemize}
 
-Let\textquotesingle s take it one at a time ...
+Let's take it one at a time ...
 
-Is the File Open?
+\newpage\EMPHASIZE{Is the File Open?}
 
-The first thing to check is that when you open the file ... that
-it\textquotesingle s actually opened! So first make sure that you
-don\textquotesingle t have a file called xyz.txt, and next run this
-program:
+The first thing to check is that when you open the file ... that it's actually opened! So first make sure that you don't have a file called xyz.txt, and next run this program:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless iostream\textgreater{}
-
-\#include \textless fstream\textgreater{}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <fstream>
 
 int main()
-
-\{
-
-std::ifstream f("xyz.txt", std::ios::in);
-
-std::cout \textless\textless{} \textbf{f.is\_open()}
-\textless\textless{} \textquotesingle\textbackslash n\textquotesingle;
-
-f.close();
-
-return 0;
-
-\} \\
-\end{longtable}
+{   
+    std::ifstream f("xyz.txt", std::ios::in);
+    std::cout << |\textbf{f.is\_open()}| << '\n';
+    f.close();
+    
+    return 0;
+}
+\end{consolethree}
 
 First note that the program does not crash even though you attempted to
 open a non-existentent file. Closing a file that was not opened also did
 not generate a fatal program crash. We definitely did not see any
 unhandled exception thrown.
 
-The method \emph{is\_open()} does return the \emph{false} boolean value
-(that\textquotesingle s why 0 was printed), telling you that the file
-cannot be opened.
+The method \verb!is_open()! does return the \texttt{false} boolean value (that's why 0 was printed), telling you that the file cannot be opened.
 
-\textbf{Exercise.} Now create the file \emph{xyz.txt} and run the
+\begin{ex} Now create the file \texttt{xyz.txt} and run the
 program again. Make sure 1 is printed.
 
 So your program should look like the following (or something similar):
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless iostream\textgreater{}
-
-\#include \textless fstream\textgreater{}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <fstream>
 
 int main()
+{   
+    std::ifstream f("xyz.txt", std::ios::in);
+    if (|\textbf{f.is\_open()}|)
+    {    
+         std::cout << "error opening file xyz.txt"
+                   << std::endl;
+    }
+    else
+    {   
+         // do what you want to do ...
+         f.close();
+    }
+    
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+Actually you can use the value of \texttt{f} to tell if the file is opened: if \texttt{f} cannot be opened, then the value of \texttt{f} is 0. Otherwise it will be a non-zero value. However using \texttt{is\_open()} is a better idea. Anyway you can try this with a non-existent \texttt{xyz.txt} and then where there's an \texttt{xyz.txt} file:
 
-\{
-
-std::ifstream f("xyz.txt", std::ios::in);
-
-if (\textbf{f.is\_open()})
-
-\{
-
-std::cout \textless\textless{} "error opening file xyz.txt"
-
-\textless\textless{} std::endl;
-
-\}
-
-else
-
-\{
-
-// do what you want to do ...
-
-f.close();
-
-\}
-
-return 0;
-
-\} \\
-\end{longtable}
-
-Actually you can use the value of \emph{f} to tell if the file is
-opened: if \emph{f} cannot be opened, then the value of \emph{f} is 0.
-Otherwise it will be a non-zero value. However using \emph{is\_open()}
-is a better idea. Anyway you can try this with a non-existent
-\emph{xyz.txt} and then where there's an \emph{xyz.txt} file:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless iostream\textgreater{}
-
-\#include \textless fstream\textgreater{}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <fstream>
 
 int main()
+{   
+    std::ifstream f("xyz.txt", std::ios::in);
+    if (|\textbf{!f}|)
+    {   
+         std::cout << "error opening file xyz.txt"
+                   << std::endl;
+    }
+    else
+    {    
+         // do what you want to do ...
+         f.close();
+    }
 
-\{
+    return 0;
 
-std::ifstream f("xyz.txt", std::ios::in);
+}
+\end{consolethree}
 
-if (\textbf{!f})
-
-\{
-
-std::cout \textless\textless{} "error opening file xyz.txt"
-\textless\textless{} std::endl;
-
-\}
-
-else
-
-\{
-
-// do what you want to do ...
-
-f.close();
-
-\}
-
-return 0;
-
-\} \\
-\end{longtable}
-
-\textbf{Exercise.} Create an exception class for file opening error and
+\begin{ex} Create an exception class for file opening error and
 rewrite the above code using the exception class.
-
+\end{ex}
+%SOLUTION FOR EX
 Solution:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless iostream\textgreater{}
-
-\#include \textless fstream\textgreater{}
+\begin{console}
+#include <iostream>
+#include <fstream>
 
 class FileOpenError
-
-\{\};
+{};
 
 int main()
+{   
+    try
+    {   
+         std::ifstream f("xyz.txt", std::ios::in);
+         if (!f.is_open())
+            throw FileOpenError();
 
-\{
+         // do what you want to do ...
+         f.close();
+     }
+     catch (FileOpenError & e)
+     {   
+         std::cout << "error opening file!"
+                   << std::endl;
+     }
 
-try
-
-\{
-
-std::ifstream f("xyz.txt", std::ios::in);
-
-if (!f.is\_open())
-
-throw FileOpenError();
-
-// do what you want to do ...
-
-f.close();
-
-\}
-
-catch (FileOpenError \& e)
-
-\{
-
-std::cout \textless\textless{} "error opening file!"
-
-\textless\textless{} std::endl;
-
-\}
-
-return 0;
-
-\} \\
-\end{longtable}
+     return 0;
+}
+\end{console}
 
 Or even this:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless iostream\textgreater{}
-
-\#include \textless fstream\textgreater{}
+\begin{console}
+#include <iostream>
+#include <fstream>
 
 class FileOpenError
-
-\{\};
+{};
 
 class InputFile: public std::ifstream
-
-\{
-
+{
 public:
-
-InputFile(const char filename{[}{]})
-
-: std::ifstream(filename, std::ios::in)
-
-\{
-
-if (!this-\textgreater is\_open())
-
-throw FileOpenError();
-
-\vtop{\hbox{\strut  \}}\hbox{\strut \};}}
+     InputFile(const char filename[])
+       : std::ifstream(filename, std::ios::in)
+     {
+        if (!this->is_open())
+           throw FileOpenError();
+     }
+};
 
 int main()
+{   
+    try
+    {
+        InputFile f("xyz.txt");
+        // do what you want to do ...
+        f.close();
+    }
+    catch (FileOpenError & e)
+    {   
+        std::cout << "error opening file "
+                  << std::endl;
+    }
+    
+    return 0;
 
-\{
+}
+\end{console}
 
-try
+\newpage\EMPHASIZE{Read Error}
 
-\{
+Now suppose you've checked that the file is open for reading, what can happen?
 
-InputFile f("xyz.txt");
+You might be attempting reading an integer from file \texttt{f}:
 
-// do what you want to do ...
-
-f.close();
-
-\}
-
-catch (FileOpenError \& e)
-
-\{
-
-std::cout \textless\textless{} "error opening file "
-
-\textless\textless{} std::endl;
-
-\}
-
-return 0;
-
-\} \\
-\end{longtable}
-
-Read Error
-
-Now suppose you\textquotesingle ve checked that the file is open for
-reading, what can happen?
-
-You might be attempting reading an integer from file \emph{f}:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{console}
 int x;
+f >> x;
+\end{console}
 
-f \textgreater\textgreater{} x; \\
-\end{longtable}
-
-when the contents from \emph{f} to be processed is not an integer. For
-instance from the file pointer, the next sequence of data is
-\emph{"hello"}. This is sometimes called a format error.
+when the contents from \texttt{f} to be processed is not an integer. For instance from the file pointer, the next sequence of data is \texttt{"hello"}. This is sometimes called a format error.
 
 Such an error can be detected like this:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{console}
 int x;
-
-f \textgreater\textgreater{} x;
-
+f >> x;
 if (f.fail())
-
-\{
-
-std::cout \textless\textless{} "x is garbage!!!\textbackslash n";
-
-char y{[}100{]};
-
-f \textgreater\textgreater{} y;
-
-std::cout \textless\textless{} "data read: " \textless\textless{} y
-\textless\textless{} \textquotesingle\textbackslash n\textquotesingle;
-
-\}
-
+{  
+    std::cout <<"x is garbage\n";
+    char y[100];
+    f >> y;
+    std::cout << "data read: " << y << '\n';
+}
 else
-
-\{
-
-// do something useful with x
-
-\} \\
-\end{longtable}
+{   
+    // do something useful with x
+}
+\end{console}
 
 In this case data is not lost. In other words, the file pointer does not
 move:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 int x;
-
-f \textgreater\textgreater{} x;
-
+f >> x;
 if (f.fail())
-
-\{
-
-std::cout \textless\textless{} "x is garbage!!!\textbackslash n";
-
-char y{[}100{]};
-
-f \textgreater\textgreater{} y;
-
-std::cout \textless\textless{} "data read: " \textless\textless{} y
-\textless\textless{} \textquotesingle\textbackslash n\textquotesingle;
-
-\}
-
+{    
+     std::cout << "x is garbage\n";
+     |\textbf{char y[100];}|
+     |\textbf{f >> y;}|
+     |\textbf{std::cout << " data read: " << y << '\textbackslash n';}|
+}
 else
-
-\{
-
-// do something useful with x
-
-\} \\
-\end{longtable}
+{    
+     // do something useful with x
+}
+\end{consolethree}
 
 There are other situations where error is more serious (example:
 hardware failure) where data can be lost. This is how you check for such
 errors:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{console}
 int x;
-
-f \textgreater\textgreater{} x;
-
+f >> x;
 if (f.bad())
-
-\{
-
-std::cout \textless\textless{} "fatal error!!!\textbackslash n";
-
-\}
-
+{  
+    std::cout << "fatal error\n";
+}
 else
-
-\{
-
-// do something useful with x
-
-\} \\
-\end{longtable}
+{   
+    // do something useful with x
+}
+\end{console}
 
 Such cases are really bad and recovery is difficult.
 
-A detailed error handling code (assuming the file is already checked to
-be open) might look like this:
+A detailed error handling code (assuming the file is already checked to be open) might look like this:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-f \textgreater\textgreater{} x;
-
+\begin{console}
+f >> x;
 if (f.fail())
-
-\{
-
-// try to do some recovery, maybe read x in a
-
-// different way and proceed
-
-\}
-
+{   
+    // try to do some recovery, maybe read x in a
+    // different way and proceed
+}
 else if (f.bad())
-
-\{
-
-// fatal error ... maybe print error message and
-
-// halt the program
-
-\}
-
+{   
+    // fatal error ... maybe print error message and
+    // halt the program
+}
 else
+{   
+    // everything is OK with reading x
+}
+\end{console}
 
-\{
+If you don't care to handle \texttt{f.fail()} and
+\texttt{f.bad()} cases separately you can of course do this:
 
-// everything is OK with reading x
-
-\} \\
-\end{longtable}
-
-If you don\textquotesingle t care to handle \emph{f.fail()} and
-\emph{f.bad()} cases separately you can of course do this:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-f \textgreater\textgreater{} x;
-
-if (f.fail() \textbar\textbar{} f.bad())
-
-\{
-
-// don\textquotesingle t bother with recovery ... data was bad
-
-// anyway ... GIGO
-
-// just print an error message and halt the
-
-// program
-
-\}
-
+\begin{console}
+f >> x;
+if (f.fail() || f.bad())
+{   
+    // don't bother with recovery ... data was bad
+    // anyway ... GIGO
+    // just print an error message and halt the
+    // program
+}
 else
+{   
+    // everything is OK with reading x ... MOVE ON!!!
+}
+\end{console}
 
-\{
+There's a shorthand for doing the above.
 
-// everything is OK with reading x ... MOVE ON!!!
+The opposite of \texttt{f.bad()} is \texttt{f.good()}. So you can do this if you like:
 
-\} \\
-\end{longtable}
-
-There\textquotesingle s a shorthand for doing the above.
-
-The opposite of \emph{f.bad()} is \emph{f.good()}. So you can do this if
-you like:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-f \textgreater\textgreater{} x;
-
+\begin{console}
+f >> x;
 if (f.good())
-
-\{
-
-// everything is OK with reading x ... MOVE ON!!!
-
-\}
-
+{    
+     // everything is OK with reading x ... MOVE ON!!!
+}
 else
+{   
+     // don't bother with recovery ... data was bad
+     // anyway ... GIGO
+     // just print an error message and halt the
+     // program
+} 
+\end{console}
 
-\{
+So let's say you have a file containing first name, last name, monthly pay:
 
-// don\textquotesingle t bother with recovery ... data was bad
-
-// anyway ... GIGO
-
-// just print an error message and halt the
-
-// program
-
-\}  \\
-\end{longtable}
-
-So let\textquotesingle s say you have a file containing first name, last
-name, monthly pay:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{console}
 John Doe 1234.56
-
 Jane Smith 2345.67
+Harry Lee 3456.78
+\end{console}
 
-Harry Lee 3456.78 \\
-\end{longtable}
+You can do this (assuming you have already checked that your file \texttt{f} is opened successfully):
 
-You can do this (assuming you have already checked that your file
-\emph{f} is opened successfully):
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{console}
 double total = 0.0;
-
 bool error = false;
-
 while (!f.eof())
-
-\{
-
-char{[}100{]} fname;
-
-char{[}100{]} lname;
-
-double pay;
-
-f \textgreater\textgreater{} fname \textgreater\textgreater{} lname
-\textgreater\textgreater{} pay;
-
-if (f.good())
-
-\{
-
-total += pay;
-
-std::cout \textless\textless{} fname \textless\textless{}
-\textquotesingle{} \textquotesingle{} \textless\textless{} lname
-
-\textless\textless{} " is paid "
-
-\textless\textless{} pay \textless\textless{} std::endl;
-
-\}
-
+{   
+     char[100] fname;
+     char[100] lname;
+     double pay;
+     f >> fname >> lname >> pay;
+     if (f.good())
+     {
+          total += pay;
+          std::cout << fname << ' ' << lname
+                    << " is paid "
+                    << pay << std::endl;
+}
 else
-
-\{
-
-error = true;
-
-break;
-
-\}
-
-\}
-
+{    
+     error = true;
+     break;
+}
 if (!error) // or use f.good()
-
-\{
-
-std::cout \textless\textless{} "total: " \textless\textless{} total
-\textless\textless{} std::endl;
-
-\}
-
+{    
+     std::cout << "total: " << total << std::endl;
+}
 else
+{
+std::cout << "DATA IN FILE IS CORRUPTED!!!"
+          << std::endl;
+}
+\end{console}
 
-\{
+\newpage\EMPHASIZE{Clearing the Error and Continuing}
 
-std::cout \textless\textless{} "DATA IN FILE IS CORRUPTED!!!"
+Once your file f hits an error, the error is stored in object f. If you do want to somehow continue with your processing of the file, you need to clear the error information stored in \texttt{f}. This is easy enough. You just do this:
 
-\textless\textless{} std::endl;
-
-\} \\
-\end{longtable}
-
-Clearing the Error and Continuing
-
-Once your file f hits an error, the error is stored in object f. If you
-do want to somehow continue with your processing of the file, you need
-to clear the error information stored in \emph{f}. This is easy enough.
-You just do this:
-
-\emph{f.clear();}
+\tab[3em]{\texttt{f.clear();}}\\
 
 Now why and when would you want to do this?
 
@@ -1608,67 +877,33 @@ garbage so that your program can continue to do something useful.
 
 For instance suppose a payroll file looks like this on Monday:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{console}
 John Doe 1234.56
-
 Jane Smith 2345.67
-
-Harry Lee 3456.78 \\
-\end{longtable}
+Harry Lee 3456.78
+\end{console}
 
 and on Tuesday someone from the HR department accidentally entered two
 new employees, forgetting that middle names should not be included in
 the file:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{console}
 John Doe 1234.56
-
 Jane Smith 2345.67
-
 Harry Lee 3456.78
-
 George E. Danger 4567.89
+Susan Doyle 5678.90
+\end{console}
 
-Susan Doyle 5678.90 \\
-\end{longtable}
+The payroll program that prints out company checks might hit an error on line 4, printing out only checks for the first 3 employees. A smarter program will attempt to read past the corrupted line, and hope that the next line is correct. If so, this program will continue to print the check for Susan Doyle.
 
-The payroll program that prints out company checks might hit an error on
-line 4, printing out only checks for the first 3 employees. A smarter
-program will attempt to read past the corrupted line, and hope that the
-next line is correct. If so, this program will continue to print the
-check for Susan Doyle.
+This is why we want to be able to clear the error information in the file object. We'll come back to this later when I've explained to you how to for instance read passed the current line of data.
 
-This is why we want to be able to clear the error information in the
-file object. We\textquotesingle ll come back to this later when
-I\textquotesingle ve explained to you how to for instance read passed
-the current line of data.
+\newpage\EMPHASIZE{C-style File I/O}
 
-C-style File I/O
-
-So far I\textquotesingle ve shown you how to work with files using the
-C++ file streams. Of course C was the father of C++. How do C
-programmers work with file? There are actually two different file I/O
-libraries that C programmers (and also for C++ programmers since C++
-programmers can also use C file I/O libraries too) can use: one comes
-from the Unix operating system and another from C language. Therefore
-there are actually three different ways to work with files:
+So far I've shown you how to work with files using the C++ file streams. Of course C was the father of C++. How do C programmers work with file? There are actually two different file I/O libraries that C programmers (and also for C++ programmers since C++ programmers can also use C file I/O libraries too) can use: one comes from the Unix operating system and another from C language. Therefore there are actually three different ways to work with files:
 
 \begin{itemize}
-\tightlist
 \item
   Unix file pointers
 \item
@@ -1677,13 +912,7 @@ there are actually three different ways to work with files:
   C++ file streams (what I talked about in this set of notes)
 \end{itemize}
 
-Now why should you be interested in C-style file I/O? Because many
-low-level code is written in C. That includes Unix and various unix
-utilities. Low-level network programming (i.e. network socket
-programming) is also usually done in C too.
+Now why should you be interested in C-style file I/O? Because many low-level code is written in C. That includes Unix and various unix utilities. Low-level network programming (i.e. network socket programming) is also usually done in C too.
 
-So you had better learn it!!! I will leave it to you read this up on
-your own. Make full use of the web and google (example google "c style
-file pointers").
+So you had better learn it!!! I will leave it to you read this up on your own. Make full use of the web and google (example google "c style file pointers").
 
-\end{document}

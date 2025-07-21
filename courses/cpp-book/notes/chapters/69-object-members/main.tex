@@ -74,7 +74,7 @@ The class \texttt{D} contains a member \texttt{c} that is an object from
 class \texttt{C}. When creating \texttt{d}, the member \texttt{d.c }calls its
 default constructor \texttt{C::C()} automatically.
 
-No constructor found
+\newpage\EMPHASIZE{No constructor found}
 
 Now we'll look at a very common case that you may run
 into: the case when your compiler cannot find a constructor to call. For
@@ -119,9 +119,7 @@ function that takes them.
 
 \newpage\EMPHASIZE{Member constructor: explicit}
 
-So what if I don't want to call the default constructor
-(the constructor that does not have any parameters), but some other
-constructor?? You can actually specify your constructor call ...
+So what if I don't want to call the default constructor (the constructor that does not have any parameters), but some other constructor?? You can actually specify your constructor call ...
 
 \begin{console}[commandchars=\~\@\$]
 class C
@@ -154,7 +152,7 @@ int main()
 }
 \end{console}
 
-Member \texttt{c_} calls constructor \texttt{C::C(int)} explicitly.
+Member \texttt{c\_} calls constructor \texttt{C::C(int)} explicitly.
 
 Here's another example:
 
@@ -172,10 +170,10 @@ private:
 };
 \end{console}
 
-\texttt{signup_date} calls \texttt{Date::Date(const Date \&)}, i.e., the
+\verb!signup_date! calls \verb!Date::Date(const Date &)!, i.e., the
 copy constructor explicitly.
 
-\begin{ex}:} Add a \texttt{get_signup_date()} method to the above
+\begin{ex} Add a \verb!get_signup_date()! method to the above
 class that does the obvious. Test your code with
 \begin{console}
 int main()
@@ -260,89 +258,92 @@ That's one method of software re-use. There's also another type of software re-u
 
 \begin{ex}
 Complete the following circle class
-
+\begin{console}
 // Circle.h
 class Circle
-{
-public:
-Circle(int x0, int y0, int r0);
-void move(int dx, int dy)
-{
-x_ += dx; y_ += dy;
-}
-void print() const;
-private:
-int x_, y_, r_;
-}; 
+{     
+public: 
+       Circle(int x0, int y0, int r0);
 
+       void move(int dx, int dy)
+       {
+           x_ += dx; y_ += dy;
+       }
+       
+       void print() const;
+
+private:
+        int x_, y_, r_;
+}; 
+\end{console}
+\begin{console}
 // Circle.cpp
 void Circle::print() const
 {
-std::cout << "center: (" << x_
-<< ", " << y_
-<< ")" << ", radius:"
-<< r_ <<
-'\ n';
+std::cout << "center: (" << x_ << ", " << y_
+          << ")" << ", radius:" << r_ << '\ n';
 }
 
-// Add other method definitions here \\
+// Add other method definitions here
 \end{console}
 
 And test it with this program:
-
+\begin{console}
 int main()
-{
-Circle c(10, 10, 5);
-c.print();
-for (int i = 0; i < 10; i++)
-{
-c.move(2, 3);
-c.print();
-}
-return 0;
+{   
+    Circle c(10, 10, 5);
+    c.print();
+    for (int i = 0; i < 10; i++)
+    {   
+        c.move(2, 3);
+        c.print();
+    }
+    return 0;
 }
 \end{console}
 
 Now finish the following class:
-
+\begin{console}
 class vec2i
 {
 public:
-// constructor
-// operator +=
-// operator<<
+        // constructor
+        // operator +=
+        // operator<<
 private:
-int x_, y_;
+        int x_, y_;
 };
 \end{console}
 
 And rewrite your circle class:
-
+\begin{console}[commandchars=\~\@\$]
 class Circle
 {
 public:
-Circle(\textbf{const vec2i \& v}, int r0);
-void move(\textbf{const vec2i \& v}) { ... }
-void print(\textbf{const vec2i \& v}) { ... }
+        Circle(~EMPHASIZE@const vec2i & v$, int r0);
+        void move(~EMPHASIZE@const vec2i & v$) { ... }
+        void print(~EMPHASIZE@const vec2i & v$) { ... }
+
 private:
-\textbf{vec2i center_;}
-int r_;
+        ~EMPHASIZE@vec2i center_;$
+        int r_;
 }; 
 \end{console}
 
 And test it with this program:
-
+\begin{console}
 int main()
-{
-Circle c(vec2i(10, 10), 5);
-c.print();
-vec2i v(2, 3);
-for (int i = 0; i < 10; i++)
-{
-c.move(v);
-c.print();
-}
-return 0;
+{   
+    Circle c(vec2i(10, 10), 5);
+    c.print();
+    vec2i v(2, 3);
+    for (int i = 0; i < 10; i++)
+    {   
+        c.move(v);
+        c.print();
+    }
+    
+    return 0;
 }
 \end{console}
 \end{ex}
@@ -355,16 +356,8 @@ The following is a common practice:
 \item
   Suppose every object of class \texttt{D} contains an object of class
   \texttt{C}.
-\end{itemize}
-
-\begin{itemize}
-\tightlist
 \item
   Suppose every object of class \texttt{C} has a method called \texttt{m()}.
-\end{itemize}
-
-\begin{itemize}
-\tightlist
 \item
   Then \texttt{D} can have a method call \texttt{m()} that calls the
   \texttt{m()} of class \texttt{C}.
@@ -402,36 +395,32 @@ do the work.
 Here's another example:
 
 Suppose you have a \texttt{vec2d} class (a vector class of 2 doubles).
-Suppose you have a \texttt{GameObject} class with a \texttt{vec2d} member
-called \texttt{pos} (the position vector in the screen). Suppose each
-\texttt{vec2d} object has a \texttt{get_x()} method. Then you might want to
-have a \texttt{get_x()} method in the \texttt{GameObject} class. This
-method calls the \texttt{p.get_x() }method.
-\begin{align*}
-&\texttt{GameObject alien; }\\
-&\texttt{std::cout << alien.get_x() << '\n';}\\
-\end{align*}
+Suppose you have a \texttt{GameObject} class with a \texttt{vec2d} member called \texttt{pos} (the position vector in the screen). Suppose each \texttt{vec2d} object has a \verb!get_x()! method. Then you might want to have a \verb!get_x()! method in the \texttt{GameObject} class. This method calls the \verb!p.get_x()! method.
+
+\tab[3em]{\verb!GameObject alien;!}\\
+\tab[3em]{\verb!std::cout << alien.get_x() << '\n';!}\\
+
 Otherwise you would have to do this:
-\begin{align*}
-\texttt{GameObject alien;}\\
-\texttt{std::cout << alien.get_pos().get_x() << '\n';}\\
-\end{align*}
+
+\tab[3em]{\verb!GameObject alien;!}\\
+\tab[3em]{\verb!std::cout << alien.get_pos().get_x() << '\n';!}\\
+
 In software, if you see something like
-\begin{center}
-\texttt{alien.get_pos().get_x() }
-\end{center}
+
+\tab[3em]{\verb!alien.get_pos().get_x()! }\\
+
 with two ``\texttt{.}''operators (the ``member operator''), then the
 delegation technique should probably be used. In well written software,
 there shouldn't be too many ``\texttt{.}''operators like
 the above. This is very subjective, but some recommend at most two
 ``\texttt{.}''. So the following is considered bad:
-\begin{center}
-\texttt{alien.get_rocket().load().fire() }
-\end{center}
+
+\tab[3em]{\verb!alien.get_rocket().load().fire()! }\\
+
 Maybe have this instead:
-\begin{center}
-\texttt{alien.fire_rocket() }
-\end{center}
+
+\tab[3em]{\verb!alien.fire_rocket()! }\\
+
 In fact some experts say there should be at most one ``\texttt{.}''
 
 \begin{ex} Complete the following class
@@ -511,3 +500,4 @@ private:
         ~EMPHASIZE@CharDynArr board; $
 };
 \end{console}
+\end{ex}
