@@ -1,9 +1,17 @@
 from latextool_basic import *
+from latexcircuit import *
 p = Plot()
-s = array(x0=0.5, y0=0.5, width=0.6, height=1.2, xs=['h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd', r'\textbackslash n', 0, ' ', 3, '.', 1, 4, r'\textbackslash  n', 4, 2, ' ',' ',' ',' ',' ',' ',' ',' '], celllinewidth=0.05)
-p.add(s)
-p += Rect(13.1, 0.51, 13.7, 1.69, background='black')
-#p+= Grid(x0=-1, y0=-2, x1=15, y1=5)
-p += Line(points=[(13.45,-1),(13.45,0.5)], linewidth=0.3, endstyle='>')
+#p += Grid(x0=-4,y0=-4,x1=5,y1=5)
+p += Rect(-2,0.5,3,2.5, label=r'\large{\texttt{while  (\ \ \ \ \ \ \ \ \ \ \ \ )}}', linewidth=0)
+p += Rect(-3,-2,5,3, linewidth=0.2)
+p += Rect(-1,-1,3,1, linewidth=0.1)
+p += Rect(-0.5,-0.5,2.5,0.5, linewidth=0.05, label=r'\texttt{\textbf{continue;}}')
+
+
+p += Line(points=[(2.5,0),(4, 0)], linewidth=0.1, linecolor='red')
+p += Line(points=[(4,0),(4,2.5)], linewidth=0.1, linecolor='red')
+p += Line(points=[(4,2.5),(1,2.5)], linewidth=0.1, linecolor='red')
+p += Line(points=[(1,2.5),(1,1.5)], linewidth=0.1, linecolor='red', endstyle='>')
+
 print(p)
 
