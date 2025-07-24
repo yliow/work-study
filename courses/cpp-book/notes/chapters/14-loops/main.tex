@@ -639,7 +639,7 @@ to compute the sum -- you have seen similar examples before.
 for-loop or a while-loop? The value you get should be approximately
 1.46361.
 \end{ex}
-%if you had a gun to my head and told me to figure out why this doesnt correctly tab before 1*1 but does afterwards or i die i would pull the trigger for you
+%if you had a gun to my head and told me to figure out why this doesnt correctly tab before 1*1 but does afterwards or i die, i would pull the trigger for you
 \begin{ex} Now modify the above program to compute
 
 \texttt{\ \ \ \ \ \ 1\ \ \ \ \ \ \ 1\ \ \ \ \ \ \ 1\ \ \ \ \ \ \ 1\ \ \ \ \ \ \ 1\ \ \ \ \ \ \ \ 1}\\
@@ -751,12 +751,13 @@ stop changing. This is a waste of CPU time.
 
 We need to figure out how to stop the loop AUTOMATICALLY.
 
-By the way if you look at the term:
+By the way if you look at the term:\\
 \tab[3em]{\texttt{
 \ \ 1
 -----
 i * i
 }}
+
 obviously you want to avoid integer division. So in C++ you should do
 \begin{center}
     \texttt{1.0 / (i * i)}
@@ -838,14 +839,14 @@ Let's call the two approximation variables a0, a1. You
 can also think of a0 and a1 scanning over the above numbers
 hand-in-hand:
 \begin{align*}
-1.1 &1.123 &1.1345 &1.1355 &\textbf{1.1356} &1.1357\\
-a0 &a1\\
-1.1 &1.123 &1.1345 &1.1355 &\textbf{1.1356} &1.1357\\
-&a0 &&a1\\
-1.1 &1.123 &1.1345 &1.1355 &\textbf{1.1356} &1.1357\\
-&&a0 &&&a1\\
-1.1 &1.123 &1.1345 &1.1355 &\textbf{1.1356} &1.1357\\
-&&&a0 &&&&a1\\
+1.1         &&1.123       &&1.1345      &&1.1355      &&\textbf{1.1356} &&1.1357 \\
+a0         &&a1 \\
+1.1         &&1.123       &&1.1345      &&1.1355      &&\textbf{1.1356} &&1.1357 \\
+&&a0        &&a1 \\
+1.1         &&1.123       &&1.1345      &&1.1355      &&\textbf{1.1356} &&1.1357 \\
+&&&&a0       &&a1 \\
+1.1         &&1.123       &&1.1345      &&1.1355      &&\textbf{1.1356} &&1.1357 \\
+&&&&&&a0      &&a1 \\
 \end{align*}
 and we stop at this point because the first three decimal places of a0
 and a1 at this point are the same.
@@ -854,10 +855,10 @@ Hmmm ... it seems like we need to initialize a0 and a1 with the first
 two approximations. But there's something about the loop
 .... Look at the first two lines.
 \begin{align*}
-1.1 &1.123 &1.1345 &1.1355 &\textbf{1.1356} &1.1357\\
-a0 &a1\\
-1.1 &1.123 &1.1345 &1.1355 &\textbf{1.1356} &1.1357\\
-&a0 &&a1\\
+1.1         &&1.123       &&1.1345      &&1.1355      &&\textbf{1.1356} &&1.1357 \\
+a0         &&a1 \\
+1.1         &&1.123       &&1.1345      &&1.1355      &&\textbf{1.1356} &&1.1357 \\
+&&a0        &&a1 \\
 \end{align*}
 The pseudocode for the above two data lines looks like this:
 \begin{align*}
@@ -893,16 +894,16 @@ What about the ending condition? The right thing to do is to first
 compute the new approximation and then terminate the loop if a0 and a1
 are close enough, say they are less than 0.0001 apart. What does that
 mean? That means we stop the loop if either
-\[a0 -- a1 < 0.0001\]
+\[a0 - a1 < 0.0001\]
 or
-\[a1 -- a0 < 0.0001\]
+\[a1 - a0 < 0.0001\]
 In other words we stop if mathematically
 \[
-| a1 -- a0 | < 0.0001
+| a1 - a0 | < 0.0001
 \]
 where $|$ ... $|$ means ``the absolute value of'' . In C++ the absolute value is given by the \texttt{abs()} function for integer values and \texttt{fabs()} for double. The above becomes
 \[
-fabs(a0 -- a1) < 0.0001
+fabs(a0 - a1) < 0.0001
 \]
 You might need to \texttt{\#include <cmath>} to use the \texttt{abs()} or \texttt{fabs()} function.
 
@@ -927,33 +928,36 @@ while (|approx0 -- approx1| >= error):
 This is correct but we can simplify the code. Look at the previous
 simulation:
 
-%% \begin{alignat*}{5}
-%% 1.1 &&1.123 &&1.1345 &&1.1355 &&\textbf{1.1356} &&1.1357\\
-%% a0 &a1\\
-%% 1.1 &1.123 &1.1345 &1.1355 &\textbf{1.1356} &1.1357\\
-%% a0 &a1\\
-%% 1.1 &1.123 &1.1345 &1.1355 &\textbf{1.1356} &1.1357\\
-%% a0 &a1\\
-%% 1.1 &1.123 &1.1345 &1.1355 &\textbf{1.1356} &1.1357\\
-%% a0 &a1\\
-%% \end{alignat*}
+\begin{align*}
+1.1         &&1.123       &&1.1345      &&1.1355      &&\textbf{1.1356} &&1.1357 \\
+a0         &&a1 \\
+1.1         &&1.123       &&1.1345      &&1.1355      &&\textbf{1.1356} &&1.1357 \\
+&&a0        &&a1 \\
+1.1         &&1.123       &&1.1345      &&1.1355      &&\textbf{1.1356} &&1.1357 \\
+&&&&a0       &&a1 \\
+1.1         &&1.123       &&1.1345      &&1.1355      &&\textbf{1.1356} &&1.1357 \\
+&&&&&&a0      &&a1 \\
+\end{align*}
 
 It requires initializing a0 and a1 with the first two approximations.
 But I can initialize a0 with a dummy value say 0:
 
+\begin{align*}
+0.0         &&1.1       &&1.123      &&1.1345      &&1.1355     &&\textbf{1.1356} &&1.1357 \\
+a0         &&a1 \\
+0.0         &&1.1       &&1.123      &&1.1345      &&1.1355     &&\textbf{1.1356} &&1.1357 \\
+&&a0        &&a1 \\
+0.0         &&1.1       &&1.123      &&1.1345      &&1.1355     &&\textbf{1.1356} &&1.1357 \\
+&&&&a0       &&a1 \\
+0.0         &&1.1       &&1.123      &&1.1345      &&1.1355     &&\textbf{1.1356} &&1.1357 \\
+&&&&&&a0      &&a1 \\
+0.0         &&1.1       &&1.123      &&1.1345      &&1.1355     &&\textbf{1.1356} &&1.1357 \\
+&&&&&&&&a0      &&a1 \\
+\end{align*}
+
 
 As long as a1 is far enough from a0, I'm guaranteed that
 the approximation will be the same as the previous code.
-%% \begin{align*}
-%% 0.0 &1.1 &1.123 &1.1345 &1.1355 &\textbf{1.1356} &1.1357\\
-%% a0 &a1\\
-%% 0.0 &1.1 &1.123 &1.1345 &1.1355 &\textbf{1.1356} &1.1357\\
-%% 0.0 &a0 &&a1\\
-%% 0.0 &1.1 &1.123 &1.1345 &1.1355 &\textbf{1.1356} &1.1357\\
-%% 0.0 &&a0 &&&a1\\
-%% 0.0 &1.1 &1.123 &1.1345 &1.1355 &\textbf{1.1356} &1.1357\\
-%% &&&a0 &&&&a1\\
-%% \end{align*}
 
 For the above problem we have the following code:
 \begin{console}
@@ -1053,19 +1057,63 @@ what is
 %% \includegraphics[width=1.2508in,height=0.3839in]{Pictures/2000000700000C68000003D0CD34451144393396.svm}
 
 in terms of x?]
-
+\end{ex}
 \newpage\EMPHASIZE{Queue}
 
 Look at our first example on approximations again. Once again we have
 two variables a0 and a1 and they scan over a bunch of values.
 
-%copy the other table above when its fixed
+\begin{align*}
+0.0         &&1.1       &&1.123      &&1.1345      &&1.1355     &&\textbf{1.1356} &&1.1357 \\
+a0         &&a1 \\
+0.0         &&1.1       &&1.123      &&1.1345      &&1.1355     &&\textbf{1.1356} &&1.1357 \\
+&&a0        &&a1 \\
+0.0         &&1.1       &&1.123      &&1.1345      &&1.1355     &&\textbf{1.1356} &&1.1357 \\
+&&&&a0       &&a1 \\
+0.0         &&1.1       &&1.123      &&1.1345      &&1.1355     &&\textbf{1.1356} &&1.1357 \\
+&&&&&&a0      &&a1 \\
+0.0         &&1.1       &&1.123      &&1.1345      &&1.1355     &&\textbf{1.1356} &&1.1357 \\
+&&&&&&&&a0      &&a1 \\
+\end{align*}
 
 You can also think about it this way: Think of a data structure (i.e.
 something that contains data and comes with operations):
-%make tikz table diagram here
+\begin{python}
+from latextool_basic import *
+p = Plot()
+#p += Grid(x0=-4, y0=-4, x1=4, y1=4)
+p += Rect(2, 0, 4, 1, linewidth=0.05)
+p += Rect(0, 0, 2, 1, linewidth=0.05)
+print(p)
+\end{python}
 and data goes in at one end and comes out from the other end.
-%TIKZ DIAGRAM HERE
+\begin{python}
+from latextool_basic import *
+from latexcircuit import POINT
+p = Plot()
+p += Grid(x0=-4, y0=-4, x1=4, y1=4)
+
+p += Rect(2, 2, 4, 3, linewidth=0.05, label='1.1')
+p += Rect(0, 2, 2, 3, linewidth=0.05, label='0.0')
+p += Line(points=[(6,2.5),(4,2.5)], linewidth=0.1, endstyle='>', label=r'1.123')
+p += Line(points=[(0,2.5),(-1,2.5)], linewidth=0.1, endstyle='>')
+p += Rect(2, 0, 4, 1, linewidth=0.05, label='1.123')
+p += Rect(0, 0, 2, 1, linewidth=0.05, label='1.1')
+p += Line(points=[(6,0.5),(4,0.5)], linewidth=0.1, endstyle='>', label=r'1.1345')
+p += Line(points=[(0,0.5),(-1,0.5)], linewidth=0.1, endstyle='>')
+p += Rect(2, -2, 4, -1, linewidth=0.05, label='1.1345')
+p += Rect(0, -2, 2, -1, linewidth=0.05, label='1.123')
+p += Line(points=[(6, -1.5),(4, -1.5)], linewidth=0.1, endstyle='>', label=r'1.1355')
+p += Line(points=[(0,-1.5),(-1,-1.5)], linewidth=0.1, endstyle='>')
+p += Line(points=[(7.5,4),(7.5,-3)], linewidth=0.1, linestyle='dashed', endstyle='>')
+X = POINT(8.7, 1, r=0, label=r'time')
+Y = POINT(-1, 0.5, r=0, label=r'0.0')
+Z = POINT(-1, -1.5, r=0, label=r'1.1')
+p += str(X)
+p += str(Y)
+p += str(Z)
+print(p)
+\end{python}
 The structure you see, as a blackbox, can keep two values. There are
 also operations on this structure: You can take things out of the
 structure and you can put things into this structure. The important
