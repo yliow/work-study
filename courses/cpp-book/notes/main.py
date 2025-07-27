@@ -1,26 +1,17 @@
 from latextool_basic import *
-from latexcircuit import POINT
+from latexcircuit import *
 p = Plot()
-p += Grid(x0=-4, y0=-4, x1=4, y1=4)
+#p += Grid(x0=-4,y0=-4,x1=5,y1=5)
+p += Rect(-2,0.5,3,2.5, label=r'\large{\texttt{while  (\ \ \ \ \ \ \ \ \ \ \ \ )}}', linewidth=0)
+p += Rect(-3,-2,5,3, linewidth=0.2)
+p += Rect(-1,-1,3,1, linewidth=0.1)
+p += Rect(-0.5,-0.5,2.5,0.5, linewidth=0.05, label=r'\texttt{\textbf{continue;}}')
 
-p += Rect(2, 2, 4, 3, linewidth=0.05, label='1.1')
-p += Rect(0, 2, 2, 3, linewidth=0.05, label='0.0')
-p += Line(points=[(6,2.5),(4,2.5)], linewidth=0.1, endstyle='>', label=r'1.123')
-p += Line(points=[(0,2.5),(-1,2.5)], linewidth=0.1, endstyle='>')
-p += Rect(2, 0, 4, 1, linewidth=0.05, label='1.123')
-p += Rect(0, 0, 2, 1, linewidth=0.05, label='1.1')
-p += Line(points=[(6,0.5),(4,0.5)], linewidth=0.1, endstyle='>', label=r'1.1345')
-p += Line(points=[(0,0.5),(-1,0.5)], linewidth=0.1, endstyle='>')
-p += Rect(2, -2, 4, -1, linewidth=0.05, label='1.1345')
-p += Rect(0, -2, 2, -1, linewidth=0.05, label='1.123')
-p += Line(points=[(6, -1.5),(4, -1.5)], linewidth=0.1, endstyle='>', label=r'1.1355')
-p += Line(points=[(0,-1.5),(-1,-1.5)], linewidth=0.1, endstyle='>')
-p += Line(points=[(7.5,4),(7.5,-3)], linewidth=0.1, linestyle='dashed', endstyle='>')
-X = POINT(8.7, 1, r=0, label=r'time')
-Y = POINT(-1, 0.5, r=0, label=r'0.0')
-Z = POINT(-1, -1.5, r=0, label=r'1.1')
-p += str(X)
-p += str(Y)
-p += str(Z)
+
+p += Line(points=[(2.5,0),(4, 0)], linewidth=0.1, linecolor='red')
+p += Line(points=[(4,0),(4,2.5)], linewidth=0.1, linecolor='red')
+p += Line(points=[(4,2.5),(1,2.5)], linewidth=0.1, linecolor='red')
+p += Line(points=[(1,2.5),(1,1.5)], linewidth=0.1, linecolor='red', endstyle='>')
+
 print(p)
 
