@@ -116,7 +116,7 @@ int main()
      {   
          std::cout << "here we go ..." << std::endl;
          int y = x + 1;
-         |\underline{std::cout << "y: " << y << std::endl;}|
+         |\begin{tikzpicture}\node[draw=red, thick, inner sep=2pt]{std::cout << "y: " << y << std::endl;};\end{tikzpicture}|
      }
      std::cout << "y: " << y << std::endl;
 
@@ -141,13 +141,12 @@ int main()
          int y = x + 1;
          std::cout << "y: " << y << std::endl;
      }
-     |\underline{std::cout << "y: " << y << std::endl;}|
-     
-     |\tikzmarknode{a}{DEFGHI}|        
+     |\begin{tikzpicture}\node[draw=red, thick, inner sep=2pt]{std::cout << "y: " << y << std::endl;};\end{tikzpicture}|
+             
      return 0;
 }
 \end{consolethree}
-As you can see, immediately on exiting the \texttt{if} statement, the \EMPHASIZE{variable in the body of the}\texttt{\EMPHASIZE{if}}\EMPHASIZE{statement is destroyed}.
+As you can see, immediately on exiting the \texttt{if} statement, the \EMPHASIZE{variable in the body of the \texttt{if} statement is destroyed}.
 
 Of course \texttt{x} was created in the \texttt{main()} block. So \texttt{x} is not destroyed.
 
@@ -163,10 +162,11 @@ of the for-loop as having an inner block.
     \node[draw,text width=4cm,minimum height=6cm,minimum width=3cm, line width=0.05cm, inner sep=0.3cm] (fora) at (-3,-2) {};
     \node[draw,text width=2cm,minimum height=1cm,line width=0.01cm,yshift=-8mm] (forxbox) at (fora.north){\normalsize{\texttt{\ \ \ \ \ \ \ \ \ }42}};
     \node[draw,text width=2cm,minimum height=1cm,line width=0.01cm,yshift=-8mm] (forpbox) at (forxbox.south){\normalsize{\texttt{\ \ \ \ \ \ \ \ \ }1}};
+    \node[yshift=15mm] (formemnodeanchor) at (fora.north){};
     \node[yshift=15mm] (formemnode) at (fora.north){\normalsize{Memory for main}};
     \node[xshift=-2mm] (forxnode) at (forxbox.west){\normalsize{x}};
     \node[xshift=-2mm] (forpnode) at (forpbox.west){\normalsize{p}};
-    \draw[->,ultra thick] (formemnode.south) to (fora.north);
+    \draw[->,ultra thick] (formemnode.south) to (formemnodeanchor);
 
     \node[draw,text width=4cm,minimum height=6cm,minimum width=3cm, line width=0.05cm, inner sep=0.3cm,yshift=-3.5cm] (for2a) at (fora.south) {};
     \node[draw,text width=2cm,minimum height=1cm,line width=0.01cm,yshift=-8mm] (for2xbox) at (for2a.north){\normalsize{\texttt{\ \ \ \ \ \ \ \ \ }42}};
@@ -181,12 +181,12 @@ of the for-loop as having an inner block.
 
 \end{tikzpicture}
 }
-\begin{console}
+\begin{consolethree}[escapeinside=||]
 #include <iostream>
 
 int main()
 {    
-     int x = 42, p = 1;
+     |\begin{tikzpicture}\node[draw=red, thick, inner sep=2pt]{int x = 42, p = 1;};\end{tikzpicture}|
 
      for (int i = 1; i <= x; ++i)
      {    
@@ -196,17 +196,17 @@ int main()
      std::cout << p << std::endl;
      
      return 0;
-\end{console}
+\end{consolethree}
 
 As we enter the \texttt{for}-loop, we get a block of memory for the \texttt{for}-loop. Variable \texttt{i} in the \texttt{for}-loop resides in this block.
 
-\begin{console}
+\begin{consolethree}[escapeinside=||]
 #include <iostream>
 
 int main()
 {    
      int x = 42, p = 1;
-     for (int i = 1; i <= x; ++i)
+     for (|\begin{tikzpicture}\node[draw=red, thick, inner sep=2pt]{int i = 1;};\end{tikzpicture}| i <= x; ++i)
      {
          int y = i * i;
          p *= y;
@@ -214,27 +214,28 @@ int main()
      std::cout << p << std::endl;
 
      return 0;
-\end{console}
+\end{consolethree}
 \newpage
 \sidenote
 {
 \begin{tikzpicture}
-
-    \node[draw,text width=4cm,minimum height=6cm,minimum width=3cm, line width=0.05cm, inner sep=0.3cm,yshift=-3.5cm] (for3a) at (fora.south) {};
-    \node[draw,text width=2cm,minimum height=1cm,line width=0.01cm,yshift=-8mm] (for3xbox) at (for3a.north){\normalsize{\texttt{\ \ \ \ \ \ \ \ \ }\textbf{42}}};
+    \node[draw,text width=4cm,minimum height=7cm,minimum width=3cm, line width=0.05cm, inner sep=0.3cm,yshift=-3.5cm] (for3a) at (fora.south) {};
+    \node[draw,text width=2cm,minimum height=1cm,line width=0.05cm,yshift=-8mm] (for3xbox) at (for3a.north){\normalsize{\texttt{\ \ \ \ \ \ \ \ \ }\textbf{42}}};
     \node[draw,text width=2cm,minimum height=1cm,line width=0.01cm,yshift=-8mm] (for3pbox) at (for3xbox.south){\normalsize{\texttt{\ \ \ \ \ \ \ \ \ }1}};
     
     \node[draw,yshift=-5mm,text width=2cm, line width=0.01cm, minimum height=1cm] (for3ibox) at (for3a.center) {\normalsize{\texttt{\ \ \ \ \ \ \ \ \ }1}};
+    
     \node[draw,xshift=2mm,yshift=-9mm,text width=2cm, line width=0.01cm, minimum height=1cm] (for3ybox) at (for3ibox.south) {\normalsize{\texttt{\ \ \ \ \ \ \ \ \ }1}};
     
-    \node[draw,text width=2.7cm,line width=0.03cm,minimum height=1.5cm] (for3abox) at (for3ybox.center) {};
-    \node[draw,yshift=-12mm,text width=3.5cm, line width=0.03cm,minimum height=3.2cm] (for3bbox) at (for3a.center) {};
+    \node[xshift=-2mm,draw,text width=2.9cm,line width=0.05cm,minimum height=1.5cm] (for3abox) at (for3ybox.center) {};
+    \node[draw,yshift=-12mm,text width=3.5cm, line width=0.03cm,minimum height=3.8cm] (for3bbox) at (for3a.center) {};
+    \node (forarranchor) at (for3abox.south) {};
     \node[xshift=-2mm] (for3inode) at (for3ibox.west){\normalsize{i}};
     \node[xshift=-2mm] (for3xnode) at (for3xbox.west){\normalsize{x}};
     \node[xshift=-2mm] (for3pnode) at (for3pbox.west){\normalsize{p}};
-    %\node[xshift=-2mm] (for3ynode) at (for3ybox.west){\normalsize{y}};
-    \node[yshift=-10mm,xshift=-15mm] (for3memnode) at (for3a.south east){\normalsize{Memory of \textbf{body} of for-loop}};
-    \draw[->,ultra thick] (for3memnode.north) to (for3abox.south east);
+    \node[xshift=-2mm] (for3ynode) at (for3ybox.west){\normalsize{y}};
+    \node[yshift=-10mm,xshift=-15mm,align=center] (for3memnode) at (for3a.south east){\normalsize{Memory of \textbf{body}}\\ \normalsize{of for-loop}};
+    \draw[->,ultra thick] (for3memnode.north) to (forarranchor);
 
     \node[draw,yshift=-4cm,text width=4cm,minimum height=6cm,minimum width=3cm, line width=0.05cm, inner sep=0.3cm,yshift=-3.5cm] (for4a) at (for3a.south) {};
     \node[draw,text width=2cm,minimum height=1cm,line width=0.01cm,yshift=-8mm] (for4xbox) at (for4a.north){\normalsize{\texttt{\ \ \ \ \ \ \ \ \ }42}};
@@ -248,7 +249,7 @@ int main()
 }
 When we step into the body of the \texttt{for}-loop, we have \texttt{\textbf{another}} block. Variable \texttt{y} is created in this inner block:
 
-\begin{console}
+\begin{consolethree}[escapeinside=||]
 #include <iostream>
 
 int main()
@@ -256,24 +257,24 @@ int main()
      int x = 42, p = 1;
      for (int i = 1; i <= x; ++i)
      {    
-          int y = i * i;
+          |\begin{tikzpicture}\node[draw=red, thick, inner sep=2pt]{int y = i * i;};\end{tikzpicture}|
           p *= y;
      }
      std::cout << p << std::endl;
 
      return 0;
-\end{console}
+\end{consolethree}
 
 When the last statement of the body of the \texttt{for}-loop is executed, we exit the body and variable \texttt{y} is destroyed:
 
-\begin{console}
+\begin{consolethree}[escapeinside=||]
 #include <iostream>
 
 int main()
 {    
      int x = 42, p = 1;
 
-     for (int i = 1; i <= x; ++i)
+     for (int i = 1; i <= x; |\begin{tikzpicture}\node[draw=red, thick, inner sep=2pt]{++i)};\end{tikzpicture}|
      {    
           int y = i * i;
           p *= y;
@@ -281,7 +282,7 @@ int main()
      std::cout << p << std::endl;
 
      return 0;
-\end{console}
+\end{consolethree}
 
 Of course when we enter the body of the \texttt{for}-loop the second time (when \texttt{i} = 2), variable \texttt{y} is created again.
 
@@ -300,20 +301,20 @@ And when we exit the \texttt{for}-loop altogether, variable \texttt{i} is destro
     \node[draw,yshift=-12cm,text width=4cm,minimum height=6cm,minimum width=3cm, line width=0.05cm, inner sep=0.3cm,yshift=-3.5cm] (for5a) at (for3a.south) {};
     \node[draw,text width=2cm,minimum height=1cm,line width=0.01cm,yshift=-8mm] (for5xbox) at (for5a.north){\normalsize{\texttt{\ \ \ \ \ \ \ \ \ }42}};
     \node[draw,yshift=-15mm,xshift=3mm,text width=2cm,minimum height=1cm,line width=0.01cm,yshift=-8mm] (for5ybox) at (for5xbox.south){\normalsize{\texttt{\ \ \ \ \ \ \ \ \ }1}};
-    \node[draw,text width=4cm,minimum height=2.5cm,minimum width=4cm, line width=0.04cm, yshift=-0.5cm] (for5a2) at (for5a) {};
-    \node[draw,text width=3cm,minimum height=1.4cm,minimum width=3cm, line width=0.03cm] (for5ybox2) at (for5ybox) {};
+    \node[draw,text width=4cm,minimum height=2.5cm,minimum width=4cm, line width=0.05cm, yshift=-0.5cm] (for5a2) at (for5a) {};
+    \node[draw,text width=3cm,minimum height=1.4cm,minimum width=3cm, line width=0.05cm] (for5ybox2) at (for5ybox) {};
     \node[xshift=-2mm] (for5xnode) at (for5xbox.west){\normalsize{x}};
     \node[xshift=-2mm] (for5ynode) at (for5ybox.west){\normalsize{y}};
     \node[yshift=1cm] (for5mainnode) at (for5a.north) {\normalsize{main}};
     \node[xshift=-1.5cm,yshift=-1cm] (for5whilenode) at (for5a.south) {\normalsize{while-loop}};
-    \node[xshift=1.5cm,yshift=-1cm] (for5whilebdynode) at (for5a.south) {\normalsize{body of while-loop}};
+    \node[xshift=1.5cm,yshift=-1cm,align=center] (for5whilebdynode) at (for5a.south) {\normalsize{body of} \\\normalsize{while-loop}};
     \draw[ultra thick, ->] (for5mainnode.south) to (for5a.north);
     \draw[ultra thick, ->] (for5whilenode.north) to (for5a2.south);
     \draw[ultra thick, ->] (for5whilebdynode.north) to (for5ybox2.south);
 \end{tikzpicture}
 }
 
-\begin{console}
+\begin{consolethree}[escapeinside=||]
 #include <iostream>
 
 int main()
@@ -325,16 +326,16 @@ int main()
           int y = i * i;
           p *= y;
      }
-     std::cout << p << std::endl;
+     |\begin{tikzpicture}\node[draw=red, thick, inner sep=2pt]{std::cout << p << std::endl;};\end{tikzpicture}|
 
      return 0;
-\end{console}
+\end{consolethree}
 
 Note that variable \texttt{x} and \texttt{p} are still in scope; they are not destroyed.
 
 What about the \texttt{while}-loop? The idea is similar: The \texttt{while}-loop has it' s memory and the body of the \texttt{while}-loop has an inner block.
 
-\begin{console}
+\begin{consolethree}[escapeinside=||]
 #include <iostream>
 
 int main()
@@ -345,12 +346,12 @@ int main()
      while (...)
      {     
            int y = 24;
-           ...
+           |\begin{tikzpicture}\node[draw=red, thick, inner sep=2pt]{...};\end{tikzpicture}|
      }
 
      ...
 }
-\end{console}
+\end{consolethree}
 
 So remember this: each loop has it' s own memory for
 variables and the body of the loop itself has its own memory.
@@ -456,7 +457,24 @@ for (int i = 0; i < 10; ++i)
 Do you see why there won' t be conflicts or confusion to C++?
 
 Here' s the case where two names are created in \EMPHASIZE{nested blocks}:
+\sidenote
+{
+\begin{tikzpicture}
+\node[draw, line width=1,text width=5cm, minimum height=6cm] (nestboxA) at (0,0) {};
 
+\node[yshift=1cm,draw, line width=0.2,text width=2.5cm, minimum height=1.25cm] (nestboxB) at (nestboxA.center) {\large\texttt{\ \ \ \ \ \ \ \ \ \ \ \ \ \ 5}};
+
+\node[yshift=-1cm,draw, line width=0.2,text width=2.5cm, minimum height=1.25cm] (nestboxC) at (nestboxA.center) {\large\texttt{\ \ \ \ \ \ \ \ \ \ \ \ \ \ 6}};
+
+\node[draw, line width=1,text width=4.5cm, minimum height=2cm] (nestboxD) at (nestboxC.center) {};
+\node[yshift=1cm] (nestouterif) at (nestboxA.north){\large{Outer if}};
+\node[yshift=-1cm] (nestinnerif) at (nestboxA.south){\large{Inner if}};
+\node[xshift=-5mm] (nestoutera) at (nestboxB.west) {\large{a}};
+\node[xshift=-5mm] (nestinnera) at (nestboxC.west) {\large{a}};
+\draw[ultra thick, ->] (nestouterif) to (nestboxA.north);
+\draw[ultra thick, ->] (nestinnerif) to (nestboxC.south);
+\end{tikzpicture}
+}
 \begin{console}
 int x = 0, y = 0;
 std::cin >> x >> y;
@@ -496,13 +514,34 @@ for (int i = 0; i < 100; i++)
 
 and only when the logic is easy to understand. But even then, you might still be shooting yourself in your foot later if you need to change the logic of your code.
 
-How does C++ search for a variable?
+\newpage\EMPHASIZE{How does C++ search for a variable?}
 
 In looking for a variable C++ will always start from the block where the execution occurs. If the variable cannot be found, C++ will look for that variable in the nearest outer enclosing block.
 
-Here' s a simple example:
+Here's a simple example:
+\sidenote
+{
+\begin{tikzpicture}
+\node[draw, line width=1,text width=4cm, minimum height=5cm] (obbybox) at (0,4) {};
+\node[yshift=-1cm,draw,line width=0.2,text width=2.5cm, minimum height=1.25cm] (obbybox5) at (obbybox.north) {\large\texttt{\ \ \ \ \ \ \ \ \ \ \ \ \ \ 5}};
+\node[draw, line width=0.2,text width=2.5cm, minimum height=1.25cm] (obbybox6) at (obbybox.center) {\large\texttt{\ \ \ \ \ \ \ \ \ \ \ \ \ \ 6}};
+\node[yshift=-0.5cm, draw, line width=1, text width=3.5cm, minimum height=2.5cm] (obby2box6) at (obbybox6.center) {};
+\node[xshift=-2mm] (obbyj) at (obbybox5.west) {\large{i}};
+\node[xshift=-2mm] (obbyi) at (obbybox6.west) {\large{j}};
 
-\begin{console}
+\node[yshift=-1.5cm, align=center] (obbydesc) at (obbybox.south) {\normalsize{i is not found in this} \\ \normalsize{block. Look for i in the} \\ \normalsize{nearest enclosing}\\\normalsize{block. FOUND!}};
+\node[xshift=0.35cm] (obbyredarrend) at (obbybox5.east){};
+\node[xshift=0.35cm,yshift=-2cm] (obbyredarrstart) at (obbybox5.east){};
+\node[xshift=-1.3cm,yshift=-1.2cm] (obbyboxend1) at (obbybox.center){};
+\node[xshift=1.3cm,yshift=-1.2cm] (obbyboxend2) at (obbybox.center){};
+\draw[ultra thick, ->] (obbydesc) to (obbyboxend1);
+\draw[ultra thick, ->] (obbydesc) to (obbyboxend2);
+\draw[ultra thick, ->, color=red] (obbyredarrstart) to (obbyredarrend);
+\end{tikzpicture}
+}
+
+
+\begin{consolethree}[escapeinside=||]
 #include <iostream>
 
 int main()
@@ -512,22 +551,36 @@ int main()
      if ( i > 0 )
      {    
           int j = 6;
-          std::cout << i;
+          |\begin{tikzpicture}\node[draw=red, thick, inner sep=2pt](nestconsolebox){std::cout << i;};\end{tikzpicture}|
      }
 
      return 0;
 }
-\end{console}
+\end{consolethree}
+
+\DrawArrowVH{obbybox.center}{nestconsolebox}
 
 
-
-
-
-
-Of course C++ might need to search in several enclosing blocks before
-it' s found.
-
-\begin{console}
+Of course C++ might need to search in several enclosing blocks before it's found.
+\sidenote
+{
+\begin{tikzpicture}
+\node[draw,line width=1,text width=4cm, minimum height=6cm] (sbox) at (0,-2){};
+\node[yshift=-0.5cm, draw, line width=1, text width=3.5cm, minimum height=4.5cm] (sbox1) at (sbox.center){};
+\node[yshift=-0.5cm,draw, line width=1, text width=3cm, minimum height=3cm] (sbox2) at (sbox1.center){};
+\node[draw, line width=1, text width=2.5cm, minimum height=2cm] (sbox3) at (sbox2.center){};
+\node[draw, line width=1, text width=2cm, minimum height=1.5cm] (sbox4) at (sbox3.center){};
+\node[xshift=0.5cm,yshift=-0.5cm] (sarrend) at (sbox.north){};
+\node[xshift=0.5cm,yshift=-1cm] (sarrstart) at (sbox.center){};
+\draw[line width=0.3, red, ultra thick, dashed, ->] (sarrstart) to (sarrend);
+\node[xshift=1cm,yshift=1.5cm,align=center] (stxt) at (sbox.north){\normalsize{C++ keeps searching}\\ \normalsize{for i from the current}\\ \normalsize{block of memory to the}\\ \normalsize{next enclosing block}\\ \normalsize{until its found.}};
+\node[xshift=-1.5cm,yshift=0.3cm,align=center] (stxti) at (sbox.north){\normalsize\textbf{i is here}};
+\node[xshift=-1.5cm,yshift=-1cm] (sarrendi) at (sbox.north){};
+\draw[line width=0.3, ultra thick, ->] (stxti.south) to (sarrendi);
+\node[xshift=-5mm] (scons) at (stxti){};
+\end{tikzpicture}
+}
+\begin{consolethree}[escapeinside=||]
 #include <iostream>
 
 int main()
@@ -536,21 +589,30 @@ int main()
      while (i > 0)
      {    
           int j = 6;
+
           for (int k = 0; k < j; ++k)
           {   
-               std::cout << i;
-               --i;
+               |\begin{tikzpicture}\node[draw=red, thick, inner sep=2pt](csearchnode){std::cout << i;};\end{tikzpicture}|
           }
+          --i;
      }
 }
-\end{console}
-
-\begin{ex} Now look at the example from the previous section.
-Why is
-
-C++ not confused?
-
-\begin{console}
+\end{consolethree}
+\DrawArrow[dashed,red,ultra thick, -]{csearchnode}{scons}
+\newpage
+\begin{ex} Now look at the example from the previous section. Why is C++ not confused?
+\sidenote
+{
+\begin{tikzpicture}
+\node[draw,text width=5cm, minimum height=4cm, line width=0.05cm] (conbox){};
+\node[yshift=-1cm,draw,text width=2cm, minimum height=1cm, line width=0.05cm] (conboxa) at (conbox.north){\normalsize\texttt{\ \ \ \ \ \ \ \ \ \ \ 5}};
+\node[yshift=1cm,draw,text width=2cm, minimum height=1cm, line width=0.05cm] (conboxa2) at (conbox.south){\normalsize\texttt{\ \ \ \ \ \ \ \ \ \ \ 6}};
+\node[draw,text width=2.5cm, minimum height=1.5cm, line width=0.05cm] (conboxa3) at (conboxa2.center){};
+\node[xshift=-5mm] (conboxx) at (conboxa.west) {\normalsize{a}};
+\node[xshift=-5mm] (conboxy) at (conboxa2.west) {\normalsize{a}};
+\end{tikzpicture}
+}
+\begin{consolethree}[escapeinside=||]
 int x = 0, y = 0;
 std::cin >> x >> y;
 
@@ -561,14 +623,15 @@ if (x == 0)
      if (y == 1)
      {    
           int a = 6;
-          std::cout << a << std::endl;
+          |\begin{tikzpicture}\node[draw=red, thick, inner sep=2pt]{std::cout << a << std::endl;};\end{tikzpicture}|
      }
 }
-\end{console}
+\end{consolethree}
 \end{ex}
 In this case when the variable \texttt{a} in the inner if-statement is created, we say that the innermost \texttt{a} \EMPHASIZE{hides} the outer \texttt{a}.
 
-\begin{ex}What is the output? (Or is there an error?)
+\begin{ex}
+What is the output? (Or is there an error?)
 
 \begin{console}
 int x = 0, y = 1;
@@ -586,7 +649,8 @@ if (x == 0)
 \end{console}
 \end{ex}
 
-\begin{ex} What is the output? (Or is there an error?)
+\begin{ex}
+What is the output? (Or is there an error?)
 
 \begin{console}
 int x = 0, y = 1;
@@ -606,7 +670,8 @@ for (int x = 5; x < 10; x++)
 \end{console}
 \end{ex}
 
-\begin{ex} What is the output? (Or is there an error?)
+\begin{ex}
+What is the output? (Or is there an error?)
 
 \begin{console}
 int i = 5, j = 6;
@@ -631,7 +696,8 @@ for (int i = 0; i < 3; i++)
 std::cout << i << ' ' << j << std::endl;
 \end{console}
 \end{ex}
-\begin{ex} What is the output? (Or is there an error?)
+\begin{ex}
+What is the output? (Or is there an error?)
 
 \begin{console}
 int i = 5, j = 6;}
@@ -660,8 +726,7 @@ std::cout << i << ' ' << j << std::endl;
 \end{ex}
 \newpage\EMPHASIZE{Principle of minimal scope}
 
-
-Here' s the principle of minimal scope:
+Here's the principle of minimal scope:
 \begin{center}
 \EMPHASIZE{Keep the scope of variables}\\
 \EMPHASIZE{as small as possible.}\\
