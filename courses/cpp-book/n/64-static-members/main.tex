@@ -1,0 +1,2177 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\author{}
+\date{}
+
+\begin{document}
+
+64. Static Members
+
+Objectives
+
+\begin{itemize}
+\tightlist
+\item
+  Understand static local variables
+\item
+  Understand static members
+\item
+  Write static members
+\item
+  Access static members
+\item
+  Write static methods
+\item
+  Call static methods
+\item
+  Understand when to use static members and methods
+\end{itemize}
+
+Static variables
+
+First let me talk about static variables in general (which has nothing
+to do with classes.)
+
+Static variables are declared before the program executes, and they stay
+in memory until the program halts. Functions are static, because the
+memory allocated for them is declared before the start of the program,
+and is only reclaimed once the program ends. Global variables are also
+static for the same reason.
+
+Try the following program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}\\
+
+void f()
+
+\{
+
+static int x = 0;
+
+int y = 0;
+
+x++; y++;
+
+std::cout \textless\textless{} x \textless\textless{} ' '
+\textless\textless{} y \textless\textless{} std::endl;
+
+\}
+
+int main()
+
+\{
+
+f(); f(); f(); f();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+What's happening??? Well ...
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void f()
+
+\{
+
+static int x = 0; // this is executed ONCE when
+
+// the program starts up
+
+// and x STAYS AROUND even when
+
+// you return from f(). x goes
+
+// away and only when the
+
+// program ends. So x is NOT
+
+// automatic.
+
+...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Write a function \emph{mybankaccount()} such that the
+first time you call \emph{mybackaccount()}, it prints 0. If you call it
+the second time with 10, the function prints 10. If you call it the
+third time with 20, it prints 30. If you call it the fourth time with
+-5, it prints 25. In other words, it records the cumulative sum of the
+arguments sent into the function. Note that the first function call does
+not pass in a value while the remaining ones do. That tells you that
+\emph{mybankaccount()} has a parameter with a default value. For
+instance you can use -9999 as the default value to mean ``reset the
+cumulative sum to 0''.
+
+Static members variables (in a class)
+
+Besides static variables in a code block, classes can have static
+members as well. Let me give the concepts first.
+
+(The code in this section is not runnable. You'll have to wait for the
+next section before I complete the code.)
+
+Think of \textbf{static member variables} as \textbf{variables belonging
+to a class} and not to each object. There is only one copy for each
+static member. All objects of a class \textbf{share} the same static
+member. If \emph{y} is a static member of a class and \emph{obj1} and
+\emph{obj2 }are objects of that class, then \emph{obj1.y} is the
+\textbf{same} as \emph{obj2.y}.
+
+To make a member static put the keyword \emph{static} in front of the
+declaration of the member in the class declaration. Static members can
+be public or private.
+
+For the next example, I'm going to make all members public just to
+simplify the discussion. Don't run the code yet -- I'm going through the
+concept of static members and the code won't be runnable until the next
+section when I show you how to initialize static members.
+
+First let me show you how to create static member variables. Here's
+class C:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// C.h
+
+\#ifndef C\_H
+
+\#define C\_H
+
+class C
+
+\{
+
+public:
+
+int x; // regular class member variable
+
+\textbf{static} int y; // static class member variable
+
+\textbf{static} int z; // static class member variable
+
+\};
+
+\#endif\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Look at the ``\emph{static}'' words in the code. This class has two
+static members: \emph{y} and \emph{z}.
+
+Now if I do this in \emph{main()} (remember: don't run the code yet --
+just focus on the idea)\emph{:}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include "C.h"
+
+int main()
+
+\{
+
+C c, d, e; // 3 objects from class C
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+then the objects currently in memory and the static members of class
+\emph{C} look like this (conceptually):
+
+Note the following:
+
+\begin{itemize}
+\tightlist
+\item
+  Each of the 3 objects have their own member variable x. So \ldots{}
+  \emph{c.x} is different from \emph{d.x} which is different from
+  \emph{e.x}. When c changes its x to \emph{1000}, \emph{d.x} is still
+  \emph{1} and \emph{e.x} is still \emph{2}.
+\item
+  All 3 objects \textbf{share} \emph{y} and \emph{z} (the
+  \textbf{static} member variables). All 3 objects do have access to
+  \emph{y} and \emph{z}. So when \emph{c} changes \emph{y} to \emph{43}
+  and \emph{d} print \emph{y}, \emph{d} will be printing \emph{43}.
+\end{itemize}
+
+Get it? It's really not that complex: regular member variables are not
+shared among objects while static member variables are shared across all
+objects.
+
+Now although the objects \emph{c}, \emph{d}, \emph{e} have access to the
+static members \emph{y}, \emph{z}, you should view the static member
+variables as variables belonging to the class \emph{C}. So \ldots{}
+although you can write \emph{c.y} in your code (member \emph{y} is
+public -- look at definition of class \emph{C}):
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include "C.h"
+
+int main()
+
+\{
+
+C c, d, e; // 3 objects from class C
+
+std::cout \textless\textless{} c.y \textless\textless{}
+'\textbackslash n';
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+it's more common to write \emph{C::y}.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include "C.h"
+
+int main()
+
+\{
+
+C c, d, e; // 3 objects from class C
+
+std::cout \textless\textless{} \textbf{C::y} \textless\textless{}
+'\textbackslash n'; // better than c.y
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+If y is a private member:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+class C
+
+\{
+
+public:
+
+int x; // regular class member variable
+
+static int z; // static class member variable
+
+private:
+
+static int y; // static class member variable
+
+\};
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+then this won't work:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include "C.h"
+
+int main()
+
+\{
+
+C c, d, e; // 3 objects from class C
+
+std::cout \textless\textless{} C::y \textless\textless{}
+'\textbackslash n'; // BAD! BAD! BAD!
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Now let me show you how to initialize the value of static member
+variables so that you can actually run the above code.
+
+Initialization of static member variables
+
+Here's our class C again:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// C.h
+
+...
+
+class C
+
+\{
+
+public:
+
+int x;
+
+static int y;
+
+static int z;
+
+\};
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The member variables y and z are static and have to be initialized even
+before any object is created.
+
+Recall an earlier example of static variable in functions:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void f()
+
+\{
+
+static int x = 0; // this is executed ONCE when
+
+// the program starts up
+
+// and x STAYS AROUND even when
+
+// you return from f(). x goes
+
+// away and only when the
+
+// program ends. So x is NOT
+
+// automatic.
+
+...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Static variables have to be initialized when you run your program. In
+the case of classes, the static members are initialized even before you
+create any object of that class. So the initialization of \emph{y} and
+\emph{z} are not done through objects.
+
+The initialization is done through the class. There are two ways of
+doing it.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// C.cpp
+
+\#include "C.h"
+
+int C::y(42); // First method of initialization
+
+int C::z = 99; // Second method of initialization\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Don't forget the \emph{C::} in front of the \emph{y}!!!
+
+Note that the initialization code must be done in the implementation
+file, i.e., the cpp file, and not in the header file. (There's an
+exception -- see later section on constant static member variables.)
+
+\textbf{WARNING:} Do \textbf{not} include keyword static in cpp file.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// C.cpp
+
+...
+
+static int C::y(42); // WRONG!!!!!!
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Static should only appear during declaration in the header file.
+
+With the above you can now run this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// C.h
+
+\#ifndef C\_H
+
+\#define C\_H
+
+class C
+
+\{
+
+public:
+
+int x;
+
+static int y;
+
+static int z;
+
+\};
+
+\#endif\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// C.cpp
+
+\#include "C.h"
+
+int C::y(42);
+
+int C::z = 99;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include "C.h"
+
+int main()
+
+\{
+
+C c, d, e;
+
+std::cout \textless\textless{} C::y \textless\textless{}
+'\textbackslash n';
+
+std::cout \textless\textless{} C::z \textless\textless{}
+'\textbackslash n';
+
+// Change C::y through c ...
+
+c.y = 24;
+
+std::cout \textless\textless{} C::y \textless\textless{}
+'\textbackslash n'; // and C::y is changed
+
+// Change C::y ...
+
+C::y = 42;
+
+std::cout \textless\textless{} d.y \textless\textless{}
+'\textbackslash n'; // and d.y is changed
+
+// And in fact they are all the same ...
+
+std::cout \textless\textless{} \&C::y \textless\textless{} ' '
+
+\textless\textless{} \&c.y \textless\textless{} ' '
+
+\textless\textless{} \&d.y \textless\textless{} '\textbackslash n'
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Static methods (i.e. static member functions)
+
+Just like a regular member variable can be made static (so that it
+belongs to the class), a method can also made static.
+
+To make a method static put the keyword \emph{static} in front of the
+prototype of the method in the class declaration.
+
+A static method or static member function is like a method that belongs
+to the class and not to individual objects. In general, this is how you
+decide if a method should be static or not \ldots{}
+
+If a method of a class \emph{C} does not work with any regular member
+variable of \emph{C}, then the method should be made static.
+
+Exercise. Which method should be static?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C
+
+\{
+
+public:
+
+C(char name{[}{]}) \{ strcpy(name\_, name); \}
+
+void print0() const
+
+\{
+
+std::cout \textless\textless{} "hello 0\textbackslash n";
+
+\}
+
+void print1() const
+
+\{
+
+std::cout \textless\textless{} "hello " \textless\textless{} name\_
+\textless\textless{} std::endl;
+
+\}
+
+private:
+
+char name\_{[}100{]};
+
+\};
+
+int main()
+
+\{
+
+C c("john");
+
+c.print0();
+
+c.print1();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Here's our class \emph{C} again:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// C.h
+
+\#ifndef C\_H
+
+\#define C\_H
+
+class C
+
+\{
+
+public:
+
+int x;
+
+static int y;
+
+static int z;
+
+\};
+
+\#endif\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// C.cpp
+
+\#include "C.h"
+
+int C::y(42);
+
+int C::z = 99;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Note that in general, you want to hide all member variables, static or
+not. So I really should do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// C.h
+
+\#ifndef C\_H
+
+\#define C\_H
+
+class C
+
+\{
+
+public:
+
+private:
+
+int x;
+
+static int y;
+
+static int z;
+
+\};
+
+\#endif\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// C.cpp
+
+\#include "C.h"
+
+int C::y(42);
+
+int C::z = 99;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+What if I might want to print the value of \emph{C::y}? The following
+does not work any more since \emph{C::y} is now private:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include "C.h"
+
+int main()
+
+\{
+
+std::cout \textless\textless{} C::y \textless\textless{}
+'\textbackslash n'; // YIKES!!!
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+What should we do?
+
+No problem... you just need a public method to return the value of
+\emph{C::y}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// C.h
+
+...
+
+class C
+
+\{
+
+public:
+
+int get\_y() const;
+
+private:
+
+...
+
+\};
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// C.cpp
+
+\#include "C.h"
+
+...
+
+int C::get\_y() const
+
+\{
+
+return y;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include "C.h"
+
+int main()
+
+\{
+
+//std::cout \textless\textless{} C::y \textless\textless{}
+'\textbackslash n';
+
+C c;
+
+std::cout \textless\textless{} c.get\_y() \textless\textless{}
+'\textbackslash n';
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Note that in this case, we're accessing \emph{C::y} using \emph{c},
+which is a \emph{C} object. It does work, but note the
+\emph{C::get\_y()} method works only with a static member variable. So
+it's better to make \emph{C::get\_y()} a static method like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// C.h
+
+...
+
+class C
+
+\{
+
+public:
+
+\textbf{static} int get\_y(); // remove "const"
+
+private:
+
+...
+
+\};
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// C.cpp
+
+\#include "C.h"
+
+...
+
+int C::get\_y() // remove ``const''
+
+\{
+
+return y;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include "C.h"
+
+int main()
+
+\{
+
+std::cout \textless\textless{} C::get\_y() \textless\textless{}
+'\textbackslash n';
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Easy right?
+
+WARNING: Do not include the \emph{static} keyword in the definition of
+the method in the cpp file. (But if the definition of the static method
+is in the class within the header file, i.e. it is inlined, then you
+have to include the keyword \emph{static}.)
+
+IMPORTANT WARNING ... Because static methods belong to the class rather
+than the object and only work with static member variables, the body of
+the method must not refer to the \emph{this} pointer. There is no
+\emph{this} pointer in the body of a static method. Also, you cannot do
+this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// C.h
+
+...
+
+class C
+
+\{
+
+public:
+
+static int get\_y() const; // Huh?!?
+
+private:
+
+...
+
+\};
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Because ``const'' refers to the fact the object making this method call
+cannot be changed by this method. But since the method should be called
+by the class, there's no object involved (even if you use a \emph{C}
+object to invoke \emph{get\_y()}).
+
+Although you can also call a static method through an object:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include "C.h"
+
+int main()
+
+\{
+
+std::cout \textless\textless{} C::get\_y() \textless\textless{}
+'\textbackslash n'; // BETTER
+
+C c;
+
+std::cout \textless\textless{} c.get\_y() \textless\textless{}
+'\textbackslash n'; // WORKS ... BUT
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise. }Add a public static method C::set\_y() to set the
+value of C::y in the above class C. Test your code.
+
+\textbf{Exercise.} What's wrong here?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C
+
+\{
+
+public:
+
+C(int a) : x\_(a) \{\}
+
+static void set() \{ x\_ = a; \}
+
+static C \& clear()
+
+\{
+
+x\_ = 0;
+
+return (*this);
+
+\}
+
+private:
+
+static int x\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Application: Keeping a count of objects which are alive
+
+Suppose you want to maintain a count of the number of objects which are
+``alive''. This is what I mean:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int main()
+
+\{
+
+Car a; // at this point, there's 1 Car obj
+
+Car b; // at this point, there are 2 Car objs
+
+int x = 42;
+
+if (x \textless{} 42)
+
+\{
+
+...
+
+\}
+
+else
+
+\{
+
+Car a; // at this point, there are 3 Car objs
+
+Car z; // at this point, there are 4 Car objs
+
+\}
+
+// at this point, there are 2 Car objs
+
+Car c; // at this point, there are 3 Car objs
+
+Car * p = new Car;
+
+// at this point, there are 4 Car objs
+
+Car d = c; // at this point, there are 5 Car objs
+
+delete p; // at this point, there are 4 Car objs
+
+return 0; // at this point, there are 0 Car objs
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+All you need to do is to declare a static member in Car to keep track of
+objects which are live:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Car
+
+\{
+
+public:
+
+static int numObjects;
+
+...
+
+private:
+
+...
+
+\};
+
+int C::numObjects(0);\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Here's what you need to do:
+
+\begin{itemize}
+\tightlist
+\item
+  You want to increment each time an object is created, therefore
+  \emph{numObjects} should increment in each constructor, including the
+  copy constructor.
+\item
+  You also want to decrement \emph{numObjects} each time an object is
+  destroyed so you want to decrement \emph{numObjects} in the
+  destructor.
+\end{itemize}
+
+\textbf{Exercise.} Modify the default destructor to decrement
+\emph{numObjects}. Also, modify the copy constructor so that you
+increment \emph{numObjects}. Complete the following:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Int.h
+
+\#ifndef INT\_H
+
+\#define INT\_H
+
+class Int
+
+\{
+
+public:
+
+Int(int a=0)
+
+: x(a)
+
+\{
+
+numObjects++;
+
+\}
+
+private:
+
+static int numObjects;
+
+...
+
+\};
+
+\#endif\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include "Int.h"
+
+int Int::numObjects(0);\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include "Int.h"
+
+int main()
+
+\{
+
+Int a;
+
+std::cout \textless\textless{} Int::get\_numObjects()
+\textless\textless{} '\textbackslash n'; // 1
+
+Int b;
+
+std::cout \textless\textless{} Int::get\_numObjects()
+\textless\textless{} '\textbackslash n'; // 2
+
+Int c = a;
+
+std::cout \textless\textless{} Int::get\_numObjects()
+\textless\textless{} '\textbackslash n'; // 3
+
+if (1)
+
+\{
+
+Int d = a;
+
+std::cout \textless\textless{} Int::get\_numObjects()
+
+\textless\textless{} '\textbackslash n'; // 4
+
+\}
+
+std::cout \textless\textless{} Int::get\_numObjects()
+\textless\textless{} '\textbackslash n'; // 3
+
+\hfill\break
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Application: Controlling default constructor using static object member
+
+Now let me give you a slightly more complicated example where the static
+member is an object.
+
+If you look at our Date class again, you recall that we use 1970/1/1 as
+a default date in the default constructor:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.h
+
+\#ifndef DATE\_H
+
+\#define DATE\_H
+
+class Date
+
+\{
+
+public:
+
+Date(int=1970, int=1, int=1);
+
+...
+
+private:
+
+int yyyy\_, mm\_, dd\_;
+
+\};
+
+\#endif\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+What if depending on the scenario of usage of the Date class, I
+sometimes want to change the behavior of the default constructor during
+runtime? In other words, occasionally, I might want to change the
+default constructor to initialize the Date object something other than
+1970/1/1. In other words I want this to happen in my main():
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include "Date.h"
+
+int main()
+
+\{
+
+Date date1; // date1 models 1970/1/1
+
+// do something here so that after this point
+
+// default Date constructor works differently
+
+Date date2; // date2 models 2000/12/25
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+How would you do that??? For sure, your program (while it's running)
+cannot possible change the default values in the constructor!!!
+
+Well \ldots{} here's I would do it \ldots{}
+
+Instead of \textbf{hardcoding} 1970/1/1 as default values in the
+constructor:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.h
+
+\#ifndef DATE\_H
+
+\#define DATE\_H
+
+class Date
+
+\{
+
+public:
+
+Date(int=\textbf{1970}, int=\textbf{1}, int=\textbf{1});
+
+...
+
+private:
+
+int yyyy\_, mm\_, dd\_;
+
+\};
+
+\#endif\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+I store 1970/1/1 as three static integers in the Date class:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.h
+
+\#ifndef DATE\_H
+
+\#define DATE\_H
+
+class Date
+
+\{
+
+public:
+
+Date(int=1970, int=1, int=1);
+
+...
+
+private:
+
+...
+
+\textbf{static int default\_yyyy\_;}
+
+\textbf{static int default\_mm\_;}
+
+\textbf{static int default\_dd\_;}
+
+\};
+
+\#endif\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+And initialize these static members in the cpp file:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.cpp
+
+...
+
+Date default\_yyyy\_(1970);
+
+Date default\_mm\_(1);
+
+Date default\_dd\_(1);
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+These three default integer static members can be used by the default
+constructor. For instance I can set the default values of the parameters
+in the constructor to 0 to mean ``use the static default yyyy, mm, dd'':
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.h
+
+\#ifndef DATE\_H
+
+\#define DATE\_H
+
+class Date
+
+\{
+
+public:
+
+Date(int=\textbf{0}, int=\textbf{0}, int=\textbf{0});
+
+...
+
+private:
+
+...
+
+static int default\_yyyy\_;
+
+static int default\_mm\_;
+
+static int default\_dd\_;
+
+\};
+
+\#endif\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+and in the \emph{Date} implementation file I do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+//Date.cpp
+
+\#include "Date.h"
+
+Date::Date(int yyyy, int mm, int dd)
+
+\{
+
+yyyy\_ = (yyyy == 0 ? default\_yyyy\_ : yyyy);
+
+mm\_ = (mm == 0 ? default\_mm\_ : mm);
+
+dd\_ = (dd == 0 ? default\_dd\_ : dd);
+
+\}
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Furthermore I can write static methods to modify these static values.
+
+Whoa ... wait \ldots{}
+
+The three static integers in fact form a date \ldots{} why not just
+bunch them up together into a default static \emph{Date} object like
+this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.h
+
+\#ifndef DATE\_H
+
+\#define DATE\_H
+
+class Date
+
+\{
+
+public:
+
+Date(int=0, int=0, int=0);
+
+...
+
+private:
+
+...
+
+\textbf{static Date default\_date\_;}
+
+\};
+
+\#endif\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+and initialize \emph{default\_date\_} in the cpp files like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.cpp
+
+...
+
+Date default\_date\_(1970, 1, 1);
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The constructor can now use this static default date like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+//Date.cpp
+
+\#include "Date.h"
+
+Date::Date(int yyyy, int mm, int dd)
+
+\{
+
+yyyy\_ = (yyyy == 0 ? default\_date.yyyy\_ : yyyy);
+
+mm\_ = (mm == 0 ? default\_date.mm\_ : mm);
+
+dd\_ = (dd == 0 ? default\_date.dd\_ : dd);
+
+\}
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+And we can change the default date like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.h
+
+\#ifndef DATE\_H
+
+\#define DATE\_H
+
+class Date
+
+\{
+
+public:
+
+Date(int=0, int=0, int=0);
+
+...
+
+private:
+
+...
+
+\textbf{static void set\_default\_date(\\
+int, int, int);}
+
+\};
+
+\#endif\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+//Date.cpp
+
+\#include "Date.h"
+
+...
+
+\textbf{void} Date::set\_default\_date(int a, int b, int c)
+
+\{
+
+default\_date\_ = Date(a, b, c); // changing default
+
+// date
+
+\}
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Exercise. Modify the above \emph{Date} class so that the constructor
+uses the \emph{default\_date\_} during the constructor and it uses an
+initializer list.
+
+Exercise. Modify \emph{Date} class by adding an integer
+\emph{num\_dates\_} static member that keeps a count of the number of
+\emph{Date} objects which are still in scope. In other words the value
+of \emph{num\_dates\_} will tell us how many \emph{Date} objects are
+still in memory.
+
+Exercise. In the \emph{IntArray} class, keep track of the number of
+bytes used by all objects of this class.
+
+Exercise. In the \emph{IntDynArray} class, keep track of the number of
+bytes used by all objects of this class.
+
+Exercise. In the \emph{IntDynArray} class, keep track of the maximum of
+number of bytes used by all objects in the class.
+
+Exercise. In your \emph{Date} class, keep a static \emph{Date} object
+\emph{earliest\_date} so that the earliest \emph{Date} object
+instantiated will have the same values as \emph{earliest\_date}. If the
+constructor is called with values which model a \emph{Date} before
+\emph{earliest\_date}, then the value of \emph{earliest\_date} is used
+instead.
+
+\textbf{Exercise.} You have a class with 200 methods that you are using
+for a computer game. The class is working well but you want to improve
+on the performance to get a smoother animation. The game is very complex
+and it's practically impossible to optimize every single one of the 200
+methods. But you still have 1 month before the game is to be shipped and
+you think you can optimize one function. You want to focus on the most
+frequently used method. You don't want to read the code and manually
+count the number of times a method is called. How would you figure out
+which method is used most?
+
+Application: Special global objects
+
+In class \emph{vec2d}, suppose you \textbf{frequently} use a
+\emph{vec2d} object with x value of 0 and y value of 0. Because of its
+values, let's call this concept (or object) the origin.
+
+You can create \emph{origin} as a public static \emph{vec2d} object in
+\emph{vec2d} class. This allows you do this in \emph{main()}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include "vec2d.h"
+
+int main()
+
+\{
+
+std::cout \textless\textless{} vec2d::origin \textless\textless{}
+'\textbackslash n';
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+which has the same effect as
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include "vec2d.h"
+
+int main()
+
+\{
+
+std::cout \textless\textless{} vec2d(0, 0) \textless\textless{}
+'\textbackslash n';
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+except that the first method is faster since the second method has to
+create \emph{vec2d(0,0)} during runtime and if you need
+\emph{vec2d(0,0)} again and again and again and again it might be slower
+(especially if the class in question has a lot more member variables and
+consumes a lot more memory.)
+
+\textbf{Exercise.} Create a public static \emph{vec2d} object member in
+your \emph{vec2d} class so that you can run this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include "vec2d.h"
+
+int main()
+
+\{
+
+std::cout \textless\textless{} vec2d::origin \textless\textless{}
+'\textbackslash n';
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Next, note that the member variables of \emph{vec2d::origin} do not
+change their values. Modify \emph{vec2d::origin} so that it is a
+\textbf{constant} public static member object of \emph{vec2d}.
+
+Application: Debug printing flag for a class
+
+Sometimes when you first write a class, you might need to print low
+level information on the objects created from that class. You can switch
+between usual printing and low level debug printing for this class by
+keeping a boolean flag in the class.
+
+Here's out IntDynArr class for handling dynamic array of integer values:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// IntDynArr.h
+
+\#ifndef INTDYNARRAY\_H
+
+\#define INTDYNARRAY\_H
+
+class IntDynArr
+
+\{
+
+public:
+
+...
+
+void print() const;
+
+private:
+
+int * x\_;
+
+int size\_;
+
+int capacity\_;
+
+\};
+
+\#endif\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// IntDynArr.cpp
+
+\#include \textless iostream\textgreater{}
+
+void IntDynArray::print() const
+
+\{
+
+std::cout \textless\textless{} '{[}';
+
+for (int i = 0; i \textless{} size\_ - 1; ++i)
+
+\{
+
+std::cout \textless\textless{} x\_{[}i{]} \textless\textless{} ", "
+
+\}
+
+if (size\_ - 1 \textgreater= 0)
+
+\{
+
+std::cout \textless\textless{} x\_{[}size\_ - 1{]};
+
+\}
+
+std::cout \textless\textless{} '{]}';
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+If \emph{arr} is an object of the above class and the array
+\emph{arr.x\_} points to has values 2, 4, 6 (the size is 3), then
+\emph{arr.print()} will print
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+{[}2, 4, 6{]}\tabularnewline
+\bottomrule
+\end{longtable}
+
+While you're writing (and debugging!) the class, you might want to print
+\emph{arr.size\_} and \emph{arr.capacity\_} You might want to do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// IntDynArr.h
+
+\#ifndef INTDYNARRAY\_H
+
+\#define INTDYNARRAY\_H
+
+class IntDynArr
+
+\{
+
+public:
+
+...
+
+void print() const;
+
+\textbf{static void set\_debug(bool);}
+
+private:
+
+\textbf{static bool debug;}
+
+int * x\_;
+
+int size\_;
+
+int capacity\_;
+
+\};
+
+\#endif\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// IntDynArr.cpp
+
+\#include \textless iostream\textgreater{}
+
+bool IntDynArry::debug(false);
+
+void IntDynArray::print() const
+
+\{
+
+std::cout \textless\textless{} '{[}';
+
+for (int i = 0; i \textless{} size\_ - 1; ++i)
+
+\{
+
+std::cout \textless\textless{} x\_{[}i{]} \textless\textless{} ", ";
+
+\}
+
+if (size\_ - 1 \textgreater= 0)
+
+\{
+
+std::cout \textless\textless{} x\_{[}size\_ - 1{]};
+
+\}
+
+std::cout \textless\textless{} '{]}';
+
+\textbf{if (debug)}
+
+\{
+
+std::cout \textless\textless{} size\_ \textless\textless{} ' '
+
+\textless\textless{} capacity\_;
+
+\}
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Or you can even print all the value \emph{arr.x\_{[}0{]}}, \ldots,
+\emph{arr.x\_{[}arr.capacity\_{]}} when \emph{IntDynArry::debug} is
+\emph{true}.
+
+Your \emph{main()} can then turn on/off debug printing:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+int main()
+
+\{
+
+IntDynArray::set\_debug(true); // turn on debug
+
+// printing
+
+IntDynArr arr;
+
+arr.print();
+
+IntDynArr::set\_debug(false); // turn off debug
+
+// printing
+
+arr.print();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Initialization of static constant integer members (DIY)
+
+You can initialize static, \textbf{constant} integer members (int, char,
+etc) in class declaration with constant expression. In other words
+instead of this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// C.h
+
+class C
+
+\{
+
+public:
+
+static const int c;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// C.cpp
+
+const int C::c(1);\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You can do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// C.h
+
+class C
+
+\{
+
+public:
+
+static const int c \textbf{= 1};
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+This ``inline initialization'' is valid only for integer constants
+(which includes character constants):
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C
+
+\{
+
+public:
+
+static const int c1 = 1; // OK
+
+static const int c2 = f(5.3); // ERROR
+
+static int c3 = 33; // ERROR
+
+const int c4 = 4444; // ERROR
+
+static const double c5 = 5.5; // ERROR
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(For \emph{c4}, a later C++ compiler which is C++11 compliant might
+allow you to initialize \emph{c4} inside the class definition.)
+
+Here's a valid use of static constant integer member:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class GameEngine
+
+\{
+
+public:
+
+static const int version = 3;
+
+...
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You can also use \emph{enum }to create static constant integer members:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C
+
+\{
+
+public:
+
+enum \{c1=1, c2=22, c3=333, c4=44, c5=5\};
+
+\};
+
+int main()
+
+\{
+
+std::cout \textless\textless{} C::c1 \textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise. }Experiment with this class:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Employee \{
+
+public:
+
+enum Type \{CEO, MGR, FULL\_TIME, PART\_TIME\};
+
+Employee(char{[}{]}, Type);
+
+private:
+
+char name\_{[}1024{]};
+
+Type type\_;
+
+\};
+
+int main()
+
+\{
+
+std::cout \textless\textless{} Employee::CEO \textless\textless{}
+std::endl;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Summary
+
+Static members are members associated to the class rather than to
+objects.
+
+All the objects share the static members. Static methods do not have
+\emph{this} pointer. To make member or method static, include the
+keyword \emph{static} before the declaration of member or method in the
+class declaration.
+
+In the definition of static members and methods in the implementation
+file do not include \emph{static} keyword.
+
+If a static member \emph{x} is public in \emph{class C} , you can access
+it by \emph{C::x} or \emph{obj.x} if \emph{obj} is a \emph{C} object.
+
+If a static method \emph{m()} is public in a \emph{class C}, you call it
+by \emph{C::m()} or \emph{obj.m()} where \emph{obj} is a \emph{C}
+object.
+
+Some uses of static members include
+
+\begin{itemize}
+\tightlist
+\item
+  Object counter
+\item
+  Default objects of a class to control default constructor
+\item
+  Special global objects within a class
+\end{itemize}
+
+\end{document}

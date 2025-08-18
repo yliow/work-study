@@ -1,0 +1,4304 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\author{}
+\date{}
+
+\begin{document}
+
+Objectives
+
+\begin{itemize}
+\tightlist
+\item
+  Pointer arithmetic
+\item
+  Understand the relationship between pointers and arrays
+\item
+  Allocate and deallocate memory for dynamic arrays in the heap
+\item
+  Understand array parameters in functions
+\item
+  Implement stacks and queues using dynamic arrays
+\item
+  Understand and implement directed graph using adjacency matrix
+\item
+  Model social media graphs
+\end{itemize}
+
+In this set of notes, we see how pointers can be used to create dynamic
+arrays, i.e., pointers that point to arrays of with variable sizes.
+
+Pointers are not arrays. But rather they have the address of the first
+value in an array. However in terms of syntax and usage, pointers do
+seem like arrays. I'll talk about the some of the similarities and
+differences between arrays and pointers. But the point is, once p points
+to an array, then the i-th index value of the array that p points to is
+p{[}i{]}, which is exactly the array notation that you're already used
+to.
+
+An array is like a container of values. We store information in these
+containers. (At this point you have only seen array of integers, of
+doubles, etc. Later on you will learn about complex values, values such
+as products in a company where each product contains product name,
+price, UPC code, etc.) The problem is that the arrays you have seen up
+to this point have fixed sizes. But no one can predict how large a
+container should be. You might think an array of size 10000 is enough.
+But what if after some time, you actually need 100000? Think for
+instance of a game. At the beginning of the game, maybe there are only
+10 enemy spaceships and at most 100 lasers are flying around in the
+screen. But at a later level, maybe there are 1000 enemy spaceships and
+1000000 lasers. Is that enough? Maybe not for an even later level.
+
+Dynamic arrays allows you to handle the situations like the above and
+they are therefore extremely important. There are actually many, many,
+many types of containers: fixed size arrays, dynamic arrays, and then in
+CISS350, I'll show you linked lists, trees, hashtables, etc.
+
+Pointers also allow you to create complex 2D arrays which are not
+rectangles. For instance if you want to create a 2D array where the
+first row has 1000000 values, the second has 5000, the third has 20000,
+and the fourth has 20, it can be done. Without pointers, you would have
+to create a 2D array with 4 rows and each with 1000000 values.
+
+Pointer arithmetic
+
+Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x = 42;
+
+int * p = \&x;
+
+int * q = p + 1;
+
+std::cout \textless\textless{} (unsigned int)(p) \textless\textless{} '
+'
+
+\textless\textless{} (unsigned int)(q) \textless\textless{}
+'\textbackslash n'; \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Aha! You can add integers to pointers. Well this is not exactly shocking
+since addresses are integers.
+
+Note the address value stored in \emph{q} ... numerically speaking the
+value of \emph{q }is actully the numerical value of \emph{p} plus 4.
+when you add 1 to the address of an \emph{int} address -- IT'S NOT
+ONE!!! Why 4? Because \ldots{} \textbf{4 comes from
+}\emph{\textbf{sizeof(int)}}.
+
+But why does it work this way? Because this allows you to think like
+this:
+
+Of course p + 2 has address value that is 8 away from 8. So if p has
+
+address value 124500, then you should have this picture in your mind:
+
+Now you might be wondering: ``Wait \ldots{} \emph{p} points to \emph{x}
+and I do see that the value of \emph{x} is 42. But what is the 3467 that
+\emph{p + 1} points to?''.
+
+\emph{p + 1} simply points to an integer (because \emph{p} is a pointer
+to \emph{int}), i.e., the four bytes starting at \emph{p + 1} as an
+integer just happens to be 3467. It does not belong to any variable.
+It's just part of your computer's memory. And of course it could be
+garbage and the value would be different next time you run the same
+program.
+
+The above applies to any type and not just \emph{int}. In general
+suppose \emph{T} is a type (\emph{int} or a \emph{char} or a
+\emph{double} or a \emph{bool} or what-have-you), and you have the
+following:
+
+T * p = \&x;
+
+and suppose a value of type \emph{T} uses k bytes (which can be obtained
+using \emph{sizeof(T)}), then numerically the address value of \emph{p +
+1} is always the address value of \emph{p} plus \emph{k}. Also, if we
+have
+
+T * p = \&x;
+
+T * q = p - 1;
+
+then \emph{q} is k smaller than \emph{p}.
+
+\textbf{Remember ...}
+
+\begin{itemize}
+\tightlist
+\item
+  if \emph{p} is an \emph{int }pointer (and if you're using a 32-bit
+  machine), then \emph{p + 1 }does \textbf{not} mean ``next address
+  value after \emph{p}''. Rather, it means address of the next\textbf{
+  integer} after the \textbf{integer} \emph{p} points to.
+\item
+  If \emph{q} is a pointer that points to a \emph{double}, then \emph{q
+  + 1} is the address of the next\textbf{ double} after the
+  \textbf{double} \emph{q} points to.
+\item
+  If \emph{r} is a pointer that points to a character, then \emph{r + 1}
+  is address of the next\textbf{ character} after the \textbf{character}
+  \emph{r} points to.
+\end{itemize}
+
+Get it?
+
+By the way:
+
+sizeof(double) is 8 (a double value takes up 8 bytes)
+
+sizeof(char)is 1 (a char value takes up 1 byte)
+
+However the \emph{sizeof(int)} can vary depending on your machine.
+
+If you want to measure the difference between two pointers, you have to
+type cast the address values not to unsigned int, but to int so that you
+can get negative values. Here's an example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x = 42;
+
+int * p = \&x;
+
+int * q = p + 1;
+
+int * r = p -- 1;
+
+std::cout \textless\textless{} (int) q -- (int) p \textless\textless{} '
+'
+
+\textless\textless{} (int) r -- (int) p \textless\textless{}
+'\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Think about this: Is \emph{(int) (p + 1)} the same as
+(\emph{(int) p) + 1}?
+
+\textbf{Exercise.} There are four pointer values (i.e., address values)
+in the following code segment. The first one is \emph{p}. As for the
+rest:
+
+\begin{itemize}
+\tightlist
+\item
+  Is \emph{p + 2} larger or smaller than \emph{p}? How far apart are
+  they?
+\item
+  Is \emph{p - 1} larger or smaller than \emph{p}? How far apart are
+  they?
+\item
+  Is \emph{p - 3} larger or smaller than \emph{p}? How far apart are
+  they?
+\end{itemize}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x = 42;
+
+int * p = \&x;
+
+std::cout \textless\textless{} (unsigned int)(p) \textless\textless{} '
+'
+
+\textless\textless{} (unsigned int)(p + 2) \textless\textless{} ' '
+
+\textless\textless{} (unsigned int)(p - 1) \textless\textless{} ' '
+
+\textless\textless{} (unsigned int)(p - 3) \textless\textless{}
+'\textbackslash n'; \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Verify your answer by running the program.
+
+\textbf{Exercise.} There are four pointer values (i.e., address values)
+in the following code segment. The first one is \emph{p}. As for the
+rest:
+
+\begin{itemize}
+\tightlist
+\item
+  Is \emph{p + 2} larger or smaller than \emph{p}? How far apart are
+  they?
+\item
+  Is \emph{p - 1} larger or smaller than \emph{p}? How far apart are
+  they?
+\item
+  Is \emph{p - 3} larger or smaller than \emph{p}? How far apart are
+  they?
+\end{itemize}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double d = 3.14;
+
+double * p = \&d;
+
+std::cout \textless\textless{} (unsigned int)(p) \textless\textless{} '
+'
+
+\textless\textless{} (unsigned int)(p + 5) \textless\textless{} ' ';
+
+\textless\textless{} (unsigned int)(p - 2) \textless\textless{} ' ';
+
+\textless\textless{} (unsigned int)(p - 4) \textless\textless{}
+'\textbackslash n'; \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Verify your answer by running the program.
+
+\textbf{Exercise.}
+
+\begin{itemize}
+\tightlist
+\item
+  Can we use pre- and post- increment and decrement operators on
+  pointers?
+\item
+  What about augmented assignment operators?
+\item
+  What is the numeric value of the difference in address value of
+  \emph{q}, \emph{r}, \emph{s} and \emph{p} in the following:
+\end{itemize}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x = 42;
+
+int * p;
+
+int * q = p;
+
+int * r = p;
+
+int * s = p;
+
+q++;
+
+r += 5;
+
+s-\/-;
+
+std::cout \textless\textless{} (int) q -- (int) p
+
+\textless\textless{} ' '
+
+\textless\textless{} (int) r -- (int) p
+
+\textless\textless{} ' '
+
+\textless\textless{} (int) s -- (int) p
+
+\textless\textless{} '\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(Recall that if you have a newer laptop, you might need to use
+\emph{\textbf{long long int}}.)
+
+\textbf{Exercise.} What is the output:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double d = 3.14;
+
+double * p = \&d;
+
+double * q = p;
+
+-\/-q;
+
+double * r = q;
+
+r += 4
+
+double * s = r;
+
+-\/-s;
+
+std::cout \textless\textless{} (int) q -- (int) p
+
+\textless\textless{} ' '
+
+\textless\textless{} (int) r -- (int) p
+
+\textless\textless{} ' '
+
+\textless\textless{} (int) s -- (int) p \textless\textless{}
+'\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise. }You have the following:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+char c = 'a';
+
+char * p = \&c;
+
+\emph{char * q = p + 8;} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+How much larger is \emph{q} when compared with \emph{p}? Verify it
+yourself. (If you get something different from the expected on your
+computer, don't panic. Talk to me.)
+
+Exercise. For a 32-bit machine, the integer values you can represent is
+about -2 billion to 2 billion. More exactly, the range of values is from
+
+-2\textsuperscript{31}, ...2\textsuperscript{31} - 1
+
+(Why 31? It's 1 less than 32, the number of bits for a 32-bit machine.)
+There is another integer type called the long integer. The formal name
+is \emph{long} or \emph{long int}. Example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+long i = 0L;
+
+long int j = 42; // OK ... C++ will type cast
+
+// 42 to 42L for you\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(Most programmers type \emph{long} instead of \emph{long int}.)
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\tightlist
+\item
+  How many bytes of memory is used by a \emph{long} value on your
+  compiler? (Write a simple program.)
+\item
+  What is the output of the following code segment?
+\end{enumerate}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+long * p = new long;
+
+std::cout \textless\textless{} (int) p -- (int) (p + 2)
+\textless\textless{} '\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(First do this without your compiler. Then, check with your compiler.)
+
+Exercise. There is yet another integer type called the long long
+integer. The formal name is \emph{long} \emph{long} or \emph{long long
+int}. Example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+long long i = 0LL;
+
+long long int j = 42; // OK ... C++ will type
+
+// cast 42 to 42LL for you\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(Most programmers just use \emph{long long} instead of \emph{long long
+int}.)
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\tightlist
+\item
+  How many bytes of memory is used by a \emph{long} \emph{long} value on
+  your compiler? (Write a simple program.)
+\item
+  What is the output of the following code segment?
+\end{enumerate}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+long long * p = new long long;
+
+std::cout \textless\textless{} (int) p -- (int) (p + 2)
+\textless\textless{} '\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(First do this without your compiler. Then, check with your compiler.)
+
+Memory layout of local variables
+
+Suppose you have two integer variables declared next to each other:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x = 42;
+
+int y = 43;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Then the address of y is \textbf{4 smaller} than the address of x --
+assuming that \emph{\textbf{sizeof(int)}}\textbf{ is 4}. (If on your
+machine, the \emph{sizeof(int)} is 8, then the address of \emph{y} is 8
+smaller.)
+
+\textbf{Caveat:} Note that that difference between \emph{\&x} and
+\emph{\&y} can be more than 4 on your computer, but it cannot be less
+than \emph{4}. The point is that an integer takes up \emph{sizeof(int)}
+number of bytes. But your computer (and your compiler) might pad some
+extra bytes between the memory used by two adjacent integer variables.
+On my Windows machine, 8 extra bytes were padded. On my linux machine,
+the padding is 0. In the notes below, I'm going to assume that the
+amount of extra padding is 0. To check on the padding of your machine,
+using the above code, print the address of x and the address of y and
+subtract. If the difference is 12, then you know that the padding is 12
+-- 4 = 8 since the \emph{sizeof(int)} is 4.
+
+First run this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x = 42, y = 43, z = 44;
+
+std::cout \textless\textless{} (unsigned int) \&x \textless\textless{} '
+'
+
+\textless\textless{} (unsigned int) \&y \textless\textless{} ' '
+
+\textless\textless{} (unsigned int) \&z \textless\textless{}
+'\textbackslash n';
+
+int * p = \&x;
+
+int * q = p - 1;
+
+std::cout \textless\textless{} (unsigned int)(p) \textless\textless{} '
+'
+
+\textless\textless{} (unsigned int)(q) \textless\textless{}
+'\textbackslash n'; \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(Recall: you might want to use \emph{unsigned long long}.) AHA \ldots{}
+so \ldots{} q is indeed pointing to x! Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x = 42, y = 43, z = 44;
+
+std::cout \textless\textless{} (unsigned int) \&x \textless\textless{} '
+'
+
+\textless\textless{} (unsigned int) \&y \textless\textless{} ' '
+
+\textless\textless{} (unsigned int) \&z \textless\textless{}
+'\textbackslash n';
+
+int * p = \&x;
+
+int * q = p - 1;
+
+std::cout \textless\textless{} (unsigned int)(p) \textless\textless{} '
+'
+
+\textless\textless{} (unsigned int)(q) \textless\textless{}
+'\textbackslash n';
+
+*q = 0;
+
+std::cout \textless\textless{} x \textless\textless{}
+'\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Sure enough, \emph{*q = 0} changes \emph{x} to 0!!!
+
+\textbf{Caveat:} In my case, because my linux machine does not pad extra
+bytes between the memory of \emph{x} and the memory of \emph{y}, for
+\emph{q} to point to \emph{y}, I only need \emph{q = p -- 1}. On my
+Windows machine, there is a padding of 8 bytes, which means that for my
+Windows machine, I would need to do \emph{q = p -- 1 - 2}, i.e., I have
+to subtract 2 more because of the 8-byte padding.
+
+So if the address of \emph{x} is 1000 (and assuming there is no extra
+padding), then the address of \emph{y} is 996 and the address of
+\emph{z} is 992.
+
+(In some rare cases, your computer might arrange to have the addresses
+going up instead of down. But that's rare.)
+
+In general if you have two variables x and y of type T which are
+declared next to each other (x first, then y), then
+
+address of \emph{y} = address of \emph{x - sizeof(T)}
+
+\textbf{Exercise.} Verify what I just said. For instance look at this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double a = 3.14, b = 2.71, c = 1.41;
+
+double * p = \&b;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Check that p + 1 points to a and p -- 1 points to c. Since a double
+takes up 8 bytes, the memory address value in p + 1 will be 8 larger
+than the value in p and the memory address value in p - 1 will be 8
+larger than the value in p
+
+\textbf{Exercise. }What is the output?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x = 42, y = 0, z = 1000;
+
+int * p = \&x;
+
+\emph{int * q = p - 1;}
+
+\emph{*q = 5;}
+
+q = p - 2;
+
+\emph{*q = 99;}
+
+std::cout \textless\textless{} x \textless\textless{} ' '
+\textless\textless{} y \textless\textless{} ' ' \textless\textless{} z
+\textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(Again I'm assuming no extra padding; otherwise you would need to adjust
+the following).
+
+\textbf{Exercise.} Look at this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int a, b, c, d, e, f, g;
+
+int * p = \&a;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Using a for-loop, set \emph{a}, \emph{b}, \emph{c}, \emph{d}, \emph{e},
+\emph{f}, \emph{g} to \emph{0}, \emph{1}, \emph{2}, \emph{3}, \emph{4},
+\emph{5}, \emph{6}. Of course you have to verify. So ...
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int a, b, c, d, e, f, g;
+
+int * p = \&a;
+
+// DO YOUR STUFF HERE USING A POINTER
+
+std::cout \textless\textless{} a \textless\textless{} ' '
+\textless\textless{} b \textless\textless{} ' ' \textless\textless{} c
+\textless\textless{} ' '
+
+\textless\textless{} d \textless\textless{} ' ' \textless\textless{} e
+\textless\textless{} ' ' \textless\textless{} f \textless\textless{} ' '
+
+\textless\textless{} g \textless\textless{} '\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Violà! Even though I have variables a, b, c, d, e, f, g (which does not
+form an array), I can treat them as though they form an array if I use a
+pointer to scan over them!!! (As another exercise, replace the print
+statement with a for-loop that prints a,b,c,d,e,f,g.
+
+\textbf{Exercise.} You are given the information that a \emph{double}
+takes up 8 bytes. Suppose we have
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double x = 3.14159;
+
+double y = 2.718;
+
+double z = 0.0;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Suppose that in the memory layout of the above program, the value
+for\emph{ y} is immediately after the value for \emph{x} and the value
+for \emph{z} is immediately after \emph{y}. If the address of the value
+of \emph{x} is 4800000, what is the address of the value for \emph{y}?
+What is the address of \emph{z}?
+
+Pointer arithmetic and arrays
+
+Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x{[}3{]} = \{1, 2, 3\};
+
+std::cout \textless\textless{} (unsigned int) \&x{[}0{]}
+\textless\textless{} ' '
+
+\textless\textless{} (unsigned int) \&x{[}1{]} \textless\textless{} ' '
+
+\textless\textless{} (unsigned int) \&x{[}2{]} \textless\textless{}
+'\textbackslash n';
+
+int * p = \&x{[}0{]};
+
+std::cout \textless\textless{} (unsigned int) p \textless\textless{} ' '
+
+\textless\textless{} (unsigned int) (p + 1) \textless\textless{} ' '
+
+\textless\textless{} (unsigned int) (p + 2) \textless\textless{}
+'\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Note two things:
+
+\begin{itemize}
+\tightlist
+\item
+  the values in the array are laid out in \textbf{ascending} address
+  values and
+\item
+  there are \textbf{no gaps} in the layout of the memory between values
+  of the array (there's no memory padding -- see previous section)
+\end{itemize}
+
+Since \emph{sizeof(int)} is 4,
+
+\textbf{ the address of }\emph{\textbf{x{[}i }\textbf{+
+1}\textbf{{]}}}\textbf{ is the address }
+
+\textbf{ of }\emph{\textbf{x{[}i{]}}}\textbf{ plus 4}
+
+Note in particular the big difference between a bunch of \emph{int}
+variables declared together and an array of integer values. In the
+previous section, you saw that the addresses of a bunch of variables go
+down. For an array the address of the values go up. For a bunch of
+variables, there might be extra byte padding. But in the case of an
+array, there's no extra byte padding.
+
+In the same way, if we have
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+double y{[}4{]};\tabularnewline
+\bottomrule
+\end{longtable}
+
+since \emph{sizeof(double)} is 8, the addresses of \emph{y{[}0{]}},
+\emph{y{[}1{]}}, \emph{y{[}2{]}}, \emph{y{[}3{]}} go up by a step of 8.
+
+In general if \emph{z} is an array of type \emph{T} values, then
+
+the address of \emph{z{[}i + 1{]}} is the address
+
+of \emph{z{[}i{]}} plus \emph{sizeof(T)}
+
+This is great because
+
+if \emph{p} points to \emph{z{[}i{]}}, then \emph{p + 1} points to
+
+\emph{z{[}i + 1{]}}
+
+and
+
+if \emph{p} points to \emph{z{[}0{]}}, then \emph{p + i} points to
+
+\emph{z{[}i{]}} and so \emph{*(p + i)} is the same as
+
+\emph{z{[}i{]}}
+
+You will see why this is important when we talk about dynamic memory
+management of arrays in the memory heap.
+
+Exercise. What is the output of this code segment:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x{[}{]} = \{2, 3, 5, 7, 11, 13\};
+
+int * p = \&(x{[}2{]});
+
+std::cout \textless\textless{} *p \textless\textless{} std::endl;
+
+++p;
+
+std::cout \textless\textless{} *p \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Exercise. What is the output of this code segment:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double x{[}{]} = \{0.0, 2.718, 3.141, 42.0\};
+
+double * p = \&(x{[}1{]});
+
+std::cout \textless\textless{} (*p + *(p + 1)) \textless\textless{}
+std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Exercise. What is the output of this code fragment:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x{[}{]} = \{5, 4, 3, 2, 1\};
+
+for (int * p = \&x{[}0{]}; p \textless= \&x{[}4{]}; ++p)
+
+\{
+
+std::cout \textless\textless{} *p \textless\textless{} ' ';
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Complete this code segment.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x{[}{]} = \{1, 3, 5, 7, 9\};
+
+int sum = 0;
+
+// Complete the following to compute the sum
+
+// of the array.
+
+// You must not use an integer index variable but
+
+// rather integer pointer variables.\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Complete this code segment.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x{[}{]} = \{1, 5, 3, 7, 9\};
+
+int * p = \&x{[}0{]};
+
+int * q = \&x{[}4{]};
+
+int max = *p;
+
+// Complete the following to compute the maximum
+
+// value in the array.
+
+// You must not use an integer index variable but
+
+// rather integer pointer variables.\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Exercise. What is the output of this code segment?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+char x{[}{]} = \{'h', 'e', 'l', 'l', 'o'\};
+
+char * p = \&(x{[}0{]});
+
+char * q = \&(x{[}4{]});
+
+*p = 'j';
+
+*(p + 2) = 'L';
+
+while (p \textless= q)
+
+\{
+
+std::cout \textless\textless{} *p;
+
+p++;\\
+\}
+
+std::cout \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(First do this without your compiler. Next, check with your compiler.)
+
+Exercise. What is the output of this code segment:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x{[}{]} = \{2, 3, 5, 7, 11, 13\};
+
+int * p = \&(x{[}2{]});
+
+(*p)++;
+
+std::cout \textless\textless{} *p \textless\textless{} std::endl;
+
+*(p++);
+
+std::cout \textless\textless{} *p \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Can you explain what's happening? (By the way, do you need the
+parentheses?)
+
+Exercise. What is the output of this code segment:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+char x{[}{]} = "c++ rules";
+
+char * p = \&x{[}0{]};
+
+while (*p)
+
+\{\\
+std::cout \textless\textless{} *p++;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Can you explain what's happening? (By the way, do you need the
+parentheses?)
+
+Static arrays
+
+One of the problems with arrays is that they have fixed size.
+
+\emph{int x{[}SIZE{]}}
+
+The \emph{SIZE} must be constant.
+
+(WARNING: Some C++ compilers allow you to declare arrays with variable
+sizes. However this is not standard. Therefore do NOT use variable size
+for arrays. You do want your C++ code to be as portable as possible,
+right?)
+
+The nice thing about an array is that it is a local variable, where the
+memory of the values in the array is allocated within the scope of its
+declaration and when the array goes out of the scope, the memory is
+reclaimed. For instance:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+if (a \textless{} 0)
+
+\{
+
+int x{[}SIZE{]};
+
+// ... do something useful with x \ldots{}
+
+\} // x goes out of scope, and array of values
+
+// used by x is reclaim by the program.\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In other words, \emph{x} an automatic variable.
+
+Such arrays are called \textbf{static arrays}.
+
+The next 4 experiments are extremely important in your understanding of
+the array, in the context of addresses. Make sure you run them all!
+
+First experiment:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int main()
+
+\{
+
+int x{[}5{]};
+
+std::cout \textless\textless{} x \textless\textless{} std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You will see an address!!! That tells you that the array \emph{x} is
+somehow an address!!!
+
+Second experiment:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int main()
+
+\{
+
+int x{[}5{]};
+
+std::cout \textless\textless{} x \textless\textless{} std::endl;
+
+std::cout \textless\textless{} \&x{[}0{]} \textless\textless{}
+std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+This tells you that if you think of \emph{x} as a pointer, then
+\emph{\textbf{x}}\textbf{ is the address of the first value }of your
+array of value.
+
+So what's happening?!?
+
+Whenever you use \emph{x} as though it's a value, the compiler will
+actually replace \emph{x} with \emph{\&x{[}0{]}}, i.e., the address of
+the first value of of the array:
+
+\emph{\textbf{x}}\textbf{ is the same as }\emph{\textbf{\&x{[}0{]}}}
+
+You also know that you can perform pointer arithmetic. Since \emph{x}
+(besides being an array/collection of values) can be thought as a
+pointer, you can think about the pointers:
+
+\emph{x}, \emph{x + 1}, \emph{x + 2}, \emph{x + 3}, \emph{x + 4}
+
+which are the same as
+
+\emph{\&x{[}0{]}}, \emph{\&x{[}1{]}}, \emph{\&x{[}2{]}},
+\emph{\&x{[}3{]}}, \emph{\&x{[}4{]}}
+
+We'll verify this fact using the next experiment \ldots{}
+
+Third experiment:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int main()
+
+\{
+
+int x{[}5{]};
+
+for (int i = 0; i \textless{} 5; ++i)
+
+\{
+
+std::cout \textless\textless{} x + i \textless\textless{} ' ';
+
+\}
+
+std::cout \textless\textless{} std::endl;
+
+for (int i = 0; i \textless{} 5; ++i)
+
+\{
+
+std::cout \textless\textless{} \&x{[}i{]} \textless\textless{} ' ';
+
+\}
+
+std::cout \textless\textless{} std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The above is about the addresses of the values in an array. What about
+the values of the array? You know that you can access the values in the
+array using
+
+\emph{x{[}0{]}}, \emph{x{[}1{]}}, \emph{x{[}2{]}}, \emph{x{[}3{]}},
+\emph{x{[}4{]}}
+
+But since \emph{x}, \emph{x + 1}, \emph{x + 2}, \emph{x + 3}, \emph{x +
+4} points to the above values, we conclude that you can also access the
+values of the array using:
+
+\emph{*x}, \emph{*(x + 1)}, \emph{*(x + 2)}, \emph{*(x + 3)}, \emph{*(x
++ 4)}
+
+Let's check that \ldots{}
+
+Fourth experiment ...
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int main()
+
+\{
+
+int x{[}5{]} = \{2, 3, 5, 7, 11\};
+
+for (int i = 0; i \textless{} 5; ++i)
+
+\{
+
+std::cout \textless\textless{} *(x + i) \textless\textless{} ' ';
+
+\}
+
+std::cout \textless\textless{} std::endl;
+
+for (int i = 0; i \textless{} 5; ++i)
+
+\{
+
+std::cout \textless\textless{} x{[}i{]} \textless\textless{} ' ';
+
+\}
+
+std::cout \textless\textless{} std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You now arrive at the conclusion that
+
+\emph{x{[}i{]}} is like \emph{*(x + i)}
+
+In fact given \emph{\textbf{any}} pointer \emph{p} (not just an array)
+and integer \emph{i}, in C/C++,
+
+\emph{\textbf{p{[}i{]} }}\textbf{is the same as }\emph{\textbf{*(p +
+i)}}
+
+Remember that!!!
+
+So let me summarize. When you declare this array variable:
+
+int x{[}5{]};
+
+\begin{itemize}
+\item
+  You can think of \emph{x} as a pointer that points to the first value
+  in the array of 5 integers, i.e. \emph{x} has the address of
+  \emph{x{[}0{]}}. In fact in your code, \emph{x}, is actually
+  translated into \emph{\&x{[}0{]}}.
+\item
+  The values \emph{x{[}0{]}}, \emph{x{[}1{]}}, \emph{x{[}2{]}},
+  \emph{x{[}3{]}}, \emph{x{[}4{]}} are laid out in memory in increasing
+  address values with no gaps.
+\item
+  The following addresses are the same:
+\item
+  The following values are the same:
+\end{itemize}
+
+\textbf{Exercise.} You are given that the address of the first value of
+the following array
+
+\emph{int x{[}100{]};}
+
+is 72008004. Assuming that each \emph{int} value takes up 4 bytes of
+memory, what is the address of the value \emph{x{[}3{]}}? What is the
+memory address of \emph{x{[}56{]}}?
+
+\textbf{Exercise.} You have the following declarations:
+
+int x = 0;
+
+double y = 2.14;
+
+int a{[}100{]};
+
+double b{[}100{]};
+
+Assuming that an \emph{int} takes up 4 bytes and a \emph{double} takes
+up 8 byte, the address of \emph{x} is 120004000, what is the address of
+\emph{a{[}3{]}} and \emph{b{[}20{]}}? (Assume that there is no gaps in
+the memory layout of variables and address value grows.)
+
+\textbf{Exercise.} What is the output of this code fragment:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int a{[}5{]} = \{2, 3, 5, 7, 11\};
+
+int * b = a;
+
+std::cout \textless\textless{} *(b + 2) \textless\textless{}
+'\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Verify!
+
+\textbf{Exercise.} What is the output of this code fragment:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int a{[}5{]} = \{2, 3, 5, 7, 11\};
+
+int * b = (a + 2);
+
+std::cout \textless\textless{} *(b + 1) \textless\textless{}
+'\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Verify!
+
+\textbf{Exercise.} What is the output of this code fragment:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int a{[}5{]} = \{2, 3, 5, 7, 11\};
+
+int * b = (a + 3);
+
+std::cout \textless\textless{} *(b - 2) + b{[}1{]} \textless\textless{}
+'\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Verify!
+
+\textbf{Exercise.} What is the output of this code fragment:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int a{[}5{]} = \{2, 3, 5, 7, 11\};
+
+int * b = (a + 3);
+
+std::cout \textless\textless{} *(b + 1) + b{[}-2{]} \textless\textless{}
+'\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Verify!
+
+\textbf{Exercise.} What is the output of this code fragment:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int a{[}5{]} = \{2, 3, 5, 7, 11\};
+
+int b = 0;
+
+for (int i = 0; i \textless{} 5; ++i)
+
+\{
+
+b += *(a + i);\\
+\}
+
+std::cout \textless\textless{} b \textless\textless{}
+'\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Verify!
+
+\textbf{Exercise.} What is the output of this code fragment:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int a{[}5{]} = \{2, 3, 5, 7, 11\};
+
+int b = a + 3;
+
+std::cout \textless\textless{} *(b -- 1) \textless\textless{}
+'\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Verify!
+
+\textbf{Exercise.} What is the output of this code fragment:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int a{[}5{]} = \{2, 3, 5, 7, 11\};
+
+int * b = a + 4;
+
+std::cout \textless\textless{} *(b -- 3) + *b \textless\textless{}
+'\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Verify!
+
+\textbf{Exercise.} What is the output of this code fragment:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int a{[}5{]} = \{2, 3, 5, 7, 11\};
+
+int * b = a;
+
+int * c = a + 1;
+
+int s = 0;
+
+for (int i = 0; i \textless{} 3; ++i)
+
+\{
+
+s += *c - *b;
+
+++b;
+
+++c;
+
+\}
+
+std::cout \textless\textless{} s \textless\textless{}
+'\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Verify!
+
+\textbf{Exercise.} Rewrite the following so that the array bracket
+operator \emph{{[}{]}} is not used.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless ctime\textgreater{}
+
+\#include \textless cstdlib\textgreater{}
+
+int main()
+
+\{
+
+srand((unsigned int) time(NULL));
+
+const int SIZE = 100;
+
+const double MAX = double(RAND\_MAX);
+
+double x{[}SIZE{]};
+
+for (int i = 0; i \textless{} SIZE; i++)
+
+\{
+
+\emph{\textbf{x{[}i{]}}} = rand() / MAX * 2 - 1;\\
+\}
+
+double min = \emph{\textbf{x{[}0{]}}};
+
+int index = 0;
+
+for (int i = 1; i \textless{} SIZE; i++)
+
+\{
+
+if (\emph{\textbf{x{[}i{]}}} \textless{} m)
+
+\{
+
+min = \emph{\textbf{x{[}i{]}}};
+
+index = i;
+
+\}\\
+\}
+
+std::cout \textless\textless{} "min:" \textless\textless{} min
+
+\textless\textless{} " at index:" \textless\textless{} index
+
+\textless\textless{} '\textbackslash n';
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Dynamic arrays (in the heap)
+
+With pointers you can allocate memory for an array (on the heap) with
+\textbf{variable size}. Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int s;
+
+std::cin \textgreater\textgreater{} s;
+
+int * x = \textbf{new int{[}s{]}}; // s can be a variable!!!
+
+// Do something with array that x points to.
+
+//
+
+// (Technically speaking x points to the first value
+
+// of the array in the heap.)
+
+\textbf{delete {[}{]} x};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Basically the command
+
+new int{[}s{]}
+
+tells the heap:
+
+``hey heap \ldots{} gimme a chunk of an \emph{int} array of \emph{s
+}values''
+
+Note that \emph{s} can be a variable!
+
+Mr Heap then goes through its memory and looks for an unused
+\textbf{contiguous} chunk of memory for an array of \emph{s} \emph{int}
+values, marks this chunk as ``in use'' (i.e. not free) and
+\textbf{returns the address of the }\emph{\textbf{first}}\textbf{
+integer value of this array}. Therefore, after calling
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+int * x = new int{[}s{]};\tabularnewline
+\bottomrule
+\end{longtable}
+
+x points to (i.e., has the address of) the \textbf{first} int value of
+an array of s int values. Again, this array of values is in the heap and
+the number of int values allocated is exactly s. I will usually say x
+points to the array although technically speaking x has the address of
+the first int value of this array, If the value for s is 3, then the
+memory model looks like this (I just put random integers into the
+array):
+
+\hfill\break
+
+When you do not need the array that \emph{x} points to, you deallocate
+the memory of this array by doing this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+delete {[}{]} x;\tabularnewline
+\bottomrule
+\end{longtable}
+
+This will release the whole array of \emph{int} values at address
+\emph{x} back to the heap so that the heap can reuse this memory for
+another memory allocation.
+
+A \textbf{big mistake} is to do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+delete x;\tabularnewline
+\bottomrule
+\end{longtable}
+
+which will \textbf{only release one value} (i.e. the single value that
+\emph{x} points to), not the whole array, back to the heap. The problem
+is that the compiler will not tell you that this is a mistake! This will
+result in a \textbf{memory leak}. This means that if you do
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int * x = new int{[}10{]};
+
+delete x;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+you are going to have a memory leak of 9 \emph{int}s. For a 32-bit
+machine, that's a loss of 9x4=36 bytes. The right thing to do is
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int * x = new int{[}10{]};
+
+delete {[}{]} x;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+So remember that in general,
+
+\begin{itemize}
+\tightlist
+\item
+  If you use \emph{new} for a single value, then you should do
+  \emph{delete}.
+\item
+  If you do \emph{new} \emph{{[}{]}} for a whole array, you must do
+  \emph{delete {[}{]}}.
+\end{itemize}
+
+Here's an example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int * x;
+
+x = new int; // ask for one int value ...
+
+delete x; // ... give back one
+
+x = new int{[}10{]}; // ask for 10 int values ...
+
+delete {[}{]} x; // ... give back 10
+
+x = new int{[}42{]}; // ask for 42 int values ...
+
+delete {[}{]} x; // ... give back 42
+
+x = new int; // ask for one int value ...
+
+delete x; // ... give back one\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+As in the case of dynamic memory management, it's also a good idea to
+set a pointer to NULL after deallocation:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int * x;
+
+x = new int; // ask for one int value ...
+
+delete x; // ... give back one
+
+x = NULL;
+
+x = new int{[}10{]}; // ask for 10 int values ...
+
+delete {[}{]} x; // ... give back 10
+
+x = NULL;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Run this \ldots{} and see the program crash ...
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int * x;
+
+while (1)
+
+\{
+
+x = new int{[}5000{]};\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Run this \ldots{} and see the program crash ...
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int * x;
+
+while (1)
+
+\{
+
+x = new int{[}5000{]};
+
+delete x;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Run this \ldots{} and see what happens:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int * x;
+
+while (1)
+
+\{
+
+x = new int{[}1000{]};
+
+delete {[}{]} x;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Stop after a couple of minutes.
+
+\textbf{Exercise.} Fixit time ...
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int * w;
+
+int * x = new int;
+
+int * y = new int{[}100{]};
+
+int * z;
+
+delete w;
+
+delete {[}{]} x;
+
+delete y;
+
+delete {[}{]} z;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+After
+
+int * x = new int{[}s{]};
+
+your x points to the first value in the array. How do you get to the
+i-th value in this array? It's just
+
+\emph{x{[}i{]}}
+
+Remember? Recall that the address of the \emph{i}-th value in this array
+is
+
+\emph{x + i}
+
+Therefore, dereferencing, the value at the address is
+
+\emph{*(x + i)}
+
+Recall that \emph{x{[}i{]}} is just a shorthand for \emph{*(x + i):}
+
+\emph{x{[}i{]}}is the same as\emph{*(x + i)}
+
+Most programmers use \emph{x{[}i{]}} since we want to think of \emph{x}
+as an array (although technically it's a pointer.) The above explanation
+was already presented in the previous section. Why am I repeating?
+BECAUSE IT'S IMPORTANT!!!
+
+Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int size;
+
+std::cin \textgreater\textgreater{} size;
+
+double * x = new double{[}size{]};
+
+for (int i = 0; i \textless{} size; i++)
+
+\{
+
+std::cin \textgreater\textgreater{} x{[}i{]};\\
+\}
+
+double product = 1.0;
+
+for (int i = 0; i \textless{} size; i++)
+
+\{
+
+product *= x{[}i{]};
+
+std::cout \textless\textless{} product \textless\textless{}
+'\textbackslash n';\\
+\}
+
+delete {[}{]} x;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} What's wrong with this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int size;
+
+std::cin \textgreater\textgreater{} size;
+
+double * x = new double{[}size{]};
+
+for (int i = 0; i \textless{} size; i++)
+
+\{
+
+std::cin \textgreater\textgreater{} x{[}i{]};\\
+\}
+
+double product = 1.0;
+
+for (int i = 0; i \textless{} size; i++)
+
+\{
+
+product *= x{[}i{]};
+
+std::cout \textless\textless{} product \textless\textless{}
+'\textbackslash n';\\
+\}
+
+delete x;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Write a program that continually prompts the user for
+a value for integer variable \emph{i}, allocate an array of integers of
+size \emph{i} for pointer \emph{p}, put \emph{i} random integer values
+into the array, sort the array using bubblesort, print all the values
+\emph{p} points to, deallocate the memory. Terminate the program when
+the user enters a 0 for \emph{i}.
+
+\textbf{Exercise.} Write a program that
+
+\begin{itemize}
+\tightlist
+\item
+  Prompts the user for s.
+\item
+  Creates a dynamic array (on the heap) and declare pointer p to point
+  to an array of s integer values.
+\item
+  Sets all values in the array to 1.
+\item
+  Sets all values at index 0, 2, 4, \ldots{} and toggle the value
+  between 0 and 1, i.e., if the value is 1, set it to 0 and if it's 0,
+  set it to 1.
+\item
+  Sets all values at index 0, 3, 6, \ldots{} and toggle the value
+  between 0 and 1, i.e., if the value is 1, set it to 0 and if it's 0,
+  set it to 1.
+\item
+  Sets all values at index 0, 4, 8, \ldots{} and toggle the value
+  between 0 and 1, i.e., if the value is 1, set it to 0 and if it's 0,
+  set it to 1.
+\item
+  Etc.
+\item
+  At the end of this process, prints the index values where the value is
+  1.
+\item
+  Deallocates the array.
+\end{itemize}
+
+Comparing pointers and arrays
+
+There are three concepts here:
+
+\begin{itemize}
+\tightlist
+\item
+  static arrays,
+\item
+  dynamic arrays in the heap, and
+\item
+  pointers.
+\end{itemize}
+
+differences. Most of the comparisons below are already presented
+earlier. However, because of the similarities and differences, it's best
+I put everything here so that you can study all the facts in one place.
+
+A pointer can be used to access any value in your computer if you have
+the address of that value (and if you have access rights). In
+particular, if a pointer points to the first value of an array (static
+or dynamic array), using pointer arithmetic, you can access value of the
+array.
+
+In terms of syntax, there are many similarities between a pointer and an
+array (static of not). This is deliberate -- the designers of C++ made
+it so.
+
+\textbf{Static and dynamic arrays}
+
+SIMILARITY \#1: Array
+
+SIMILARITY \#3: Bracket operator.
+
+The i-th value of a static array and the i-value of a dynamic array can
+both be accessed using the bracket operator.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+char x{[}10{]} = \{'a', 'b', 'c'\};
+
+char * y = x;
+
+int size = 10;
+
+char * z = new char{[}size{]};
+
+//
+
+// index-2 value of x is x{[}2{]} or y{[}2{]}
+
+// index-2 value of array z is pointing to is z{[}2{]}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Remember that \emph{z{[}2{]}} is a shorthand for \emph{*(z + 2)}.
+
+SIMILARITY \#4: Bracket operator and out of bound access
+
+After you declare declare a static array or allocate memory for a
+dynamic array (in the heap) with a size s, the array has s values
+starting with index 0 and ending with index s -- 1. HOWEVER, it's
+possible to access values \textbf{OUTSIDE} the array -- remember what I
+said about pointers being able to access any value in your computer (as
+long as you have the address and the access rights). For instance is x
+is a static array of size 10 or a pointer to a dynamic array of size 10
+in the heap, then \emph{x{[}i{]}} is just the value at location \emph{x
++ i}. You can have \emph{x{[}42{]}}, \emph{x{[}-5{]}}, etc.!!! You can
+access the value at address \emph{x + 42} and \emph{x + (-5)} as long as
+you have the access rights!!!
+
+Now for the differences \ldots{}
+
+\textbf{DIFFERENCE \#1:} \textbf{Memory location.}
+
+The most obvious difference is the location of the values of the array.
+In the case of
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+const int size = 10;
+
+char x{[}size{]};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+the memory allocation is local (i.e. in the current execution block).
+When you exit the block, the memory use for this array is reclaimed
+automatically. Therefore static arrays are automatic variables. Dynamic
+arrays created in the heap using \emph{new{[}{]}}, i.e.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int size = 10;
+
+char * y = new char{[}size{]};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+lives in the heap, not in the local scope. (Of course the pointer
+\emph{x} is local). The values of this array is not reclaimed
+automatically; \emph{x} is local so the pointer value of \emph{x} is
+reclaimed. You must deallocate the memory of this array yourself (when
+you're done using the array) by doing this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+delete {[}{]} y;\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{DIFFERENCE \#2:} \textbf{Size.}
+
+The second difference is that the size of the array must be a constant
+for static array:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+const int size = 10;
+
+char x{[}size{]}; // size must be constant\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+However the size used in creating an array in the heap can be any
+variable expression:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int size = 10;
+
+char * y = new char{[}size{]};
+
+...
+
+delete {[}{]} y;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{DIFFERENCE 3.} \textbf{Initialization.}
+
+An array can be initialized. For instance
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+const int size = 10;
+
+char x{[}size{]} = \{'a', 'b', 'c'\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+There is no corresponding syntax for the case for a dynamic array on the
+heap.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int size = 10;
+
+char * y = new char{[}size{]} \{'a', 'b', 'c'\}; // WHAT?!?
+
+delete {[}{]} y;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You have to perform assignment:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int size = 10;
+
+char * y = new char{[}size{]};
+
+y{[}0{]} = 'a';
+
+y{[}1{]} = 'b';
+
+y{[}2{]} = 'c';
+
+delete {[}{]} y;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Static arrays and pointers}
+
+\textbf{SIMILARITY 1. Array name is like a pointer.}
+
+You can do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+const int SIZE = 10;
+
+char x{[}SIZE{]};
+
+char * y = x; // Remember that x is \&x{[}0{]}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The reason (as stated above) is because in the above \emph{x} is the
+same as \emph{\&x{[}0{]}}. So the above make \emph{x} like a pointer
+(syntactically speaking).
+
+DIFFERENCE 1: Array name is constant pointer, not just pointer.
+
+However static arrays are not exactly pointers. If x and y are pointers
+of the same type (with values), then you can assign between them:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+x = y;\tabularnewline
+\bottomrule
+\end{longtable}
+
+But try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+char x{[}10{]};
+
+char * y;
+
+char * z = new char{[}10{]};
+
+char w{[}10{]};
+
+y = x; // OK
+
+x = z; // NOPE!!!\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+So what's \emph{x} if \emph{x} is an array since it's not a pointer? You
+can view \emph{x} as a constant pointer. In other words, you can think
+of \emph{x} as a pointer but the address of \emph{x} cannot be changed.
+So for this code fragment:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+char x{[}10{]};
+
+char * y;
+
+y = x; // OK\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+If you want to make \emph{y} as close to \emph{x} as possible, you can
+do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+char x{[}10{]};
+
+char * const y = x; // OK\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In that case the address value in \emph{y} cannot be changed.
+
+\textbf{DIFFERENCE 2:}\emph{\textbf{ }\textbf{sizeof().}}
+
+Another difference is in the behavior of the \emph{sizeof()} function.
+Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+char x{[}10{]};
+
+char * y = x;
+
+std::cout \textless\textless{} sizeof(x) \textless\textless{}
+'\textbackslash n';
+
+std::cout \textless\textless{} sizeof(y) \textless\textless{}
+'\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The \emph{sizeof()} on an array returns the size of memory used for the
+array of values. The \emph{sizeof()} on a pointer returns the size of
+memory used for the pointer itself, i.e., the memory used for the
+address of the first value of the array, not the array.
+
+Array and pointer parameters
+
+I've already talked about pointers and arrays. Let's see what happens
+when they are used as parameters of functions.
+
+When you make a function call like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void f(int x)
+
+\{\}
+
+int main()
+
+\{
+
+int y = 42;
+
+f(y); // give value of y to x of
+
+// function f()
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+you can pretty much understand the data passed from \emph{main()} to
+\emph{f()} by running this code segment:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int y = 42;
+
+int x = y; // give value of y to x\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(This is pass-by-value.)
+
+However there is one case where this does not work. The following that
+passes an array to a function does work:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void f(int x{[}{]})
+
+\{\}
+
+int main()
+
+\{
+
+int y{[}100{]} = \{1, 2, 3\};
+
+f(y);
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You might be tempted to run this code segment:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int y{[}100{]} = \{1, 2, 3\};
+
+int x{[}{]} = y;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You \emph{\textbf{will}} get a error.
+
+However \textbf{this works}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int y{[}100{]} = \{1, 2, 3\};
+
+int * x = y;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+So here's the thing you need to know:
+
+An array parameter is like a pointer
+
+Now the question is this: Is the pointer parameter a
+\emph{\textbf{constant}} pointer? Let's try an experiment:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void f(int x{[}{]})
+
+\{
+
+int * y = new int{[}10{]};
+
+x = y; // can parameter x be changed?
+
+\}
+
+int main()
+
+\{
+
+int y{[}100{]} = \{1, 2, 3\};
+
+f(y);
+
+return 0;\\
+\} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+It turns out that the above does work. This means that the \textbf{x is
+not a constant pointer}. This means that
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void f(int x{[}{]})
+
+\{\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+is the same as
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void f(int * x)
+
+\{\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You can verify this piece of information using the following trick to
+get your compiler to tell you the truth. Compile this program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void f(int x{[}{]})
+
+\{
+
+abc; // a deliberate error
+
+\}
+
+int main()
+
+\{
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Your compiler will give you an error. For g++, here's the error:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+c.cpp: In function 'void f(int*)':
+
+c.cpp:3:3: error: 'abc' was not declared in this scope\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+AHA!!! The function header of \emph{f()} is really
+
+\emph{void f(int *)}
+
+and \emph{\textbf{not}}
+
+\emph{void f(int {[}{]})}
+
+So here's the extremely important principle to remember:
+
+\textbf{An array parameter is actually a }
+
+non-constant pointer
+
+Default values
+
+There's another thing that we should investigate: What about default
+values? Let's try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void f(int x{[}{]} = \{1, 2, 3\})
+
+\{\}
+
+int main()
+
+\{
+
+f();
+
+return 0;\\
+\} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You will get an error. Of course you will. You already know that
+pointers cannot be initialized with an array. In other words the
+following is invalid:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int main()
+
+\{
+
+int * x = \{1, 2, 3\};
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You can try other cases (with constantness):
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+const int * a = \{1, 2, 3\};
+
+int * const b = \{1, 2, 3\};
+
+const int * const c = \{1, 2, 3\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+None of them will work.
+
+In general the only default value you should use is NULL:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void f(int x{[}{]} = NULL)
+
+\{\} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+There \emph{\textbf{is}} one case where a pointer can be initialized to
+point to values and only for certain compilers. Therefore you shouldn't
+use the following in real code:
+
+const char * x = "hello world";
+
+Again. Don't use this in real code. It's better to just be simple, like
+this:
+
+char x{[}{]} = "hello world";
+
+Functions with array parameters: where to start
+
+This is an old example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int sum(int x{[}{]})
+
+\{
+
+int s = 0;
+
+for (int i = 0; i \textless{} 10; ++i)
+
+\{
+
+s += x{[}i{]};\\
+\}
+
+return s;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+This adds up the values x{[}0{]}, \ldots, x{[}9{]}. Great. But this one
+is even better because it allows to specify how many values to add:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int sum(int x{[}{]}, int size)
+
+\{
+
+int s = 0;
+
+for (int i = 0; i \textless{} size; ++i)
+
+\{
+
+s += x{[}i{]};\\
+\}
+
+return s;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You can use it like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int a{[}{]} = \{1, 3, 5, 7, 2, 4, 6, 8\};
+
+std::cout \textless\textless{} sum(a, 8) \textless\textless{}
+'\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+which will add up all the 8 values in the array. Of course if I want to
+sum up only the first 4 numbers, I would do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int a{[}{]} = \{1, 3, 5, 7, 2, 4, 6, 8\};
+
+std::cout \textless\textless{} sum(a, 8) \textless\textless{}
+'\textbackslash n';
+
+std::cout \textless\textless{} sum(a, 4) \textless\textless{}
+'\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+But what if I want to compute \emph{x{[}4{]} + x{[}5{]} + x{[}6{]}}? In
+other words, I want to specify the starting index of the summation. The
+function starts with index position 0. Recall that in the notes on
+functions and arrays, I have to rewrite the above function so that it
+accepts a starting index value, like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int sum(int x{[}{]}, int start, int size)
+
+\{
+
+int s = 0;
+
+for (int i = start; i \textless{} size; ++i)
+
+\{
+
+s += x{[}i{]};\\
+\}
+
+return s;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Actually it's \textbf{not necessary at all (if you know pointers)!}
+
+You see I can do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int sum(int x{[}{]}, int size)
+
+\{
+
+int s = 0;
+
+for (int i = 0; i \textless{} size; i++)
+
+\{
+
+s += x{[}i{]};\\
+\}
+
+return s;
+
+\}
+
+int main()
+
+\{
+
+int a{[}{]} = \{1,3,5,7,2,4,6,8\};
+
+std::cout \textless\textless{} sum(a, 8) \textless\textless{}
+'\textbackslash n';
+
+std::cout \textless\textless{} sum(a, 4) \textless\textless{}
+'\textbackslash n';
+
+std::cout \textless\textless{} \textbf{sum(a + 4, 3)}
+\textless\textless{} '\textbackslash n';
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+to compute \emph{x{[}4{]} + x{[}5{]} + x{[}6{]}}. In this case, the
+value for size is the number of terms that is added.
+
+Neat right? This means that when writing functions for arrays, you
+\textbf{never have to specify an option for a starting index value}!!!
+(For languages that do not support pointers and pointer arithmetic, the
+alternative is almost always slower.)
+
+Exercise. What is the output of this program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int sum(int x{[}{]}, int size)
+
+\{
+
+int s = 0;
+
+for (int i = 0; i \textless{} size; i++)
+
+\{
+
+s += x{[}i{]};\\
+\}
+
+return s;
+
+\}
+
+double avg(int x{[}{]}, size)
+
+\{
+
+return double(sum(x, size)) / size;\\
+\}
+
+int main()
+
+\{
+
+int a{[}{]} = \{1, 3, 5, 7, 2, 4, 6, 8\};
+
+std::cout \textless\textless{} avg(a + 4, 3) \textless\textless{}
+'\textbackslash n';
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Exercise. Rewrite the following program so that the prototype of the max
+function looks like this:
+
+int max(int x{[}{]}, int size);
+
+Modify the test code in \emph{main()} so that the same result is
+produced.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int max(int x{[}{]}, int start, int end)
+
+\{
+
+int m = x{[}start{]};
+
+for (int i = start + 1; i \textless= end; i++)
+
+\{
+
+if (m \textless{} x{[}i{]}) m = x{[}i{]};\\
+\}
+
+return m;
+
+\}
+
+int main()
+
+\{
+
+int a{[}{]} = \{1, 3, 5, 7, 2, 4, 6, 8\};
+
+std::cout \textless\textless{} max(a, 0, 2) \textless\textless{}
+'\textbackslash n';
+
+std::cout \textless\textless{} max(a, 4, 6) \textless\textless{}
+'\textbackslash n';
+
+std::cout \textless\textless{} max(a, 6, 6) \textless\textless{}
+'\textbackslash n';
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Functions with array parameters: where to start and where to end
+
+Let's continue with the example from the previous section:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int sum(int x{[}{]}, int size)
+
+\{
+
+int s = 0;
+
+for (int i = 0; i \textless{} size; ++i)
+
+\{
+
+s += x{[}i{]};\\
+\}
+
+return s;
+
+\}
+
+int main()
+
+\{
+
+int a{[}{]} = \{1,3,5,7,2,4,6,8\};
+
+std::cout \textless\textless{} sum(a, 8) \textless\textless{}
+'\textbackslash n';
+
+std::cout \textless\textless{} sum(a, 4) \textless\textless{}
+'\textbackslash n';
+
+std::cout \textless\textless{} sum(a + 4, 3) \textless\textless{}
+'\textbackslash n';
+
+return 0;
+
+\} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Again, in function sum, you want to think of x as a pointer to an array
+of values. When you call
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+... sum(a + 4, 3) ...\tabularnewline
+\bottomrule
+\end{longtable}
+
+You are basically telling the function to start at the value which is 4
+integers away from the address a (i.e., the 5\textsuperscript{th}
+integer in the array).
+
+I can rewrite the \emph{sum} function like this so that it's really
+clear that the array parameter is really a pointer parameter:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int sum(int * start\_pointer, int size)
+
+\{
+
+int s = 0;
+
+for (int i = 0; i \textless{} size; ++i)
+
+\{
+
+s += start\_pointer{[}i{]};\\
+\}
+
+return s;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Since you're using a starting pointer address to specify where to find
+the first value, why not specify the pointer address of the last value?
+In that case your code becomes \textbf{more uniform} like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int sum(int * start\_pointer, int * end\_pointer)
+
+\{
+
+int s = 0;
+
+for (int * p = start\_pointer;
+
+p \textless= end\_pointer; ++p)
+
+\{
+
+s += *p;\\
+\}
+
+return s;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You do have to know for instance that ++p on a pointer will move the
+pointer p to the next integer (and I've already talked about it.)
+
+Now, it's actually more common to specifying the ending address value to
+be the value that is just \textbf{one step outside} the array of values
+to be processed:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int sum(int * start\_pointer, int * end\_pointer)
+
+\{
+
+int s = 0;
+
+for (int * p = start\_pointer;
+
+p \textbf{\textless{}} end\_pointer; ++p)
+
+\{
+
+s += *p;\\
+\}
+
+return s;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Simplifying the parameter names a little, I get \ldots{}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int sum(int * start, int * end)
+
+\{
+
+int s = 0;
+
+for (int * p = start; p \textbf{\textless{}} end; ++p)
+
+\{
+
+s += *p;\\
+\}
+
+return s;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(Instead of start and end, it's also common to name the pointers begin
+and end.)
+
+In this form, \emph{main()} would have to look like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int main()
+
+\{
+
+int a{[}{]} = \{1, 3, 5, 7, 2, 4, 6, 8\};
+
+std::cout \textless\textless{} sum(a, a + 8) \textless\textless{}
+'\textbackslash n';
+
+std::cout \textless\textless{} sum(a, a + 4) \textless\textless{}
+'\textbackslash n';
+
+std::cout \textless\textless{} sum(a + 4, a + 7) \textless\textless{}
+'\textbackslash n';
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Let me repeat: the general practice is that \emph{end} points to one
+value beyond what you want to process. So the values processed are
+
+\emph{*start}, \emph{*(start + 1)}, \emph{*(start + 2)}, \ldots,
+\emph{*(end - 1)}
+
+Note that no values are process if start equals end.
+
+\textbf{Exercise.} Complete and test this function that does the
+obvious:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+void println(int * start, int * end);\tabularnewline
+\bottomrule
+\end{longtable}
+
+(It's clear when you should stop.) Here's the format of the output:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\{5, 1, 2, 4\}\tabularnewline
+\bottomrule
+\end{longtable}
+
+A newline should be printed. When \emph{start} and \emph{end} have the
+same value, the output looks like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\{\}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Complete and test this function that does the
+obvious:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+int max(int * start, int * end);\tabularnewline
+\bottomrule
+\end{longtable}
+
+(It's clear when you should stop.) You maybe assume at least one value
+is processed, i.e., assume \emph{start} \textless= \emph{end -- 1}.
+
+\textbf{Exercise.} Complete and test this function:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+int * max(int * start, int * end);\tabularnewline
+\bottomrule
+\end{longtable}
+
+that returns the address of the maximum value in \emph{*start}, \ldots,
+\emph{*(end -- 1)} if \emph{start \textless= end -- 1}. Otherwise
+\emph{NULL} is returned. You maybe assume at least one value is
+processed, i.e., assume \emph{start} \textless= \emph{end -- 1}.
+
+\textbf{Exercise.} Complete and test this function:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+int * linearsearch(int * start, int * end, int target);\tabularnewline
+\bottomrule
+\end{longtable}
+
+that returns the address of the first \emph{target} (left-to-right) that
+occurs in the array of values \emph{*start}, \ldots, \emph{*(end -- 1)}.
+If \emph{target} does not occur in the array, \emph{NULL} is returned.
+
+\textbf{Exercise.} Complete and test this very important function:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+void fill(int * start, int * end, int value);\tabularnewline
+\bottomrule
+\end{longtable}
+
+that copies \emph{value} to the values at \emph{start}, \emph{start +
+1}, etc.
+
+\textbf{Exercise.} Complete and test this very important function:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+void copy(int * start0, int * start1, int * end1);\tabularnewline
+\bottomrule
+\end{longtable}
+
+that copies the value at \emph{start1} to the value at location
+\emph{start0}, etc. (It's clear when you should stop.)
+
+Exercise. Complete and test this very important function:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+void resize(int ** start, int * size, int newsize);\tabularnewline
+\bottomrule
+\end{longtable}
+
+Initially, \emph{*start} describes an array of \emph{size} integers in
+the heap. When we return from the above function call, \emph{*start}
+contains the address of an array of \emph{newsize} integers in the heap
+and it contains (as many as possible) the values from the original
+array. For instance if you have
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+int * p = NULL, size = 0;\tabularnewline
+\bottomrule
+\end{longtable}
+
+after calling
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+resize(\&p, \&size, 5);\tabularnewline
+\bottomrule
+\end{longtable}
+
+\emph{p} points to an array of 5 integers in the heap and \emph{size} is
+changed to 5. Suppose we continue the above with
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+p{[}0{]} = 2;
+
+p{[}1{]} = 3;
+
+p{[}2{]} = 5;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Here's the memory model:
+
+Next if we call
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+resize(\&p, \&size, 7);\tabularnewline
+\bottomrule
+\end{longtable}
+
+\emph{p} points to an array of 7 integers in the heap and \emph{size} is
+changed to 7. Furthermore the first three values of the new array
+\emph{p} points to are 2, 3, and 5. The memory model at this point looks
+like this:
+
+(Note: \emph{newsize} can be smaller than \emph{size}.)
+
+Difference of pointers: binary search
+
+Note that we have been using addition operator pointers:
+
+Here's continue with the example from the previous section:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int a{[}{]} = \{1,3,5,7,2,4,6,8\};
+
+int * p = \&a{[}1{]};
+
+int * q = \&a{[}4{]}; \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+That's addition of a pointer value and a constant integer.
+
+Go ahead and try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int a{[}{]} = \{1,3,5,7,2,4,6,8\};
+
+int * p = \&a{[}1{]};
+
+int * q = p + 3;
+
+std::cout \textless\textless{} \textbf{p + q} \textless\textless{}
+'\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Read the error message carefully.
+
+You \textbf{cannot add pointers}.
+
+However try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int a{[}{]} = \{1,3,5,7,2,4,6,8\};
+
+int * p = \&a{[}1{]};
+
+int * q = \&a{[}4{]};
+
+std::cout \textless\textless{} \textbf{p - q} \textless\textless{}
+'\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+It works. This tells you (of course) that the integer \emph{q} points to
+is 3 integers away from the integer that \emph{p} points.
+
+Why is this important?
+
+Recall from the previous section, when it comes to functions that
+computes on a section of an array, i.e. a subarray, you want to call the
+function with two pointers. For instance:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int sum(int * start, int * end)
+
+\{
+
+// returns sum of *start, ..., *(end - 1)
+
+...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Sometimes you want to know how many terms of the array is involved. This
+is
+
+end -- start
+
+This is the size of the subarray that the function works with.
+
+Another reason why the difference of pointers is important is because of
+binary search. In the scenario when you are performing binary search on
+a subarray where you specify the subarray using index values, the
+function looks like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int binarysearch(int x{[}{]}, int start, int end,
+
+int target)
+
+\{
+
+int left = start, right = end -- 1;
+
+while (left \textless= right)
+
+\{
+
+int mid = (left + right) / 2;
+
+...
+
+\}
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+See chapter on 1D arrays of CISS240.
+
+This version has a problem. Remember that an integer is usually (at
+least for now) is made up of 32 bits. So the range of an integer value
+is -2\^{}31, \ldots, 2\^{}31 -- 1. So when your \emph{left} and
+\emph{right} are both large, for instance they are both very close to
+2\^{}31 -- 1, then \emph{left + right} will overflow and become a
+negative integer!!!
+
+The way to fix this is to compute the \emph{mid} index like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int binarysearch(int x{[}{]}, int start, int end,
+
+int target)
+
+\{
+
+int left = start, right = end -- 1;
+
+while (left \textless= right)
+
+\{
+
+int mid = \textbf{left + (right - left) / 2;}
+
+...
+
+\}
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+This version will not cause an integer overflow. So from now on, you
+must use this version of binary search.
+
+In the above, \emph{right} is the largest index of the subarray the
+current iteration of your binary search is working on.
+
+You can also do this where \emph{right} is \textbf{one index beyond} the
+subarray your binary search is working on:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int binarysearch(int x{[}{]}, start, int end,
+
+int target)
+
+\{
+
+int left = start, right = \textbf{end};
+
+while (left \textbf{\textless{}} right)
+
+\{
+
+int mid = left + (right - left) / 2;
+
+...
+
+\}
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+This is now the index value version of binary search that you must use:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int binarysearch(int x{[}{]}, int start, int end,
+
+int target)
+
+\{
+
+int left = start, right = end;
+
+while (left \textless{} right)
+
+\{
+
+int mid = (left + right) / 2;
+
+if (x{[}mid{]} == target)
+
+\{
+
+return mid;
+
+\}
+
+else if (x{[}mid{]} \textgreater{} target)
+
+\{
+
+right = mid; // note: no "- 1"
+
+\}
+
+else
+
+\{
+
+left = mid + 1;
+
+\}
+
+\}
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+What about a pointer version of binary search? Using the CISS240 version
+as a guide, when you try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int * binarysearch(int * start, int * end,
+
+int target)
+
+\{
+
+int * left = start;
+
+int * right = end;
+
+while (left \textless{} right)
+
+\{
+
+int * mid = (left + right) / 2;
+
+...
+
+\}
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+you'll see that it does not even compile \ldots{} because you
+\textbf{cannot add pointers}.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+int * mid = (left \textbf{+} right) / 2;
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The solution is to compute the middle pointer in a different way:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int * binarysearch(int * start, int * end,
+
+int target)
+
+\{
+
+int * left = start;
+
+int * right = end;
+
+while (left \textless{} right)
+
+\{
+
+int * mid = left + (right -- left) / 2;
+
+...
+
+\}
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The quantity
+
+(right -- left) / 2
+
+is half the number of integer from left to just before right. It's
+slightly less than half if the number of such values is odd. Add this to
+left would then of course give you the address of the integer in the
+middle of integers \textbf{*left,\ldots,*(right -- 1)}.
+
+This middle pointer computation is just like the middle index
+computation.
+
+From now on you should use the midpoint calculation
+
+mid = left + (right - left) / 2
+
+for both middle index and middle pointer computation for binary search.
+
+By the way, in general, there's no reason to compute the difference of
+two addresses other than the address of two values in the same array.
+One last thing: if you want to store the difference of two pointers, you
+need to know that there's a type for pointer differences:
+
+std::ptrdiff\_t d = p -- q;
+
+You need to \#include \textless cstddef\textgreater{} if you want to use
+std::ptrdiff\_t.
+
+\textbf{Exercise.} Implement the pointer version of bubblesort and
+binary search:
+
+void bubblesort(int * start, int * end);
+
+int * binarysearch(int * start, * end, int target);
+
+In your \emph{main()}, get integers \emph{n}, \emph{start}, \emph{end},
+\emph{target} from the user and then do the following:
+
+\begin{itemize}
+\tightlist
+\item
+  Allocate memory for a dynamic integer array of size \emph{n} and put
+  random integers (from 0..9) into the array.
+\item
+  Print the array.
+\item
+  Bubblesort \emph{x{[}start{]}}, \ldots, \emph{x{[}end-1{]}}.
+\item
+  Print the array.
+\item
+  Perform binary search for \emph{target} in \emph{x{[}start{]}},
+  \ldots, \emph{x{[}end-1{]} }and print the address and the value at
+  that address.
+\end{itemize}
+
+\textbf{Exercise.} Let \emph{x} be an integer array of size \emph{n}.
+Let \emph{y} be an array of integer pointers where \emph{y{[}0{]}}
+points to \emph{x{[}0{]}}, \emph{y{[}1{]}} points to \emph{x{[}1{]}},
+etc. Write a bubblesort on \emph{y} so that \emph{y{[}0{]}}, \ldots,
+\emph{y{[}n - 1{]}} each points to a unique values in x and
+*\emph{y{[}0{]} \textless= *y{[}1{]}, }*\emph{y{[}1{]} \textless=
+*y{[}2{]},} etc. The values in \emph{x} are not moved. For instance say
+\emph{x} is \emph{\{1, 5, 0\}} (when \emph{n} = 3). Initially
+\emph{y{[}0{]}} points to \emph{x{[}0{]}}, \emph{y{[}1{]}} points to
+\emph{x{[}1{]}} and \emph{y{[}2{]}} points to \emph{x{[}2{]}}. After
+your bubblesort is done, \emph{y{[}0{]}} points to \emph{x{[}2{]}},
+\emph{y{[}1{]}} points to \emph{x{[}0{]}} and \emph{y{[}2{]}} points to
+\emph{x{[}1{]}}.
+
+Stack using a dynamic array
+
+A \textbf{stack} is like an array except that it supports the following
+operations:
+
+\begin{itemize}
+\tightlist
+\item
+  You can put a value into the stack. This is called \textbf{push}. The
+  value you just put into the stack is called the \textbf{top} of the
+  stack.
+\item
+  You can remove a value from the stack. The value that is removed is
+  always the last one that was put into the stack. This is called
+  \textbf{pop}.
+\item
+  You have access to the number of values in the stack. I'm going to
+  call this the \textbf{size} of the stack.
+\item
+  You can also look at the value that is to be popped. I'll call this
+  \textbf{peek}. Peeking at a stack returns a copy of the value, it does
+  not remove the top.
+\end{itemize}
+
+Think of a stack of plates at a buffet restaurant: When you add a plate
+to the stack, that new plate goes on top. When you take a plate, you
+take the one on top (well \ldots{} usually).
+
+You can implement a stack using a dynamic array. The top of the stack is
+the value at the last index of the array. If you push a value onto the
+stack, you will need to enlarge the array by 1. If you pop the stack,
+you will need to replace the array with another one that is 1 size
+smaller; of course you need to copy the original values to the new stack
+(except for the top.)
+
+Pushing the stack is not new, you have actually seen this in an earlier
+exercise on the \emph{array\_append() function.}
+
+Stacks are very important and are used in many areas of CS including AI,
+language processing, etc. A stack should be thought of as a memory
+device. You can ask the stack ``Hey stack \ldots{} what was the
+\textbf{last thing} I put into you?''
+
+\textbf{Exercise.} Write a program that implements a stack of integers
+using dynamic arrays. Test it thoroughly! You can test your stack
+implementation with the following:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int main()
+
+\{
+
+int * stack = NULL;
+
+int stack\_size = 0;
+
+println(stack, stack\_size); // Get \{\}
+
+push(\&stack, \&stack\_size, 5);
+
+println(stack, stack\_size); // Get \{5\}
+
+push(\&stack, \&stack\_size, 3);
+
+println(stack, stack\_size); // Get \{5, 3\}
+
+push(\&stack, \&stack\_size, 9);
+
+println(stack, stack\_size); // Get \{5, 3, 9\}
+
+int x;
+
+x = peek(stack, stack\_size);
+
+std::cout \textless\textless{} x \textless\textless{} std::endl; // Get
+9
+
+println(stack, stack\_size); // Get \{5, 3, 9\}
+
+pop(\&stack, \&stack\_size);
+
+println(stack, stack\_size); // Get \{5, 3\}
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+There are many ways to implement a stack. Later you'll see that a more
+efficient way of implementing a stack is to use a \textbf{singly linked
+list}, something that uses pointers.
+
+Queue using a dynamic array
+
+A \textbf{queue} is like an array except that it supports the following
+operations:
+
+\begin{itemize}
+\tightlist
+\item
+  You can put a value into a queue. This is called \textbf{enqueue}. The
+  value you just put into the queue is called the \textbf{back} of the
+  queue.
+\item
+  You can remove a value from the queue. The value that is removed is
+  always the value in the queue that has been in the queue the longest.
+  This is called the \textbf{front} of the queue. This operation is
+  called \textbf{dequeue}.
+\item
+  You have access to the number of values in the queue. I'm going to
+  call this the \textbf{size} of the queue.
+\item
+  You can also look at the value of the front and back of the queue
+  without removing these values. These operations are sometimes called
+  \textbf{front} and \textbf{back}.
+\end{itemize}
+
+You think of a queue as a line of people in front of a ticket booth:
+When a person joins a queue, he/she joins it at the back. When the booth
+is ready to serve the next customer, the person to leave the queue to go
+to the booth is the one in front of the queue.
+
+You can implement a queue using a dynamic array. The front of the queue
+is the value at index 0 of the array. The back of the queue is the value
+at the last index of the array. If you enqueue a value into the queue,
+you will need to enlarge the array by 1. If you dequeue the stack, you
+will need to replace the array with another one that is 1 size smaller.
+
+Like stacks, queues are very important and are used in many areas of CS
+including AI, language processing, etc. A queue should be thought of as
+a memory device. You can ask the queue ``Hey queue \ldots{} what was the
+\textbf{earliest thing} that you can think of?''
+
+\textbf{Exercise.} Write a program that implements a queue of integers
+using dynamic arrays. Test it thoroughly! You can test your queue
+implementation with the following:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int main()
+
+\{
+
+int * queue = NULL;
+
+int queue\_size = 0;
+
+println(queue, queue\_size); // Get \{\}
+
+enqueue(\&queue, \&queue\_size, 5);
+
+println(queue, queue\_size); // Get \{5\}
+
+enqueue(\&queue, \&queue\_size, 3);
+
+println(queue, queue\_size); // Get \{5, 3\}
+
+enqueue(\&queue, \&queue\_size, 9);
+
+println(queue, queue\_size); // Get \{5, 3, 9\}
+
+int x;
+
+x = front(queue);
+
+std::cout \textless\textless{} x \textless\textless{} std::endl; // Get
+5
+
+x = back(queue, queue\_size);
+
+std::cout \textless\textless{} x \textless\textless{} std::endl; // Get
+9
+
+println(queue, queue\_size); // Get \{5, 3, 9\}
+
+dequeue(\&queue, \&queue\_size);
+
+println(queue, queue\_size); // Get \{3, 9\}
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+There are many ways to implement a queue. Later you'll see that a more
+efficient way of implementing a queue is to use a \textbf{doubly linked
+list}, something that uses pointers (and is very similar to singly
+linked list.)
+
+Set using a dynamic array
+
+A \textbf{set} is a container of values where you don't care about the
+number of times a value occurs and you don't really care about the index
+position of a value. It supports the following operations:
+
+\begin{itemize}
+\tightlist
+\item
+  You can \textbf{add} a value to a set. You can put it anywhere you
+  like in your dynamic array. For instance you can put is at the last
+  index position, like the \emph{array\_append()} function. Since you
+  don't really care how many times a value occurs, if you try to add a
+  value into the set and the set already contains that value, you simply
+  do NOT add the value into the set, i.e., a set does not contain
+  duplicates.
+\item
+  You can \textbf{remove} a value from a set. If you attempt to remove a
+  value not in the set, then nothing happens -- the set is unchanged.
+\item
+  You can check if a value is \textbf{in} a set. I'll call this
+  \emph{has\_member()} function.
+\item
+  You have access to the number of values in the set. I'll call this
+  \textbf{size}.
+\end{itemize}
+
+You can think of a set also as a memory device except that you don't
+care about when you started remembering a value.
+
+\textbf{Exercise.} Write a program that implements a set of integers
+using dynamic arrays. Test it thoroughly! You can test your set
+implementation with the following:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int main()
+
+\{
+
+int * set = NULL;
+
+int set\_size = 0;
+
+println(set, set\_size); // Get \{\}
+
+add(\&set, \&set\_size, 5);
+
+println(set, set\_size); // Get \{5\}
+
+add(\&stack, \&set\_size, 3);
+
+println(set, set\_size); // Get \{5, 3\}
+
+add(\&set, \&set\_size, 5);
+
+println(set, set\_size); // Get \{5, 3\}
+
+add(\&set, \&set\_size, 3);
+
+println(set, set\_size); // Get \{5, 3\}
+
+bool b;
+
+b = has\_member(set, set\_size, 5);
+
+std::cout \textless\textless{} b \textless\textless{} std::endl; // Get
+1
+
+println(set, set\_size); // Get \{5, 3\}
+
+b = has\_member(set, set\_size, 3);
+
+std::cout \textless\textless{} b \textless\textless{} std::endl; // Get
+1
+
+println(set, set\_size); // Get \{5, 3\}
+
+b = has\_member(set, set\_size, 2);
+
+std::cout \textless\textless{} b \textless\textless{} std::endl; // Get
+0
+
+println(set, set\_size); // Get \{5, 3\}
+
+remove(\&set, \&set\_size, 3);
+
+println(set, set\_size); // Get \{5\}
+
+remove(\&set, \&set\_size, 0);
+
+println(set, set\_size); // Get \{5\}
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+There are many ways to implement a set. The above is actually not
+efficient. Later you will see that better ways to implement a set
+includes using a balanced tree and a hashtable.
+
+Array of pointers and multi-dimensional dynamic arrays
+
+I want you to think deeply about this
+
+If I do ``int x{[}10{]};'' I have a fixed size 1D array x of size 10.
+
+and
+
+If I do ``int * x = new int{[}10{]};'' x points to a 1D array of size
+10.
+
+\textbf{Exercise.} Take a deep breath \ldots{} Draw the memory model of
+the following code fragment. Study the code very carefully.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int ** p;
+
+p = new int*{[}3{]};
+
+// Draw a memory model here
+
+for (int i = 0; i \textless{} 3; i++)
+
+\{
+
+p{[}i{]} = new int{[}5{]};
+
+// Update memory model
+
+\}
+
+p{[}1{]}{[}1{]} = 42;
+
+p{[}2{]}{[}3{]} = 24;
+
+// Update memory model
+
+for (int i = 0; i \textless{} 3; i++)
+
+\{
+
+delete {[}{]} p{[}i{]};
+
+// Update memory model
+
+\}
+
+// Update memory model\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+So what exactly is \emph{p} pointing to (so to speak?)
+
+\textbf{Exercise.} Take a deep breath \ldots{} Draw the memory model of
+the following code fragment. Read the code very carefully.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int ** p;
+
+p = new int*{[}3{]};
+
+// Draw a memory model here
+
+for (int i = 0; i \textless{} 3; i++)
+
+\{
+
+p{[}i{]} = new int{[}i + 2{]};
+
+// Draw a memory model
+
+\}
+
+p{[}1{]}{[}1{]} = 42;
+
+p{[}2{]}{[}3{]} = 24;
+
+// Update memory model
+
+for (int i = 0; i \textless{} 3; i++)
+
+\{
+
+delete {[}{]} p{[}i{]};
+
+// Update memory model
+
+\}
+
+// Update memory model\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+See the power of pointers yet?
+
+Graphs and social media
+
+One of the most important structures in CS is the graph. A
+\textbf{directed graph} is just a bunch of dots and arrows between the
+dots. For instance here's a social media graph:
+
+say this represents ``follows the twitters of''. For instance John
+follows Sue's twitters. In general, nowadays social media type graphs
+are extremely huge and complex -- and they keep growing. Trying to get
+information out of social media graphs without computers is impossible.
+(Obviously information gathered from social media graphs of all types
+would be extremely valuable.)
+
+One way to represent the above graph is to use a table or spreadsheet
+like this:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+\endhead
+& john & sue & tom\tabularnewline
+john & 0 & 1 & 1\tabularnewline
+sue & 0 & 0 & 1\tabularnewline
+tom & 1 & 0 & 0\tabularnewline
+\bottomrule
+\end{longtable}
+
+It's pretty obvious how you should interpret the table. Like I said, in
+the real world, graphs can be extremely huge. So we need to find a way
+to put the table into a program and answer interesting questions such
+as:
+
+\begin{itemize}
+\tightlist
+\item
+  Is there a sequence of arrows joining X to Y?
+\end{itemize}
+
+Clearly the table looks like a 2D array!
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+\endhead
+0 & 1 & 1\tabularnewline
+0 & 0 & 1\tabularnewline
+1 & 0 & 0\tabularnewline
+\bottomrule
+\end{longtable}
+
+This matrix (a matrix is just a 2D array of numbers) that described a
+directed graph is called the \textbf{adjacency matrix} of the graph.
+
+Of course we need to remember that john has a row and column index of 0,
+sue has a row and column index of 1, and tom has a row and column index
+of 2. So we can have an array of strings. Don't forget that strings are
+character arrays (containing the null character `\textbackslash0'). So
+the index-name associate can be described by a 2D array of characters:
+
+\begin{longtable}[]{@{}llllllllll@{}}
+\toprule
+\endhead
+`j' & `o' & `h' & `n' & `\textbackslash0' & & & & &\tabularnewline
+`s' & `u' & `e' & `\textbackslash0' & & & & & &\tabularnewline
+`t' & `o' & `m' & `\textbackslash0' & & & & & &\tabularnewline
+\bottomrule
+\end{longtable}
+
+In the above, I'm assuming that there are 3 persons in the social media
+graph and their names are at most 9 characters long (don't forget that
+you need one character space for the null character.)
+
+Therefore all in all, the space requirement is like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+char name{[}3{]}{[}10{]};
+
+int matrix{[}3{]}{[}3{]}; \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+a total of 9 integers and 30 characters. In general, if there are k
+people, then the space requirement is k x k integers and k x 10
+characters (if names have a maximum string length of 9.)
+
+\textbf{Exercise.} Write a program that will allow you to manage the
+above social media graph, assuming that there will always be only 3
+persons and their names are at most 9 characters long. Your program of
+course should be able to display the names and the social media matrix.
+You should allow the user to change the names and the matrix (but always
+assuming that there are 3 persons in the social media graph.)
+
+Exercise. Now improve on your above program by allowing the user to add
+and delete person(s) from the social media graph.
+
+Exercise. Now improve on your above program so that if a person's name
+has 6 characters, then you use 7 characters for this person.
+Furthermore, your program should allow names of length greater than 9.
+This will save some memory. For instance for tom, you only need 4
+characters for him.
+
+Exercise. Now, how can we save memory for the social media matrix? You
+see the problem is: If there are k people, then the matrix is made up of
+k x k integers. Think about this: How many people do you think have a
+facebook account? It's approximately 1.2 billion. If you use the above
+2D array to represent the social media graph in FB, then the matrix
+needs 1.2 billion x 1.2 billion integers!!! That's 1.44 x
+10\textsuperscript{18} integers!!! {[}HINT: Most people are not friends
+of everyone in the world. In other words, in a row of a social media
+adjacency matrix, most of the values are actually 0s.{]}
+
+\textbf{Exercise.} Path connectivity problem. Now add the following to
+your program: The user to enter two names, X and Y, and the program
+prints a sequence of names going X to Y, following the arrows. If
+possible, print the sequence that is the shortest. {[}This is not easy!
+You will probably need \textbf{everything} in the notes up to this
+point!{]}
+
+By the way, in the real world, many graphs are ``bidirectional'':
+
+In that case, the directed graph diagram is usually drawn like this:
+
+where each line represents the fact that the relationship between two
+dots go both ways. A graph where the lines do not have arrowheads is
+called an \textbf{undirected graph}.
+
+Both directed and undirected graphs appear everywhere in CS and
+engineering. As long as you have relationships between data, you will
+have graphs. And they have been around for a very long time -- a family
+tree is a directed graph. But it's also used in modern scenarios such as
+social media graphs, a graph of nodes in a computer network, food web,
+
+etc.
+
+Solutions
+
+\textbf{Exercise.} Implement the pointer version of bubblesort and
+binary search:
+
+int * bubblesort(int * start, * end)
+
+int * binarysearch(int * start, * end, int target)
+
+In your \emph{main()}, get integers \emph{n}, \emph{start}, \emph{end},
+\emph{target} from the user and then do the following:
+
+\begin{itemize}
+\tightlist
+\item
+  Allocate memory for a dynamic integer array of size \emph{n}. and put
+  random integers (from 0..9) into the array.
+\item
+  Print the array.
+\item
+  Bubblesort \emph{x{[}start{]}}, \ldots, \emph{x{[}end-1{]}}.
+\item
+  Print the array.
+\item
+  Perform binary search for \emph{target} in \emph{x{[}start{]}},
+  \ldots, \emph{x{[}end-1{]} }and print the address and the value at
+  that address.
+\end{itemize}
+
+Solution is below. Don't memorize the code. Understand the motivation
+and intention of bubblesort and binarysearch, implement them using index
+values, then convert to pointers.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+// print *start, .., *(end - 1)
+
+void println(int * start, int * end) // or begin and end
+
+\{
+
+for (int * p = start; p \textless{} end; ++p)
+
+\{
+
+std::cout \textless\textless{} (*p) \textless\textless{} ' ';
+
+\}
+
+std::cout \textless\textless{} '\textbackslash n';
+
+\}
+
+// bubblesort *start, .., *(end - 1)
+
+void bubblesort(int * start, int * end)
+
+\{
+
+for (int * q = end - 2; q \textgreater= start; -\/-q)
+
+\{
+
+for (int * p = start; p \textless= q; ++p)
+
+\{
+
+if (*p \textgreater{} *(p + 1))
+
+\{
+
+int t = *p; *p = *(p + 1); *(p + 1) = t;
+
+\}
+
+\}
+
+\}
+
+\}
+
+// binarysearch for target in *start, .., *(end - 1)
+
+int * binarysearch(int * start, int * end, int target)
+
+\{
+
+while (start \textless{} end)
+
+\{
+
+int * mid = start + (end - start) / 2;
+
+if (*mid == target)
+
+\{
+
+return mid;
+
+\}
+
+else if (*mid \textgreater{} target)
+
+\{
+
+end = mid;
+
+\}
+
+else
+
+\{
+
+start = mid + 1;
+
+\}
+
+\}
+
+return NULL;
+
+\}
+
+int main()
+
+\{
+
+int n, start, end, target;
+
+std::cin \textgreater\textgreater{} n \textgreater\textgreater{} start
+\textgreater\textgreater{} end \textgreater\textgreater{} target;
+
+int * x = new int{[}n{]};
+
+for (int i = 0; i \textless{} n; ++i)
+
+\{
+
+x{[}i{]} = rand() \% 10;
+
+\}
+
+print(\&x{[}0{]}, \&x{[}n{]});
+
+bubblesort(\&x{[}start{]}, \&x{[}end{]});
+
+print(\&x{[}0{]}, \&x{[}n{]});
+
+int * p = binarysearch(\&x{[}start{]}, \&x{[}end{]}, target);
+
+std::cout \textless\textless{} p \textless\textless{} ' '
+
+\textless\textless{} (p != NULL ? *p : -1) \textless\textless{}
+'\textbackslash n';
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\end{document}

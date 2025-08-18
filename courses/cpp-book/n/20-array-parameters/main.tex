@@ -1,0 +1,1995 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\author{}
+\date{}
+
+\begin{document}
+
+20. Array Parameters
+
+Objectives
+
+\begin{itemize}
+\tightlist
+\item
+  Write functions with array parameters
+\item
+  Pass array to function
+\item
+  Use \emph{sizeof()} to compute the size of an array variable
+\item
+  Modify array values via a function
+\item
+  Introduction to 1D cellular automata
+\end{itemize}
+
+Array parameters
+
+So far we talked about parameters of basic type (or none at all). C++
+functions can handle arrays too.
+
+Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void print(int x{[}3{]})
+
+\{
+
+for (int i = 0; i \textless{} 3; ++i)
+
+\{
+
+std::cout \textless\textless{} x{[}i{]} \textless\textless{} ' ';
+
+\}\\
+\}
+
+int main()
+
+\{
+
+int a{[}{]} = \{1, 2, 3\};
+
+print(a);
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Actually you need not specify the size of the array parameter:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void print(\textbf{int x{[}{]}})
+
+\{
+
+...
+
+\}
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(You'll understand why once you have studied pointers.)
+
+If you want your function to work for an array of any size, you want to
+pass in the size of the array. For instance the above program can be
+improved as follows:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void print(int x{[}{]}, \textbf{int x\_size})
+
+\{
+
+for (int i = 0; i \textless{} \textbf{x\_size}; ++i)
+
+\{
+
+std::cout \textless\textless{} x{[}i{]} \textless\textless{} ' ';
+
+\}\\
+\}
+
+int main()
+
+\{
+
+int a{[}{]} = \{1, 2, 3\};
+
+print(a, 3);
+
+int b{[}{]} = \{5, 6, 7, 8, 9\};
+
+print(b, 5);
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Frequently programmers also call such a variable a length variable. So
+another suitable name for the \emph{x\_size} parameter is
+\emph{\textbf{x\_len}}.
+
+One \textbf{very important} thing to note is that it's OK to process
+\textbf{only part of the array} by passing in a smaller size:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+int main()
+
+\{
+
+int a{[}{]} = \{1, 2, 3\};
+
+print(a, \textbf{2});
+
+...
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Even though array \emph{a} has 3 values, the \emph{print()} function
+will only print the first 2. So the 2 in \emph{print(a, 2)} does not
+mean that the array \emph{a }has 2 values. It just means that you want
+the \emph{print()} function to print the first 2 values.
+
+You can even have a function that prints values in the array starting at
+any index position:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void print(int x{[}{]}, int xSize)
+
+\{
+
+for (int i = 0; i \textless{} xSize; ++i)
+
+\{
+
+std::cout \textless\textless{} x{[}i{]} \textless\textless{} ' ';
+
+\}\\
+\}
+
+void print\_from(int x{[}{]}, int start, int end)
+
+\{
+
+for (int i = start; i \textless= end; ++i)
+
+\{
+
+std::cout \textless\textless{} x{[}i{]} \textless\textless{} ' ';
+
+\}\\
+\}
+
+int main()
+
+\{
+
+int a{[}{]} = \{5, 3, 5, 2, 42, 8, 2\};
+
+print\_from(a, 2, 6);
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In the \emph{\textbf{print\_from()}}, you can specify the starting and
+ending index of the values in \emph{x} to print. Frequently when you
+want a function to work on only a part of the array (i.e., a subarray),
+you usually specify the starting index and the index that is \textbf{one
+beyond the last index} to process:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+void print\_from(int x{[}{]}, int start, int end)
+
+\{
+
+for (int i = start; i \textless{} end; ++i)
+
+\{
+
+std::cout \textless\textless{} x{[}i{]} \textless\textless{} ' ';
+
+\}\\
+\}
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In that case, the number of values processed (in this case printed) will
+be \emph{\textbf{end -- start}}.
+
+Let's try another example. I want a function \emph{sum()} that accepts
+an array of \emph{double}s and a size and returns the sum of the array.
+The return type must of course be \emph{double}. So the function looks
+like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double sum(double x{[}{]}, int x\_size)
+
+\{
+
+...
+
+\}
+
+int main()
+
+\{
+
+double a{[}{]} = \{1.1, 2.2, 3.3\};
+
+std::cout \textless\textless{} sum(a, 1) \textless\textless{} std::endl;
+
+std::cout \textless\textless{} sum(a, 2) \textless\textless{} std::endl;
+
+std::cout \textless\textless{} sum(a, 3) \textless\textless{} std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The code summing up the array x is just
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double s = 0.0;
+
+for (int i = 0; i \textless{} x\_size; ++i)
+
+\{
+
+s += x{[}i{]};
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+So putting everything together we get the following \ldots{} and of
+course you should test your code ...
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double sum(double x{[}{]}, int xSize)
+
+\{
+
+double s = 0.0;
+
+for (int i = 0; i \textless{} x\_size; ++i)
+
+\{
+
+s += x{[}i{]};
+
+\}
+
+return s;\\
+\}
+
+int main()
+
+\{
+
+double a{[}{]} = \{1.1, 2.2, 3.3\};
+
+std::cout \textless\textless{} sum(a, 1) \textless\textless{} std::endl;
+
+std::cout \textless\textless{} sum(a, 2) \textless\textless{} std::endl;
+
+std::cout \textless\textless{} sum(a, 3) \textless\textless{} std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Write a function that returns the product of all
+doubles in the array that is passed in to the function.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\_\_\_\_\_\_\_\_\_\_\_\_\_ product(double x{[}{]}, int x\_size)
+
+\{
+
+\}
+
+int main()
+
+\{
+
+double a{[}{]} = \{1, 2, 3\};
+
+std::cout \textless\textless{} product(a, 1) \textless\textless{}
+'\textbackslash n'; // 1
+
+std::cout \textless\textless{} product(a, 2) \textless\textless{}
+'\textbackslash n'; // 2
+
+std::cout \textless\textless{} product(a, 3) \textless\textless{}
+'\textbackslash n'; // 6
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Exercise. Write a \emph{min()} function that accepts an array of
+\emph{double}s and the size of the array and returns the minimum value
+of the values in the array. Here's a skeleton:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\_\_\_\_\_\_\_\_\_\_\_\_ min(\_\_\_\_\_\_\_\_\_\_\_\_\_, int x\_size)
+
+\{
+
+...\\
+\}
+
+int main()
+
+\{
+
+double a{[}{]} = \{1.2, -2.5, -7.3, 0.0\};
+
+std::cout \textless\textless{} min(a, 1) \textless\textless{} std::endl;
+// 1.2
+
+std::cout \textless\textless{} min(a, 2) \textless\textless{} std::endl;
+// -2.5
+
+std::cout \textless\textless{} min(a, 3) \textless\textless{} std::endl;
+// -7.5
+
+std::cout \textless\textless{} min(a, 4) \textless\textless{} std::endl;
+// -7.5
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Write a function \emph{find()} that accepts an array
+of integers, the size of the array, a \emph{target} integer, and returns
+the smallest index in the array where target occurs. If \emph{target} is
+not found, \emph{-1} is returned. Test it with this
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int find(int x{[}{]}, int x\_size, int target)
+
+\{
+
+...\\
+\}
+
+int main()
+
+\{
+
+int a{[}{]} = \{1, 3, 5, 2, 4, 6, 1, 3, 5, 2, 4, 6\};
+
+std::cout \textless\textless{} find(a, 2, 3) \textless\textless{}
+std::endl; // 1
+
+std::cout \textless\textless{} find(a, 2, 9) \textless\textless{}
+std::endl; // -1
+
+std::cout \textless\textless{} find(a, 10, 2) \textless\textless{}
+std::endl; // 3
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Exercise. Write \emph{find\_from()} function such that
+\emph{find\_from(x, target, start, end)} returns the index of the value
+of \emph{target} in array \emph{x}, scanning left-to-right from index
+value \emph{start} to index value \emph{end - 1}. If the value is not
+found, \emph{-1} is returned.
+
+Exercise. Write \emph{reversefind()} function such that
+\emph{reversefind(x, target, start, end)} will return the index of the
+value of \emph{target} in array \emph{x}, scanning right-to-left from
+index value \emph{end - 1} to index value \emph{start}. If the value is
+not found, \emph{-1} is returned.
+
+\textbf{Exercise.} Write a function \emph{count()} that accepts an array
+of integers, the size of the array, and an integer value \emph{target}
+and returns the number of times \emph{target} occurs in the array. For
+instance if the array passed in is \emph{\{1, 42, 3, 42, 42, 1\}} with
+size 5, and 42 is passed to \emph{target}, then 3 is returned (because
+42 occurs 3 times in the array.)
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int count(int x{[}{]}, int x\_size, int target)
+
+\{
+
+...\\
+\}
+
+int main()
+
+\{
+
+...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Refer to your notes on the binary search algorithm.
+Write a function \emph{binarySearch()} that accepts an array of
+integers, the size of the array, and a value for parameter
+\emph{target}, and returns the index of the value of \emph{target} in
+the array. If the value of \emph{target} is not in the array -1 is
+returned. Test your code by passing in an array that is sorted in the
+ascending order, its size and a target in the array. Next test it with a
+target value that's not in the array.
+
+Modification of values in an array through a function
+
+There is something different between the way functions work with an
+array and a variable of basic type (\emph{int} or \emph{double} or
+\emph{bool} or \emph{char}). You already know that the following will
+not change the value of \emph{x} in \emph{main()}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void inc(int x)
+
+\{
+
+++x;\\
+\}
+
+int main()
+
+\{
+
+int x = 42;
+
+inc(x);
+
+std::cout \textless\textless{} x \textless\textless{} std::endl; //
+still 42, right?
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void inc(int x{[}{]})
+
+\{
+
+++x{[}0{]};\\
+\}
+
+int main()
+
+\{
+
+int x{[}{]} = \{42, 43, 44, 45\};
+
+inc(x);
+
+std::cout \textless\textless{} x{[}0{]} \textless\textless{} std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Functions \textbf{can modify} the \textbf{values} in an \textbf{array
+that's passed in}. In other words, by default, \textbf{arrays are
+pass-by-reference}.
+
+Remember that!!!
+
+For the reason why arrays are so different from variables of basic type
+you will have to wait till we talk about pointers.
+
+Here's another example. This function sets all the values in the array
+parameter to zero:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void zero\_out(int x{[}{]}, int size)
+
+\{
+
+for (int i = 0; i \textless{} size; i++)
+
+\{
+
+x{[}i{]} = 0;\\
+\}\\
+\}
+
+int main()
+
+\{
+
+int y{[}{]} = \{1, 2, 3\};
+
+zero\_out(y, 3);
+
+for (int i = 0; i \textless{} 3; i++)
+
+\{
+
+std::cout \textless\textless{} y{[}i{]} \textless\textless{} ' ';\\
+\}
+
+std::cout \textless\textless{} '\textbackslash n';
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Here's a picture to keep in mind. Right after all parameters of the
+\emph{zero\_out()} function are initialized (but before the for-loop)
+the memory of the functions look like this:
+
+As you can see the parameter \emph{size} (of \emph{zeroOut()}) has its
+own memory. It's just like any regular variable. The initialization of
+\emph{size} involves copying the value of 3 to \emph{size}. Recall that
+this type of parameter passing is called pass-by-value.
+
+However the parameter \emph{x} (of \emph{zero\_out()}) does \textbf{NOT}
+receive the values of the array \emph{y}. The point of the picture is to
+show you that \emph{x} actually \textbf{refers} directly to the memory
+of \emph{y}. You can and should think of \emph{x} as another name for
+\emph{y} -- an alias. Or you can think of the \emph{x} in
+\emph{zero\_out()} as a parasite that lives on the memory of \emph{y}.
+Therefore changing \emph{x{[}0{]}} in \emph{zero\_out()} is the same as
+changing the \emph{y{[}0{]}} in \emph{main()}. This form of
+parameter-passing is called \textbf{pass-by-reference}.
+
+Test the function to make sure it works.
+
+\textbf{Exercise.} Write a function \emph{zero\_out\_odd()} that accepts
+an array of integers and the size of the array and then replaces all the
+odd values in the array by zero. Test your function.
+
+\textbf{Exercise.} Write a function \emph{rand\_array()} that accepts an
+array of integers, the size of the array, min (an int), max (an int) and
+puts random integers from min, min+1, \ldots, max -- 1 into the array.
+For instance calling \emph{rand\_array(x, 10, 1, 7)} will randomize
+x{[}0{]}, x{[}1{]}, x{[}2{]}, \ldots, x{[}9{]} with integer values from
+1 to 6. Test your function.
+
+\textbf{Exercise.} Write a function \emph{two\_powers()} that accepts an
+array of integers and the size of the array and puts powers of 2
+starting with 2\^{}0=1 into the array. For instance if you pass array x
+with size 5 into the function, on return, \emph{x} has values 1, 2, 4,
+8, 16, Test your function.
+
+\textbf{Exercise.} Write a function \emph{primes()} that accepts an
+array of integers and the size of the array and puts primes into the
+array starting with 2. For instance calling \emph{primes(x, 5)} will set
+\emph{x{[}0{]}} to 2, \emph{x{[}1{]}} to 3, \emph{x{[}2{]}} to 5,
+\emph{x{[}3{]}} to 7, \emph{x{[}4{]}} to 11. Test your function.
+
+\textbf{Exercise. }Write a function \emph{swap()} that accepts an array
+of integers and two index values, and swaps the values at those index
+positions. For instance if x is an array initialized with \{1, 2, 3,
+4\}, then on return from calling \emph{swap(x, 1, 3)}, the values in
+\emph{x} becomes
+
+1, 4, 3, 2
+
+Test your function.
+
+Bubblesort and binary search
+
+\textbf{Exercise.} Write a function \emph{bubblesort()} that accepts an
+array of integers and an integer for the size of the array and performs
+bubblesort on the array so that the values are in ascending order. Test
+your code: Create an array of 10 random integers, call the
+\emph{bubblesort()} function, and print the values of \emph{x} in
+\emph{main()}. Test your function.
+
+\textbf{Exercise.} Write a function
+\emph{\textbf{bubble}\textbf{s}\textbf{ort\_}\textbf{from}\textbf{()}}
+that accepts an array \emph{\textbf{x}} of integers and two integers
+\emph{\textbf{start}} and \emph{\textbf{end }}and performs bubblesort on
+from \emph{\textbf{x{[}start{]}}} to \emph{\textbf{x{[}end -- 1{]}}} so
+that the values are in ascending order. Test your code: Create an array
+of 10 random integers, call the
+\emph{\textbf{bubble}\textbf{s}\textbf{ort\_}\textbf{from}\textbf{()}}
+function to sort the values using \emph{\textbf{start=2}} and
+\emph{\textbf{end=7}}, and print the values of \emph{\textbf{x}} in
+\emph{\textbf{main()}}. Test your function.
+
+\textbf{Exercise.} Write a function \emph{binarysearch()} that performs
+binary search on an array. Specifically, the function accepts an array
+\emph{\textbf{x}} of integers, an integer \emph{\textbf{x\_len}} for the
+size of the array, and an integer \emph{\textbf{target}}. The function
+returns the index in \emph{x} where \emph{\textbf{target}} appears. The
+function assume that \emph{\textbf{x}} is sorted in ascending order.
+Test your function.
+
+\textbf{Exercise.} Write a function \emph{binarysearch()} that accepts
+an integer array \emph{\textbf{x}}, integers \emph{\textbf{start}} and
+\emph{\textbf{end}} and integer \emph{\textbf{target}}, and then
+performs binary search on an array \emph{\textbf{x}} from index
+\emph{\textbf{start}} to index \emph{\textbf{end -- 1 }}searching for
+\emph{\textbf{target. }}The function returns the index in \emph{x} where
+\emph{\textbf{target}} appears. The function assume that
+\emph{\textbf{x}} is sorted in ascending order from index
+\emph{\textbf{start}} to index \emph{\textbf{end - 1}}. Test your
+function.
+
+Computing array sizes: \emph{sizeof()}
+
+This is a quick review.
+
+The amount of memory (in terms of bytes -- i.e. 8 bits) used by a value,
+a variable, or a type can be found by calling the \emph{sizeof()}
+function.
+
+Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+std::cout \textless\textless{} sizeof(int) \textless\textless{}
+std::endl;
+
+std::cout \textless\textless{} sizeof(42) \textless\textless{}
+std::endl;
+
+int x;
+
+std::cout \textless\textless{} sizeof(x) \textless\textless{} std::endl;
+
+int y{[}5{]};
+
+std::cout \textless\textless{} sizeof(y) \textless\textless{}
+std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+As you can see, to determine the amount of memory used to hold an int
+value is 4 bytes. And you get this number (I.e. 4) by using any of the
+following:
+
+sizeof(int)sizeof(1)sizeof(x)
+
+where \emph{x} is an \emph{int} variable. In the above
+
+\emph{sizeof(y})
+
+gives you the number of bytes used for an array of 5 integers.
+
+Here's a useful application of the \emph{sizeof()} function. Suppose you
+have an array of integers and you want to compute \textbf{the size of
+the array}. You can do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int y{[}5{]};
+
+std::cout \textless\textless{} sizeof(y) / sizeof(int)
+\textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+With this, the following program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+void print(int x{[}{]}, int x\_size)
+
+\{
+
+for (int i = 0; i \textless{} x\_size; ++i)
+
+\{
+
+std::cout \textless\textless{} x{[}i{]} \textless\textless{} ' ';
+
+\}\\
+\}
+
+int main()
+
+\{
+
+int a{[}{]} = \{1, 2, 3\};
+
+print(a, 3);
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+can be rewritten as
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+int main()
+
+\{
+
+int a{[}{]} = \{1, 2, 3\};
+
+int a\_size = sizeof(a) / sizeof(int);
+
+print(a, a\_size);
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Why is this is a good thing? Because now if you change your program so
+that it works with an array of 5 values:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+int main()
+
+\{
+
+int a{[}{]} = \{1, 2, 3\textbf{, 6, 2}\};
+
+...
+
+\}
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+you don't have to worry about changing
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+print(a, \textbf{3});
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+to
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+print(a, \textbf{5});
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Since with
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+int a\_size = sizeof(a) / sizeof(int);
+
+print(a, a\_size);
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The program works for array \emph{\textbf{a}} of any size.
+
+By the way, remember that it's OK to process only part of the array:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+void print(int x{[}{]}, int x\_size)
+
+\{
+
+for (int i = 0; i \textless{} x\_size; ++i)
+
+\{
+
+std::cout \textless\textless{} x{[}i{]} \textless\textless{} ' ';
+
+\}\\
+\}
+
+int main()
+
+\{
+
+int a{[}{]} = \{1, 2, 3\};
+
+print(a, 2);
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Of course you already know (see earlier notes on arrays) that you should
+never go outside the array so something like this is BAD ... (this has
+nothing to do with functions of course) ...
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+int a{[}{]} = \{1, 2, 3\};
+
+print(a, \textbf{5});
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Make sure you try it.
+
+Gotchas
+
+It's very important to remember that the \emph{sizeof()} function is
+correct only when the array variable is \textbf{not a function
+parameter} in other words, you should only call \emph{sizeof()} on an
+array variable that's not a parameters.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+void print(int x{[}{]})
+
+\{
+
+int x\_size = sizeof(x) / sizeof(int);
+
+for (int i = 0; i \textless{} x\_size; ++i)
+
+\{
+
+std::cout \textless\textless{} x{[}i{]} \textless\textless{} ' ';
+
+\}\\
+\}
+
+int main()
+
+\{
+
+int a{[}{]} = \{1, 2, 3\};
+
+print(a);
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Here's another one ...
+
+You \textbf{cannot return an array}!!! The following is not valid
+
+C++ code:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int{[}3{]} whatever()
+
+\{
+
+int x{[}3{]} = \{1, 2, 3\};
+
+return x;\\
+\} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In C/C++ you can pass an array into a function, but you cannot send an
+array back. Remember that!!!
+
+Arrays and operators
+
+Here are some \textbf{very common gotchas for arrays}.
+
+In general all the usual operators do not work the way you expect.
+
+Suppose you want to check if two arrays have the same values. Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x{[}{]} = \{1, 2, 3\};
+
+int y{[}{]} = \{1, 2, 3\};
+
+if (x == y)
+
+\{
+
+std::cout \textless\textless{} "same" \textless\textless{} std::endl;
+
+\}
+
+else
+
+\{
+
+std::cout \textless\textless{} "different" \textless\textless{}
+std::endl;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Does it work? (Duh.) You will have to wait till we talk about pointers
+before you know why.
+
+What about this?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x{[}{]} = \{1,2,3\};
+
+int y{[}3{]};
+
+y = x;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Or:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x{[}{]} = \{1, 2, 3\};
+
+int y{[}{]} = \{1, 2, 4\};
+
+if (x == y)
+
+std::cout \textless\textless{} "same" \textless\textless{} std::endl;
+
+else
+
+std::cout \textless\textless{} "different" \textless\textless{}
+std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+So remember this: \textbf{The comparison operators == and != and the
+assignment operator = does not work as ``expected'' for arrays.}
+
+In general you should not expect any operator to work ``in the obvious
+way'' for arrays.
+
+Standard operations on arrays
+
+As mentioned in the previous section, standard operations for variables
+of basic types (int, double, bool, char) such as assignment (i.e., =)
+and equality comparison (I.e., ==) does not work for arrays.
+
+The correct thing to do is compare the values in the arrays manually.
+Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x{[}{]} = \{1, 2, 3\};
+
+int y{[}{]} = \{1, 2, 3\};
+
+bool same = true;
+
+for (int i = 0; i \textless{} 3; i++)
+
+\{
+
+if (x{[}i{]} != y{[}i{]})
+
+\{
+
+same = false;
+
+break;\\
+\}\\
+\}
+
+if (same)
+
+\{
+
+std::cout \textless\textless{} "same" \textless\textless{} std::endl;
+
+\}
+
+else
+
+\{
+
+std::cout \textless\textless{} "different" \textless\textless{}
+std::endl;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+So let's say you compare lots of arrays. You say to yourself, ``I'm
+smart enough to write a function to do that!'' So you rewrite the above
+as this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+bool array\_isequal(int x{[}{]}, int y{[}{]})
+
+\{
+
+for (int i = 0; i \textless{} 3; i++)
+
+\{
+
+if (x{[}i{]} != y{[}i{]})
+
+\{
+
+return false;\\
+\}
+
+\}
+
+return true;
+
+\}
+
+int main()
+
+\{
+
+int x{[}{]} = \{1, 2, 3\};
+
+int y{[}{]} = \{1, 2, 3\};
+
+std::cout \textless\textless{} array\_isequal(x, y) \textless\textless{}
+std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Of course we want to make sure our ``array equal comparison function''
+works for general arrays of any sizes. Of course the arrays have
+difference sizes, they are different. (Right? The array \emph{\{1, 2,
+3\}} is different from \emph{\{1, 2, 3, {[}blah{]}\}} regardless of the
+value of \emph{{[}blah{]}}.)
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+bool array\_isequal(int x{[}{]},\textbf{ int x\_len},
+
+int y{[}{]}, \textbf{int y\_len})
+
+\{
+
+if (x\_len == y\_len)
+
+\{
+
+for (int i = 0; i \textless{} x\_len; ++i)
+
+\{
+
+if (x{[}i{]} != y{[}i{]})
+
+\{
+
+return false;
+
+\}
+
+\}
+
+return true;
+
+\}
+
+else
+
+\{
+
+return false;\\
+\}
+
+\}
+
+int main()
+
+\{
+
+int x{[}{]} = \{1, 2, 3\};
+
+int y{[}{]} = \{1, 2, 3\};
+
+std::cout \textless\textless{} array\_isequal(x, y) \textless\textless{}
+std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+But ... we're used to something like
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+if (x == y)
+
+\{
+
+std::cout \textless\textless{} "same" \textless\textless{} std::endl;
+
+\}
+
+else
+
+\{
+
+std::cout \textless\textless{} "different" \textless\textless{}
+std::endl;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+instead of
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+if (array\_isequal(x, x\_len, y, y\_len))
+
+\{
+
+std::cout \textless\textless{} "same" \textless\textless{} std::endl;
+
+\}
+
+else
+
+\{
+
+std::cout \textless\textless{} "different" \textless\textless{}
+std::endl;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+It turns out that you can actually define your own version of the
+\emph{==} operator! ... but you have to wait for CISS245 (Advanced
+Programming) to learn to write your own ==. In other words not only can
+you create your own functions, you can also create your own operators as
+well.
+
+\textbf{Exercise.} Write a function \emph{array\_assign()} (for
+``assignment operator'') such that
+
+\emph{array\_assign(x, x\_len, y, y\_len)}
+
+will copy the first \emph{y\_len} values in the array \emph{y} to the
+array \emph{x and set x\_len} to \emph{y\_len.} Test your function.
+
+\textbf{Exercise.} Write a function \emph{array\_insert(x, size, v, i)}
+such that if x is an array with values \{11,22,33,44\}, \emph{x\_len} is
+\emph{4}, calling
+
+\emph{array\_insert(x, x\_len, 42, 1)}
+
+will insert \emph{42} into the array \emph{x} at index \emph{1}. The end
+result is that \emph{x} has the following values
+
+\{11, 42, 22, 33, 44\}
+
+and \emph{x\_len} is set to \emph{5}.
+
+Example: Cellular automata
+
+In an earlier chapter, I talked about the concept of cellular automata.
+Now that we know functions, let's rewrite and clean up the code using
+functions. I'll repeat the information of cellular automata here so you
+don't have to look for the info from that earlier chapter.
+
+A \textbf{cellular automata (CA)} is simply a grid of values where the
+value at a point in the grid can change its value. The way such a value
+v changes depends on the values near v.
+
+CAs are studied in math, CS, physics, biology, social science, etc. You
+name it. They can be as practical as image processing where they are
+used to remove noise from images to create cleaner images. Yet they can
+be as abstract and complex as you like -- they appear in AI, dynamical
+systems, and chaos theory. You can find lots of information about
+cellular automata on the web -- go ahead and check out the CA entry at
+wikipedia.
+
+Let me be more specific by looking at a simple example. Suppose we look
+at a 1-dimensional CA with these values:
+
+0,0,1,1,0,1,1,1
+
+This CA is made up of 8 cells. The values are either 0 or 1. So a CA can
+be as simple as an array.
+
+Now suppose the value at a cell changes according to these rules:
+
+\begin{itemize}
+\item
+  If the value is 1 and together with the values on its left and right,
+  there are three or one 1s, then the value becomes 0. Otherwise it
+  stays as 1. In other words, if the value is 1 and either the left or
+  right neighbor is 1 (but not both), then 1 stays as 1. Otherwise it
+  becomes 0. You can think of it this way:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Companionship: If 1 has exactly one companion, he/she/it lives on.
+    If 1 has no companion, it dies.
+  \item
+    Overcrowding: If 1 has too many companions, overcrowding kills
+    he/she/it.
+  \end{itemize}
+\item
+  If this value is 0, and together with the values on its left and
+  right, there are two 1s, then the value becomes 1. Otherwise it stays
+  as 0. You can think of it this way:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Reproduction: If a spot is available, then the 1 on the left and
+    right produces a 1. A reproduction (i.e., 0-\textgreater1) occurs
+    only when there are two adjacent 1s next to the 0.
+  \end{itemize}
+\end{itemize}
+
+For instance, the overcrowding rule gives is this:
+
+1,1,1
+
+↓
+
+0
+
+So applying this rule to the value at index 6 we get
+
+0,0,1,1,0,1,1,1
+
+↓
+
+0,0,1,1,0,1,0,1
+
+For simplicity, I might write the rule as 111 → 0 instead of
+
+1,1,1
+
+↓
+
+0
+
+Here are more examples:
+
+\begin{itemize}
+\tightlist
+\item
+  Using the rule \emph{001 → 0}, we get
+\end{itemize}
+
+0,0,1,1,0,1,1,1
+
+↓
+
+\_,0,\_,\_,\_,\_,\_,\_
+
+\begin{itemize}
+\tightlist
+\item
+  Using the rule \emph{011 → 1}, we get
+\end{itemize}
+
+0,0,1,1,0,1,1,1
+
+↓
+
+\_,\_,1,\_,\_,\_,\_,\_
+
+\begin{itemize}
+\tightlist
+\item
+  Using the rule \emph{101 → 1}, we get
+\end{itemize}
+
+0,0,1,1,0,1,1,1
+
+↓
+
+\_,\_,\_,\_,1,\_,\_,\_
+
+In general the new i-th value depends on the current (i-1)-th, i-th,
+(i+1)th values:
+
+\_,\_,\_,\_,?,\_,\_,\_
+
+\_,\_,\_,\_,?,\_,\_,\_
+
+The value at the ends (the first and last) do not have two neighbors. So
+we will not change the values at the left and right end points:
+
+0,0,1,1,0,1,1,1
+
+↓ ↓
+
+0,\_,\_,\_,\_,\_,\_,1
+
+(There are other ways to compute the value of the cells at end points.
+For instance you can view the CA as being wrapped around at the end
+points so that the new value for the first cell depends on the values of
+first, second, and last cell).
+
+So using the above rules we get the following behavior
+
+0,0,1,1,0,1,1,1
+
+0,0,1,1,1,1,0,1
+
+You can think of the above as an evolving CA that changes with time.
+With three times we get
+
+0,0,1,1,0,1,1,1 (time 0)
+
+0,0,1,1,1,1,0,1 (time 1)
+
+0,0,1,0,0,1,1,1 (time 2)
+
+etc.
+
+(A 2D CA is similar to the 1D CA except that a value has 8 neighbors or
+4 neighbors, depending on how you define neighbors. A 2D array, i.e.,
+2-dimensional array, is a 2-dimensional version of a 1D array. For
+instance here's a 4-by-3 2D array. See later notes on 2D arrays for
+details.
+
+So the new value at that location depends on 9 values (itself and its 8
+surrounding neighbors) or 5 values (itself and its 4 neighbors on its
+N,S,E,W sides). 2D ca is used in for instance in image processing.)
+
+We will use CA to generate some ASCII art by printing the values of the
+cells in 1D CA: If the value is 0, we print a space and if the value is
+1 we print X. We will let our CA run through a certain number of time
+steps, printing the CA for each time step. For instance the above CA
+goes through three time steps:
+
+0,0,1,1,0,1,1,1
+
+0,0,1,1,1,1,0,1
+
+0,0,1,0,0,1,1,1
+
+and we print
+
++-\/-\/-\/-\/-\/-\/-\/-+
+
+\textbar{} XX XXX\textbar{}
+
+\textbar{} XXXX X\textbar{}
+
+\textbar{} X XXX\textbar{}
+
++-\/-\/-\/-\/-\/-\/-\/-+
+
+We will use a 1D CA of size 2 * n + 1 where n is an input from the user.
+We will run this for n time steps. We will start off with a CA with a 1
+in the middle of the 1D array and 0 elsewhere. The set of rules to use
+is:
+
+000 → 0
+
+001 → 1
+
+010 → 0
+
+011 → 1
+
+100 → 1
+
+101 → 0
+
+110 → 1
+
+111 → 0
+
+Here's the skeleton code:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+declare an array ca of size 2*500 + 1.
+
+note that the maximum size of the ca is 2*500 + 1.
+
+declare an array t of size 2*500 + 1.
+
+get n from user (at most 500) where the size of the ca is 2*n + 1.
+
+note that we will only use ca{[}0{]}, \ldots, ca{[}2*n{]}.
+
+set the values in ca to all 0s except for a 1 in the middle.
+
+// time = 0
+
+print ca (for value 1 print 'X' and for value 0 print ' '; use a loop).
+
+// time \textgreater{} 0
+
+for time = 1, 2, ..., n - 1:
+
+\{
+
+for each value in ca:
+
+\{
+
+apply the above rules and fill the corresponding value in t.
+
+copy values in t back to ca (use a loop).
+
+print ca (for value 1 print 'X' and for value 0 print ' ')
+
+\}
+
+\} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Note that you can specify n = 500 for a maximum CA of size 2 * 500 + 1 =
+1001. However, you can't see the ASCII art clearly on your console
+window because of wraparound. You can probably right-click and choose a
+smaller font size and larger window size and then you can see the ASCII
+art up to about n = 100. For larger sizes, you can save the output to a
+document (say MS Word), choose a really tiny font and a larger page size
+and print it out.
+
+Try different values for input. In particular start small and then try
+larger and larger value and you'll see a very interesting diagram,
+
+If the diagram does not surprised you, then you are probably wrong!!!
+
+Here are some functions that clearly appears in the above pseudocode:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// initialize the ca
+
+void init(char ca{[}{]}, int size);
+
+// print the ca
+
+void print(char ca{[}{]}, int size);
+
+// copy values in t into ca
+
+void copy(char ca{[}{]}, char t{[}{]}, int size);
+
+// update the ca
+
+void update(char ca{[}{]}, int size); \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Test the above functions thoroughly. Then write a function to print n
+steps in the evolution of a CA.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void print\_n\_generations(int n)
+
+\{
+
+int ca{[}2 * 500 + 1{]};
+
+init(ca, n);
+
+print(ca, n);
+
+for (int time = 1; time \textless{} n; ++time)
+
+\{
+
+update(ca, n);
+
+print(ca, n);
+
+\}
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Much cleaner right?
+
+\textbf{Exercise.} Keep running your ca above. When will the values of
+the ca start to repeat? What is the state (the values) of your ca that
+first gets repeated (you get a cycle)? How many time steps for the first
+repeat? (I hope it's obvious that the state of your ca will repeat!!!)
+
+\textbf{Exercise.} Now change the initial state (i.e., the intial
+values) of your ca. For instance instead of a 1 in the middle, try three
+1s in the middle, try 1,0,1,0,1,0,\ldots, try all 1s, etc. For each
+initial state, figure out shortest time for a first repeat. Print out
+your results. Which initial state of your ca will give you the longest
+cycle? How would you do this systematically? In other words, how would
+you write a program to go through ALL possible initial states for your
+ca? {[}Challenging: Read the section on BINARY NUMBERS{]}
+
+\textbf{Exercise.} Find a way to iterate through all possible sets of CA
+rules. For each set of rules, find the number of steps for the ca to
+repeat itself. {[}Challenging: Read the section on BINARY NUMBERS{]}
+
+\textbf{BINARY NUMBERS}: Recall that a number such as 1425 is just
+1*1000 + 4*100 + 2*10 + 5. You can extract the 1, 4, 2, and 5 from 1425
+by using integer division / and integer mod \%. This is viewing an
+integer ``written in base 10''. If I give you 1,0,1 or any sequence of
+zeroes and ones, then it's sometimes convenient to convert that into a
+single integer. For instance you can convert 1,0,1 into 5 using ``binary
+representation'' -- I'll explain the conversion in a bit. But first, why
+would you want to do that? Well, compare this
+
+int a = 1, b = 0, c = 1; // 1,0,1
+
+if (a == 1 \&\& b == 0 \&\& c == 1)
+
+\{
+
+...
+
+\}
+
+with this:
+
+int d = 5;
+
+if (d == 5)
+
+\{
+
+...
+
+\}
+
+Clearly the second code fragment is simpler. Also, because you are
+comparing a single integer value, you can use a switch:
+
+switch (d)
+
+\{
+
+case 5:
+
+\ldots{}
+
+break;\\
+\}
+
+But what is a nice way to convert 1,0,1 to an integer? You use the same
+idea as base 10 representation of numbers:
+
+1,0,1 → 1*4 + 0*2 + 1*1
+
+i.e., instead of powers of 10, you use powers of 2!!! Here's another
+example:
+
+10111 → 1*16 + 0*8 + 1*4 + 1*2 + 1*1 = 23
+
+In the case of our CA, the three ``bits'' determining how to change a
+bit can be converted to an integer. The rules:
+
+000 → 0
+
+001 → 1
+
+010 → 0
+
+011 → 1
+
+100 → 1
+
+101 → 0
+
+110 → 1
+
+111 → 0
+
+if you convert the 0s and 1s on the left to base 10 numbers, becomes
+
+0 → 0
+
+1 → 1
+
+2 → 0
+
+3 → 1
+
+4 → 1
+
+5 → 0
+
+6 → 1
+
+7 → 0
+
+Coding involving the bits (such as 101) instead of base 10 numbers (such
+as 5) is clearly going to be more tedious.
+
+\hfill\break
+\textbf{Exercise.} The above converts a bunch of bits into a regular
+integer. What about the opposite? How would you convert an integer into
+bits? Of course the conversion process are compatible: From 101 you get
+5 and your process for convert an integer back to bits must convert 5 to
+101. Also, the bits 10111 is converted to 23 and your process must
+convert 23 back to 10111.
+
+Summary
+
+Functions can have array parameters:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void f(int x{[}{]})
+
+\{
+
+...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The syntax for calling a function is the usual
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int main()
+
+\{
+
+int a{[}3{]};
+
+f(a);
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+When a function modifies the values of an array parameter, the value in
+the array argument is also modified:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void g(double x{[}{]})
+
+\{
+
+x{[}2{]} = 42;
+
+return;
+
+\}
+
+int main()
+
+\{
+
+double d{[}100{]} = \{0.0\}; // all values set to 0.0
+
+g(d);
+
+std::cout \textless\textless{} d{[}2{]} \textless\textless{}
+'\textbackslash n'; // d{[}2{]} is changed
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In other words, array arguments are pass by reference.
+
+The \emph{sizeof()} will not work in the usual way for array parameters:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void g(double x{[}{]})
+
+\{
+
+// does not print 100
+
+std::cout \textless\textless{} sizeof(d) / sizeof(double)
+\textless\textless{} '\textbackslash n';
+
+return;
+
+\}
+
+int main()
+
+\{
+
+double d{[}100{]} = \{0.0\};
+
+// 100 is printed
+
+std::cout \textless\textless{} sizeof(d) / sizeof(double)
+\textless\textless{} '\textbackslash n';
+
+g(d);
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+To make a function work in general for an array of any size, you can
+pass the intended size of the array. For instance
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void f(int x{[}{]}, int size)
+
+\{
+
+// process x from x{[}0{]}, x{[}1{]}, ..., x{[}size - 1{]}\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Of course you need not start with index 0. For instance you can do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void f(int x{[}{]}, int start, int end)
+
+\{
+
+// process x from x{[}start{]} to x{[}end - 1{]}\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\end{document}

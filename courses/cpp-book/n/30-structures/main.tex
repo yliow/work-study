@@ -1,0 +1,2254 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\author{}
+\date{}
+
+\begin{document}
+
+30. Structures
+
+Objectives
+
+\begin{itemize}
+\tightlist
+\item
+  Define a \emph{struct}
+\item
+  Declare \emph{struct} variable with or without initialization
+\item
+  Use dot \emph{.} operator to access a \emph{struct} variable's member
+\item
+  Declare and allocation/deallocate memory for a pointer-to-struct
+  variable.
+\item
+  Use \emph{-\textgreater{}} dereferencing operator
+\item
+  Declare array of \emph{struct} values
+\item
+  Create nested \emph{struct}.
+\end{itemize}
+
+Up to this point we have been using types provided by C++: basic types,
+array types, etc.
+
+In this set of notes we will create our own types.
+
+struct
+
+Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless iomanip\textgreater{}
+
+int main()
+
+\{
+
+struct Time
+
+\{
+
+int hour;
+
+int min;
+
+int sec;\\
+\};
+
+Time t0;
+
+t0.hour = 5;
+
+t0.min = 18;
+
+t0.sec = 0;
+
+std::cout \textless\textless{} std::setw(2) \textless\textless{}
+std::setfill('0')
+
+\textless\textless{} t0.hour \textless\textless{} ':'
+
+\textless\textless{} std::setw(2) \textless\textless{} std::setfill('0')
+
+\textless\textless{} t0.min \textless\textless{} ':'
+
+\textless\textless{} std::setw(2) \textless\textless{} std::setfill('0')
+
+\textless\textless{} t0.sec
+
+\textless\textless{} std::endl;
+
+return 0;
+
+\} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\emph{t0} is like a \textbf{variable containing other variables}:
+\emph{hour}, \emph{min}, \emph{and sec}. This is the picture of
+\emph{main()}'s memory after declaring and assigning values to
+\emph{t0:}
+
+Here's the format for creating a struct type:
+
+struct \emph{{[}struct name{]}}
+
+\{
+
+{[}type 1{]} {[}member name 1{]};
+
+{[}type 2{]} {[}member name 2{]};
+
+...\\
+\};
+
+The most common gotcha is to forget the \textbf{semicolon} at the end.
+
+Of course \emph{{[}type 1{]}}, \emph{{[}type 2{]}}, ... must be types
+that are already defined.
+
+For our example above, the \emph{hour} in \emph{t0} is called a
+\textbf{member} (or \textbf{member variable}) of \emph{t0}.
+
+The member in a struct variable is accessed by the \textbf{dot
+operator}. The format is this:
+
+{[}struct var name{]}.{[}member name{]}
+
+The ``\emph{hour} in \emph{t0}'' is \emph{\textbf{t0.hour}}.
+
+You \emph{\textbf{do}} know how to work with \emph{{[}struct var
+name{]}.{[}member name{]} since {[}struct var name{]}.{[}member name{]}}
+is just like a ``regular'' variable.
+
+\textbf{Exercise.} Create a variable \emph{t1} of type \emph{Time} and
+set it to the time one second after \emph{t0}. Print \emph{t1} in the
+same format as the print statement of \emph{t0}. Note that the values of
+\emph{sec} of \emph{t1} and \emph{sec} of \emph{t0} are different.
+
+Let's compare the struct variable and an array. Note that a struct
+variable is like an array in the sense that they both \textbf{contain
+values}.
+
+int x{[}3{]} = \{1, 2, 3\};
+
+struct Y
+
+\{
+
+int a;
+
+int b;
+
+int c;
+
+\};
+
+Y y = \{1, 2, 3\};
+
+In the above \emph{x} is made up of three integers 1, 2, 3. The variable
+\emph{y} contains three variables \emph{a}, \emph{b}, and \emph{c} with
+values 1, 2, and 3 respectively. We refer to the values in \emph{x} by
+
+x{[}0{]}
+
+x{[}1{]}
+
+x{[}2{]}
+
+while we refer to the values in \emph{y} by
+
+y.a
+
+y.b
+
+y.c
+
+Make sure you \textbf{see the difference!!!} This is the picture of the
+program's memory during execution:
+
+They both look the same but the names of the cells are different.
+Remember that.
+
+Note that while you can scan an array like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+for (int i = 0; i \textless{} 3; ++i)
+
+\{
+
+std::cout \textless\textless{} x{[}i{]} \textless\textless{} std::endl;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+there's no analog for our \emph{struct} variable y: there is no way to
+scan the values in y using a \emph{for}-loop. That's not the purpose of
+\emph{struct }variables.
+
+The purpose of \emph{struct} is allow the software engineer to think at
+a \textbf{higher level of abstraction}. For instance in the case of our
+\emph{Time} struct, a function like
+
+void addOneSec(Time \& t);
+
+and a code like
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+Time currentTime, endTime;
+
+...
+
+while (isLessThan(currentTime, endTime))
+
+\{
+
+// ... do something for a second
+
+readCurrentTime(currentTime);\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+for instance will let us focus on the concept of time and not worry
+about the details of a time variable (hours, minutes, seconds.) While
+\textbf{functions} chunk up \textbf{code}, \textbf{struct variables}
+allows us to chunk up \textbf{data}.
+
+\textbf{Exercise.} There's a section on functions for struct variables.
+But I'm sure you can handle this exercise. Write the \emph{isLessThan()}
+function. We need to make sure that the \emph{Time} struct is outside
+the \emph{main()} and above this function:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless iomanip\textgreater{}
+
+struct Time
+
+\{
+
+int hour;
+
+int min;
+
+int sec;\\
+\};
+
+bool isLessThan(Time t0, Time t1)
+
+\{
+
+// convert t0 and t1 into seconds since midnight
+
+// and then compare.
+
+\}
+
+int main()
+
+\{
+
+Time t0;
+
+t0.hour = 5;
+
+t0.min = 18;
+
+t0.sec = 0;
+
+Time t1;
+
+t1.hour = 5;
+
+t1.min = 18;
+
+t1.sec = 1;
+
+std::cout \textless\textless{} isLessThan(t0, t1) \textless\textless{}
+'\textbackslash n';
+
+return 0;
+
+\} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Another difference between arrays and structs is this: You can have
+member variables of any type in a struct variable. For instance
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+struct Student
+
+\{
+
+char lastname{[}50{]};
+
+char firstname{[}50{]};
+
+double gpa;
+
+\};
+
+Student johnDoe = \{"Doe", "John", 3.55\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Here's the memory:
+
+On the other hand, the values in an array MUST all have the same type.
+In C/C++ there is no such concept as a single array made up of 3
+integers, 4 doubles, and 5 strings.
+
+\textbf{Exercise. }Using this code segment:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+struct Student
+
+\{
+
+char lastname{[}50{]};
+
+char firstname{[}50{]};
+
+double gpa;
+
+\};
+
+Student johnDoe = \{"Doe", "John", 3.55\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+print the first name, last name and GPA of \emph{johnDoe} variable.
+
+\textbf{Exercise.} The following is a \emph{struct} called
+\emph{Fraction} with two integer members: \emph{numerator} and
+\emph{denominator}. Correct any errors in the code. Of course a
+\emph{Fraction} variable models a (mathematical) fraction. Create a
+\emph{Fraction} variable modeling the fraction 2/3. Write a print
+function that prints a Fraction variable in the ``usual'' way, i.e.
+numerator, followed by '/', and then by the denominator.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+struct Fraction
+
+\{
+
+int numerator;
+
+int denominator;\\
+\};
+
+void print(Fraction f)
+
+\emph{\{}\\
+\}
+
+int main()
+
+\{
+
+Fraction x;
+
+// assign values to the members of x so that
+
+// it models the fraction 2/3
+
+print(x);
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Exercise.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+struct Customer
+
+\{
+
+char fname{[}100{]};
+
+char lname{[}100{]};
+
+char email{[}100{]};\\
+\};
+
+// Prints customer data in the format
+
+// Firstname: ***, Lastname: ***, Email: ***
+
+void print(Customer customer)
+
+\{\\
+\}
+
+int main()
+
+\{
+
+Customer customer = \{"John",
+
+"Doe",
+
+"jdoe@gmailcom"\};
+
+print(customer);
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} The GPS device from a company has an ID (an
+\emph{int}) and it's position which is longitude (a \emph{double})and
+latitude (a \emph{double}). Design a struct that works for the concept
+of a GPS device. Declare a GPS device with name GPS1 with ID 7, with
+longitude 45.26 degrees, and with latitude 31.22 minutes. Print the
+values in GPS1. Prompt the user for a \emph{double} \emph{x} and add
+\emph{x} to the longitudinal degree of GPS1. Print the values in GPS1
+again.
+
+\textbf{Exercise.} You are writing a game and you need to create game
+objects. Your game objects have their images loaded from image files.
+Therefore each game object has a filename associated with it. Your game
+object must also be drawn to the windows' drawing surface. To do that
+you need to indicate an area to blit (i.e, copy) the image file. An area
+on your surface is completely described by the position of the top left
+corner of the area with respect to the window, i.e. you need the x and y
+coordinates (as integers). You also need the width and height (as
+integers) for this area. Each game object also as an energy level which
+is described by a double. Design a \emph{GameObject} struct that
+completely describes the concept of a game object outlined above.
+Declare \emph{redAlien} variable of type \emph{GameObject} whose image
+is taken from image file ``red.bmp''. \emph{redAlien} will be
+initialized with x = 5, y = 6 and the width and height of the image as
+it appears on the surface is 20 and 30; it's energy level starts with
+100.0.
+
+\textbf{Exercise.} Design a struct called \emph{Car} to be used in a
+computerized car. What structure members do you need?
+
+One last small point before we're done with this section. Just like in
+your earlier C++ programs
+
+int x;
+
+int y;
+
+is the same as
+
+int x, y;
+
+for a struct. This
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+struct Student
+
+\{
+
+int ID;
+
+double height;
+
+double weight;
+
+double GPA;\\
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+is the same as
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+struct Student\\
+\{
+
+int ID;
+
+double height, weight, GPA;\\
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Find the error(s):
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+struct X \{ int x; int y \}
+
+X a;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+By the way it's possible to define a \emph{struct} and use it to declare
+\emph{struct} variables in a single statement. Make sure you try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+struct Robot
+
+\{
+
+char name{[}100{]};
+
+double weight;
+
+double height;
+
+int x;
+
+int y;
+
+\} arnold, t3;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+And it's even possible to define a \emph{struct} without giving it a
+name. Run this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+struct
+
+\{
+
+char name{[}100{]};
+
+double weight;
+
+double height;
+
+int x;
+
+int y;
+
+\} arnold, t3;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+This is \textbf{not common} since in most cases you want to writing
+functions to accept \emph{struct} values and therefore the function
+would need to use the \emph{struct}. For instance you might have
+something like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+struct Robot
+
+\{
+
+char name{[}100{]};
+
+double weight;
+
+double height;
+
+int x;
+
+int y;
+
+\}
+
+void print(Robot r)\\
+\{
+
+...
+
+\}
+
+int main()
+
+\{
+
+Robot arnold, t3;
+
+...
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Initialization
+
+As shown earlier, you can initialize a \emph{struct} variable using
+initializers:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless iomanip\textgreater{}
+
+int main()
+
+\{
+
+struct Time
+
+\{
+
+int hour, min, sec;\\
+\};
+
+Time t0 = \{5, 18, 0\};
+
+std::cout \textless\textless{} std::setw(2) \textless\textless{}
+std::setfill('0')
+
+\textless\textless{} t0.hour
+
+\textless\textless{} ':'
+
+\textless\textless{} std::setw(2) \textless\textless{} std::setfill('0')
+
+\textless\textless{} t0.min
+
+\textless\textless{} ':'
+
+\textless\textless{} std::setw(2) \textless\textless{} std::setfill('0')
+
+\textless\textless{} t0.sec
+
+\textless\textless{} std::endl;
+
+return 0;
+
+\} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Notice that this looks very similar to initialization of an array. And
+just like arrays you can perform partial initialization:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+struct Time
+
+\{
+
+int hour, min, sec;\\
+\};
+
+\emph{struct Time t0 = \{5\};} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} What are the values of \emph{t0}?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+struct Time
+
+\{
+
+int hour, min, sec;\\
+\};
+
+\emph{Time t0 = \{5\};} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise. }What are the values in x?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+struct X
+
+\{
+
+int a, b, c;
+
+double d, e, f;\\
+\};
+
+\emph{X x = \{5\};} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} What is the output?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+struct X
+
+\{
+
+int x;
+
+char y;
+
+double z;\\
+\};
+
+X a = \{1, '\$', 3.14\};
+
+std::cout \textless\textless{} a{[}0{]} \textless\textless{} ' '
+\textless\textless{} a{[}1{]} \textless\textless{} ' '
+\textless\textless{} a{[}2{]}
+
+\emph{ \textless\textless{} std::endl;} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Write one single input statement (of course using
+\emph{std::cin}) to fill \emph{a} with values and one statement to print
+all the values in \emph{a}.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+struct X
+
+\{
+
+int x;
+
+char y;
+
+double z;\\
+\};
+
+X a;
+
+// input values into a
+
+// output all values in a\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} It's not too surprising that you can put an array
+into a struct. Define a \emph{TicTacToeGame} struct containing
+\emph{board}, a 3-by-3 array of characters and a \emph{turn} variable
+that is of \emph{char} type. The array \emph{board} models the state of
+a tic-tac-toe game and the \emph{turn} variable tells us which player
+(either X or O) will be the next to make a move.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// define struct here
+
+// declare variable x of type TicTacToe so that it
+
+// models the game board
+
+// X \textbar{} \textbar{} O
+
+// -\/-\/-+-\/-\/-+-\/-\/-
+
+// X \textbar{} X \textbar{} O
+
+// -\/-\/-+-\/-\/-+-\/-\/-
+
+// \textbar{} \textbar{}
+
+// (for instance x.board{[}0{]}{[}0{]} is 'X' and the turn is
+
+// set to '0'.
+
+// Write a double for-loop to print x.board in the
+
+// format of the above comment. Of course the code
+
+// should work for different x.board values!!!
+
+// Now write a statement to prompt the appropriate
+
+// player to make a move. For instance if x.turn
+
+// is 'X', the message printed is "X's turn: " and
+
+// if x.turn is 'O', then the message is "O's turn: "\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Operator =
+
+To copy values from one struct variable to another you can of course do
+this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+struct Time
+
+\{
+
+int hour, min, sec;\\
+\};
+
+Time t0 = \{5, 18, 0\};
+
+Time t1;
+
+t1.hour = t0.hour;
+
+t1.min = t0.min;
+
+\emph{t1.sec = t1.sec;} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+A better way is this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+struct Time
+
+\{
+
+int hour, min, sec;\\
+\};
+
+Time t0 = \{5, 18, 0\};
+
+Time t1;
+
+t1 = t0;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In other words the operator = (i.e. assignment operator) is defined
+between struct variables of the same type. It copies all the values from
+the left to the right. It's not too surprising that the same holds for
+the initialization operator:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+struct Time
+
+\{
+
+int hour, min, sec;\\
+\};
+
+Time t0 = \{5, 18, 0\};
+
+\emph{Time t1} = t0;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Is the operator \emph{==} defined for struct
+variables of the same type? In other words does the following print 1?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+struct Time
+
+\{
+
+int hour, min, sec;\\
+\};
+
+Time t0 = \{5, 18, 0\};
+
+\emph{Time t1} = t0;
+
+std::cout \textless\textless{} (t1 == t0) \textless\textless{}
+std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Is the operator \emph{!=} defined for struct
+variables of the same type? Design an experiment to verify your guess.
+
+Array of Structs
+
+Does this surprise you?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless iomanip\textgreater{}
+
+struct Time
+
+\{
+
+int hour;
+
+int min;
+
+int sec;\\
+\};
+
+int main()
+
+\{
+
+Time t{[}10{]};
+
+for (int i = 0; i \textless{} 10; i++)
+
+\{
+
+t{[}i{]}.hour = 5;
+
+t{[}i{]}.min = 18;
+
+t{[}i{]}.sec = 2 * i;\\
+\}
+
+for (int i = 0; i \textless{} 10; i++)
+
+\{
+
+std::cout \textless\textless{} std::setw(2)
+
+\textless\textless{} std::setfill('0')
+
+\textless\textless{} t{[}i{]}.hour
+
+\textless\textless{} ':'
+
+\textless\textless{} std::setw(2)
+
+\textless\textless{} std::setfill('0')
+
+\textless\textless{} t{[}i{]}.min
+
+\textless\textless{} ':'
+
+\textless\textless{} std::setw(2)
+
+\textless\textless{} std::setfill('0')
+
+\textless\textless{} t{[}i{]}.sec
+
+\textless\textless{} std::endl;
+
+\}
+
+return 0;
+
+\} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Enough said ...
+
+Pointers to structs
+
+Since you can create pointers to any kind of variable, you can create
+pointers to structs too.(Review your notes/books on pointers if
+necessary.) Here's a quick review.
+
+Recall that to declare a pointer to point to a value of type X you do
+this:
+
+X * p;
+
+For instance here's an int pointer:
+
+int * p;
+
+If you are pointing to a value that already exists you can access that
+value using your pointer:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x = 5;
+
+int * p = \&x;
+
+*p = 42;
+
+std::cout \textless\textless{} p \textless\textless{} std::endl
+
+std::cout \textless\textless{} (*p) \textless\textless{} std::endl\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+If not you have to give your pointer a value to point to. This is how
+you do it:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int * p;
+
+p = new int;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+That's called \textbf{allocating memory} for \emph{p}. (You have already
+seen this concept.) You can do it in one step:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+int * p = new int;\tabularnewline
+\bottomrule
+\end{longtable}
+
+Where does this memory (the int) come from? It's from a pool of
+available memory that was created before your program runs; it's called
+the heap or the free store. Once you're done with using the value your
+pointer is pointing to you must release the memory back to the heap.
+This is called \textbf{deallocating memory}. You do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int * p = new int;
+
+... do something with p ...
+
+delete p;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Note (yet again) that \emph{delete p} releases the memory that \emph{p}
+is pointing to; \emph{p} itself is not somehow removed from the program
+until it goes out of scope. Therefore you can use it again:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int * p = new int;
+
+... do something with p ...
+
+delete p;
+
+...
+
+p = new int;
+
+... do something else with p ...
+
+delete p;
+
+...
+
+p = new int;
+
+... do something else with p ...
+
+delete p;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You can also get pointers to point to an array of values in the heap:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int * p = new int;
+
+... do something with p ...
+
+delete p;
+
+...
+
+p = new int;
+
+... do something else with p ...
+
+delete p;
+
+...
+
+int size = 42;
+
+p = new int{[}size{]};
+
+... do something with p ...
+
+delete {[}{]} p; \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Once \emph{p} points to an array, you can use \emph{p} like an array:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int size = 42;
+
+p = new int{[}size{]};
+
+for (int i = 0; i \textless{} size; i++)
+
+\{
+
+\textbf{p{[}i{]}} = i * i;\\
+\}
+
+delete {[}{]} p; // \textless-\/-\/- WARNING!!!\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The \textbf{address} of the \emph{i-}th value that \emph{p} points to is
+\emph{p + i} and therefore the value of this value is \emph{*(p+i)}. So
+remember that the i-th value of the array that \emph{p} points is is
+both \emph{p{[}i{]}} and \emph{*(p + i)}. They are the same. The
+preference is to use \emph{p{[}i{]}}.
+
+This is only a quick review. You should go over your previous notes on
+pointers. Now try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless iomanip\textgreater{}
+
+int main()
+
+\{
+
+struct Time
+
+\{
+
+int hour;
+
+int min;
+
+int sec;\\
+\};
+
+Time t0;
+
+t0.hour = 5;
+
+t0.min = 18;
+
+t0.sec = 0;
+
+std::cout
+
+\textless\textless{} std::setw(2) \textless\textless{} std::setfill('0')
+\textless\textless{} t0.hour
+
+\textless\textless{} ':'
+
+\textless\textless{} std::setw(2) \textless\textless{} std::setfill('0')
+\textless\textless{} t0.min
+
+\textless\textless{} ':'
+
+\textless\textless{} std::setw(2) \textless\textless{} std::setfill('0')
+\textless\textless{} t0.sec
+
+\textless\textless{} std::endl;
+
+Time * p = new Time;
+
+*p = t0;
+
+std::cout
+
+\textless\textless{} std::setw(2) \textless\textless{} std::setfill('0')
+\textless\textless{} (*p).hour
+
+\textless\textless{} ':'
+
+\textless\textless{} std::setw(2) \textless\textless{} std::setfill('0')
+\textless\textless{} (*p).min
+
+\textless\textless{} ':'
+
+\textless\textless{} std::setw(2) \textless\textless{} std::setfill('0')
+\textless\textless{} (*p).sec
+
+\textless\textless{} std::endl;
+
+delete p;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Read the code carefully. There is really no new concepts at all. While
+\emph{p} is the pointer to a \emph{Time} value, \emph{*p} is the actual
+\emph{Time} value \emph{p} is pointing to. Therefore
+
+(*p).hour
+
+is the hour of the value p is pointing to. There is actually a shorthand
+notation for this. Note that \emph{(*p)}.hour involves two operators:
+the * and the . operators. Let me emphasize that:
+
+(*p).hour
+
+is the same as
+
+p-\textgreater hour
+
+The operator -\textgreater{} is called the \textbf{de-referencing
+operator}. Unfortunately * as in \emph{*p} is also called the
+de-referencing operator!!! You should use this instead of doing
+de-referencing-followed-by-the-dot-operator, i.e. write
+
+\emph{\textbf{p-\textgreater hourGOOD}}
+
+(*p).hourBAD
+
+Of course one quick question to ask is this. Suppose we omit the
+parentheses so that we have two operators, like this \emph{*x.y}. Which
+operator goes first? Is \emph{*x.y} really \emph{(*x).y} or is it
+\emph{*(x.y)?} The dot operator actually goes first. In other words
+\emph{*x.y} is really \emph{*(x.y).}
+
+\textbf{Exercise.} Rewrite the above program with the -\textgreater{}
+operator.
+
+Now try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless iomanip\textgreater{}
+
+int main()
+
+\{
+
+struct Time
+
+\{
+
+int hour;
+
+int min;
+
+int sec;\\
+\};
+
+Time t0;
+
+t0.hour = 5;
+
+t0.min = 18;
+
+t0.sec = 0;
+
+std::cout
+
+\textless\textless{} std::setw(2) \textless\textless{} std::setfill('0')
+\textless\textless{} t0.hour
+
+\textless\textless{} ':'
+
+\textless\textless{} std::setw(2) \textless\textless{} std::setfill('0')
+\textless\textless{} t0.min
+
+\textless\textless{} ':'
+
+\textless\textless{} std::setw(2) \textless\textless{} std::setfill('0')
+\textless\textless{} t0.sec
+
+\textless\textless{} std::endl;
+
+Time * p = new Time{[}100{]};
+
+for (int i = 0; i \textless{} 100; i++)
+
+\{
+
+p{[}i{]} = t0;
+
+p{[}i{]}.sec++;
+
+std::cout
+
+\textless\textless{} std::setw(2) \textless\textless{} std::setfill('0')
+\textless\textless{} p{[}i{]}.hour
+
+\textless\textless{} ':'
+
+\textless\textless{} std::setw(2) \textless\textless{} std::setfill('0')
+\textless\textless{} p{[}i{]}.min
+
+\textless\textless{} ':'
+
+\textless\textless{} std::setw(2) \textless\textless{} std::setfill('0')
+\textless\textless{} p{[}i{]}.sec
+
+\textless\textless{} std::endl;
+
+\}
+
+delete {[}{]} p;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Study the code carefully. Again there is really no new concept.
+
+\textbf{Exercise.} Refer to a previous exercise on the \emph{Fraction}
+struct:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+struct Fraction
+
+\{
+
+int numerator;
+
+int denominator;\\
+\}
+
+void print(Fraction f)
+
+\emph{\{}\\
+\}
+
+int main()
+
+\{
+
+Fraction x;
+
+// assign values to the members of x so that
+
+// it models the fraction 2/3
+
+print(x);
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Modify this program and prompt the user for \emph{size} (an integer).
+Declare a pointer \emph{Fraction} and allocate an array of
+\emph{Fraction}s to this pointer; the size of this array is given by
+\emph{size}. In a for-loop, put random fractions into the array (there
+is one value you should avoid in the denominators ...) Print all the
+fractions. Deallocate memory used by the pointer.
+
+Functions
+
+Look at this again:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless iomanip\textgreater{}
+
+int main()
+
+\{
+
+struct Time
+
+\{
+
+int hour;
+
+int min;
+
+int sec;\\
+\};
+
+Time t0;
+
+t0.hour = 5;
+
+t0.min = 18;
+
+t0.sec = 0;
+
+std::cout
+
+\textless\textless{} std::setw(2) \textless\textless{} std::setfill('0')
+\textless\textless{} t0.hour
+
+\textless\textless{} ':'
+
+\textless\textless{} std::setw(2) \textless\textless{} std::setfill('0')
+\textless\textless{} t0.min
+
+\textless\textless{} ':'
+
+\textless\textless{} std::setw(2) \textless\textless{} std::setfill('0')
+\textless\textless{} t0.sec
+
+\textless\textless{} std::endl;
+
+return 0;
+
+\} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Write a function to print the values of a \emph{Time}
+variable:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless iomanip\textgreater{}
+
+void print(Time t)
+
+\{\\
+\}
+
+int main()
+
+\{
+
+struct Time
+
+\{
+
+int hour;
+
+int min;
+
+int sec;\\
+\};
+
+Time t0;
+
+t0.hour = 5;
+
+t0.min = 18;
+
+t0.sec = 0;
+
+print(t0);
+
+return 0;
+
+\} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(Where must the struct definition be?)
+
+Once you use a function for passing variables of a certain type you
+immediately ask if the parameters (the variables in the function) can
+modify the values in the calling function ... try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless iomanip\textgreater{}
+
+// Time struct here
+
+void print(Time t)
+
+\{\\
+\}
+
+void init(Time t)
+
+\{
+
+t.hour = t.min = t.sec = 0;\\
+\}
+
+int main()
+
+\{
+
+Time t0;
+
+t0.hour = 5;
+
+t0.min = 18;
+
+t0.sec = 0;
+
+print(t0);
+
+init(t0);
+
+print(t0);
+
+return 0;
+
+\} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{By default, structs are not passed by reference}. Recall that
+functions can modify an array which is passed in. Therefore arrays are
+passed by reference by default. This is another difference between an
+array and a struct variable.
+
+To really change the variable in the calling function you can do two
+things (see your earlier notes): using references or using pointers.
+Here's the version that uses references
+
+:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+void init(Time \& t)
+
+\{
+
+t.hour = t.min = t.sec = 0;\\
+\}
+
+int main()
+
+\{
+
+Time t0;
+
+t0.hour = 5;
+
+t0.min = 18;
+
+t0.sec = 0;
+
+print(t0);
+
+init(t0);
+
+print(t0);
+
+return 0;
+
+\} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+And here's an initialization using pointers::
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+void init2(Time * t)
+
+\{
+
+t-\textgreater hour = t-\textgreater min = t-\textgreater sec = 0;\\
+\}
+
+int main()
+
+\{
+
+...
+
+print(t0);
+
+init2(\&t0);
+
+print(t0);
+
+return 0;
+
+\} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Pass by Constant Reference
+
+You know that since \emph{struct} variables are passed by value, they
+can't be changed by function call unless if passed by reference. Now
+look at your print function:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless iomanip\textgreater{}
+
+// Time structure here
+
+void print(Time t)
+
+\{\\
+\}
+
+int main()
+
+\{
+
+...
+
+return 0;
+
+\} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+This does work since the \emph{print()} function should not change the
+value of the variable passed in anyway. However a struct variable by
+nature tends to contains lots of values. If you pass by value, the
+values will be copied to the receiving parameter. This takes time.
+Therefore you can pass by reference to save time. Pass by reference will
+not result in values being copied. Therefore we can do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless iomanip\textgreater{}
+
+// Time structure here
+
+void print(Time \& t)
+
+\{\\
+\}
+
+int main()
+
+\{
+
+...
+
+return 0;
+
+\} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Now the danger is that you (or someone working with you on the same
+project) might accidentally change the value of \emph{t} in the
+\emph{print()} function:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless iomanip\textgreater{}
+
+// Time structure here
+
+void print(Time \& t)
+
+\{
+
+t.hour = 0; // YIKES!!!\\
+\}
+
+... \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+So one way to prevent that and at the same time passing a \emph{Time}
+variable by reference for speed is to make the parameter a
+\textbf{constant reference}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless iomanip\textgreater{}
+
+// Time structure here
+
+void print(\textbf{const} Time \textbf{\&} t)
+
+\{
+
+\}
+
+... \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In summary
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Struct parameters} should be \textbf{pass by reference}
+\item
+  If a function \textbf{should not change} the values of a
+  \textbf{struct parameter}, then the parameter should be a
+  \textbf{constant reference}.\textbf{ }
+\end{itemize}
+
+\textbf{Exercise.} Recall the following struct:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+struct Fraction
+
+\{
+
+int numerator;
+
+int denominator;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Write a \emph{print()} function for this struct. Make sure you use
+pass-by- constant-reference.
+
+\textbf{Exercise.} Write a function that checks if a \emph{Time} struct
+parameter is valid. The boolean value \emph{true} is returned if the
+value is correct, i.e. the hour is between 0 and 23 (inclusive), the
+minute is between 0 and 59 (inclusive), and the second is between 0 and
+23 (inclusive). The name of the function is \emph{isValid}. {[}Question:
+Does the function change the value of the parameter? What type of
+parameter-passing should you use?{]}
+
+Struct return values
+
+You already know that functions can only return one value at one time.
+So something like this is \textbf{WRONG}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int, int squareAndCube(int x)
+
+\{
+
+return x*x, x*x*x; // trying to return a square
+
+// and a cube ...\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In other words you cannot return two values at the same time.
+
+However all the values of the member variables inside a struct variable
+is considered a single value. So this is OK:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless iomanip\textgreater{}
+
+// Time struct
+
+// print function
+
+\textbf{Time} addOneSec(const struct Time \& t0)
+
+\{
+
+\textbf{struct Time t = t0;}
+
+t.sec++;
+
+if (t.sec \textgreater= 60)
+
+\{
+
+t.min += t.sec / 60;
+
+t.sec \%= 60;
+
+if (t.min \textgreater= 60)
+
+\{
+
+t.hour += t.min / 60;
+
+t.min \%= 60;
+
+if (t.hour \textgreater= 24)
+
+\{
+
+t.hour \%= 24;
+
+\}\\
+\}
+
+\}
+
+\emph{ }\textbf{return t;}\\
+\}\\
+
+int main()
+
+\{
+
+struct Time t0 = \{5, 18, 0\}; // 05:18:00 hours
+
+...
+
+t0 = addOneSec(t0);
+
+print(t0);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Header Files
+
+A \emph{struct} that is used by different programs can of course be kept
+in a header file. Function prototypes for functions related to the
+\emph{struct} can be placed in the header file. And of course the
+implementation of the functions are in a cpp file.
+
+\textbf{Exercise.} Rewrite this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless iomanip\textgreater{}
+
+// Time struct
+
+// print function
+
+Time addOneSec(const struct Time \& t0)
+
+\{
+
+struct Time t = t0;
+
+t.sec++;
+
+if (t.sec \textgreater= 60)
+
+\{
+
+t.sec \%= 60;
+
+t.min += t.sec / 60;
+
+if (t.min \textgreater= 60)
+
+\{
+
+t.min \%= 60;
+
+t.hour += t.min / 60;
+
+if (t.hour \textgreater= 24)
+
+\{
+
+t.hour \%= 24;
+
+\}\\
+\}
+
+\}
+
+return t;\\
+\}\\
+
+int main()
+
+\{
+
+struct Time t0 = \{5, 18, 0\}; // 05:18:00 hours
+
+...
+
+t0 = addOneSec(t0);
+
+print(t0);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+So that it looks like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless iomanip\textgreater{}
+
+\#include "Time.h"
+
+int main()
+
+\{
+
+struct Time t0 = \{5, 18, 0\}; // 05:18:00 hours
+
+...
+
+t0 = addOneSec(t0);
+
+print(t0);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Of course you need a \emph{Time.h} and a \emph{Time.cpp}.
+
+Nested \emph{struct}
+
+A \emph{struct} definition contains variable of any type. Since a
+\emph{struct} itself is a type ... you can put a \emph{struct} in a
+\emph{struct}!!!!
+
+Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+struct StopWatch
+
+\{
+
+int ID;
+
+Time time;\\
+\};
+
+StopWatch s;
+
+s.ID = 0;
+
+s.time.hour = 5;
+
+s.time.min = 18;
+
+s.time.sec = 0;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Nothing to it right?
+
+\textbf{Exercise.} Write a \emph{Date} struct containing month, day,
+year integers and a \emph{Time} struct containing hour, minute, second
+integers. Finally create a \emph{DateTime} struct that contains the date
+of \emph{Date} type and time of the \emph{Time} type. Write a
+\emph{print()} function for \emph{Date}, \emph{Time}, and
+\emph{DateTime} types. The \emph{print()} function for \emph{DateTime}
+should be the \emph{print()} from \emph{Date} and \emph{Time}.
+
+\textbf{Exercise. }Given
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+struct X
+
+\{
+
+int x;
+
+int * y;
+
+int z;\\
+\};
+
+struct Y
+
+\{
+
+int * x;
+
+X * y;
+
+int * z;\\
+\};
+
+struct Z
+
+\{
+
+X * x;
+
+Y * y;
+
+int * z;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+and \emph{x}, \emph{y}, \emph{z}, \emph{w} are variables of type
+\emph{X}, \emph{Y}, \emph{Z}, \emph{Z*} respectively. Which of the
+following is valid:
+
+\begin{itemize}
+\tightlist
+\item
+  std::cout \textless\textless{} x.x + 2;
+\item
+  x.y = new int;
+\item
+  x.z = new int{[}10{]};
+\item
+  delete {[}{]} y.z;
+\item
+  y.x = x.y;
+\item
+  std::cout \textless\textless{} y-\textgreater y.x;
+\item
+  std::cout \textless\textless{} y.y-\textgreater x;
+\item
+  std::cout \textless\textless{} z.y-\textgreater x;
+\item
+  std::cout \textless\textless{} z-\textgreater y-\textgreater x;
+\item
+  std::cout \textless\textless{} z.y-\textgreater y-\textgreater x;
+\item
+  std::cout \textless\textless{} w-\textgreater y-\textgreater y.x;
+\item
+  std::cout \textless\textless{}
+  w-\textgreater y-\textgreater y-\textgreater x;
+\end{itemize}
+
+Note that if there are several \emph{-\textgreater{}} operators in a
+chain, then the evaluation goes left-to-right. In other words:
+
+a-\textgreater b-\textgreater c-\textgreater d
+
+is the same as
+
+((a-\textgreater b)-\textgreater c)-\textgreater d
+
+And remember that . goes before -\textgreater. So
+
+a-\textgreater b-\textgreater c.d
+
+is really the same as
+
+a-\textgreater b-\textgreater(c.d)
+
+\end{document}

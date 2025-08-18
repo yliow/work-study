@@ -1,0 +1,287 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\author{}
+\date{}
+
+\begin{document}
+
+91. Namespace
+
+Objectives
+
+\begin{itemize}
+\tightlist
+\item
+  Create a namespace
+\item
+  Place identifiers in a namespace
+\end{itemize}
+
+Namespace
+
+Run this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+namespace yliow
+
+\{
+
+int x;
+
+void f()
+
+\{
+
+std::cout \textless\textless{} "hello world" \textless\textless{}
+std::endl;
+
+\}
+
+class C
+
+\{\};
+
+\}
+
+int main()
+
+\{
+
+yliow::x = 42;
+
+yliow::f();
+
+yliow::C obj;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+A \textbf{namespace} is just a container of names (i.e., variables,
+functions, structs, classes.)
+
+Why?
+
+Allows you to put names into a namespace to avoid naming conflicts.
+
+For instance suppose John and Mary work on the same project. They can
+choose different namespaces for their own things:
+
+\begin{itemize}
+\tightlist
+\item
+  john::print\_helloworld()
+\item
+  mary::print\_helloworld()
+\end{itemize}
+
+Openness of namespace
+
+Namespaces are \textbf{open}: you can open it after it's closed.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+namespace yliow
+
+\{
+
+class C
+
+\{\};
+
+\}
+
+namespace yliow // open again!!!
+
+\{
+
+class D
+
+\{\};
+
+\}
+
+int main()
+
+\{
+
+yliow::C obj1;
+
+yliow::D obj2;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The most common usage of namespace is probably to hold classes and
+function prototypes:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// GameLib.h
+
+namespace GameLib
+
+\{
+
+class vec2d \{ ... \};
+
+class graphics \{ ... \};
+
+class sound \{ ... \};
+
+class physics \{ ... \};
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+If you're writing games and scientific simulations. You can split the
+above.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Physics.h
+
+namespace GameLib
+
+\{
+
+class vec2d \{ ... \};
+
+class physics \{ ... \};
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// GameLib.h
+
+\#include "Physics.h"
+
+namespace GameLib
+
+\{
+
+class graphics \{ ... \};
+
+class sound \{ ... \};
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In this way, when you're writing a text-based sci simulations, you don't
+need to compile with the graphics and sound class.
+
+Using
+
+You can avoid typing a namespace when you use it:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+namespace yliow
+
+\{
+
+class X \{\};
+
+class Y \{\};
+
+\}
+
+using namespace yliow;
+
+int main()
+
+\{
+
+X obj; // do not need yliow::X
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\end{document}

@@ -1,0 +1,1975 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\author{}
+\date{}
+
+\begin{document}
+
+62. Destructors
+
+Objectives
+
+\begin{itemize}
+\tightlist
+\item
+  Write destructors
+\item
+  Understand default destructors
+\item
+  Understand when to overwrite destructors
+\item
+  Understand when destructors are called
+\end{itemize}
+
+Review: Automatic variables and automatic reclaim of memory
+
+Constructors let you initialize objects when they are created. Objects
+also need to ``die" just like ``regular" variables, i.e., automatic
+variables. When I say a variable ``dies'', I mean that the name of the
+variable goes out of scope. When a variable goes out of scope, the
+memory used by the variable in the local scope is reclaimed
+automatically. (Remember that the memory used in the free store is not
+reclaimed automatically -- the memory in the free store was requested
+manually by a memory allocation command using \emph{new} and you have to
+reclaim it yourself using \emph{delete} or \emph{delete{[}{]}} .)
+
+Here are some examples and scenarios \ldots{} MAKE SURE YOU STUDY THEM
+CAREFULLY!!!
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+if (x \textgreater{} 0)
+
+\{
+
+int i; // i created
+
+...
+
+\} // i goes out of scope at the end of the
+
+// if-block and i's memory is reclaimed
+
+// automatically.\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+for (int i = 0; i \textless{} 10; i++)
+
+\{
+
+int x{[}100{]}; // x created
+
+\} // x goes out of scope after the body of
+
+// the for-loop. x is destroyed and memory
+
+// for x (100 integers) is reclaimed and
+
+// execution returns to the update section
+
+// of the for-loop\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void f()
+
+\{
+
+int i; // i created
+
+return; // i goes out of scope and i's memory
+
+// is reclaimed automatically.
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void g()
+
+\{
+
+double * i; // i created
+
+i = new double{[}100{]}; // 100 doubles allocated
+
+// in the heap (and i's
+
+// value is to set to the
+
+// address of the first
+
+// double of this array of
+
+// doubles)
+
+return; // i goes out of scope and i's memory is
+
+// reclaimed automatically. However the
+
+// 100 doubles allocated from the heap is
+
+// not deallocated ... MEMORY LEAK!
+
+\}
+
+int main()
+
+\{
+
+g();
+
+g();
+
+g();
+
+g();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+All the above is OLD STUFF. If you don't remember, you have to comb
+through the old notes and look for information on scopes on variables.
+
+Now \ldots{}
+
+Automatic objects and automatic reclaim of memory
+
+What happens when an \textbf{object} goes out of scope? Memory of all
+\textbf{automatic instance variables} of the object will be reclaimed
+automatically:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+if (x \textgreater{} 0)
+
+\{
+
+Date date = Date(1970, 1, 1);
+
+...
+
+\} // date goes out of scope after the if-block.
+
+// date.yyyy, date.mm, date.dd are int variables
+
+// which are *automatic* and are therefore
+
+// automatically reclaimed. No memory leak.
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Of course in the case where the object is in the free store, you will
+have to delete it manually. So this is BAD:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+if (x \textgreater{} 0)
+
+\{
+
+Date * p = new Date(1970, 1, 1);
+
+...
+
+\} // p goes out of scope after the if-block. p is
+
+// automatic since it's in this local scope.
+
+// So the memory used for pointer p is
+
+// automatically reclaimed. However the object
+
+// in the free store that p points to is not
+
+// reclaimed!!! MEMORY LEAK!!!
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+It should be this instead:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+if (x \textgreater{} 0)
+
+\{
+
+Date * p = new Date(1970, 1, 1);
+
+...
+
+delete p; // Deallocate the memory used by p,
+
+// i.e., the object that p points to is
+
+// reclaimed by the free store. In this
+
+// since all instance variables in Date
+
+// objects are automatic, their memory
+
+// used are automatically reclaimed.
+
+\} // ... and p goes out of scope after the
+
+// if-block. p is automatic since it's in this
+
+// local score.
+
+// So the memory used for pointer p is
+
+// automatically reclaimed. No memory leak.
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Likewise this is correct:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+if (x \textgreater{} 0)
+
+\{
+
+Date * p = new Date{[}1000{]};
+
+...
+
+delete {[}{]} p; // Deallocate the memory used by p,
+
+// i.e., the 1000 objects that p
+
+// points to is reclaimed by the
+
+// free store ...
+
+\} // ... and p goes out of scope after the
+
+// if-block. p is automatic since it's in this
+
+// local score.
+
+// So the memory used for pointer p is
+
+// automatically reclaimed. No memory leak.
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Destructors!!!
+
+However, in general, some objects are more complicated and might need
+special \textbf{``cleaning up''. }This is because some objects
+\textbf{acquire resources (such as memory) which are not automatically
+released}.
+
+Here's an example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Thingy
+
+\{
+
+public:
+
+Thingy()
+
+: y\_(new char) // memory allocation during
+
+\{\} // constructor call
+
+private:
+
+int x\_; // x\_ is automatic
+
+char * y\_; // y\_ is automatic, but the *memory*
+
+// that y\_ points to, if allocated,
+
+// is *not* automatic.
+
+\};
+
+int main()
+
+\{
+
+int x = 1;
+
+if (x \textgreater{} 0)
+
+\{
+
+Thingy thing; // memory for thing.x\_,
+
+// thing.y\_ and *(thing.y\_)
+
+// allocated.
+
+// do something with thing
+
+\} // At the end of the body of the if-statement,
+
+// memory for thing.x\_, thing.y\_ is reclaimed
+
+// automatically ...
+
+// BUT the memory that thing.y\_ points to is
+
+// NOT deallocated!!!
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+What's the problem? Note that \emph{thing.y\_} has requested for memory
+in the constructor. So I really need to execute
+
+\emph{\textbf{delete thing.}\textbf{y\_}\textbf{;}}
+
+before \emph{thing} goes out of scope!!! In other words I should do
+something like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Thingy
+
+\{
+
+...
+
+\};
+
+int main()
+
+\{
+
+int x = 1;
+
+if (x \textgreater{} 0)
+
+\{
+
+Thingy thing;\\
+// do something with thing
+
+// *** delete thing.y\_ ***
+
+\}
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Of course, you can't do that because \emph{thing.y\_} is private. No big
+deal! I can create a method and call that method.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Thingy
+
+\{
+
+public:
+
+...
+
+void cleanup()
+
+\{
+
+delete y\_;
+
+\}
+
+...
+
+\};
+
+int main()
+
+\{
+
+int x = 1;
+
+if (x \textgreater{} 0)
+
+\{
+
+Thingy thing;\\
+// do something with thing
+
+\textbf{thing.cleanup();}
+
+\}
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+But what if I forget?
+
+WAIT \ldots{} don't even do that!!! The destructor comes to the
+rescue!!!
+
+A \textbf{destructor} is a member function that is
+\textbf{automatically}
+
+\textbf{called} when an object is about to be destroyed (i.e., about to
+go
+
+out of scope):
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Thingy
+
+\{
+
+...
+
+\};
+
+int main()
+
+\{
+
+int x = 1;
+
+if (x \textgreater{} 0)
+
+\{
+
+Thingy thing;
+
+// do something with thing
+
+\} // thing calls its destructor here just
+
+// before thing goes out of scope.
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(The above is for the case where the object is in the local scope. I'll
+talk about objects in the free store in a bit.)
+
+TADA!!!
+
+\ldots{} so what???
+
+Well, let me write a destructor for the \emph{Thingy} class. But first
+...
+
+There are three rules for writing a destructor \ldots{}
+
+\begin{itemize}
+\tightlist
+\item
+  For class \emph{C}, the name of the destructor must be
+  \emph{\textasciitilde C}.
+\item
+  Destructors have an empty list of parameters -- no parameters, i.e.,
+  the prototype must be \emph{\textasciitilde C()}.
+\item
+  Destructors do not have return type. You can't even put \emph{void} as
+  a return type. (This is just like constructors.)
+\end{itemize}
+
+So I do the following:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Thingy
+
+\{
+
+public:
+
+Thingy() // memory allocation
+
+: y\_(new char) // during constructor call
+
+\{\}
+
+\textbf{\textasciitilde Thingy()}
+
+\textbf{\{}
+
+\textbf{delete y\_;}
+
+\textbf{\}}
+
+private:
+
+int x\_; // x\_ is automatic
+
+char * y\_; // y\_ is automatic, but the *memory*
+
+// that y\_ points to, if allocated,
+
+// is not automatic.
+
+\};
+
+int main()
+
+\{
+
+int x = 1;
+
+if (x \textgreater{} 0)
+
+\{
+
+Thingy thing; // memory for thing.x\_,
+
+// thing.y\_, *(thing.y\_)
+
+// allocated.
+
+// do something with thing
+
+\} // At the end of the body of the if-statement,
+
+// memory for thing.x\_, thing.y\_ is reclaimed
+
+// automatically ...
+
+// BUT before that ... (and this is the point):
+
+// thing.\textasciitilde Thingy() executes so that the
+
+// memory that thing.y\_ points to is reclaimed
+
+// by the free store.
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+And note that in my code in \emph{main()} \ldots{} I do not have to
+write code to deallocate the memory used by \emph{thing.y\_} because
+that's written in \emph{Thingy.\textasciitilde Thingy()} and
+\emph{thing} will call this method automatically just before going out
+of scope. I don't have to worry about forgetting to deallocate memory
+used by \emph{thing} (i.e. through \emph{thing.y\_}). The danger of
+accidental memory leaks is reduced.
+
+TADA!!! GET IT!!!
+
+It's a common practice to do the following:
+
+\begin{itemize}
+\tightlist
+\item
+  A destructor is placed just after the constructor in the class
+  definition.
+\item
+  Destructors are usually inlined.
+\end{itemize}
+
+\textbf{Exercise.} Do a simple experiment yourself to show that the
+destructor is indeed called:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Thingy
+
+\{
+
+public:
+
+Thingy() // memory allocation
+
+: y\_(new char) // during constructor call
+
+\{\}
+
+\textbf{\textasciitilde Thingy()}
+
+\textbf{\{}
+
+std::cout \textless\textless{}
+"Thingy::\textasciitilde Thingy()\textbackslash n";
+
+\textbf{delete y\_;}
+
+\textbf{\}}
+
+private:
+
+int x\_; // x\_ is automatic
+
+char * y\_; // y\_ is automatic, but the *memory*
+
+// that y\_ points to, if allocated,
+
+// is not automatic.
+
+\};
+
+int main()
+
+\{
+
+int x = 1;
+
+if (x \textgreater{} 0)
+
+\{
+
+Thingy thing; // memory for thing.x\_,
+
+// thing.y\_, *(thing.y\_)
+
+// allocated.
+
+// do something with thing
+
+\} // At the end of the body of the if-statement,
+
+// memory for x, y\_ is reclaimed
+
+// automatically ...
+
+// BUT before that ... (and this is the point):
+
+// thing.\textasciitilde Thingy() executes so that the
+
+// memory that thing.y\_ points to is reclaimed
+
+// by the free store.
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} What is the name of the destructor for the
+\emph{WeatherCtrl} class?
+
+Destructors are used (in classes) to include code for releasing
+resources acquired, not just memory. For instance, there are other
+resources like:
+
+\begin{itemize}
+\tightlist
+\item
+  Member variable might be a pointer
+\item
+  Member variable might be holding onto the CD player
+\item
+  Member variable might be holding a file
+\item
+  Member variable might be a network connection
+\item
+  Etc.
+\end{itemize}
+
+Let's write a destructor for \emph{Date}. Technically we don't have to
+clean up anything since all instance members (or member variables) in
+\emph{Date} are automatic. This is just a drill and also to check that
+\emph{Date} objects do call their destructor just before they die.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.h
+
+...
+
+class Date
+
+\{
+
+public:
+
+...
+
+\textbf{\textasciitilde Date()}
+
+\{
+
+std::cout \textless\textless{} "Date::\textasciitilde Date
+...\textbackslash n";
+
+\}
+
+...
+
+\}
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// main.cpp
+
+...
+
+int main()
+
+\{
+
+...
+
+for (int i = 0; i \textless{} 5; i++)
+
+\{
+
+std::cout \textless\textless{} '\textbackslash n' \textless\textless{} i
+\textless\textless{} "... \textbackslash n";
+
+Date date(1970, 1, 1);
+
+date.print();
+
+// does date call its destructor \textasciitilde Date?
+
+\}
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Default destructor
+
+Since objects call their destructors just before they die (i.e. just
+before they go out of scope) and our previous version of \emph{Date}
+does not have a destructor, how come the previous version can still
+compile and run??? Shouldn't your C++ compiler yell at you and tell you
+that \emph{\textasciitilde Date()} is not found???
+
+\textbf{No.}
+
+Because ... if you don't specify a destructor for a class, the C++
+compiler actually includes a do-nothing destructor in the class. This is
+the \textbf{default destructor}. The default destructor is a do-nothing
+method because it has an empty body:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C
+
+\{
+
+public:
+
+...
+
+\textasciitilde C() \{\} // default destructor of C
+
+...
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In the case of the earlier \emph{Date} class, C++ included this
+destructor into the \emph{Date} class when there was no destructor:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Date
+
+\{
+
+public:
+
+// constructors
+
+\textasciitilde Date() \{\}
+
+// other methods
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+If you do write a destructor, then your C++ compiler will not insert a
+default destructor for you.
+
+Note that the default destructor supplied by C++ does not do anything.
+Since all instance variables are automatic in \emph{Date}, a destructor
+is not necessary. It's still a good (and common) practice to include
+destructors
+
+even if it's not necessary. Being explicit is better than leaving things
+implicit.
+
+\textbf{Exercise.} What is the order in which objects call their
+destructor? (This is important!)
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int main()
+
+\{
+
+Date date1(1970, 1, 1);
+
+Date date2(1985, 1, 1);
+
+Date date3(2010, 10, 10);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Why is knowing the order important? Because in complex systems, there
+might be some dependencies between objects so that some object \emph{x}
+can exist only if object \emph{y} exists, i.e., \emph{y} must be
+constructed before \emph{x} and \emph{x} must be destroyed before
+\emph{y}.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int main()
+
+\{
+
+Date date1(1970, 1, 1);
+
+Date date2(1985, 1, 1);
+
+Date date3(2010, 10, 10);
+
+return 0; // date3 calls its destructor,
+
+// *then* date2 calls its destructor,
+
+// *then* date1 calls its destructor.
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+So, remember this: \textbf{the order of destructor calls is always
+opposite to the order of constructor calls.}
+
+\textbf{Exercise.} Is it possible to call the destructor ``manually''?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int main()
+
+\{
+
+Date date(1970, 1, 1);
+
+date.\textasciitilde Date();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} What is the output?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class A
+
+\{
+
+public:
+
+\textasciitilde A() \{ std::cout \textless\textless{}
+"A::\textasciitilde A\textbackslash n"; \}
+
+\};
+
+class B
+
+\{
+
+public:
+
+\textasciitilde B() \{ std::cout \textless\textless{}
+"B::\textasciitilde B\textbackslash n"; \}
+
+\};
+
+class C
+
+\{
+
+public:
+
+\textasciitilde C() \{ std::cout \textless\textless{}
+"C::\textasciitilde C\textbackslash n"; \}
+
+\};
+
+int main()
+
+\{
+
+A a;
+
+B b;
+
+for (int i = 0; i \textless{} 5; i++)
+
+\{
+
+C c;
+
+if (i \textgreater{} 3)
+
+\{
+
+A a;
+
+if (i == 4) B b;
+
+\}
+
+\}
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Write a destructor for \emph{WeatherCtrl} and test it
+by inserting
+
+a print statement in the destructor to check that it is called. Are all
+the instance variables automatic? So, is the default destructor good
+enough?
+
+\textbf{Exercise.} Write a destructor for \emph{Vehicle} and test it by
+inserting a print
+
+statement in the destructor to check that it is called. Are all the
+instance variables automatic? So, is the default destructor good enough?
+
+\textbf{Exercise.} Write a destructor for \emph{Being} and test it by
+inserting a print
+
+statement in the destructor to check that it is called. Is the default
+destructor good enough?
+
+\textbf{Exercise.} Write a destructor for \emph{IntArray} and test it by
+inserting a print
+
+statement in the destructor to check that it is called. Is the default
+destructor good enough?
+
+Objects in the free store
+
+The above is for an object in the local scope. For the case of an object
+in the free store, say a pointer \emph{p} is pointing to this object,
+when we execute \emph{delete p}, then the object will call its
+destructor automatically. For the case of a pointer \emph{p} pointing to
+an array of objects in the free store, when we execute \emph{delete
+{[}{]} p}, each object in the array will call its destructor. Again: You
+do \textbf{not} call destructors explicitly. They are called
+automatically. (In fact you cannot call destructors in your code.)
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Thingy
+
+\{
+
+public:
+
+Thingy() // memory allocation
+
+: y\_(new char) // during constructor call
+
+\{\}
+
+\textasciitilde Thingy()
+
+\{
+
+delete y\_;
+
+\}
+
+private:
+
+int x\_; // x\_ is automatic
+
+char * y\_; // y\_ is automatic, but the *memory*
+
+// that y\_ points to, if allocated,
+
+// is not automatic.
+
+\};
+
+int main()
+
+\{
+
+int x = 1;
+
+if (x \textgreater{} 0)
+
+\{
+
+Thingy * pthing = new Thingy;
+
+// do something with *pthing
+
+delete pthing; // Memory used by the object
+
+// that pthing points to is
+
+// decallocated -- reclaimed
+
+// by the free store. But
+
+// before that, this object
+
+// (*pthing) calls its
+
+// destructor
+
+// (*pthing).\textasciitilde Thingy().
+
+\}
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The story is similar if you have a pointer pointing to an array of
+objects in the free store:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int main()
+
+\{
+
+int x = 1;
+
+if (x \textgreater{} 0)
+
+\{
+
+Thingy * p = new Thingy{[}100{]};
+
+// do something with p{[}0{]},...,p{[}99{]}
+
+delete {[}{]} p; // p{[}0{]}, ..., p{[}99{]} call
+
+// their destructors
+
+\}
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+IntPointer
+
+When you want a pointer, you declare it and allocate memory (using
+\emph{new}) from the heap for the pointer to point to. You never forget
+to \emph{new} the pointer because your program will not work immediately
+if you don't \emph{new}.
+
+But it's easy to forget to deallocate / release the memory (using
+\emph{delete}) after you're done with using the value that \emph{p}
+points to. The problem is this: the program will continue to work until
+it runs out of memory which will be much later. By then you have to find
+that one bad pointer among hundreds or thousands of pointers in your
+code.
+
+Here's our \emph{IntPointer}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+class IntPointer
+
+\{
+
+public:
+
+IntPointer(int x = 0)
+
+: p\_(new int)
+
+\{
+
+*p\_ = x;
+
+\}
+
+IntPointer(const IntPointer \& intptr)
+
+: p\_(new int)
+
+\{
+
+*p\_ = *(intptr.p\_);
+
+\}
+
+int \& operator*()
+
+\{
+
+return *p\_;
+
+\}
+
+void deallocate()
+
+\{
+
+delete p\_;
+
+\}
+
+private:
+
+int * p\_;
+
+\};
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+int main()
+
+\{
+
+for (int i = 0; i \textless{} 5; i++)
+
+\{
+
+IntPointer intptr(i);
+
+\}
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Note that each of the five \emph{intptr} contain a pointer \emph{p\_}
+which points to an allocated integer in the free store. Note however
+that the integer \emph{intptr.p\_} points to is not deallocated. You can
+see the point in time when each \emph{intptr} dies (and when one
+additional memory leak occurs). Add the following destructor:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+class IntPointer
+
+\{
+
+public:
+
+...
+
+\textasciitilde IntPointer()
+
+\{
+
+std::cout \textless\textless{} "memory leak ... :(\textbackslash n";
+
+\}
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Run your program again. If you don't believe me that you'll run out of
+memory, resulting in program abort, try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+int main()
+
+\{
+
+while (1)
+
+\{
+
+IntPointer intptr(0);
+
+\}
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(You may want to comment out the print statement in the destructor
+because printing slows down your program and delays the program from
+crashing.)
+
+Now we make our pointer object smart enough to deallocate memory used by
+itself:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+class IntPointer
+
+\{
+
+public:
+
+...
+
+\textasciitilde IntPointer()
+
+\{
+
+delete p\_;
+
+\}
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Run this again and see if you have memory leaks:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+int main()
+
+\{
+
+while (1)
+
+\{
+
+IntPointer intptr(0);
+
+\}
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You won't.
+
+Now, if ever we need an integer pointer, we can use this class and we
+will never have to worry about memory leaks. (There are a few more
+things to add to this class to really complete it \ldots)
+
+Typically, if you have a class that grabs hold of some resource (not
+just memory) in the constructor of the class, you should probably
+include code in the destructor to release the resource.
+
+\textbf{Exercise.} Are we done improving \emph{IntPointer}? Not quite.
+Why is the following a problem? Trace it by hand and draw a diagram.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+int main()
+
+\{
+
+IntPointer p1(42);
+
+IntPointer p2(0);
+
+p2 = p1;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You should be able to explain why there's a problem. There are two
+possible solutions. What are they? (This pretty much depends on what you
+want \emph{operator=} to mean \ldots{} I'll be talking about operators
+later.) We'll have to come back to this issue again later and redefine
+\emph{operator=} in the \emph{IntPointer} class.
+
+\textbf{Exercise.} Is the default destructor good enough for the
+following class? Run the program below.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C
+
+\{
+
+public:
+
+C(int x) : u\_(x)
+
+\{
+
+if (u\_ \textless= 0)
+
+\{
+
+t\_ = new char;
+
+\}
+
+else
+
+\{
+
+t\_ = new char{[}u\_{]};
+
+\}
+
+\}
+
+private:
+
+char s\_{[}100{]};
+
+char * t\_;
+
+const int u\_;
+
+\};
+
+int main()
+
+\{
+
+int i = 0;
+
+while (1)
+
+\{
+
+if (i \% 2 == 0)
+
+\{
+
+C c(i);
+
+\}
+
+else\\
+\{
+
+C c(0);
+
+\}
+
+++i;
+
+\}
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+If the default destructor is not good enough, write a destructor that
+does the job. Test run it in a long while loop and see if your program
+crashes.
+
+IntDynArray
+
+Here's our \emph{IntDynArray} with the placeholder \emph{deallocate()}
+function:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+class IntDynArray
+
+\{
+
+public:
+
+...
+
+void deallocate()
+
+\{
+
+delete {[}{]} x\_;
+
+\}
+
+...
+
+private:
+
+int * x\_;
+
+int size\_;
+
+int capacity\_;
+
+\};
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Replace the \emph{deallocate()} function in
+\emph{IntDynArray }with a destructor. Test it with the following to make
+sure that there's no memory leak:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+int main()
+
+\{
+
+while (1)
+
+\{
+
+IntDynArray a(1000);
+
+\}
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+There's still a similar problem involving \emph{operator=}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+int main()
+
+\{
+
+IntDynArry a(100);
+
+IntDynArry b(100);
+
+b = a;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Again, we'll come back to this issue later.
+
+Lazy allocation
+
+There are times when you might want to delay allocating memory (or any
+resource) because it might not be needed till later.
+
+You can assign any pointer the value of NULL.
+
+NULL (or the NULL pointer) is usually integer 0 (or something similar
+... like \emph{(void *)0}). NULL is frequently used as a value to
+indicate that a pointer has not been allocated memory.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless cstdlib\textgreater{} // or \#include
+\textless cstddef\textgreater{}
+
+\#include \textless iostream\textgreater{}
+
+// NULL can be the integer 0 or it can be
+
+// ((void *) 0)
+
+class C\{\};
+
+int main()
+
+\{
+
+// NULL can be assigned to pointers of any type:
+
+int * p = NULL;
+
+char * q = NULL;
+
+double * r = NULL;
+
+bool * s = NULL;
+
+C * t = NULL;
+
+std::cout \textless\textless{} p \textless\textless{}
+'\textbackslash n';
+
+std::cout \textless\textless{} (int)NULL \textless\textless{}
+'\textbackslash n';
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In this case you can do the following: In the constructor, do NOT
+allocate memory but set the \textbf{relevant} \textbf{pointer} to NULL.
+
+Example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+class LazyIntPointer
+
+\{
+
+public:
+
+LazyIntPointer()
+
+: p\_(NULL)
+
+\{\}
+
+...
+
+private:
+
+int * p\_;
+
+\};
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+When do you allocate memory? Only when you need to use the value that
+p\_ points to:\textbackslash\textbackslash{}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+class LazyIntPointer
+
+\{
+
+public:
+
+...
+
+int \& operator*()
+
+\{
+
+// Allocate memory only when p\_ is NULL
+
+if (p\_ == NULL)
+
+\{
+
+p\_ = new int;
+
+\}
+
+return *p\_;
+
+\}
+
+...
+
+\};
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+And in the destructor, only deallocate when \emph{p\_} is not NULL,
+i.e., only when \emph{p\_} has actually been allocated memory:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+class LazyIntPointer
+
+\{
+
+public:
+
+...
+
+\textasciitilde LazyIntPointer()
+
+\{
+
+// De-allocate memory only when p is not NULL
+
+if (p\_ != NULL)
+
+\{
+
+delete p\_;
+
+\}
+
+\}
+
+...
+
+\};
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+This is a very common technique to save on memory usage. (There are many
+other techniques.)
+
+Summary
+
+Every class can have a special method called the destructor. If \emph{C}
+is a class, then the prototype of its destructor is
+\emph{\textasciitilde C()} with no return type.
+
+The default destructor of a class is a method that has an empty body:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C
+
+\{
+
+...
+
+\textasciitilde C()\{\} // default destructor of C
+
+...
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+If a destructor is not defined in a class, then the C++ compiler will
+provide the default destructor automatically. If a destructor is
+defined, then the compiler will not supply the default destructor.
+
+The destructor cannot be called manually by code -- it is called
+automatically.
+
+Just before an object in the local scope goes out of scope, the object
+calls its destructor.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\{
+
+C c;
+
+\ldots{}
+
+// c calls its destructor just before
+
+// going out of scope
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+When an object in the free store is deallocated, the object will call
+its destructor:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\{
+
+C * p = new C;
+
+...
+
+delete p; // (*p) calls its destructor \textasciitilde C()
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The story is similar when \emph{p} points to an array of objects in the
+free store:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\{
+
+C * p = new C{[}1000{]};
+
+...
+
+delete {[}{]} p; // p{[}0{]}, \ldots, p{[}999{]} call their
+
+// destructors \textasciitilde C()
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Memory used by automatic instance variables of objects will be
+automatically reclaimed.
+
+Destructors are called automatically in the opposite order that the
+constructors were called.
+
+Resources acquired by objects through constructor calls such as memory
+allocation for pointer instance variables (if not deallocated) must be
+deallocated by destructors.
+
+\end{document}

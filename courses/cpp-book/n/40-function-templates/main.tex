@@ -1,0 +1,2029 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\author{}
+\date{}
+
+\begin{document}
+
+40. Function Templates
+
+Objectives
+
+\begin{itemize}
+\tightlist
+\item
+  Write function templates
+\item
+  Make template function instantiation
+\item
+  Write function template specialization
+\item
+  Write header file for templates
+\end{itemize}
+
+We now come to a very important area in modern C++ programming. The
+concept of templates. There are three types of templates
+
+\begin{itemize}
+\tightlist
+\item
+  Function templates
+\item
+  Struct templates
+\item
+  Class templates
+\end{itemize}
+
+For this chapter I'll focus on function templates.
+
+C++ template programming is a very important technique in C++
+programming because templates produces code. When you are writing C++
+templates, you are not just writing code -- you are writing code that
+produces code.
+
+Modern C++ libraries are frequently written using templates. This is the
+case for general algorithms and data structures, scientific computation,
+computer vision, linear algebra, AI, etc.
+
+This is only going to be a short introduction to function templates. C++
+templates is a very vast subject, with the C++ standards committee
+adding new features to templates every few years.
+
+OK. Let's go.
+
+Function templates are great ... really. It's perfect for people who
+want to write less code. Let's try an example.
+
+Run this program.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+void println(int x)
+
+\{
+
+std::cout \textless\textless{} x \textless\textless{} std::endl;
+
+\}
+
+int main()
+
+\{
+
+println(1);
+
+println(3.14);
+
+println('c');
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+When you call println(3.14), C++ will try to find a function that best
+fit the value passed in (i.e. a \emph{double}). The closest is our
+\emph{println()} function but it accepts as \emph{int}. So C++ typcast
+the \emph{double} 3.14 to an \emph{int}, i.e. 3, and call println().
+
+Let's say we do not want C++ to typecast. So here's the program we want:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+void println(int x)
+
+\{
+
+std::cout \textless\textless{} x \textless\textless{} std::endl;
+
+\}
+
+void println(double y)
+
+\{
+
+std::cout \textless\textless{} y \textless\textless{} std::endl;
+
+\}
+
+void println(char z)
+
+\{
+
+std::cout \textless\textless{} z \textless\textless{} std::endl;
+
+\}
+
+int main()
+
+\{
+
+println(1);
+
+println(3.14);
+
+println('c');
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Boy ... what a pain!!! Furthermore the functions all look pretty
+similar. Smart people hate to do silly things like this: mindless
+duplication of code.
+
+OK. Before you swear at C++, rewrite this program like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+template \textless{} typename T \textgreater{}
+
+void println(\textbf{T} x)
+
+\{
+
+std::cout \textless\textless{} x \textless\textless{} std::endl;
+
+\}
+
+int main()
+
+\{
+
+println\textbf{\textless{} int \textgreater{}}(1);
+
+println\textbf{\textless{} double \textgreater{}}(3.14);
+
+println\textbf{\textless{} char \textgreater{}}('c');
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+WOW!!! There is only one function and it seems to work for all three
+cases!!!
+
+The ``function''
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template \textless{} typename T \textgreater{}
+
+void println(T x)
+
+\{
+
+...
+
+\} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+is called a \textbf{function template}. It's actually not a function.
+It's like a rubber stamp for producing functions. You should think of
+the \emph{\textbf{T}} as a \textbf{type variable} for the compiler.
+Here's how the compiler use this \emph{T}. When the compiler see this
+statement in your program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+println\textbf{\textless{} int \textgreater{}}(1);
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+it (i.e., the compile) says: ``Aha! So you need
+\emph{println\textbf{\textless{} }\textbf{int }\textbf{\textgreater{}}}.
+OK I'll take the rubber stamp \emph{println} (i.e. the function
+template) and create one with \emph{\textbf{T}} replaced by
+\emph{\textbf{int}}.''
+
+In other words C++ will insert this into the program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+void println(\textbf{int} x)
+
+\{
+
+std::cout \textless\textless{} x \textless\textless{} std::endl;
+
+\}
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+It might be better to think of the instantiated function as:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template \textless\textgreater{}
+
+void println(\textbf{int} x)
+
+\{
+
+std::cout \textless\textless{} x \textless\textless{} std::endl;
+
+\} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+This ``production of a C++ function'' by a function template is called a
+\textbf{function instantiation}. Note that if
+\emph{println\textless char *\textgreater()} was not called, the
+following function will \emph{\textbf{not}} appear in your program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+template \textless\textgreater{}
+
+void println(char * x)
+
+\{
+
+std::cout \textless\textless{} x \textless\textless{} std::endl;
+
+\}
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Note that the function template itself is actually not included in the
+binary executable code that is executed. It's only used as a rubber
+stamp by the compiler for creating actual functions.
+
+Writing function templates is sort of like writing \textbf{code that
+}\emph{\textbf{produces}}\textbf{ code}. Specifically a function
+template can produce functions. This style of programming is called
+\textbf{generic programming}. Templates also lead to something called
+\textbf{metaprogramming}, but I won't get into that because that's
+beyond the scope of basic programming.
+
+Do you see the power of function templates?
+
+The variable type \emph{T} (usually called a \textbf{type parameter})
+can appear anywhere in the function template, not just in the function
+header. Below is an example where the type parameter appears as a return
+type.
+
+Another thing to remember is that you can use any identifier name for
+the type parameter. I used \emph{T}. You can use \emph{X} if you like.
+But the practice is to use a single uppercase letter.
+
+\textbf{Exercise.} In this example the same type parameter appears as a
+\textbf{return type}. You are given the following program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int addOne(int x)
+
+\{
+
+return x + 1;
+
+\}
+
+int main()
+
+\{
+
+int a = 1;
+
+std::cout \textless\textless{} addOne(a) \textless\textless{}
+'\textbackslash n';
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Run it. Easy program right? Now run this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int addOne(int x)
+
+\{
+
+return x + 1;
+
+\}
+
+int main()
+
+\{
+
+int a = 1;
+
+std::cout \textless\textless{} addOne(a) \textless\textless{}
+'\textbackslash n';
+
+std::cout \textless\textless{} addOne(3.3) \textless\textless{}
+'\textbackslash n';
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The 3.3 is passed to the x of \emph{addOne()} which will typecast the
+value to an integer, i.e. 3. Now rewrite the program so that the
+\emph{addOne()} function becomes a function template; some test code is
+included to test your function template. The types that needs to be
+parameterized (made into a variable) is in bold and larger font.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\textbf{int} addOne(\textbf{int} x)
+
+\{
+
+return x + 1;
+
+\}
+
+int main()
+
+\{
+
+int a = 1;
+
+std::cout \textless\textless{} addOne\textbf{\textless{} int
+\textgreater{}}(a) \textless\textless{} '\textbackslash n';
+
+std::cout \textless\textless{} addOne\textless{} double
+\textgreater(3.3) \textless\textless{} '\textbackslash n';
+
+std::cout \textless\textless{} addOne\textless{} char \textgreater('c')
+\textless\textless{} '\textbackslash n';
+
+int * p = new int;
+
+std::cout \textless\textless{} addOne\textless{} int * \textgreater(p)
+\textless\textless{} '\textbackslash n';
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(Note that I'm using the \emph{addOne()} function with \emph{double},
+\emph{char}, \emph{int*} values which have the + operator, i.e. if
+\emph{x} in either an \emph{int}, or a \emph{double}, or a char, or an
+\emph{int*}, the following makes sense in C++:
+
+x + 1;
+
+\textbf{Exercise.} In this exercise you write a function template with
+one type parameter that appears in the function body. Here's one
+familiar \emph{swap()} function.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+void swap(int \& x, int \& y)
+
+\{
+
+int t;
+
+t = x;
+
+x = y;
+
+y = t;
+
+\}
+
+int main()
+
+\{
+
+int x = 1, y = 42;
+
+swap(x, y);
+
+std::cout \textless\textless{} x \textless\textless{} ' '
+\textless\textless{} y \textless\textless{} std::endl;
+
+return 0;
+
+\} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Rewrite it into a function template and test it with the extra code.
+HINT: The types that should be parameterized are in bold and larger
+font.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+void swap(\textbf{int} \& x, \textbf{int} \& y)
+
+\{
+
+\textbf{int} temp;
+
+temp = x;
+
+x = y;
+
+y = temp;
+
+\}
+
+int main()
+
+\{
+
+int x = 1, y = 42;
+
+swap\textless{} int \textgreater(x, y);
+
+std::cout \textless\textless{} x \textless\textless{} ' '
+\textless\textless{} y \textless\textless{} std::endl;
+
+double a = 1.2, b = 3.4;
+
+swap\textless{} double \textgreater(a, b);
+
+std::cout \textless\textless{} a \textless\textless{} ' '
+\textless\textless{} b \textless\textless{} std::endl;
+
+return 0;
+
+\} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Complete the following:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int main()
+
+\{
+
+std::cout \textless\textless{} max\textless{} int \textgreater(1, 3)
+\textless\textless{} '\textbackslash n';
+
+std::cout \textless\textless{} max\textless{} double \textgreater(3.1,
+1.1) \textless\textless{} '\textbackslash n';
+
+std::cout \textless\textless{} min\textless{} int \textgreater(1, 3)
+\textless\textless{} '\textbackslash n';
+
+std::cout \textless\textless{} min\textless{} double \textgreater(3.1,
+1.1) \textless\textless{} '\textbackslash n';
+
+return 0;
+
+\} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+bool arrayEqual(int{[}{]}, int, int{[}{]}, int);
+
+int main()
+
+\{
+
+int x{[}{]} = \{1, 2, 3\};
+
+int y{[}{]} = \{1, 2, 3\};
+
+std::cout \textless\textless{} arrayEqual(x, 3, y, 3);
+
+return 0;\\
+\}\\
+
+bool arrayEqual(int x{[}{]}, int xSize, int y{[}{]}, int ySize)
+
+\{
+
+if (xSize == ySize)
+
+\{
+
+bool same = true;
+
+for (int i = 0; i \textless{} xSize; i++)
+
+\{
+
+if (x{[}i{]} != y{[}i{]})
+
+\{
+
+same = false;
+
+break;\\
+\}
+
+\}
+
+return same;
+
+\}
+
+else
+
+\{
+
+return false;\\
+\}
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+What if you want to compare arrays of doubles? You need to have another
+function:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+bool arrayEqual2(double x{[}{]}, double y{[}{]})
+
+\{
+
+bool same = true;
+
+for (int i = 0; i \textless{} xSize; i++)
+
+\{
+
+if (x{[}i{]} != y{[}i{]})
+
+\{
+
+same = false;
+
+break;\\
+\}
+
+\}
+
+return same;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Uh oh ... what about comparing array of booleans? Or characters? Etc.
+
+Now try \emph{\textbf{this}}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+template \textless{} typename T \textgreater{}
+
+bool arrayEqual(T{[}{]}, int, T{[}{]}, int);
+
+int main()
+
+\{
+
+int x{[}{]} = \{1, 2, 3\};
+
+int y{[}{]} = \{1, 2, 3\};
+
+std::cout \textless\textless{} arrayEqual\textbf{\textless{} int
+\textgreater{}}(x, 3, y, 3)
+
+\textless\textless{} std::endl;
+
+double a{[}{]} = \{1.2, 3.4, 5.6\};
+
+double b{[}{]} = \{2.1, 4.3, 6.5\};
+
+std::cout \textless\textless{} arrayEqual\textbf{\textless{} double
+\textgreater{}}(a, 3, b, 3)
+
+\textless\textless{} std::endl;
+
+return 0;
+
+\}
+
+template \textless{} typename T \textgreater{}
+
+bool arrayEqual(\textbf{T} x{[}{]}, int xSize, \textbf{T} y{[}{]}, int
+ySize)
+
+\{
+
+if (xSize == ySize)
+
+\{
+
+bool same = true;
+
+for (int i = 0; i \textless{} 3; i++)
+
+\{
+
+if (x{[}i{]} != y{[}i{]})
+
+\{
+
+same = false;
+
+break;
+
+\}
+
+\}
+
+return same;
+
+\}
+
+else
+
+\{
+
+return false;
+
+\}
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In this example our function template is this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template \textless{} typename T \textgreater{}
+
+bool arrayEqual(T x{[}{]}, int xSize, T y{[}{]}, int ySize)
+
+\{
+
+...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Note that in the body of the function template, x and y are array of
+elements of type T. The elements of the two arrays appear in the code as
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+bool arrayEqual(T x{[}{]}, int xSize, T y{[}{]}, int ySize)
+
+\{
+
+...
+
+\textbf{if (x{[}i{]} != y{[}i{]})}
+
+...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+As long as the \emph{\textbf{!=}} makes sense for type
+\emph{\textbf{T}}, C++ will be able to generate the actual function.
+
+For instance you can compare characters using !=. Therefore you can
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+\textbf{char} s{[}{]} = \{'a', 'b', 'c'\};
+
+\textbf{char} t{[}{]} = \{'a', 'b', 'c'\};
+
+std::cout \textless\textless{}
+arrayEqual\textbf{\textless{}char\textgreater{}}(x, 3, y, 3)
+
+\textless\textless{} std::endl;
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Why does this program not work? Which statement
+causes the problem?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+template \textless{} typename T \textgreater{}
+
+void printProduct(T x, T y)
+
+\{
+
+std::cout \textless\textless{} (x * y) \textless\textless{} std::endl;\\
+\}
+
+int main()
+
+\{
+
+int a = 2;
+
+int b = 3;
+
+printProduct\textless{} int \textgreater(a, b);
+
+double c = 1.2;
+
+double d = 3.4;
+
+printProduct\textless{} double \textgreater(c, d);
+
+int * e = new int;
+
+int * f = new int;
+
+\emph{ printProduct\textless{} int * \textgreater(e, f);}\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(Run this with your compiler and read the error message.)
+
+\textbf{Exercise.} Convert the following program to one containing a
+function template:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int max (int x{[}{]}, int size)
+
+\{
+
+int m = x{[}0{]};
+
+for (int i = 1; i \textless{} size; i++)
+
+\{
+
+if (m \textless{} x{[}i{]}) m = x{[}i{]};
+
+\}
+
+return m;
+
+\}
+
+int main()
+
+\{
+
+int x{[}10{]} = \{3, 1, 5, 6, 2, 8, 9, 3, -2, 3\};
+
+std::cout \textless\textless{} max(x, 10) \textless\textless{}
+std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+And test it with this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int main() \{
+
+int x{[}10{]} = \{3, 1, 5, 6, 2, 8, 9, 3, -2, 3\};
+
+std::cout \textless\textless{} max\textless{} int \textgreater(x, 10)
+\textless\textless{} std::endl;
+
+int z{[}8{]} = \{3, 1, 5, 6, 2, 8, 9, 3\};
+
+std::cout \textless\textless{} max\textless{} int \textgreater(z, 8)
+\textless\textless{} std::endl;
+
+double y{[}8{]} = \{3.1, 1.8, 5.2, 6.7,
+
+8.4, 9.1, 3.6, -2.7\};
+
+std::cout \textless\textless{} max\textless{} double \textgreater(y, 8)
+\textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Template parameters
+
+In all previous examples we have only one parameter. And the parameter
+is used as a type. You can have as many template parameters as you like.
+You can actually use value parameters. Try these examples.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+template \textless{} typename T, typename S \textgreater{}
+
+void spam(T x, S y)
+
+\{
+
+std::cout \textless\textless{} x \textless\textless{} ", "
+\textless\textless{} y \textless\textless{} std::endl;\\
+\}
+
+int main()
+
+\{
+
+spam\textless int, double\textgreater(1, 2.2);
+
+spam\textless double, int\textgreater(1.1, 2);
+
+spam\textless double, double\textgreater(1.1, 2.2);
+
+spam\textless int, int\textgreater(1.1, 2.2);
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(Of course for the last function there is a typecast from the two
+doubles 1.1 and 2.2 into integers).
+
+And here's an example where a template parameter is actually is an
+\emph{\textbf{int}} value:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+template \textless{} typename T, \textbf{int} S \textgreater{}
+
+T eggs(T x)
+
+\{
+
+return x + S;
+
+\}
+
+int main()
+
+\{
+
+std::cout \textless\textless{} eggs\textless int, 1\textgreater(42)
+\textless\textless{} std::endl;
+
+std::cout \textless\textless{} eggs\textless int, 11\textgreater(42)
+\textless\textless{} std::endl;
+
+std::cout \textless\textless{} eggs\textless double, 1\textgreater(2.2)
+\textless\textless{} std::endl;
+
+std::cout \textless\textless{} eggs\textless char, 3\textgreater('a')
+\textless\textless{} std::endl;
+
+return 0;
+
+\emph{\}} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+So now you know that a template parameter is declared with the word
+\textbf{``typename''} if it is a type and if it is an integer value you
+use the word \textbf{``int''}.
+
+\textbf{Exercise.} Can you have a template parameter that is a char? A
+double?
+
+\textbf{Exercise.} Remember this example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+template \textless{} typename T \textgreater{}
+
+T max(T x{[}{]}, int size)
+
+\{
+
+T m = x{[}0{]};
+
+for (int i = 1; i \textless{} size; i++)
+
+\{
+
+if (m \textless{} x{[}i{]}) m = x{[}i{]};
+
+\}
+
+return m;
+
+\}
+
+int main()
+
+\{
+
+int x{[}10{]} = \{3, 1, 5, 6, 2, 8, 9, 3, -2, 3\};
+
+std::cout \textless\textless{} max\textless{} int \textgreater(x, 10)
+\textless\textless{} std::endl;
+
+double y{[}8{]} = \{3.1, 1.8, 5.2, 6.7,
+
+8.4, 9.1, 3.6, -2.7\};
+
+std::cout \textless\textless{} max\textless{} double \textgreater(y, 10)
+\textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Modify the template function so that the size of the array is passed in
+as a template parameter instead of a function parameter. In other words
+your \emph{main()} should look like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+...
+
+int main()
+
+\{
+
+int x{[}10{]} = \{3, 1, 5, 6, 2, 8, 9, 3, -2, 3\};
+
+std::cout \textless\textless{} max\textless{} int, 10 \textgreater(x)
+\textless\textless{} std::endl;
+
+int z{[}8{]} = \{3, 1, 5, 6, 2, 8, 9, 3\};
+
+std::cout \textless\textless{} max\textless{} int, 8 \textgreater(x)
+\textless\textless{} std::endl;
+
+double y{[}8{]} = \{3.1, 1.8, 5.2, 6.7,
+
+8.4, 9.1, 3.6, -2.7\};
+
+std::cout \textless\textless{} max\textless{} double, 8 \textgreater(y)
+\textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+What is the difference between the old template function and the new in
+terms of the code they produced? Specifically how many actual functions
+were created by C++ for the above \emph{main()} by the original function
+template and by the new template function?
+
+So now you know you can have either this\textbf{ }
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template \textless{} typename T\textgreater{}
+
+int max(T x{[}{]}, int size)
+
+\{
+
+...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Or this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template \textless{} typename T, int SIZE \textgreater{}
+
+int max(T x{[}{]})
+
+\{
+
+... SIZE appears in code ...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The big question is \ldots{} what's the difference between the two? Why
+does C++ allow integer template parameters?
+
+Well for the first version, an example of a function call is this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+max\textless{} int \textgreater(x, 10); \tabularnewline
+\bottomrule
+\end{longtable}
+
+For the second version , an example of a function call is this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+max\textless{} int, 10 \textgreater(x); \tabularnewline
+\bottomrule
+\end{longtable}
+
+In the second case, the \emph{\textbf{int 10}} is not passed into the
+function.
+
+Review the \textbf{very important} pages in the first chapter on
+functions where I did a trace. When you call a function, in your CPU,
+the program has to put the arguments for a function call into the
+function call stack. The first version has to put two values into the
+stack. The second version has to put one value into the stack:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+max\textless{} int \textgreater(\textbf{x, 10}); \tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+max\textless{} int, 10 \textgreater(\textbf{x}); \tabularnewline
+\bottomrule
+\end{longtable}
+
+See it? This is the benefit.
+
+However there's a disadvantage. Recall that if you make the following
+function call in your code:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+max\textless{} int, 10 \textgreater(x); \tabularnewline
+\bottomrule
+\end{longtable}
+
+then your compiler will instantiate (i.e., create) the functions
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template \textless\textgreater{}
+
+int max\textless{} int, 10 \textgreater(int x{[}{]})
+
+\{
+
+...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+If you also have
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+max\textless{} double, 20 \textgreater(y); \tabularnewline
+\bottomrule
+\end{longtable}
+
+then your compiler will also instantiate
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template \textless\textgreater{}
+
+int max\textless{} double, 10 \textgreater(int x{[}{]})
+
+\{
+
+...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+This means that the second version will generate a large executable
+binary code.
+
+\textbf{Exercise.} Can integer template parameter accept values from a
+variable? Say something like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x{[}{]} = \{2, 3, 5, 7, 11\};
+
+int i = 5;
+
+max\textless{} int, i \textgreater(x);\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Write a function template that computes the maximum
+of the values from one pointer address up to but not including the
+second pointer address.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x{[}{]} = \{2, 3, 5, 7, 11\};
+
+std::cout \textless\textless{} max\textless{} int
+\textgreater(\&x{[}0{]}, \&x{[}5{]});\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} IMPORTANT!!! Create a simple experiment to verify
+that a function template parameter can accept a pointer type.
+
+Header Files
+
+Here's a very common gotcha. (I see this all the time.)
+
+When you organize your template functions, you should remember to
+include the \textbf{body of the function template in the header file}
+not a cpp file. That's because function templates are inline functions.
+
+Exercise. Write a header file \emph{array.h} so that the following
+works:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include "array.h"
+
+int main()
+
+\{
+
+int x{[}{]} = \{5, 3, 1, 2, 4\};
+
+int xSize = sizeof(x) / sizeof(int);
+
+int y{[}{]} = \{5, 3, 1, 2, 4\};
+
+int ySize = sizeof(x) / sizeof(int);
+
+println\textless{} int \textgreater(x, xSize);
+
+println\textless{} int \textgreater(y, ySize);
+
+bubbleSort\textless{} int \textgreater(x, xSize);
+
+println\textless{} int \textgreater(x, xSize);
+
+println\textless{} int \textgreater(y, ySize);
+
+double a{[}{]} = \{5.5, 3.3, 1.1, 2.2, 4.4\};
+
+int aSize = sizeof(a) / sizeof(double);
+
+double b{[}{]} = \{5.5, 3.3, 1.1, 2.2, 4.4\};
+
+int bSize = sizeof(b) / sizeof(double);
+
+println\textless{} double \textgreater(a, aSize);
+
+println\emph{\textless{} }double\emph{ \textgreater{}}(b, bSize);
+
+bubbleSort\emph{\textless{} }double\emph{ \textgreater{}}(a, aSize);
+
+println\emph{\textless{} }double\emph{ \textgreater{}}(a, aSize);
+
+println\emph{\textless{} }double\emph{ \textgreater{}}(b, bSize);
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Automatic resolution
+
+Sometimes you don't have to tell C++ which ``version'' of the function
+to use. Here's a previous exercise:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+template \textless{} typename T \textgreater{}
+
+void println(T x)
+
+\{
+
+std::cout \textless\textless{} x \textless\textless{} std::endl;
+
+\}
+
+int main()
+
+\{
+
+println\textless int\textgreater(1);
+
+println\textless double\textgreater(3.14);
+
+println\textless char\textgreater('c');
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Modify and run this instead:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+template \textless{} typename T \textgreater{}
+
+void println(T x)
+
+\{
+
+std::cout \textless\textless{} x \textless\textless{} std::endl;
+
+\}
+
+int main()
+
+\{
+
+println(1);
+
+println(3.14);
+
+println('c');
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You see, when you call
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+println(1);\tabularnewline
+\bottomrule
+\end{longtable}
+
+this matches the version with
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template \textless\textgreater{}
+
+void println(int x)
+
+\{
+
+std::cout \textless\textless{} x \textless\textless{} std::endl;
+
+\} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+and deduce that the T is int.
+
+\textbf{Exercises.} I have two function templates, f and g, that accepts
+a pointer and prints the value stores in the pointer and prints the
+value that the pointer is pointing to.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int * p = new int;
+
+f(p);
+
+g(p);\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Because of automatic resolution, I don't have to specify the type when I
+call these two functions. The two functions print:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+0x10d92c0 0
+
+0x10d92c0 0\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Of course f and g has to also work for
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double * q = new double;
+
+f(q);
+
+g(q);\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Although these two functions have the same output, they are actually
+different.
+
+\begin{itemize}
+\tightlist
+\item
+  How would you implement f and g so that they are different?
+\item
+  In what scenario would you use one way of implementation and not the
+  other?
+\end{itemize}
+
+Gotcha
+
+You notice that when I define a template function I write this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template \textless{} typename T \textgreater{}
+
+bool arrayEqual(T x{[}{]}, int xSize, T y{[}{]}, int ySize)
+
+\{
+
+...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+which is really the same as this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template \textless typename T\textgreater{}
+
+bool arrayEqual(T x{[}{]}, int xSize, T y{[}{]}, int ySize)
+
+\{
+
+...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In other words there is no space after \textless{} and before
+\textgreater. You should follow the first format. Why? Because, besides
+functions, several other ``things'' can be ``templatized'', including
+types. You can end up calling a template function with a template type
+like this:
+
+someFunction\textless{} someType\textless int\textgreater{}
+\textgreater(...);
+
+(Don't worry too much about this: I'll be talking about type templates
+later.) So what will happen is that if you don't have a practice of
+putting spaces around a type parameter? You might end up with code like
+this:
+
+someFunction\textless someType\textless int\textgreater\textgreater(...);
+
+And now you have a problem because the \textgreater\textgreater{} as in
+
+someFunction\textless someType\textless int\textbf{\textgreater\textgreater{}}(...);
+
+is the input operator!!! (Also known as the stream insertion operator.)
+To make matters worse, the error message you get in such cases tend to
+be unintelligible.
+
+If you know what you're doing you may leave out the spaces. Otherwise
+it's best to stay with the first format: Always have a space after
+\textless{} and before \textgreater{} when used in the context of
+templates.
+
+(ASIDE: The new C++0x standard, published since 2011, stipulates that a
+2011-compliant C++ compiler should parse nested templates correctly. So
+something like
+\emph{someFunction\textless someType\textless int\textbf{\textgreater\textgreater{}}(\ldots)}
+should be fine for such a compiler. But to be absolutely safe, I suggest
+you follow the practice as stated above and use a space to separate the
+two \emph{\textbf{\textgreater\textgreater{}}}. That way your C++ code
+will compile on both new and old compilers.)
+
+Non-deducible context and ambiguity
+
+There are times when your C++ compiler won't be able to deduce the
+correct type for your template parameter T.
+
+Try to compile this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template \textless{} typename T \textgreater{}\\
+T f(int x)\\
+\{\\
+return x;\\
+\}
+
+int main()
+
+\{
+
+f(42);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In this case, T can be \emph{\textbf{int}}, But note that it can also be
+\emph{\textbf{double}} since
+
+C++ allows automatic typecasting from \emph{\textbf{int}} to
+\emph{\textbf{double}}.
+
+In these cases, you have to explicit specify the substitution for
+\emph{\textbf{T}}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template \textless{} typename T \textgreater{}\\
+T f(int x)\\
+\{\\
+return x;\\
+\}
+
+int main()
+
+\{
+
+f\textbf{\textless{} int \textgreater{}}(42);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Template specialization
+
+There are times when you want ``special cases'' for your function
+templates. For instance look at this example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+template \textless{} typename T, int SIZE \textgreater{}
+
+T sum(T x{[}{]})
+
+\{
+
+T sum = 0;
+
+for (int i = 0; i \textless{} SIZE; i++)
+
+\{
+
+s += x{[}i{]};
+
+\}
+
+return s;
+
+\}
+
+int main()
+
+\{
+
+int x{[}10{]} = \{3, 1, 5, 6, 2, 8, 9, 3, -2, 3\};
+
+std::cout \textless\textless{} sum\textless{} int, 1 \textgreater(x)
+\textless\textless{} std::endl;
+
+std::cout \textless\textless{} sum\textless{} int, 2 \textgreater(x)
+\textless\textless{} std::endl;
+
+std::cout \textless\textless{} sum\textless{} int, 10 \textgreater(x)
+\textless\textless{} std::endl;
+
+double y{[}8{]} = \{3.1, 1.8, 5.2, 6.7,
+
+8.4, 9.1, 3.6, -2.7\};
+
+std::cout \textless\textless{} sum\textless{} double, 1 \textgreater(y)
+\textless\textless{} std::endl;
+
+std::cout \textless\textless{} sum\textless{} double, 2 \textgreater(y)
+\textless\textless{} std::endl;
+
+std::cout \textless\textless{} sum\textless{} double, 10 \textgreater(y)
+\textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The function template sum does work. But clearly when the number of
+terms to add is small, it's silly waste of time to do the summation in a
+loop. For instance when the size is 1, you can just return x{[}0{]}.
+When the size is 2, it's x{[}0{]} + x{[}1{]}. In both of these cases, if
+you unroll the for-loop, you would save on declaring int variable i with
+initialization of 0, you save on checking i \textless{} size, you save
+on ++i. There's also a cost in the CPU of going from the bottom of the
+loop to the top of the loop. (This will be clarified in CISS360.) For
+the case of size = 1, using a for-loop will make the function call about
+5 times slower!
+
+C++ allows you to specify special cases for a function template. These
+are called \textbf{template specializations}.
+
+Run this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+template \textless{} typename T, int SIZE \textgreater{}
+
+T sum(T x{[}{]})
+
+\{
+
+...
+
+\}
+
+template \textless\textgreater{}
+
+int sum\textless{} int, 0 \textgreater(int x{[}{]})
+
+\{
+
+return x{[}0{]};
+
+\}
+
+int main()
+
+\{
+
+...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+I've added a specialization of the \emph{\textbf{sum}} function template
+for the case when \emph{\textbf{T = int}} and \emph{\textbf{SIZE = 0}}.
+
+Exercise. Add 3 more specializations to the above sum function template:
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{\textbf{T = int}} and \emph{\textbf{SIZE = 2}}
+\item
+  \emph{\textbf{T = double}} and \emph{\textbf{SIZE = 1}}
+\item
+  \emph{\textbf{T = double}} and \emph{\textbf{SIZE = 2}}
+\end{itemize}
+
+Insert print statements into the \emph{\textbf{sum}} function template
+and its specialization to verify that you are indeed calling the right
+function.
+
+The above specialization is called a \textbf{full specialization}. For
+templates, there's a concept of \textbf{partial specialization}. The
+syntax would be something like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template \textless{} typename T \textgreater{}
+
+T sum\textless{} T, 0 \textgreater(int x{[}{]})
+
+\{
+
+return x{[}0{]};
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+i.e., only \emph{SIZE} has been specialized to \emph{0}. However the
+above \textbf{does not compile} because \textbf{currently partial
+specialization is not supported for function templates}. (However it is
+supported for struct templates and class templates -- see later chapters
+for struct and classes.)
+
+This is a bummer since if we do have partial specialization for function
+templates, we'll be writing less code.
+
+Also, note that the specialized function
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template \textless\textgreater{}
+
+int sum\textless{} int, 0 \textgreater(int x{[}{]})
+
+\{
+
+return x{[}0{]};
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Is not a template anymore. It's a regular function. Therefore for
+multi-file compilation,
+
+\begin{itemize}
+\tightlist
+\item
+  You can put that in a cpp file and put the prototype in the header
+  file, or
+\item
+  You can inline the function and put the above in the header file.
+\end{itemize}
+
+The standard practice for creating specializations is to create them for
+frequently used cases where you want speed. For instance, you probably
+do NOT want to have specializations for int sum\textless{} int, 0
+\textgreater, int sum\textless{} int, 1 \textgreater, int sum\textless{}
+int, 2 \textgreater, \ldots, int sum\textless{} int, 99 \textgreater!!!
+
+\textbf{Exercise.} Test putting your \emph{\textbf{sum}} function
+templates and its 4 specializations into a header file as inline
+function. Make sure you can compile your program.
+
+\textbf{Exercise.} Next, try putting the prototypes of the 4
+specializations into a heaer file and implementations (i.e. bodies) of
+the 4 specializations in the cpp file. Make sure your program compiles.
+
+Exercise. Write a \emph{max} function template with specializations
+similar to the \emph{sum} function template.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template \textless{} typename T, int SIZE \textgreater{}
+
+int max(T x{[}{]})
+
+\{
+
+...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Exercise. Write a \emph{bubblesort} function template with
+specializations similar to the \emph{sum} function template.
+
+Exercise. Write a \emph{binarysearch} function template with
+specializations similar to the \emph{sum} function template.
+
+\textbf{Exercises.} You can model a 2D point as an array of two numbers:
+\{2, 3\}. In general you want to model points of dimension 1, 2, 3, 4,
+\ldots. In physics, engineering, computer vision, etc, it's common to
+have points with coordinate which are \emph{\textbf{float}}s or
+\emph{\textbf{double}}s. Technically speaking I'm talking about
+``vectors'' and not ``points''. One common operation is to add vectors
+of the same dimension. For instance
+
+\{2, 3\} + \{1, 6\} = \{2+1, 3+6\}
+
+Write a function template so that you can run the following:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double p0{[}2{]} = \{2, 3\};
+
+double q0{[}2{]} = \{1, 6\};
+
+double sum0{[}2{]};
+
+vec\_add\textless{} double, 2 \textgreater(sum0, p0, q0);
+
+vec\_println(sum0); // prints \textless3, 9\textgreater{} and newline
+
+float p1{[}2{]} = \{2.1, 3.2\};
+
+float q1{[}2{]} = \{1.3, 6.4\};
+
+float sum1{[}2{]};
+
+vec\_add\textless{} float, 2 \textgreater(sum1, p1, q1);
+
+vec\_println(sum1); // prints \textless3.4, 9.6\textgreater{} and
+newline\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Your \emph{vec\_add} and \emph{vec\_println} should work for any
+dimension. After you are done, write some specializations. The most
+common case is when the dimension is 1, 2, 3, 4.
+
+\textbf{Exercise.} Write a template function with specialization(s) to
+print an array.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x{[}{]} = \{2, 3, 5\};
+
+array\_println\textless{} int \textgreater(\&x{[}0{]}, \&x{[}3{]});
+
+// prints \{2, 3, 5\} and '\textbackslash n'
+
+double y{[}{]} = \{2.1, 3.1, 5.1\};
+
+array\_println\textless{} double \textgreater(\&y{[}0{]}, \&y{[}3{]});
+
+// prints \{2.1, 3.1, 5.1\} and '\textbackslash n'
+
+char z{[}{]} = "abcde";
+
+array\_println\textless{} char \textgreater(\&z{[}0{]}, \&z{[}5{]});
+
+// prints abcde and '\textbackslash n'\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\end{document}

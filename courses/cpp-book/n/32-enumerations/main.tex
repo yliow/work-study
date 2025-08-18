@@ -1,0 +1,740 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\author{}
+\date{}
+
+\begin{document}
+
+32. Enumerations
+
+Objectives
+
+\begin{itemize}
+\tightlist
+\item
+  Create enums
+\item
+  Use enums
+\item
+  Understand the relationship between enums and constants
+\end{itemize}
+
+Up to this point we have been using types provided by C++. Using these
+types we have also been using arrays and pointer types. Now we will
+create our own types using \emph{enum}. The \emph{enum} basically
+creates a type made up of integer constants.
+
+Enum
+
+There's another way to rewrite a previous example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+typedef int EmployeeCode;
+
+const EmployeeCode CEO = 0;
+
+const EmployeeCode MANAGER = 1;
+
+const EmployeeCode FULLTIME = 2;
+
+const EmployeeCode PARTTIME = 3;
+
+EmployeeCode code = CEO;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Here's how you do it:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int main()
+
+\{
+
+\emph{ }enum EmployeeCode
+
+\{
+
+CEO, MANAGER, FULLTIME, PARTTIME
+
+\};
+
+EmployeeCode code = CEO;
+
+std::cout \textless\textless{} CEO \textless\textless{} std::endl;
+
+std::cout \textless\textless{} code \textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Here comes some \emph{enum} jargon ...
+
+enum EmployeeCode
+
+\{
+
+CEO, MANAGER, FULLTIME, PARTTIME
+
+\};
+
+The format of creating an enumeration is\\
+
+enum \emph{{[}enumeration name{]}}
+
+\{
+
+\emph{{[}enumerator-1{]}}, ...,
+
+\emph{{[}enumerator-n{]}}
+
+\};
+
+\textbf{Exercise.} Declare a \emph{Grade} enumeration containing
+enumerators \emph{A}, \emph{B}, \emph{C}, \emph{D}, and \emph{F}.
+Declare variable \emph{johnDoeGrade} of type \emph{Grade} and initialize
+it with \emph{A}. Print \emph{johnDoeGrade} and then print \emph{A}.
+
+Enum as a type
+
+So what's the difference between
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+typedef int EmployeeCode;
+
+const EmployeeCode CEO = 0;
+
+const EmployeeCode MANAGER = 1;
+
+const EmployeeCode FULLTIME = 2;
+
+const EmployeeCode PARTTIME = 3;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+and
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+enum EmployeeCode
+
+\{
+
+CEO, MANAGER, FULLTIME, PARTTIME
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(besides the fact that the second produces a shorter code)???
+
+The enumeration \emph{EmployeeCode} is actually \emph{\textbf{a new
+type}}. This means that you can actually have this:
+
+\textbf{Exercise.} Try compiling this program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+enum EmployeeCode
+
+\{
+
+CEO, MANAGER, FULLTIME, PARTTIME
+
+\};
+
+void f(EmployeeCode c)
+
+\{\}
+
+void f(int i)
+
+\{\}
+
+int main()
+
+\{
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Enumerators and Integers
+
+You might say ... ``Hang on there! What do you mean that the
+\emph{EmployeeCode} is a new type??? When I print an \emph{EmployeeCode}
+variable like this ...''
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+enum EmployeeCode
+
+\{
+
+CEO, MANAGER, FULLTIME, PARTTIME
+
+\};
+
+std::cout \textless\textless{} CEO \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+``I see that \emph{CEO} \emph{is} 0!!! So it \emph{is} an integer!!!
+Isn't it???''
+
+Yes and no.
+
+There's actually an automatic \emph{typecasting} between enumerators and
+integers. The statements:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+std::cout \textless\textless{} CEO \textless\textless{} std::endl;
+
+std::cout \textless\textless{} MANAGER \textless\textless{}
+std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+are really the same as
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+std::cout \textless\textless{} int(CEO) \textless\textless{} std::endl;
+
+std::cout \textless\textless{} int(MANAGER) \textless\textless{}
+std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+This means that \emph{CEO}, because it's the \emph{\textbf{first}}
+enumerator of an enumeration, is automatically typecast to the integer
+\emph{\textbf{0}} if necessary, \emph{MANAGER} is automatically typecast
+to the integer 1 if necessary, etc.
+
+That example shows you that \emph{EmployeeCode} enumerator is
+automatically typecast to an \emph{int} when necessary. What about from
+an \emph{int} to \emph{EmployeeCode} enumerator? Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+enum EmployeeCode
+
+\{
+
+CEO, MANAGER, FULLTIME, PARTTIME
+
+\};
+
+EmployeeCode code = EmployeeCode(1);\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The last statement is the same as:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+EmployeeCode code = MANAGER;\tabularnewline
+\bottomrule
+\end{longtable}
+
+Now let's see if the typecast is also automatic. Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+enum EmployeeCode
+
+\{
+
+CEO, MANAGER, FULLTIME, PARTTIME
+
+\};
+
+EmployeeCode code = 1; // 1 becomes EmployeeCode(1)??\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The point: An integer is \emph{\textbf{not}} automatically typecast to
+an enumerator.
+
+Since C/C++ will automatically typecast enumerators to integers if
+necessary, we can use it as though it's an integer. Here are some
+examples:
+
+Run this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+enum operation \{ADD, SUB, MUL, DIV\};
+
+operation op = ADD;
+
+int x = 10, y = 20;
+
+switch (op)
+
+\{
+
+case ADD: std::cout \textless\textless{} x + y; break;
+
+case SUB: std::cout \textless\textless{} x - y; break;
+
+case MUL: std::cout \textless\textless{} x * y; break;
+
+case DIV: std::cout \textless\textless{} x / y; break;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Try changing the \emph{op} to different values.
+
+\textbf{Exercise.} Is this a valid code segment? If so, what is the
+output? If it isn't explain why.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+enum operation \{ADD, SUB, MUL, DIV\};
+
+std::cout \textless\textless{} ADD + SUB + MUL + DIV
+\textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The integer value of an enumerator
+
+You can actually change the integer value associated with an enumerator.
+Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+enum CutOff
+
+\{
+
+A = 90, B = 80, C = 70, D = 60, F = 0
+
+\};
+
+std::cout \textless\textless{} B \textless\textless{} std::endl;
+
+CutOff x = B;
+
+std::cout \textless\textless{} x \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Now try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+enum X
+
+\{
+
+a = 5, b, c, d = 42, e, f
+
+\};
+
+std::cout \textless\textless{} a \textless\textless{} ' '
+\textless\textless{} b \textless\textless{} ' ' \textless\textless{} c
+\textless\textless{} ' '
+
+\textless\textless{} d \textless\textless{} ' ' \textless\textless{} e
+\textless\textless{} ' ' \textless\textless{} f \textless\textless{}
+std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+And ... you \emph{\textbf{have}} to try this because it's a common
+gotcha:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+enum X \{a = 1.1\};\tabularnewline
+\bottomrule
+\end{longtable}
+
+The point is that enumerators can only be initialized with integer
+values.
+
+Exercise. Either write down the output of the following code segment or
+find the error:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+enum X
+
+\{
+
+a, b, c, d = 42, e, f
+
+\};
+
+\emph{X} foo = b;
+
+X bar = f;
+
+std::cout \textless\textless{} b \textless\textless{} f
+\textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Exercise. Either write down the output of the following code segment or
+find the error:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+enum Y
+
+\{
+
+a = 1, b, c, d = 4.5, e = 5.6, f = 6.7
+
+\};
+
+\emph{X} foo = b;
+
+std::cout \textless\textless{} b \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Enum Without Enumeration Name
+
+Notice that
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+enum EmployeeCode
+
+\{
+
+CEO, MANAGER, FULLTIME, PARTTIME
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+actually does \emph{\textbf{two}} things:
+
+\begin{itemize}
+\tightlist
+\item
+  It creates four constants (enumerators)
+\item
+  It gives a type (enumeration) for the four constants.
+\end{itemize}
+
+You can actually use the \emph{enum} to create constants without
+creating an enumeration. Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int main()
+
+\{
+
+enum \{A, B, C, D, E\};
+
+std::cout \textless\textless{} A \textless\textless{} std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Rewrite the following using enumerators:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+const int FEE = 1;
+
+const int FIE = 0;
+
+const int FOE = 2;
+
+const int FUM = 3;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Omit the enumeration name and integer values.
+
+Symbolic constants
+
+Sometimes we don't really care about the integer value of enumerators.
+We really want the names of the enumerators to make it easier to read
+our programs. Look at this example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+enum GameState
+
+\{
+
+INIT, MENU, STARTING, RUN, RESTART, EXIT
+
+\};
+
+GameState gameState = INIT;
+
+int main()
+
+\{
+
+int energy = 1000;
+
+while (gameState != EXIT)
+
+\{
+
+...
+
+if (energy == 0)
+
+\emph{ }gameState = EXIT
+
+...
+
+switch (gameState)
+
+\{
+
+case INIT: ...
+
+case MENU: ...
+
+case STARTING: ...
+
+case RUN: ...
+
+case RESTART: ...
+
+case EXIT: ...\\
+\}
+
+\}
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Notice that it doesn't matter if the integer value of \emph{INIT} is 0
+or 1 or 2 or what-have-you.
+
+Using this technique of programming where the code to execute is based
+on the value of a variable, you create something called a finite state
+machine.
+
+\textbf{Exercise.} Given
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+enum EnumA \{x, y, z\};
+
+enum EnumB \{a, b, c\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+does this work?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+EnumA i = a;\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Given
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+enum EnumA \{x, y, z\};
+
+enum EnumB (a, b, c\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+does this work?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+EnumA a0 = x;
+
+EnumB a1 = a;
+
+std::cout \textless\textless{} (a0 == a1) \textless\textless{}
+std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Multi-file Compilation
+
+Enumerations can be placed in a header file if other files (source or
+header) use it.
+
+Summary
+
+You can create symbolic constants using enum.
+
+You can give the set of constants a name. This creates a type.
+
+You can then create a variable of an enum type.
+
+enum PlaneState \{ STATIONARY, FLYING, MAINTENANCE \};
+
+PlaneState boeing747a = STATIONARY;
+
+PlaneState boeing747b = FLYING;
+
+By default enumerators are given integer values: 0, 1, 2, ...
+
+You can give the enumerators values:
+
+enum PlaneState
+
+\{
+
+STATIONARY=5, FLYING, MAINTENANCE=10
+
+\}; // int(FLYING) is 6
+
+The name of the enumeration is optional.
+
+\end{document}

@@ -1,0 +1,2133 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\author{}
+\date{}
+
+\begin{document}
+
+61. Constructors
+
+Objectives
+
+\begin{itemize}
+\tightlist
+\item
+  Understand what a constructor is
+\item
+  Write constructors
+\item
+  Write constructors using the initializer list
+\item
+  Write inline methods
+\item
+  Write overloaded constructors
+\item
+  Understand how the default constructor works
+\item
+  Write constructors with default values
+\item
+  Write and use copy constructors
+\end{itemize}
+
+Constructor
+
+Its always a good idea to initialize variables . So C++ encourages
+object initialization by giving a standardized way of initializing
+objects which is much better than the \emph{init()} method in the
+\emph{Date} class .
+
+This is called the \textbf{class constructor} .
+
+Techno-jargon: When you create an object \emph{obj} from a class
+\emph{C}, besides saying you are declaring \emph{obj} from \emph{C}, you
+would also say that you are \textbf{instantiating} \emph{obj} from class
+\emph{C}.
+
+The constructor is just a method (i.e. member function.) Therefore, if
+you can write methods, you can write a constructor. However, there are
+two rules that you must follow :
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  The constructor has the same name as the class
+\item
+  The constructor does not have a return type (not even \emph{void})
+\end{enumerate}
+
+Let's add a constructor to the \emph{Date} class and remove the
+\emph{init()} method.
+
+First we replace the \emph{init()} prototype in the class definition in
+the header file with the following constructor prototype:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Next, we change the name of the \emph{Date::init()} method to
+\emph{Date::Date() }in the implementation file (I'm also adding a print
+statement just for testing):
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Now run this and see what happens:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// main.cpp
+
+...
+
+int main()
+
+\{
+
+Date today = Date(2014, 12, 25);
+
+today.print();
+
+Date yesterday(2014, 12, 24);
+
+yesterday.print();
+
+Date * p = new Date(1970, 1, 1);
+
+p-\textgreater print();
+
+delete p;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Note how I call the constructor ...
+
+There are two different ways of calling the constructor in C++:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+and
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+They do the same thing.
+
+And in the case of memory allocation of a Date object in the free store
+using new:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+Date * p = new Date(1970, 1, 1);\tabularnewline
+\bottomrule
+\end{longtable}
+
+There's a warning in using this version of calling the constructor:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+It's better to use
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+Date d = Date(2014, 1, 1);\tabularnewline
+\bottomrule
+\end{longtable}
+
+See the later section on Default Constructor.
+
+Of course you can also construct a \emph{Date} \emph{value} without
+giving it to a variable name:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+In this case, you create a \emph{Date} object (without a name) and use
+it to invoke \emph{print}.
+
+\textbf{Exercise.} Write a class \emph{Being} with instance variables
+\emph{num\_heads}, \emph{num\_arms}, \emph{num\_legs}. Write a
+constructor to initialize all members. Write a \emph{print} method in
+the class to print the values of all instance variables. Write getter
+and setter methods to get and set all instance variables. Test your
+class.
+
+\textbf{Exercise.} Write a class \emph{Vehicle} with instance variables
+\emph{numWheels}, \emph{numSeats}, \emph{mileage (double)}, \emph{year},
+\emph{make} (C-string, max size of 50), and \emph{model} (C-string, max
+size of 50). Write a \emph{print} method in the class to print the
+values of all instance variables. Write a constructor to initialize all
+members. Test your class.
+
+Initializer List
+
+Recall that in C++, arrays and \emph{struct} variables can be
+initialized using an initializer list:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Similarly, the member variables (instance variables) of an object can be
+
+initialized by an \textbf{initializer list }in the constructor.
+
+Example:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+In the above "\emph{yyyy\_(yyyy)}" means "\emph{yyyy\_} is initialized
+with \emph{yyyy}".
+
+Constructor initializers are important and unfortunately not always
+emphasized in books! (\textbf{Some books don't even mention them!!!})
+
+In a constructor, whenever possible, you should use initialization and
+not assignment like this:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\textbf{Warning: }If you do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.cpp
+
+...
+
+Date::Date(int yyyy, int mm, int dd)
+
+\{
+
+yyyy\_ = yyyy;
+
+mm\_ = mm;
+
+dd\_ = dd;
+
+\}
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+you should know by now that you're using assignment and not
+initialization.
+
+This means that \emph{yyyy\_} was
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  initialized to random garbage and \emph{then}
+\item
+  assigned the value of \emph{yyyy}.
+\end{enumerate}
+
+Therefore, because of the above (\emph{and} also other reasons) using
+initializers will always be faster. Do not let me ever catch you doing
+an assignment in constructors when it should be an initialization using
+an initializer list.
+
+In fact there are cases where you \textbf{have} to use initializers:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// C.cpp
+
+C::C(int \& x)
+
+: x\_(x), y\_(3.14159)
+
+\{\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Why? Because references and constants \textbf{must be initialized}.
+
+The following is a quick review of the relevant facts. Check notes on
+constants and references for details.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+const int x; // WRONG: constants MUST be initialized!
+
+x = 42; // TOO LATE!!!
+
+int j = 42;
+
+int \& k; // WRONG: References must be initialized!
+
+k = j; // TOO LATE!!! \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+It should have been this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+const int x = 42; // THAT'S BETTER!!!
+
+int j = 42;
+
+int \& k = j; // YES!!!\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+By the way, you can use any valid expression to initialize the object's
+members and the body of the method can still have statements:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Rewrite the constructor of the \emph{Being} class so
+that the constructor uses an initializer list.
+
+\textbf{Exercise.} Rewrite the constructor of the \emph{Vehicle} class
+so that the constructor uses an initializer list. (Note that for the
+string members, you have to copy the characters of the strings in the
+body of the constructor. So the body is not empty.)
+
+Gotchas
+
+Here are two very common gotchas for you \ldots{}
+
+\textbf{First:} The initializer syntax can only be used in constructors:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\textbf{Second:} Order of initialization is the order of member
+declaration:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+To fix this problem, either
+
+(1) use \emph{a} and \emph{b} in the initialization of \emph{avg\_:}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// C.cpp
+
+C::C(int a, int b)
+
+: x\_(a), y\_(b), avg\_((a + b) / 2)
+
+// avg\_ doesn't rely on x\_ and y\_, so it's safe
+
+\{\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+or
+
+(2) declare \emph{avg\_} after \emph{x\_} and \emph{y\_} in the class
+definition (after all, the \emph{avg\_} average should clearly be set
+after \emph{x\_} and \emph{y\_}, right?!?!)
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// C.h
+
+class C
+
+\{
+
+public:
+
+C(int, int);
+
+private:
+
+int x\_, y\_, avg\_;
+
+// avg\_ = average of x\_, y\_
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Review: Inline Functions
+
+Review the notes on inline functions. The following is only a quick
+recap.
+
+Recall that an inline function is like a rubber stamp for a function:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+This means that there is really no \emph{max()} function. Rather, at the
+place where the inline function is called, C++ substitutes the code for
+\emph{max()} so that the program compiled is:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Inline functions can speed up program execution since the act of making
+a function call takes time.
+
+The compiler can choose to ignore making a function an inline function
+so that it becomes a real function. This can happen if the function is
+too long.
+
+For multi-file compilation, the \emph{whole} inline function must be in
+the header file. You cannot have an inline prototype in the header file
+and the definition of the body of the function in the implementation
+file.
+
+Inline Methods
+
+The information in this section applies to inlining of methods and not
+just constructors.
+
+Class methods (i.e., member functions) can also be inlined.
+
+To inline a class method, you can either:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Put the whole method inside the class definition.
+\item
+  Put the method definition in the header file prepended with
+  \emph{inline}.
+\end{enumerate}
+
+First way:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Second way:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise. }All the methods in our \emph{Date} class are pretty
+short. Inline them.
+
+\textbf{Exercise.} Inline all the short methods in the \emph{Being}
+class.
+
+\textbf{Exercise. }Inline all the short methods in the \emph{Vehicle}
+class.
+
+Review: Function Signature
+
+Review notes on function loading. This is a quick recap.
+
+The \textbf{signature} of a function is the list of types of the
+parameters of the function.
+
+WARNING: Note that the return type is \emph{\textbf{not}} part of the
+function signature.
+
+Here's an example: the signature of
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+is \emph{(int, char)}
+
+Here are some warnings:
+
+\begin{itemize}
+\tightlist
+\item
+  The type of ``\emph{const X}'' is \emph{X.}
+\item
+  The type of ``\emph{const X *}'' is \emph{const X *.}
+\item
+  The type of ``\emph{X{[}{]}}'' is \emph{X*}.
+\end{itemize}
+
+Here's a trick to get your C++ compiler to tell you the signature of a
+function. Deliberately include an error in the function.
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+When you compile, the compiler will have to tell you there's an error in
+the above function, listing the prototype. For g++, you will get:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+You can see from the above error message that for the second parameter,
+although it's \emph{const int}, the type as part of the signature is
+\emph{int}.
+
+\textbf{Exercise. }Pair up functions below with the same signatures.
+Find a way to check your answer with your compiler.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void f(int x, const int \& y) \{\}
+
+void f(int x, const int * y) \{\}
+
+void f(int x, const int y) \{\}
+
+void f(char x, const int y) \{\}
+
+void f(const int y, char x) \{\}
+
+void f(int * x) \{\}
+
+void f(int x{[}{]}) \{\}
+
+void f(int x{[}10{]}) \{\}
+
+void f(int x{[}10{]}{[}10{]}) \{\}
+
+void f(int x{[}10{]}{[}{]}) \{\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Review: Function Overloading
+
+A function is \textbf{overloaded} if its name is used more than once.
+
+The signature of the functions with the same name must be different.
+That's because in C++, a function is identified not by its name, but by
+it name and its signature, i.e., the name and the list of types of its
+parameters.
+
+\textbf{Exercise.} Does this compile? Next, check with your compiler.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void f(int x)\{\} // f and signature int
+
+void f(int y, int y)\{\} // f and signature (int,int)
+
+void f(int x, double y)\{\} // f and signature (int,double)
+
+int main()
+
+\{
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Does this compile? Next, check with your compiler.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void f(int x) \{\}
+
+int f(int x) \{\}
+
+void f(int x, double y) \{\}
+
+int main()
+
+\{
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Does this compile? Next, check with your compiler.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void f(int * x) \{\}
+
+int f(int x{[}{]}) \{\}
+
+int main()
+
+\{
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+When a function is called in your code, C++ will use the function that
+matches both the function name and the type of the values passed in with
+the candidate's signature. If none is found, C++ will try to typecast
+the arguments. The one used is the one with the least number of
+typecasts. If there isn't one, you get an ambiguous invocation error.
+
+\textbf{Exercise.} Which function is called (or is there an error)?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void f(int x) \{\}
+
+void f(double x) \{\}
+
+int main()
+
+\{
+
+f(1);
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Check by running this version:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Which function is called (or is there an error)?
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Check with a program.
+
+If you compile the following with g++:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+it will complain with this message:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+a.cpp: In function int main():
+
+a.cpp:3:20: error: call of overloaded f(int, int) is
+
+ambiguous
+
+a.cpp:1:6: note: candidates are: void f(double, int)
+
+a.cpp:2:6: note: void f(int, double)\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Basically, when looking for a function to execute
+
+\emph{f(1, 1);}
+
+there is no exact match. So C++ attempts to typecast. If C++ typecasts
+the first value to 1.0:
+
+f(double(1), 1);
+
+it will be able to match this:
+
+void f(double x, int y) \{\}
+
+and if C++ typecasts the second value to get 1.0:
+
+f(1, double(1));
+
+it will match this:
+
+void f(int x, double y) \{\}
+
+So, in this case, since both functions match \emph{f(1, 1)} with 1
+typecast, your C++ compiler does not know what to do and will complain.
+Of course if there's no exact match and there's only one option with one
+typecast, then C++ will happily choose that function that matches
+
+\emph{f(1, 1)} with one typecast.
+
+Method overloading
+
+Methods in a class can also be overloaded as long as the signatures are
+different.
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+In this case, all the following have different signatures.
+
+C::f(int)
+
+C::f(int, int)
+
+C::f(int, double)
+
+Note that since every method is within a class scope, you can have
+methods with the same name and same signatures but in different classes.
+So the following is OK:
+
+C::f(int x) \{\}
+
+D::f(int x) \{\}
+
+since if an object \emph{obj} is of class \emph{C}, then
+\emph{obj.f(42)} will result in \emph{C::f} being executed. There's no
+ambiguity.
+
+We will be overloading the \emph{Date} constructor: We will later write
+a ``default'' constructor and a ``copy constructor''.
+
+I'll write another constructor so that I can do something like this:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+The prototype is of course like this:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+The pseudocode should be like this:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+And we get:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+Date(char s{[}{]})
+
+\{
+
+int i = 0;
+
+if (s{[}0{]} == 'J' \&\& s{[}1{]} == 'a') mm\_ = 1;
+
+else if (s{[}0{]} == 'F' \&\& s{[}1{]} == 'e') mm\_ = 2;
+
+...
+
+i = 2;
+
+while (s{[}i{]} != ' ') i++;
+
+i++;
+
+dd\_ = 0;
+
+while ((0 \textless= s{[}i{]} - '0') \&\& (s{[}i{]} - '0' \textless= 9))
+
+\{
+
+dd\_ *= 10; dd\_ += (s{[}i{]} - '0'); i++;
+
+\}
+
+while ((s{[}i{]} \textless{} '0') \textbar\textbar{} (s{[}i{]}
+\textgreater{} '9')) i++;
+
+yyyy\_ = 0;
+
+while ((0 \textless= s{[}i{]} - '0') \&\& (s{[}i{]} - '0' \textless= 9))
+
+\{
+
+yyyy\_ *= 10;
+
+yyyy\_ += (s{[}i{]} - '0');
+
+i++;
+
+\}
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Default constructor
+
+The \textbf{default constructor} of a class is the constructor that does
+not have any parameters.
+
+Why use a default constructor? Because they make it easy to construct
+the most common objects.
+
+Let's add one more constructor (i.e. we are overloading the constructor)
+to our Date class.
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+How do you call the default constructor? Easy.
+
+If \emph{C} is a class, the following are two different ways to call the
+default constructor:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Try this with our \emph{Date} class:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+To verify that we did go into the default constructor, run the program
+again with a print statement in the default constructor.
+
+Here's an important \textbf{WARNING} \ldots{} From this syntax of
+calling constructors:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+Date today(2014, 12, 25);\tabularnewline
+\bottomrule
+\end{longtable}
+
+you might be tempted to do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+Date date1(); // trying to call Date::Date() ...
+
+// WRONG!!!\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+This is a subtle problem as the compiler will not complain and in fact
+you can even run the program.
+
+The problem begins when you use \emph{date1}:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Why is that?!? Because when you write this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+Date date1();\tabularnewline
+\bottomrule
+\end{longtable}
+
+Your compiler thinks that you're writing down a function prototype!!! In
+other words, your compilers thinks that \emph{date1} is a function with
+no parameters and returns a \emph{Date} value.
+
+Summary:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+The FREE default constructor
+
+For any class, C, if you do not specify any constructor, C++ will
+automatically add the default constructor that does not do anything into
+the class:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C
+
+\{
+
+public:
+
+C() \{\}
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In fact, that's the reason why our first Date class works. Recall that
+for that version (without explicitly defining constructors), I was able
+to do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+int main()\\
+\{
+
+Date today;
+
+today.init(2014, 12, 25);
+
+...
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Of course now you know that in fact:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+int main()\\
+\{
+
+Date today; // default constructor Date::Date() was
+
+// called to initialize the members of
+
+// today. In particular today.yyyy\_,
+
+// today.mm\_ and today.dd\_ was initialized
+
+// to random values.
+
+today.init(2014, 12, 25);
+
+...
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+This means that when using the default constructor, the object
+
+being initialized will have random initial values.
+
+If you write one or more constructors in this class, C++ will
+\textbf{not} add this do-nothing default constructor into this class.
+This is very important because later you will see that there are times
+when you need to have a default constructor, whether it is supplied by
+your C++ compiler (automatically) or by you (manually).
+
+\textbf{Exercise.} Create a default constructor for the \emph{Being}
+class with the following default values: 2 for number of heads, 3 for
+number of arms, and 2 for number of legs. Test your code.
+
+\textbf{Exercise.} Create a default constructor for the \emph{Vehicle}
+class with the following default values: 4 for number of wheels, 4 for
+number of seats, 45.24 for mileage, 2011 for year, ``Nissan'' for make,
+and ``Sentra'' for model. Test your code.
+
+Review: Default values for functions
+
+Review the notes on default values for functions. This is only a quick
+recap.
+
+Recall: Parameters of a function can have default values.
+
+If a default value is assigned to a parameter, then all parameters to
+the right must also have default values:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+You can then invoke the function without specifying values for
+default-valued parameters. If you do not specify a value for such a
+parameter, the default value is used:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+For multi-file compilation, default values are in the header file, not
+in the cpp file:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Does this program compile?
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Which function is called (or is there an error)?
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Default value for methods
+
+The above information on default values for functions also applies to
+methods of classes.
+
+Modify our \emph{Date} class:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Now modify the implementation file \emph{Date.cpp}. Add test cases to
+\emph{main()}.
+
+\textbf{Exercise.} For the \emph{Being} class, rewrite the constructor
+so that it has default values using the values from the default
+constructor. Modify the setter methods to use the corresponding default
+values.
+
+\textbf{Exercise.} For the \emph{Vehicle} class, rewrite the constructor
+so that it has default values using the values from the default
+constructor. Modify the setter methods to use the corresponding default
+values.
+
+Copy constructor
+
+Suppose you already have a \emph{Date} object \emph{date1}. You want to
+create another \emph{Date} object, \emph{date2}, so that \emph{date2}
+has the same values as \emph{date1}.
+
+\emph{date2} is not a reference to date1 like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+Date \& date2 = date1;\tabularnewline
+\bottomrule
+\end{longtable}
+
+Rather, you want \emph{date2} to be an actual Date object with it's own
+member variables.
+
+You can do this
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+using the constructor that accepts three integers. But ...
+
+What a pain!
+
+This is cleaner:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+But this means that \emph{date1} was first initialized to something that
+I do not want, and \emph{then} I assign the values of \emph{date1} to
+\emph{date2}. That's not efficient.
+
+We can achieve a cleaner initialization if we define a constructor that
+accepts a \emph{Date} object. In other words I would like to do this:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+The prototype looks like this:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Note that I'm passing by reference to make the parameter passing
+efficient and since I don't intend to modify the parameter, I make it a
+constant. I'm therefore passing by constant reference.
+
+The implementation looks like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.cpp
+
+Date::Date(const Date \& date)
+
+: yyyy\_(date.yyyy\_), mm\_(date.mm\_), dd\_(date.dd\_)
+
+\{\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You can think of \emph{date2} as a clone of \emph{date1}. You can (and
+should) think of the copy constructor as a cloning operation.
+
+For any class \emph{C}, the \textbf{copy constructor} of that class is a
+constructor with the following prototype:
+
+\emph{C(const C \&); }
+
+Think of the copy constructor as a \textbf{cloning operation} and the
+intent is to copy values from one object to another.
+
+\textbf{Exercise.} Inline our \emph{Date} copy constructor.
+
+Calling the copy constructor
+
+There are actually two different syntax for invoking the copy
+constructor of a class \emph{C}:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+WARNING: The second syntax is calling the copy constructor, not the
+assignment operator.
+
+\textbf{Example.} Insert a print statement in the copy constructor of
+\emph{Date}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+Date(const Date \& date)
+
+: yyyy\_(date.yyyy\_), mm\_(date.mm\_), dd\_(date.dd\_)
+
+\{
+
+std::cout \textless\textless{} "Date::Date(const Date
+\&)\textbackslash n";
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+and then execute this in \emph{main()}:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Default copy constructor
+
+If a copy constructor is not specified, your C++ compiler will supply a
+default copy constructor that initializes all instance variables of the
+object invoking the constructor with the corresponding members of the
+object that is passed in.
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+So technically we don't need the copy constructor for our \emph{Date}
+class. However, you will see very soon, that there are cases (many
+cases!!!) where you want your own copy constructor to do something else.
+So here's the warning just so you catch it ...
+
+\textbf{WARNING:} There are cases where the default member-by-member
+copy is \emph{\textbf{not}} what you want. (See later examples.)
+
+If you define a copy constructor, of course the compiler will not supply
+one. You can't possibly have two copy constructors. (Why?)
+
+Comment out our copy constructor in \emph{Date} and then execute in
+\emph{main()}:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+You will find that the compiler will not complain and the program does
+run. Why? Because your C++ compiler supplies the default copy
+constructor.
+
+\textbf{Exercise.} Write a copy constructor for the \emph{Being} class.
+
+\textbf{Exercise.} Write a copy constructor for the \emph{Vehicle}
+class.
+
+\textbf{Exercise. }Here's the header file for weather control devices:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// WeatherCtrl.h
+
+class WeatherCtrl
+
+\{
+
+public:
+
+WeatherCtrl(double, double);
+
+double get\_temp();
+
+double get\_pressure();
+
+void set\_temp(double);
+
+void set\_pressure(double);
+
+private:
+
+double temp\_;
+
+double pressure\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Write a cpp file containing the method implementation (i.e., definition)
+for all the prototypes that appear in the header file.
+
+Next go over the following \emph{main.cpp} that uses the weather control
+class:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} If \emph{C} is a class and \emph{obj1} is an object
+of class \emph{C} and you want to clone \emph{obj1} to another object,
+say \emph{obj2}. The following works but it's a bad idea. Why?
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+If you don't believe me you can try
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} The following \emph{Int} class essentially models an
+integer. Complete it.
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Now write a set method to set the value of x in the object. Test it with
+this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include "Int.h"
+
+int main()
+
+\{
+
+Int i(5);
+
+// Construct object j of type Int
+
+// using i. Use the copy constructor.
+
+std::cout \textless\textless{} j.get() \textless\textless{}
+'\textbackslash n';
+
+i.set(42);
+
+std::cout \textless\textless{} i.get() \textless\textless{}
+'\textbackslash n'; // should be 42
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Finally, add an increment method so that this works:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include "Int.h"
+
+int main()
+
+\{
+
+Int i(5);
+
+// Construct object j of type Int
+
+// using i. Use the copy constructor.
+
+std::cout \textless\textless{} j.get() \textless\textless{}
+'\textbackslash n';
+
+i.set(42);
+
+std::cout \textless\textless{} i.get() \textless\textless{}
+'\textbackslash n'; // should be 42
+
+i.increment(j); // i.x is incremented by j.x
+
+std::cout \textless\textless{} i.get() \textless\textless{}
+'\textbackslash n'; // should be 47
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Example and exercise: \emph{IntPointer}
+
+The next few exercises are extremely important!!! Some will in fact
+appear in assignments!!!
+
+One of the problems regarding pointers (pointing to either a single
+value or an array of values) is that there's a danger of forgetting to
+deallocate memory:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+You will see later (see notes on Destructors) that classes will help
+solve this very dangerous problem. For this section, let's talk about a
+pointer to a single value and write a class for that.
+
+The following class models an integer pointer. This is an important
+example. But it's incomplete. (Clearly once you're done with this, you
+can also talk about a class to model the pointer to a double, to a char,
+etc.)
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class IntPointer
+
+\{
+
+public:
+
+IntPointer(int x)
+
+: p\_(new int) // allocate memory for p\_
+
+\{
+
+*p\_ = x; // store an int at memory that p\_
+
+// points to
+
+\}
+
+IntPointer(const IntPointer \& intptr)
+
+: p\_(new int)
+
+\{
+
+*p\_ = *(intptr.p\_);
+
+\}
+
+int dereference()
+
+\{
+
+return *p\_;
+
+\}
+
+void allocate()
+
+\{
+
+if (p\_ == NULL)
+
+\{
+
+p\_ = new int;
+
+\}
+
+\}
+
+void deallocate()
+
+\{
+
+delete p\_;
+
+\}
+
+private:
+
+int * p\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Here's a program that uses the above class. Trace the
+program by hand. Draw a picture of the memory during execution. What is
+the output?
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Check your trace by completing the above code and running it. Can you
+explain why there's a memory leak?
+
+\textbf{Exercise.} To make the above object more like a pointer, modify
+the
+
+\emph{dereference} method:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+and in \emph{f} change the call to \emph{dereference()} to \emph{*}:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Run the program again.
+
+\textbf{Exercise.} However this does not work:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void f()
+
+\{
+
+...
+
+std::cout \textless\textless{} *q \textless\textless{}
+'\textbackslash n';
+
+*q = 1024; // YIKES
+
+std::cout \textless\textless{} *q \textless\textless{}
+'\textbackslash n';
+
+...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Compile and read the error message - remember it! It seems that getting
+\emph{*q} works but modifying \emph{*q} does not work.
+
+\textbf{Execise.} To correct it, change \emph{operator*} to this:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Compile and run. Remember this fix!
+
+\textbf{Execise.} Now add a line of code to deallocate memory so that
+there's no memory leak. It's still a problem that we have to deallocate
+memory before object \emph{q} dies (i.e., goes out of scope). We might
+forget!!! Later you will see that you can tell the object to
+automatically invoke a very special method just before the object dies.
+
+\textbf{Exercise.} Note that I have overwritten the default copy
+constructor:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class IntPointer
+
+\{
+
+public:
+
+...
+
+IntPointer(const IntPointer \& intptr)
+
+: p\_(new int)
+
+\{
+
+*p\_ = *(intptr.p\_);
+
+\}
+
+...
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Draw a memory model of what happens when you use this copy constructor,
+for instance, like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+int main()
+
+\{
+
+IntPointer p(42);
+
+IntPointer q = p; // calls copy constructor
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Check the definition of the default copy constructor. It copies values
+memberwise., i.e., the default copy constructor works like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class IntPointer
+
+\{
+
+public:
+
+...
+
+IntPointer(const IntPointer \& intptr)
+
+: p\_(intptr.p\_)
+
+\{\}
+
+...
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+What is the difference between this copy constructor (the default
+provided by the compiler if you do not have one) and the one that I
+wrote? (Hint: Draw a picture).
+
+Now, what if I deallocate while using the default copy constructor?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class IntPointer
+
+\{
+
+public:
+
+...
+
+IntPointer(const IntPointer \& intptr)
+
+: p\_(intptr.p\_)
+
+\{\}
+
+...
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+int main()
+
+\{
+
+IntPointer p(42);
+
+IntPointer q = p;
+
+q.deallocate();
+
+p.deallocate();
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Why?
+
+Example and exercise: \emph{IntArray}
+
+\textbf{Exercise. }We frequently use a fixed size array with a length
+variable:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise. }We should package up an int array with a length
+variable either using \emph{struct} or \emph{class}. Of course
+\emph{class} has class! Here's the \emph{IntArray} class:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+and here's \emph{main} to test the class:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// What's missing here?
+
+int main()
+
+\{
+
+IntArray a;
+
+a.print(); // prints blank line;
+
+// a.length\_ is 0
+
+a.set\_length(5);
+
+a.print(); // prints 5 random values;
+
+// a.length\_ is 5
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Complete the class by implementing all the listed methods. Test your
+code by running it.
+
+\textbf{Exercise.} There's still no way to set the values in the array.
+Add the
+
+following to the class:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Define the method (or rather, the operator) and then do this in
+\emph{main()}:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Now do this:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+and ... you get a problem! It seems that getting \emph{a{[}0{]}} works
+but modifying \emph{a{[}0{]}} does not work. Fix it. (See
+\emph{IntPointer}.)
+
+\textbf{Exercise.} Once the \emph{operator{[}{]}} is fixed you can do
+this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int main()
+
+\{
+
+IntArray a;
+
+a.print(); // prints blank line; a.length\_ is 0
+
+a.set\_length(5);
+
+for (int i = 0; i \textless{} a.get\_length(); i++)
+
+\{
+
+a{[}i{]} = i * i;
+
+\}
+
+a.print(); // prints 5 values; a.length\_ is 5
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise. }Add a sum method that returns the sum of the values
+of \emph{a.x\_{[}0{]}, a.x\_{[}1{]}, ..., a.x\_{[}a.length\_ - 1{]}}.
+Test your code with this:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Clearly you can also implement an array of doubles, of bools, of ...
+
+Example and exercise: \emph{IntDynArray}
+
+The \emph{IntArray} is great for packaging up all that you need to work
+with the concept of an array with changing length. Of course the actual
+maximum size of the array is fixed. (In the above case, it's fixed at
+1000.) This is a waste if for instance you need only 10. And if you need
+to store more than 1000 values in an IntArray object, then you're out of
+luck.
+
+Therefore it's better to \textbf{dynamically} request for what you need
+based on what happens when the program runs. Pointers to the
+rescue!!!Why? Because for array in the local scope the size must be
+constant:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+However arrays allocated in the free store can have variable sizes:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Pause \ldots{} and study your notes on pointers again \ldots{}
+
+\textbf{Exercise.} Write the following dynamic integer array class. What
+I'm calling length in \emph{IntArray}, I'm calling \emph{size} here. The
+size of the array requested on the memory heap is \emph{capacity}. Many
+of the methods requires minimum change from the version in
+\emph{IntArray}.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class IntDynArray
+
+\{
+
+public:
+
+IntDynArray(int capacity); // Allocate capacity
+
+// number of integers
+
+// for pointer x\_. Set
+
+// size\_ to 0 and
+
+// capacity\_ to
+
+// capacity.
+
+IntDynArray(const IntDynArray \&);
+
+int get\_size();
+
+void set\_size(int);
+
+void get\_capacity();
+
+void print();
+
+private:
+
+int * x\_;
+
+int size\_;
+
+int capacity\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Test your code with this:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Add a method to deallocate all memory allocated:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+and in \emph{main} do this:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Again, later you will see that you can define a method that will be
+called automatically whenever the object is about to die. All you need
+to do is to deallocate memory in this special method and we don't have
+to remember to deallocate anymore.
+
+Clearly you can also implement a dynamical array of doubles, of chars,
+of \ldots{}
+
+\end{document}

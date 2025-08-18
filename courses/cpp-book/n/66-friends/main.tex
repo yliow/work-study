@@ -1,0 +1,462 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\author{}
+\date{}
+
+\begin{document}
+
+66. Friends
+
+Objectives
+
+\begin{itemize}
+\tightlist
+\item
+  Make a function a friend of a class
+\item
+  Make a method a friend of a class
+\item
+  Make s class a friend of a class
+\end{itemize}
+
+Friend function
+
+You can include the prototype of a function inside the class declaration
+to make it a \textbf{friend. }
+
+The friend function will then have direct access to private members of
+the class. This is done usually for \textbf{efficiency}.
+
+You can put the friend function in the private or the public section --
+no difference.
+
+Consider the following example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C
+
+\{
+
+public:
+
+C(int x):
+
+x\_(x)
+
+\{\}
+
+\textbf{friend} void f(C c);
+
+private:
+
+int x\_;
+
+\};
+
+void f(C c)
+
+\{
+
+std::cout \textless\textless{} \textbf{c.x\_} \textless\textless{}
+'\textbackslash n';
+
+\}
+
+int main()
+
+\{
+
+C c(23);
+
+f(c);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Exercise. Look at your \emph{Date} class. Make
+\emph{operator\textless\textless(std::ostream \&, const Date \&)} a
+friend of \emph{Date} and rewrite it such that it accesses the private
+members of \emph{Date} directly.
+
+In general, friend functions break information hiding since the
+intention is for the friend function to directly access private member
+variables or directly call private member functions. Therefore you
+should limit the use of \emph{friend}.
+
+It's OK if the function is a function that is considered an integral
+part of the class you are writing. But you definitely do NOT want to
+make a function a friend if the function is not part of the class. For
+instance if one of your team mates (in a software project) says ``Hey,
+can you please make this function I'm writing a friend of your class?''
+you should probably say ``No!''
+
+Friend member function
+
+You can also make a member function of a different class, i.e., a method
+of a different class, a friend of the current class.
+
+For example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C
+
+\{
+
+public:
+
+...
+
+void f(C c);
+
+...
+
+\};
+
+class D
+
+\{
+
+public:
+
+...
+
+friend void C::f(C);
+
+...
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Friend classes
+
+You can make \textbf{all} the methods of a class friends to another
+class. The class with the methods is then called a friend class to the
+other class.
+
+Make one class a friend of another only when they create objects which
+are conceptually related.
+
+Example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class D
+
+\{
+
+public:
+
+D(int y)
+
+: y\_(y)
+
+\{\}
+
+\textbf{friend class C;}
+
+private:
+
+int y\_;
+
+\};
+
+class C
+
+\{
+
+public:
+
+\textbf{ }void f(D d)
+
+\{
+
+std::cout \textless\textless{} "f: " \textless\textless{} \textbf{d.y\_}
+\textless\textless{} '\textbackslash n';
+
+\}
+
+\textbf{ }void g(D d)
+
+\{
+
+std::cout \textless\textless{} "g: " \textless\textless{} \textbf{d.y\_}
+\textless\textless{} '\textbackslash n';
+
+\}
+
+\};
+
+int main()
+
+\{
+
+\textbf{ }D d(42);
+
+C c;
+
+\textbf{ }c.f(d);
+
+c.g(d);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You can also make classes \textbf{friends of each other}. If you want
+classes to be friends of each other, you need to declare the classes
+first, and \textbf{then} implement the classes.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class C;
+
+class D
+
+\{
+
+public:
+
+...
+
+void f(C);
+
+friend class C;
+
+...
+
+private:
+
+int x\_;
+
+\};
+
+class C
+
+\{
+
+public:
+
+...
+
+void f(D);
+
+friend class D;
+
+...
+
+private:
+
+int x\_;
+
+\};
+
+void D::f(C c)
+
+\{
+
+std::cout \textless\textless{} c.x\_ \textless\textless{}
+'\textbackslash n';
+
+\}
+
+void C::f(D d)
+
+\{
+
+std::cout \textless\textless{} d.x\_ \textless\textless{}
+'\textbackslash n';
+
+\}
+
+int main()
+
+\{
+
+\textbf{ }C c;
+
+D d;
+
+\textbf{ }c.f(d);
+
+d.f(c);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Beware of the following gotcha:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class C;
+
+class D
+
+\{
+
+public:
+
+...
+
+void f(C);
+
+friend class C;
+
+...
+
+private:
+
+int x\_;
+
+\};
+
+void D::f(C c)
+
+\{
+
+std::cout \textless\textless{} c.x \textless\textless{}
+'\textbackslash n';
+
+\}
+
+class C
+
+\{
+
+public:
+
+...
+
+void f(D);
+
+friend class D;
+
+...
+
+private:
+
+int x\_;
+
+\};
+
+void C::f(D d)
+
+\{
+
+std::cout \textless\textless{} d.x\_ \textless\textless{}
+'\textbackslash n';
+
+\}
+
+int main()
+
+\{
+
+\textbf{ }C c;
+
+D d;
+
+c.f(d);
+
+d.f(c);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The same advice goes for friend classes: Don't have too many friend
+classes. It's OK, you the two classes work hand in hand and are meant to
+be used together, and especially if you write both of the together.
+
+An example would be a matrix class and a vector class (for those of you
+who have heard of these terms before). Matrices and vectors for used in
+physics, engineering, computer graphics, \ldots, you name it. And they
+are always used together.
+
+A car class and a car engine class can probably be friends too.
+
+\end{document}

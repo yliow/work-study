@@ -1,0 +1,3852 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\author{}
+\date{}
+
+\begin{document}
+
+19. Functions
+
+Objectives
+
+\begin{itemize}
+\tightlist
+\item
+  Write functions with any number of parameters of basic type and either
+  with or without a return value of basic type
+\item
+  Understand pass-by-value
+\item
+  Understand function scope
+\item
+  Understand global scope
+\item
+  Understand the negative impact of global variables
+\item
+  Use global constants
+\item
+  Understand pass-by-reference
+\item
+  Use pass-by-function when appropriate
+\item
+  Understand function prototypes
+\item
+  Write function prototypes
+\end{itemize}
+
+Functions
+
+OK. Here's a program. Run it. Can you guess what's happening?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int square(int x)
+
+\{
+
+return x * x;
+
+\}
+
+int main()
+
+\{
+
+std::cout \textless\textless{} square(3) \textless\textless{} std::endl;
+
+int i = 5;
+
+std::cout \textless\textless{} square(i) \textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+First let me talk about the flow of execution of calling the function:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int square(int x)
+
+\{
+
+return x * x;
+
+\}
+
+int main()
+
+\{
+
+std::cout \textless\textless{} square(3) \textless\textless{} std::endl;
+
+int i = 5;
+
+std::cout \textless\textless{} square(i) \textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Now let's go over some terms and the syntax of a function.
+
+This is called a \textbf{function}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int square(int x)
+
+\{
+
+return x * x;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The \textbf{name} of the function is \emph{square()}.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int square(int x)
+
+\{
+
+return x * x;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int square(int x)
+
+\{
+
+return x * x;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+If you like you can think of the above function as a machine that takes
+a value, give the value to x, compute and return a value:
+
+Note that the body of the function is just like the code you write in
+\emph{main()}. (In fact \emph{main()} \emph{\textbf{is}} a function!)
+You can have as many statements as you like as long as they are valid
+statements.
+
+Let's get C++ to show us the flow of execution into and out of the
+function. Modify the previous program and run it:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int square(int x)
+
+\{
+
+std::cout \textless\textless{} "in square() ... "
+
+\textless\textless{} "x = " \textless\textless{} x \textless\textless{}
+std::endl;
+
+int y = x * x;
+
+std::cout \textless\textless{} "exiting square() ... "
+
+\textless\textless{} "returning " \textless\textless{} y
+\textless\textless{} std::endl;
+
+return y;
+
+\}
+
+int main()
+
+\{
+
+std::cout \textless\textless{} \textbf{"calling square() with 3 ...";}
+
+int a = square(3);
+
+std::cout \textless\textless{} \textbf{"... back from square() ... ";}
+
+\textless\textless{} \textbf{"received " \textless\textless{} }a
+\textless\textless{} std::endl;
+
+int i = 5;
+
+std::cout \textless\textless{} \textbf{"calling square() with 5 ...";}
+
+std::cout \textless\textless{} square(i) \textless\textless{} std::endl;
+
+a = square(i);
+
+std::cout \textless\textless{} \textbf{"... back from square() ... ";}
+
+\textless\textless{} \textbf{"received " \textless\textless{} }a
+\textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In our example, the function \emph{main()} calls the function
+\emph{square()}. We say that \emph{main()} is the \textbf{caller} and
+\emph{square()} is the \textbf{callee}.
+
+The following is the format for creating a function:
+
+\emph{{[}return type{]} {[}func name{]}}( \emph{{[}param type{]} {[}var
+name{]}} )
+
+\{
+
+\emph{{[}body of function{]}}
+
+\}
+
+\textbf{Exercise.} Using the above program, add a \emph{cube()} function
+that accepts an integer value and returns the cube of that value. In
+your \emph{main()}, write a \emph{for}-loop to print the cubes of 0, 1,
+2, ..., 10 using the \emph{cube()} function. (Use a \emph{for}-loop,
+correct?) Run your program and verify it works correctly.
+
+\textbf{Exercise.} Using the above program, add a \emph{reciprocal()}
+function that accepts a \emph{double} value and returns the reciprocal
+of that value. In your \emph{main()}, write a \emph{for}-loop to print
+\emph{reciprocal(1)}, \emph{reciprocal(2)}, ..., \emph{reciprocal(10)}.
+Note in this case that the parameter (variable that receives a value) is
+a \emph{double}. The return value is also a \emph{double}. Therefore
+your function should look like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+\textbf{double} reciprocal(\textbf{double} x)
+
+\{
+
+...
+
+\}
+
+int main()
+
+\{
+
+std::cout \textless\textless{} reciprocal(1) \textless\textless{}
+'\textbackslash n';
+
+std::cout \textless\textless{} reciprocal(2) \textless\textless{}
+'\textbackslash n';
+
+std::cout \textless\textless{} reciprocal(10) \textless\textless{}
+'\textbackslash n';
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Run your program and verify it works correctly.
+
+\textbf{Exercise.} Write a function \emph{sign()} that accepts a
+\emph{double} and returns 1 if the \emph{double }is \textgreater{} 0, 0
+if the \emph{double }is 0, or -1 if the \emph{double }is \textless{} 0.
+Note in this case that the return value is an \emph{int} (yes you can
+use a \emph{double }but that would be an overkill -- not to mention
+waste of memory since a \emph{double} takes up more space.) Here's
+skeleton for you:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\textbf{int} sign(\textbf{double} x)
+
+\{
+
+...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Of course you should always test your code.
+
+\textbf{Exercise. }Write a function \emph{sum()} that accepts an integer
+value and returns the sum of all integer values from 0 to the given
+integer value. For instance \emph{sum(0)} returns 0; \emph{sum(3)}
+returns 6 (since 0 + 1 + 2 + 3 gives 6). Here's something that might
+help:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int sum(int n)
+
+\{
+
+int s = 0;
+
+// write a for-loop so that s = 0 + 1 + ... + n
+
+return s;\\
+\}
+
+int main()
+
+\{
+
+for (int i = 0; 5; ++i)
+
+\{
+
+std::cout \textless\textless{} sum(i) \textless\textless{}
+'\textbackslash n';
+
+\}
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Write a function \emph{factorial()} that accepts an
+integer value and returns the factorial of that integer value. Make sure
+you test your function.
+
+Pass-by-Value
+
+It's extremely important to remember that \emph{main()} calls
+\emph{square()} by passing in a value. This is called
+\textbf{pass-by-value}. The parameter (i.e. \emph{x}) receives the
+value.
+
+Here's a \textbf{very common gotcha}: If \emph{main()} calls
+\emph{square()} with a variable say \emph{i}, and \emph{x} (in
+\emph{square()}) receives the \textbf{value} of \emph{i}, then modifying
+\emph{x} (in \emph{square()}) does NOT affect the value of \emph{i}.
+
+Here's an example where the value of \emph{i} is passed in to our
+\emph{square()} function with \emph{x} receiving the value. We change
+the value of \emph{x} and back in \emph{main()}, then value of \emph{i}
+is not affected.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int square(int x)
+
+\{
+
+int y = x * x;
+
+x = 0;
+
+return x * x;
+
+\}
+
+int main()
+
+\{
+
+int i = 5;
+
+std::cout \textless\textless{} square(i) \textless\textless{} std::endl;
+
+std::cout \textless\textless{} i \textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Many students think that somehow the \textbf{variable} \emph{i} (in
+\emph{main()}) is passed in and that \emph{x} (in \emph{square()}) is
+somehow tied to the i (in \emph{main()}).
+
+That's \textbf{NOT TRUE}. Only the value of \emph{i} (in \emph{main()})
+is passed onto the \emph{x} (in \emph{square()}). \textbf{The two
+variables have their own memory spaces. Changing one does not change the
+other.}
+
+It's also important to remember that the memory of \emph{square()} is
+created when you call it. When you return to \emph{main()} (i.e. when
+you exit the block for \emph{square()}), the memory for that particular
+call of \emph{square()} is destroyed.
+
+The following example shows you that when you call \emph{square()}, the
+memory created for that call is different from the memory of
+\emph{main()}. We'll create a variable \emph{i} in \emph{square()} and
+set it to zero. The \emph{i} (in \emph{main()}) is not changed.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int square(int x)
+
+\{
+
+int y = x * x;
+
+\textbf{int i = 0;}
+
+return x * x;
+
+\}
+
+int main()
+
+\{
+
+int i = 5;
+
+std::cout \textless\textless{} square(i) \textless\textless{} std::endl;
+
+std::cout \textless\textless{} i \textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+A mental computational model
+
+To explain the execution and return of a function call, here's a model
+of our ``computer''.
+
+We're adding a special container, called the \textbf{stack}, that will
+allow us to do three things:
+
+\begin{itemize}
+\tightlist
+\item
+  Remember the point of return
+\item
+  Put value(s) to pass to the function
+\item
+  Put value to pass back from the function
+\end{itemize}
+
+Remember that \textbf{this is only a model}.
+
+Here's the program we will execute on our model. (We won't talk about
+\#include. That will come soon.)
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int square(int x)
+
+\{
+
+return x * x;
+
+\}
+
+int main()
+
+\{
+
+int i = 5;
+
+int j = square(i + 1);
+
+std::cout \textless\textless{} j \textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+So here's your computer again:
+
+As before the speech bubble is the output. Everything printed appears in
+it.
+
+Now when you run the program, the computer loads the program:
+
+That's it!
+
+There are several important things to observe in this simulation:
+
+\begin{itemize}
+\tightlist
+\item
+  The memory for the call to \emph{square()} is different from the
+  memory of \emph{main()}
+\item
+  Values are passed between \emph{main()} and \emph{square()} and not
+  the variables.
+\end{itemize}
+
+By the way there's something special about the stack. A \textbf{stack}
+is a data structure (i.e. container of data with operations) that allows
+you to put things into it (this operation is called \textbf{push}) and
+also to get something out of it (the operation is called \textbf{pop}).
+You cannot choose what you want to get out of the stack: It will always
+be the last thing that you put into it. That's why the stack is also
+called a \textbf{last-in-first-out} \textbf{(LIFO)} data structure.
+
+A stack of plates at a buffet is (almost) a stack. The plate you take
+(if you only take from the top) is the last plate placed onto the stack.
+
+The above model illustrates many concepts in function calling. But it's
+only a model. For the real picture you have to take CISS360 (Assembly
+Language and Computer Systems) and to understand how Physics (or
+electronics) can be used to physically implement a computational device
+you have to take CISS430 (Computer Architecture).
+
+By the way, it's actually \textbf{OK not to use a return value}. For
+instance the following program is valid:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int square(int x)
+
+\{
+
+return x * x;\\
+\}
+
+int main()
+
+\{
+
+square(4);
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+As you can see in the above code the value 16 is neither being used in
+any computation or nor in a print statement. It's just thrown away.
+
+In fact something like this is also valid! (Although quite silly).
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int main()
+
+\{
+
+16;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Run it. Again the value 16 is not used in any way.
+
+Note again that when C++ returned from \emph{square()}, the memory used
+for \emph{square()}'s variables is destroyed. This is similar to exiting
+for instance a for-loop. So in this code segment that uses
+\emph{square()} twice:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+std::cout \textless\textless{} square(5) \textless\textless{} std::endl;
+
+...
+
+std::cout \textless\textless{} square(i) \textless\textless{}
+std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+the memory for \emph{square()} to hold data is created and destroyed
+twice.
+
+\textbf{Exercise.} Write a function \emph{isprime()} that accepts an
+integer value and returns \emph{true} if the integer value is a prime;
+otherwise \emph{false} is returned. (Refer to previous notes on checking
+for primeness.) Test your function thoroughly. Note that the value
+passed into the function is an \emph{int}. The value returned is a
+\emph{bool}. Therefore the function looks like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+bool isprime(int n)
+
+\{
+
+...\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In your main(), write a for-loop that prints all the primes up to
+1000000000 using the above function.
+
+\textbf{Exercise.} Using the above function, print all twin primes less
+than 1000000000, i.e. print p and p + 2 such that p and p+2 are primes
+and less than 100000000.
+
+Returning nothing
+
+You can write a function that does not return a value:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\textbf{void} printHelloWorld(int x)
+
+\{
+
+std::cout \textless\textless{} "Hello, World!" \textless\textless{}
+std::endl
+
+\textless\textless{} "Function received: "
+
+\textless\textless{} x
+
+\textless\textless{} std::endl;
+
+return;
+
+\}
+
+int main()
+
+\{
+
+printHelloWorld(3);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Question: What is the return type of a function that does not return a
+value? (Look at the code above.)
+
+\textbf{Exercise.} Write a function \emph{printYesNo()} that accepts a
+boolean value and prints yes if the value is \emph{true} and no
+otherwise. Test your code. {[}Hint: You can use the
+\emph{printHelloWorld()} function above. The parameter \emph{x} is an
+\emph{int}. You need to change it to a \emph{bool}.{]}
+
+\textbf{Exercise.} What's wrong here?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void f(int x)
+
+\{
+
+return x * x;
+
+\}
+
+int main()
+
+\{
+
+int y = f(5);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Exercise. What is the output (without running the program)?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void increment(int x)
+
+\{
+
+x++;
+
+std::cout \textless\textless{} x \textless\textless{} std:::endl;
+
+return;
+
+\}
+
+int main()
+
+\{
+
+int x = 1;
+
+increment(x);
+
+std::cout \textless\textless{} x \textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Now verify by running the program. Correct the program using this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\_\_\_\_\_\_\_\_\_\_\_\_ increment(int x)
+
+\{
+
+x++;
+
+return \_\_\_\_\_\_\_\_\_\_\_\_;
+
+\}
+
+int main()
+
+\{
+
+int x = 1;
+
+x = increment(x);
+
+std::cout \textless\textless{} x \textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Invent your own ASCII art problem (or take the code
+from earlier notes or assignments and write a function for it) and write
+a function for it. Here's one: Write the function \emph{drawSquare()}
+that accepts an int value and draw a box with height and width of the
+specified \emph{int} length. For instance calling \emph{drawSquare(3)}
+prints this to the console window:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+***
+
+* *
+
+***\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+and calling \emph{drawSquare(8)} prints this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+********
+
+* *
+
+* *
+
+* *
+
+* *
+
+* *
+
+* *
+
+********\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Passing in nothing
+
+You can also have a function that does not accept any value:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+void printHelloWorld()
+
+\{
+
+std::cout \textless\textless{} "hello, world!" \textless\textless{}
+std::endl;
+
+return;
+
+\}
+
+int main()
+
+\{
+
+printHelloWorld();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Of course you can have a function that accepts nothing but returns a
+value.
+
+\textbf{Exercise.} The function \emph{f()} accepts nothing and returns a
+\emph{char}. Write the function header of \emph{f()}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+
+\{
+
+...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} The function \emph{g()} accepts an \emph{int} and
+returns a \emph{double}. Write the function header of \emph{g()}. (You
+can choose any name for the \emph{int} parameter.)
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+
+\{
+
+...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} The function \emph{h()} accepts a \emph{double} but
+does not return any value. Write the function header of \emph{h()}. (You
+can choose any name for the \emph{int} parameter.)
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+
+\{
+
+...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Write a function called \emph{gimmeInt()} that does
+not have any parameter. Each time you call the function it returns the
+integer 42. Test your code with this
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+// put your function here
+
+int main()
+
+\{
+
+for (int i = 0; i \textless{} 10; ++i)
+
+\{
+
+std::cout \textless\textless{} gimmeInt() \textless\textless{}
+'\textbackslash n';\\
+\}
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Scope
+
+Functions are like variables: They have scopes too.
+
+\textbf{Exercise.} Does this work?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int main()
+
+\{
+
+printHamAndEggs();
+
+return 0;
+
+\}
+
+void printHamAndEggs()
+
+\{
+
+std::cout \textless\textless{} "ham and eggs!";
+
+return;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Although you can nest for-loops to get double for-loops, you can nest if
+statements, you can nest while loops, you \textbf{cannot nest functions
+in C++}. Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int main()
+
+\{
+
+void printHamAndEggs()
+
+\{
+
+std::cout \textless\textless{} "ham and eggs!";
+
+return;
+
+\}
+
+printHamAndEggs();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(Some programming languages do allow you to do this. But not C++).
+
+\textbf{Exercise.} Will this work? Why?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+void f()
+
+\{
+
+std::cout \textless\textless{} matrixReloadedRating \textless\textless{}
+"\textbackslash n";
+
+return;
+
+\}
+
+int main()
+
+\{
+
+int matrixReloadedRating = 1;
+
+f();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Verify with your compiler.
+
+Functions with two parameters
+
+I hope it's not too surprising that you can define a function with two
+parameters.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+double max(double x, double y)
+
+\{
+
+if (x \textless{} y)
+
+return y;
+
+else
+
+return x;
+
+\}
+
+int main()
+
+\{
+
+std::cout \textless\textless{} max(5, 3) \textless\textless{} std::endl;
+
+int x = 5, y = 3;
+
+std::cout \textless\textless{} max(x * x, y + x) \textless\textless{}
+std::endl;\\
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Here's a picture that might help:
+
+Note that in this case \emph{max()} is called with values 25 and 8. The
+\textbf{ordering} of 25 and 8 is \textbf{important}!!! The x of max()
+will receive the first argument (i.e. 25) and y of max() will receive
+the second argument (i.e. 8).
+
+You can think of a return statement as a point of exit from a function.
+Just like the for-loop and while-loop, you should NOT have too many
+points of exit because it makes you code much harder to trace and debug.
+For instance in the above \emph{max()} function you can rewrite it as:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double max(double x, double y)
+
+\{
+
+int m = x;
+
+if (m \textless{} y) m = y;
+
+return m;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Another thing to note is that you are calling \emph{max()} with two
+integers; \emph{max()} expects two \emph{double}s. That's the same as
+initializing the \emph{x} and the \emph{y} of \emph{max()} with two
+integers; the integer values 25 and 8 are just promoted to
+\emph{double}s 25.0 and 8.0. That's all there is to it. This is similar
+to declaring a \emph{double} and initializing it with an integer:
+
+\emph{double blah = 3;}
+
+It's clear that you can have a function of three parameters, four
+parameters, etc.\\
+
+Note only that, the parameters need not have the same types. Something
+like this is OK:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void f(int x, double y, bool z, char c)
+
+\{
+
+...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise. }Write a function \emph{min()} that accepts two
+doubles and returns the minimum of their values. (What should the return
+type be?) Test your function thoroughly.
+
+\textbf{Exercise.} Write a function \emph{avg()} that accepts two
+doubles and returns their average. (What's the reasonable return type?)
+Test your code.
+
+\textbf{Exercise.} Write a function \emph{clip()} such that
+\emph{clip(min, max, x)} (all values are doubles) will return x if min
+\textless= x and x \textless= max. Otherwise if x is greater than max,
+max is returned and if x is less than min, then min is returned. For
+instance \emph{clip(0.0, 0.25, 1.0)} will return \emph{0.25},
+\emph{clip(0.0, -1.2, 1.0)} will return \emph{0.0}, and \emph{clip(0.0,
+5.25, 1.0)} returns \emph{1.0}.
+
+\textbf{Exercise.} Write a function \emph{letterGrade()} that returns a
+letter grade given a student's percentage grade and the cutoff
+percentages for A, B, C, D. For instance this function call
+
+\emph{letterGrade(86.5, 90.5, 79.6, 70, 60.2)}
+
+requests for the letter grade for the percentage grade 86.5 where a
+percentage grade of 90.5 or above is an \emph{'A'}, 79.6 or above is a
+\emph{'B'}, 70 or above is a \emph{'C'}, 60.2 or above is a \emph{'D'},
+and in all other cases an \emph{'F'} is returned.
+
+Lots of exercises
+
+\textbf{Exercise.} Write a function \emph{printDollars()} that accepts
+an integer that represents the number of pennies and print the amount in
+dollars. For instance \emph{printDollar(123)} will print
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\$1.23\tabularnewline
+\bottomrule
+\end{longtable}
+
+What is the return type of this function?
+
+\textbf{Exercise.} Write a function \emph{randunit()} that returns a
+random double between 0.0 and 1.0. Verify your work.
+
+\textbf{Exercise.} Write a function \emph{randrange()} that accepts two
+integers a and b, and returns a random integer between a and b
+(inclusive). Verify your work.
+
+\textbf{Exercise.} Write a function \emph{apsum()} (sum of arithmetic
+progression) that accepts three doubles a, b, d and returns the sum of
+the terms a, a+d, a+2*d, ... which are at most b. (There are two cases:
+c is positive or c is negative.) Verify your work.
+
+\textbf{Exercise.} Write a function \emph{gpsum()} (sum of geometric
+progression) that accepts three \emph{double}s a, b, r and returns the
+sum of the terms a, a*r, a*r*r, ... which are at most b. Verify your
+work.
+
+\textbf{Exercise.} Write a function \emph{getYOrN()} that continually
+prints the following message:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\emph{Yes or no (y/n)?} \tabularnewline
+\bottomrule
+\end{longtable}
+
+prompts the user for a character until either y or n is entered. Once
+either y or n is entered, that character is returned. Test it with the
+following \emph{main()}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+// your function here
+
+int main()
+
+\{
+
+std::cout \textless\textless{} "do u need an extra
+head?\textbackslash n";
+
+char answer = getYorN();
+
+if (answer == 'y')
+
+\{
+
+std::cout \textless\textless{} "step right up ...\textbackslash n";\\
+\}
+
+else
+
+\{
+
+std::cout \textless\textless{} "next ...\textbackslash n";\\
+\}
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Write a function \emph{power()} so that
+\emph{power(a, b)} returns \emph{a} to the power of \emph{b} where
+\emph{a}, \emph{b} are integers and \emph{b \textgreater= 0}. (This is
+more or less a simplified \emph{pow()} function.)
+
+Functions calling functions
+
+You can also have any function (other than \emph{main()}) call another
+function:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+void f()
+
+\{
+
+std::cout \textless\textless{} "in f() ..." \textless\textless{}
+std::endl;
+
+return;
+
+\}
+
+void g()
+
+\{
+
+std::cout \textless\textless{} "in g() ..." \textless\textless{}
+std::endl;
+
+f();
+
+std::cout \textless\textless{} "in g() again ..." \textless\textless{}
+std::endl;
+
+return;
+
+\}
+
+int main()
+
+\{
+
+g();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Complete this code segment:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Returns the square of n
+
+int square(int n)
+
+\{
+
+...\\
+\}
+
+// Returns the sum of i*i for i = start, start+1,...,
+
+// end
+
+int sum\_squares(int start, int end)
+
+\{
+
+...\\
+\} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Write a \emph{main()} to test \emph{sum\_squares()}.
+
+\textbf{Exercise.} What is the output of this program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int g(double x, double y)
+
+\{
+
+return x + y;\\
+\}
+
+int f(int x, int y)
+
+\{
+
+return g(x, y) + x;\\
+\}
+
+int main()
+
+\{
+
+int x = 5;
+
+double z = 3.14;
+
+std::cout \textless\textless{} f(x, z) \textless\textless{} std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} What is the output of this program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int h(double x, int y)
+
+\{
+
+return x * y;\\
+\}
+
+int g(double x, double y)
+
+\{
+
+return x + y;\\
+\}
+
+int f(int x, int y)
+
+\{
+
+return g(x, y) + h(y, x);\\
+\}
+
+int main()
+
+\{
+
+int x = 5, y = 7;
+
+double z = 3.14;
+
+std::cout \textless\textless{} f(x, z) + g(y, x) \textless\textless{}
+std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Write a function \emph{isleapyear()} such that
+\emph{isleapyear(yyyy)} returns true exactly when the integer
+\emph{yyyy} is a leap year. Make sure you test your function.
+
+\textbf{Exercise. }Write a function \emph{days\_in\_month()} such that
+\emph{days\_in\_month(mm, yyyy)} returns the number of days for month
+\emph{mm} in year \emph{yyyy}. This function should use the
+\emph{isleapyear()} function.
+
+\textbf{Exercise.} Write a function \emph{seconds\_from\_midnight()}
+such that \emph{seconds\_from\_midnight(hhmmss)} returns the number of
+seconds since midnight for the integer 6-digit integer \emph{hhmmss}
+which represents time in the hh:mm:ss 24-hour format. For instance
+\emph{second\_from\_midnight(93045)} returns the number of seconds from
+midnight to 9:30:45.
+
+\textbf{Exercise.} Write a function \emph{hhmmss()} such that
+\emph{hhmmss(secs)} returns a 6-digit integer representing time in the
+hh:mm:ss 24-hour format where secs is the number of seconds since
+midnight.
+
+\textbf{Exercise.} Write a function \emph{printhhmmss()} such that
+\emph{printhhmmss(hhmmss)} prints \emph{hhmmss,} which represents time
+in the hh:mm:ss 24-hour format, with the hh, mm, ss separated by ':'.
+For instance \emph{printhhmmss(93045)} prints \emph{09:30:45.}
+
+\textbf{Exercise.} Write a program that accepts two times in the hhmmss
+24-hour format and display their difference in the hhmmss 24-hour
+format.
+
+Here's a test run:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+091410
+
+092500
+
+00:10:50\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Your program should use the previous functions
+\emph{seconds\_from\_midnight()}, \emph{hhmmss() }and
+\emph{printhhmmss()}.
+
+main()
+
+A C/C++ program can have many functions.
+
+In fact you have been using functions since day one: main() is a
+function too.
+
+main() is a very special function. When you run your program (in MS
+Studio .NET, you do that with Ctrl-F5), main() is the first function to
+execute. Therefore every C/C++ program must have a \emph{main()}
+function.
+
+Of course the curious thing is that \emph{main()} has a return value.
+Who (or what!!!) does \emph{main()} return the value to?
+
+Without going into details, not only can you get functions to call
+functions, in fact you can get programs to run programs. The return
+value of \emph{main()} is sent back to the program that runs it. In the
+context of a program X running another program Y, the return value
+reports an error code of the execution of program Y back to program X.
+The convention is the if program Y executed successfully, the error code
+returned to X is 0.
+
+Why functions?
+
+There are several reasons:
+
+\begin{itemize}
+\tightlist
+\item
+  Reduce code duplication by re-using code.
+\item
+  Improve program readability
+\item
+  Improves maintainability
+\end{itemize}
+
+The last two reasons are similar to the use of constants.
+
+This will be obvious with an example.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// this program helps the instructor tracks the
+
+// minimum and maximum number of eyes and heads per
+
+// student in a class of 3
+
+\#include \textless iostream\textgreater{}
+
+int main()
+
+\{
+
+int a, b, c, min, max;
+
+std::cout \textless\textless{} "no. of eyes for each students:";
+
+std::cin \textgreater\textgreater{} a \textgreater\textgreater{} b
+\textgreater\textgreater{} c;
+
+min = a;
+
+if (min \textgreater{} b) min = b;
+
+if (min \textgreater{} c) min = c;
+
+max = a;
+
+if (max \textless{} b) max = b;
+
+if (max \textless{} c) max = c;
+
+std::cout \textless\textless{} "min,max for eyes:"
+
+\textless\textless{} min \textless\textless{} ' ' \textless\textless{}
+max \textless\textless{} std::endl;
+
+std::cout \textless\textless{} "no. of heads for each students:";
+
+std::cin \textgreater\textgreater{} a \textgreater\textgreater{} b
+\textgreater\textgreater{} c;
+
+min = a;
+
+if (min \textgreater{} b) min = b;
+
+if (min \textgreater{} c) min = c;
+
+max = a;
+
+if (max \textless{} b) max = b;
+
+if (max \textless{} c) max = c;
+
+std::cout \textless\textless{} "min,max for heads:"
+
+\textless\textless{} min \textless\textless{} ' ' \textless\textless{}
+max \textless\textless{} std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You see the computation of \emph{min} twice so ...
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// this program helps the instructor track the
+
+// minimum and maximum number of eyes and heads per
+
+// student in a class of 3
+
+\#include \textless iostream\textgreater{}
+
+int min(int a, int b, int c)
+
+\{
+
+int m = a;
+
+if (m \textgreater{} b) m = b;
+
+if (m \textgreater{} c) m = c;
+
+return m;
+
+\}
+
+int main()
+
+\{
+
+int a, b, c, max;
+
+std::cout \textless\textless{} "no. of eyes for each students:";
+
+std::cin \textgreater\textgreater{} a \textgreater\textgreater{} b
+\textgreater\textgreater{} c;
+
+max = a;
+
+if (max \textless{} b) max = b;
+
+if (max \textless{} c) max = c;
+
+std::cout \textless\textless{} "min,max for eyes:"
+
+\textless\textless{} \textbf{min(a, b, c)} \textless\textless{} ' '
+
+\textless\textless{} max \textless\textless{} std::endl;
+
+std::cout \textless\textless{} "no. of heads for each students:";
+
+std::cin \textgreater\textgreater{} a \textgreater\textgreater{} b
+\textgreater\textgreater{} c;
+
+max = a;
+
+if (max \textless{} b) max = b;
+
+if (max \textless{} c) max = c;
+
+std::cout \textless\textless{} "min,max for heads:"
+
+\textless\textless{} \textbf{min(a, b, c)} \textless\textless{} ' '
+
+\textless\textless{} max \textless\textless{} std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Now's your turn. There's one obvious chunk of code
+that can be converted to a function. Do it. {[}Hint: Of course it's the
+code for the computation of max. Duh.{]}
+
+Here's a common gotcha :
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int min(int a, int b, int c)
+
+\{
+
+int m = a;
+
+if (m \textgreater{} b) m = b;
+
+if (m \textgreater{} c) m = c;
+
+return m;
+
+\}
+
+int main()
+
+\{
+
+int a, b, c, min, max;
+
+std::cout \textless\textless{} "no. of eyes for each students:";
+
+std::cin \textgreater\textgreater{} a \textgreater\textgreater{} b
+\textgreater\textgreater{} c;
+
+\textbf{min = min(a, b, c);}
+
+max = a;
+
+if (max \textless{} b) max = b;
+
+if (max \textless{} c) max = c;
+
+std::cout \textless\textless{} "min,max for eyes:"
+
+\textless\textless{} min \textless\textless{} ' '
+
+\textless\textless{} max \textless\textless{} std::endl;
+
+...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Do you see the problem? The problem is when you're inside \emph{main()},
+the \emph{min} is an \emph{int} variable. But you're trying to use
+\emph{min} as a function as well (see the \emph{min = min(a, b, c)}
+statement). C++ will be confused because in the scope, the closest
+\emph{min} is an \emph{int} variable and not a function.
+
+In fact some functions are so commonly used that they are already
+written for you. You only need to use them (you have to use \#include to
+make them available). You have already used \emph{pow()}, \emph{sqrt()},
+\emph{std::setprecision()}, etc. And if you wantt o develop games, then
+you use a game development library that contains functions to load
+images from files, blit the image onto a window, load a sound file, play
+the sound, paint texts, etc.
+
+Testing
+
+Not only is it easier to reuse your code when you broke up your program
+into re-usable functions, it also makes it easier for you to test your
+program by testing each separate function.
+
+For instance here's the function isprime from an earlier section:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+bool isprime(int n)
+
+\{
+
+if (n \textgreater{} 1)
+
+\{
+
+for (int d = 2; d \textless{} n; ++d)
+
+\{
+
+if (n \% d == 0)
+
+\{
+
+return false
+
+\}
+
+\}
+
+return true;
+
+\}
+
+else
+
+\{
+
+return false
+
+\}\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Primes are used a lot in cryptography and computer security. So perhaps
+this is part of a very large security system. When building a large
+system, it's so much easier if you can test the various parts of the
+system separately. For the case of the above isprime() function, you can
+write a function to test it:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+bool isprime(int n)
+
+\{
+
+...
+
+\}
+
+// Test isprime(int n) for n = 0, 1, 2, ..., 9.
+
+void test\_isprime()
+
+\{
+
+std::cout \textless\textless{} (!isprime(0) ? "pass\textbackslash n" :
+"FAIL\textbackslash n")
+
+\textless\textless{} (!isprime(1) ? "pass\textbackslash n" :
+"FAIL\textbackslash n")
+
+\textless\textless{} ( isprime(2) ? "pass\textbackslash n" :
+"FAIL\textbackslash n")
+
+\textless\textless{} ( isprime(3) ? "pass\textbackslash n" :
+"FAIL\textbackslash n")
+
+\textless\textless{} (!isprime(4) ? "pass\textbackslash n" :
+"FAIL\textbackslash n")
+
+\textless\textless{} ( isprime(5) ? "pass\textbackslash n" :
+"FAIL\textbackslash n")
+
+\textless\textless{} (!isprime(6) ? "pass\textbackslash n" :
+"FAIL\textbackslash n")
+
+\textless\textless{} ( isprime(7) ? "pass\textbackslash n" :
+"FAIL\textbackslash n")
+
+\textless\textless{} (!isprime(8) ? "pass\textbackslash n" :
+"FAIL\textbackslash n")
+
+\textless\textless{} (!isprime(9) ? "pass\textbackslash n" :
+"FAIL\textbackslash n")
+
+\textless\textless{} std::endl;
+
+return;
+
+\}
+
+int main()
+
+\{
+
+test\_isprime();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Refactoring
+
+\textbf{Exercise.} Analyze the following code:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int main()
+
+\{
+
+int a, b, c, d, e, f, g, h;
+
+std::cin \textgreater\textgreater{} a \textgreater\textgreater{} b
+\textgreater\textgreater{} c \textgreater\textgreater{} d;
+
+e = a + b + c * d;
+
+f = a * e + d -- b;
+
+g = e / 5 * f + a;
+
+h = a * (g -- f);
+
+std::cout \textless\textless{} h \textless\textless{} std::endl;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Note that the program prompts the user for 4 int values and displays an
+int value. Create a function \emph{func()} that reduces the complexity
+of \emph{main()} in the following way:
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{func()} has the smallest number of parameters to compute the
+  value to be displayed
+\item
+  The input of the values required to perform the computation in
+  \emph{func()} stays in \emph{main()} - in other words \emph{func()}'s
+  only purpose is to compute the value to display.
+\item
+  \emph{main()} has the least number of variables so that the program
+  has not changed.
+\end{itemize}
+
+Remember that the new program has only changed in terms of organization
+of code, but not in its function. Here's the code that actually performs
+computations:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+e = a + b + c * d;
+
+f = a * e + d -- b;
+
+g = e / 5 * f + a;
+
+h = a * (g -- f);
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Here's a skeleton for the new program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\_\_\_\_\_
+func(\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_)
+
+\{
+
+...
+
+\}
+
+int main()
+
+\{
+
+int
+\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_;
+
+std::cin \textgreater\textgreater{} a \textgreater\textgreater{} b
+\textgreater\textgreater{} c \textgreater\textgreater{} d;
+
+std::cout \textless\textless{}
+func(\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_)
+
+\textless\textless{} std::endl;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The above exercise where you modify the structure of a code without
+changing its functionality is frequently called ``\textbf{refactoring}
+the code''. This is frequently performed on large-scale software to
+improve the structure of the software. The goal is not to add more
+features -\/- it's to simplify the software. Refactoring software is
+part of software maintenance activity.
+
+In general software undergoes lots of changes in its lifecycle.
+Sometimes the changes are ad hoc. Without constant refactoring, software
+``decay'' sets in, making the software hard to read, debug, and
+maintain. In fact the cost of maintenance can be 60-100 times the cost
+of initial software development. Take CISS465 (Software Engineering) and
+CISS438 (Object-oriented analysis and design) for more information.
+
+\textbf{Exercise.} The following program
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int main()
+
+\{
+
+int n = 0;
+
+std::cin \textgreater\textgreater{} n;
+
+for (int i = n-1; i \textgreater= 0; i-\/-)\\
+\{
+
+// Print i spaces
+
+for (int j = 1; j \textless= i; j++)
+
+\{
+
+std::cout \textless\textless{} ' ';\\
+\}
+
+// Print n stars
+
+for (int j = 1; j \textless= n; j++)
+
+\{
+
+std::cout \textless\textless{} '*';\\
+\}
+
+std::cout \textless\textless{} std::endl;\\
+\}
+
+~\\
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Global scope
+
+Although the basic scope rules apply to functions (for instance you
+can't call a function before it's defined) there's still something
+different between a function name and a variable name.
+
+Up to this point variables are created \textbf{within} a function, i.e.
+variables live inside the memory of functions.
+
+But functions are not. Where does a function live?
+
+Here's a piece of code and a picture showing all the scopes (when they
+are active):
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int spam()
+
+\{
+
+int x = 42;
+
+if (...)
+
+\{
+
+...
+
+\}
+
+...
+
+\}
+
+int eggs(double y)
+
+\{
+
+for (...)
+
+...
+
+...
+
+\}
+
+int main()
+
+\{
+
+int x = 24;
+
+...
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Note in particular now I'm drawing a scope for the \textbf{whole source
+file}. This is \emph{\textbf{also}} a scope -- you can think of the
+whole file as a block if you like. It's called a \textbf{global scope}.
+You can also put names in global scopes. In particular in C/C++
+functions have global scopes.
+
+Global variables and global constants
+
+The previous section hints to you that you can of course declare
+variables in global scopes. Variables declared in the global scope are
+called \textbf{global variables}.
+
+Based on the way C++ search for a variable, can you figure out the
+output of this program (without running it?):
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int x = 42;
+
+void f()
+
+\{
+
+std::cout \textless\textless{} "in f() ..." \textless\textless{} x
+\textless\textless{} std::endl;
+
+++x;
+
+std::cout \textless\textless{} "in f() ..." \textless\textless{} x
+\textless\textless{} std::endl;
+
+int x = 9;
+
+std::cout \textless\textless{} "in f() ..." \textless\textless{} x
+\textless\textless{} std::endl;
+
+return;
+
+\}
+
+int main()
+
+\{
+
+std::cout \textless\textless{} "in main() ..." \textless\textless{} x
+\textless\textless{} std::endl;
+
+f();
+
+std::cout \textless\textless{} "in main() ..." \textless\textless{} x
+\textless\textless{} std::endl;
+
+int x = 0;
+
+std::cout \textless\textless{} "in main() ..." \textless\textless{} x
+\textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Verify yourself!
+
+Now you might then say: ``Hey! In that case I don't need to pass values
+into the function through parameters right? Like this ...''
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+double x = 0.0;
+
+void square()
+
+\{
+
+x = x * x;\\
+\}
+
+void cube()
+
+\{
+
+x = x * x * x;\\
+\}
+
+int main()
+
+\{
+
+double a = 0.0;
+
+std::cin \textless\textless{} a;
+
+x = a;
+
+square();
+
+std::cout \textless\textless{} x \textless\textless{} std::endl;
+
+x = a;
+
+cube();
+
+std::cout \textless\textless{} x \textless\textless{} std::endl;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+OK. This is a \textbf{really bad practice} because it violates the
+principle of minimal scope. You have now a \emph{double} variable that
+is used by everyone!!! (everyone = every function). Side effects will
+propagate like crazy and debugging an error will be a nightmare (unless
+if you're masochistic), because if the value of a global variable is
+corrupted or computed incorrectly and the variable is accessed by
+hundreds of functions, then you have a much harder problem of tracking
+down which function is the guilty one.
+
+Using only parameters and return values, you can tell which exactly what
+goes into the function and what comes out. So if a program has 5000
+variable names but a function has three parameters and one return value,
+you can limit your debugging of that function to four things (at least
+initially).
+
+So you should almost never use such global variables.
+
+One exception are constants. \textbf{Global constants are OK} since
+being constants they can't be changed anyway, especially \textbf{if they
+are used by many functions}. For instance a business application with
+the following constants is OK:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+const int COE\_EMPLOYEE\_CODE = 0;
+
+const int MANAGER\_EMPLOYEE\_CODE = 1;
+
+const int FULLTIME\_EMPLOYEE\_CODE = 2;
+
+const int PARTTIME\_EMPLOYEE\_CODE = 3;
+
+const int PARTTIME\_HOURLY\_RATE\_IN\_CENTS = 700;
+
+... code ...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Or for a game with a single window this is OK:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+const int W = 640; // width of game window
+
+const int H = 480; // height of game window
+
+... code ...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Exercise. Study the following program carefully. Rewrite the program so
+that global constants are used when appropriate.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+double area(double r)
+
+\{
+
+return 3.1416 * r * r;
+
+\}
+
+double circumference(double r)
+
+\{
+
+return 2 * 3.1416 * r;
+
+\}
+
+double get\_radius()
+
+\{
+
+double r = -1;
+
+while (r \textless{} 0)
+
+\{
+
+std::cout \textless\textless{} "enter radius (\textgreater0): ";
+
+std::cin \textgreater\textgreater{} r;
+
+\}
+
+return r;
+
+\}
+
+void area\_option()
+
+\{
+
+double r = get\_radius();
+
+std::cout \textless\textless{} "area: "
+
+\textless\textless{} area(r) \textless\textless{} std::endl;
+
+\}
+
+void circumference\_option()
+
+\{
+
+double r = get\_radius();
+
+std::cout \textless\textless{} "circumference: "
+
+\textless\textless{} circumference(r) \textless\textless{} std::endl;
+
+\}
+
+void print\_menu()
+
+\{
+
+std::cout \textless\textless{} "enter option:\textbackslash n"
+
+\textless\textless{} "{[}a{]} area\textbackslash n"
+
+\textless\textless{} "{[}c{]} circumference\textbackslash n"
+
+\textless\textless{} "{[}s{]} send donation\textbackslash n"
+
+\textless\textless{} "{[}q{]} quit\textbackslash n";
+
+\}
+
+char get\_option()
+
+\{
+
+char c = ' ';
+
+while (c != 'a' \&\& c != 'c'
+
+\&\& c != 's' \&\& c != 'q')
+
+\{
+
+std::cout \textless\textless{} "option (a, c, s, q): ";
+
+std::cin \textgreater\textgreater{} c;
+
+\}
+
+return c;
+
+\}
+
+int main()
+
+\{
+
+std::cout \textless\textless{} "circle calculator!!!\textbackslash n"
+
+\textless\textless{} "this is not freeware ...\textbackslash n"
+
+\textless\textless{} "please send your donations to:\textbackslash n"
+
+\textless\textless{} "yliow@ccis.edu\textbackslash n"
+
+\textless\textless{} "warning: pi is approximated with "
+
+\textless\textless{} 3.1416 \textless\textless{}
+"\textbackslash n\textbackslash n";
+
+while (1)
+
+\{
+
+print\_menu();
+
+char c = get\_option();
+
+if (c == 'q' \textbar\textbar{} c == 'Q') break;
+
+switch (c)
+
+\{
+
+case 'A':
+
+case 'a':
+
+area\_option();
+
+break;
+
+case 'C':
+
+case 'c':
+
+circumference\_option();
+
+break;
+
+case 's':
+
+case 'S':
+
+std::cout \textless\textless{} "\$1000 is charged to
+your\textbackslash n"
+
+\textless\textless{} "visa card toward\textbackslash n"
+
+\textless\textless{} "Dubious Software Co.\textbackslash n";
+
+break;
+
+\}
+
+std::cout \textless\textless{} std::endl;
+
+\}
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+``Why do I sometimes not see \emph{return} in a function?''
+
+If a function's return type is \emph{void} (i.e. no return value), then
+once the program has executed the last statement in the body of the
+function, an automatic return is execute. In other words
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void printOminousPreamble()
+
+\{
+
+std::cout \textless\textless{} "On a dark and stormy night ...";\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+is the same as
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void printOminousPreamble()
+
+\{
+
+std::cout \textless\textless{} "On a dark and stormy night ...";
+
+\textbf{return;}\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Pass-by-reference
+
+Recall that the parameter \emph{x} in function \emph{f()} is
+pass-by-value:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void f(int x) // x is a variable and has
+
+// it's own value. It cannot
+
+// change y in main().
+
+\{
+
+x = 42;
+
+\}
+
+int main()
+
+\{
+
+int y = -1;
+
+f(y); // value of y passed to x
+
+// y is not 42. y is still -1.
+
+std::cout \textless\textless{} y \textless\textless{} std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Note that the \emph{y} in \emph{main()} is \textbf{NOT} changed when you
+return back to \emph{main()}.
+
+Now try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void f(int \textbf{\&} x) // x is not a variable -\/- x
+
+// is a reference or a
+
+// reference variable. x
+
+// does not have a value --
+
+// x uses the value of y.
+
+// x can change the y in
+
+// main().
+
+\{
+
+x = 42;
+
+\}
+
+int main()
+
+\{
+
+int y = -1;
+
+f(y); // y is passed to x in f().
+
+// y is not -1. y is now 42.
+
+std::cout \textless\textless{} y \textless\textless{} std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In the above example, the variables \emph{x} in \emph{f()} is called a
+\textbf{reference variable}, in particular \emph{x} is an integer
+reference variable. \emph{x }is different from the regular plain-jane
+variables: \emph{x} \textbf{does not have its own memory for keeping a
+value}. Instead, \emph{x} \textbf{refers} to other variables. In the
+above example, \emph{x} refers to the value of \emph{y} in
+\emph{main().} A reference variable is an \textbf{alias} of another
+variable -- in the above example the \emph{x} in \emph{f()} is just
+another name for the \emph{y} in \emph{main()}.
+
+When \emph{main()} calls \emph{f()}, the integer reference variable
+\emph{x} in \emph{f()} will \textbf{refer} to the memory of \emph{y}; it
+\textbf{does not receive a value} from \emph{y}. As a matter of fact,
+referring to the diagram, you see that \emph{x} does not even have its
+own memory!
+
+We call this type of parameter passing \textbf{pass-by-reference}. We
+say that the \emph{x} in \emph{f()} is a pass-by-reference parameter.
+
+So
+
+\begin{itemize}
+\tightlist
+\item
+  If \emph{y} in \emph{main()} is pass to a variable \emph{x} of
+  \emph{f()}, changing \emph{x} in \emph{f()} does not change the
+  \emph{y} in \emph{main()}.
+\item
+  If \emph{y} in \emph{main()} is pass to a reference \emph{x} of
+  \emph{f()}, changing \emph{x} in \emph{f()} changes the \emph{y} in
+  \emph{main()}.
+\end{itemize}
+
+Also
+
+\begin{itemize}
+\tightlist
+\item
+  If you use an integer variable as a function parameter, the
+  communication into that function uses pass-by-value.
+\item
+  If you use a reference as a function parameter, the communication into
+  that function uses pass-by-reference.
+\end{itemize}
+
+Here's another example. First run this program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+void swap(int x, int y)
+
+\{
+
+int t = x;
+
+x = y;
+
+y =t;
+
+\}
+
+int main()
+
+\{
+
+int a = 0, b = 999;
+
+std::cout \textless\textless{} a \textless\textless{} ' '
+\textless\textless{} b \textless\textless{} '\textbackslash n';
+
+swap(a, b)
+
+std::cout \textless\textless{} a \textless\textless{} ' '
+\textless\textless{} b \textless\textless{} '\textbackslash n';
+
+int c = -1, d = 42;
+
+std::cout \textless\textless{} c \textless\textless{} ' '
+\textless\textless{} d \textless\textless{} '\textbackslash n';
+
+swap(c, d)
+
+std::cout \textless\textless{} c \textless\textless{} ' '
+\textless\textless{} d \textless\textless{} '\textbackslash n';
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Run it, stare at the output, and study the program. Both parameters
+\emph{x} and \emph{y} in \emph{swap()} uses pass-by-value.
+
+Now compare it with this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+void swap(int \textbf{\&} x, int \textbf{\&} y)
+
+\{
+
+int t = x;
+
+x = y;
+
+y =t;
+
+\}
+
+int main()
+
+\{
+
+int a = 0, b = 999;
+
+std::cout \textless\textless{} a \textless\textless{} ' '
+\textless\textless{} b \textless\textless{} '\textbackslash n';
+
+swap(a, b)
+
+std::cout \textless\textless{} a \textless\textless{} ' '
+\textless\textless{} b \textless\textless{} '\textbackslash n';
+
+int c = -1, d = 42;
+
+std::cout \textless\textless{} c \textless\textless{} ' '
+\textless\textless{} d \textless\textless{} '\textbackslash n';
+
+swap(c, d)
+
+std::cout \textless\textless{} c \textless\textless{} ' '
+\textless\textless{} d \textless\textless{} '\textbackslash n';
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Get it?
+
+\textbf{Exercise.} What is the output?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+void increment(int x)
+
+\{
+
+++x;
+
+\}
+
+int main()
+
+\{
+
+int x = 0;
+
+increment(x);
+
+std::cout \textless\textless{} x \textless\textless{}
+'\textbackslash n';
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Fix this program so that it works:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+void increment(int \& x)
+
+\{
+
+++x;
+
+\}
+
+int main()
+
+\{
+
+int a = 42;
+
+increment(a);
+
+std::cout \textless\textless{} a \textless\textless{}
+'\textbackslash n'; // should see 43
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(Of course this is just for demo. In a real world program, you should
+use ++ instead of writing a function for it!)
+
+\textbf{Exercise.} The following does not work -- see the comment below.
+Fix it.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+void clear(int x)
+
+\{
+
+x = 0;
+
+\}
+
+int main()
+
+\{
+
+int x = 42;
+
+clear(x);
+
+std::cout \textless\textless{} x \textless\textless{}
+'\textbackslash n'; // Should be 0.
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} The following does not work -- see the comment below.
+Fix it.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+void double\_it(double x)
+
+\{
+
+x *= 2;
+
+\}
+
+int main()
+
+\{
+
+double x = 1.1;
+
+double\_it(x);
+
+std::cout \textless\textless{} x \textless\textless{}
+'\textbackslash n'; // Should be 2.2.
+
+x = 5;
+
+double\_it(x);
+
+std::cout \textless\textless{} x \textless\textless{}
+'\textbackslash n'; // Should be 10.
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Complete this program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// sort x, y, z in ascending order using bubblesort
+
+void sort(int \& x, int \& y, int \& z)
+
+\{
+
+... CODE ...\\
+\}
+
+int main()
+
+\{
+
+int x = 3, y = 5, z = 2;
+
+sort(x, y, z);
+
+std::cout \textless\textless{} x \textless\textless{} ' '
+\textless\textless{} y \textless\textless{} z \textless\textless{} ' '
+
+\textless\textless{} std::endl; // should get: 2 3 5
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Important advice: }In general we use references only when a
+function is meant to change the value of a variable that is passed in.
+We do not want accidental changes in the function to propagate back to
+the caller. In other words, use references only when you need to.
+Therefore you should minimize the use of reference variables.
+
+Exercise. One of the parameters in \emph{f()} need not be a reference.
+Which one? You have 2 seconds.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int f(int \& a, double \& b)
+
+\{
+
+b += a;
+
+return a * b\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Exercise. Is the person who wrote this function a good programmer? Why?
+You have 2 seconds.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double average(int x, int y)
+
+\{
+
+return (x + y) / 2.0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Return value or pass-by-reference???
+
+Now we have a dilemma \ldots{}
+
+At this point, there are two ways of changing the value of a variable:
+The following is our simple \emph{square()} function:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+double square(double x)
+
+\{
+
+return x * x;
+
+\}
+
+int main()
+
+\{
+
+double the\_square;
+
+the\_square = square(3.14);
+
+std::cout \textless\textless{} the\_square \textless\textless{}
+std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Now, after studying references, you know that you can also do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void square(double \& the\_square, double x)
+
+\{
+
+the\_square = x * x;
+
+\}
+
+int main()
+
+\{
+
+double the\_square;
+
+square(the\_square, 3.14);
+
+std::cout \textless\textless{} the\_square \textless\textless{}
+std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Make sure you run it.
+
+Which should you use??? (Don't you hate making decisions ...)
+
+In general, if your function is like a mathematical function that
+computes a value, then you should use a return value. (Principle of
+least surprise.)
+
+For instance look at the above example. Notice how clumsy is the usage
+of the \emph{square()} function. For instance if you just want the value
+of the square of 3.14, you can do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+double square(double x)
+
+\{
+
+return x * x;
+
+\}
+
+int main()
+
+\{
+
+std::cout \textless\textless{} square(3,14) \textless\textless{}
+std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You don't have to declare a variable to store the square of 3.14. The
+method of references requires a variable -- you have no choice.
+
+If you have a function that computes two values, then you might want to
+have to have two pass-by-reference variables. Of course you can have two
+different functions. Here's an example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void min\_max(int x, int y, int \& min, int \& max)
+
+\{
+
+min = (x \textless= y ? x : y);
+
+max = (x \textgreater= y ? x : y);
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+This function computes the max and min of two inputs. Of course you
+\textbf{cannot} return two values in a function:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\textbf{int, int} min\_max(int x, int y)
+
+\{
+
+min = (x \textless= y ? x : y);
+
+max = (x \textgreater= y ? x : y);
+
+return \textbf{min, max};
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+So in this case you have to a function that returns two values in the
+sense of modifying two variables which are passed into the function by
+reference.\\
+
+However this means that one fine day, if you really need to compute only
+the minimum (and not maximum), you will run into some ugly coding. This
+is like going to a car dealer that insist that whenever you buy a car
+from them you must buy your car insurance policy through them as well.
+
+A basic principle of good software design is to design each function to
+perform one task and not two. There are however cases where the values
+computed cannot be viewed as separate entities -- they are viewed as a
+package of values that has to be used together at all times.
+
+Of course you can have two different functions:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int min(int x, int y)
+
+\{
+
+return (x \textless= y ? x : y);
+
+\}
+
+int max(int x, int y)
+
+\{
+
+return (x \textgreater= y ? x : y);
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+So if you have a function that computes and returns more than one value,
+you have \textbf{two choices}:
+
+\begin{itemize}
+\tightlist
+\item
+  ``Return'' the values through \textbf{multiple reference variables}
+\item
+  Redesign it into \textbf{multiple functions}, each computing and
+  returning one value
+\end{itemize}
+
+Now if you look at our \emph{swap()} function
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void swap(int \textbf{\&} a, int \textbf{\&} b)
+
+\{
+
+int t = a;
+
+a = b;
+
+b = t;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+It does not perform a numerical computation; there is really no return
+value. It performs a transformation on variables. Note that the values
+of both variables should be change. There's no reason to change one of
+the variables and not the other. So in this case, it makes sense to have
+one function and not two, even though technically two things happened.
+That's why the design of this function is reasonable.
+
+There are other uses of reference variables. We'll come back to this
+concept again later in a set of notes just on references.
+
+Style
+
+Instead of
+
+\emph{int \& x}
+
+another more common style is
+
+int \&x;
+
+Function prototype
+
+First, try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless stream\textgreater{}
+
+void mamamia()
+
+\{
+
+std::cout \textless\textless{} "ma ma mia\textbackslash n";\\
+\}
+
+int main()
+
+\{
+
+mamamia();
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Next, try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int main()
+
+\{
+
+mamamia();
+
+return 0;\\
+\}
+
+void mamamia()
+
+\{
+
+std::cout \textless\textless{} "ma ma mia\textbackslash n";\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Of course the program won't compile. The reason is because the function
+\emph{mamamia()} is defined after the function call of \emph{mamamia()}
+in \emph{main()}. This is not new. I have already talked about it.
+
+This means that we need to arrange our function code so that the
+definition of a function is before the function is called. There's a way
+around this issue ...
+
+Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+void mamamia();
+
+int main()
+
+\{
+
+mamamia();
+
+return 0;\\
+\}
+
+void mamamia()
+
+\{
+
+std::cout \textless\textless{} "ma ma mia\textbackslash n";\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Voila! It works.
+
+The statement in the above code:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+void mamamia();
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+is called a \textbf{function prototype}.
+
+A \textbf{function prototype} is just the header of a function (without
+the function body) which ends with a semicolon -- it's a complete
+statement. The function prototype announces the existence of a function
+somewhere in the code. That way, you can define the function anywhere in
+your source file. This will save you some time on re-organizing your
+code. That's it.
+
+Here's another example. This will not compile:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int main()
+
+\{
+
+int a = 0, b = 999;
+
+swap(a, b)
+
+std::cout \textless\textless{} a \textless\textless{} ' '
+\textless\textless{} b \textless\textless{} '\textbackslash n';
+
+return 0;
+
+\}
+
+void swap(int \& x, int \& y)
+
+\{
+
+int t = x;
+
+x = y;
+
+y =t;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+I can add a function prototype for the \emph{swap()} function:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+void swap(int \& x, int \& y);
+
+int main()
+
+\{
+
+int a = 0, b = 999;
+
+swap(a, b)
+
+std::cout \textless\textless{} a \textless\textless{} ' '
+\textless\textless{} b \textless\textless{} '\textbackslash n';
+
+return 0;
+
+\}
+
+void swap(int \& x, int \& y)
+
+\{
+
+int t = x;
+
+x = y;
+
+y =t;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Now it compiles.
+
+Another thing to note is that in function prototypes, \textbf{parameter
+names} are actually \textbf{optional}. Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+void swap(int \&, int \&);
+
+int main()
+
+\{
+
+int a = 0, b = 999;
+
+swap(a, b)
+
+std::cout \textless\textless{} a \textless\textless{} ' '
+\textless\textless{} b \textless\textless{} '\textbackslash n';
+
+return 0;
+
+\}
+
+void swap(int \& x, int \& y)
+
+\{
+
+int t = x;
+
+x = y;
+
+y =t;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Again it works.
+
+As I mentioned earlier, using function prototypes relieves you of the
+pain of having to spend time organizing your code so that functions
+definitions can be anywhere in your source file. There's actually more
+to it. There's a later set of notes on function prototype. But this is
+enough for now. We'll come back function prototypes again later.
+
+How do you write function prototypes for pass-by-reference parameters?
+Easy! It's the same as your other variables. For instance if you have
+this function:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void f(int a, double \& b, char \& c, const bool \& b)
+
+\{
+
+... code ...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The function prototype is just
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+void f(int, double \&, char \&, const bool \&);\tabularnewline
+\bottomrule
+\end{longtable}
+
+That's all there is to it. So there's nothing new here.
+
+\textbf{Exercise.} Given this code
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int f(int \& a, double \& b)
+
+\{
+
+a++;
+
+b += a;
+
+return a * b\\
+\}
+
+int main()
+
+\{
+
+int x = 42;
+
+double y = 1;
+
+int z = f(x, y);
+
+std::cout \textless\textless{} x \textless\textless{} ' '
+\textless\textless{} y \textless\textless{} ' ' \textless\textless{} z
+
+\textless\textless{} std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Rewrite it into this form:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+// prototype of f() here
+
+int main()
+
+\{
+
+int x = 42;
+
+double y = 1;
+
+int z = f(x, y);
+
+std::cout \textless\textless{} x \textless\textless{} ' '
+\textless\textless{} y \textless\textless{} ' ' \textless\textless{} z
+
+\textless\textless{} std::endl;
+
+return 0;\\
+\}
+
+int f(int \& a, double \& b)
+
+\{
+
+a++;
+
+b += a;
+
+return a * b\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Run your program to make sure that you did it correctly.
+
+\textbf{Exercise.} Complete the following
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// function prototype for rotate\_right
+
+int main()
+
+\{
+
+int x = 42;
+
+int y = 1;
+
+int z = -3;
+
+rotate\_right(x, y, z); // x,y,z becomes -3,42,1
+
+std::cout \textless\textless{} x \textless\textless{} ' '
+\textless\textless{} y \textless\textless{} \textless\textless{} ' '
+\textless\textless{} z
+
+\textless\textless{} std::endl;
+
+return 0;\\
+\}
+
+// function definition for rotate\_right\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Test your program.
+
+\textbf{Exercise.} Complete the following
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// function prototype for rotate\_left
+
+int main()
+
+\{
+
+int x = 42;
+
+int y = 1;
+
+int z = -3;
+
+rotate\_left(x, y, z); // x,y,z become 1,-3,42
+
+std::cout \textless\textless{} x \textless\textless{} ' '
+\textless\textless{} y \textless\textless{} ' ' \textless\textless{} z
+\textless\textless{} '\textbackslash n';
+
+return 0;\\
+\}
+
+// function definition for rotate\_right\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Test your program.
+
+\textbf{Exercise.} Complete the following
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// function prototype for digits
+
+int main()
+
+\{
+
+int x = 152;
+
+int digit2, digit1, digit0;
+
+digits(x, digit2, digit1, digit0);
+
+// digit2,digit1,digit0 become 1,5,2
+
+std::cout \textless\textless{} digit2 \textless\textless{} ' '
+\textless\textless{} digit1 \textless\textless{} ' '
+
+\textless\textless{} digit0 \textless\textless{} '\textbackslash n';
+
+return 0;\\
+\}
+
+// function definition for digits\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Test your program.
+
+Summary
+
+A function looks like this:
+
+\emph{{[}return type{]} {[}func name{]}}( \emph{{[}param type{]} {[}var
+name{]} })
+
+\{
+
+\emph{{[}body of function{]}}
+
+\}
+
+There can be more than one parameter type and name. A parameter is just
+a variable that receives a value passed into the function. The return
+type can be any valid type including \emph{void} if the function does
+not return a value.
+
+The function body can be any valid C++ statement. To return a value the
+function executes
+
+\emph{return {[}expression{]};}
+
+in its body. If the function does not return a value, executing
+
+\emph{return;}
+
+will return to the point of function call.
+
+If a function has return type void, return need not be present. In that
+case when the execution reached the end of the function block, a return
+is executed.
+
+Functions cannot be nested.
+
+The largest scope in a program file is the global scope. You can declare
+variables and constants in the global scope. These are called global
+variables and global constants respectively. However you should avoid
+(if possible) the declaration of global variables.
+
+On returning from a function, since the program leaves the scope of the
+function, all variables created within the function's scope are
+destroyed.
+
+A parameter is pass-by-value if the parameter has its own value. A
+parameter is pass-by-reference if the parameter does not have its own
+value but references the value of a variable that is passed to that
+parameter. Changing the value of the parameter that is pass-by-reference
+will change the value of the variable passed to the parameter. By
+default, parameters of basic types (int, double, char, bool) are
+pass-by-value. The following parameter \emph{x} is pass-by-value:
+
+void f(..., int x, ...) \{ ... \}
+
+while the following parameter \emph{y} is pass-by-reference:
+
+void g(..., int \& x, ...) \{ ... \}
+
+A function prototype is just the header of a function as a statement. A
+function prototype is usually placed near the top of source files in
+order to indicate to the compiler the existence that function. If a
+function prototype is seen by the compiler, then calling that function
+will be compiled correctly by the compiler even if the function
+definition is below the point where the function call is made.
+
+Exercise
+
+Q1. Write a function \emph{divides()} so that \emph{divides(d, n)}
+return \emph{true} exactly when \emph{d} divides \emph{n}. Test your
+code.
+
+Q2. Write a function \emph{average()} so that \emph{average(a, b, c)}
+returns the average of doubles \emph{a}, \emph{b}, and \emph{c}.
+
+Q3. Write a function \emph{num\_digits()} so that \emph{num\_digits(n)}
+returns the number of digits of \emph{n}.
+
+Q4. Write a function \emph{digit()} such that \emph{digit(n, i)} returns
+the \emph{i}-th digit of \emph{n}. For instance \emph{digit(834, 0)}
+return \emph{4}, \emph{digit(834, 1)} returns \emph{3}, \emph{digit(834,
+2)} returns \emph{8}, and \emph{digit(834, 3)} returns \emph{0}.
+
+Q5. Write a function \emph{prettyprintint()} such that
+\emph{prettyprintint(n)} prints \emph{n} with commas separating groups
+of 3 digits. For instance \emph{prettyprintint(12345678)} prints
+\emph{12,345,678} (note the commas).
+
+Q6. Write a function \emph{nextprime()} such \emph{nextprime(n)} returns
+the smallest prime which is at least \emph{n}. For instance
+\emph{nextprime(6)} return \emph{7 }and \emph{nextprime(11)} returns
+\emph{11.}
+
+Q7. Write a function \emph{randunit()} such that \emph{randunit()}
+returns a random double d in the interval {[}0.0, 1.0{]}.
+
+Q8. Write a function \emph{randrange()} such that \emph{randrange(a, b)}
+returns a random int in the interval {[}a, b -- 1{]} where a and b are
+integers.
+
+Q9 Write a function randdouble() such that randdouble(a, b) where a and
+b are doubles returns a random double d such that a \textless= d and d
+\textless= b.
+
+\end{document}

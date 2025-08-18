@@ -1,0 +1,2657 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\author{}
+\date{}
+
+\begin{document}
+
+10. for Loops: Part 1
+
+Objectives
+
+\begin{itemize}
+\tightlist
+\item
+  Use increment, decrement, and augmented assignment operators
+\item
+  Write for-loops
+\item
+  Write block of statements for the body of for loops
+\end{itemize}
+
+We'll now begin our study of loops. I've already mentioned many times
+that a loop allows you to repeat the execution of a chunk of code.
+
+I'll also talk a little more about the important concept of scopes.
+
+Why loops?
+
+What are loops? Well, a loop is just something that will \textbf{repeat}
+a statement or a bunch of statements (i.e., a block).
+
+Why do we need loops? Because we are too lazy and \textbf{way too smart}
+to do redundant work.
+
+For instance, look at the following multiplication game. Instead of
+asking a single multiplication question (I'm using 2 spaces for
+indentation for the notes but in your work you should still use 4
+spaces):
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless ctime\textgreater{}
+
+int main()
+
+\{
+
+srand((unsigned int) time(0));
+
+int x = rand() \% 10 + 90;
+
+int y = rand() \% 10 + 90;
+
+int guess = 0;
+
+std::cout \textless\textless{} "What is " \textless\textless{} x
+\textless\textless{} " * " \textless\textless{} y \textless\textless{}
+"?";
+
+std::cin \textgreater\textgreater{} guess;
+
+int product = x * y;
+
+if (guess \textless{} product)
+
+\{
+
+std::cout \textless\textless{} "Incorrect! Too low!"
+
+\textless\textless{} "The answer is " \textless\textless{} product
+
+\textless\textless{} std::endl;
+
+\}
+
+else if (guess == product)
+
+\{
+
+std::cout \textless\textless{} "Correct!" \textless\textless{}
+std::endl;
+
+\}
+
+else
+
+\{
+
+std::cout \textless\textless{} "Incorrect! Too high!"
+
+\textless\textless{} "The answer is" \textless\textless{} product
+
+\textless\textless{} std::endl;\\
+\}
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+what if you want to ask two questions? You can copy and paste your code:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless ctime\textgreater{}
+
+int main()
+
+\{
+
+srand((unsigned int) time(0));
+
+int x = rand() \% 10 + 90;
+
+int y = rand() \% 10 + 90;
+
+int guess = 0;
+
+std::cout \textless\textless{} "What is " \textless\textless{} x
+\textless\textless{} " * " \textless\textless{} y \textless\textless{}
+"?";
+
+std::cin \textgreater\textgreater{} guess;
+
+int product = x * y;
+
+if (guess \textless{} product)
+
+\{
+
+std::cout \textless\textless{} "Incorrect! Too low!"
+
+\textless\textless{} "The answer is " \textless\textless{} product
+
+\textless\textless{} std::endl;
+
+\}
+
+else if (guess == product)
+
+\{
+
+std::cout \textless\textless{} "Correct!" \textless\textless{}
+std::endl;
+
+\}
+
+else
+
+\{
+
+std::cout \textless\textless{} "Incorrect! Too high!"
+
+\textless\textless{} "The answer is" \textless\textless{} product
+
+\textless\textless{} std::endl;\\
+\}
+
+\textbf{x = rand() \% 10 + 90;}
+
+y = rand() \% 10 + 90;
+
+std::cout \textless\textless{} "What is " \textless\textless{} x
+\textless\textless{} " * " \textless\textless{} y \textless\textless{}
+"?";
+
+std::cin \textgreater\textgreater{} guess;
+
+product = x * y;
+
+if (guess \textless{} product)
+
+\{
+
+std::cout \textless\textless{} "Incorrect! Too low!"
+
+\textless\textless{} "The answer is " \textless\textless{} product
+
+\textless\textless{} std::endl;
+
+\}
+
+else if (guess == product)
+
+\{
+
+std::cout \textless\textless{} "Correct!" \textless\textless{}
+std::endl;
+
+\}
+
+else
+
+\{
+
+std::cout \textless\textless{} "Incorrect! Too high!"
+
+\textless\textless{} "The answer is" \textless\textless{} product
+
+\textless\textless{} std::endl;\\
+\}
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(Of course variables \emph{x}, \emph{y}, \emph{guess}, and
+\emph{product} are already declared, so you don't declare them again!)
+
+Great ...
+
+\emph{\textbf{But}} ... what if you want to ask \emph{\textbf{10}}
+questions instead? Or worse ...what if you allow the user to specify the
+number of questions he/she wants to answer?
+
+And ... what if you want to modify the program? Each time you modify one
+part of the program you have to modify all the other copies!!! That's
+not smart!!!
+
+That's when you need to know how to write loops.
+
+Or, take for instance, a computer game. Most games with graphics involve
+continually moving an image by a small amount to simulate smooth motion.
+In this case you want to repeat each small change until the user stops
+the game or when the game ends.
+
+Similarly, in business applications, for instance in a payroll program,
+the program will process the pay for each employee kept in a file until
+all records are read. (Never mind if you don't understand what a file
+is. The point is that you need repetitions.)
+
+Anyway, you will need a way to tell C++ to continually execute a
+statement or a block of statements until a condition is reached.
+
+C++ understands three different types of loops: the
+\emph{\textbf{for}}\textbf{-loop}, the
+\emph{\textbf{while}}\textbf{-loop} and the
+\emph{\textbf{do-while}}\textbf{ loop}. We'll talk about the
+\emph{for}-loop first. But before we talk about the \emph{for}-loop, we
+will need to talk about some operators which are frequently used with
+the \emph{for}-loop.
+
+In this set of notes, because of the way C++ (and Java) programmers
+write their loops, I also want to talk about ``scope''.
+
+Increment and decrement operators
+
+You have already seen the +, -, *, /, \% operators for numeric values.
+Now for a few more.
+
+Exercise. Run this:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Change the initial value of \emph{i} to any other number and run the
+program again.
+
+The ++ and \emph{-\/-} are the increment and decrement operators
+respectively. When you apply ++ \textbf{in front} of the variable, you
+are using the \textbf{pre-increment} operator:
+
+\emph{++i;}
+
+And when you use ++ \textbf{after} the variable, you're using the
+\textbf{post-increment} operator.
+
+\emph{i++;}
+
+Although they both add 1 to \emph{i}, there is a difference. First of
+all, when you apply ++ to a variable, not only is the value of the
+variable changed, a copy of the value is returned. The next two
+exercises will make everything clear.
+
+Exercise. Run this.
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Exercise. Now run this:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Make sure to compare the above two programs!!!
+
+In other words, the difference is in the \textbf{order} of incrementing
+and giving the value of the variable.
+
+The same applies to the pre- and the post-decrement operators.
+
+Exercise. Run this.
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Exercise. And this:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+So now you know three different ways to add 1 to variable i:
+
+i = i + 1;i++;++i;
+
+Choices are nice, right? Well, except for people who can't make up their
+minds. Here's a hint: the increment operators are faster.
+
+Another thing. Do not try to confuse yourself (or others) by using the
+increment and decrement operators in an expression. For instance the
+following is \textbf{BADDDDDDD} although it does run:
+
+a = (++i) + (k-\/-) * (++j);
+
+This is the same as:
+
+++i;
+
+++j;
+
+a = i + k * j;
+
+-\/-k;
+
+which is much easier to read.
+
+\textbf{Exercise. }First try to figure out the output without your C++
+compiler:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int i = 0;
+
+int j = (++i) + (++i);
+
+std::cout \textless\textless{} i \textless\textless{} ' '
+\textless\textless{} j \textless\textless{} '\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Now verify with your C++ compiler. Explain to yourself what happens when
+the pre-increment operator is applied multiple times to the same
+variable in an expression. Now do the same with this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int i = 0;
+
+int j = (i++) + (i++);
+
+std::cout \textless\textless{} i \textless\textless{} ' '
+\textless\textless{} j \textless\textless{} '\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} We have been using the pre-++ and post-++ on
+\emph{int} variables. Can you do that to \emph{double} variables?
+
+Let me summarize what we now know about the pre- and post-increment
+operators:
+
+\emph{++i}increments the value of \emph{i}
+
+\emph{i++}increments the value of \emph{i}
+
+\emph{j = (++i)}increments the value of \emph{i} and then assign new
+value of \emph{i} to \emph{j}
+
+\emph{j = (i++)}give the value of \emph{i} to \emph{j} and then
+increments the value of \emph{i}
+
+and here's the summary for pre- and post-decrement operators:
+
+\emph{-\/-i}decrements the value of \emph{i}
+
+\emph{i-\/-}decrements the value of \emph{i}
+
+\emph{j = (-\/-i)}decrements the value of \emph{i} and then assign new
+value of \emph{i} to \emph{j}
+
+\emph{j = (i-\/-)}give the value of \emph{i} to \emph{j} and then
+decrements the value of \emph{i}
+
+Gotchas
+
+Try all these gotchas and remember them.
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Augmented assignment operators
+
+Exercise. Run this
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Change the initial values of \emph{i }and\emph{ j} and run the program
+again.
+
+Exercise. Run this
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Run the program again with different initial values for \emph{i} and
+\emph{j}.
+
+Exercise. Run this
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+In general, suppose \emph{{[}op{]}} is an operator such as +, --, *, /,
+\%, then
+
+\emph{x {[}op{]}= y}
+
+is the same as
+
+\emph{x = x {[}op{]} y}
+
+For instance,
+
+\emph{x \%= y + 5}is the same as\emph{x = x \% (y + 5)}
+
+\emph{y /= c}is the same as\emph{y = y / c}
+
+etc. Note that the left hand version (using the augmented assignment
+operators) is faster than using an operator and then assignment.
+
+Exercise. First figure out the output on your own:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Now verify with your C++ compiler.
+
+Exercise. Figure out the output without your compiler:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Verify with your compiler.
+
+Exercise. Figure out the output without your compiler:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Verify with your compiler.
+
+Exercise. One more exercise ...
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+By the way, you now have \emph{\textbf{four}} different ways to add one
+to variable \emph{i}:
+
+++i;i++;i += 1;i = i + 1;
+
+(C++ programming is terrible for people who can't decide. Right?) In
+general, the operators on the left are faster than the ones to their
+right.
+
+\textbf{Exercise}. Rewrite the following using an augmented assignment
+operator.
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise}. Rewrite the following using an augmented assignment
+operator.
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} In fact, the augmented operators actually return a
+value, i.e., besides modifying the value of a variable, they evaluate to
+a value. Try this experiment:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int i = 0;
+
+int j = (i += 1); // i is incremented *AND* (i += 1)
+
+// gives the new value of i
+
+std::cout \textless\textless{} i \textless\textless{} ' '
+\textless\textless{} j \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise. }What is the output (without using your compiler of
+course)?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int i = 5;
+
+int j = (i += 5);
+
+int k = (j += i);
+
+i = (k -= j + 1);
+
+std::cout \textless\textless{} i \textless\textless{} ' '
+\textless\textless{} j \textless\textless{} ' ' \textless\textless{} k
+\textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Here's a horrifying program. First try to figure out
+the output on your own.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int i = 0, j = 1;
+
+int k = (++i) * (i += 1) + (j *= i) * (i-\/-);
+
+std::cout \textless\textless{} i \textless\textless{} ' '
+\textless\textless{} j \textless\textless{} ' ' \textless\textless{} k
+\textless\textless{} '\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Now verify with your C++ compiler. You should \emph{\textbf{never}}
+write such an expression in actual programs. And if you join a company
+where programmers write such code ... well ... good luck to you!!!
+
+\textbf{Exercise.} Can we increment an \emph{int} by a \emph{double}?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int i = 5;
+
+double j = 1.5;
+
+i += j;
+
+std::cout \textless\textless{} i \textless\textless{} ' '
+\textless\textless{} j \textless\textless{} std::endl;
+
+std::cout \textless\textless{} (i += j) \textless\textless{} ' '
+\textless\textless{} j \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Can we increment a \emph{double} by a \emph{double}?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double i = 5.5;
+
+int j = 1;
+
+i += j;
+
+std::cout \textless\textless{} i \textless\textless{} ' '
+\textless\textless{} j \textless\textless{} std::endl;
+
+std::cout \textless\textless{} (i += j) \textless\textless{} ' '
+\textless\textless{} j \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} How about incrementing a \emph{double} by an
+\emph{int}?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double i = 5.5;
+
+int j = 1;
+
+i += j;
+
+std::cout \textless\textless{} i \textless\textless{} ' '
+\textless\textless{} j \textless\textless{} std::endl;
+
+std::cout \textless\textless{} (i += j) \textless\textless{} ' '
+\textless\textless{} j \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Test if \emph{-=}, \emph{*=}, \emph{/=} work with
+\emph{double}s. What about \emph{\%=}?
+
+\emph{for-}loop
+
+Exercise. Run this
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Note that the statement in bold, the \emph{for}-loop, is a single
+statement.
+
+Here's how the for-loop controls the execution:
+
+std::cout \textless\textless{} "before" \textless\textless{} std::endl;
+
+for (int i = 0; i \textless{} 10; i = i + 1)
+
+true
+
+std::cout \textless\textless{} i \textless\textless{} std::endl;
+
+false
+
+std::cout \textless\textless{} "after" \textless\textless{} std::endl;
+
+\textbf{Exercise.} Rewrite the for-loop using the ++ operator (either
+pre-increment or post-increment).
+
+More examples
+
+The for-loop is a brand new concept. So let's do more drills before your
+first warm-up.
+
+Try this:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Try this:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Try this:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Try this:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Exercise. Warm-up time!!! Modify the previous program so that the output
+is
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Write a program that prints 1000 \emph{"hello
+world!"}s ... oh ... and you have to do it in 1 minute. So either you
+are a killer typist or you have to use the \emph{for}-loop.
+
+Blocks
+
+Of course it's not too surprising that you can have \textbf{blocks} with
+the \emph{for}-loop:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+It shouldn't be surprising that you can do this:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+By the way, just like in the case of if- and if-else statements, C/C++
+programming tend to use blocks for the for-loop even when the body of
+the for-loop has only one statement:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Exercise. Remember our program that prints a table of squares?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+n n\^{}2
+
+-\/-\/- -\/-\/-
+
+0 0
+
+1 1
+
+2 4\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Write a program that prints the squares of all positive integers from 0
+to 100. Your program must be less than 10 lines long and you have 3
+minutes to do that -- so I don't mean you have a very long
+\emph{std::cout}!!! Here's some pseudocode that might help:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+Print "n n\^{}2\textbackslash n"
+
+Print "-\/-\/- -\/-\/-\textbackslash n"
+
+For n running from 0 to 100 (inclusive):
+
+print n, spaces, square of n, and newline\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Exercise. Modify your program so that it prompts the user for integers
+and assign them to integer variables \emph{start} and \emph{end}. Print
+a table of squares from \emph{start} to \emph{end}.
+
+\textbf{Exercise.} Can you use a \emph{double} variable to control the
+for-loop? Try this
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+std::cout \textless\textless{} "before" \textless\textless{} std::endl;
+
+for (double x = 3.1; x \textless{} 7.2; x += 0.1)
+
+\{
+
+std::cout \textless\textless{} x \textless\textless{} std::endl;
+
+\}
+
+std::cout \textless\textless{} "after" \textless\textless{}
+std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Write a program that prints a table of cubes (like
+the program on squares above).
+
+Scope
+
+The scope of a variable refers to where you can reference the variable.
+In the following program:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+The variable \emph{i} is created in the \emph{for}-loop. Once you step
+out of the \emph{for}-loop, the variable \emph{i} goes out of scope and
+is \textbf{destroyed}.
+
+THIS IS VERY IMPORTANT!!!
+
+Try this:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+(WARNING: If you're using Microsoft Visual Studio, you MUST Disable
+Language Extensions. Some versions of MSVS do NOT destroy variables
+created inside a \emph{for}-loop.)
+
+Now try this:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+There are other scenarios and other scope rules but this is enough for
+the time being.
+
+It's really important to understand the scope of a for-loop. The
+presence of a block (and not just a statement) that is controlled by the
+for-loop visually makes things slightly more complicated. So let's look
+at the basic for-loop again. Here's a simple for-loop:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+for (int i = 0; i \textless{} 10; i++)
+
+std::cout \textless\textless{} i \textless\textless{} std::endl;
+
+std::cout \textless\textless{} i \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Again you see that the \emph{i} lives inside the \emph{for}-loop and
+dies and once the \emph{for}-loop is finished, the \emph{i} is
+destroyed.
+
+There are other scope rules but this is enough for the time being.
+
+Mental picture of flow of execution
+
+Recall that the flow of execution for the for-loop looks like this:
+
+for ( ; ; )
+
+true
+
+false
+
+For you to be a competent programmer, it's extremely important to
+``visualize'' the flow of execution and roughly how the computer thinks.
+So I'm going to simulate the execution of a simple for-loop.
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+CPU main
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+CPU main
+
+sum 0
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+CPU main
+
+sum 0
+
+i 3
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+CPU main
+
+sum 0
+
+i \textless{} 5
+
+i 3
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+CPU main
+
+sum 0
+
+3 \textless{} 5
+
+i 3
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+CPU main
+
+sum 0
+
+true
+
+i 3
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+CPU main
+
+sum 0
+
+sum = sum + i
+
+i 3
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+CPU main
+
+sum 0
+
+sum = 0 + i
+
+i 3
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+CPU main
+
+sum 0
+
+sum = 0 + 3
+
+i 3
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+CPU main
+
+sum 0
+
+sum = 3
+
+i 3
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+CPU main
+
+sum 3
+
+i 3
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+CPU main
+
+sum 3
+
+i = i + 1
+
+i 3
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+CPU main
+
+sum 3
+
+i = 3 + 1
+
+i 3
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+CPU main
+
+sum 3
+
+i = 4
+
+i 3
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+CPU main
+
+sum 3
+
+i 4
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+CPU main
+
+sum 3
+
+i \textless{} 5
+
+i 4
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+CPU main
+
+sum 3
+
+4 \textless{} 5
+
+i 4
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+CPU main
+
+sum 3
+
+true
+
+i 4
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+CPU main
+
+sum 3
+
+sum = sum + i
+
+i 4
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+CPU main
+
+sum 3
+
+sum = 3 + i
+
+i 4
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+CPU main
+
+sum 3
+
+sum = 3 + 4
+
+i 4
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+CPU main
+
+sum 3
+
+sum = 7
+
+i 4
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+CPU main
+
+sum 7
+
+i 4
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+CPU main
+
+sum 7
+
+i = i + 1
+
+i 4
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+CPU main
+
+sum 7
+
+i = 4 + 1
+
+i 4
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+CPU main
+
+sum 7
+
+i = 5
+
+i 4
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+CPU main
+
+sum 7
+
+i 5
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+CPU main
+
+sum 7
+
+i \textless{} 5
+
+i 5
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+CPU main
+
+sum 7
+
+5 \textless{} 5
+
+i 5
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+CPU main
+
+sum 7
+
+false
+
+i 5
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+CPU main
+
+sum 7
+
+Note that the above simulation is only a \emph{\textbf{model}}.
+Furthermore, it does not explain how the computer knew that 4
+\textless{} 5 was true. And what does ``true'' really mean to a computer
+anyway? In fact, does a computer ``know'' what's a ``4'' (as in four)???
+For details like these you will have to take Assembly Language (CISS360)
+and Computer Architecture (CISS420).
+
+\textbf{Exercise. }There's one place where you can use the pre-increment
+operator and another where you can use +=. Modify the above code.
+
+\textbf{Exercise.} Do the same trace with this program:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+What is the output? Now run the program with your C++ compiler and
+verify.
+
+\textbf{Exercise.} Do the same trace with this program:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+What is the output? Now run the program with your C++ compiler and
+verify.
+
+\textbf{Exercise.} Do the same trace with this program:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+What is the output (or is there an error)? Now run the program with your
+C++ compiler and verify.
+
+Using \emph{for}-loop to compute sums
+
+Look at the following program:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+OK. \ldots{} looks like a long program \ldots{} but most of it repeats.
+
+Now look at this one:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Do you see that they do the same thing? Make sure you trace both
+programs by hand and see that the actual computations are the same.
+
+\textbf{Exercise.} Modify the \emph{i = i + 1} so that the plus
+augmented operator is used. (Don't peek ahead!)
+
+\textbf{Exercise.} You can get C++ to tell us what's happening in the
+for-loop by pausing the loop like this:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Make sure you try this. This is a \textbf{very basic technique} for
+slowing down a loop so that you can follow what's happening and do
+\textbf{debugging}.
+
+\textbf{Exercise.} Rewrite the program to use an augmented operator.
+(Yes, there's one other place where you can use an augmented operator.)
+
+\textbf{Exercise.} Modify the above program to compute the sum of all
+integers from 1 to 100. You want to remove the pause in the middle of
+the program:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Modify the above program to compute the sum of
+squares from 1\textsuperscript{2} to 5\textsuperscript{2 }. Verify your
+program by calculating this sum with a calculator. Modify your program
+to compute the sum of squares from 1\textsuperscript{2} to
+100\textsuperscript{2}. Of course the number is going to be really huge
+\ldots{} you do not want to check this one with your calculator!
+
+\textbf{Exercise.} Modify the above program to compute the sum of
+reciprocals of squares from 1/1\textsuperscript{2} to
+1/5\textsuperscript{2 }. (What type of values are you adding to
+\emph{sum}? What should the type of \emph{sum} be?) Verify your program
+by calculating this \emph{sum} with a calculator. Modify your program to
+compute the sum of reciprocals of squares from 1/1\textsuperscript{2} to
+1/100\textsuperscript{2}. Compare to the previous exercise and note that
+the sum stabilizes quickly since the terms you're adding to the sum
+shrink very quickly. In this case we say that the sum
+\textbf{converges}. You can try to modify your program to add up to
+1/1000000\textsuperscript{2}. You'll find that it won't change the sum
+much.
+
+\textbf{Exercise.} Modify the above program to compute
+
+1/1 + 1/2 + 1/3 + \ldots{} + 1/100
+
+In this case, the sum seems to stabilize since each term you add to the
+sum shrinks. However the sum is actually NOT stabilizing. It is actually
+growing \ldots{} but very slowly. You can try to compute the sum up to
+1/1000000.
+
+In general the computation of a sum using a loop looks like this:
+
+sum = 0
+
+for i running from a, a+1, a+2, \ldots, b:
+
+sum = sum + (some term)
+
+For instance:
+
+sum = 0;
+
+for (int i = 1; i \textless= 100; ++i)
+
+\{
+
+sum += i;
+
+\}
+
+In this case the term to add to \emph{sum} is \emph{i}. If you want to
+sum squares you can do this:
+
+sum = 0;
+
+for (int i = 1; i \textless= 100; ++i)
+
+\{
+
+sum += i * i;
+
+\}
+
+or this:
+
+sum = 0;
+
+for (int i = 1; i \textless= 100; ++i)
+
+\{
+
+int term = i * i;
+
+sum += term;
+
+\}
+
+Of course for such cases, the term can be computed from \emph{i}.
+There's no reason why the term cannot be supplied by, for instance, a
+user. Here's one that adds integers specified by a user:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int num\_accts;
+
+std::cout \textless\textless{} "how many bank accounts do you have? ";
+
+std::cin \textgreater\textgreater{} num\_accts;
+
+double sum = 0;
+
+for (int i = 1; i \textless= num\_accts; ++i)
+
+\{
+
+std::cout \textless\textless{} "enter amt in bank acct \#"
+\textless\textless{} i
+
+\textless\textless{} "? \$";
+
+double amt;
+
+std::cin \textgreater\textgreater{} amt;
+
+sum += amt;
+
+std::cout \textless\textless{} "so far ... you have \$"
+\textless\textless{} sum
+
+\textless\textless{} std::endl;\\
+\}
+
+std::cout \textless\textless{} "total ... you have \$"
+\textless\textless{} sum
+
+\textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Write a program that first asks a user how many
+houses he/she has. Next the program asks the user for the number of
+rooms in each house. Finally, the program prints the total number of
+rooms he/she has for all the properties owned by the user.
+
+\textbf{Exercise.} Write a program that first asks a user how many
+houses he/she has. Next the program asks the user for the number of
+rooms in each house and the average square footage for the rooms in that
+house. Finally, the program prints the total square footage of all the
+rooms across all the properties owned by the user.
+
+Using for-loop to compute products
+
+Exercise. Trace this by hand:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+What is the output (or is there an error)? Now run the program with your
+C++ compiler and verify.
+
+By the way, the product of all positive integer from 1 to 5 (i.e.
+1x2x3x4x5) is called the \textbf{factorial} of 5. The factorial of 10 is
+just
+
+1 x 2 x 3 x 4 x 5 x 6 x 7 x 8 x 9 x 10
+
+In general, the factorial of n is such an important quantity that we
+have a shorthand notation for it: The factorial of n is written n!. So
+
+10! = 1 x 2 x 3 x 4 x 5 x 6 x 7 x 8 x 9 x 10
+
+Note that the factorial of 0 is defined to be 1.
+
+0! = 1
+
+Study the above code. Do you see that it computes the factorial of 5?
+
+The factorial appears in Computer Science, Math, Physics, Chemistry,
+Finance, etc. So you bet it's important.
+
+\textbf{Exercise.} Compute by hand the factorial of n for n = 0, 1, 2,
+3, 4, 5, 6. Use your calculator to verify your work. Using C++, compute
+the factorial of 10.
+
+\textbf{Exercise.} Why did I initialize \emph{product} with \emph{1} and
+not \emph{0}? What if you run this program instead?
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+And what if I initialize the \emph{product} to 2? (See why it has to be
+initialized to \emph{1} now?)
+
+\textbf{Exercise.} Write a program that prompts the user for n and
+prints the product of \emph{\textbf{odd}} integers greater than 0 and
+less than n.
+
+\textbf{Exercise.} Write a program that prompts the user for n (an
+integer value at least 0) and prints 2-to-the-power of n. For instance,
+if the user enters 0, the program prints 1; if the user enters 3, the
+program prints 8; if the user entered 10, the program prints 1024; Etc.
+
+\textbf{Exercise.} Write a program that prompts the user for \emph{x} (a
+\emph{double}) and then \emph{n} (an \emph{int} value at least \emph{0})
+and prints \emph{x}-to-the-power of \emph{n}. Check your program with
+several cases, testing it either by hand or by using a calculator.
+
+\textbf{Exercise.} Write a program that prompts the user for \emph{x} (a
+\emph{double}) and then \emph{n} (an \emph{int} value
+\emph{\textbf{which can be negative}}) and prints \emph{x}-to-the-power
+of \emph{n}. Check your program with several cases, testing it either by
+hand or by using a calculator.
+
+\textbf{Exercise.} Besides the factorial function n!, there's another
+quantity that is extremely important in Computer Science, Math, Physics,
+and you-name-it. It's called the n-choose-r function. It's sometimes
+written C(n,r). It depends on the factorial. Let n and r be positive
+integers where r is at most n. Then n-choose-r is given by
+
+n! / (r! (n -- r)!)
+
+n-choose-r is the total numbers of ways to choose r things from n
+distinct things. For instance, suppose you are an IT manager and have a
+team of 40 programmers, and you have to form a team of 5 software
+engineers. The total numbers of ways to form this team is 40-choose-5,
+i.e.,
+
+40! / (5! x (40 -- 5)!) = 40! / (5! x 35!)
+
+However 40! is too huge to compute. Use your program to compute
+5-choose-2. Verify the correctness of your program by doing this
+computation by hand. Here are 5 symbols:
+
+a, b, c, d, e
+
+Write down all possible selections of 2 symbols. Let me begin for you:
+
+a, b
+
+a, c
+
+Note that the selection of a, b is considered the same as the selection
+of b, a. So do not include b, a. Likewise only include b, e and not e,
+b.
+
+Using for-Loop to compute min/max
+
+Recall that if you have int variables a, b, c, d, and you want to
+compute the minimum, you can do this (pseudocode only!):
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+min = a
+
+if b \textless{} min:
+
+min = b
+
+if c \textless{} min:
+
+min = c
+
+if d \textless{} min:
+
+min = d\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In this case min is an integer variable. (Re-study your notes on the if
+statement if you don't recall this!!!)
+
+The idea of course works for doubles too. Of course the min variable
+must be declared to be a double variable. Make sure you understand the
+above!
+
+The idea for the computation of the maximum is similar.
+
+Now the above sure looks like a loop. If the values are not stored in
+variables a, b, c, d but for instance is supplied by the user (so we
+need to do std::cin), then we have a very compact way to compute the
+minimum of 4 values supplied by the user. Instead of doing
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+prompt user for a
+
+min = a
+
+prompt user for b
+
+if b \textless{} min:
+
+min = b
+
+prompt user for c
+
+if c \textless{} min:
+
+min = c
+
+prompt user for d
+
+if d \textless{} min:
+
+min = d
+
+print min\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+we can do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+prompt user for x
+
+min = x
+
+// 3 more values
+
+for i = 0, 1, 2:
+
+prompt user for x
+
+if x \textless{} min:
+
+min = x
+
+print min\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(user inputs are all stored using x).
+
+The C++ code is then:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x;
+
+int min;
+
+std::cin \textgreater\textgreater{} x;
+
+min = x;
+
+// 3 more values, so i = 0, 1, 2 works.
+
+for (int i = 0; i \textless{} 3; i++)
+
+\{
+
+std::cin \textgreater\textgreater{} x;
+
+if (x \textless{} min)
+
+\{
+
+min = x;
+
+\}
+
+\}
+
+std::cout \textless\textless{} min \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Not only that, this code can be EASILY modified to compute the minimum
+of 10 values:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x;
+
+int min;
+
+std::cin \textgreater\textgreater{} x;
+
+min = x;
+
+// i = 0, 1, 2, 3, 4, 5, 6, 7, 8 ---\/- 9 more values
+
+for (int i = 0; i \textless{} 9; i++)
+
+\{
+
+std::cin \textgreater\textgreater{} x;
+
+if (x \textless{} min)
+
+\{
+
+min = x;
+
+\}
+
+\}
+
+std::cout \textless\textless{} min \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The old method without loops would take a lot more time to write!
+
+Not only that, the above method works when you allow the user to specify
+how many values the user wants to input!!
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x;
+
+int min;
+
+int n; // number of values for the min computation
+
+std::cin \textgreater\textgreater{} n;
+
+std::cin \textgreater\textgreater{} x;
+
+min = x;
+
+for (int i = 0; i \textless{} n - 1; i++)
+
+\{
+
+std::cin \textgreater\textgreater{} x;
+
+if (x \textless{} min)
+
+\{
+
+min = x;
+
+\}
+
+\}
+
+std::cout \textless\textless{} min \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+As you can see, the loop is indispensable!!!
+
+\textbf{Exercise. }Write a program that prompts the user for n and then
+prompts the user for n double values and then prints the maximum of the
+values enters by the user.
+
+\textbf{Exercise.} Write a program that prompt the user for n and then
+prompts the user for n double values and then prints the minimum of the
+\textbf{absolute values} of the values entered by the user. Recall from
+MATH104 that the absolute value of x is just x without the negative
+sign. So for instance
+
+\textbar42\textbar{} = 42
+
+\textbar--24\textbar{} = 24
+
+The absolute value functions were mentioned in the set of notes on
+doubles. For your convenience, here's the information again. For C++, if
+you need the absolute value of an integer value this is how yo do it:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless cstdlib\textgreater{}
+
+int main()
+
+\{
+
+int x = 42, y = -24;
+
+std::cout \textless\textless{} abs(42) \textless\textless{}
+'\textbackslash n';
+
+std::cout \textless\textless{} abs(-42) \textless\textless{}
+'\textbackslash n';\\
+std::cout \textless\textless{} abs(x) \textless\textless{}
+'\textbackslash n';\\
+std::cout \textless\textless{} abs(y) \textless\textless{}
+'\textbackslash n';
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+If you need to compute the absolute value of doubles or floats you do
+this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless cmath\textgreater{}
+
+int main()
+
+\{
+
+int x = 4.2, y = -2.4;
+
+std::cout \textless\textless{} fabs(42) \textless\textless{}
+'\textbackslash n';
+
+std::cout \textless\textless{} fabs(-42) \textless\textless{}
+'\textbackslash n';\\
+std::cout \textless\textless{} fabs(x) \textless\textless{}
+'\textbackslash n';\\
+std::cout \textless\textless{} fabs(y) \textless\textless{}
+'\textbackslash n';
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The boolean condition
+
+Here's one of our first few programs:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Look at this boolean expression:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+One of the most common misconceptions about the for-loop (and actually
+applies to all loops) is that many first-time programmers think that if
+the boolean expression
+
+i \textgreater{} 0
+
+is false at \textbf{any point} in the loop, you will break you out of
+the for-loop immediately. That's \textbf{NOT TRUE}. Look at the picture
+on page 12 again. The check on whether to break out of the loop occurs
+at a specific point. If I do this instead:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+The program would still execute the last statement in the body of the
+for-loop:
+
+std::cout \textless\textless{} "exiting the block ...\textbackslash n";
+
+because the boolean check comes after this print statement.
+
+MAKE SURE YOU REMEMBER THAT!
+
+Generating Equally Spaced Points on a Line
+
+In the next two sections, we will generate points in a range which are
+equally spaced. This is what I mean:
+
+Suppose I tell you that I want 5 equally spaced points on the interval
+{[}0, 4{]} that includes the end points 0 and 4. You would say:
+
+0, 1, 2, 3, 4
+
+There are 5 values. They are equally spaced: consecutive values differ
+by 1. The first value 0 is the left endpoint of {[}0, 4{]} and the last
+value 4 is the right endpoint of {[}0, 4{]}.
+
+What if I ask you for 3 equally spaced points on {[}0, 4{]} including
+both end points? Well this means that you want 3 values, say we call
+them
+
+x0, x1, x2
+
+where x0 is 0 and x2 is 4. What about x1? x1 is right in the middle. So
+it must be
+
+x1 = (x2 -- x1) / 2 = 2
+
+So the values are
+
+0, 2, 4
+
+Great! Done!
+
+What if I ask you for 4 equally points in {[}0, 4{]}? Let's call then
+
+x0, x1, x2, x3
+
+Of course
+
+x0 = 0
+
+x3 = 4
+
+What about x1 and x2? Well since they are equally spaced, let's say the
+gap between x0 and x1 is d. Since the points are equally spaced, the gap
+is of course also the gap between x1,x2 and also x2,x3. There are
+altogether 3 gaps and they add up to 4. So
+
+d = 4/3
+
+(as a real number, i.e., double. The above is math, not C++) In other
+words:
+
+d = 1.3333.... (up to 4 decimal places)
+
+This mean that
+
+x0 = 0
+
+x1 = 0 + d = 1.3333....
+
+x2 = x1 + d = 2.6666...
+
+x3 = x2 + d = 4
+
+What if I want \textbf{7} points in the same interval? Say the points
+are
+
+x0, x1, x2, x3, x4, x5, x6
+
+There are \textbf{6} gaps. Call the gap d. The gaps add up to 4.
+Therefore
+
+6d = 4
+
+i.e.,
+
+d = 4/6 = 0.6666...
+
+and the values of the points are
+
+x0 = 0
+
+x1 = x0 + d
+
+x2 = x1 + d
+
+x3 = x2 + d
+
+x4 = x3 + d
+
+x5 = x4 + d
+
+x6 = x5 + d
+
+Writing this as a C++ program I get
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double x = 0;
+
+double d = double(4) / 6
+
+for (int i = 0; i \textless{} 7; ++i)
+
+\{
+
+std::cout \textless\textless{} x \textless\textless{}
+'\textbackslash n';
+
+x += d\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Run this and check that you do get 7 points which are equally spaced.
+
+\textbf{Exercise.} Modify the following code to generate equally spaced
+points in {[}0, 4{]} if the number of points is n.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int n;
+
+std::cin \textgreater\textgreater{} n;
+
+double x = 0;
+
+double d = double(4) / 6;
+
+for (int i = 0; i \textless{} 7; ++i)
+
+\{
+
+std::cout \textless\textless{} x \textless\textless{}
+'\textbackslash n';
+
+x += d\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Test your program for different values of \emph{n}.
+
+\textbf{Exercise.} If the interval is not {[}0, 4{]} but {[}0, b{]} and
+the number of points is n, then modify the following code as
+appropriate:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int n = 0;
+
+double b = 0.0;
+
+std::cin \textgreater\textgreater{} b;
+
+std::cin \textgreater\textgreater{} n;
+
+double x = 0;
+
+double d = double(4) / 6;
+
+for (int i = 0; i \textless{} 7; ++i)
+
+\{
+
+std::cout \textless\textless{} x \textless\textless{}
+'\textbackslash n';
+
+x += d\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Test your code thoroughly.
+
+\textbf{Exercise.} If the interval is {[}a, b{]} and the number of
+points is n, then modify the following code as appropriate:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int n = 0;
+
+double a = 0.0, b = 0.0;
+
+std::cin \textgreater\textgreater{} a \textgreater\textgreater{} b;
+
+std::cin \textgreater\textgreater{} n;
+
+double x = 0;
+
+double d = double(4) / 6;
+
+for (int i = 0; i \textless{} 7; ++i)
+
+\{
+
+std::cout \textless\textless{} x \textless\textless{}
+'\textbackslash n';
+
+x += d\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Test your code thoroughly. {[}Hint: Move the interval so that the left
+endpoint is 0. The interval becomes {[}0, b -- a{]}. Get the points
+using the previous exercise. Now move the points back to {[}a, b{]}.{]}
+
+WARNING \ldots{} INCOMING SPOILER!!!
+
+Here's the answer to the above. If you are generating n equally spaced
+points in the interval {[}a, b{]} (and the left and right end points are
+included), the code is
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double x = a;
+
+double d = double(b - a) / (n - 1);
+
+for (int i = 0; i \textless{} n; ++i)
+
+\{
+
+std::cout \textless\textless{} x \textless\textless{}
+'\textbackslash n';
+
+x += d\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Note that because of rounding errors (remember that doubles and floats
+are not exact!), the last point might not be exactly the value b. You
+can stop the for-loop earlier and manually use b for the last point:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double x = a;
+
+double d = double(b - a) / (n - 1);
+
+for (int i = 0; i \textless{} n - 1; ++i)
+
+\{
+
+std::cout \textless\textless{} x \textless\textless{}
+'\textbackslash n';
+
+x += d\\
+\}
+
+x = b;
+
+std::cout \textless\textless{} x \textless\textless{}
+'\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In the next couple of sections, we will be using these equally spaced
+points to do some computations. So in the general case, the code will
+look something like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double x = a;
+
+double d = double(b - a) / (n - 1);
+
+for (int i = 0; i \textless{} n - 1; ++i)
+
+\{
+
+\emph{... do something with x ...}
+
+x += d;\\
+\}
+
+x = b;
+
+... do something with x ...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Sums again: Area computation
+
+I'm going to use the for-loop to compute a certain sum. This time it's
+going to be the area under a curve. The computation of areas is
+extremely important in many areas of science.
+
+The idea is actually very simple: you need to know how to compute the
+area of rectangles and you need to be able to add lots of these areas.
+
+The idea is pretty simple and illustrates the power of being able to do
+perform repetitions quickly.
+
+First you draw the graph of the function, for example, y = f(x) = x*x,
+the standard parabola):
+
+\includegraphics[width=4.5in,height=2.7736in]{Pictures/10000000000002B3000001AAC5D1A577C30A5997.png}
+
+Suppose you want to compute the area under this curve and above the
+x-axis and from x = 2 to x = 7:
+
+\includegraphics[width=4.5in,height=2.5165in]{Pictures/10000000000002CD000001911B1B47C442016F8D.png}
+
+You can make an approximation by computing the areas of the rectangles
+with
+
+x=2 to x=3 with height f(2)
+
+x=3 to x=4 with height f(3)
+
+x=4 to x=5 with height f(4)
+
+x=5 to x=6 with height f(5)
+
+x=6 to x=7 with height f(6)
+
+There are altogether 5 rectangles. Draw these rectangles into the graph
+above.
+
+\includegraphics[width=4.5in,height=2.5362in]{Pictures/10000000000002CB00000193C61596A9DE7C6C44.png}
+
+Note that for each rectangle, the base has width 1. Also, for each
+rectangle, I am using the left endpoint on the width to determine the
+height. The areas of these rectangles is smaller than the area under the
+parabola from x = 2 to 2 = 7.
+
+\textbf{Exercise.} Write a for-loop to compute the sum of the above
+rectangles. Write down the sum of areas. We'll need it for comparison
+later.
+
+Now we ``move'' the sum of areas of our rectangles towards the parabola
+in the following way: we will use \emph{more} rectangles. Previously the
+base of the rectangles had a width of 1. Now I'm going to use rectangles
+with base of length 0.5. Altogether we now have 10 rectangles:
+
+x=2.0 to x=2.5 with height f(2.0)
+
+x=2.5 to x=3.0 with height f(2.5)
+
+x=3.0 to x=3.5 with height f(3.0)
+
+x=3.5 to x=4.0 with height f(3.5)
+
+x=4.0 to x=4.5 with height f(4.0)
+
+x=4.5 to x=5.0 with height f(4.5)
+
+x=5.0 to x=5.5 with height f(5.0)
+
+x=5.5 to x=6.0 with height f(5.5)
+
+x=6.0 to x=6.5 with height f(6.0)
+
+x=6.5 to x=7.0 with height f(6.5)
+
+Draw these 10 rectangles into the above graph.
+
+\includegraphics[width=4.5in,height=2.5492in]{Pictures/10000000000002C9000001940CA977BFEBA1D44B.png}
+
+Do you see that the total area of these rectangles are closer to the
+actual area under the parabola than the one from our first
+approximation?
+
+Do you see that, intuitively, the total area of the rectangles gets
+closer and closer to the area under the parabola from x = 2 to x = 7 as
+the number of rectangles used increases? Here's the case where the
+length of the base of the rectangles is 0.25:
+
+\includegraphics[width=4.5in,height=2.5181in]{Pictures/10000000000002C90000018F19E7A9D9A73C9FA9.png}and
+here's the case where the length is 0.125
+
+\includegraphics[width=4.4272in,height=2.139in]{Pictures/10000000000002CA00000191D2EF8AEA529C84AC.png}
+
+Using the code that computes equally spaced point, the sum of the areas
+of these rectangles can thus be computed as follows:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double a = 2;
+
+double b = 7;
+
+int n = 11; // 10 rects mean 11 points
+
+double sum = 0;
+
+double x = 0;
+
+double d = double(b - a) / (n - 1);
+
+for (int i = 0; i \textless{} n - 1; ++i)
+
+\{
+
+sum += d * (x * x);
+
+x += d;\\
+\}
+
+// Why do we NOT need to execute the following?
+
+// x = b;
+
+// sum += d * (x * x);\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Compute area when 20 rectangles are used.
+
+\textbf{Exercise.} Now do the same where you use 100 rectangles.
+
+Now write a program that prompts the user for the number of rectangles!
+Say we call this variable n. Run the program with n = 1000 rectangles!!!
+You bet the value computed by your program is extremely close to the
+real area of the parabola. Of course you wouldn't add the areas of 1000
+rectangles by hand -- it would take too long! That's what a program is
+for -- if you know C++!!!
+
+\textbf{Exercise.} If you know some Calculus 1, you know that the area
+under the parabola from x = 2 to x = 7 is in fact exactly
+
+(1 / 3)(7 * 7 * 7 -- 2 * 2 * 2)
+
+Use your calculator (or C++) to compute this value and compare against
+the value obtained by your program with n = 1000 rectangles.
+
+\textbf{Exercise. }The above prompts the user for n, the number of
+rectangles to use for the area computation using a for-loop. Write a
+nested for-loop where the outer for-loop supplies values of n running
+from 1000 to 1000000 by increments of 1000. The pseudocode looks like
+this:
+
+for n = 1000, 2000, 3000, \ldots, 1000000:
+
+compute and print the area using n rectangles
+
+\textbf{Exercise.} Modify the above program so that instead of computing
+the area under the parabola from x = 2 to x = 7, the program prompts the
+user for a, b, n and computes the area under the parabola from x = a to
+x = b using n rectangles.
+
+\textbf{Exercise.} What is the area under the curve y = x*x*x from x=0
+to x=10?
+
+The computation of areas under a curve is important. For instance in
+Physics, the work done by a force F is the area under the
+force-displacement graph where you plot the force acting on an object
+and the displacement of the object. By Newton's law of universal
+gravitation, we know the gravitational force between two objects which
+are apart from each other at a fixed distance. So if a rocket wants to
+move away from earth, you can compute the work done moving the rocket to
+a distance from the surface of earth to a far away point in space.
+Knowing the work to be done moving the rocket from earth through a
+required distance, you can then compute the amount of chemical fuel that
+is needed to combust in order to convert the chemical energy into
+required work done. Of course there are many other applications of the
+computation of areas.
+
+Root finding: An inefficient method
+
+Another very common problem in Math and Sciences is finding solution(s)
+to an equation such as finding solutions to quadratic equations:
+
+2 * x * x + 4 * x -- 3 = 0
+
+This is easy since we have the quadratic equation formula. But this is
+highly non-trivial if the equation is more complex such as a degree 5
+equation:
+
+2 * x * x * x * x * x + 4 * x * x -- 3 * x + 10 = 0
+
+or even one with trigonometric, logartihmic, and/or exponential
+functions!!!
+
+For instance, what if I want to find a solution to
+
+3 * x * x -- 10 * x * sin(x) -- 500 = 0
+
+in the range {[}0, 20{]}? You don't recall a solution to such an
+equation from your math classes right?!?
+
+Since we don't have a formula to use, we just have to plot the graph and
+visually see where the function touches the x-axis. In the same way, we
+can compute the values of the above expression
+
+3 * x * x -- 10 * x * sin(x) -- 500
+
+for many many many many many values in the range {[}0, 20{]} and see
+which value of x will give a value of
+
+3 * x * x -- 10 * x * sin(x) -- 500
+
+that is very close to 0. For instance we can test 1,000,000 values in
+the range {[}0,20{]}. If we do this by hand, we would go crazy. But
+\ldots{}
+
+We know C++!!!!
+
+All we need to do is to run a for-loop of 1,000,000 values in the range
+{[}0,20{]} and find the value of x that will get use as close as
+possible to the y-axis. Close to the y-axis means
+
+\textbar f(x)\textbar{}
+
+is close to zero. In other words, if you're finding the point closest to
+the y-axis it means that you need to find the smallest
+\textbar f(x)\textbar{} for the 1,000,000 x values in the range.
+
+\textbf{Exercise.} Using a for-loop, find a value for x from 1 to 5 such
+that
+
+x sin(x) + 1 is as close as possible to the x-axis.
+
+Maximum and minimum of functions
+
+Using the idea of generating lots and lots of equally spaced points on
+an interval, you can very quickly compute the approximate maximum and
+minimum of functions. Note that the max or min is only an approximation
+since your points might miss the actual maximum and minimum.
+
+\textbf{Exercise.} Write a program to compute and print the maximum
+value of the sine function on the interval {[}0, 10{]} using 1,000,000
+equally spaced points. The sine function is already mentioned in the
+notes on floating point values.
+
+\textbf{Exercise.} Modify the above program so that it prints the value
+of x where the maximum occurs.
+
+\textbf{Exercise.} Compute and print the maximum and minimum value of
+the function
+
+f(x) = x sin(x)
+
+on the interval {[}0, 20{]} using 1,000,000 points. When you're done,
+modify the program to also print the x value where the maximum and
+minimum occurs.
+
+\end{document}

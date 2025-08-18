@@ -1,0 +1,579 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\author{}
+\date{}
+
+\begin{document}
+
+70. C++ \emph{string} class
+
+Objectives
+
+\begin{itemize}
+\tightlist
+\item
+  Learn about C strings.
+\item
+  Learn about the \emph{string} class from the C++ standard library.
+\end{itemize}
+
+Review: C-strings
+
+You already know that a string is an array of \emph{char} terminated by
+'\textbackslash0'. '\textbackslash0' has numeric value 0. Here's an
+example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+char x{[}{]} = "abc"; // same as \{'a', 'b', 'c',
+'\textbackslash0'\}\tabularnewline
+\bottomrule
+\end{longtable}
+
+These are called C-strings, i.e., C-strings are character arrays
+containing the null character.
+
+There are some useful functions to work with C strings of which some are
+listed below (see CISS240):
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+strcpy(s1, s2) // copy
+
+strcmp(s1, s2) // compare
+
+strcat(s1, s2) // concat
+
+strlen(s1) // string length\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Note that in order to work with the above functions, you must include
+the header \emph{cstring} like so:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\#include \textless cstring\textgreater{}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Note that the relational operators ==, !=, etc. don't work with the
+string content but rather with the pointer to the first value the array.
+In particular, note that s1 == s2 compares the addresses of s1 and s2.
+In other words, it does not compare the contents of the arrays. Likewise
+for !=, \textless, etc.
+
+\textbf{The }\emph{\textbf{std::}\textbf{s}\textbf{tring}}\textbf{ class
+in C++}
+
+You can use C-strings just fine in C++ but C++ also provides a
+\emph{string} class as part of it's standard library that can be easier
+to work with. The \emph{string} class in C++ is defined under the
+\emph{std} namespace like the rest of the standard library and provides
+the usual operations you would expect with strings packaged together as
+a first class object.
+
+Some major features of the C++ \emph{string} class are outline below:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+string(const char *) // constructor that lets you
+
+// build a C++ string object
+
+// from a C-string
+
+= // assign a string to another
+
+// works even with C strings
+
+== != // compare C++ string objects
+
+\textgreater{} \textless{} // relate C++ string objects
+
++= + // concatenate string objects
+
+{[}int{]} at(int) // access characters at a
+
+// particular index
+
+substr(int) // Get substrings at particular
+
+substr(int, int) \emph{ // locations in the string}
+
+length() // Get the length of the string
+
+empty() // Check if the string is empty
+
+\emph{swap(string \&) // swap two string values}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Check C++ references online for more.
+
+Here's a sample \emph{main.cpp} that shows most of the above in action.
+Ask yourself what the output should be then verify by running it.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless string\textgreater{}
+
+int main()
+
+\{
+
+std::string s1("Hello, World!"), s2("");
+
+std::string s3("Hello, World!");
+
+std::cout \textless\textless{} "1:" \textless\textless{} s1
+\textless\textless{} "\textbackslash n";
+
+std::cout \textless\textless{} "2:" \textless\textless{} s1.length()
+\textless\textless{} "\textbackslash n";
+
+std::cout \textless\textless{} "3:{[}" \textless\textless{} s2
+\textless\textless{} "{]}\textbackslash n";
+
+std::cout \textless\textless{} "4:" \textless\textless{} s2.length()
+\textless\textless{} "\textbackslash n";
+
+std::cout \textless\textless{} "5:" \textless\textless{} (s1 != s2)
+\textless\textless{} "\textbackslash n";
+
+std::cout \textless\textless{} "6:" \textless\textless{} (s1 == s2)
+\textless\textless{} "\textbackslash n";
+
+std::cout \textless\textless{} "7:" \textless\textless{} (s2.empty())
+\textless\textless{} "\textbackslash n";
+
+std::cout \textless\textless{} "8:" \textless\textless{} (s2 == "")
+\textless\textless{} "\textbackslash n";
+
+s2 = "!!";
+
+std::cout \textless\textless{} "9:" \textless\textless{} s1 + s2
+\textless\textless{} "\textbackslash n";
+
+std::cout \textless\textless{} "10:" \textless\textless{} s1 + "!!"
+\textless\textless{} "\textbackslash n";
+
+s1 += s3;
+
+std::cout \textless\textless{} "11:" \textless\textless{} s1
+\textless\textless{} "\textbackslash n";
+
+s1 += "???";
+
+std::cout \textless\textless{} "12:" \textless\textless{} s1
+\textless\textless{} "\textbackslash n";
+
+std::cout \textless\textless{} "13:" \textless\textless{} s1.substr(3)
+\textless\textless{} "\textbackslash n";
+
+std::cout \textless\textless{} "14:" \textless\textless{} s1.substr(3,
+1) \textless\textless{} "\textbackslash n";
+
+std::cout \textless\textless{} "15:" \textless\textless{} s1{[}2{]}
+\textless\textless{} "\textbackslash n";
+
+s1{[}2{]} = 'X';
+
+std::cout \textless\textless{} "16:" \textless\textless{} s1
+\textless\textless{} "\textbackslash n";
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Searching for substrings
+
+You can use the methods \emph{find()} and \emph{rfind()} provided by the
+string library to search for substrings within a \emph{string} object.
+Use \emph{find()} to search from the left side of the string and
+\emph{rfind()} to search from the right side instead. You can use both
+C++ \emph{string} objects and C strings as the substring values to
+search for.
+
+Example.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+std::string s1 = "01234567890123456789";
+
+std::string s2 = "23";
+
+std::cout \textless\textless{} "1." \textless\textless{} s1.find(s2)
+\textless\textless{} "\textbackslash n";
+
+std::cout \textless\textless{} "2." \textless\textless{} s1.find("23")
+\textless\textless{} "\textbackslash n";
+
+std::cout \textless\textless{} "3." \textless\textless{} s1.find("\$")
+\textless\textless{} "\textbackslash n";
+
+std::cout \textless\textless{} "4." \textless\textless{} s1.rfind("23")
+\textless\textless{} "\textbackslash n";\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Both \emph{find()} and \emph{rfind()} return the index where the
+substring first occurs. If the substring isn't found,
+\emph{std::string::npos} is returned which is the same as -1 but as an
+\emph{unsigned int}.
+
+Searching for characters
+
+The standard \emph{string} library provides the following methods to
+search for characters in a string:
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{find\_first\_of()} which takes in a character, a C-string or a
+  \emph{string} object as its argument and finds the first index from
+  the left side in the invoking \emph{string} object where any of the
+  characters in the argument occur.
+\item
+  \emph{find\_last\_of()} which is similar to \emph{find\_first\_of()}
+  except it searches from the right side instead.
+\item
+  \emph{find\_first\_not\_of()} which also takes in a character, a C
+  string or a \emph{string} object as argument but finds the index of
+  the first character in the invoking \emph{string} object that isn't
+  also in the argument provided to the method.
+\item
+  \emph{find\_last\_not\_of()} which is similar to
+  \emph{find\_first\_not\_of()} except that it searches from the right
+  side instead.
+\end{itemize}
+
+Example.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+std::string s = "01234567890123456789";
+
+std::string t = "23";
+
+std::cout \textless\textless{} "1." \textless\textless{}
+s.find\_first\_of(t) \textless\textless"\textbackslash n";
+
+std::cout \textless\textless{} "2." \textless\textless{}
+s.find\_first\_not\_of("01") \textless\textless{} "\textbackslash n";
+
+std::cout \textless\textless{} "3." \textless\textless{}
+s.find\_last\_of("012") \textless\textless{} "\textbackslash n";
+
+std::cout \textless\textless{} "4." \textless\textless{}
+s.find\_last\_not\_of("012") \textless\textless{}
+"\textbackslash n";\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+As with substring search, if nothing is found, \emph{std::string::npos}
+is returned which is the same as -1 but as an \emph{unsigned int}.
+
+Replacement
+
+You can use the \emph{replace()} method to replace the contents of a
+string with the content of another. You need to specify indices to
+replace for the \emph{string} object invoking the method but if you
+want, you can also specify the portion of the string passed in as the
+argument to use for the replacement.
+
+Example.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless string\textgreater{}
+
+int main()
+
+\{
+
+std::string s1("0123456789");
+
+std::string s2("abcdef");
+
+s1.replace(3, 2, s2);
+
+std::cout \textless\textless{} s1 \textless\textless{}
+"\textbackslash n";
+
+s1 = "0123456789";
+
+s1.replace(3, 2, s2, 1, 3);
+
+std::cout \textless\textless{} s1 \textless\textless{}
+"\textbackslash n";
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+There are still other forms of \emph{replace()} available which can take
+in C strings or characters or even let you repeat a character a certain
+number of times. Research using Google when you have free time.
+
+Insertion
+
+You can use the \emph{insert()} method to insert the contents of a
+string into another. You need to specify the index of the invoking
+\emph{string} object to insert at but you can also specify the portion
+of the string passed in as the argument to insert.
+
+Example.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless string\textgreater{}
+
+int main()
+
+\{
+
+std::string s1("0123456789");
+
+std::string s2("abcdef");
+
+s1.insert(3, s2);
+
+std::cout \textless\textless{} s1 \textless\textless{}
+"\textbackslash n";
+
+s1 = "0123456789";
+
+s1.insert(3, s2, 2, 3);
+
+std::cout \textless\textless{} s1 \textless\textless{}
+"\textbackslash n";
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Even more method signatures of \emph{insert()} exist as well.
+
+Type conversion
+
+Given a C++ string object, you can get a C string with the same content
+using the \emph{c\_str()} method.
+
+Example.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int main()
+
+\{
+
+std::string s1 = "Hi!";
+
+const char * s2;
+
+s2 = s1.c\_str();
+
+std::cout \textless\textless{} s2 \textless\textless{}
+"\textbackslash n";
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You can use a regular constant character pointer to bind to the C-string
+returned but you \textbf{shouldn't delete the pointer} if you do since
+the pointer will be pointing to the C-string content of the C++
+\emph{string} object.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+const char * s2;
+
+s2 = s1.c\_str();
+
+std::cout \textless\textless{} s2 \textless\textless{}
+"\textbackslash n";
+
+delete {[}{]} s2; // BAD!!!\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Since the C-string returned is a constant pointer to a character array,
+you \textbf{can't change its content} through simple assignment.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+const char * s2;
+
+s2 = s1.c\_str();
+
+s2{[}1{]} = '\$'; // BAD!!!\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+External Resources
+
+There are many resources available to you to learn more if you are
+interested.
+
+Most textbooks contain some information on the \emph{std::string} class.
+
+The internet is full of websites containing a detailed reference to the
+C++ standard library. The following are two good ones, just Google for
+more:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{http://www.cplusplus.com/}{http://www.cplusplus.com}
+\item
+  \href{http://en.cppreference.com/}{http://en.cppreference.com}
+\end{itemize}
+
+You should get used to researching content online. When you have
+questions, you are more than likely running into an issue that other
+people also have run into in the past. Leverage their experience. Find
+and join a good C++ forum. At the very least, join the following
+discussion websites meant for programmers:
+
+\begin{itemize}
+\tightlist
+\item
+  \url{http://stackoverflow.com/}
+\item
+  \url{http://programmers.stackexchange.com/}
+\end{itemize}
+
+Of course you shouldn't outright plagiarize content you find online. It
+won't really help you much to just copy-paste code in anyway.
+
+Exercises
+
+\textbf{Exercise. }Do an experiment to verify that
+\emph{operator\textgreater\textgreater{}} (i.e., input) is overloaded to
+work with \emph{std::string} objects. Note that a whitespace will
+terminate an input.
+
+\textbf{Exercise. }Write a program that does the following: Declare a
+\emph{std::string} object and initialize it with a string. Create an
+array of \emph{std::string} objects from the words in the first string.
+The separator of words include the space and the period. Print all the
+words in the first string, each on a separate line. Print the total
+number of words and the average number of characters per word.
+
+\textbf{Exercise.} Write a program that prompts the user for a string
+and prints ``integer'' if the string is made up of digit characters
+where the first is not `0'; otherwise the program prints ``not
+integer''.
+
+\textbf{Exercise.} Write a function that accepts a \emph{std::string}
+object and returns the string with words capitalized. In other words, if
+the object passed in is \emph{std::string("hello world")}, then
+\emph{std::string"Hello World")} is returned; if the object passed in is
+\emph{std::string("ok. that's great!")}, then \emph{std::string("Ok.
+That's great!")} is returned. Assume that the only word separators are
+the space, the period, and the exclamation mark.
+
+\end{document}

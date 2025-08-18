@@ -1,0 +1,1663 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\author{}
+\date{}
+
+\begin{document}
+
+Objectives
+
+\begin{itemize}
+\tightlist
+\item
+  Understand and use reference variables
+\item
+  Write functions with reference parameters
+\end{itemize}
+
+You have already seen references (or reference variables). This chapter
+is a quick review and some more information on references.
+
+Problems with Our Functions
+
+What about writing a function to perform ``array assignment'', i.e., we
+want to do the following:
+
+int x{[}{]} = \{1,2,3\};
+
+int xSize = 3;
+
+int y{[}3{]};
+
+int ySize = 3;
+
+arrayAssign(y, 3, x, 3); // like y = x
+
+That's easy: Just write a for-loop in the function to pass the values
+from one to the other.
+
+This works for arrays of the same size. What if I use a ``length'' for
+an array?
+
+What I mean is that suppose I have an array of size 1000. I want to use
+the array like a container: I want to put values into the array and I
+want to pull values out of the array. The length of an array measures
+the number of things I put into the array that has not been taken out.
+For instance suppose I have the following:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+const int GOOGLE\_STOCK\_PRICE\_SIZE = 1000;
+
+double googleStockPrice{[}GOOGLE\_STOCK\_PRICE\_SIZE{]};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+which records the stock as the day progresses.
+\emph{googleStockPrice{[}0{]}} is the stock price of Google at 9:00AM
+when the stock market opens, and \emph{googleStockPrice{[}1{]}} is the
+stock price at 9:01AM, etc. At 9:05AM, I have stock prices of Google for
+9:00AM, 9:01AM, 9:02AM, 9:03AM, 9:04AM, 9:05AM, i.e. there are 6 values.
+Of course the array has a size of 1000. But only
+\emph{googleStockPrice{[}i{]}} for i = 0, 1, 2, 3, 4, 5 are valid at
+that point in time. I can keep track of how many values (from index 0)
+are valid using an integer variable, say \emph{googleStockPriceLen} (Len
+for length).
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+const int GOOGLE\_STOCK\_PRICE\_SIZE = 1000;
+
+double googleStockPrice{[}GOOGLE\_STOCK\_PRICE\_SIZE{]};
+
+int googleStockPriceLen = 0;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+So make sure you see the difference between the two different measures
+of an array: one measures the \textbf{total number of values the array
+can hold}, and the other measures \textbf{the number of values that have
+been placed into the array that has not been taken out}.
+
+Now suppose we want to write an array assignment function for such a
+general situation (remember: you want functions to be re-usable,
+therefore you want to make them general enough), then you want to be
+able to do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+const int XSIZE = 10;
+
+int x{[}XSIZE{]} = \{42, 41, 40\};
+
+int xlen = 3;
+
+const int YSIZE = 10;
+
+int y{[}YSIZE{]};
+
+int ylen = 0;
+
+arrayAssign(y, ylen, x, xlen); // sorta like y = x\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+After the function call you want \emph{y{[}0{]} = 42}, \emph{y{[}1{]} =
+41}, \emph{y{[}2{]} = 40} and \emph{ylen = 3. }
+
+Now note this: A function can change the values of \emph{y} which is an
+array. But the problem is that \emph{ylen} is an integer variable and
+hence cannot be changed by a function when it is passed in as a
+pass-by-value parameter. Right? Here's an example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void swap(int a, int b)
+
+\{
+
+int t = a;
+
+a = b;
+
+b = t;\\
+\}
+
+int main()
+
+\{
+
+int x = 0;
+
+int y = 42;
+
+swap(x, y); // x, y NOT CHANGED!!!!!!!!!!!!!!!!!!
+
+std::cout \textless\textless{} x \textless\textless{} ' '
+\textless\textless{} y \textless\textless{} std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+One way to get around that is that you can return a value from a
+function and use that to change the value of \emph{ylen} in the calling
+function. So the code using the array assignment function would look
+like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+const int XSIZE = 10;
+
+int x{[}XSIZE{]} = \{42, 41, 40\};
+
+int xlen = 3;
+
+const int YSIZE = 10;
+
+int y{[}YSIZE{]};
+
+int ylen = 0;
+
+ylen = arrayAssign(y, x, xlen); // sorta like y = x\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+That will work. \textbf{But} the prototype of this function would look
+very different from other useful array functions. This is how a header
+file for all the useful array functions if you have one:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// array.h
+
+bool arrayEqual(int{[}{]}, int, int{[}{]}, int);
+
+bool arrayNotEqual(int{[}{]}, int, int{[}{]}, int);
+
+void bubbleSort(int{[}{]}, int);
+
+int binarySearch(int{[}{]}, int, int target);
+
+int arrayAssign(int{[}{]}, int{[}{]}, int);\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+One quality of a well-designed program is one with \textbf{least
+surprises}. In all parameters, you always see an array followed by a
+length ... EXCEPT for the case of \emph{arrayAssign()}.
+
+There's another problem with using return values to change variables: If
+you want to change the value of two variables through one single
+function call you CAN'T. \textbf{A function cannot return two values at
+the same time}. The following \textbf{does NOT work}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\textbf{int,int} swap(int a, int b)
+
+\{
+
+int t = a;
+
+a = b;
+
+b = t;
+
+\textbf{return a, b // abominable}\\
+\}
+
+int main()
+
+\{
+
+int x = 0;
+
+int y = 42;
+
+\textbf{x, y = swap(x, y); // :o}
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Pass-by-Reference
+
+Now try this
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void swap(int \textbf{\&} a, int \textbf{\&} b)
+
+\{
+
+int t = a;
+
+a = b;
+
+b = t;\\
+\}
+
+int main()
+
+\{
+
+int x = 0;
+
+int y = 42;
+
+swap(x, y);
+
+std::cout \textless\textless{} x \textless\textless{} ' '
+\textless\textless{} y \textless\textless{} std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The variables \emph{a} and \emph{b} are called \textbf{reference
+variable}, in particular they are integer reference variables. They are
+different from the regular plain-jane variables. They \textbf{do not
+have their own memory for keeping values}. They \textbf{refer} to other
+variables. A reference variable is an \textbf{alias} of another
+variable.
+
+Now back to our program with the \emph{swap()} function:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void swap(int \textbf{\&} a, int \textbf{\&} b)
+
+\{
+
+int t = a;
+
+a = b;
+
+b = t;\\
+\}
+
+int main()
+
+\{
+
+int x = 0;
+
+int y = 42;
+
+swap(x, y);
+
+std::cout \textless\textless{} x \textless\textless{} ' '
+\textless\textless{} y \textless\textless{} std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+when \emph{main()} calls \emph{swap()}, the integer reference variable
+\emph{a} in \emph{swap()} will \textbf{refer} to the memory of \emph{x};
+it \textbf{does not receive a value} from \emph{x}. As a matter of fact,
+referring the diagram, you see that \emph{a} does not even have its own
+memory!
+
+Likewise the integer reference variable \emph{b} in \emph{swap()} does
+not have have its own memory but rather it refers to the memory of
+\emph{y}.
+
+We call this type of parameter passing \textbf{pass-by-reference}. We
+say that the \emph{a} in \emph{swap()} is a pass-by-reference parameter.
+
+To simplify the scenario, let's forget about functions and just look at
+reference variables alone. Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int i = 5;
+
+int \& j = i;
+
+std::cout \textless\textless{} i \textless\textless{} ' '
+\textless\textless{} j \textless\textless{} std::endl;
+
+i = 42;
+
+std::cout \textless\textless{} i \textless\textless{} ' '
+\textless\textless{} j \textless\textless{} std::endl;
+
+j = 0;
+
+std::cout \textless\textless{} i \textless\textless{} ' '
+\textless\textless{} j \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+As you can see \emph{j} has type
+
+\emph{int \&}
+
+i.e. \emph{j} is an integer reference. It's initialized to \emph{i}.
+That means that \emph{j} refers to the memory of \emph{i}.
+
+\textbf{Exercise.} Can you declare reference variables of doubles?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double i = 3.14;
+
+\_\_\_\_\_\_\_\_\_ j = i; // declare j to be a reference to I
+
+std::cout \textless\textless{} i \textless\textless{} ' '
+\textless\textless{} j \textless\textless{} std::endl;
+
+i = 2.718;
+
+std::cout \textless\textless{} i \textless\textless{} ' '
+\textless\textless{} j \textless\textless{} std::endl;
+
+j = -1;
+
+std::cout \textless\textless{} i \textless\textless{} ' '
+\textless\textless{} j \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+See how a reference variable behaves? \emph{j} refers to the memory of
+\emph{i}. \emph{j} is just another name for \emph{i}; it's an alias for
+\emph{i.}
+
+In terms of our program
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void swap(int \textbf{\&} a, int \textbf{\&} b)
+
+\{
+
+int t = a;
+
+a = b;
+
+b = t;\\
+\}
+
+int main()
+
+\{
+
+int x = 0;
+
+int y = 42;
+
+swap(x, y);
+
+std::cout \textless\textless{} x \textless\textless{} ' '
+\textless\textless{} y \textless\textless{} std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+when \emph{swap()} is called, the reference variable \emph{a} is created
+and is assigned \emph{x} which makes \emph{a} a reference to \emph{x} --
+\emph{a} uses the memory of \emph{x. }Whatever you do to \emph{a} in
+\emph{swap()} therefore also change \emph{x.}
+
+\textbf{Exercise.} Fix this program so that it works:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void inc(int x)
+
+\{
+
+x++;\\
+\}
+
+int main()
+
+\{
+
+int a = 42;
+
+inc(a);
+
+std::cout \textless\textless{} a \textless\textless{} std::endl; //
+should see 43
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(Of course this is just for demo. In a real world program, you should
+use ++ instead of writing a function for it!)
+
+\textbf{Exercise.} Complete this program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// sort x, y, z in ascending order using bubblesort
+
+void sort(int \& x, int \& y, int \& z)
+
+\{
+
+... CODE ...\\
+\}
+
+int main()
+
+\{
+
+int x = 3, y = 5, z = 2;
+
+sort(x, y, z);
+
+std::cout \textless\textless{} x \textless\textless{} ' '
+\textless\textless{} y \textless\textless{} z \textless\textless{} ' '
+
+\textless\textless{} std::endl; // should get: 2 3 5
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Advice: In general we only use references only when a function is meant
+to change the value of a variable that is passed in. We do not want
+accidental changes in the function to propagate back to the caller. In
+other words, use references only when you need to. Therefore you should
+minimize the use of reference variables.
+
+Style
+
+Instead of
+
+\emph{int \& x}
+
+It's actually more common to write
+
+\emph{int\& x}
+
+Another style is this:
+
+int \&x;
+
+Gotcha
+
+Warning!!! This code fragment
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x = 42;
+
+int \& a = x, b = x, c = x;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+means this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x = 42;
+
+int \& a = x;
+
+int b = x;
+
+int c = x;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+If you really want \emph{b} and \emph{c} to be references, then you
+should do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x = 42;
+
+int \& a = x, \textbf{\&} b = x, \textbf{\&} c = x;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+or just declare one thing per line:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x = 42;
+
+int \& a = x;
+
+int \& b = x;
+
+int \& c = x;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Array assignment function
+
+Let's get back to our array assignment function.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+void println(int x{[}{]}, int len)
+
+\{
+
+for (int i = 0; i \textless{} len; i++)
+
+\{
+
+std::cout \textless\textless{} x{[}i{]} \textless\textless{} ' ';
+
+\}
+
+std::cout \textless\textless{} std::endl;\\
+\}
+
+void arrayAssign(int y{[}{]}, \textbf{int \& ylen},
+
+int x{[}{]}, int xlen)
+
+\{
+
+ylen = xlen;
+
+for (int i = 0; i \textless{} xlen; i++)
+
+\{
+
+y{[}i{]} = x{[}i{]};\\
+\}\\
+\}
+
+int main()
+
+\{
+
+int x{[}{]} = \{1, 2, 3\};
+
+int y{[}100{]};
+
+int ylen = 0;
+
+arrayAssign(y, ylen, x, 3);
+
+println(y, ylen);
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(WARNING: the code does not check that \emph{y} has enough space for the
+copying process.)
+
+Now's your turn:
+
+\textbf{Exercise.} Write an \emph{arrayConcat()} function (concatenation
+of arrays) that appends an array to another. In other words, if \emph{x}
+is the array \emph{\{1, 2, 3\}} and \emph{y} is the array \emph{\{6, 7,
+8, 9\}}, after calling this function with \emph{x} and \emph{y}, you
+want \emph{x} to be \emph{\{1, 2, 3, 6, 7, 8, 9\}}.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+void println(int x{[}{]}, int len)
+
+\{
+
+for (int i = 0; i \textless{} len; i++)
+
+\{
+
+std::cout \textless\textless{} x{[}i{]} \textless\textless{} ' ';
+
+\}
+
+std::cout \textless\textless{} std::endl;\\
+\}
+
+void arrayConcat(int x{[}{]}, int \& xlen,
+
+int y{[}{]}, int ylen)
+
+\{
+
+... CODE ...\\
+\}
+
+int main()
+
+\{
+
+int x{[}100{]} = \{1, 2, 3\};
+
+int xlen = 3;
+
+int y{[}100{]} = \{6, 7, 8, 9\};
+
+int ylen = 4;
+
+arrayConcat(x, xlen, y, ylen);
+
+println(x, xlen);
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+More examples
+
+\textbf{Exercise. }Can you create a reference that refers to a
+reference?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double i = 3.14;
+
+double \& j = i;
+
+double \& k = j; // k references j which references i
+
+i = 2.718;
+
+std::cout \textless\textless{} i \textless\textless{} ' '
+\textless\textless{} j \textless\textless{} ' ' \textless\textless{} k
+\textless\textless{} std::endl;
+
+j = 1.414;
+
+std::cout \textless\textless{} i \textless\textless{} ' '
+\textless\textless{} j \textless\textless{} ' ' \textless\textless{} j
+\textless\textless{} std::endl;
+
+k = 0.693;
+
+std::cout \textless\textless{} i \textless\textless{} ' '
+\textless\textless{} j \textless\textless{} ' ' \textless\textless{} j
+\textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Here's the relevant rule: \textbf{A reference can refer to another
+reference}. In other words, a reference variable can reference a
+variable or it can reference another reference variable.
+
+\textbf{Exercise.} What is the output?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void f(int \& a, double c)
+
+\{
+
+a = a + int(c);
+
+c = 1.0;\\
+\}
+
+void g(int \& b, double \& c)
+
+\{
+
+b *= 2 + int(c);
+
+c = 0.0;
+
+f(b, c);\\
+\}
+
+int main()
+
+\{
+
+int x = 42;
+
+double y = 3.14;
+
+g(x, y);
+
+std::cout \textless\textless{} x \textless\textless{} ' '
+\textless\textless{} y \textless\textless{} std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(Suggestion: Drawing a memory model might help.)
+
+Here's another rule: \textbf{References must be initialized. Once you
+declare a reference, it must immediately refer to the memory of another
+variable}. Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int i = 5;
+
+int \& j; // create a reference variable ...
+
+j = i; // ... and *then* make the reference\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Does this work?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int i = 5;
+
+int \& j = i + 1;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Or this?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int i = 5;
+
+int k = 6;
+
+int \& j = i + k;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Why?
+
+Yet another rule: \textbf{Variable references must be initialized to
+variables or another reference (not an expression) } (This one is kind
+of obvious.) Here's an example:
+
+\textbf{Exercise.} Of course you know that you can do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double x = 3.14;
+
+int y = x;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+What about this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double x = 3.14;
+
+int \& y = x;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Rules, rules, rules ... \textbf{The type of a reference must match the
+type it's referring to}.
+
+\textbf{Exercise.} What is the output? (Or find the errors).
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void swap(int \& b, int \& c)
+
+\{
+
+int t = b;
+
+b = c;
+
+c = t;\\
+\}
+
+int main()
+
+\{
+
+int x = 42;
+
+double y = 1.234;
+
+swap(x, y);
+
+std::cout \textless\textless{} x \textless\textless{} ' '
+\textless\textless{} y \textless\textless{} std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} What is the output? (Or is there an error?)
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void g(double \& b, double \& c)
+
+\{
+
+b *= 2 + int(c);
+
+c = 0.0;\\
+\}
+
+int main()
+
+\{
+
+int x = 42;
+
+double y = 3.14;
+
+g(x, y);
+
+std::cout \textless\textless{} x \textless\textless{} ' '
+\textless\textless{} y \textless\textless{} std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(Suggestion: Drawing a memory model might help.)
+
+\textbf{Exercise. }You now know this works:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int i = 0;
+
+int \& a = i;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+What about the following?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int i = 0;
+
+const int \& a = i;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+const int i = 0;
+
+const int \& a = i;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+const int i = 0;
+
+int \& a = i;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Try all of them. Give a reason for those that does not work. For those
+that work, can you change the value of \emph{i} using \emph{i}?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+i = 42;\tabularnewline
+\bottomrule
+\end{longtable}
+
+Can you change the value of \emph{i} using \emph{a}?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+a = 42;\tabularnewline
+\bottomrule
+\end{longtable}
+
+Why?
+
+\textbf{Exercise.} What is the output? (Or find all the errors).
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void g(const int \& b, const double \& c)
+
+\{
+
+b *= 2 + c;
+
+c = 0.0;
+
+f(b, c);\\
+\}
+
+int main()
+
+\{
+
+const int x = 42;
+
+double y = 3.14;
+
+g(x, y);
+
+std::cout \textless\textless{} x \textless\textless{} ' '
+\textless\textless{} y \textless\textless{} std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} What is the output? (Or find all the errors).
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void g(int \& b, const double \& c)
+
+\{
+
+b *= 2 + c;
+
+c = 0.0;
+
+f(b, c);\\
+\}
+
+int main()
+
+\{
+
+const int x = 42;
+
+double y = 3.14;
+
+g(x, y);
+
+std::cout \textless\textless{} x \textless\textless{} ' '
+\textless\textless{} y \textless\textless{} std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+As mentioned before, a variable reference must reference a variable (or
+another reference). One exception is that \textbf{a constant reference
+can refer to a constant}. Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+const int \& i = 5;\tabularnewline
+\bottomrule
+\end{longtable}
+
+On the other hand the following won't work since you already know that a
+reference must refer to a variable:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+int \& i = 5;\tabularnewline
+\bottomrule
+\end{longtable}
+
+A \textbf{constant reference} is a reference that refers to a value and
+treat that value as a constant.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x = 42;
+
+const int \& y = x; // y is a const ref to x
+
+const int a = 0;
+
+const int \& b = a; // b is a const ref to a\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+It's very important to remember that if \emph{x} is a non-constant
+variable and \emph{y} is a constant reference to \emph{x}, then you
+cannot change the value of \emph{x} using \emph{y} -- because \emph{y}
+views the value of \emph{x} as though it's constant. However \emph{x}
+can still change it's value:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x = 42;
+
+const int \& y = x;
+
+std::cout \textless\textless{} x \textless\textless{} ' '
+\textless\textless{} y \textless\textless{} '\textbackslash n'
+
+x = 0; // changing x ... OK
+
+std::cout \textless\textless{} x \textless\textless{} ' '
+\textless\textless{} y \textless\textless{} '\textbackslash n'
+
+y = -1; // changing x using y ... BAD!!!\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} What is the output? (Or find the error)
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int f(int x{[}{]}, int \& len)
+
+\{
+
+int p = 1;
+
+for (int i = 0; i \textless{} len; i++)
+
+\{
+
+p *= x{[}i{]};\\
+\}
+
+return p;
+
+\}
+
+int main()
+
+\{
+
+int a{[}{]} = \{1, 2, 3\};
+
+std::cout \textless\textless{} f(a, 3) \textless\textless{} std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} After declaring a reference can the reference change
+the variable it's referring to? Does = work?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x = 1;
+
+int y = 2;
+
+int \& z = x; // make z refer to x
+
+z = 0;
+
+std::cout \textless\textless{} x \textless\textless{} ' '
+\textless\textless{} y \textless\textless{} ' ' \textless\textless{} z
+\textless\textless{} std::endl;
+
+z = y; // make z refer to y ... can we?
+
+z = -1;
+
+std::cout \textless\textless{} x \textless\textless{} ' '
+\textless\textless{} y \textless\textless{} ' ' \textless\textless{} z
+\textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Here the rule: \textbf{a reference variable cannot refer to another
+variable after it's initialization.}
+
+Return value or pass-by-reference???
+
+Now we have a dilemma ...
+
+The following is a simple \emph{square()} function:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double square(double x)
+
+\{
+
+return x * x;
+
+\}
+
+int main()
+
+\{
+
+std::cout \textless\textless{} square(3.14) \textless\textless{}
+std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+But you know that you can also do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void square(double x, double \& theSquare)
+
+\{
+
+theSquare = x * x;
+
+\}
+
+int main()
+
+\{
+
+double theSquare = 0.0;
+
+square(3.14, theSquare);
+
+std::cout \textless\textless{} theSquare \textless\textless{} std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Make sure you run it.
+
+Which should you use??? (Don't you hate making decisions ...)
+
+In general, if your function is like a mathematical function that
+computes a value, then you should use a return value. (Principle of
+least surprise.)
+
+For instance look at the above example. Notice how clumsy is the usage
+of the \emph{square()} function.
+
+If you have a function that computes two values, then you might want to
+have to have two pass-by-reference variables. Of course you can have two
+different functions. Here's an example:\\
+
+Here's functions:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double max(int x{[}{]}, int len)
+
+\{
+
+double m = x{[}0{]};
+
+for (int i = 1; i \textless{} len; i++)
+
+\{
+
+if (m \textless{} x{[}i{]}) m = x{[}i{]};\\
+\}
+
+return m;\\
+\}
+
+double min(int x{[}{]}, int len)
+
+\{
+
+double m = x{[}0{]};
+
+for (int i = 1; i \textless{} len; i++)
+
+\{
+
+if (m \textgreater{} x{[}i{]}) m = x{[}i{]};\\
+\}
+
+return m;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You can combine them into one:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void max\_min(int x{[}{]}, int len,
+
+int \& max, int \& min)
+
+\{
+
+double max = x{[}0{]};
+
+double min = x{[}0{]};
+
+for (int i = 1; i \textless{} len; i++)
+
+\{
+
+if (max \textless{} x{[}i{]}) max = x{[}i{]};
+
+if (min \textgreater{} x{[}i{]}) min = x{[}i{]};\\
+\}\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+If your program(s) always have to compute both the maximum and minimum,
+then the second version might be more useful. In fact it's faster than
+calling both \emph{max()} and \emph{min()} which requires \textbf{two}
+function calls and also \textbf{two} scans of the array.
+
+However this means that one fine day, if you really need to compute only
+the minimum of an array, you have to call this function and you have to
+create a dummy variable for the max which is not going to be used:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double x, y;
+
+max\_min(a, 10, x, y); // a is some array of length 10
+
+... only x is used ...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Or you have to write a \emph{min()} function.
+
+A basic principle of good software design is to design each function to
+perform one task and not two.
+
+Now if you look at our \emph{swap()} function
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void swap(int \textbf{\&} a, int \textbf{\&} b)
+
+\{
+
+int t = a;
+
+a = b;
+
+b = t;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+It does not perform a numerical computation; there is really no return
+value. It performs a transformation on variables. That's why the design
+of this function is reasonable.
+
+Prototypes for references
+
+How do you write function prototypes for pass-by-reference parameters?
+Easy! It's the same as your other variables. For instance if you have
+this function:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void f(int a, double \& b, char \& c, const bool \& b)
+
+\{
+
+... code ...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The function prototype is just
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+void f(int, double \&, char \&, const bool \&);\tabularnewline
+\bottomrule
+\end{longtable}
+
+That's all there is to it. So there's nothing new here.
+
+\textbf{Exercise.} Given this code
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int f(int \& a, double \& b)
+
+\{
+
+a++;
+
+b += a;
+
+return a * b\\
+\}
+
+int main()
+
+\{
+
+int x = 42;
+
+double y = 1;
+
+int z = f(x, y);
+
+std::cout \textless\textless{} x \textless\textless{} ' '
+\textless\textless{} y \textless\textless{} ' ' \textless\textless{} z
+
+\textless\textless{} std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Rewrite it into this form:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+// prototype of f() here
+
+int main()
+
+\{
+
+int x = 42;
+
+double y = 1;
+
+int z = f(x, y);
+
+std::cout \textless\textless{} x \textless\textless{} ' '
+\textless\textless{} y \textless\textless{} ' ' \textless\textless{} z
+
+\textless\textless{} std::endl;
+
+return 0;\\
+\}
+
+int f(int \& a, double \& b)
+
+\{
+
+a++;
+
+b += a;
+
+return a * b\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Run your program to make sure that you did it correctly.
+
+\textbf{Exercise.} Here's the \emph{swap()} example again.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void swap(int \& b, int \& c)
+
+\{
+
+int t = b;
+
+b = c;
+
+c = t;\\
+\}
+
+int main()
+
+\{
+
+int x = 42;
+
+int y = 1;
+
+swap(x, y);
+
+std::cout \textless\textless{} x \textless\textless{} ' '
+\textless\textless{} y \textless\textless{} std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Write a header file for the \emph{swap()} function. Implement the body
+of the \emph{swap()} function in a separate source file. Test your
+program.
+
+Exercise. One of the parameters in \emph{f()} need not be a reference.
+Which one?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int f(int \& a, double \& b)
+
+\{
+
+b += a;
+
+return a * b\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\end{document}

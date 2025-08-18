@@ -1,0 +1,1400 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\author{}
+\date{}
+
+\begin{document}
+
+72. Class Templates
+
+Objectives
+
+\begin{itemize}
+\tightlist
+\item
+  Write class templates
+\item
+  Instantiate classes from class templates
+\end{itemize}
+
+The problem
+
+What if we want to have a class where the only instance variable is an
+integer, and then we want another where the only instance variable is a
+character?
+
+They both have the same kind of ``behavior''. The constructor sets the
+value of the instance variable and there are get and set methods. Here's
+an example. Make sure you run it.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Int
+
+\{
+
+public:
+
+Int(int x0)
+
+: x(x0)
+
+\{\}
+
+int get() const \{ return x; \}
+
+void set(int x0) \{ x\_ = x0; \}
+
+private:
+
+int x;
+
+\};
+
+class Char
+
+\{
+
+public:
+
+Char(char x0): x(x0) \{\}
+
+char get() const \{ return x; \}
+
+void set(char x0) \{ x = x0; \}
+
+private:
+
+char x;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The test code is:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int main()
+
+\{
+
+Int d(5);
+
+Char e('a');
+
+std::cout \textless\textless{} d.get() \textless\textless{} ' '
+
+\textless\textless{} e.get() \textless\textless{} '\textbackslash n';
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Note that the two classes are very similar. In fact, within the class
+the only difference is the type associated with the instance variable.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Int
+
+\{
+
+public:
+
+Int(\textbf{int} x0)
+
+: x(x0)
+
+\{\}
+
+\textbf{int} get() const \{ return x; \}
+
+void set(\textbf{int} x0) \{ x\_ = x0; \}
+
+private:
+
+\textbf{int} x;
+
+\};
+
+class Char
+
+\{
+
+public:
+
+Char(\textbf{char} x0): x(x0) \{\}
+
+\textbf{char} get() const \{ return x; \}
+
+void set(\textbf{char} x0) \{ x = x0; \}
+
+private:
+
+\textbf{char} x;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+What a pain to type two chunks of code which are almost the same. It's
+like typing unrolled for-loops!
+
+Class templates
+
+Now we allow types to vary.
+
+Generic Programming refers to the style of programming using parameters
+for types.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template\textless{} typename T \textgreater{}
+
+class D \{
+
+public:
+
+D()\{\}
+
+D(T c) : x(c) \{\}
+
+T get() const \{ return x; \}
+
+void set(const T \& c) \{ x = c; \}
+
+private:
+
+T x;
+
+\};
+
+int main()
+
+\{
+
+\textbf{ D\textless{} int \textgreater{}} d(5);
+
+\textbf{ D\textless{} char \textgreater{}} e('a');
+
+std::cout \textless\textless{} d.get() \textless\textless{} ","
+\textless\textless{} e.get() \textless\textless{} "\textbackslash n";
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+A class is generated from a class template by the compiler when you
+specify the parameters.
+
+Example:
+
+D\textless{} int \textgreater{} d(5);
+
+If \emph{D\textless{} char \textgreater{}} does not appear, then the
+class \emph{D\textless{} char \textgreater{}} is not generated by the
+compiler. Here are some terms:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Template instantiation} = generating class from class template
+  and template arguments.
+\end{itemize}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Specialization} = template with parameters specified
+\end{itemize}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Template members} = members of a class template.
+\end{itemize}
+
+Template members are parameterized by the templates. So if a template
+member is defined outside the class, then the class template must be
+specified
+
+WARNING: Everything must be placed in the header file!!! No .cpp for
+class template!!!
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+template\textless typename T\textgreater{}
+
+class D \{
+
+public:
+
+D()\{\}
+
+D(T c) : x(c) \{\}
+
+T get() const;
+
+void set(const T \&);
+
+private:
+
+T x;
+
+\};
+
+template\textless class T\textgreater{}
+
+T D\textless{} T \textgreater::get() const
+
+\{
+
+return x;
+
+\}
+
+template\textless typename T\textgreater{}
+
+void D\textless{} T \textgreater::set(const T \& c)
+
+\{
+
+x = c;
+
+\}
+
+int main()
+
+\{
+
+D\textless{} int \textgreater{} d(5);
+
+D\textless{} char \textgreater{} e('a');
+
+std::cout \textless\textless{} d.get() \textless\textless{} ","
+\textless\textless{} e.get() \textless\textless{} "\textbackslash n";
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Note that
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template\textless typename T\textgreater{}
+
+T D\textless{} T \textgreater::get\textless{} T \textgreater() const
+
+\{
+
+return x;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+is the same as:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template\textless typename T\textgreater{}
+
+T D\textless{} T \textgreater::get() const
+
+\{
+
+return x;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+i.e., within the scope of \emph{D\textless{} T \textgreater{}}, T is
+already known.
+
+Constants for template parameters
+
+There are three things you can specify as template parameters. We'll
+talk about only two. The template parameters can be for
+
+\begin{itemize}
+\tightlist
+\item
+  types
+\end{itemize}
+
+or
+
+\begin{itemize}
+\tightlist
+\item
+  basic type values
+\end{itemize}
+
+In the above examples, the template parameters are for types:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template \textless{} typename T \textgreater{}
+
+class X
+
+\{
+
+...
+
+private:
+
+T ...
+
+...
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Here's an example where the template parameter is a value. Run this and
+study it very carefully.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+template \textless typename T, \textbf{int} MAX\textgreater{}
+
+class D
+
+\{
+
+public:
+
+T get(int) const;
+
+void set(int, const T \&);
+
+private:
+
+T x{[}MAX{]};
+
+\};
+
+template \textless typename T, int MAX\textgreater{}
+
+T D\textless{} T, MAX \textgreater::get(int index) const
+
+\{
+
+return x{[}index{]};
+
+\}
+
+template \textless typename T, int MAX\textgreater{}
+
+void D\textless{} T, MAX \textgreater::set(int index, const T \& c)
+
+\{
+
+x{[}index{]} = c;
+
+\};
+
+int main()
+
+\{
+
+D\textless{} int, \textbf{10} \textgreater{} d; // d is an int array of
+size 10
+
+D\textless char, \textbf{5}\textgreater{} e; // d is a char array of
+size 5
+
+d.set(1,5);
+
+e.set(2,'a');
+
+std::cout \textless\textless{} d.get(1) \textless\textless{} ","
+\textless\textless{} e.get(2) \textless\textless{} "\textbackslash n";
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+D is a class for fixed size arrays of different types. One of the
+template parameter is for the type of the array and the other template
+parameter is for the size of the array.
+
+When instantiating the value must be a \textbf{constant expression.}
+
+Run this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+const int x = 4;
+
+int y = 5;
+
+D\textless int, 5\textgreater{} d1;
+
+D\textless int, x - 2\textgreater{} d2;
+
+D\textless int, y\textgreater{} d3; // \textbf{WRONG!!! y is a
+variable.}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Type parameters are:
+
+\begin{itemize}
+\tightlist
+\item
+  Any type including basic types (int, bool) or classes.
+\end{itemize}
+
+If D is a class template
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template\textless{} typename T1, typename T2,
+
+int x, bool b \textgreater{}
+
+class D\{\ldots\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Then
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+D\textless{} X, Y, 10, true \textgreater{}\tabularnewline
+\bottomrule
+\end{longtable}
+
+and
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+const int x = 12;
+
+D\textless{} X, Y, x - 2, !false \textgreater{}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+are considered the same type (if \emph{X} and \emph{Y} are valid types).
+
+Recall that typedef is only an alias and does not create a new type. So
+if
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template\textless class X\textgreater{}
+
+class D\{...\};
+
+typedef int Salary;
+
+int main()
+
+\{
+
+D\textless{} int \textgreater{} x;
+
+D\textless{} Salary \textgreater{} y;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+then, \emph{D\textless{} int \textgreater{}}, \emph{D\textless{} Salary
+\textgreater{}} are of the same type and \emph{x}, \emph{y} have the
+same type.
+
+Error checking can be done with two different levels: syntax errors in
+template and when the template parameters are being used.
+
+In the definition of the template and class template, the template
+parameters are not specified yet. So the definition of
+
+\emph{Array\textless{} T \textgreater::print} is OK
+
+\emph{Array\textless{} int \textgreater::print} is OK
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class vec2d
+
+\{
+
+public:
+
+vec2d(float x0, float y0)
+
+: x(x0),y(y0)
+
+\{\}
+
+private:
+
+float x, y;
+
+\};
+
+template\textless{} typename T \textgreater{}
+
+class Array \{
+
+public:
+
+Array(int s)
+
+: size(s), arr(new T{[}s{]})
+
+\{\}
+
+void print() const;
+
+private:
+
+int size; T * arr;
+
+\};
+
+template\textless{} typename T \textgreater{}
+
+void Array\textless T\textgreater::print()
+
+\{
+
+for (int i=0; i\textless size; i++)
+
+std::cout \textless\textless{} arr{[}i{]} \textless\textless{}
+'\textbackslash n';
+
+\}
+
+int main() \{
+
+Array\textless int\textgreater{} a(10); a.print();
+
+\textbf{ Array\textless{} vec2d \textgreater{} b(10); }
+
+b.print();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You can specify default values for template parameters.
+
+The rules for default parameters are like those for default values for
+function parameters.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class C\{\};
+
+template\textless{} typename T0, \textbf{typename T1=int} \textgreater{}
+
+class D\{
+
+public: void f(T1 a) \{ std::cout \textless\textless{} a
+\textless\textless{} "\textbackslash n"; \}
+
+\};
+
+int main()
+
+\{
+
+\textbf{D\textless{} C \textgreater{}} obj1; obj1.f(1.1);
+
+\textbf{D\textless{} C, double \textgreater{}} obj2; obj2.f(1.1);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class C\{\};
+
+template \textless typename T0, typename T1=int\textgreater{}
+
+class D
+
+\{
+
+public: void f(T1);
+
+\};
+
+template \textless{} typename T0, typename T1 \textgreater{}
+
+void D\textless T0, T1\textgreater::f(T1 a)
+
+\{
+
+std::cout \textless\textless{} a \textless\textless{}
+``\textbackslash n'';
+
+\}
+
+int main()
+
+\{
+
+D\textless C\textgreater{} obj1;
+
+obj1.f(1.1);
+
+D\textless C, double\textgreater{} obj2;
+
+obj2.f(1.1);
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+When programming a class template, try it out for a specific type first.
+After the code works, change to a generic type and include template.
+
+WARNING: The following will give you an error.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template \textless typename T\textgreater{} class C\{...\};
+
+template \textless typename T\textgreater{} class D\{...\};
+
+int main()
+
+\{
+
+C\textless D\textless int\textgreater\textgreater{} c;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Why? Because \emph{\textgreater\textgreater{}} is an operator and for
+this code:
+
+C\textless D\textless int\textgreater\textgreater{} c;
+
+you compiler will think you are trying ot do this:
+
+...int \textgreater\textgreater{} c...
+
+as if you're doing some input!!!
+
+So write
+
+C\textless{} D\textless{} int \textgreater{} \textgreater{} c;
+
+to prevent the above. In general when working with templates, always
+have a space on the right of \textless{} and a space to the left of
+\textgreater.
+
+Function and struct templates
+
+So far we've talked about class templates which are templates for
+creating classes. But you can also have function templates and struct
+templates. Struct templates are very similar to class templates. Here's
+an example of a function template:
+
+Run this and study it carefully:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+template \textless{} typename T \textgreater{}
+
+T max(T x, T y)
+
+\{
+
+return (x \textgreater= y ? x : y);\\
+\}
+
+int main()
+
+\{
+
+std::cout \textless\textless{} max\textless{} int \textgreater(5, 2)
+\textless\textless{} std::endl;
+
+std::cout \textless\textless{} max\textless{} double \textgreater(1.2,
+3.4) \textless\textless{} std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+For the case of function templates, usually the compiler can figure out
+what types are intended for the type parameter. So you can run the above
+test cases with this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+int main()
+
+\{
+
+std::cout \textless\textless{} max(5, 2) \textless\textless{} std::endl;
+
+std::cout \textless\textless{} max(1.2, 3.4) \textless\textless{}
+std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+i.e., without the \emph{\textless{} int \textgreater{}} and the
+\emph{\textless{} double \textgreater{}}.
+
+Like class templates, if you want to write a function template in a
+separate file, then the whole function template must be a header file.
+
+\textbf{Exercise.} Write a min function template. Test it.
+
+Here's another example for you to study. Add test code in your
+\emph{main()} function and run it. Study it carefully. Note that in this
+case, the type parameter \emph{T} appears in the body of the function
+template.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template \textless{} typename T \textgreater{}
+
+T swap(T \& x, T \& y)
+
+\{
+
+\textbf{T} t = x;
+
+x = y;
+
+y = t;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Write a print function template to print an array of
+type \emph{T} values. The function should receive an array of \emph{T}
+values and the number of things in the array to print starting at index
+0:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template \textless{} typename T \textgreater{}
+
+void print(T x{[}{]}, int n)
+
+\{
+
+...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise. }Write a linearsearch function template:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template \textless{} typename T \textgreater{}
+
+int linearsearch(T x{[}{]}, int n, const T \& target)
+
+\{
+
+\ldots{}
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Test it! Make sure you test it with an array of integer values, double
+values, and char values.
+
+\textbf{Exercise.} Write a bubblesort function template.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template \textless{} typename T \textgreater{}
+
+void bubblesort(T a{[}{]}, int size);\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Test it by performing bubble sort on an array of integers and an array
+of doubles. Is it possible to write this version?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template \textless{} typename T \textgreater{}
+
+void bubblesort(T * start, T * end);\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Write a binarysearch function template:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template \textless{} typename T \textgreater{}
+
+int binarysearch(T a{[}{]}, int size, const T \& target);\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Test it! What about this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template \textless{} typename T \textgreater{}
+
+T * binarysearch(T * start, T * end, T * target);\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(I have a set of notes just on function templates and just on struct
+templates. Study them both when you have time.)
+
+Typename and class
+
+Instead of
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template \textless{} \textbf{typename} X \textgreater{}
+
+class C\{\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You can say
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template \textless{} \textbf{class} X \textgreater{}
+
+class C\{\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+They mean the same thing. However, \emph{typename} is better.
+
+Template specialization
+
+Suppose you have this \emph{\textbf{Array}} class template:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+template\textless{} typename T, int size \textgreater{}
+
+class Array
+
+\{
+
+public:
+
+Array(T x{[}{]})
+
+\{
+
+for(int i = 0; i \textless{} size; ++i)
+
+x\_{[}i{]} = x{[}i{]};
+
+\}
+
+int sum() const
+
+\{
+
+int s = 0;
+
+for (int i = 0; i \textless{} size; ++i)
+
+s += x{[}i{]};
+
+return s;
+
+\}
+
+private:
+
+T x\_{[}size{]};
+
+\};
+
+int main()
+
+\{
+
+int x{[}{]} = \{2, 3, 5, 7, 11, 13, 17, 19\};
+
+Array\textless{} int, 4 \textgreater{} a(x);
+
+std::cout \textless\textless{} a.sum() \textless\textless{}
+'\textbackslash n';
+
+Array\textless{} int, 3 \textgreater{} b(x);
+
+std::cout \textless\textless{} b.sum() \textless\textless{}
+'\textbackslash n';\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Run it.
+
+Then you realize that in your software that you are building, one
+extremely common usage of your \emph{\textbf{Array}} library is for the
+case of modeling \emph{\textbf{int}}\textbf{ arrays of size 3}.
+
+A loop over an array of size 3 to compute the sum is definitely slower
+that unrolling the loop. The unrolled loop is going to be about twice as
+fast.
+
+Hmmm \ldots{} can we \textbf{speedup this case}?
+
+Yes you can \ldots{} you can write a version of \emph{\textbf{Array}}
+just for the case when T = \emph{\textbf{int}} and size = 3. This is
+called a \textbf{template specialization}.
+
+Run this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+template\textless{} typename T, int size \textgreater{}
+
+class Array
+
+\{
+
+// ... same as before ...
+
+\};
+
+template\textless\textgreater{}
+
+class Array\textless{} int, 3 \textgreater{}
+
+\{
+
+public:
+
+Array(int x{[}{]})
+
+\{
+
+std::cout \textless\textless{} "specialization
+speedup!!!\textbackslash n";
+
+x\_ = x{[}0{]}; y\_ = x{[}1{]}; z\_ = x{[}2{]};
+
+\}
+
+int sum() const
+
+\{
+
+std::cout \textless\textless{} "specialization
+speedup!!!\textbackslash n";
+
+return x\_ + y\_ + z\_;
+
+\}
+
+private:
+
+int x\_, y\_, z\_;
+
+\};
+
+int main()
+
+\{
+
+// ... same as before ...\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Template specialization is a very important idea and is used quite
+frequently.
+
+\textbf{Exercise.} Add \emph{\textbf{operator{[}{]}}} to both classes.
+Test your code.
+
+\textbf{Exercise.} Then you realize that \ldots{} wait a minute \ldots{}
+this specialization idea is also helpful for a \emph{\textbf{double}}
+array of size 3 and a \emph{\textbf{float}} array of size 3. Hmmm
+\ldots{} can we partially specialize? In other words can we have
+\emph{\textbf{size}} = 3 but retain \emph{\textbf{T}} as a template
+parameter Try to figure it out \emph{\textbf{on your own}} before
+turning the page for the answer!!! You have 20 minutes ...
+
+\textbf{Exercise.} Write a \emph{\textbf{Matrix}} class template. A
+matrix is just a 2D array. Here's a sample run:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include "Matrix.h"
+
+int main()
+
+\{
+
+int x{[}{]} = \{0, 1, 2, 3, 4, 5, 6, 7, 8, 9\};
+
+Matrix\textless{} int, 2, 3 \textgreater{} m(x); // m is 2-by-3.
+
+std::cout \textless\textless{} m \textless\textless{} '\textbackslash n'
+// prints
+
+// 0 1 2
+
+// 3 4 5
+
+Matrix\textless{} int, 2, 1 \textgreater{} n(x); // n is 2-by-1
+
+std::cout \textless\textless{} n \textless\textless{} '\textbackslash n'
+// prints
+
+// 0
+
+// 1
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+That 2-by-1 matrix is sometimes called a ``2-dimensional column
+vector''. Column vectors are used frequently. Furthermore processing a
+regular 1-dimensional array of size 2 is faster than viewing it as a
+2-by-1 2D array. So \ldots{} speedup your \emph{\textbf{Matrix}} library
+by providing a specialization for the column vector case of a
+\emph{\textbf{Matrix}} object where you use a 1-dimensional array in
+this case The following should then work:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include "Matrix.h"
+
+int main()
+
+\{
+
+int x{[}{]} = \{0, 1, 2, 3, 4, 5, 6, 7, 8, 9\};
+
+Matrix\textless{} int, 2, 3 \textgreater{} m(x); // m is 2-by-3.
+
+std::cout \textless\textless{} m \textless\textless{} '\textbackslash n'
+// prints
+
+// 0 1 2
+
+// 3 4 5
+
+\textbf{Matrix\textless{} int, 2 \textgreater{}} n(x); // n is 2-by-1
+
+std::cout \textless\textless{} n \textless\textless{} '\textbackslash n'
+// prints
+
+// 0
+
+// 1
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Such a template library is very common in computer graphics and computer
+vision. Such a library usually provide a typedef for
+\emph{\textbf{Matrix\textless{} double, 4, 4 \textgreater{}}},
+\emph{\textbf{Matrix\textless{} int, 2 \textgreater{}}}, etc.. For
+instance there might be a typedef \emph{\textbf{mat4x4}} for
+\emph{\textbf{Matrix\textless{} double, 4, 4 \textgreater{}}}\textbf{,
+}\emph{\textbf{mat}\textbf{f}\textbf{4x4}} for
+\emph{\textbf{Matrix\textless{} }\textbf{float}\textbf{, 4, 4
+\textgreater{}}}, and \emph{\textbf{vec4f}} for
+\emph{\textbf{Matrix\textless{} }\textbf{float}\textbf{, 4
+\textgreater.}}
+
+WARNING \ldots{} INCOMING SPOILER \ldots{}
+
+Here's the (obvious?) answer to the question on the previous page:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template\textless{} typename T, int size \textgreater{}
+
+class Array
+
+\{
+
+public:
+
+Array(T x{[}{]})
+
+\{
+
+for(int i = 0; i \textless{} size; ++i)
+
+x\_{[}i{]} = x{[}i{]};
+
+\}
+
+int sum() const
+
+\{
+
+int s = 0;
+
+for (int i = 0; i \textless{} size; ++i)
+
+s += x\_{[}i{]};
+
+return s;
+
+\}
+
+private:
+
+T x\_{[}size{]};
+
+\};
+
+template\textless{} typename T \textgreater{}
+
+class Array\textless{} T, 3 \textgreater{}
+
+\{
+
+public:
+
+Array(T x{[}{]})
+
+\{
+
+std::cout \textless\textless{} "specialization
+speedup!!!\textbackslash n";
+
+x\_ = x{[}0{]}; y\_ = x{[}1{]}; z\_ = x{[}2{]};
+
+\}
+
+int sum() const
+
+\{
+
+std::cout \textless\textless{} "specialization
+speedup!!!\textbackslash n";
+
+return x\_ + y\_ + z\_;
+
+\}
+
+private:
+
+T x\_, y\_, z\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\end{document}

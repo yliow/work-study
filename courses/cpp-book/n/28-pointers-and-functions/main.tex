@@ -1,0 +1,623 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\author{}
+\date{}
+
+\begin{document}
+
+Objectives
+
+\begin{itemize}
+\tightlist
+\item
+  Understand function pointer values
+\item
+  Understand function pointers
+\item
+  Understand how function pointers allow us to write compact and
+  flexible code
+\end{itemize}
+
+Functions and Pointers
+
+Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+double avg(int x, int y)
+
+\{
+
+return (x + y) / 2.0;\\
+\}
+
+int main()
+
+\{
+
+std::cout \textless\textless{} avg(1, 2) \textless\textless{} std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+No surprises. Of course
+
+avg(1, 2)
+
+is a function call. No big deal. BUT \ldots{} now try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+double avg(int x, int y)
+
+\{
+
+return (x + y) / 2.0;\\
+\}
+
+int main()
+
+\{
+
+std::cout \textless\textless{} avg(1, 2) \textless\textless{} std::endl;
+
+std::cout \textless\textless{} (unsigned int) avg \textless\textless{}
+std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+What do you get? What do you think \emph{avg} means?
+
+\emph{avg} is actually the address of the function avg. You can think of
+it this way: Not only data (i.e. variable values) lives in your
+computer's memory, even code lives in your RAM. avg is the address of
+the first line of code of avg.
+
+You can save the function address in a variable. Such a variable is
+called \textbf{function pointer}. Here's an example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+double avg(int x, int y)
+
+\{
+
+return (x + y) / 2.0;\\
+\}
+
+int main()
+
+\{
+
+std::cout \textless\textless{} avg(1, 2) \textless\textless{} std::endl;
+
+std::cout \textless\textless{} (unsigned int) avg \textless\textless{}
+std::endl;
+
+double (*g)(int, int);
+
+g = \&avg;
+
+std::cout \textless\textless{} (unsigned int) g \textless\textless{}
+std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Note the declaration of \emph{g}.
+
+\textbf{Exercise.} Instead of this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+double (*g)(int, int);
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+can you do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+double *g(int, int);
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Why?
+
+\textbf{Exercise.} It turns out that instead of
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+g = \&avg;
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+you can also write
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+g = avg;
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In other words, for the case of functions, the address operator \& is
+optional.
+
+What can you do with a function pointer?
+
+So what can you do with a function pointer? Well \ldots{} you can use it
+just like a function:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+double avg(int x, int y)
+
+\{
+
+return (x + y) / 2.0;\\
+\}
+
+int main()
+
+\{
+
+std::cout \textless\textless{} avg(1, 2) \textless\textless{} std::endl;
+
+std::cout \textless\textless{} (unsigned int) avg \textless\textless{}
+std::endl;
+
+double (*g)(int, int);
+
+g = \&avg;
+
+std::cout \textless\textless{} \textbf{g(1, 2)} \textless\textless{}
+std::endl;
+
+std::cout \textless\textless{} (unsigned int) g \textless\textless{}
+std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Write a function \emph{square()} that accepts a value
+(a \emph{double}) and returns the square of the value. Create a function
+pointer \emph{p} and store the address of \emph{square} in \emph{p}.
+Using \emph{p}, print the square of \emph{2}.
+
+Why?
+
+OK. The above looks bizarre. But what good is it? Why not just use
+\emph{avg}?
+
+Because now even functions can be viewed as values. The following will
+make things clear.
+
+For instance suppose you have two functions \emph{f1}, \emph{f2}, both
+accepting two integers and returning a \emph{double} and you have a
+program that looks like where \emph{f1}, \emph{f2} are used a lot but in
+two different scenarios:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+if (x \textless{} 0)
+
+\{
+
+double a = f1(x + a, b);
+
+double b = f1(a, b + c / 2);
+
+double c = a + b + f1(5.0, a + b);
+
+z = a + b + c + f1(1, 1);
+
+\}
+
+else
+
+\{
+
+double a = f2(x + a, b);
+
+double b = f2(a, b + c / 2);
+
+double c = a + b + f2(5.0, a + b);
+
+z = a + b + c + f2(1, 1);
+
+\}
+
+std::cout \textless\textless{} z \textless\textless{}
+'\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Note that the computation in both case are essentially the same other
+than a difference in which of \emph{f1}, \emph{f2} should be used. Now
+if your programming language has the concept of function pointers like
+C++, you can do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double (*g)(int, int) = (x \textless{} 0 ? \&f1 : \&f2);
+
+double a = g(x + a, b);
+
+double b = g(a, b + c / 2);
+
+double c = a + b + g(5.0, a + b);
+
+z = a + b + c + g(1, 1);
+
+std::cout \textless\textless{} z \textless\textless{}
+'\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Note in particular, you can create a function that accepts functions as
+parameters! If you think of functions as computing with inputs values
+such as integer and doubles, then you can also think of functions as
+performing computations on functions \ldots{} functions operating on
+functions!!!
+
+Are there such things in real life? Of course. Suppose you want to find
+the maximum value of a function like the function x*x + x - 5 in the
+interval {[}a, b{]}. You might do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double max(double a, double b)
+
+\{
+
+double m = a * a + a -- 5;
+
+for (double x = a + 0.001; x \textless= b; x += 0.001)
+
+\{\\
+double y = x * x + x -- 5;
+
+if (y \textgreater{} m)
+
+\{
+
+m = y;
+
+\}
+
+\}
+
+return m;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Unfortunately, the function x * x + x -- 5 is ``hard-coded'' into the
+above \emph{max()} function. It cannot be used to compute for instance
+the maximum value of 3 * x * x * x -- 5 * x * x + 12. You would have to
+write another function, say \emph{max2()}, that does more or less the
+same thing.
+
+But \ldots{} ahhh \ldots{} since C/C++ allows function pointers, you can
+do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double max(double a, double b, double (*f) (double))
+
+\{
+
+double m = f(a);
+
+for (double x = a + 0.001; x \textless{} b; x += 0.001)
+
+\{
+
+double y = f(x);
+
+if (y \textgreater{} m)
+
+\{
+
+m = y;
+
+\}
+
+\}
+
+double y = f(b);
+
+if (y \textgreater{} m)
+
+\{
+
+m = y;
+
+\}
+
+return m;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Now if you want to compute the maximum of 3 * x * x * x -- 5 * x * x +
+12 for 1\textless= x \textless= 100, all you need to do is to do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double f(double x)
+
+\{
+
+return 3 * x * x * x -- 5 * x * x + 12;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+and then call the above \emph{max} function with this \emph{f}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+std::cout \textless\textless{} max(1, 100, \&f) \textless\textless{}
+std::endl;\tabularnewline
+\bottomrule
+\end{longtable}
+
+Exercise. The above \emph{max} function tests x points spaced out in
+such a way that consecutive x values differ by 0.001. Write a max
+function that lets you specify this gap, called \emph{dx}, where the
+default value is \emph{0.001}.
+
+Exercise. Write a \emph{min} function that does the obvious thing
+similar to the above.
+
+Exercise. Write an area function that computes the area of a function
+\emph{f}. For instance \emph{area(1, 5, \&f, 0.0001)} computes the area
+under the curve y = f(x) from x = 1 to x = 5 using the sum of tiny
+rectangular strips of width 0.0001. Let the default width be 0.001.
+
+Exercise. Look at your bubblesort function again:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+void bubblesort(int x{[}{]}, int size);\tabularnewline
+\bottomrule
+\end{longtable}
+
+The problem is that it sorts either in ascending or descending order.
+Note that The difference is only in comparison of values in array x. You
+need to know if x{[}i{]} \textgreater{} x{[}i+1{]} is true. We can have
+two boolean comparison functions:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+bool lessthan(int x, int y);
+
+bool greaterthan(int x, int y);\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+and write a \emph{bubblesort} function so that you can call
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+bubblesort(x, size, \&lessthan);\tabularnewline
+\bottomrule
+\end{longtable}
+
+to sort \emph{x} in ascending order and call
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+bubblesort(x, size, \&greaterthan);\tabularnewline
+\bottomrule
+\end{longtable}
+
+to sort \emph{x} in descending order.
+
+Array of function pointers
+
+In the above I let g be one of two functions:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double (*g)(int, int) = (x \textless{} 0 ? \&f1 : \&f2);
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+What if you have a collection of 3 functions? Or 5 functions? Or 100
+functions? You can put them into an array of function pointers, and then
+select which one you want by specifying an index value. Run this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int f(int x, int y)
+
+\{
+
+return x;
+
+\}
+
+int g(int x, int y)
+
+\{
+
+return y;
+
+\}
+
+int h(int x, int y)
+
+\{
+
+return x + y;
+
+\}
+
+int main()
+
+\{
+
+\textbf{int (*F{[}3{]})(int, int)} = \{f, g, h\};
+
+for (int i = 0; i \textless{} 3; ++i)
+
+\{
+
+std::cout \textless\textless{} F{[}i{]}(0, 1) \textless\textless{}
+'\textbackslash n';
+
+\}
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\end{document}

@@ -1,0 +1,1177 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\author{}
+\date{}
+
+\begin{document}
+
+07. \emph{if} and \emph{if}-\emph{else}: Part 1
+
+Objectives
+
+\begin{itemize}
+\tightlist
+\item
+  Write if statements (including blocks)
+\item
+  Write if-else statements (including blocks)
+\item
+  Write nested if-else statements
+\end{itemize}
+
+We will now talk about writing statements that make decisions. In other
+words, statements that decide whether to run other statements or not.
+
+This is significant \ldots{} we are now embarking on writing program
+with intelligence \ldots{}
+
+ONWARD!!!
+
+\emph{if} statements
+
+So far you know that C++ can do arithmetic, print integer values, print
+string values, accept integer values from the keyboards, create and
+update variables.
+
+You should expect more! (Otherwise C++ is pretty dumb.)
+
+For instance you would expect programs to make decisions. Now wouldn't
+it be nice if C++ can do this:
+
+if alien is killed:
+
+score = score + 10
+
+or
+
+if my ship's energy is 0:
+
+end the game
+
+or
+
+if plane's left engine has failed and
+
+plane's right engine has failed:
+
+activate seat ejection!!!
+
+Note that for the first case, if the alien is not killed, you do
+\emph{not} want to execute the statement \emph{score = score + 10}.
+Otherwise everyone would keeping getting the same score! What kind of
+dumb game is that?
+
+In fact C++ \emph{does} understand the \emph{if} statement.
+
+Run this program
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Run the program several time, entering different values for x. Note that
+the statement printing \emph{"spam!"} is controlled by the \emph{if}.
+However the statement that prints \emph{"eggs"} is not.
+
+For readability, the if statement is written like this:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Big picture: The format of the \emph{if} statement looks like this
+
+\emph{\textbf{if (}\textbf{{[}bool expr{]}}\textbf{)}}
+
+\emph{{[}stmt{]}}
+
+where {[}\emph{bool expr{]}} is a \textbf{boolean expression} -- this
+means that it's an expression that can be evaluated to a boolean value
+-- and {[}\emph{stmt{]} }is a C++ statement (of course there's a
+semi-colon at the end). Since we need boolean expressions it's a good
+time now to recall the following:
+
+\emph{!}``not''
+
+\emph{\&\&}"and"
+
+\emph{\textbar\textbar{}}"or"
+
+\emph{==}"is equal to"
+
+\emph{!=}"is not equal to"
+
+\emph{\textless{}}"is less than"
+
+\emph{\textless=}"is less than or equal to"
+
+\emph{\textgreater{}}"is greater than"
+
+\emph{\textgreater=}"is greater than or equal to"
+
+An example of a boolean expression is
+
+{[}variable{]} {[}bool op{]} {[}value{]}
+
+where {[}variable{]} is a variable of int or double or float type,
+{[}bool op{]} is one of the above boolean operators and {[}value{]} is
+an int or double or float. Don't forget that if there is a type
+mismatch, C++ will try to type promote one value to match the type of
+the other. For instance if \emph{x} is an \emph{int} variable and the
+boolean expression is
+
+\emph{x \textless{} 1.23}
+
+then C++ will use the \emph{double} of \emph{x} (i.e., \emph{x} is
+automatically promoted to a \emph{double}):
+
+\emph{double(x) \textless{} 1.23}
+
+Exercise. Modify the above program so that \emph{"spam!"} is printed
+when the integer entered is 42. Test your program.
+
+Exercise. Modify the above program so that the program prompts the user
+for his/her favorite number and print ``you don't like 42?!?'' if the
+integer entered is not 42. Here's an execution:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+what's your favorite number? \textbf{42}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Here's another:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+what's your favorite number? \textbf{1}
+
+you don't like 42?!?\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Write a program that prompts the user for an integer
+and prints ``That's even. Am I smart?'' if the integer entered is even.
+Here's an execution
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+100
+
+That's even. Am I smart?\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Here's another
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+101\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Write a program that prompts the user for his/her age
+and prints ``You're lying! Think you can fool me???'' if the value
+entered is less than 18. Here's an execution:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+Enter your age: \textbf{16}
+
+You're lying! Think you can fool me???\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Here's another:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+Enter your age: \textbf{100}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Of course this is another boolean expression:
+
+{[}var1{]} {[}bool op{]} {[}var2{]}
+
+In this case you're comparing two (integer or double) variables.
+
+\textbf{Exercise.} Write a program that prompts the user for two integer
+values and prints ``First is bigger'' if the first integer entered is
+larger than the second. Here's an execution of the program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+1 2\tabularnewline
+\bottomrule
+\end{longtable}
+
+Here's another
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+2 -1
+
+First is bigger\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Here's yet another boolean expression:
+
+{[}expr{]} {[}bool op{]} {[}value{]}
+
+where \emph{{[}expr{]}} is an (integer or double) expression.
+
+\textbf{Exercise.} Write a program that prompts the user for his/her
+height (in ft) and weight (in lbs) and prints ``you will live more than
+100 years!!!'' if the product of the height and weight is at least
+200.45. (This is not supported by any form of research.) Here's an
+execution of the program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+6.1 180.180
+
+you will live more than 100 years!!!\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Here's another
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+3.4 23.4\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Write a program that prompts the user for the year of
+his/her date of birth and the current year and prints his/her
+approximate age and then prints ``you must have watched lots of movies
+by now'' if the difference of the two values is at least 20. Here's an
+execution:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+1900 2000
+
+you are about 100 years old
+
+you must have watched lots of movies by now\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Here's another:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+2000 2006
+
+you are about 6 years old\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+One last one ... here's one more boolean expression:
+
+{[}expr1{]} {[}bool op{]} {[}expr2{]}
+
+Now, we're comparing two expressions.
+
+\textbf{Exercise.} Write a program that prompts the user for the month,
+day of his/her date of birth and also his/her height (in ft) and weight
+(in lbs). Print the approximate number of days from January 1 of the
+year he/she was born and the sum of his/her height and weight. If the
+first printed number is greater than the second, print ``According to
+the theory of relativity, you are going to win the next powerball.''.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+Enter the month, day of your DOB: \textbf{1 1}
+
+Enter your height and weight: \textbf{6 100}
+
+1 106\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Here's another:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+Enter the month, day of your DOB: \textbf{12 25}
+
+Enter your height and weight: \textbf{6 200}
+
+355 206
+
+According to the theory of relativity, you are going to win the next
+powerball.\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(You may assume the number of days in a month is 30.)
+
+\textbf{Exercise. }Try this:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+And then this:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Combine both into one program so that I get the following execution:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+How many heads do you have? \textbf{1}
+
+You are not Zaphod\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+And here's an execution of the same program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+How many heads do you have? \textbf{2}
+
+Are you Zaphod?\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Next modify the program so that, in addition to the above requirements,
+if the number of heads entered is greater than 2, the program prints "No
+kidding!". Finally, modify the program so that, in addition to the
+above, if the number of heads is 1, the program prints "Let me introduce
+you to our surgeons." Test your program by entering 0, 1, 2, 3.
+
+(There's a better way to do this exercise ...)
+
+Mental picture: flow of execution for \emph{if}
+
+The \emph{if} statement is difficult for some beginning programmers
+because it alters the flow of execution of a program.
+
+Before this set of notes, C++ executes one statement at a time from top
+to bottom; it executes every statement.
+
+The \emph{if} statement is different because it has a statement
+\textbf{inside} the \emph{if} statement.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x = 0;
+
+std::cin \textgreater\textgreater{} x;
+
+if (x \textgreater{} 0)
+
+std::cout \textless\textless{} "spam!" \textless\textless{} std::endl;
+
+std::cout \textless\textless{} "eggs" \textless\textless{}
+std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The statement in the \emph{if} statement is executed only when the
+\emph{x \textgreater{} 0} is true. If the condition is not true, the
+statement in the \emph{if} statement is not executed.
+
+In the following diagram, you can follow the arrows to get a sense of
+the flow of execution:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x = 0;
+
+std::cin \textgreater\textgreater{} x;
+
+if (x \textgreater{} 0)
+
+std::cout \textless\textless{} "spam!" \textless\textless{} std::endl;
+
+std::cout \textless\textless{} "eggs" \textless\textless{}
+std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Of course the program is still executing one statement at a time from
+the top to the bottom if you view the if statement as a statement (i.e.
+forget about the internals of the if statement).
+
+Gotchas
+
+Exercise. Try this:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Fix it.
+
+\textbf{Exercise.} Try this:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+What do you learn from this example?
+
+\textbf{Exercise.} Here's another wacky example ...
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Multiplication game: Part 1
+
+Exercise. Write a program that tests if the user can do two digit
+multiplication. Right now we will just ask the one question: the product
+of 97 and 94. The program congratulates the user if the right answer is
+entered. Otherwise the program stops immediately. Here's an execution of
+the program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+What is the product of 97 and 94? \textbf{1}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Here's another execution of the program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+What is the product of 97 and 94? \textbf{9118}
+
+You smart dawg!\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+This is kind of a dumb program because it asks the same question again
+and again.
+
+Here's the \textbf{pseudocode} (pseudocode = informal description of
+steps in a program):
+
+Declare integer variable guess
+
+Print a prompt string to user
+
+Prompt user for integer value for guess
+
+If guess is 9118
+
+print congratulatory message
+
+Note that this is not a C++ program yet!!! You can't run it!!!
+
+Complete the program using the above pseudocode. Test your program.
+
+Blocks
+
+What if you want to execute \emph{\textbf{several}} statements when a
+boolean expression is true? Here's one way:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+It does work \ldots{} but ... that's the \textbf{BAD} way of executing
+two statements when a condition holds.
+
+\emph{\textbf{This}} is the right way:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+The \emph{\{...\}} is called a \textbf{block} or \textbf{block of
+statements. }(You've actually seen this already. Look at your
+\emph{main()} \ldots) You can have as many statements as you like in a
+block, not just two.
+
+\textbf{Exercise.} Here's part of a game that you're writing \ldots{}
+complete it. If the missile hits the alien, increment the \emph{score}
+by 100, set \emph{play\_explosion} to \emph{true}, increment your
+\emph{energy} by the alien's energy (i.e. \emph{alien\_energy}), and set
+the alien's energy to 0. Test your code with different inputs.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int score = 1234;
+
+int energy = 6789;
+
+int alien\_energy = 42;
+
+bool play\_explosion = false;
+
+bool missile\_hit\_alien;
+
+std::cin \textgreater\textgreater{} missile\_hit\_alien;
+
+std::cout \textless\textless{} "score: " \textless\textless{} score
+\textless\textless{} '\textbackslash n'
+
+\textless\textless{} "energy: " \textless\textless{} energy
+\textless\textless{} '\textbackslash n'
+
+\textless\textless{} "alien\_energy: " \textless\textless{}
+alien\_energy \textless\textless{} '\textbackslash n'
+
+\textless\textless{} "play\_explosion: " \textless\textless{} score
+\textless\textless{} '\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Random integers
+
+Generating a random integer occurs commonly in computer programs. For
+instance if you want to write a strategy role-playing game, you might
+have different rooms in a mansion and you want to put different things
+in different rooms. Suppose you have a magic potion in a bottle. Now
+suppose the rooms are numbered from 1 to 1000. You don't want your magic
+potion bottle to be in room 5 whenever you start the game. You want each
+game to be different.
+
+At a more complex level you might want to randomly make doors between
+two rooms. This creates a random maze.
+
+So you'd better learn how to generate random things.
+
+Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int main()
+
+\{
+
+std::cout \textless\textless{} "the potion is in room "
+\textless\textless{} \textbf{rand()}
+
+\textless\textless{} std::endl;
+
+std::cout \textless\textless{} "the potion is in room "
+\textless\textless{} \textbf{rand()}
+
+\textless\textless{} std::endl;
+
+std::cout \textless\textless{} "the potion is in room "
+\textless\textless{} \textbf{rand()}
+
+\textless\textless{} std::endl;
+
+std::cout \textless\textless{} "total number of rooms: "
+
+\textless\textless{} \textbf{RAND\_MAX} \textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(Note: You might need \emph{\#include \textless cstdlib\textgreater{}}
+just after \emph{\#include \textless iostream\textgreater{}}. This
+depends on your compiler.)
+
+Looks like you're getting random integers. But wait ... run the program
+a second time ... a third time ... a fourth time. Notice something?
+
+OK. Let's modify the program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless ctime\textgreater{}
+
+int main()
+
+\{
+
+srand((unsigned int) time(NULL));
+
+std::cout \textless\textless{} "the potion is in room "
+\textless\textless{} rand()
+
+\textless\textless{} std::endl;
+
+std::cout \textless\textless{} "the potion is in room "
+\textless\textless{} rand()
+
+\textless\textless{} std::endl;
+
+std::cout \textless\textless{} "the potion is in room "
+\textless\textless{} rand()
+
+\textless\textless{} std::endl;
+
+std::cout \textless\textless{} "total number of rooms: "
+
+\textless\textless{} RAND\_MAX \textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Run this program several times. Notice that the room number is different
+each time you run the program.
+
+I will not go into details on the statement
+
+srand((unsigned int) time(NULL));
+
+The only thing I will say is that it ``seeds'' the random generator so
+as to make it ``more random''. The important thing to remember is that
+you must execute this statement and furthermore you execute it
+\emph{\textbf{once}} (usually) and \emph{\textbf{before}} you call the
+\emph{rand()} function. The standard practice is to execute the seeding
+in \emph{main()} and at the beginning:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless ctime\textgreater{}
+
+int main()
+
+\{
+
+srand((unsigned int) time(NULL));
+
+...
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Since \emph{rand()} gives you a random number from \emph{0} to
+\emph{RAND\_MAX},
+
+\emph{rand() / RAND\_MAX}
+
+will give you a random \emph{double} between \emph{0.0} and \emph{1.0}.
+But this is not right because the / is an \emph{\textbf{integer}}
+division. Therefore we do this:
+
+\emph{double(rand()) / RAND\_MAX}
+
+to get a random double from 0.0 to 1.0.
+
+\textbf{Exercise.} Check that I was not lying by printing 10 random
+doubles from 1.0 to 0.0. By the way, if the numbers are truly random,
+you would expect their average to be close to 0.5. Check that too.
+
+There are times when you need to generate a random
+\emph{\textbf{integer}} between two bounds. For instance if you have a
+maze game and the rooms are numbered 1 to 100, you want a random room
+number for a magic potion. How many values are there from 1 to 100? You
+have 100. Since \emph{rand()} gives you a random integer from 0 to
+\emph{RAND\_MAX}, if you do
+
+\emph{rand() \% 100}
+
+you get 100 numbers, from 0 to 99. You add 1 to it and you get a random
+integer from 1 to 100. In other words
+
+\emph{1 + rand() \% 100}
+
+does the trick.
+
+\textbf{Exercise.} How do you generate random integers from 1,..., 6?
+(For instance to simulate a dice roll.) Verify with a C++ program.
+
+\textbf{Exercise.} How do you generate random integers from 1,..., 10?
+Verify with a C++ program.
+
+What about generating random integers from 5,..., 20? In this case the
+the lower bound is 5 and not 1. You use the same idea. Note that if you
+do something like
+
+\emph{rand() \% 10}
+
+or
+
+\emph{rand() \% 18}
+
+the range of numbers starts from 0. So if you want to generate random
+numbers in the range of 5,..., 20, the first thing you do is to think
+about the range
+
+0, \ldots, 15
+
+first. In other words move the given range 5, \ldots, 20 so that the
+lower bound of the range becomes 0. That means subtracting 5 from the
+range. To generate a number in the range of 0, \ldots, 15, you do
+
+\emph{rand() \% 16}
+
+This gives a number in the range 0, \ldots, 15. You then add 5 to it:
+
+\emph{5 + rand() \% 16}
+
+\textbf{Exercise.} Verify that the expression
+
+5 + rand() \% 16
+
+does give you numbers in the range of 5, \ldots, 20. .
+
+\textbf{Exercise.} How do you generate random integers from 9,...142?
+Verify with a C++ program.
+
+\textbf{Exercise.} How do you generate random integers from -5,...,5?
+Verify with a C++ program.
+
+\textbf{Exercise.} How do you generate random \emph{double} from
+0,...,2.0? Verify with a C++ program.
+
+\textbf{Exercise.} How do you generate random double from -1.0,...,1.0?
+Verify with a C++ program.
+
+\textbf{Exercise.} How do you generate random double from 0,...,3.5?
+Verify with a C++ program.
+
+\hfill\break
+
+\textbf{Exercise.} How do you generate random double from -2.0,...,2.0?
+Verify with a C++ program.
+
+The important swap ``trick''
+
+Recall the following extremely important ``trick'' that you must know.
+It allows you to swap the values in two variables:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Write a program that declares two doubles,
+initializing them with 1.234 and 4.567. Print the values of the
+variables. Swap their values. Print the values of the variables.
+
+First sorting example
+
+Here's your first sorting problem:
+
+\begin{itemize}
+\tightlist
+\item
+  Prompt the user for two integer values and assign them to x and y.
+\item
+  Sort the values so that the value of x is less than or equal to the
+  value of y
+\end{itemize}
+
+\textbf{Exercise.} Write the above program. Here are some test cases:
+
+Test 1
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+1 2
+
+1 2\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Test 2
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\textbf{2 1}
+
+1 2\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Test 3
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+-1 5
+
+-1 5\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Test 4
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+5 -1
+
+-1 5\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Test 5
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+2 2
+
+2 2\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+More sorting examples: bubblesort
+
+Now suppose you have three integer variables and you want to sort the
+values in the variables. What I mean is this. Suppose your variables are
+x, y, and z. After some operations you want
+
+\emph{x \textless= y \&\& y \textless= z}
+
+to be true (NOT \emph{x \textless= y \textless= z} !!! Remember???)
+
+Here's the idea. First do this:
+
+\begin{itemize}
+\tightlist
+\item
+  Swap the values of x and y so that x \textless= y.
+\item
+  Swap the values of y and z so that y \textless= z.
+\end{itemize}
+
+This will guarantee that z is the largest.
+
+\textbf{Exercise.} Take a piece of paper. And write down three integer
+values for x, y, and z and follow the above steps. Do you see that the
+largest will always be in variable z's box?
+
+\textbf{Exercise.} Does this means that the smallest will be in x?
+
+The above two steps is said to be one \emph{\textbf{pass}} of this
+sorting process. Now do this:
+
+\begin{itemize}
+\tightlist
+\item
+  Swap (if necessary) the values of x and y so that x \textless= y.
+\end{itemize}
+
+This will guarantee that the larger value between x and y will be in y.
+
+Now everything is in ascending order, i.e.
+
+\emph{x \textless= y \&\& y \textless= z}
+
+Altogether these are the steps:
+
+Pass 1: To get largest among x, y, z into z do this:
+
+\begin{itemize}
+\tightlist
+\item
+  Swap (if necessary) the values of x and y so that x \textless= y.
+\item
+  Swap (if necessary) the values of y and z so that y \textless= z.
+\end{itemize}
+
+Pass 2: To get largest among x, y into y
+
+\begin{itemize}
+\tightlist
+\item
+  Swap (if necessary) the values of x and y so that x \textless= y.
+\end{itemize}
+
+Such a ``recipe'' (a finite number of steps to achieve a goal) is called
+an \textbf{algorithm}. This sorting algorithm is called
+\textbf{bubblesort}. There are actually many different sorting
+algorithms.
+
+\textbf{Exercise.} Write a program that prompts the user for three
+integers and prints the three integers in ascending order. Here are some
+executions:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\textbf{1 2 3}
+
+1 2 3\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\textbf{1 3 2}
+
+1 2 3\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\textbf{2 1 3}
+
+1 2 3\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\textbf{2 3 1}
+
+1 2 3\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\textbf{3 1 2}
+
+1 2 3\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\textbf{3 2 1}
+
+1 2 3\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+What if you have 4 values to sort (in ascending order)? Say the values
+are stored in a, b, c, d. If you understood the above bubblesort for 3
+values, the bubblesort for 4 values is similar:
+
+Pass 1: To get largest among a, b, c, d into d do this:
+
+\begin{itemize}
+\tightlist
+\item
+  Swap (if necessary) the values of a and b so that a \textless= b.
+\item
+  Swap (if necessary) the values of b and c so that b \textless= c.
+\item
+  Swap (if necessary) the values of c and d so that c \textless= d.
+\end{itemize}
+
+Pass 2: To get largest among a, b, c into c
+
+\begin{itemize}
+\tightlist
+\item
+  Swap (if necessary) the values of a and b so that a \textless= b.
+\item
+  Swap (if necessary) the values of b and c so that b \textless= c.
+\end{itemize}
+
+Pass 3: To get largest among a, b into b
+
+\begin{itemize}
+\tightlist
+\item
+  Swap (if necessary) the values of a and b so that a \textless= b.
+\end{itemize}
+
+\textbf{Exercise. }Test the above bubblesort for 4 values: Write a
+program that prompts the user for 4 integers and prints the values in
+ascending order.
+
+\textbf{Exercise. }What if you have five variables a, b, c, d, e? How
+would you take the values from a, b, c, d, e sort them into ascending
+order, and put them into a, b, c, d, e?
+
+\textbf{Exercise.} Write a program that prompts the user for 4
+\emph{\textbf{double}}\textbf{s} and prints the \emph{double}s in
+ascending order.
+
+\textbf{Exercise. }Write a program that prompts the user for 4 integers
+and prints the integer values in \textbf{descending} order. (You need to
+modify the above bubblesort algorithm.)
+
+\textbf{Exercise.} Now, you have four variables a, b, c, d. You know
+that one pass of the bubblesort will put the largest value of a, b, c, d
+into d. What would you do if I ask you to write a program to prompt the
+user for four values and then print the second largest. Now write the
+program and test it. {[}Hint: You need \textbf{two} passes.{]}
+
+\textbf{Exercise.} Again suppose you have four variables a, b, c, d.
+Suppose during the second pass, you notice that no swap was performed.
+Do you see that you do not need to perform any more passes?
+
+You must memorize the bubblesort algorithm for any number of variables.
+
+\end{document}

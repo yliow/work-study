@@ -1,0 +1,778 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\author{}
+\date{}
+
+\begin{document}
+
+31. \emph{Typedef}s
+
+Objectives
+
+\begin{itemize}
+\tightlist
+\item
+  Create typedef
+\item
+  Understand that typedef does not create a new type
+\end{itemize}
+
+I will show you how to create an alias for a type. This does not really
+create a new type but simply gives a type another name.
+
+typedef
+
+Just like we prefer to create constants instead of hardcoding constants:
+
+const int MAX\_AGE = 100;
+
+so we can also give type another (hopefully more readable) name. For
+instance instead of
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+const int CEO = 0;
+
+const int MANAGER = 1;
+
+const int FULLTIME = 2;
+
+const int PARTTIME = 3;
+
+int employeeCode = FULLTIME;
+
+std::cin \textgreater\textgreater{} employeeCode;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+we can create a name for employee code type:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+typedef int EmployeeCode;
+
+const EmployeeCode CEO = 0;
+
+const EmployeeCode MANAGER = 1;
+
+const EmployeeCode FULLTIME = 2;
+
+const EmployeeCode PARTTIME = 3;
+
+EmployeeCode employeeCode = FULLTIME;
+
+std::cin \textgreater\textgreater{} employeeCode;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The statement
+
+typedef int EmployeeCode;
+
+basically tells C/C++ to replace \emph{EmployeeCode} with \emph{int}
+before compiling the program. The format for a typedef looks like this:
+
+typedef \emph{{[}type{]} {[}typedef name{]}};
+
+\textbf{Exercise.} Create a typedef for \emph{double} with the name
+\emph{GPA}. Declare a variable \emph{johnDoeGPA} of type \emph{GPA} and
+initialize it with the value of \emph{3.25}.
+
+It's important to remember that \emph{typedef}s are type aliases. Why is
+this important? This means that you \textbf{cannot} have the following
+overloaded functions like the following:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+typedef int EmployeeCode;
+
+const EmployeeCode CEO = 0;
+
+const EmployeeCode MANAGER = 1;
+
+const EmployeeCode FULLTIME = 2;
+
+const EmployeeCode PARTTIME = 3;
+
+void print(int i)
+
+\{
+
+std::cout \textless\textless{} i;\\
+\}
+
+void print(EmployeeCode code)
+
+\{
+
+std::cout \textless\textless{} "Employee code: " \textless\textless{}
+code;
+
+\}
+
+int main()\\
+\{
+
+print(42);
+
+print(CEO);
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Why? Because \emph{EmployeeCode} is just an alias for \emph{int}. In
+other words as far as the compiler is concerned the code is the same as:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+void print(int i)
+
+\{
+
+std::cout \textless\textless{} i;\\
+\}
+
+void print(int code)
+
+\{
+
+std::cout \textless\textless{} "Employee code: " \textless\textless{}
+code;
+
+\}
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+And of course you see the problem: There are two functions with the same
+signatures and that's not allowed.
+
+The following is an example on how to \emph{typedef} a reference type, a
+constant type, and a pointer type (no surprises):
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+typedef int \& intr; // typedef for int \&
+
+typedef const int cint; // typedef for const int
+
+typedef int * pint; // typedef for int *
+
+int i = 42;
+
+intr x = i;
+
+cint j = 0;
+
+pint p = \&i;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Make sure you create corresponding typedefs for
+doubles. Test the typedefs.
+
+Typedef for Array Types
+
+You can also do typedef for array types. It's very common to use an
+array of two integers to model a point in 2-dimensional space.
+
+int p{[}2{]} = \{3, 6\}; // variable p models (3,6)
+
+// in 2-dimensional space
+
+In the above code, we want to think of p as a point where p{[}0{]} is
+the x-coordinate of p while p{[}1{]} is the y-coordinate of p.
+
+You can do this:
+
+typedef int Point {[}2{]};
+
+This is how you can use this \emph{typedef}:
+
+typedef int Point {[}2{]};
+
+Point p = \{3, 6\};
+
+The format for creating typedefs for array types is this:
+
+typedef \emph{{[}type{]}} \emph{{[}array typedef{]}}
+{[}\emph{{[}size{]}}{]};
+
+A very \textbf{common typo / error / ignorance / atrocity / etc}. is
+this:
+
+typedef int\textbf{{[}2{]}} Point; // BADDDD!!!
+
+Remember, the size of the array comes last.
+
+\textbf{Exercise.} Rewrite the following program using the above
+\emph{typedef} for \emph{Point} and replace the type \emph{int {[}2{]}
+by Point.}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+void print(int p{[}2{]})
+
+\{
+
+std::cout \textless\textless{} "(" \textless\textless{} p{[}0{]}
+\textless\textless{} ", " \textless\textless{} p{[}1{]}
+\textless\textless{} ")";\\
+\}
+
+void add(int sum{[}2{]}, int p{[}2{]}, int q{[}2{]})
+
+\{
+
+sum{[}0{]} = p{[}0{]} + q{[}0{]};
+
+sum{[}1{]} = p{[}1{]} + q{[}1{]};\\
+\}
+
+int main()
+
+\{
+
+int q{[}2{]} = \{3, 5\};
+
+print(q);
+
+std::cout \textless\textless{} std::endl;
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Typedef For Pointer Types
+
+Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+typedef int * IntPtr;
+
+int main()
+
+\{
+
+IntPtr p = new int;
+
+*p = 42;
+
+std::cout \textless\textless{} (*p) + 3 \textless\textless{} std::endl;
+
+delete p;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Get it?
+
+\textbf{Exercise.} Create a typedef for a pointer to doubles and use
+this typedef in this code whenever possible. Fill in the missing code
+and correct errors (yes there are errors).
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-
+
+// Allocate memory for p
+
+//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-
+
+void constructArray(double * p, int size)
+
+\{
+
+p = new double{[}size{]};\\
+\}
+
+//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-
+
+// Deallocate memory for p
+
+//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-
+
+void destructArray(double * p)
+
+\{
+
+delete {[}{]} p;\\
+\}
+
+//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-
+
+// Randomize the array p is pointing to.
+
+//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-
+
+void randArray(double * p, int size)
+
+\{
+
+for (int i = 0; i \textless{} size; i++)
+
+\{
+
+p{[}i{]} = rand() / RANDMAX;\\
+\}
+
+\}
+
+//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-
+
+// Print all the element p is pointing to
+
+//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-
+
+void printArray(double * p, int size)
+
+\{
+
+\}
+
+int main()
+
+\{
+
+srand();
+
+std::cout \textless\textless{} "How many doubles do you want?";
+
+std::cin \textgreater\textgreater{} size;
+
+while (size \textgreater{} 0)
+
+\{
+
+double * arr;
+
+constructArray(arr, size);
+
+randArray(p, size);
+
+printArray(p, size);
+
+destructArray(arr);
+
+std::cout \textless\textless{} "How many doubles do you want?";
+
+std::cin \textgreater\textgreater{} size;
+
+\}\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Create a typedef for a \emph{\textbf{2}}-dimensional
+array in the following program and use it whenever possible.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+const int SIZE = 5;
+
+// put your typedef here
+
+void print(char x{[}SIZE{]}{[}SIZE{]})
+
+\{
+
+for (int row = 0; row \textless{} SIZE; row++)
+
+\{
+
+for (int col = 0; col \textless{} SIZE; col++)
+
+\{
+
+std::cout \textless\textless{} x{[}row{]}{[}col{]};
+
+\}
+
+std::cout \textless\textless{} std::endl;
+
+\}
+
+\}
+
+int main()
+
+\{
+
+char a{[}SIZE{]}{[}SIZE{]};
+
+int row = 0, col = 0;
+
+for (int i = 0; i \textless{} SIZE * SIZE; i++)
+
+\{
+
+a{[}row{]}{[}col{]} = char(i + 'a');
+
+col++;
+
+if (col == SIZE)
+
+\{
+
+row++;
+
+col = 0;
+
+\}
+
+\}
+
+print(a);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Now rewrite the above code so that, without changing
+the behavior of the program, the code has the following form:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+const int SIZE = 5;
+
+// put your typedef here
+
+void print(char x{[}SIZE{]}{[}SIZE{]})
+
+\{
+
+for (int row = 0; row \textless{} SIZE; row++)
+
+\{
+
+for (int col = 0; col \textless{} SIZE; col++)
+
+\{
+
+std::cout \textless\textless{} x{[}row{]}{[}col{]};
+
+\}
+
+std::cout \textless\textless{} std::endl;
+
+\}
+
+\}
+
+int main()
+
+\{
+
+char a{[}SIZE{]}{[}SIZE{]};
+
+\emph{ for (int row = 0; row \textless{} SIZE; row++)}\\
+\{
+
+for (int col = 0; col \textless{} SIZE; col++)
+
+\{
+
+\emph{ a{[}row{]}{[}col{]} = \_\_\_\_\_\_\_\_\_\_\_\_;}\\
+\}\\
+\}
+
+print(a);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\emph{typedef} and Multi-file Compilation
+
+\emph{typedef}s can be placed in a header file.
+
+When do you want to do that? When a \emph{typedef} is used by several
+cpp files.
+
+Not only that. If several functions are closely associated with the
+\emph{typedef}, then the prototypes of these functions and the
+\emph{typedef} should be in the same header file.
+
+Here's an example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// employee.h
+
+\#ifndef EMPLOYEE\_H
+
+\#define EMPLOYEE\_H
+
+\#include \textless iostream\textgreater{}
+
+typedef int EmployeeCode;
+
+const EmployeeCode CEO = 0;
+
+const \emph{EmployeeCode} MANAGER = 1;
+
+const \emph{EmployeeCode} FULLTIME = 2;
+
+const \emph{EmployeeCode} PARTTIME = 3;
+
+void print(EmployeeCode);
+
+EmployeeCode promote(EmployeeCode);
+
+EmployeeCode demote(EmployeeCode);
+
+\#endif EMPLOYEE\_H\\
+\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// employee.cpp
+
+\#include \textless iostream\textgreater{}
+
+\#include "employee.h"
+
+void print(EmployeeCode code)
+
+\{
+
+std::cout \textless\textless{} code;\\
+\}
+
+EmployeeCode promote(EmployeeCode code)
+
+\{
+
+\emph{ return (code \textgreater{} CEO ? code -- 1 :} code);\\
+\}
+
+EmployeeCode demote(EmployeeCode)
+
+\{
+
+\emph{ return (code \textless{} PARTTIME ? code + 1 : code);}
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Rewrite this program so that you have two more file
+for the array-related typedef and functions: a header file
+\emph{Array.h} containing the typedef and function prototypes and C++
+source file \emph{Array.cpp} for the definition of the array-related
+functions. (See the previous section.)
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-
+
+// Allocate memory for p
+
+//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-
+
+void constructArray(double * p, int size)
+
+\{
+
+p = new double{[}size{]};\\
+\}
+
+//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-
+
+// Deallocate memory for p
+
+//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-
+
+void destructArray(double * p)
+
+\{
+
+delete {[}{]} p;\\
+\}
+
+//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-
+
+// Randomize the array p is pointing to with random
+
+// doubles between 0.0 and 1.0.
+
+//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-
+
+void randArray(double * p, int size)
+
+\{
+
+for (int i = 0; i \textless{} size; i++)
+
+\{
+
+p{[}i{]} = rand() / RANDMAX;\\
+\}
+
+\}
+
+//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-
+
+// Print all the element p is pointing to
+
+//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-
+
+void printArray(double * p, int size)
+
+\{
+
+\}
+
+int main()
+
+\{
+
+srand(0);
+
+std::cout \textless\textless{} "How many doubles do you want?";
+
+std::cin \textgreater\textgreater{} size;
+
+while (size \textgreater{} 0)
+
+\{
+
+double * arr;
+
+constructArray(arr, size);
+
+randArray(p, size);
+
+printArray(p, size);
+
+destructArray(arr);
+
+std::cout \textless\textless{} "How many doubles do you want?";
+
+std::cin \textgreater\textgreater{} size;
+
+\}\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\end{document}

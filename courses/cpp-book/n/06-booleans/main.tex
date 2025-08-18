@@ -1,0 +1,1430 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\author{}
+\date{}
+
+\begin{document}
+
+06. Booleans
+
+Objectives
+
+\begin{itemize}
+\tightlist
+\item
+  Use boolean literals
+\item
+  Use boolean operators
+\item
+  Declare boolean variables
+\item
+  Declare and initialize boolean variables
+\item
+  Use assignment operator for boolean variables
+\item
+  Declaring constant boolean variables
+\end{itemize}
+
+Boolean values represent ``true'' and ``false''. We'll see later that
+this type is important for writing programs that can make decisions.
+
+Booleans
+
+An integer can be 5 or 42 or 1024. A double can be 2.141.
+
+A \textbf{boolean} value is either true or false. Boolean values are
+used by programs to make decisions (among other things). Up to this
+point our programs can now accept input(s) and perform computations one
+statement at a time.
+
+THAT'S NOT GOOD ENOUGH!
+
+Programs should be smart enough to decide which statement to execute. If
+you're playing a game, you want the game to decide when to restart a
+game right? You do want to gain extra points when you hit a rogue
+spaceship, correct??? A program that analyzes the image file of a brain
+scan should only print ``THERE'S BRAIN TUMOR!'' only when there's really
+a brain tumor right?!?
+
+All these and more require \textbf{decision-making}. You want to write a
+program that says (more or less):
+
+if rocket hits bad ship then
+
+bad ship explodes
+
+player gets 10 points
+
+The condition
+
+rocket hits bad ship
+
+is of course either true or false. That's the point of having booleans.
+
+Another use of booleans is to decide/control when a \textbf{loop} or
+\textbf{repetition} should end. For instance, look at this ``program''
+from a DVD player software:
+
+``continue playing the video stream and audio stream
+
+as long as the STOP button is not pressed''
+
+or to make it more like a ``program'':
+
+while STOP button is not pressed:
+
+play the next 0.01 second of video stream and the
+
+next 0.01 second of audio stream
+
+The condition ``STOP button is not pressed'' again is either true or
+false. It has a boolean value.
+
+So \ldots{} before we can talk about decision-making and (also known as
+branching) and loops/repetition, you need to know how to work with
+booleans.
+
+Whereas \emph{int}s and \emph{double}s and \emph{float}s can have lots
+of values, note that booleans have only \textbf{two}: \emph{true} and
+\emph{false}.
+
+\textbf{Exercise.} Run this program.
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+What does C++ display \emph{true} as? \_\_\_\_\_
+
+What does C++ display \emph{false} as? \_\_\_\_\_
+
+Boolean operators: and
+
+Booleans, like \emph{int}s and \emph{double}s, have operators. Just like
++ allows you to combine two \emph{int}s into one:
+
+\emph{1 + 2}
+
+(i.e. \emph{3}) boolean operators take boolean value(s) and return a
+boolean value. Why do you need them? Here's a simple example:
+
+(I'm learning C++) and (I'm a student at CC)
+
+Is this true or false? Well this becomes:
+
+(true) and (true)
+
+(Otherwise why are you here???) Of course you know that this is
+
+true
+
+So what I'm saying is that the \textbf{``and''} is a \textbf{binary
+operator} that takes (true) and (true) and evaluates to (true). In a C++
+program ``and'' is written
+
+\&\&
+
+Too bad that's something you have to remember. \emph{\&\&} is a
+\textbf{binary} boolean operator since you need to feed it \textbf{two}
+boolean values to get a result. (Instead of calling it the ``and''
+operator, mathematicians/computer scientists call it the ``logical and''
+operator.)
+
+To define ``and'' you need to figure out all the possible cases:
+
+true \&\& true= true
+
+true \&\& false= false
+
+false \&\& true= false
+
+false \&\& false= false
+
+This is called a \textbf{truth table} of ``and'' or \emph{\&\&}. Make
+sure you can reproduce the above truth table!!!
+
+\textbf{Exercise.} Verify the result of the \&\& operator by completing
+this program. Complete and run this program and make sure C++ is not
+crazy.
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} By the way, what happens if you remove the
+parentheses?, i.e., what happens when you do this:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise. }What is the value of this boolean expression
+
+\emph{false \&\& \_\_\_\_\_\_\_\_}
+
+even though the second value is missing? This is the same for
+
+\_\_\_\_\_\_\_\_ \&\& false
+
+Boolean operator: or
+
+Another important boolean operator is ``or'' (or ``logical or''). Here's
+an example:
+
+(I'm learning C++) or (I have 3 arms)
+
+Assuming you do not have three arms, the resulting boolean value is of
+course:
+
+(true) or (false) = (true)
+
+In C++ ``or'' is written
+
+\emph{\textbf{\textbar\textbar{}}}
+
+(two vertical broken lines -- look at the left of the keyboard, above
+the backslash \textbackslash{} key on your keyboard).
+
+\textbf{Exercise.} Of course we must have a truth table for ``or'':
+Verify this table using a C++ program:
+
+true \emph{\textbar\textbar{}} true= true
+
+true \emph{\textbar\textbar{}} false= true
+
+false \emph{\textbar\textbar{}} true= true
+
+false \emph{\textbar\textbar{}} false= false
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Same thing again ... make sure you can reproduce the above table.
+
+\textbf{Exercise.} What is the value of this boolean expression
+
+\emph{true \textbar\textbar{} \_\_\_\_\_\_\_\_}
+
+even though the second value is missing? What about this:
+
+\_\_\_\_\_\_\_\_ \emph{\textbar\textbar{} true}
+
+At this point we have two boolean operators. What if we have a boolean
+expression like this:
+
+\emph{false \&\& false \textbar\textbar{} true}
+
+Note that precedence is important since
+
+\emph{ (false \&\& false) \textbar\textbar{} true }
+
+= false \textbar\textbar{} true
+
+= true
+
+and
+
+\emph{ false \&\& (false \textbar\textbar{} true) }
+
+= false \&\& true
+
+= false
+
+which gives us different results!!!
+
+The precedence rule is simple:
+
+()highest priority
+
+\&\&
+
+\emph{\textbar\textbar{} }lowest priority
+
+and as usual for (boolean) operators of the same priority level, you
+perform left-to-right.
+
+Let's evaluate this by hand:
+
+true \textbar\textbar{} false \&\& (\emph{false \textbar\textbar{}
+true}) \&\& false
+
+= true \textbar\textbar{} false \&\& \emph{(true)} \&\& false by false
+\textbar\textbar{} true = true
+
+= true \textbar\textbar{} \emph{false \&\& true} \&\& false by (true) =
+true
+
+= true \textbar\textbar{} \emph{false \&\& false} by false \&\& true
+=false
+
+= \emph{true \textbar\textbar{} false} by false \&\& false =false
+
+= true by\emph{ true }\textbar\textbar{}\emph{ false = }true
+
+Now verify it with C++:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+std::cout \textless\textless{} (true \textbar\textbar{} false \&\&
+(false \textbar\textbar{} true) \&\& false)
+
+\textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You should get 1 which means that boolean value is \emph{true}.
+
+\textbf{Exercise.} First evaluate this by hand:
+
+(true \textbar\textbar{} false) \&\& false \textbar\textbar{} true \&\&
+false
+
+Next verify it with C++:
+
+\textbf{Exercise.} First evaluate this by hand:
+
+(false \&\& false) \textbar\textbar{} (false \textbar\textbar{} true)
+\&\& false
+
+Next verify it with C++:
+
+\textbf{Exercise.} Check that \&\& and \textbar\textbar{} are
+commutative, i.e. suppose x and y are boolean values, then
+
+x \&\& yis the same asy \&\& x
+
+x \textbar\textbar{} y is the same asy \textbar\textbar{} x
+
+(Here's a memory aid: ``I have three arms and I am the Queen of
+England'' has the same boolean value as ``I am the Queen of England and
+I have three arms''. That's pretty obvious, right?)
+
+\textbf{Exercise.} Check that if x is a boolean value, then
+
+x \&\& xis the same asx
+
+x \textbar\textbar{} xis the same asx
+
+(Here's a memory aid: ``I have a space shuttle in my backyard and I have
+a space shuttle in my backyard'' is the same as ``I have a space shuttle
+in my backyard''. Also, ``I have ten dollars or I have ten dollars'' is
+the same as ``I have ten dollars''. Right?)
+
+Boolean operator: not
+
+So far we have ``and'' (i.e. \&\& in C++-speak) and ``or'' (i.e.
+\emph{\textbar\textbar{}} in C++-speak).
+
+There's another operator called ``not'' (or ``logical not''). In C++
+it's written
+
+!
+
+This operator is \textbf{unary} -- it requires one value. It simply
+inverts the boolean value. You write the boolean value on the right-hand
+side of !. In other words you write
+
+\emph{!true }
+
+and not
+
+true!
+
+\textbf{Exercise.} Complete the following truth table
+
+!true=
+
+!false=
+
+by completing and running this program:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Check that if x is a boolean value then
+
+!!x is the same asx
+
+{[}Memory aid: ``It is not true that I am not tall'' is the same as ``I
+am tall''.{]}
+
+Here the precedence rules for \&\&, \textbar\textbar, and !:
+
+()highest precedence level
+
+!
+
+\&\&
+
+\emph{\textbar\textbar{}}lowest precedence level
+
+(Memory aid: remember unary operators always have higher priority. This
+is the same for integer and floating point operators.)
+
+\textbf{Exercise.} Evaluate this by hand:
+
+(true \textbar\textbar{} false) \&\& !false \textbar\textbar{} true \&\&
+!false
+
+Now verify it with C++:
+
+\textbf{Exercise.} Evaluate this by hand:
+
+!true \&\& !(false \&\& !false \textbar\textbar{} true) \&\& false
+
+Now verify it with C++.
+
+Other boolean operators
+
+So far the boolean operators take boolean values (true and false) and
+returns a boolean value.
+
+Now we want to think about those that take numeric values (ints,
+doubles, floats) and spit out boolean values.
+
+\textbf{Exercise.} Run this program.
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Of course you know
+
+\textless less than
+
+\textgreater greater than
+
+and you can easily guess
+
+\textless=less than or equal to
+
+\textgreater=greater than or equal to
+
+It's probably harder to guess that
+
+==is equal to
+
+!=is not equal to
+
+By the way \textless= and \textgreater= CANNOT be written as
+
+=\textless BAD, BAD, BAD!!!
+
+=\textgreater BAD, BAD, BAD!!!
+
+\textbf{Exercise.} Run this program.
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+What's wrong? Fix it!!!
+
+It's not too surprising that the above boolean operators (\textless,
+\textless=, \textgreater, \textgreater=, ==, !=) work for doubles too.
+Yes?
+
+\textbf{Exercise.} Check your instructor was not lying by running this
+program:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Associativity and precedence rules
+
+What happens when you want C++ to evaluate a boolean expression like
+this:
+
+\emph{x + y \textless{} a * b - c}
+
+where x, y, a, b and c are (say) integer variables? C++ must of course
+work on one operator at a time. In general, the numeric operators go
+first. In other words the +, *, - in the above expression goes before
+\textless.
+
+In general the precedence rules now look like this:
+
+*, /, \%, +, - (binary and unary)
+
+\textless, \textless=, \textgreater, \textgreater=, !=, ==
+
+The ! Is slightly special. It's unary. So the precedence is pretty high.
+
+Specifically we have
+
++, - (unary)highest precedence level
+
+!
+
+*, /, \%
+
++, - (binary)
+
+\textless, \textless=, \textgreater, \textgreater=
+
+==, !=
+
+\&\&
+
+\textbar\textbar lowest precedence level
+
+By the way = is also an operator -- the assignment operator. It's not
+too surprising that for the following expression:
+
+x = a + b -- c
+
+= is the last thing to happen (see previous notes). In fact = is the
+last in the precedence rules:
+
++, -- (unary)highest precedence level
+
+!
+
+*, /, \%
+
++, -- (binary)
+
+\textless, \textless=, \textgreater, \textgreater=
+
+==, !=
+
+\&\&
+
+\textbar\textbar{}
+
+=lowest precedence level
+
+The associativity rules are what you expect.
+
+a \textless= b \textless= cis the same as (a \textless= b) \textless= c
+
+(This actually causes a very common error \ldots{} see next section for
+a VERY IMPORTANT gotcha) and
+
+! ! ! (1 == 2)is the same as!(!(!(1 == 2)))
+
+So there's nothing much to remember.
+
+Let's try to compute the boolean value of
+
+3 \textless{} 2 * 3 \&\& 9 / 2 \textless{} 6 * 3
+
+Here we go:
+
+3 \textless{} 2 + 3 \&\& \emph{9 / 2} \textless{} 6 * 3
+
+= 3 \textless{} 2 + 3 \&\& 4 \textless{} \emph{6 * 3} by 9 / 2 = 4
+
+= 3 \textless{} \emph{2 + 3} \&\& 4 \textless{} 18 by 6 * 3 = 18
+
+= \emph{3 \textless{} 5} \&\& 4 \textless{} 18 by 2 + 3 = 5
+
+= true \&\& \emph{4 \textless{} 18} by 3 \textless{} 5 = true
+
+= \emph{true \&\& true} by 4 \textless{} 18
+
+= true by true \&\& true
+
+Make sure you check this with a program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+std::cout \textless\textless{} (3 \textless{} 2 + 3 \&\& 9 / 2
+\textless{} 6 * 3) \textless\textless{}
+'\textbackslash n';\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Evaluate
+
+1 + 2 \textless{} 2 * 2 \&\& 3 -- 1 \textless{} 5 -- 2
+\textbar\textbar{} 5 * 2 \textless{} 6 * 3
+
+and verify with C++.
+
+\textbf{Exercise.} Evaluate
+
+6 * 2 \textless{} 2 + 6 \&\& (3 -- 1 \textless{} 5 -- 2
+\textbar\textbar{} 5 * 2 \textless{} 6 * 3)
+
+and verify with C++.
+
+\textbf{Exercise.} Evaluate
+
+6 * 2 \textless{} 8 \&\& (2 \textgreater= 5 -- 3 \textbar\textbar{} (2
+!= 6 * 3 \textbar\textbar{} 3 \textless{} 4))
+
+and verify with C++.
+
+Gotcha
+
+Here's a \textbf{very very very common gotcha} that unfortunately even
+experienced programmers make. Look at this:
+
+-3 \textless= -2 \textless= -1
+
+This seems to be similar to the following in math:
+
+-3 ≤ -2 ≤ -1
+
+and in math
+
+-3 ≤ -2 ≤ -1
+
+is true, right? Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+std::cout \textless\textless{} (-3 \textless= -2 \textless= -1)
+\textless\textless{} std::endl;\tabularnewline
+\bottomrule
+\end{longtable}
+
+The output is 0!!! Which means false!!! Whoa ... what's happening?!?
+Let's evaluate this the way C++ would::
+
+-3 \textless= -2 \textless= -1
+
+is the same as
+
+(-3 \textless= -2) \textless= -1
+
+Now
+
+-3 \textless= -2 is true
+
+That means that
+
+-3 \textless= -2 \textless= -1
+
+= (-3 \textless= -2) \textless= -1
+
+= true \textless= -1
+
+Here lies the problem. This is a comparison between a boolean and an
+integer. C++ type cast the boolean true to 1:
+
+-3 \textless= -2 \textless= -1
+
+= (-3 \textless= -2) \textless= -1
+
+= true \textless= -1
+
+= 1 \textless= -1
+
+and of course 1\textless= -1 is false
+
+-3 \textless= -2 \textless= -1
+
+= (-3 \textless= -2) \textless= -1
+
+= true \textless= -1
+
+= 1 \textless= -1
+
+So how do we fix it? Well \emph{\textbf{mathematically}}
+
+-3 ≤ -2 ≤ -1
+
+actually means
+
+``-3 ≤ -2 and -2 ≤ -1''
+
+Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+std::cout \textless\textless{} ((-3 \textless= -2) \&\& (-2 \textless=
+-1)) \textless\textless{} '\textbackslash n';\tabularnewline
+\bottomrule
+\end{longtable}
+
+So if you want to (mathematically) say
+
+a ≤ b ≤ c
+
+then in C++ you want to say
+
+a \textless= b \&\& b \textless= c
+
+Likewise the C++ expression for the mathematical expression:
+
+a \textless{} b \textless{} c
+
+is
+
+a \textless{} b \&\& b \textless{} c
+
+Don't say I didn't warn you.
+
+Boolean variables
+
+The C++ name for the boolean type is \emph{bool}.
+
+Declaring boolean variables is easy. Try this program:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Declare a boolean variable \emph{totallyBroke} and
+initialize it with the ``and'' of the all the three variables in the
+following code segment. Print the values of all the variables.
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Of course you can use an expression that evaluates to a boolean value:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Suppose you're given an integer variable \emph{x}.
+Write down the a boolean expression that is true exactly when \emph{x}
+is greater than 1 and less than 10. Test your code with \emph{x} = 0, 1,
+5, 10, 20.
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Exercise. Write a program that prompts the user for the following
+values:
+
+\begin{itemize}
+\tightlist
+\item
+  amount in the user's savings account
+\item
+  monthly rent
+\item
+  daily expenses
+\item
+  number of days in the current month
+\end{itemize}
+
+(choose appropriate names and types). Next declare a boolean variable
+\emph{callHomeForCash} and set it to true exactly when the amount in the
+user's savings account is less than the total expenses for the current
+month. Print all the values.
+
+\textbf{Exercise.} Verify that you can declare boolean constants.
+
+Boolean input (console window)
+
+You can input boolean values from the keyboard in a console application.
+However you do \emph{\textbf{not}} enter true or false. You enter 1 for
+true and 0 for false.\textbf{ }Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+bool b;
+
+std::cin \textgreater\textgreater{} b;
+
+std::cout \textless\textless{} b \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Run your above program again. This time enter integer
+5. Next try integer 42. Hmmmm. What's happening?
+
+Exercise. You are commissioned to write a software for Bowing's new
+plane. The software takes the following as input:
+
+\begin{itemize}
+\tightlist
+\item
+  distance to nearest airport (mile)
+\item
+  amount of fuel left (gallons)
+\item
+  mileage (miles per gallon with only one pilot)
+\item
+  number of passengers (excluding pilot)
+\item
+  average weight of each passenger (in lbs, excluding pilot)
+\item
+  thunderstorm in flight path to nearest airport
+\end{itemize}
+
+(choose appropriate names and types). With passengers, the mileage
+decreases by 1/100 of the total weight of the passengers (excluding the
+pilot). For instance if the mileage is 1000 miles/gallon, then with an
+extra passenger weight of 200lbs, the mileage becomes 1000/(200/100).
+Furthermore, if there is indeed a thunderstorm in the path towards the
+nearest airport, the mileage drops by a factor of 3. For instance if the
+mileage (after taking into account the extra passenger weight) is 300
+miles per gallon, then with the presence of a thunderstorm in the path,
+the mileage becomes 300/3. Finally declare a boolean variable
+\emph{canMakeIt} and set it to true exactly when the plane can arrive at
+the nearest airport. Write a program to prompts the user for all the
+above data and print \emph{canMakeIt}.
+
+Some simplification tricks
+
+Here's a summary of some simplification rules for ! where x and y are
+numeric (either \emph{int}s or \emph{double}s or \emph{float}s):
+
+\emph{!(x == y)}same as\emph{x != y}
+
+\emph{!(x != y)}same as\emph{x == y}
+
+\emph{!(x \textless{} y)}same as\emph{x \textgreater= y}
+
+\emph{!(x \textless= y)}same as\emph{x \textgreater{} y}
+
+\emph{!(x \textgreater{} y)}same as\emph{x \textless= y}
+
+\emph{!(x \textgreater= y)}same as\emph{x \textless{} y}
+
+\textbf{Exercise.} Simplify
+
+!(a + b \textgreater{} c + d + e)
+
+Using a C++ program, check that your new expression has the same boolean
+value as the original expression above.
+
+Decision trees
+
+You must have seen something like this before. Suppose you go to a
+restaurant and you were told that there are two entrees: barbecue
+chicken (BC) and grilled fish (GF) and there are two desserts: ice cream
+(IC) or carrot cake (CC). This is the decision tree of all possible
+meals:
+
+This diagram lists the consequence of decisions. For instance if you
+choose BC for entree and IC for dessert, the consequence (see lower left
+of the above diagram) is that you have a meal of
+
+BC, IC
+
+At each point, there are several options. Etc. This is sometimes called
+a decision tree. Decision trees might also contain information such as
+cost benefit, risk analysis, etc.
+
+For me, I'll use this to show you what happens when you have a complex
+boolean expression. Here we go.
+
+Suppose you're given integer variables \emph{x} and \emph{y}. Write down
+a boolean expression that is true exactly when the following is true:
+
+\begin{itemize}
+\tightlist
+\item
+  If \emph{x} is greater than 1, then y must be less than 10
+\item
+  If x is less than or equal to 1, then y must be 42.
+\end{itemize}
+
+Here are all the possible cases:
+
+The boolean expression we want is one that will take us from the top to
+the bottom with a value of true. There are of course two paths:
+
+i.e., either the take the path where x \textgreater{} 1 and y
+\textless{} 10 or you take the path where x \textless= 1 and y == 42.
+
+The boolean expression that guarantees a true value is then
+
+(x \textgreater{} 1 \&\& y \textless{} 10) \textbar\textbar{} (x
+\textless= 1 \&\& y == 42)
+
+Ignore the boolean expression for now and look at the original
+requirement:
+
+``Write down the a boolean expression that is true exactly when the
+following is true:
+
+\begin{itemize}
+\tightlist
+\item
+  If \emph{x} is greater than 1, then y must be less than 10
+\item
+  If x is less than or equal to 1, then y must be 42.''
+\end{itemize}
+
+What will you get if x = 0 and y = 0? Since x = 0, you should look at
+the second case:
+
+``Write down the a boolean expression that is true exactly when the
+following is true:
+
+\begin{itemize}
+\tightlist
+\item
+  If \emph{x} is greater than 1, then y must be less than 10
+\item
+  \textbf{If x is less than or equal to 1, then y must be 42.}''
+\end{itemize}
+
+In this case, your boolean expression must be true exactly when y is 42.
+But our y is 0. So we must have a false value. Now let's check our
+boolean expression and see if we do get a false value. Substituting x =
+0 and y = 0 into:
+
+(x \textgreater{} 1 \&\& y \textless{} 10) \textbar\textbar{} (x
+\textless= 1 \&\& y == 42)
+
+we get
+
+(0 \textgreater{} 1 \&\& 0 \textless{} 10) \textbar\textbar{} (0
+\textless= 1 \&\& 0 == 42)
+
+\emph{\hfill\break
+}Now let's compute the boolean value of this expression:
+
+(0 \textgreater{} 1 \&\& 0 \textless{} 10) \textbar\textbar{} (0
+\textless= 1 \&\& 0 == 42)
+
+= (false \&\& true ) \textbar\textbar{} ( true \&\& false )
+
+= ( false ) \textbar\textbar{} ( false )
+
+= false
+
+Voila! Our boolean expression is correct in this case.
+
+\textbf{Exercise.} Let's check one more case.
+
+(a) From the requirements, what is the expected boolean value when x =
+10 and y = 10?
+
+(b) What is the boolean value of our boolean expression
+
+(x \textgreater{} 1 \&\& y \textless{} 10) \textbar\textbar{} (x
+\textless= 1 \&\& y == 42)
+
+when x=10 and y=10?
+
+(c) Does (a) match (b)?
+
+\textbf{Exercise.} One more check ...
+
+(a) From the requirements, what is the expected boolean value when x = 1
+and y = -5?
+
+(b) What is the boolean value of our boolean expression
+
+(x \textgreater{} 1 \&\& y \textless{} 10) \textbar\textbar{} (x
+\textless= 1 \&\& y == 42)
+
+when x = 1 and y = -5?
+
+(c) Does (a) match (b)?
+
+\textbf{Exercise.} To speed up the verification process you can write a
+code to evaluate the boolean expression:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x, y;
+
+std::cin \textgreater\textgreater{} x \textgreater\textgreater{} y;
+
+bool b = (x \textgreater{} 1 \&\& y \textless{} 10) \textbar\textbar{}
+(x \textless= 1 \&\& y == 42);
+
+std::cout \textless\textless{} b \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+When you're testing your boolean expression, you SHOULD test all
+possible branches of the decision tree:
+
+In other words your test cases must run through all the four possible
+paths from the top to the bottom. For instance here are 4 cases:
+
+\begin{itemize}
+\tightlist
+\item
+  x = 2, y = 0
+\item
+  x = 10, y = 10
+\item
+  x = 0, y = 42
+\item
+  x = -1, y = 10
+\end{itemize}
+
+In fact, in testing boolean expressions (or testing software in
+general), you should also test near boundary cases. For instance, in the
+above, when x \textgreater{} 1, the value y = 10 is the boundary case.
+So it is advisable for x = 10, one should test the cases y = 9, y = 10,
+y = 11. For the case when x \textless= 1, the boundary case is at y =
+42. So it makes sense to test y = 41, 42, 43. In fact at the higher
+level, x has a boundary case of x = 1. So it's also advisable to test x
+= -1, x = 0, x = 1.
+
+\textbf{Exercise.} Suppose you're given integer variables x and y. Write
+a boolean expression that is true exactly when the following is true:
+
+\begin{itemize}
+\tightlist
+\item
+  If x is even, then y is less than 10
+\item
+  If x is odd, then y is greater than 20
+\end{itemize}
+
+Test your boolean expression thoroughly.\\
+
+\textbf{Exercise.} Suppose you're writing a computer game and you have
+the following variables.
+
+fuel\_levelintThe amount of fuel left. Range from 0 to
+
+1000.
+
+shield\_energyintRange from 0 to 3.
+
+laser\_pod\_energydoubleRanges from 0.0 to 1.0. The player can
+
+fire the laser only when this is 1.0, i.e.,
+
+when the laser pod is fully charged.
+
+num\_laser\_collidesintNumber of enemy laser that collides with
+
+your ship.
+
+num\_asteroid\_collidesintNumber of asteroids that collides with
+
+your ship.
+
+(You of course do not need to know how values are assigned to these
+variables. Just assume that they have the right values.) Write a boolean
+expression that tells us if the game should continue. The game should
+continue exactly when the following is true:
+
+Your fuel level is greater than 0 and furthermore one of the following
+is true.
+
+\begin{itemize}
+\tightlist
+\item
+  If your shield energy is 0: the number of lasers and asteroids that
+  collides with you is 0.
+\item
+  If your shield energy is 1: the number of lasers is at most 1 and no
+  asteroid has collided with you
+\item
+  If your shield energy is 2: the number of lasers is at most 5 and the
+  number of asteroid that is in collision with you is at most 2.
+\item
+  Your shield energy is 3.
+\end{itemize}
+
+De Morgan's laws
+
+Look at this statement. John said to Mary:
+
+``I'm not stupid and I'm not ugly!!!''
+
+What about this. John said
+
+``It's not true that I'm either stupid or ugly!!!''
+
+Note that they both mean the same thing. In other words if b and c are
+boolean values, then
+
+(!b) \&\& (!c)
+
+is the same as
+
+!(b \textbar\textbar{} c)
+
+\textbf{Exercise.} Complete this program to verify the above formula by
+initializing \emph{b} and \emph{c} with all possible choices of boolean
+values.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+bool b = true, c = true;
+
+std::cout \textless\textless{} (!b \&\& !c) \textless\textless{} ' '
+\textless\textless{} !(b \textbar\textbar{} c) \textless\textless{}
+'\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+There is a similar formula:
+
+(!b) \textbar\textbar{} (!c)
+
+is the same as
+
+!(b \&\& c)
+
+The two facts:
+
+\emph{(!b) \&\& (!c)}is the same as\emph{!(b \textbar\textbar{} c)}
+
+\emph{(!b) \textbar\textbar{} (!c)}is the same as\emph{!(b \&\& c)}
+
+are called \textbf{de Morgan's laws}.
+
+Why are these formula helpful? Here's one use of de Morgan's Laws to
+simplify a boolean expression:
+
+!(x \textless{} 0 \textbar\textbar{} x \textgreater{} 5) = !(x
+\textless{} 0) \&\& !(x \textgreater{} 5)
+
+Now note that !(x \textless{} 0) is the same as x \textgreater= 0.
+Right? Also, !(x \textgreater{} 5) is the same as x \textless= 5. So
+
+!(x \textless{} 0 \textbar\textbar{} x \textgreater{} 5) = !(x
+\textless{} 0) \&\& !(x \textgreater{} 5)
+
+= (x \textgreater= 0) \&\& (x \textless= 5)
+
+Note that the final boolean expression does not have the ! operator.
+Altogether
+
+!(x \textless{} 0 \textbar\textbar{} x \textgreater{} 5)uses 4 operators
+
+(x \textgreater= 0) \&\& (x \textless= 5)uses 3 operators
+
+Get it?
+
+\textbf{Exercise.} Using de Morgan's law, simplify this expression:
+
+!(x \textless{} y + z \&\& y -- z == x)
+
+Write a simple C++ program to verify your simplification.
+
+\textbf{Exercise.} Using de Morgan's law, simplify this expression:
+
+!(x \textless{} y + z \textbar\textbar{} y != x + y \&\& y -- z == x)
+
+Write a simple C++ program to verify your simplification.
+
+\textbf{Exercise.} Using de Morgan's law, simplify this expression:
+
+!((x \textless{} y + z \textbar\textbar{} y != x + y) \&\& y -- z == x)
+
+Write a simple C++ program to verify your simplification.
+
+\textbf{Exercise.} Simplify this expression:
+
+!((x \textless{} y * z \textbar\textbar{} y \% 3 \textless{} 1) \&\& y
+\textgreater= x + 1)
+
+(All variables are integer variables with positive values.) Write a
+simple C++ program to verify your simplification.
+
+An easy simplification
+
+Here's something you should know: If \emph{x} is a boolean variable.
+Then
+
+\emph{x}
+
+and
+
+\emph{x == true}
+
+have the same boolean value. That's not too surprising since the
+following pairs of statements are the same:
+
+``I'm broke.''\,``It is true that I'm broke.''
+
+``I'm ten feet tall.''\,``It is true that I'm ten feet tall.''
+
+``I have a pet tiger.''\,``It is true that I have a pet tiger.''
+
+Right?
+
+Let me try to prove that. There are only two possible values for
+\emph{x}: it's either \emph{true} of \emph{false}.
+
+CASE: \emph{x} is \emph{true}. In that case
+
+x == true
+
+= true == true
+
+= true
+
+which is the value of \emph{x}.
+
+CASE: \emph{x} is \emph{false}. In that case
+
+x == true
+
+= false == true
+
+= false
+
+which is, again, the value of \emph{x}.
+
+So in all cases,
+
+x
+
+and
+
+\emph{x == true}
+
+have the same boolean value.
+
+Similarly
+
+\emph{!x}
+
+and
+
+\emph{x == false}
+
+have the same boolean value.
+
+\textbf{Exercise.} Here's a boolean expression for ``It is true that the
+earth is flat, it is true that the speed of light is greater than 180000
+miles/second, it is true that I have a pet tiger, and it is false that I
+cannot tie shoelaces.'':
+
+(earth\_is\_flat == true)
+
+\&\& ((LIGHT\_SPEED \textgreater{} 180000) == true)
+
+\&\& (have\_pet\_tiger == true)
+
+\&\& (cannot\_tie\_shoelaces == false)
+
+Simplify it (so that == does not appear in your simplified expression.)
+Test it with a C++ program.
+
+Summary
+
+The boolean type has two values: \emph{true} and \emph{false}. The C++
+name of the boolean type is \emph{bool}.
+
+C++ supports the following operators for boolean values:
+
+\emph{\&\&}(logical) and
+
+\emph{\textbar\textbar{}}(logical) or
+
+!(logical) not
+
+They are defined by the following truth tables:
+
+true \&\& true= true
+
+true \&\& false= false
+
+false \&\& true= false
+
+false \&\& false= false
+
+true \textbar\textbar{} true= true
+
+true \textbar\textbar{} false= true
+
+false \textbar\textbar{} true= true
+
+false \textbar\textbar{} false= false
+
+!true= false
+
+!false= true
+
+C++ supports the following binary boolean operators that accept numeric
+values (integer or floating point types):
+
+\textless less than
+
+\textless=less than or equal to
+
+\textgreater greater than
+
+\textgreater=greater than or equal to
+
+==equal to
+
+!=not equal to
+
+The following gives the precedence rules for a boolean expression
+containing the following operators:
+
++, - (unary)highest precedence level
+
+!
+
+*, /, \%
+
++, - (binary)
+
+\textless, \textless=, \textgreater, \textgreater=
+
+==, !=
+
+\&\&
+
+\textbar\textbar lowest precedence level
+
+There is an automatic type casting between numeric types (integers and
+floating point types) and boolean values. Zero is type casted to false
+and vice versa. Nonzero values are typecasted to true.
+
+Exercises\\
+
+\textbf{Q1.} Evaluate the following boolean expression or indicate the
+error:
+
+1 + 2 \textless{} 2 * 2 \&\& 3 -- 1 \textless{} 4 -- 2
+\textbar\textbar{} 5 * 2 \textless{} 6 * 3
+
+\textbf{Q2.} Evaluate the following boolean expression or indicate the
+error:
+
+5 + 2 \textless{} 2 * 1 \&\& (3 / 2 \textless{} 4 \% 2
+\textbar\textbar{} 3 * 2 \textless{} 6 \% 4) \textbar\textbar{} 3 + 3
+\textless{} 5 / 3
+
+\textbf{Q3.} The following declares a boolean variable that is true when
+z is smaller than both x, y, i.e., What's wrong with this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x = 42;
+
+int y = 24;
+
+int z = 10;
+
+bool zSmallest = (z \textless{} x \&\& y);\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Q4.} You're writing software for Dr Badadviz. After 20 years of
+research he found that a couple is compatible if the sum of their
+salaries (in pennies) when dividing by the sum of the weight (in lbs) is
+less than the number of fingers they have. Help Dr Badaviz write a
+program that prompts the user for the above, sets a boolean value
+\emph{compatible} to true exactly when the couple is compatible.
+
+\textbf{Q5.} In order to join the "Foo CEO Club", you need to have
+\$1000000 in\\
+personal assets, is or has been a CEO of at least 3 companies, and the\\
+sum of your height in ft and weight in lbs must be at most 300, and\\
+finally either you have at least 5 houses or at least 2 jets.
+
+Write a program that prompts the user for the above relevant information
+and sets a boolean variable to true exactly when the user is eligible
+for membership; print the value of this variable. Before you begin, here
+a test case.
+
+Test case:\\
+assets = 2000000\\
+companies = 5\\
+height = 6\\
+weight = 200\\
+houses = 4\\
+jet = 0\\
+result = NOT ELIGIBLE
+
+NOW ... go ahead and write your program and test it against the test\\
+cases.
+
+\end{document}

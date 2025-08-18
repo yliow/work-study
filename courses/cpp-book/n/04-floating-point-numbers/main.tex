@@ -1,0 +1,1856 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\author{}
+\date{}
+
+\begin{document}
+
+04. Floating Point Numbers
+
+Objectives
+
+\begin{itemize}
+\item
+  Use floating point literals
+\item
+  Use floating point operators
+\item
+  Declare floating point variables
+\item
+  Declare and initialize floating point variables
+\item
+  Use assignment operator for floating variables
+\item
+  Use type casting
+\item
+  Understand automatic type conversion and type promotion
+\end{itemize}
+
+If you've finished studying the set of notes on integers (both integer
+values and integer variables) this one should be easy.
+
+Floats
+
+No, not the A\&W kind.
+
+A floating point number is just a number with decimal places (well ...
+almost). I usually call them floats.
+
+Run this program:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Phew! It's good to know that C++ can do decimal places ...
+
+Recall that a \textbf{type} is just a collection of values. For instance
+\emph{int} is a type; it includes values such as 0, 5, -3, and 41.
+
+(WARNING: The word ``type'' has several meanings in Computer Science.
+The above is one of them. You can usually discern the intended meaning
+from the context.)
+
+The name of the type of the above values (1.2345,...) is
+\emph{\textbf{double}}.
+
+C++ actually understands two different kinds for floats:
+\emph{\textbf{float}} and \emph{\textbf{double}}. Of course
+mathematically you can have infinitely many decimal places. For instance
+your math instructor might write this on the board:
+
+3.333333...
+
+But hey you can't put infinitely many values (the three dots ...) into a
+computer right?
+
+In the first program above 1.2345 is actually a \emph{double}. If you
+want to use a \emph{float} you write this:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+But why are there two kinds of floating point numbers, the \emph{double}
+and the \emph{float}? Good question!!!
+
+You can be more precise with a \emph{double} than a \emph{float}.
+Furthermore \emph{double}s represent a wider range of value than the
+\emph{float}s. It's because of this that a \emph{double} value takes up
+more memory than a \emph{float }and operations with \emph{double}s might
+be slower than operations with \emph{float}s.
+
+For this course we will be using mainly the \emph{double} type.
+
+The notation for doubles using e is called the \textbf{scientific
+notation}. Although you can write this in this notation
+
+\emph{123.45e3}
+
+it's usually written so it looks like this:
+
+\emph{1.2345e5}
+
+So ...
+
+1.2345e5
+
+The notation not using e is usually called \textbf{fixed-point
+notation}.
+
+In these notes, to distinguish between the integer five from the
+floating point number five I will write
+
+\begin{itemize}
+\item
+  5 for the integer five
+\item
+  5.0 for the floating point five
+\end{itemize}
+
+\textbf{Exercises.} Convert the following to scientific notation. You
+should check your work with a calculator.
+
+\begin{itemize}
+\tightlist
+\item
+  12345.0
+\item
+  -12345.6789
+\item
+  0.00001234
+\item
+  -0.00004564
+\end{itemize}
+
+\textbf{Exercise.} Convert the following numbers from scientific
+notation to fixed-point notation:
+
+\begin{itemize}
+\tightlist
+\item
+  1.23E-3
+\item
+  123.32e5
+\item
+  -123.32e-5
+\end{itemize}
+
+Operators
+
+\textbf{Exercise.} Write a program that displays that sum, difference,
+product and quotient of 1.1 and 2.2.
+
+AHA! You can perform +, --, *, / on floats just like the \emph{int}
+type.
+
+\textbf{Exercise.} Run this program.
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+What's the point of this exercise?
+
+Associativity and precedence rules
+
+The associativity and precedence rules are exactly the same as those for
+integer values (with the caveat that \emph{\%} is not defined for
+floats).
+
+Done! Yeah! :)
+
+\textbf{Exercise.} Which operator is the second to be used for
+evaluating the following expression:
+
+\emph{1.234 + (3.4562 + 234.23 * 1.2345) / 1.23}
+
+\textbf{Exercise.} Which operator is the third to be used for evaluating
+the following expression:
+
+(1.234 - 3.4562 + 234.23) - 1.2345 / 1.23
+
+\textbf{Output: }\emph{\textbf{std::setw()}}
+
+The next few sections are some tricks for controlling output.
+
+\textbf{Exercise.} Try the following which has nothing to do with
+floats:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless iomanip\textgreater{}
+
+int main()
+
+\{
+
+std::cout \textless\textless{} "ham" \textless\textless{} std::endl;
+
+std::cout \textless\textless{} \textbf{std::setw(5)}
+\textless\textless{} "and" \textless\textless{} std::endl;
+
+std::cout \textless\textless{} "eggs" \textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Change the 5 to 6 and run the program. Change the 6 to 10 and run it.
+Change the 6 to 2 and run it. So what does \emph{std::setw()} do? Remove
+the line \emph{\#include \textless iomanip\textgreater{}} and run it. So
+what must you remember to do whenever you use \emph{std::setw()}?
+
+An important thing to note is that \emph{std::setw()} only affects one
+output value. So in the above example, the width for the
+\emph{\textbf{next}} output (i.e. \emph{"eggs"}) is not affected.
+
+\textbf{Exercise.} Change the string \emph{"and"} in the above program
+to your favorite integer (example: maybe 42?) and run your program.
+Change the integer value to a double (say 3.14). Does \emph{std::setw()}
+work with integers and doubles?
+
+Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+std::cout \textless\textless{} std::setw(5) \textless\textless{} 2
+
+\textless\textless{} std::setw(5) \textless\textless{} 3
+\textless\textless{} std::endl;
+
+\textless\textless{} std::setw(10) \textless\textless{} 1
+\textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(And what must you do whenever you use \emph{std::setw()}?) This shows
+you that you can have multiple width controls in a single
+\emph{std::cout} statement.
+
+\textbf{Exercise.} Write a program that produces the following output.
+Do not use the space or the tab character.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+n n\^{}3
+
+- -\/-\/-
+
+0 0
+
+1 1
+
+2 8
+
+3 27\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Can the integer value used in \emph{std::setw()} be
+an integer \emph{\textbf{variable}} instead? Write a program that works
+as follows.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless iomanip\textgreater{}
+
+int main()
+
+\{
+
+int w = 0;
+
+std::cout \textless\textless{} "width: ";
+
+std::cin \textgreater\textgreater{} w;
+
+std::cout \textless\textless{} std::setw(\textbf{w})
+\textless\textless{} 1 \textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Run this program entering different values for w.
+
+\textbf{Exercise.} What happens when the width set is too small for the
+value to be printed? Does C++ chop off (truncate) the value so that it
+fits? Do this experiment: set the width to 3 and print \emph{"hello"}.
+
+Output: \emph{std::setfill()}
+
+The next set of exercises have to do with \emph{std::setfill()}.
+Remember that the h character is written \emph{'h'}.
+
+\textbf{Exercise.} Run this program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless iomanip\textgreater{}
+
+int main()
+
+\{
+
+std::cout \textless\textless{} std::setfill('*')
+
+\textless\textless{} std::setw(3) \textless\textless{} 1
+\textless\textless{} '\textbackslash n'
+
+\textless\textless{} std::setw(5) \textless\textless{} 1
+\textless\textless{} std::endl;
+
+std::cout \textless\textless{} std::setfill('\$')
+
+\textless\textless{} std::setw(3) \textless\textless{} 1
+\textless\textless{} '\textbackslash n'
+
+\textless\textless{} std::setw(5) \textless\textless{} 1
+\textless\textless{} std::endl;
+
+std::cout \textless\textless{} std::setfill(' ')
+
+\textless\textless{} std::setw(3) \textless\textless{} 1
+\textless\textless{} '\textbackslash n'
+
+\textless\textless{} std::setw(5) \textless\textless{} 1
+\textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+What does \emph{std::setfill()} do? (Duh)
+
+\textbf{Exercise.} Write a program that produces the following output.
+You are only allowed to press the \# key once in your program!!!
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#\#\#\#\#\#\#\#\#\#
+
+\#\#\#\#\#\#\#\#\#\#
+
+\#\#\#\#\#\#\#\#\#\#
+
+\#\#\#\#\#\#\#\#\#\#\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Output: justification
+
+Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless iomanip\textgreater{}
+
+int main()
+
+\{
+
+std::cout \textless\textless{} std::left
+
+\textless\textless{} std::setw(3) \textless\textless{} 1
+\textless\textless{} '\textbackslash n'
+
+\textless\textless{} std::setw(5) \textless\textless{} 1
+\textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Now try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless iomanip\textgreater{}
+
+int main()
+
+\{
+
+std::cout \textless\textless{} std::left
+
+\textless\textless{} std::setw(3) \textless\textless{} 1
+\textless\textless{} '\textbackslash n'
+
+\textless\textless{} std::setw(5) \textless\textless{} 1
+\textless\textless{} std::endl;
+
+std::cout \textless\textless{} std::right
+
+\textless\textless{} std::setw(3) \textless\textless{} 1
+\textless\textless{} '\textbackslash n'
+
+\textless\textless{} std::setw(5) \textless\textless{} 1
+\textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Enough said.
+
+Notice that once you do one \emph{std::right} for right justification
+like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+std::cout \textless\textless{} std::right;
+
+\textless\textless{} std::setw(3) \textless\textless{} 1
+\textless\textless{} '\textbackslash n'
+
+\textless\textless{} std::setw(5) \textless\textless{} 1
+\textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+it will be in effect until you change to left justification.
+
+\textbf{Exercise. }Run this program
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless iomanip\textgreater{}
+
+int main()
+
+\{
+
+std::cout \textless\textless{} std::left;
+
+std::cout \textless\textless{} '\textless' \textless\textless{} 1
+\textless\textless{} '\textgreater' \textless\textless{} std::endl;
+
+std::cout \textless\textless{} std::right;
+
+std::cout \textless\textless{} '\textless' \textless\textless{} 1
+\textless\textless{} '\textgreater' \textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+and you get
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\textless1\textgreater{}
+
+\textless1\textgreater{}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Insert two \emph{\textless\textless{} std::setw(10)} into the code so
+the you get the following output:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\textless1 \textgreater{}
+
+\textless{} 1\textgreater{}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Here's another example. Run this program and study the code and the
+output yourself:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless iomanip\textgreater{}
+
+int main()
+
+\{
+
+std::cout \textless\textless{} std::left \textless\textless{}
+std::setw(12) \textless\textless{} "January"
+
+\textless\textless{} '\$'
+
+\textless\textless{} std::right \textless\textless{} std::setw(10)
+\textless\textless{} 123.45
+
+\textless\textless{} std::endl;
+
+std::cout \textless\textless{} std::left \textless\textless{}
+std::setw(12) \textless\textless{} "February"
+
+\textless\textless{} '\$'
+
+\textless\textless{} std::right \textless\textless{} std::setw(10)
+\textless\textless{} 23.45
+
+\textless\textless{} std::endl;
+
+std::cout \textless\textless{} std::left \textless\textless{}
+std::setw(12) \textless\textless{} "March"
+
+\textless\textless{} '\$'
+
+\textless\textless{} std::right \textless\textless{} std::setw(10)
+\textless\textless{} 3.45
+
+\textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise. }Modify the program\textbf{ }
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless iomanip\textgreater{}
+
+int main()
+
+\{
+
+std::cout \textless\textless{} std::left \textless\textless{}
+std::setw(12) \textless\textless{} "January"
+
+\textless\textless{} '\$'
+
+\textless\textless{} std::right \textless\textless{} std::setw(10)
+\textless\textless{} 123.45
+
+\textless\textless{} std::endl;
+
+std::cout \textless\textless{} std::left \textless\textless{}
+std::setw(12) \textless\textless{} "February"
+
+\textless\textless{} '\$'
+
+\textless\textless{} std::right \textless\textless{} std::setw(10)
+\textless\textless{} 23.45
+
+\textless\textless{} std::endl;
+
+std::cout \textless\textless{} std::left \textless\textless{}
+std::setw(12) \textless\textless{} "March"
+
+\textless\textless{} '\$'
+
+\textless\textless{} std::right \textless\textless{} std::setw(10)
+\textless\textless{} 3.45
+
+\textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+so that you get this output:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+January \$....123.45
+
+February \$.....23.45
+
+March \$......3.45\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Output: std::fixed and std::scientific
+
+Because there are two formats for \emph{double}s (example: 123.456 is
+the same as 1.23456e2) sometimes you want to force C++ to choose a
+particular format.
+
+Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless iomanip\textgreater{}
+
+int main()
+
+\{
+
+std::cout \textless\textless{} 0.00001 \textless\textless{} std::endl;
+
+std::cout \textless\textless{} 0.00002 \textless\textless{} std::endl;
+
+std::cout \textless\textless{} std::fixed;
+
+std::cout \textless\textless{} 0.00001 \textless\textless{} std::endl;
+
+std::cout \textless\textless{} 0.00002 \textless\textless{} std::endl;
+
+std::cout \textless\textless{} std::scientific;
+
+std::cout \textless\textless{} 0.00001 \textless\textless{} std::endl;
+
+std::cout \textless\textless{} 0.00002 \textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Output: }\emph{\textbf{std::setprecision()}}
+
+First run this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless iomanip\textgreater{}
+
+int main()
+
+\{
+
+std::cout \textless\textless{} std::setprecision(3);
+
+std::cout \textless\textless{} std::setw(10) \textless\textless{} 6789
+\textless\textless{} std::endl;
+
+std::cout \textless\textless{} std::setw(10) \textless\textless{} 67.8
+\textless\textless{} std::endl;
+
+std::cout \textless\textless{} std::setw(10) \textless\textless{} 67.89
+\textless\textless{} std::endl;
+
+std::cout \textless\textless{} std::setw(10) \textless\textless{} 678.9
+\textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+And also this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless iomanip\textgreater{}
+
+int main()
+
+\{
+
+std::cout \textless\textless{} std::setprecision(3) \textless\textless{}
+std::fixed;
+
+std::cout \textless\textless{} std::setw(10) \textless\textless{} 6789
+\textless\textless{} std::endl;
+
+std::cout \textless\textless{} std::setw(10) \textless\textless{} 67.8
+\textless\textless{} std::endl;
+
+std::cout \textless\textless{} std::setw(10) \textless\textless{} 67.89
+\textless\textless{} std::endl;
+
+std::cout \textless\textless{} std::setw(10) \textless\textless{} 678.9
+\textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Change the 3 to 6 in the above programs and run the programs again. So
+... what does \emph{std::setprecision()} do?
+
+Note that whereas you need to call \emph{std::setw()} for each value
+displayed, note that calling \emph{std::setprecision()} will affect all
+the displayed value until you call it again to set the precision to
+another number.
+
+\textbf{Exercise.} Modify the above example by print different doubles
+of different number of decimal places.
+
+\textbf{Exercise.} Do the same experiment as above but with printing set
+to scientific mode.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless iomanip\textgreater{}
+
+int main()
+
+\{
+
+std::cout \textless\textless{} std::setprecision(3)
+
+\textless\textless{} std::scientific;
+
+std::cout \textless\textless{} std::setw(10) \textless\textless{} 6789
+\textless\textless{} std::endl;
+
+std::cout \textless\textless{} std::setw(10) \textless\textless{} 67.8
+\textless\textless{} std::endl;
+
+std::cout \textless\textless{} std::setw(10) \textless\textless{} 67.89
+\textless\textless{} std::endl;
+
+std::cout \textless\textless{} std::setw(10) \textless\textless{} 678.9
+\textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Get it? You might want to modify the precision and the \emph{double}s
+being printed.
+
+\textbf{Exercise.} Can you use a variable when specifying the precision?
+
+Double variables
+
+Warning: Incoming warm-up ...
+
+\textbf{Exercise.} Declare a \emph{double} variable \emph{x} with an
+initial value of 0.0. Print the value of \emph{x}. Run the program and
+make sure it works. Now fill in the blank:
+
+\_\_\_\_\_\_\_\_\_ x = \_\_\_\_\_\_\_\_\_\_;
+
+\textbf{Exercise.} Using the previous program, declare a \emph{double}
+variable called \emph{pi} with an initial value of 3.14159. Print the
+value of \emph{pi}.
+
+It's always a good practice to initialize your variables. If you do not
+have a value in mind, the default choice is \emph{0.0}.
+
+\textbf{Exercise.} Declare two \emph{double} variables \emph{x} and
+\emph{y}, initializing their values to 1.2 and 3.4 respectively. Print
+their sum, difference, product and quotient. (Yes, I haven't shown you
+how to get C++ to compute the sum, difference, product and quotient of
+\emph{\textbf{double}} variables. But you do know how to do the sum,
+difference, product and quotient of \emph{\textbf{int}}s. So make a
+guess.)
+
+Double input (console window)
+
+\textbf{Exercise.} Be brave. You can do it. Write a program that prompts
+the user for two floating point numbers (use \emph{double}, not
+\emph{float}) and then print their sum.
+
+That's it for input to floating point variables!!!
+
+\textbf{Exercise.} Complete the program above so that it prompts the
+user for two \emph{double}s, prompts the user for a display width,
+prompts the user for the precision, and finally prints the sum with the
+given width and precision in fixed point format.
+
+\textbf{Exercise.} Write a mileage calculator. Here's an execution of
+the program.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+***** Mileage calculator *****
+
+Enter distance travelled (in miles): \textbf{1234}
+
+Enter gas used (in gallons): \textbf{12}
+
+Mileage (miles/gallon): 102.833\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(Make sure you choose good variable names.)
+
+\textbf{Exercise.} Write an hourly wage calculator. Here's an execution
+of the program.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+Pay calculator (version 0.1)
+
+Enter hours: \textbf{12.3}
+
+Enter pay-per-hour (in dollars): \textbf{99.88}
+
+Pay: \$1228.52\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Write a program that compute the area of a right
+triangle. Make sure the output is in fixed point mode and with 4 decimal
+places. Here's an execution of the program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+Right triangle area calculator !!!
+
+Base: \textbf{12.345}
+
+Height: \textbf{23.456}
+
+The area is 144.7822\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Here's another execution:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+Right triangle area calculator !!!
+
+Base: \textbf{1}
+
+Height: \textbf{2}
+
+The area is 1.000\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Types
+
+So far you have seen \textbf{five} types of values:
+
+The first is the \textbf{C-string}. For instance \emph{"hello world"} is
+a string. The empty string (or null string) is just \emph{"".}
+
+The second type is the \textbf{character}. For instance \emph{'h'} is a
+character, so is
+
+\emph{' '} (the space)\emph{. }There are special character such as
+\emph{'\textbackslash n'}, \emph{'\textbackslash t'},
+\emph{'\textbackslash"'}, etc. A C-string is in fact made up of
+characters.
+
+The third is the \textbf{integer}. For instance 41 is an integer. The
+C++ name of this type is int.
+
+The fourth and fifth type are both \textbf{floating point types}. Their
+C++ names are double and the float.
+
+I haven't given you the C++ names of the \textbf{character} and
+\textbf{C-string} type yet. We will talk about them later. But just to
+give you something to play with, try this program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+char x = '\$';
+
+char y = '\textbackslash n';
+
+char s{[}100{]} = "Frodo lives!";
+
+char t{[}100{]} = "C++ rules!";
+
+std::cout \textless\textless{} x \textless\textless{} std::endl
+
+\textless\textless{} y \textless\textless{} std::endl
+
+\textless\textless{} s \textless\textless{} std::endl
+
+\textless\textless{} t \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} You are entirely on your own \ldots{} be brave
+\ldots{} write a program that does this when you run it with this input:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+what's you fav character? \textbf{a}
+
+a? ... not bad\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+and this when you run it with this input:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+what's you fav character? \textbf{T}
+
+T? ... not bad\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} And now do this \ldots{} write a program that does
+this when you run it with this input:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+i'm c++ ... what's your name? \textbf{arthur}
+
+hi arthur\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+and this when you run it with this input:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+i'm c++ ... what's your name? \textbf{zaphod}
+
+hi zaphod\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+What happens when you entered \emph{zaphod beeblebrox} instead?
+
+Important warning
+
+It's extremely important to remember that floating point numbers are
+approximations.
+
+\textbf{Exercise.} Run this program.
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+No surprises. Now increase the precision to 15 and then to 20 and run
+the program ...\\
+~\\
+Got it?
+
+The mystery of what's happening here will be revealed in CISS360
+(Assembly language and computer systems).
+
+Typecasting
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+std::cout \textless\textless{} 5 \textless\textless{}
+std::endl;\tabularnewline
+\bottomrule
+\end{longtable}
+
+And try this
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+std::cout \textless\textless{} std::setprecision(10)
+
+\textless\textless{} \textbf{double(5)} \textless\textless{}
+std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\emph{double(5)} returns the \emph{double} value of the integer five.
+
+What do I mean by ``return''? It's just like evaluating an expression.
+
+Here's another way to do it:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+std::cout \textless\textless{} std::setprecision(10)
+
+\textless\textless{} \textbf{(double) 5} \textless\textless{}
+std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} What does this do?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+std::cout \textless\textless{} \textbf{int(12.89)} \textless\textless{}
+std::endl;
+
+std::cout \textless\textless{} \textbf{(int) 12.89} \textless\textless{}
+std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Can you type cast the value of a variable? Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int i = 42;
+
+double j = 3.14;
+
+std::cout \textless\textless{} (double) i \textless\textless{}
+std::endl;
+
+std::cout \textless\textless{} (int) j \textless\textless{}
+std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Do you get an error?
+
+Sometimes C++ will automatically do typecasting for you. Run this
+program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int i = 7.89;
+
+float x = 5;
+
+double y = 42;
+
+std::cout \textless\textless{} i \textless\textless{} std::endl;
+
+std::cout \textless\textless{} std::fixed \textless\textless{} x
+\textless\textless{} '\textbackslash n'
+
+\textless\textless{} y \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Then there's \textbf{type promotion}. I've already told you that there's
+the integer addition operator and the double addition operator. Try
+this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+std::cout \textless\textless{} 2 + 3.1 \textless\textless{}
+std::endl;\tabularnewline
+\bottomrule
+\end{longtable}
+
+This is not the ``integer-double'' addition operator -- there is no such
+operator!
+
+What happens is that 2 is actually converted to the \emph{double} of 2
+before the addition. Of course, the addition is the \emph{double}
+addition operator.
+
+In general if you apply an operator to an integer and a double (or
+float), the integer will first be converted to a double (or float)
+before the operator is evaluated. That's all there is. Remember that the
+integer is converted to a double and not the other way round. Why?
+Because C++ will try to be as accurate as possible.
+
+\textbf{Exercise.} Is the value of this expression an \emph{int} or a
+\emph{double}?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+1 + 2 -- 3 / 4 * 5.1 + 2\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} What integer value is first type promoted to a
+\emph{double}?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+4 + 2 -- 13 / 4 * 5.1 + 2\tabularnewline
+\bottomrule
+\end{longtable}
+
+If you have an integer expression and you really want the output to be a
+\emph{double}, you can typecast the variables. Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int i = 1;
+
+int j = 2;
+
+std::cout \textless\textless{} i / j \textless\textless{}
+std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You get zero right? Because the / is the integer division operator. Now
+change it to this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int i = 1;
+
+int j = 2;
+
+std::cout \textless\textless{} double(i) / double(j)
+\textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Run it again.
+
+\textbf{Exercise.} Run this and explain why the output is the same as
+the previous program.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int i = 1;
+
+int j = 2;
+
+std::cout \textless\textless{} double(i) / j \textless\textless{}
+std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Run this \emph{version}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int i = 1;
+
+int j = 2;
+
+std::cout \textless\textless{} double(i / j) \textless\textless{}
+std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Explain! Pay attention: This is a \emph{\textbf{very common mistake!!!}}
+
+\textbf{Exercise.} Run this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double x;
+
+std::cin \textgreater\textgreater{} x;
+
+int i = x + 0.5;
+
+std::cout \textless\textless{} x \textless\textless{} ','
+\textless\textless{} i \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+With several inputs for x (example: 3, 3.1, 3.5, 3.8, etc.) What does
+this program do?
+
+A function quickie
+
+So what is a function? A function in C++ is like a function in math but
+it's lot more. There is a complete set of notes for functions. Right now
+I just want to give you enough understanding to move on. Now in math, a
+function like
+
+f(x) = 2x
+
+means that
+
+f(5) = 2(5) = 10
+
+In other words a function in math is something that has an input and an
+output. For f(x) above, when you put in 5, f(5) gives you 10.
+
+Likewise for the function
+
+g(x,y) = xy
+
+when you put 4 for x and 7 for y you get
+
+g(4,7) = (4)(7) = 28
+
+Again the 4 and 7 are the inputs and 28 is the output.
+
+The above examples are functions that performs numeric computations:
+they take input(s), compute, and return a value. In programming,
+functions can do more than just computations. Later you will learn that
+there are functions that open a file for read/write, open a network
+socket for network communication, open a GUI (graphical user interface)
+window, etc. Right now I just want to get back to functions that perform
+numeric computations.
+
+Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless cmath\textgreater{}
+
+int main()
+
+\{
+
+std::cout \textless\textless{} pow(2.0, -1.0) \textless\textless{}
+'\textbackslash n'
+
+\textless\textless{} pow(2.0, 1.0) \textless\textless{}
+'\textbackslash n'
+
+\textless\textless{} pow(2.0, 2.0) \textless\textless{}
+'\textbackslash n'
+
+\textless\textless{} pow(2.0, 3.0) \textless\textless{}
+'\textbackslash n';
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+So \ldots{} what does the function \emph{pow(a, b)} give you?
+
+Note that to use the \emph{pow()} function you must have this in the
+program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+\#include \textless cmath\textgreater{}
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Of course you can use expressions:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless cmath\textgreater{}
+
+int main()
+
+\{
+
+double x = 2.0, y = -1.0;
+
+std::cout \textless\textless{} pow(x, y) \textless\textless{}
+'\textbackslash n'
+
+\textless\textless{} pow(x, y + 1.0) \textless\textless{}
+'\textbackslash n'
+
+\textless\textless{} pow(x * x, y + 5 * x) \textless\textless{}
+'\textbackslash n';
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+WARNING: MS VS .NET will give you an error if you do this:
+
+\emph{pow(1, 2)}
+
+For \emph{pow()} to work correctly, at least one of the two values you
+pass in to the \emph{pow()} function must be a \emph{double}; the return
+value is a \emph{double}.
+
+\textbf{Exercise.} How would you correct this program without changing
+the type of \emph{x} and \emph{y}?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless cmath\textgreater{}
+
+int main()
+
+\{
+
+int x, y;
+
+std::cout \textless\textless{} pow(x, y) \textless\textless{}
+'\textbackslash n';
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} The Pythagoras' theorem states if x, y, z are the
+lengths of a right angle triangle where z is the hypothenuse, then
+
+x\textsuperscript{2} + y\textsuperscript{2 } = z\textsuperscript{2 }
+
+Write a program that prompts the user for x and y, and print the value
+of z.
+
+The Pythagoras' theorem can be used to compute the distance between two
+points. This can then be used in, for instance, computing if two things
+collide in a computer game.
+
+Now, you know that \emph{x * x} is the same as \emph{pow(x, 2)}. However
+you should not overuse \emph{pow()} since the evaluation of \emph{x * x}
+is probably much faster than \emph{pow()} especially if you're trying to
+compute the square of integers.
+
+In general, a more general function tends to be slower than a more
+specific/specialized function. Remember that.
+
+\textbf{Exercise.} Write a program that prompts the user for a
+\emph{double} and prints the square root of the \emph{double}.
+
+\textbf{Exercise.} Write a program that get an integer n from the user
+prints 10 to the n-th power (as an integer). For instance if your input
+is 0, the program prints 1. If your input is 3, the program prints 1000.
+
+\textbf{Exercise.} If n is the integer 860713524, then the 0th digit of
+n is 4 (the rightmost digit), the 1st digit of n is 2, the 2nd digit of
+n is 5, the 3rd digit of n is 3, the 4th digit of n is 1, the 5th digit
+of n is 7, the 6\textsuperscript{th} digit of n is 0, the 7th digit of n
+is 6, etc. Write a program that get n and k from the user and prints the
+k-th digit of n.
+
+\textbf{Exercise.} Here the famous simple interest formula: If you have
+P in a savings account at a bank and the bank gives you an interest rate
+of r (for instance r might be 0.015, i.e. 1.5\%), then after t years you
+will have
+
+P(1 + r)\textsuperscript{t}
+
+(P is called the ``principal''.) Write a program that computes this.
+Here's an execution of the program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+Savings account calculator!!!
+
+Enter P (principal): \$\textbf{1000}
+
+Enter r (interest rate in percent): \textbf{1.5}
+
+Enter t (number of years): \textbf{30}
+
+Final balance: \$1563.08\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Here's another execution:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+Savings account calculator!!!
+
+Enter P (principal): \$\textbf{2000}
+
+Enter r (interest rate in percent): \textbf{1.75}
+
+Enter t (number of years): \textbf{40}
+
+Final balance: \$4003.19\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+A bunch of functions available in C++
+
+There are many functions available in C++. Here are some (and don't
+forget to use \emph{\#include \textless cmath\textgreater{}} when you
+want to use any of these functions.)
+
+\emph{pow(x, y)}Returns the power of x to y i.e. x\textsuperscript{y}
+
+\textsuperscript{}x and y are \emph{double}s and the return value is a
+\emph{double}
+
+\emph{sqrt(x)}Returns the square root of x
+
+\textsuperscript{}x is a \emph{double}, the return value is a
+\emph{double}
+
+\emph{exp(x)}Returns the power of the natural number e to x,
+e\textsuperscript{x}. Here e = 2.718...
+
+\textsuperscript{}x is a \emph{double}, the return value is a
+\emph{double}
+
+\emph{log(x)}Returns the natural logarithm of x, log\textsubscript{e}(x)
+which is also
+
+written ln(x) in math
+
+\textsuperscript{}x is a \emph{double}, the return value is a
+\emph{double}
+
+\emph{log10(x)}Returns the logarithm of x to base 10,
+log\textsubscript{10}(x)
+
+\textsuperscript{}x is a \emph{double}, the return value is a
+\emph{double}
+
+\emph{sin(x)}Returns the sine of x, sin(x) where x is in radians
+
+x is a \emph{double}, the return value is a \emph{double}
+
+\emph{cos(x)}Returns the cosine of x, cos(x) where x is in radians
+
+x is a \emph{double}, the return value is a \emph{double}
+
+\emph{tan(x)}Returns the tangent of x, tan(x) where x is in radians
+
+x is a \emph{double}, the return value is a \emph{double}
+
+For all the above functions you can also pass in \emph{float}s instead
+of \emph{doubles}. If you pass in \emph{float}s the return value is
+usually a \emph{float}.
+
+(The above list of functions is not exhaustive.)
+
+\textbf{Exercise.} You should know from math classes that
+
+log\textsubscript{10}(10\textsuperscript{x}) = x
+
+Verify this for the case x = 3 and x = 4.5 using C++.
+
+\textbf{Exercise.} Another version of the Pythagoras' theorem says that
+
+sin\textsuperscript{2}(x) + cos\textsuperscript{2}(x) = 1
+
+{[}Here sin\textsuperscript{2}(x) means (sin(x))\textsuperscript{2.}{]}
+Verify this for the case x = 1 and x = 2.34 using C++.
+
+Summary
+
+There are two floating point types: \emph{double} and \emph{float}. A
+double is capable of more precision than a float.
+
+The following are binary operators available for floating point types
+(both double and float): +, -, *, /. Note that \% is not defined for
+floating point types. The same precedence and associative rules for
+integers hold.
+
+The declaration of double or float variables follows the same rules as
+that or integer variables.
+
+Keyboard input of double variables is similar to integer variables.
+
+\emph{double()} returns the double of a value. \emph{int()} returns the
+integer of a value.
+
+Assignment and initialization operator (i.e. =) can be used between
+integers and doubles. For instance you can assign an integer variable a
+\emph{double} value. An automatic type casting occurs.
+
+When a binary operator operates on an integer and a double, the integer
+is replaced by its double (it's automatically type casted to a double)
+before the operator is evaluated.
+
+Exercises\\
+
+\textbf{Q1.} Write a console program that does the following. It prompts
+for the user's height, weight, length of his/her thumb, radius of
+his/her skull and the number college classes the he/she has taken and
+displays the user's IQ using the following formula
+
+\emph{iq = PI * skullRadius}\textsuperscript{\emph{2 }}\emph{+ x
+classes}
+
+Your program should use the following for variable names.
+
+\begin{itemize}
+\tightlist
+\item
+  height
+\item
+  weight
+\item
+  thumbLength
+\item
+  skullRadius
+\item
+  classes
+\item
+  iq
+\end{itemize}
+
+PI is the constant 3.14159. Your code must of course contain the
+definition of PI.
+
+Q2. What's wrong with this program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+std::cout \textless\textless{} "Area of triangle\textbackslash n";
+
+double height = 0.0; base = 0.0;
+
+std::cout \textless\textless{} "Base: ";
+
+std::cin \textgreater\textgreater{} based;
+
+std::cout \textless\textless{} "Height: ";
+
+std::cin \textgreater\textgreater{} height;
+
+std::cout \textless\textless{} "Area of triangle with height "
+
+\textless\textless{} base \textless\textless{} " and base "
+\textless\textless{} height
+
+\textless\textless{} " is "
+
+\textless\textless{} (1 / 2) * base * height \textless\textless{}
+std::end;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Correct it by hand. Verify with C++.
+
+Q3. Do you get the same output for the two print statements?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+std::cout \textless\textless{} (1.2 + 3.4 + 5.6) / 3
+\textless\textless{} std::endl;
+
+std::cout \textless\textless{} (1.2 + 3.4 + 5.6) / 3.0
+\textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Verify with C++
+
+Q4. The following should print the average of three integers but does
+not. Correct it by hand.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x = 0, y = 0, z = 0;
+
+std::cin \textgreater\textgreater{} x \textgreater\textgreater{} y
+\textgreater\textgreater{} z \textgreater\textgreater{} std::endl;
+
+std::cout \textless\textless{} (x + y + z) / 3 \textless\textless{}
+std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Verify with C++.
+
+\textbf{Q5.} The formula for converting temperature in Fahrenheit to
+Celsius is given by this formula:
+
+5
+
+c = --- (f - 32)
+
+9
+
+(where f is the temperature in Fahrenheit and c is the temperature in
+Celsius.) Here's an execution of the program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+35
+
+1.66667\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(Of course the input on the first line is the temperature in Fahrenheit
+and the second line gives the temperature in Celsius.)
+
+Q6. Write a program that does the following:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+Differentiator!!!
+
+Only for monomials right now ... :(
+
+Enter c and a to differentiate c * x\^{}a: \textbf{1.2 5.6}
+
+d
+
+-\/- (1.2 * x \^{} 5.6) = 6.72 * x \^{} 4.6
+
+dx\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Mathematically,
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+\endhead
+d &\tabularnewline
+& ( c x\textsuperscript{a }) = (ca) x \textsuperscript{a -
+1}\tabularnewline
+dx &\tabularnewline
+\bottomrule
+\end{longtable}
+
+You do not need to know calculus to do this problem.
+
+Q7. Write a program gets integers n and d from the user and prints the
+d-th digit of n. If n is 13524, the 0-th digit is 4, the 1-st digit is
+2, the 2\textsuperscript{nd} digit is 5, etc. Here's a test run:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+13524 0
+
+4\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Here's another test run:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+13524 1
+
+2\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\end{document}

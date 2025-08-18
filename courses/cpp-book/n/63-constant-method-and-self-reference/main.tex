@@ -1,0 +1,3221 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\author{}
+\date{}
+
+\begin{document}
+
+63. Constant Method and Self Reference
+
+Objectives
+
+\begin{itemize}
+\tightlist
+\item
+  Understand the \emph{this} pointer
+\item
+  Understand the uses of the \emph{this} pointer
+\item
+  Return a reference to an object
+\item
+  Return a reference to an instance variable
+\item
+  Understand the dangers of returning references to an instance variable
+\item
+  Make parameters constant to protect from accidental modification
+\item
+  Make \emph{*this} constant to protect from accidental modification
+\end{itemize}
+
+Recall
+
+Suppose we have a class \emph{C} with a method \emph{m}. Suppose an
+object \emph{obj} of \emph{C} invokes \emph{m}. In the body of method
+\emph{m}, members and member functions without objects are those
+automatically associated with \emph{obj}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Int.h
+
+class Int
+
+\{
+
+public:
+
+Int(int x) : x\_(x) \{\}
+
+void print()
+
+\{
+
+std::cout \textless\textless{} x\_ \textless\textless{}
+"\textbackslash n";
+
+\}
+
+private:
+
+int x\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// main.cpp
+
+\#include ``Int.h``
+
+int main()
+
+\{
+
+Int i(5);
+
+i.print();
+
+Int j(-3);
+
+j.print();
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Again, this applies to methods as well...
+
+Add methods \emph{m1}, \emph{m2} into the \emph{Int} class. For
+simplicity, I'm inlining the methods into the class header. But remember
+that you should inline minimally.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Int.h
+
+...
+
+class Int
+
+\{
+
+public:
+
+...
+
+void m1()
+
+\{
+
+std::cout \textless\textless{} "m1:" \textless\textless{} x
+\textless\textless{} "\textbackslash n";
+
+m2();
+
+\}
+
+void m2()
+
+\{
+
+std::cout \textless\textless{} "m2:" \textless\textless{} x
+\textless\textless{} "\textbackslash n";
+
+\}
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// main.cpp
+
+\#include "Int.h"
+
+int main()
+
+\{
+
+Int i(42);
+
+i.m1();
+
+std::cout \textless\textless{} std::endl;
+
+Int j(0);
+
+j.m1();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(Note: This is a review. I already talked about methods calling methods
+when we were looking at the \emph{Date} class.)
+
+Thinking of Objects
+
+You should think of a class as a rubber stamp for creating objects.
+
+You should think of each object as a computational machine.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+Int\tabularnewline
+- x\_ : int \tabularnewline
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
++ print: void
+
++ m1: void
+
++ m2: void \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You can (and should) think of the ``stuff'' on the green band (the
+\emph{m1}, \emph{m2}, \emph{print}) -- the \emph{public} things -- as
+things that outsiders can access while the stuff on the inside (the
+\emph{x\_}) -- the \emph{private} things -- are not available to
+outsiders. By outsiders, I mean functions not in the class and methods
+not in this class (i.e. methods of another class).
+
+What is the Invoking Object
+
+What if a method must know the invoking object? Here's such an example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Int
+
+\{
+
+public:
+
+...
+
+\textbf{Int max(const Int \& c) }
+
+\{
+
+if (c.x\_ \textgreater{} x\_)
+
+\{
+
+return c;
+
+\}
+
+else
+
+\{
+
+return ???;
+
+\}
+
+\}
+
+private:
+
+int x\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int main()
+
+\{
+
+Int a(100), b(1);
+
+Int c = a.max(b);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+For \emph{a.max(b)} we want to return \emph{a}. But what's the name of
+\emph{a} in the code of \emph{max()}??? In general, what's the name of
+the object making the call?
+
+There is a secret parameter in every method. You do not pass this
+parameter into the method. It's done for you automatically.
+
+What is this secret parameter??? ...
+
+The \emph{this} Pointer
+
+Try the program below.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Int.h
+
+\#ifndef INT\_H
+
+\#define INT\_H
+
+\#include \textless iostream\textgreater{}
+
+class Int
+
+\{
+
+public:
+
+Int(int x) : x\_(x) \{\}
+
+void print()
+
+\{
+
+\textbf{std::cout \textless\textless{} this \textless\textless{} x\_
+\textless\textless{} "\textbackslash n";}
+
+\}
+
+private:
+
+int x\_;
+
+\};
+
+\#endif\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// main.cpp
+
+\#include \textless iostream\textgreater{}
+
+\#include ``Int.h"
+
+int main()
+
+\{
+
+Int i(42);
+
+std::cout \textless\textless{} \&i \textless\textless{}
+"\textbackslash n";
+
+i.print();
+
+Int j(0);
+
+std::cout \textless\textless{} \&j \textless\textless{}
+"\textbackslash n";
+
+j.print();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+When an object \emph{obj} invokes a method \emph{m}, a special pointer
+\emph{this} is passed into \emph{m} automatically. The important thing
+to remember is that:
+
+\emph{this} points to \emph{obj}
+
+If an object \emph{obj} has member variable \emph{x\_} and \emph{this}
+is a pointer to \emph{obj}, then the following are the same:
+
+\emph{obj.x (*this).x this-\textgreater x}
+
+This is the same notation used for pointers to \emph{struct} variables.
+You should \emph{\textbf{not}} use \emph{(*this).x}. Write
+\emph{this-\textgreater x} instead.
+
+(There is an exception. Static methods do not have the \emph{this}
+secret parameter discussed here. We will talk about static methods
+later.)
+
+\textbf{WARNING:} \emph{*p.x} means \emph{*(p.x)} because \emph{.} has
+higher precedence than \emph{*}. Make sure you try changing the
+following
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Int
+
+\{
+
+public:
+
+...
+
+void print()
+
+\{
+
+std::cout \textless\textless{} \textbf{x\_} \textless\textless{}
+"\textbackslash n";
+
+\}
+
+...
+
+private:
+
+int \_x;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+to this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Int
+
+\{
+
+public:
+
+...
+
+void print()
+
+\{
+
+std::cout \textless\textless{} \textbf{this-\textgreater x\_}
+\textless\textless{} "\textbackslash n";
+
+\}
+
+...
+
+private:
+
+int x\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+OK ... now to use \emph{this} ...
+
+When do you use \emph{this}?
+
+\textbf{Standard Practice: }Don't use \emph{this} in a method just to
+access members or member functions. In other words, in a method
+
+\begin{itemize}
+\item
+  \emph{this-\textgreater x} should be \emph{x}
+\item
+  \emph{this-\textgreater m()} should be \emph{m()}
+\end{itemize}
+
+For instance, this does work:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+class Date
+
+\{
+
+public:
+
+\ldots{}
+
+int get\_year()
+
+\{
+
+return \textbf{this-\textgreater yyyy\_};
+
+\}
+
+void set\_year(int y)
+
+\{
+
+\textbf{this-\textgreater yyyy\_} = y;
+
+\}
+
+...
+
+void add\_m\_y(int m, int d)
+
+\{
+
+\textbf{this-\textgreater add\_m(m)};
+
+\textbf{this-\textgreater add\_d(d)};
+
+\}
+
+private:
+
+...
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+but \textbf{DON'T DO THAT!!!} Do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+class Date
+
+\{
+
+public:
+
+\ldots{}
+
+int get\_year()
+
+\{
+
+return \textbf{yyyy\_};
+
+\}
+
+void set\_year(int y)
+
+\{
+
+\textbf{yyyy\_} = y;
+
+\}
+
+...
+
+void add\_m\_y(int m, int d)
+
+\{
+
+\textbf{add\_m(m)};
+
+\textbf{add\_d(d)};
+
+\}
+
+private:
+
+...
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The pointer \emph{this} is used when it's used on its own either as
+\emph{this} or \emph{*this}. In particular \emph{*this} can be used for
+returning a copy of or a reference to the object making the method
+invocation and \emph{this} can be used for address comparison (you'll
+see this later when we need to compare address values when we overload
+the assignment operator \emph{operator=}.)
+
+(There are exceptions \ldots{} later. But the above two uses are good
+enough.)
+
+Returning a copy of \emph{*this}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+class Int
+
+\{
+
+...
+
+Int max(const Int \& c)
+
+\{
+
+if (c.x\_ \textgreater{} x\_)
+
+return c;
+
+else
+
+return \textbf{*this};
+
+\}
+
+...
+
+private:
+
+int x\_;
+
+\};
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+And now you can try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include "Int.h"
+
+int main()
+
+\{
+
+Int a(100), b(1);
+
+Int c = a.max(b); // a.max(b) should return an
+
+// Int object with x\_ value of
+
+// 100
+
+c.print();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Of course, this is better:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+class Int
+
+\{
+
+public:
+
+...
+
+Int max(const Int \& c)
+
+\{
+
+return (c.x\_ \textgreater{} x\_ ? c : *this);
+
+\}
+
+...
+
+private:
+
+int x\_;
+
+\};
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Get it? In this case, we are returning a copy of the \emph{Int} object
+that \emph{this} points to, i.e., the object invoking the method.
+
+Notice however that you can also do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+class Int
+
+\{
+
+...
+
+Int \textbf{\&} max(const Int \& c)
+
+\{
+
+return (c.x\_ \textgreater{} x\_ ? c : *this);
+
+\}
+
+...
+
+private:
+
+int x\_;
+
+\};
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In this case, a \textbf{reference is returned}.
+
+Why is this important? Look at this code:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include ``Int.h``
+
+int main()
+
+\{
+
+Int a(100), b(1);
+
+Int c = a.max(b);
+
+c.print();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+This means if the return of \emph{Int::max()} is an \emph{Int} and not
+an \emph{Int \&}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+class Int
+
+\{
+
+public:
+
+...
+
+\textbf{Int} max(const Int \& c)
+
+\{
+
+...
+
+\}
+
+...
+
+\};
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+then an \emph{Int} value is returned (it has the same values as \emph{a}
+or \emph{b}). This \emph{Int} value is used for the invocation of the
+\emph{Int} copy constructor to initialize \emph{c:}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include ``Int.h``
+
+int main()
+
+\{
+
+Int a(100), b(1);
+
+Int c = a.max(b);
+
+c.print();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Make sure you read the last two sentences again (and again and again).
+
+However if a reference is returned:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+class Int
+
+\{
+
+public:
+
+...
+
+\textbf{Int \&} max(const Int \& c)
+
+\{
+
+...
+
+\}
+
+...
+
+\};
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+then back in \emph{main()}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include ``Int.h``
+
+int main()
+
+\{
+
+Int a(100), b(1);
+
+Int c = a.max(b);
+
+c.print();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+on returning from \emph{Int::max()}, a reference to a or to b is used by
+the copy constructor to initialize \emph{c}. There's no extra \emph{Int}
+object created by \emph{Int::max()} that is used to initialize \emph{c}.
+
+Let me repeat again: when you return \emph{Int} (not \emph{Int \&}), a
+copy of the object to be returned is made (by using the copy
+constructor).
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+class Int
+
+\{
+
+public:
+
+...
+
+\textbf{Int} max(const Int \& c)
+
+\{
+
+return (c.x \textgreater{} x ? c : *this);
+
+\}
+
+...
+
+private:
+
+int x;
+
+\};
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Whereas if you return \emph{Int \&}, no \emph{Int} object is created.
+The copy constructor used to create \emph{c} will simply reference
+\emph{a} or \emph{b}.
+
+Returning references
+
+In the previous section, I have shown you an example of returning a
+reference.
+
+Certain methods and operators update the values of the variables or
+objects and return the values of the variables or objects. Run this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x = 5;
+
+x++;
+
+std::cout \textless\textless{} x \textless\textless{} std::endl;
+
+int y = x++;
+
+std::cout \textless\textless{} x \textless\textless{} ','
+\textless\textless{} y \textless\textless{} std::endl;
+
+y = (x += 5);
+
+std::cout \textless\textless{} x \textless\textless{} ','
+\textless\textless{} y \textless\textless{} std::endl;
+
+(x += 5) += 5;
+
+std::cout \textless\textless{} x \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Don't overdo this! Why? Because
+
+y = (x += 5);
+
+does too many things. A function/method/operator should do
+\emph{\textbf{one}} thing to avoid confusion. This is clearly easier to
+understand:
+
+x += 5;
+
+y = x;
+
+Note that the \emph{+=} when called twice:
+
+(x += 5) += 5;
+
+operates on the same \emph{x}. This means that \emph{+=}, besides
+incrementing \emph{x}, also returns a reference to x so that the second
+\emph{+=} operators on the same \emph{x}. If \emph{+=} returns a new
+\emph{int} value that has the same value as \emph{x} after incrementing,
+then the second \emph{+=} would have operated on this new \emph{int}
+value and not on \emph{x}. Therefore the right thing to do is to return
+a reference to \emph{x} and not a copy of \emph{x}.
+
+Of course returning a reference is faster than returning an object since
+objects tend to consume more memory. References are implemented using
+pointers and pointers take up very little memory.
+
+Refer to the \emph{Date} example. Suppose the \emph{add\_y} method is to
+add an integer value to the year value, \emph{and} return the value of
+the object.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.h
+
+...
+
+class Date
+
+\{
+
+public:
+
+...
+
+\textbf{Date \&} add\_y(int);
+
+...
+
+private:
+
+int yyyy\_, mm\_, dd\_;
+
+\};
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.cpp
+
+...
+
+\textbf{Date \&} Date::add\_y(int inc)
+
+\{
+
+yyyy\_ += inc;
+
+\textbf{return *this;}
+
+\}
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+With the above, I can now do this:
+
+Date today(1, 1, 1970);
+
+today.add\_y(1).add\_y(3);
+
+The first invocation of \emph{add\_y} will add 1 to the year of
+\emph{today} and then a reference to \emph{today} is returned. Therefore
+the second \emph{add\_y} is called by this reference, which means that
+the second \emph{add\_y} is called by \emph{today}.
+
+However if you do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.cpp
+
+...
+
+\textbf{Date }Date::add\_y(int inc)
+
+\{
+
+y += inc;
+
+\textbf{return *this;}
+
+\}
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+i.e., return a \emph{Date} object instead of a reference, then
+\emph{Date}'s copy constructor is used to create a new \emph{Date}
+object from \emph{*this}. This object is returned to \emph{main()} and
+the \emph{add\_y} is called by this object so that \emph{today} does not
+have its year incremented by 3.
+
+We now look at returning references from a function call or method call.
+
+There's nothing new here about references.
+
+\textbf{WARNING: }Pay attention to the next programs!!!
+
+Run the following pair of programs. Explain their outputs.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int \& f(int \& x)
+
+\{
+
+x++;
+
+return x;
+
+\}
+
+int main()
+
+\{
+
+int a = 42;
+
+int \& b = f(a);
+
+std::cout \textless\textless{} a \textless\textless{} ' '
+\textless\textless{} b \textless\textless{} '\textbackslash n';
+
+std::cout \textless\textless{} \&a \textless\textless{} ' '
+\textless\textless{} \&b \textless\textless{} '\textbackslash n';
+
+b++;
+
+std::cout \textless\textless{} a \textless\textless{} ' '
+\textless\textless{} b \textless\textless{} '\textbackslash n';
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int \& f(int \& x)
+
+\{
+
+x++;
+
+return x;
+
+\}
+
+int main()
+
+\{
+
+int a = 42;
+
+int b = f(a);
+
+std::cout \textless\textless{} a \textless\textless{} ' '
+\textless\textless{} b \textless\textless{} '\textbackslash n';
+
+std::cout \textless\textless{} a \textless\textless{} ' '
+\textless\textless{} b \textless\textless{} '\textbackslash n';
+
+b++;
+
+std::cout \textless\textless{} a \textless\textless{} ' '
+\textless\textless{} b \textless\textless{} '\textbackslash n';
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The point:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int a = 42;
+
+int \& b = a;
+
+int \& receiver1 = b; // receiver1 references a
+
+int receiver2 = b; // receiver2 gets the value of a
+
+receiver1 = 0; // a is changed
+
+receiver2 = 0; // receiver2 is changed, not a.\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+What about this?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int \& f()
+
+\{
+
+int x = 42;
+
+return x;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+This returns a reference to a local variable but you cannot refer to
+this local variable once it goes out of scope since it will be destroyed
+at that point. (Note: this is OLD stuff. Yes I have already talked about
+it.)
+
+Yet more examples on returning \emph{*this} as a reference (DIY)
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Point2d
+
+\{
+
+public:
+
+Point2d \& set\_x(int x) \{ x\_ = x; return *this; \}
+
+Point2d \& set\_y(int y) \{ y\_ = y; return *this; \}
+
+void print()
+
+\{
+
+std::cout \textless\textless{} x\_ \textless\textless{} ','
+\textless\textless{} y\_ \textless\textless{} '\textbackslash n';
+
+\}
+
+private:
+
+int x\_, y\_;
+
+\};
+
+int main()
+
+\{
+
+Point2d p;
+
+Point2d \& q = p.set\_x(1);
+
+q.set\_y(2);
+
+p.print();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Explain!
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Point2d
+
+\{
+
+public:
+
+Point2d \textbf{\&} set\_x(int x)
+
+\{
+
+x\_ = x;
+
+return \textbf{*this};
+
+\}
+
+Point2d \textbf{\&} set\_y(int y)
+
+\{
+
+y\_ = y;
+
+return \textbf{*this};
+
+\}
+
+void print()
+
+\{
+
+std::cout \textless\textless{} x\_ \textless\textless{} ','
+\textless\textless{} y\_ \textless\textless{} '\textbackslash n';
+
+\}
+
+private:
+
+int x\_, y\_;
+
+\};
+
+int main()
+
+\{
+
+Point2d p;
+
+p.set\_x(1).set\_y(2);
+
+p.print();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+This is similar to the previous program except that I got rid of
+\emph{q}. Explain!
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Point2d
+
+\{
+
+public:
+
+\textbf{Point2d} set\_x(int x)
+
+\{
+
+x\_ = x;
+
+return *this;
+
+\}
+
+\textbf{Point2d} set\_y(int y)
+
+\{
+
+y\_ = y;
+
+return *this;
+
+\}
+
+void print()
+
+\{
+
+std::cout \textless\textless{} x\_ \textless\textless{} ','
+\textless\textless{} y\_ \textless\textless{} '\textbackslash n';
+
+\}
+
+private:
+
+int x\_, y\_;
+
+\};
+
+int main()
+
+\{
+
+Point2d p;
+
+p.set\_x(1).set\_y(2);
+
+p.print();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Explain!
+
+Returning reference to member variable
+
+Of course you can also return a reference to a member (yes I know I've
+already talked about this before).
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Point2d
+
+\{
+
+public:
+
+int \& get\_x()
+
+\{
+
+return x\_;
+
+\}
+
+void print()
+
+\{
+
+std::cout \textless\textless{} x\_ \textless\textless{} ','
+\textless\textless{} y\_ \textless\textless{} '\textbackslash n';
+
+\}
+
+private:
+
+int x\_, y\_;
+
+\};
+
+int main()
+
+\{
+
+Point2d p;
+
+p.print();
+
+int \& a = p.get\_x();
+
+a = 0;
+
+p.print();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+But remember about information hiding. Clients usually should not have
+direct access to instance variables. The class (and the objects) should
+provide services to clients through methods and hide internal
+implementation from outsiders. This makes the software more
+maintainable.
+
+And you definitely cannot do this in a method:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Point2d
+
+\{
+
+public:
+
+int \& get\_x()
+
+\{
+
+int x = x\_;
+
+return x; // ERROR! Returning reference to
+
+// local variable!!! Arghh!!!
+
+\}
+
+private:
+
+int x\_, y\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Temporary object values
+
+Most of the time we have objects with names:
+
+Date date(1970, 1, 1);
+
+date.print();
+
+Of course you can create object values not bound to names:
+
+Date(1970, 1, 1).print();
+
+(I've already talked about this.)
+
+In the second case above, we have a temporary object, or an object value
+that does not belong to an object name.
+
+In the \emph{Int} class, if you have operator+ returns object values,
+you might see temporary objects:
+
+Int i(5), j(7), k (8);
+
+Int z = i + j + k; // i + j is temporary object
+
+// this temporary object is
+
+// added with k to produce
+
+// another temporary object
+
+Of course, just like a method, a function can return an object value
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+Date rand\_date()
+
+\{
+
+return Date(rand()\%10 + 1,
+
+rand()\%10 + 1, rand());
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Of course this is different from returning a reference:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+Date \& Date::f()
+
+\{
+
+return (*this);
+
+\}
+
+int main()
+
+\{
+
+Date date(1, 1, 1970);
+
+date.f(); // A reference to date
+
+// is returned
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+A temporary object can be destroyed immediately after the expression
+containing the temporary object is computed.
+
+There is an exception \ldots{} you can create an object name and bind it
+to a temporary object value. In this case the temporary object value is
+not destroyed immediately. For instance
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int main()
+
+\{
+
+Date date1 = rand\_date();
+
+...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The value of \emph{date1} is actually the same as the value of the
+object returned by \emph{rand\_date()}, i.e., there is no copy
+constructor call. To verify this add some print statements:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+Date randdate()
+
+\{
+
+Date ret(rand() \% 10 + 1,
+
+rand() \% 10 + 1, rand());
+
+std::cout \textless\textless{} \&ret \textless\textless{}
+'\textbackslash n';
+
+return ret;
+
+\}
+
+int main()
+
+\{
+
+Date date1 = f();
+
+std::cout \textless\textless{} \&date1 \textless\textless{}
+'\textbackslash n';
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You can also insert print statements in the \emph{Date} destructor to
+verify that there is only one destructor call, not two, i.e., in the
+above, there is really only one \emph{Date} value.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+rand\_date(); // Date value returned by
+
+// rand\_date() is not bound to a
+
+// name. It's destroyed.
+
+// Destructor is called.
+
+Date date1 = rand\_date(); // Date value bound to
+
+// date1. Destructor not
+
+// called yet \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In the above example:
+
+Date date1 = rand\_date();
+
+the destructor is called only when the name \emph{date1} goes out of
+scope.
+
+Here are the scenarios you should study and be familiar with:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+Date Date::f(...) \{ \ldots; return *this; \}
+
+Date \& Date::f(...) \{ \ldots; return *this; \}
+
+Date Date::f(...) \{ \ldots; Date x; return x; \}
+
+Date \& Date::f(...) \{ \ldots; Date x; return x; \} (error)
+
+Date Date::f(...) \{ \ldots; return Date(1,1,1970); \}
+
+Date \& Date::f(...) \{ \ldots; return Date(1,1,1970); \}
+
+(error)
+
+(date1.f()).print()
+
+Date date2 = date1.f()
+
+Date \& date2 = date1.f()\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Avoid similar names
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x\_ = 0;
+
+int m2()
+
+\{
+
+return 5;
+
+\}
+
+class C
+
+\{
+
+public:
+
+void m1()
+
+\{
+
+x\_ = m2();
+
+\}
+
+void m2()
+
+\{
+
+return 0;
+
+\}
+
+private:
+
+int x\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Avoid such ambiguities! What's this about \ldots{}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C
+
+\{
+
+public:
+
+void m(int x\_)
+
+\{
+
+std::cout \textless\textless{} x\_;
+
+\}
+
+private:
+
+int x\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In general here's how C++ search for names in the above cases: first
+local variables are searched, then instance variables (member
+variables), and then globals.
+
+Notes
+
+In some programming languages, instead of \emph{this} (in a method)
+which points to the object invoking the method, in other programming
+languages there's a \emph{self} or \emph{me} in a method this plays the
+same role as \emph{this} except that it is a reference to the object
+invoking the method.
+
+Forcing a reference parameter to be constant
+
+Recall: When writing a function, it's a good idea to use \emph{const}
+for arguments that should not be changed. This is the case for both
+(regular) functions and methods of a class:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// function
+
+void f(\textbf{const} C \& c) \{ ... \}
+
+// method in class C
+
+void C::g(\textbf{const} C \& c) \{ ... \}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The following example shows 4 possible ways of pass-by-reference:
+
+\begin{itemize}
+\tightlist
+\item
+  Non-const to non-const \&
+\item
+  Non-const to const \&
+\item
+  Const to non-const \&
+\item
+  Const to const \&
+\end{itemize}
+
+Which ones work and which do not? Here's an experiment that will help.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void f(const int \& i) \{\}
+
+void g(int \& i) \{\}
+
+int main()
+
+\{
+
+int i = 0;
+
+const int j = 0;
+
+f(i); // nonconst passed to const reference
+
+f(j); // const passed to const reference
+
+g(i); // nonconst passed to nonconst reference
+
+g(j); // const passed to nonconst reference
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+First figure out on your own which is reasonable. Compile this and read
+the error message. Correct and check by compiling the program.
+
+Answer:
+
+\begin{itemize}
+\tightlist
+\item
+  Non-const to non-const \&OK
+\item
+  Non-const to const \&OK
+\item
+  Const to non-const \&BAD!!!
+\item
+  Const to const \&OK
+\end{itemize}
+
+Why?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void g(int \& i) \{\} // i not constant
+
+// g() can change i
+
+int main()
+
+\{
+
+const int j = 0; // j cannot be changed
+
+g(j); // oops ... now what?
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The case of object parameters is the same.
+
+The following example shows 4 possible ways of pass-by-reference:
+
+\begin{itemize}
+\tightlist
+\item
+  Non-const to non-const \&
+\item
+  Non-const to const \&
+\item
+  Const to non-const \&
+\item
+  Const to const \&
+\end{itemize}
+
+Which ones work and which do not?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C \{\};
+
+void f(const C \& y) \{\}
+
+void g(C \& y) \{\}
+
+int main()
+
+\{
+
+C a;
+
+const C b = C();
+
+f(a);
+
+f(b);
+
+g(a);
+
+g(b);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Answer:
+
+\begin{itemize}
+\tightlist
+\item
+  Non-const to non-const \&OK
+\item
+  Non-const to const \&OK
+\item
+  Const to non-const \&BAD!!!
+\item
+  Const to const \&OK
+\end{itemize}
+
+Why?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C\{\};
+
+void h(C \& x) \{\} // h can modify x
+
+int main()
+
+\{
+
+const C y = C(); // y cannot be modified
+
+h(y); // oops ... now what???
+
+\emph{\}} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In summary if \emph{T} is any type (\emph{int} , \emph{char} , \ldots,
+some \emph{class}, \ldots), and \emph{f()} has the following prototype:
+
+\emph{void f(\textbf{T \& x});}
+
+and y is a \emph{\textbf{constant}} \emph{T} object, then the following
+is incorrect:
+
+const T y;
+
+f(y);
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C \{public: int x\};
+
+void f0(const C \& y) \{\}
+
+void f1(C \& y) \{\}
+
+int main()
+
+\{
+
+C a;
+
+f0(a); f1(a);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class IntPointer
+
+\{
+
+public:
+
+...
+
+IntPointer(\textbf{const} IntPointer \& a)
+
+: p\_(new int)
+
+\{ *p\_ = *(a.p\_); \}
+
+...
+
+private:
+
+int * p\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Int
+
+\{
+
+public:
+
+Int(int x)
+
+: x\_(x)
+
+\{\}
+
+Int max(Int \& a)
+
+\{
+
+if (x\_ \textless{} a.x\_)
+
+return a;
+
+else
+
+return (*this);
+
+\}
+
+private:
+
+int x\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+So
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+class Int
+
+\{
+
+public:
+
+Int(int x)
+
+: x\_(x)
+
+\{\}
+
+Int max(\textbf{const} Int \& a)
+
+\{
+
+if (x\_ \textless{} a.x\_)
+
+return a;
+
+else
+
+return (*this);
+
+\}
+
+public:
+
+int x\_;
+
+\};
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C
+
+\{
+
+public:
+
+void f(int a)
+
+\{
+
+x\_ = a;
+
+\}
+
+int g(int a)
+
+\{
+
+return y\_ + a;
+
+\}
+
+private:
+
+int x\_, y\_;
+
+\};
+
+void j(C \& c)
+
+\{
+
+c.f(0);
+
+\}
+
+void k(C \& c)
+
+\{
+
+c.g(0);
+
+\}
+
+int main()
+
+\{
+
+C c, d;
+
+j(c);
+
+k(c);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Example. }Invoking \emph{c.f() }will modify \emph{c}
+
+class C
+
+\{
+
+...
+
+void f(int a)\{ x\_ = a; \} // modifies x\_
+
+...
+
+\};
+
+This means that the following will \emph{\textbf{not}} work:
+
+void j(\emph{\textbf{const}} C \& c) \{ c.f(0); \}
+
+Invoking \emph{c.g()} will not modify \emph{c}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C
+
+\{
+
+...
+
+int g(int a)
+
+\{
+
+return y + a;
+
+\}
+
+...
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+This means that the following \emph{\textbf{will}} work:
+
+\emph{void j(\textbf{const} C \& c) \{ c.f(0); \}}
+
+\textbf{Exercise.} Which parameters in \emph{j,k} can be made constant?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C
+
+\{
+
+public:
+
+void f(int a)
+
+\{
+
+x\_ = a;
+
+\}
+
+int g(int a)
+
+\{
+
+return y\_ + a;
+
+\}
+
+void h(C \& c)
+
+\{
+
+f(c.x\_);
+
+\}
+
+void i(C \& c)
+
+\{
+
+c.x\_ = g(5);
+
+\}
+
+private:
+
+int x\_, y\_;
+
+\};
+
+void j(C \& c, C \& d)
+
+\{
+
+c.h(d);
+
+\}
+
+void k(C \& c, C \& d)
+
+\{
+
+c.i(d);
+
+\}
+
+int main()
+
+\{
+
+C c, d;
+
+j(c, d);
+
+k(c, d);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Which parameter should be made \emph{const}?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Int
+
+\{
+
+public:
+
+Int(int x0)
+
+: x\_(x0)
+
+\{\}
+
+void incrementBy(Int \& a)
+
+\{
+
+x\_ += a.x\_;
+
+\}
+
+void increment(Int \& a)
+
+\{
+
+a.x\_ += x\_;
+
+\}
+
+int get()
+
+\{
+
+return x\_;
+
+\}
+
+private:
+
+int x\_;
+
+\};
+
+int main()
+
+\{
+
+Int a(1), b(5);
+
+a.incrementBy(b);
+
+a.increment(b);
+
+std::cout \textless\textless{} a.get() \textless\textless{} ' '
+\textless\textless{} b.get() \textless\textless{} '\textbackslash n';
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Forcing a return reference to be constant
+
+Recall this example from above:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Point2d
+
+\{
+
+public:
+
+int \& get\_x()
+
+\{
+
+return x\_;
+
+\}
+
+void print()
+
+\{
+
+std::cout \textless\textless{} x\_ \textless\textless{} ','
+\textless\textless{} y\_ \textless\textless{} '\textbackslash n';
+
+\}
+
+private:
+
+int x\_, y\_;
+
+\};
+
+int main()
+
+\{
+
+Point2d p;
+
+p.print();
+
+int \& a = p.get\_x();
+
+a = 0;
+
+p.print();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The \emph{p.get\_x()} method returns a reference to \emph{p.x\_}. This
+reference is then given to \emph{a}:
+
+int \& a = p.get\_x();
+
+This means that a is a reference to p.x\_. Therefore changing a will
+mean changing p.x\_.
+
+But remember what I said earlier about information hiding. Clients
+usually should not have direct access to instance variables. The class
+(and the objects) should provide services to clients through methods and
+hide internal implementation from outsiders. This makes the software
+more maintainable. So to prevent \emph{main()} from changing
+\emph{p.x\_} directly, you can do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Point2d
+
+\{
+
+public:
+
+\textbf{const} int \& get\_x()
+
+\{
+
+return x\_;
+
+\}
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The reference returned will not be able to change the x\_ of the object.
+In fact, now the \emph{main()} above cannot be compiled. Why?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Point2d
+
+\{
+
+public:
+
+const int \& get\_x()
+
+\{
+
+return x\_;
+
+\}
+
+...
+
+\};
+
+int main()
+
+\{
+
+Point2d p;
+
+p.print();
+
+int \& a = p.get\_x();
+
+...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Because the \emph{a} in \emph{main()} is a reference that can
+potentially attempt to the the value of \emph{p.x\_}. The issue is not
+whether \emph{a} will actually change or not. The only way for the above
+to compile is to make it impossible for a to change, i.e., you would
+have to do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Point2d
+
+\{
+
+public:
+
+const int \& get\_x()
+
+\{
+
+return x\_;
+
+\}
+
+...
+
+\};
+
+int main()
+
+\{
+
+Point2d p;
+
+p.print();
+
+\textbf{const} int \& a = p.get\_x();
+
+...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+How to make \emph{*this} constant?
+
+But what about \emph{this}? It's passed in automatically and is not
+shown in the parameter list! How do you ``\emph{const}'' \emph{this}?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Int
+
+\{
+
+public:
+
+Int(int x)
+
+: x\_(x)
+
+\{\}
+
+Int max(\textbf{const }Int \& a)
+
+\{
+
+if (x\_ \textless{} a.x\_)
+
+return a;
+
+else
+
+return (*this);
+
+\}
+
+private:
+
+int x\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+But \ldots.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Int
+
+\{
+
+public:
+
+Int(int x)
+
+: x\_(x)
+
+\{\}
+
+Int max(\textbf{const} Int \& a)
+
+\{
+
+if (x\_ \textless{} a.x\_)
+
+return a;
+
+else
+
+return (*this);
+
+\}
+
+private:
+
+int x\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Int
+
+\{
+
+public:
+
+Int(int x)
+
+: x\_(x)
+
+\{\}
+
+Int max(\textbf{const} Int \& a) \emph{\textbf{const}}
+
+\{
+
+if (x\_ \textless{} a.x\_)
+
+return a;
+
+else
+
+return (*this);
+
+\}
+
+private:
+
+int x\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Date
+
+\{
+
+public:
+
+int get\_d() \textbf{const};
+
+private:
+
+int yyyy\_, mm\_, dd\_;
+
+\};
+
+int Date::get\_d() \textbf{const}
+
+\{
+
+return dd\_;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Correct the error(s)!
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Date
+
+\{
+
+public:
+
+int get\_d() const
+
+\{
+
+return dd\_;
+
+\}
+
+void set\_d(int dd) const
+
+\{
+
+dd\_ = dd;
+
+\}
+
+private:
+
+int yyyy\_, mm\_, dd\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+WARNING:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C
+
+\{
+
+public:
+
+void f() \textbf{const}
+
+\{\}
+
+void g() \textbf{const};
+
+\};
+
+void C::g() \textbf{const}
+
+\{\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Go ahead and experiment with this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C\{
+
+public:
+
+void f() \textbf{const}
+
+\{\}
+
+void g() \textbf{const};
+
+\};
+
+void C::g() \textbf{const}
+
+\{\}
+
+int main()
+
+\{\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Which methods should be constant?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Int
+
+\{
+
+public:
+
+Int(int x)
+
+: x\_(x)
+
+\{\}
+
+void incrementBy(Int \& a)
+
+\{
+
+x\_ += a.x\_;
+
+\}
+
+void increment(Int \& a)
+
+\{
+
+a.x\_ += x\_;
+
+\}
+
+int get()
+
+\{
+
+return x\_;
+
+\}
+
+private:
+
+int x\_;
+
+\};
+
+int main()
+
+\{
+
+Int a(1), b(5);
+
+a.incrementBy(b);
+
+a.increment(b);
+
+std::cout \textless\textless{} a.get() \textless\textless{} ' '
+\textless\textless{} b.get() \textless\textless{} '\textbackslash n';
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Functions with \emph{const} at the end are called \textbf{constant
+member functions}.\textbf{ }In other words, constant member functions
+are methods that will not modify the object invoking the method.
+
+\textbf{Exercise.} Which statement in \emph{main()} is incorrect? Next,
+Compile this and read the error message. Correct and check by compiling
+the program.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C
+
+\{
+
+public:
+
+void m1()
+
+\{\}
+
+void m2() const
+
+\{\}
+
+\};
+
+int main()
+
+\{
+
+const C a;
+
+C b;
+
+a.m1();
+
+a.m2();
+
+b.m1();
+
+b.m2();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise. }Which methods should be constant? Which parameters
+should be constant?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C
+
+\{
+
+public:
+
+void m(C \& a, C \& b)
+
+\{
+
+x\_ = a.x\_;
+
+y\_ = b.y\_;
+
+\}
+
+void m(C \& a, C \& b)
+
+\{
+
+x\_ = a.x\_;
+
+b.y\_ = y\_;
+
+\}
+
+void m(C \& a, C \& b)
+
+\{
+
+a.x\_ = x\_;
+
+y\_ = b.y\_;
+
+\}
+
+void m(C \& a, C \& b)
+
+\{
+
+a.x\_ = x\_;
+
+b.y\_ = y\_;
+
+\}
+
+private:
+
+int x\_, y\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Go over \emph{all} the previous classes you have
+built (\emph{Date}, \emph{Vehicle}, \emph{WeatherCtrl}, \emph{Int},
+\emph{IntPointer}, \emph{IntArray}, \emph{IntDynArr}, etc.) Make all
+relevant parameters constant whenever possible. Make all methods
+constant whenever possible.
+
+\textbf{Exercise. }Does this compile?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C
+
+\{
+
+public:
+
+void m()
+
+\{\}
+
+void m() const
+
+\{\}
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise. }Look at the \emph{IntPointer} class very carefully.
+In particular look at the de-reference operator, \emph{operator*()}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class IntPointer
+
+\{
+
+public:
+
+...
+
+int \& operator*()
+
+\{
+
+return *p\_;
+
+\}
+
+...
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Should \emph{operator*()} be constant? The question to ask is this: is
+\emph{p} changed? The important point \ldots{} There is a difference
+between asking if \emph{p} should be constant and if \emph{*p} should be
+constant.
+
+\textbf{Exercise.} Continuing the above idea, look at \emph{IntArray}
+and \emph{IntDynArr}. There is a similar issue for
+\emph{operator{[}{]}(int)}. Should it be a constant operator?
+
+Summary
+
+\begin{itemize}
+\tightlist
+\item
+  When an object \emph{obj} invokes a method \emph{m}, a pointer called
+  \emph{this} is in the scope of \emph{m}. The \emph{this} pointer
+  points to \emph{obj}. In other words, in a method, the \emph{this}
+  pointer always point to the object invoking the method. (See section
+  on static methods for exception.)
+\end{itemize}
+
+\begin{itemize}
+\tightlist
+\item
+  In the body of a method, if an object \emph{obj} has instance variable
+  \emph{x\_}, then the following are the same:
+\end{itemize}
+
+\emph{x\_}is the same as\emph{this-\textgreater x\_}
+
+\begin{itemize}
+\tightlist
+\item
+  In the body of a method, if an object \emph{obj} has another method
+  called \emph{m}, then the following are the same:
+\end{itemize}
+
+\emph{m()}is the same as\emph{this-\textgreater m()}
+
+\begin{itemize}
+\tightlist
+\item
+  A method can return a copy of the value of the object of class
+  \emph{C}:
+\end{itemize}
+
+\emph{C C::m() }
+
+\{
+
+...
+
+return *this;
+
+\}
+
+\emph{C \& C::m() }
+
+\{
+
+...
+
+return *this;
+
+\}
+
+\begin{itemize}
+\tightlist
+\item
+  If a method returns a reference to itself, then you can chain up
+  methods:
+\end{itemize}
+
+\emph{obj.m().m1()}
+
+\begin{itemize}
+\tightlist
+\item
+  WARNING: If \emph{m} does not return a reference of the invoking
+  object, then in the following:
+\end{itemize}
+
+\emph{obj.m().m1()}
+
+\begin{itemize}
+\item
+  A constant method is a method that cannot modify the object invoking
+  the method.
+\item
+  A method is made constant by putting the word \emph{const} on the
+  right of the method header. This is done in the header file and if the
+  method is defined outside the class definition, then it must also be
+  done in the definition of the method.
+\end{itemize}
+
+\end{document}

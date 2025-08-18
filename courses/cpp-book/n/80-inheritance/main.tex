@@ -1,0 +1,2888 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage[normalem]{ulem}
+% Avoid problems with \sout in headers with hyperref
+\pdfstringdefDisableCommands{\renewcommand{\sout}{}}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\author{}
+\date{}
+
+\begin{document}
+
+80. Inheritance
+
+Objectives
+
+\begin{itemize}
+\tightlist
+\item
+  Understand inheritance
+\item
+  Understand how to call the constructor of the superclass
+\item
+  Understand how the destructor of the superclass is called
+\item
+  Understand how a method can hide a method of the same signature in the
+  superclass
+\item
+  Understand how a member variable can hide a member variable in the
+  superclass
+\item
+  Understand how to call a hidden method in the superclass
+\item
+  Understand how names are found by the compiler in an inheritance
+  hierarchy
+\item
+  Understand the difference between composition and inheritance
+\item
+  Understand how to choose between composition and inheritance
+\item
+  Understand multiple inheritance
+\item
+  Understand protected members
+\item
+  Understand public, protected, and private inheritance
+\end{itemize}
+
+The problem
+
+Instead of working with classes (and their objects) alone, we can work
+with a hierarchy of classes. Why do we want to do this? To improve
+``re-use''.
+
+For instance: Suppose you have an \emph{Employee} class and you want to
+create a \emph{Manager} class. A manager \textbf{is an} employee -\/-
+everything in the \emph{Employee} class should be in the \emph{Manager}
+class. For instance an \emph{Employee} might have a last name,
+\emph{Manager} should have a last name too.
+
+You basically want the \emph{Manager} class to have all the member
+variables and methods of the \emph{Employee} class. Of course you can
+copy-and-paste the code from the \emph{Employee }class into the
+\emph{Manager }class:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Employee
+
+\{
+
+public:
+
+...
+
+std::string get\_firstname();
+
+void set\_firstname(const std::string \&);
+
+private:
+
+std::string firstname;
+
+...
+
+\};
+
+class Manager
+
+\{
+
+public:
+
+...
+
+std::string get\_firstname();
+
+void set\_firstname(const std::string \&);
+
+// other stuff not from Employee class
+
+...
+
+private:
+
+std::string firstname;
+
+// other stuff not from Employee class
+
+...
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Of course you would expect the \emph{Manager} class to contain more
+things than the \emph{Employee} class. For instance in the company where
+the above software is written, a manager might have a secretary while
+non-managers do not.
+
+We don't like to duplicate code. If you need to modify the code from the
+\emph{Employee} class, then you also need to modify the same code in the
+\emph{Manager} class. And if code in the \emph{Employee} class is used
+in 10 other classes, the maintenance work on code would be horrific.
+
+What should we do?
+
+Inheritance
+
+The solution is to use \textbf{inheritance}!!!
+
+The general idea is very simple: Basically C++ allows you to define a
+class so that it will have all the ``features'' of another.
+
+That's all. BUT \ldots{} there is \textbf{a lot} of details beyond the
+general idea of inheritance. So \textbf{pay attention}.
+
+Here is the basic syntax to get a class to inherit ``features'' from
+another class:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Employee
+
+\{ ... \};
+
+class Manager: \textbf{public Employee}
+
+\{ ... \};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+This is called \textbf{public inheritance}, i.e., the \emph{Manager}
+class \textbf{inherits} everything (i.e. member variables and methods)
+of the \emph{Employee} class in the sense that the \emph{Manager} class
+will have all the features (member variables and methods) from the
+\emph{Employee} class.
+
+Here is some basic terminology that you must know:
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Employee} is the \textbf{parent class} or the
+  \textbf{superclass} and \emph{Manager} is the \textbf{child class} or
+  the \textbf{subclass}.
+\item
+  \emph{Manager} is \textbf{derived} from \emph{Employee} or
+  \emph{Manager} is a \textbf{derived subclass} of \emph{Employee}.
+\end{itemize}
+
+I'm going to use the following very simple example to illustrate
+important principles when working with inheritance.
+
+\begin{itemize}
+\tightlist
+\item
+  The parent class \emph{P} has the integer member \emph{x\_} together
+  with \emph{get\_x} and \emph{set\_x} methods.
+\item
+  The child class \emph{C} has an integer member \emph{y\_} together
+  with \emph{get\_y} and \emph{set\_y} methods.
+\end{itemize}
+
+I don't have to tell you ... run it.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class P
+
+\{
+
+public:
+
+P() : x\_(1) \{\}
+
+int get\_x() const \{ return x\_; \}
+
+void set\_x(int x) \{ x\_ = x; \}
+
+private:
+
+int x\_;
+
+\};
+
+class C : public P
+
+\{
+
+public:
+
+C() : y\_(2) \{\}
+
+int get\_y() const \{ return y\_; \}
+
+void set\_y(int y) \{ y\_ = y; \}
+
+private:
+
+int y\_;
+
+\};
+
+int main()
+
+\{
+
+C c;
+
+std::cout \textless\textless{} "c.x\_ =" \textless\textless{} c.get\_x()
+\textless\textless{} ", "
+
+\textless\textless{} "c.y\_ =" \textless\textless{} c.get\_y()
+\textless\textless{} '\textbackslash n';
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Notice that the \emph{c} object of class \emph{C} inherits \emph{x\_},
+\emph{get\_x}, and \emph{set\_x} from \emph{P}. That's why you can
+execute \emph{c.get\_x()} even though class \emph{C} does not have a
+\emph{get\_x()} method.
+
+Make sure you keep the above code handy since I'll be using this again
+and again in this set of notes. I'm going to call the above program our
+``Basic Example''.
+
+\textbf{Exercise.} Get rid of the inheritance clause in our Basic
+Example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+class P
+
+\{
+
+...
+
+\};
+
+class C \textbf{\sout{: public P}}
+
+\{
+
+...
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+and compile your code again. See the error? Now you cannot execute
+\emph{c.get\_x()}. READ the error message carefully. So we see that
+object \emph{c} does seem to have the \emph{get\_x} method! (Put the
+``\emph{: public P}'' back into the code after you're done with this
+exercise.)
+
+\textbf{Exercise.} Does \emph{c} have the \emph{set\_x} method? How
+would you check that?
+
+\textbf{Exercise.} Does \emph{c} have the \emph{x\_} member variable?
+How would you check that? (Make \emph{x\_} public and print \emph{c.x\_}
+in \emph{main()}.)
+
+So \emph{C} seems to have a ``copy'' of \emph{P}'s declaration in it. Is
+that so? There are lots of other questions:
+
+\begin{itemize}
+\tightlist
+\item
+  What about the private section of \emph{P}? Can \emph{C} define
+  methods to access the private members of \emph{P}? If inheritance is a
+  message to the compiler to ``copy-and-paste'' code from \emph{P }to
+  \emph{C}, then surely methods in \emph{C }can access the private
+  members of \emph{P}. Is that so?
+\item
+  Also, what if \emph{C} uses some features of \emph{P} but not all --
+  and in fact some features need to be modified. What can we do?
+\item
+  What about constructor? Clearly \emph{P::P()} constructor was called
+  since in the above experiment \emph{x\_ }is clearly 1. Can we call a
+  parent constructor explicitly so that we can initialize the
+  \emph{x\_}?
+\item
+  What about object destruction?
+\item
+  Etc., etc., etc.!!!
+\end{itemize}
+
+\textbf{Exercise.} The inheritance stack can be as tall as you like.
+Create a class \emph{G} (``grandparent'') with integer member \emph{z\_}
+and with \emph{get\_z} and \emph{set\_z} method. Let the default
+constructor of \emph{G} initialize \emph{z\_} to \emph{42}. Let class
+\emph{P} inherit class \emph{G}. In \emph{main()}, print the value of
+\emph{c.z\_}.
+
+Inheritance is not copy-and-paste of code!
+
+It's really important to understand that inheritance is not a
+copy-and-paste of code from the parent class to the child class.
+Inheritance is not like your ``\emph{\#include}'' business.
+
+Here's how you should visualize objects created from a class that's a
+child class. Look at our Basic Example code again. We have a \emph{c}
+object declared with class \emph{C} which inherits class \emph{P}. The
+object \emph{c} has member \emph{y\_}, \emph{get\_y}, and \emph{set\_y}
+since the type of \emph{c} is class \emph{C}. From the experiments in
+the previous section, we see that \emph{c} also has \emph{gx\_},
+\emph{get\_x}, and \emph{set\_x} from its parent \emph{P}.
+
+Here's a picture to keep in mind. First here's a diagram of our classes:
+
+Each box represents the class. The arrow describes the inheritance
+relationship between the two classes. (This is the so-called class
+diagram from UML. I'm simplifying it a little -- see previous notes for
+details on what to draw inside the boxes.) We created an object \emph{c}
+from class \emph{C}. So informally I'll draw it this way:
+
+We also know that through inheritance, \emph{c} also has \emph{x\_},
+\emph{get\_x}, and \emph{set\_x}. So where's \emph{c.x\_},
+\emph{c.get\_x}, and \emph{c.set\_x}?
+
+Now if you think of \emph{c.x\_}, \emph{c.get\_x}, and \emph{c.set\_x}
+in the same bag of things like this:
+
+then you would be surprised by the following experiment: Add an integer
+member variable to class \emph{C}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class P
+
+\{
+
+public:
+
+P() : x\_(1) \{\}
+
+int get\_x() const \{ return x\_; \}
+
+void set\_x(int x) \{ x\_ = x; \}
+
+private:
+
+int x\_;
+
+\};
+
+class C : public P
+
+\{
+
+public:
+
+C() : y\_(2) \{\}
+
+int get\_y() const \{ return y\_; \}
+
+void set\_y(int y) \{ y\_ = y; \}
+
+private:
+
+\textbf{int x\_;}
+
+int y\_;
+
+\};
+
+int main()
+
+\{
+
+C c;
+
+std::cout \textless\textless{} "c.x\_ =" \textless\textless{} c.get\_x()
+\textless\textless{} ", "
+
+\textless\textless{} "c.y\_ =" \textless\textless{} c.get\_y()
+\textless\textless{} '\textbackslash n';
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The program does compile. But this means that \emph{c\_} now has two
+\emph{x\_}'s!!!
+
+When you call upon \emph{c.x\_} which one is it??? Why does the compiler
+allow this?
+
+\textbf{Exercise.} Can you think of an experiment that can tell you
+which \emph{x\_} is used if you access \emph{c.x\_} in \emph{main()}?
+
+You really want to think of the members (member variables as well as
+methods) as being organized into two different scopes:
+
+The members of \emph{c} that are due to inheritance is at the top while
+the members declared in class \emph{C} are at the bottom. In particular
+the \emph{x\_} declared in class \emph{C} is at the bottom.
+
+The name \emph{c.x\_} refers to the \emph{x\_} at the bottom, i.e., the
+\emph{x\_} due to the class \emph{C}. Of course now you have a problem:
+what if in \emph{main()}, you want to access the \emph{x\_} at the
+top???
+
+In fact to be very precise, each member of \emph{c} belongs to one of
+the two bags (bottom and top) and you can think of the two bags as
+scopes. You can in fact specify the scopes when you access a member of
+\emph{c}. First of all the scopes have names: they are \emph{C} and
+\emph{P}, i.e., the names of the classes:
+
+You can actually address a particular member by prepending it with
+\emph{C::} or \emph{P::} if you want to be specific. Try the following:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class P
+
+\{
+
+public:
+
+P() : x\_(1) \{\}
+
+int get\_x() const \{ return x\_; \}
+
+void set\_x(int x) \{ x\_ = x; \}
+
+private:
+
+int x\_;
+
+\};
+
+class C : public P
+
+\{
+
+public:
+
+C() : y\_(2) \{\}
+
+int get\_y() const \{ return y\_; \}
+
+void set\_y(int y) \{ y\_ = y; \}
+
+private:
+
+int x\_;
+
+int y\_;
+
+\};
+
+int main()
+
+\{
+
+C c;
+
+std::cout \textless\textless{} "c.x\_ =" \textless\textless{} c.get\_x()
+\textless\textless{} ", "
+
+\textless\textless{} "c.y\_ =" \textless\textless{} c.get\_y()
+\textless\textless{} '\textbackslash n';
+
+std::cout \textless\textless{} "c.x\_ =" \textless\textless{}
+c.\textbf{P::}get\_x() \textless\textless{} ", "
+
+\textless\textless{} "c.y\_ =" \textless\textless{}
+c.\textbf{C::}get\_y() \textless\textless{} '\textbackslash n';
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+We also have two \emph{x\_}'s in \emph{c}. Let's temporarily make them
+public and then access them:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class P
+
+\{
+
+public:
+
+P() : x\_(1) \{\}
+
+int get\_x() const \{ return x\_; \}
+
+void set\_x(int x) \{ x\_ = x; \}
+
+public:
+
+int x\_;
+
+\};
+
+class C : public P
+
+\{
+
+public:
+
+C() : y\_(2) \{\}
+
+int get\_y() const \{ return y\_; \}
+
+void set\_y(int y) \{ y\_ = y; \}
+
+public:
+
+int x\_;
+
+int y\_;
+
+\};
+
+int main()
+
+\{
+
+C c;
+
+std::cout \textless\textless{} "c.x\_ =" \textless\textless{} c.get\_x()
+\textless\textless{} ", "
+
+\textless\textless{} "c.y\_ =" \textless\textless{} c.get\_y()
+\textless\textless{} '\textbackslash n';
+
+std::cout \textless\textless{} "c.x\_ =" \textless\textless{}
+c.P::get\_x() \textless\textless{} ", "
+
+\textless\textless{} "c.y\_ =" \textless\textless{} c.C::get\_y()
+\textless\textless{} '\textbackslash n';
+
+std::cout \textless\textless{} "c.x\_ (in C) =" \textless\textless{}
+c.\textbf{P::x\_} \textless\textless{} ", "
+
+\textless\textless{} "c.x\_ (in P) =" \textless\textless{}
+c.\textbf{C::x\_}
+
+\textless\textless{} '\textbackslash n';
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+NOTE: Since \emph{c.C::x\_} is not initialized, your C++ compiler will
+give you a warning. In that case, just do this (duh):
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+class C : public P
+
+\{
+
+public:
+
+C() : \textbf{x\_(3), }y\_(2) \{\}
+
+...
+
+public:
+
+int x\_;
+
+int y\_;
+
+\};
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Note that in \emph{main()}, \emph{c.x\_} by default refers to the
+\emph{x\_} in \emph{C} and not the \emph{x\_} of \emph{P}. Sometimes we
+say that the \emph{x\_} in \emph{C} \textbf{hides} the \emph{x\_} in
+\emph{P}.
+
+After the above experiments, change the ``\emph{public:}'' back to
+``\emph{private:}'' and make the appropriate changes.
+
+In general, here's how your C++ compiler hunts down a name (member
+variable or method) or an object. Say your code has \emph{c.x\_}.
+
+\begin{itemize}
+\tightlist
+\item
+  The compiler starts with the class used to declare the object. If
+  there's an \emph{x\_} in that class, that's the one used.
+\item
+  If the class used to declare \emph{c} does not have \emph{x\_}, your
+  compiler will look at the parent class. If the parent has an
+  \emph{x\_}, then that's the one used.
+\item
+  If the parent class does not have \emph{x\_}, and if the parent class
+  inheritance from another class (that would be a grandparent class of
+  the class of \emph{c}), then the compiler will look for \emph{x\_} in
+  the grandparent class of \emph{C}.
+\item
+  Etc.
+\item
+  If it's not found going up the public inheritance hierarchy, then your
+  C++ compiler will yell at you.
+\end{itemize}
+
+If a class scope was specified, say you call upon \emph{c.P::x\_}, then
+the search for \emph{x\_} starts at class \emph{P} proceeds upward
+through the inheritance hierarchy until it's found.
+
+Note that the search for a name goes \textbf{up} the inheritance
+hierarchy. Add the following to our Basic Example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+class P
+
+\{
+
+public:
+
+...
+
+\textbf{void b() \{ std::cout \textless\textless{} }
+
+\textbf{ "P::b()\textbackslash n"; \}}
+
+...
+
+\};
+
+class C : public P
+
+\{
+
+public:
+
+...
+
+\textbf{void a() \{ std::cout \textless\textless{} }
+
+\textbf{ "C::a()\textbackslash n";}
+
+\textbf{ b(); \} }
+
+...
+
+\};
+
+int main()
+
+\{
+
+...
+
+\textbf{c.a();}
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} What is the output? Or is there an error? The
+following is obtained by adding code to our Basic Example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+class P
+
+\{
+
+public:
+
+...
+
+\textbf{void c() \{ std::cout \textless\textless{}
+"P::c()\textbackslash n"; d(); \}}
+
+...
+
+\};
+
+class C : public P
+
+\{
+
+public:
+
+...
+
+\textbf{void d() \{ std::cout \textless\textless{}
+"C::c()\textbackslash n"; \}}
+
+...
+
+\};
+
+int main()
+
+\{
+
+...
+
+\textbf{c.c();}
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Private members of the parent class
+
+For public inheritance, a child cannot access private member variables
+or private methods of parent. Let's do an experiment to verify this.
+Here's our Basic Example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class P
+
+\{
+
+public:
+
+P() : x\_(1) \{\}
+
+int get\_x() const \{ return x\_; \}
+
+void set\_x(int x) \{ x\_ = x; \}
+
+private:
+
+int x\_;
+
+\};
+
+class C: public P
+
+\{
+
+public:
+
+C() : x\_(3), y\_(2) \{\}
+
+int get\_y() const \{ return y\_; \}
+
+void set\_y(int y) \{ y\_ = y; \}
+
+private:
+
+int x\_;
+
+int y\_;
+
+\};
+
+int main()
+
+\{
+
+C c;
+
+std::cout \textless\textless{} "c.x\_ =" \textless\textless{} c.get\_x()
+\textless\textless{} ", "
+
+\textless\textless{} "c.y\_ =" \textless\textless{} c.get\_y()
+\textless\textless{} '\textbackslash n';
+
+std::cout \textless\textless{} "c.x\_ =" \textless\textless{}
+c.P::get\_x() \textless\textless{} ", "
+
+\textless\textless{} "c.y\_ =" \textless\textless{} c.C::get\_y()
+\textless\textless{} '\textbackslash n';
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Now let's create a method in \emph{C} to access a private member of
+\emph{P}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+class C : public P
+
+\{
+
+public:
+
+...
+
+\textbf{void m() \{ P::x\_ = 42; \}}
+
+private:
+
+int x\_;
+
+int y\_;
+
+\};
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You will get an error when you compile your program -- make sure you
+read the error message. This is the same for private method in the
+parent:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+class P
+
+\{
+
+...
+
+private:
+
+\textbf{void m() \{\}}
+
+int x\_;
+
+\};
+
+class C: public P
+
+\{
+
+public:
+
+...
+
+\textbf{void n() \{ m(); \}}
+
+...
+
+\};
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Constructor
+
+Now add some print statements in the parent and child constructor:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class P
+
+\{
+
+public:
+
+P() : x\_(1) \{ \textbf{std::cout \textless\textless{}
+"P::P()\textbackslash n"; }\}
+
+int get\_x() const \{ return x\_; \}
+
+void set\_x(int x) \{ x\_ = x; \}
+
+private:
+
+int x\_;
+
+\};
+
+class C: public P
+
+\{
+
+public:
+
+C() : x\_(3), y\_(2) \{ \textbf{std::cout \textless\textless{}
+"C::C()";} \}
+
+int get\_y() const \{ return y\_; \}
+
+void set\_y(int y) \{ y\_ = y; \}
+
+private:
+
+int x\_;
+
+int y\_;
+
+\};
+
+int main()
+
+\{
+
+C c;
+
+std::cout \textless\textless{} "c.x\_ =" \textless\textless{} c.get\_x()
+\textless\textless{} ", "
+
+\textless\textless{} "c.y\_ =" \textless\textless{} c.get\_y()
+\textless\textless{} '\textbackslash n';
+
+std::cout \textless\textless{} "c.x\_ =" \textless\textless{}
+c.P::get\_x() \textless\textless{} ", "
+
+\textless\textless{} "c.y\_ =" \textless\textless{} c.C::get\_y()
+\textless\textless{} '\textbackslash n';
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Run it. You'll see that the parent constructor is indeed executed. This
+means that the child constructor actually called the parent's
+constructor.
+
+Note that the \textbf{parent constructor }was \textbf{called before
+}the\textbf{ child constructor.} Why is that? Because during child
+construction, you may use data already constructed in the parent. You
+cannot do the opposite.
+
+Now what if you want to choose how to initialize the parent part of the
+\emph{c} object? How do you explicitly call the parent's constructor?
+Let's add a new constructor in \emph{P}, one that accepts an integer
+value and get the \emph{C}'s constructor to call \emph{P::P(int):}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class P
+
+\{
+
+public:
+
+P() : x\_(1) \{ std::cout \textless\textless{} "P::P()\textbackslash n";
+\}
+
+\textbf{P(int x) : x\_(x) \{ std::cout \textless\textless{}
+"P::P(int)\textbackslash n"; \}}
+
+int get\_x() const \{ return x\_; \}
+
+void set\_x(int x) \{ x\_ = x; \}
+
+private:
+
+int x\_;
+
+\};
+
+class C: public P
+
+\{
+
+public:
+
+C() : \textbf{P(42),} x\_(3), y\_(2)
+
+\{ std::cout \textless\textless{} "C::C()"; \}
+
+int get\_y() const \{ return y\_; \}
+
+void set\_y(int y) \{ y\_ = y; \}
+
+private:
+
+int x\_;
+
+int y\_;
+
+\};
+
+int main()
+
+\{
+
+C c;
+
+std::cout \textless\textless{} "c.x\_ =" \textless\textless{} c.get\_x()
+\textless\textless{} ", "
+
+\textless\textless{} "c.y\_ =" \textless\textless{} c.get\_y()
+\textless\textless{} '\textbackslash n';
+
+std::cout \textless\textless{} "c.x\_ =" \textless\textless{}
+c.P::get\_x() \textless\textless{} ", "
+
+\textless\textless{} "c.y\_ =" \textless\textless{} c.C::get\_y()
+\textless\textless{} '\textbackslash n';
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} You are given this incomplete code. Add to the
+constructor of \emph{Car} and \emph{Motorcycle} so that a \emph{Car}
+object is initialized to have 4 wheels and a \emph{Motorcycle} object is
+initialized to have 2 wheels.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Vehicle
+
+\{
+
+public:
+
+Vehicle(int numWheels)
+
+: numWheels\_(numWheels)
+
+\{\}
+
+int numWheels() const \{ return numWheels\_; \}
+
+private:
+
+int numWheels\_;
+
+\};
+
+class Car: public Vehicle
+
+\{
+
+public:
+
+Car(bool keyless\_entry)
+
+: keyless\_entry\_(keyless\_entry)
+
+\{\}
+
+private:
+
+bool keyless\_entry\_;
+
+\};
+
+class Motorcycle: public Vehicle
+
+\{
+
+public:
+
+Motorcycle()
+
+:
+
+\{\}
+
+\};
+
+int main()
+
+\{
+
+Car aCar; // aCar has 4 wheels
+
+Motorcycle aMotorcycle; // aMotorcycle has 2
+
+// wheels
+
+std::cout \textless\textless{} "aCar has "
+
+\textless\textless{} aCar.numWheels() \textless\textless{} "
+wheels\textbackslash n";
+
+std::cout \textless\textless{} "aMotorcycle has "
+
+\textless\textless{} aMotorcycle.numWheels()
+
+\textless\textless{} " wheels\textbackslash n";
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} This is an incomplete piece of code:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class GameObject
+
+\{
+
+private:
+
+bool is\_alive\_;
+
+int x\_;
+
+int y\_;
+
+\};
+
+class Laser: public GameObject
+
+\{
+
+\};
+
+class Alien: public GameObject
+
+\{
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Add code so that during the initialization of a \emph{Laser} object, the
+\emph{is\_alive\_} is set to \emph{false} and during the initialization
+of an \emph{Alien} object, the \emph{is\_alive\_} is set to \emph{true}.
+
+Destructor
+
+Now let's analyze what happens when a child object is destroyed. Of
+course the child object will call it's destructor. What about the
+parent's destructor?
+
+Run the following:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class P
+
+\{
+
+public:
+
+P() : x\_(1) \{ std::cout \textless\textless{} "P::P()\textbackslash n";
+\}
+
+\textbf{\textasciitilde{}P() \{ std::cout \textless\textless{}
+"P::\textasciitilde P()\textbackslash n"; \}}
+
+int get\_x() const \{ return x\_; \}
+
+void set\_x(int x) \{ x\_ = x; \}
+
+private:
+
+int x\_;
+
+\};
+
+class C: public P
+
+\{
+
+public:
+
+C() : x\_(3), y\_(2) \{ std::cout \textless\textless{} "C::C()"; \}
+
+\textbf{\textasciitilde{}C() \{ std::cout \textless\textless{}
+"C::\textasciitilde C()\textbackslash n"; \}}
+
+int get\_y() const \{ return y\_; \}
+
+void set\_y(int y) \{ y\_ = y; \}
+
+private:
+
+int x\_;
+
+int y\_;
+
+\};
+
+int main()
+
+\{
+
+C c;
+
+std::cout \textless\textless{} "c.x\_ =" \textless\textless{} c.get\_x()
+\textless\textless{} ", "
+
+\textless\textless{} "c.y\_ =" \textless\textless{} c.get\_y()
+\textless\textless{} '\textbackslash n';
+
+std::cout \textless\textless{} "c.x\_ =" \textless\textless{}
+c.P::get\_x() \textless\textless{} ", "
+
+\textless\textless{} "c.y\_ =" \textless\textless{} c.C::get\_y()
+\textless\textless{} '\textbackslash n';
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Note that the \textbf{child destructor} was called \textbf{before} the
+\textbf{parent destructor}. So:
+
+\begin{itemize}
+\tightlist
+\item
+  Constructor: Parent's constructor called before child's constructor
+\item
+  Destructor: Child's destructor called before parent's destructor
+\end{itemize}
+
+Assignment operator
+
+If \emph{c} is a \emph{C} object and \emph{p} is a \emph{P} object, and
+\emph{C} is derived from \emph{P}, can we do the following:
+
+c = p; ???
+
+\emph{p = c; ???}\\
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class P
+
+\{
+
+public:
+
+P() : x\_(1) \{ std::cout \textless\textless{} "P::P()\textbackslash n";
+\}
+
+P(int x) : x\_(x) \{ std::cout \textless\textless{}
+"P::P(int)\textbackslash n"; \}
+
+\textasciitilde P() \{ std::cout \textless\textless{}
+"P::\textasciitilde P()\textbackslash n"; \}
+
+int get\_x() const \{ return x\_; \}
+
+void set\_x(int x) \{ x\_ = x; \}
+
+private:
+
+int x\_;
+
+\};
+
+class C: public P
+
+\{
+
+public:
+
+C() : P(42), x\_(3), y\_(2)
+
+\{ std::cout \textless\textless{} "C::C()"; \}
+
+\textasciitilde C() \{ std::cout \textless\textless{}
+"C::\textasciitilde C()\textbackslash n"; \}
+
+int get\_y() const \{ return y\_; \}
+
+void set\_y(int y) \{ y\_ = y; \}
+
+private:
+
+int x\_;
+
+int y\_;
+
+\};
+
+int main()
+
+\{
+
+C c;
+
+std::cout \textless\textless{} "c.x\_ =" \textless\textless{} c.get\_x()
+\textless\textless{} ", "
+
+\textless\textless{} "c.y\_ =" \textless\textless{} c.get\_y()
+\textless\textless{} '\textbackslash n';
+
+std::cout \textless\textless{} "c.x\_ =" \textless\textless{}
+c.P::get\_x() \textless\textless{} ", "
+
+\textless\textless{} "c.y\_ =" \textless\textless{} c.C::get\_y()
+\textless\textless{} '\textbackslash n';
+
+P p;
+
+// Which one works?
+
+c = p;
+
+p = c;\\
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+So if C is derived from \emph{P}, \emph{c} is a \emph{C} object and
+\emph{p} is a \emph{P} object, then \emph{p = c;} is valid. Why?
+
+Think about it. A \emph{C} object has more ``features'', so you can copy
+those features to a \emph{P} object.
+
+For instance suppose a child class object c has member variables c.w,
+c.x, c.y, c.x and a parent class object p has member variables p.w, p.x,
+then when you perform
+
+p = c;
+
+this would happen:
+
+p.w = c.w;
+
+p.x = c.x;
+
+But if you attempt to do
+
+\emph{c = p;}
+
+then it's not clear what should be done for the last two assignments:
+
+c.w = p.w;
+
+c.x = p.x;
+
+c.y = ????
+
+c.z = ????
+
+\textbf{Class Reuse: ``has-a'' and ``is-a''}
+
+Do not confuse inheritance and composition. They re-use old classes in
+different ways. Suppose \emph{P} is a class.
+
+There are two ways to reuse \emph{P}:
+
+\begin{itemize}
+\tightlist
+\item
+  Using inheritance: \emph{C} inherits from \emph{P}
+\item
+  Using composition:\emph{ C} contains a member that is of type \emph{P}
+\end{itemize}
+
+Look at the following example carefully. Make sure you understand what
+is happening.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class P
+
+\{
+
+public:
+
+P() : x\_(1) \{ std::cout \textless\textless{} "P::P()\textbackslash n";
+\}
+
+P(int x) : x\_(x) \{ std::cout \textless\textless{}
+"P::P(int)\textbackslash n"; \}
+
+\textasciitilde P() \{ std::cout \textless\textless{}
+"P::\textasciitilde P()\textbackslash n"; \}
+
+int get\_x() const \{ return x\_; \}
+
+void set\_x(int x) \{ x\_ = x; \}
+
+private:
+
+int x\_;
+
+\};
+
+class C: public P
+
+\{
+
+public:
+
+C() : P(42), x\_(3), y\_(2)
+
+\{ std::cout \textless\textless{} "C::C()"; \}
+
+\textasciitilde C() \{ std::cout \textless\textless{}
+"C::\textasciitilde C()\textbackslash n"; \}
+
+int get\_y() const \{ return y\_; \}
+
+void set\_y(int y) \{ y\_ = y; \}
+
+private:
+
+int x\_;
+
+int y\_;
+
+\};
+
+class D
+
+\{
+
+public:
+
+D() : p\_(42), x\_(3), y\_(2)
+
+\{ std::cout \textless\textless{} "D::D()"; \}
+
+\textasciitilde D() \{ std::cout \textless\textless{}
+"D::\textasciitilde D()\textbackslash n"; \}
+
+int get\_y() const \{ return y\_; \}
+
+void set\_y(int y) \{ y\_ = y; \}
+
+private:
+
+P p\_;
+
+int x\_;
+
+int y\_;
+
+\};
+
+int main()
+
+\{
+
+C c;
+
+std::cout \textless\textless{} "c.x\_ =" \textless\textless{} c.get\_x()
+\textless\textless{} ", "
+
+\textless\textless{} "c.y\_ =" \textless\textless{} c.get\_y()
+\textless\textless{} '\textbackslash n';
+
+std::cout \textless\textless{} "c.x\_ =" \textless\textless{}
+c.P::get\_x() \textless\textless{} ", "
+
+\textless\textless{} "c.y\_ =" \textless\textless{} c.C::get\_y()
+\textless\textless{} '\textbackslash n';
+
+P p;
+
+p = c;\\
+
+D d;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Study the above carefully. The \emph{c} object has its own \emph{x\_}
+and \emph{y\_} and the \emph{get\_y} and \emph{set\_y} methods. It also
+has (through inheritance) its \emph{P::x\_} and method \emph{P::get\_x}
+and \emph{P::set\_x}. The object \emph{d} also has \emph{x\_} and
+\emph{y\_} and the \emph{get\_x} and \emph{set\_x} and it also has
+\emph{p\_.x}\_ and \emph{p\_.get\_x }and \emph{p\_.set\_x}. In some
+sense both \emph{c} and \emph{d} have the same ``features''.
+
+\emph{c} has \emph{P}'s features by inheritance while \emph{d} has
+\emph{P}'s features through composition.
+
+If what you want in a class can be found in another class, should you
+use composition or inheritance?
+
+Look at ``is-a'' and ``has-a'' relationships between concepts.
+
+Suppose you have a \emph{Vehicle} class. You want to build a \emph{Car}
+class. Think about the relationship between the concept of a car and a
+vehicle. Which one sounds right:
+
+\begin{itemize}
+\tightlist
+\item
+  A car ``is a'' vehicle or a vehicle ``is a'' car
+\item
+  A car ``has a'' vehicle or a vehicle ''has a'' car
+\end{itemize}
+
+Clearly this one sounds better.
+
+\begin{itemize}
+\tightlist
+\item
+  A car ``is a'' vehicle
+\end{itemize}
+
+This tells you that you should probably use inheritance:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Vehicle \{...\};
+
+class Car: public Vehicle \{...\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Suppose you have an \emph{Engine} class. You want to build a \emph{Car}
+class. What is the relationship between an engine and a car? Which one
+sounds right:
+
+\begin{itemize}
+\tightlist
+\item
+  An engine ``is a'' car or an engine ``is a'' car
+\item
+  An engine car ``has a'' vehicle or a vehicle ``has an'' engine
+\end{itemize}
+
+Clearly this is the best:
+
+\begin{itemize}
+\tightlist
+\item
+  A vehicle ``has an'' engine
+\end{itemize}
+
+This tells you that you should probably use composition:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Engine \{...\};
+
+class Car \{
+
+...
+
+private:
+
+Engine anEngine;
+
+...
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+For composition, you want to create methods for methods in the instance
+members (delegation):
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Engine \{
+
+public:
+
+void start();
+
+\};
+
+class Car \{
+
+public:
+
+void start() \{ anEngine.start(); \}
+
+private:
+
+Engine anEngine;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Users can then do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+Car honda\_civic;
+
+honda\_civic.start();
+
+// i.e., honda\_civic.start() actually
+
+// executes honda\_civic.anEngine.start()
+
+// i.e., honda\_civic delegates the work of
+
+// "start" to it's engine\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Otherwise you would need this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Engine \{
+
+public:
+
+void start();
+
+\};
+
+class Car \{
+
+public:
+
+Engine \& get\_engine() \{ return anEngine; \}
+
+private:
+
+Engine anEngine;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+And users would have to do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+Car honda\_civic;
+
+honda\_civic.get\_engine().start();\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+This is \textbf{not} so good. Why? Because you want to \textbf{hide
+lower level details (engines)} and let users of your \emph{Car} class
+focus on higher level details (cars) which in this case is to ``start a
+car'' and not ``start the engine of a car''.
+
+In terms of re-use of code:
+
+\begin{itemize}
+\tightlist
+\item
+  Derivation/inheritance is a form of white-box re-use
+\item
+  Composition is a form of black-box re-use
+\end{itemize}
+
+So in summary make sure you remember this:
+
+\begin{itemize}
+\tightlist
+\item
+  ``is a'' -- inheritance
+\item
+  ``has a'' -- composition
+\end{itemize}
+
+\textbf{Exercise. }You want to write the Geometry Wars 2D game. You want
+different shapes with different colors. To get a feel for the problem,
+you want to focus on circles and squares. Circles have colors. Squares
+have colors. In fact \ldots{} every shape has a color. Therefore create
+a \emph{Shape} class containing color, i.e., R, G, B (\emph{int}
+instance variables). A circle has a radius. (HINT: Not all shapes have
+radius -- squares do not have radii. The location of a circle is
+determined by the center of the circle. A square has a width and height
+which are the same in value. The location of the square is determined by
+the coordinates of the top-left corner. A rectangle is similar to the
+square except that the width and height need not be the same. Write
+relevant classes so that if you execute this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// white circle at (2,5) of radius 3
+
+Circle circle(2, 5, 3, 255, 255, 255);
+
+// red square with top-left corner at (6, 7) with
+
+// sides of length 8.
+
+Square square(6, 7, 8, 255, 0, 0);
+
+// green rectangle with top-left corner at (9, 10)
+
+// with width 11 and height 12.
+
+Rect rect(9, 10, 11, 12, 0, 255, 0);\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Type conversion
+
+Add the following to our Basic Example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class P
+
+\{
+
+...
+
+\};
+
+class C: public P
+
+\{
+
+...
+
+\};
+
+int main()
+
+\{
+
+C c;
+
+...
+
+P p;
+
+...
+
+C c0(p); // This does not work!!!
+
+P p0(c); // This works
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+This tells you that if \emph{C} is a subclass of \emph{P}, then
+automatically, \emph{P} has a constructor of the form
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class P
+
+\{
+
+...
+
+P(const C \&);
+
+...
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The default behavior of this constructor is to copy relevant values from
+a \emph{C} object to the \emph{P} object that is being initialized.
+
+This acts as a type conversion operator.
+
+The idea is very similar to the assignment operator between objects of
+\emph{C} and objects or \emph{P}. And the reason that
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+C c0(p);\tabularnewline
+\bottomrule
+\end{longtable}
+
+does NOT work is similar.
+
+Multiple inheritance
+
+A class can be the child class of more than one parent class.
+
+Suppose we have a \emph{Vehicle} class and a \emph{Ship} class. Then
+\emph{AmphibiousVehicle} is a child of both \emph{Vehicle} and
+\emph{Ship} class.
+
+Syntax for multiple inheritance using public inheritance is simply:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class P0 \{\};
+
+class P1 \{\};
+
+class C: public P0, public P1 \{\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Some programming languages do not allow multiple inheritance. Why?
+
+Well, suppose class \emph{C0} is derived from \emph{P0}, \emph{P1} and
+both \emph{P0}, \emph{P1} have \emph{f()}. If \emph{c} is a \emph{C}
+object, then \emph{c.f()} is ambiguous. MAKE SURE you run the following:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class P0
+
+\{
+
+public:
+
+void f() \{\}
+
+\};
+
+class P1
+
+\{
+
+public:
+
+void f() \{\}
+
+\};
+
+class C: public P0, public P1
+
+\{\};
+
+int main()
+
+\{
+
+C c;
+
+c.f(); // which one!?!?!
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Your C++ compiler will probably yell at you and say you have an
+ambiguous invocation. This is of course the same for ambiguous member
+variables:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class P0
+
+\{
+
+public:
+
+int x\_;
+
+\};
+
+class P1
+
+\{
+
+public:
+
+int x\_;
+
+\};
+
+class C: public P0, public P1
+
+\{\};
+
+int main()
+
+\{
+
+C c;
+
+c.x\_; // which one!?!?!
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+However note that if you have two members in both parents with the same
+name but you never call upon that name, your C++ will \textbf{not}
+complain. For instance
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class P0
+
+\{
+
+public:
+
+int x\_;
+
+\};
+
+class P1
+
+\{
+
+public:
+
+int x\_;
+
+\};
+
+class C: public P0, public P1
+
+\{\};
+
+int main()
+
+\{
+
+C c;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+will compile. If \emph{P0} has a method that works with \emph{P0::x\_}
+and \emph{P1} has a method that works with \emph{P1::x\_}, that wouldn't
+be a problem:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class P0
+
+\{
+
+public:
+
+void f0() \{ std::cout \textless\textless{} x\_ \textless\textless{}
+'\textbackslash n'; \}
+
+int x\_;
+
+\};
+
+class P1
+
+\{
+
+public:
+
+void f1() \{ std::cout \textless\textless{} x\_ \textless\textless{}
+'\textbackslash n'; \}
+
+int x\_;
+
+\};
+
+class C: public P0, public P1
+
+\{\};
+
+int main()
+
+\{
+
+C c;
+
+c.f0();
+
+c.f1();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Another situation where multiple inheritance might cause a problem is
+when, further up, \emph{P0} and \emph{P1} inherits from a common class:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class G
+
+\{\};
+
+class P0: public G
+
+\{\};
+
+class P1: public G
+
+\{\};
+
+class C: public P0, public P1
+
+\{\};
+
+int main()
+
+\{
+
+C c;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The important thing to realize is that the object constructions starting
+with \emph{C} is done one class at a time going up -- there are
+\textbf{two paths} in this case. The two paths don't really
+``synchronize'' with each other: the creation of objects along the two
+inheritance paths is independent. This means that there are \textbf{two}
+objects created with class G for \emph{c}!!!
+
+To verify, first do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class G
+
+\{
+
+public:
+
+int x\_;
+
+\};
+
+class P0: public G
+
+\{\};
+
+class P1: public G
+
+\{\};
+
+class C: public P0, public P1
+
+\{\};
+
+int main()
+
+\{
+
+C c;
+
+std::cout \textless\textless{} \&(c.P0::x\_) \textless\textless{}
+'\textbackslash n';
+
+std::cout \textless\textless{} \&(c.P1::x\_) \textless\textless{}
+'\textbackslash n';
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The object \emph{c} has two \emph{x\_}'s. We print the address of the
+two \emph{x\_}'s, which of course are different:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class G
+
+\{
+
+public:
+
+int x\_;
+
+\};
+
+class P0: public G
+
+\{\};
+
+class P1: public G
+
+\{\};
+
+class C: public P0, public P1
+
+\{\};
+
+int main()
+
+\{
+
+C c;
+
+std::cout \textless\textless{} \&(c.P0::x\_) \textless\textless{}
+'\textbackslash n';
+
+std::cout \textless\textless{} \&(c.P1::x\_) \textless\textless{}
+'\textbackslash n';
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Suppose you have a game of shapes. The Shape class describes (with its
+subclasses) how to draw the shape. You have another class PointMass that
+computes how the shapes moves as a physical point mass. You can have:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class PhysicalShape: public Shape, PointMass
+
+\{...\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+This separates out the (motion) physics of object as a point mass from
+the drawing of the object.
+
+\begin{itemize}
+\tightlist
+\item
+  If there's a draw method: it's probably from the \emph{Shape} class.
+\item
+  If there's a move method: it's probably from the \emph{PointMass}
+  class
+\end{itemize}
+
+Public inheritance: protected member from the parent class
+
+Recall that our child class cannot access private members in the parent
+class. (Remember that we're doing public inheritance.)
+
+A \textbf{protected member} (either a member variable or method) is
+accessible by a subclass. Run the following:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class P
+
+\{
+
+public: int x;
+
+protected: int y\_;
+
+private: int z\_;
+
+\};
+
+class C: public P
+
+\{
+
+public:
+
+void f() \{ y\_++; \} // OK
+
+\};
+
+int main()
+
+\{
+
+C c;
+
+\textbf{c.y\_++;} // WRONG!!! Will not compile!!!
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Public, protected, and private
+
+So far you have seen public inheritance:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class P
+
+\{ ... \};
+
+class C: \textbf{public} P
+
+\{ ... \};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+There are two other types of inheritance: \textbf{protected and private
+inheritance}. Suppose you have a class \emph{P}. Now define the
+following child classes:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class CPublic: public P \{\};
+
+class CProtected: protected P \{\};
+
+class CPrivate: private P \{\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{itemize}
+\tightlist
+\item
+  The private members of \emph{P} stay private in \emph{CPublic},
+  \emph{CProtected}, \emph{CPrivate}.
+\item
+  \emph{CPublic}: public of \emph{P} are public, protected of \emph{P}
+  are protected
+\item
+  \emph{CProtected}: public and protected of \emph{P} are protected
+\item
+  \emph{CPrivate}: public, protected, and private of \emph{P} are
+  private.
+\end{itemize}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class P
+
+\{
+
+public: int x;
+
+protected: int y\_;
+
+private: int z\_;
+
+\};
+
+class C: \textbf{public P}
+
+\{
+
+public:
+
+void f() \{ y\_++; \} // OK
+
+\};
+
+int main()
+
+\{
+
+C c;
+
+\textbf{c.x\_++;} // OK
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class P
+
+\{
+
+public: int x\_;
+
+protected: int y\_;
+
+private: int z\_;
+
+\};
+
+class C: \textbf{protected P}
+
+\{
+
+public:
+
+void f() \{ y\_++; \} // OK
+
+\};
+
+int main()
+
+\{
+
+C c;
+
+\textbf{c.x\_++;} // WRONG!!! Public x in P becomes
+
+// protected in C so that only subclass
+
+// can access x
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class P
+
+\{
+
+public: int x\_;
+
+protected: int y\_;
+
+private: int z\_;
+
+\};
+
+class C: \textbf{protected P}
+
+\{
+
+public:
+
+void f() \{ y\_++; \} // OK
+
+\};
+
+class C0: public C
+
+\{
+
+public:
+
+void f() \{ \textbf{x\_++;} \} // OK. Public x becomes
+
+// protected in C which
+
+// is accessible in CO
+
+\};
+
+int main()
+
+\{
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In summary, suppose \emph{C} is a protected subclass of \emph{P}, and
+\emph{x\_} is a public member of \emph{P}.
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{x\_} is accessible in \emph{C}. (Any method in \emph{C} can
+  access member \emph{x\_})
+\item
+  \emph{x\_} becomes protected in \emph{C}. Functions outside of
+  \emph{C} cannot access \emph{obj.x\_} if \emph{obj} is an object of
+  \emph{C}.
+\end{itemize}
+
+Note that \emph{p} is an object of \emph{P}, the \emph{p.x\_} is still
+public.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class P
+
+\{
+
+public: int x\_;
+
+protected: int y\_;
+
+private: int z\_;
+
+\};
+
+class C: \textbf{private P }// public x\_ in P becomes
+
+// private in C.
+
+\{
+
+public:
+
+void f() \{ y\_++; \} // OK
+
+\};
+
+class C0: public C
+
+\{
+
+public:
+
+void f() \{ \textbf{x\_++;} \} // WRONG!!! x\_ is now private
+
+\};
+
+int main()
+
+\{
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You can have as many layers of inheritance as you like:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class GameObject \{ ... \};
+
+class Weapon: public GameObject \{ ... \};
+
+class Laser: public Weapon \{ ... \};
+
+class Rocket: public Weapon \{ ... \};
+
+class Spaceship: public GameObject \{ ... \};
+
+class AlienSoldierShip: public Spaceship \{ ... \};
+
+class AlienCommanderShip: public Spaceship \{ ... \};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Obviously create a new class only when there are member variables and/or
+methods which cannot be combined.
+
+For instance if the following
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+Class AlienWorth10Points \{...\};
+
+class AlienWorth20Points \{...\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+have exactly the same member variables and methods except that when
+objects of these types are destroyed in a gameplay, the points earned
+are different, then you should have combined the two as...
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Alien
+
+\{
+
+...
+
+int points;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Template inheritance
+
+Now I want to show you how to do template inheritance. Try the following
+exercise:
+
+\textbf{Exercise.} Write a class \emph{\textbf{C\textless{} T
+\textgreater{}}} to be a subclass of \emph{\textbf{P\textless{} T
+\textgreater{}}}. The class \emph{\textbf{P\textless{} T
+\textgreater{}}} has a member variable \emph{\textbf{x}} and method
+\emph{\textbf{m()}}. The class \emph{\textbf{C\textless{} T
+\textgreater{}}}\textbf{ }will have a member variable named
+\emph{\textbf{y}} and method \emph{\textbf{n()}}. In
+\emph{\textbf{C\textless{} }\textbf{T \textgreater{}}\textbf{::n()}}
+and\emph{\textbf{ P}\textbf{\textless{} }\textbf{T
+\textgreater{}}\textbf{::}\textbf{m}\textbf{()}} try to access the
+\emph{\textbf{x}} defined in \emph{\textbf{P\textless{} T
+\textgreater{}}}. For simplicity make all members public.
+
+Here's the obvious first attempt at the above exercise. Run it.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+template \textless{} typename T \textgreater{}
+
+class P
+
+\{
+
+public:
+
+void m()
+
+\{
+
+x = 42;
+
+std::cout \textless\textless{} "P::m() ... " \textless\textless{} x
+\textless\textless{} '\textbackslash n';
+
+\}
+
+T x;
+
+\};
+
+template \textless{} typename T \textgreater{}
+
+class C: public P\textless{} T \textgreater{}
+
+\{
+
+public:
+
+void n()
+
+\{
+
+std::cout \textless\textless{} "C::n() ... \textbackslash n";
+
+x = 43;
+
+std::cout \textless\textless{} x \textless\textless{}
+'\textbackslash n';
+
+std::cout \textless\textless{} y \textless\textless{}
+'\textbackslash n';
+
+\}
+
+T y;
+
+\};
+
+int main()
+
+\{
+
+C\textless{} int \textgreater{} c;
+
+c.n();
+
+c.m();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+But there's an error! Here's the error message (if you are using g++):
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+main.cpp: In member function 'void C\textless T\textgreater::n()':
+
+main.cpp:22:9: error: 'x' was not declared in this scope
+
+22 \textbar{} x = 43;
+
+\textbar{} \^{}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Written this way, \emph{\textbf{C\textless{} T \textgreater{}}} is not
+able to access the \emph{\textbf{x}} member variable of
+\emph{\textbf{P\textless{} T \textgreater{}}}. Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// ... as above \ldots{}
+
+template \textless{} typename T \textgreater{}
+
+class C: public P\textless{} T \textgreater{}
+
+\{
+
+public:
+
+void n()
+
+\{
+
+std::cout \textless\textless{} "C::n() ... \textbackslash n";
+
+\textbf{this-\textgreater{}}x = 43;
+
+std::cout \textless\textless{} \textbf{this-\textgreater{}}x
+\textless\textless{} '\textbackslash n';
+
+std::cout \textless\textless{} y \textless\textless{}
+'\textbackslash n';
+
+\}
+
+T y;
+
+\};
+
+// ... as above ...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\end{document}

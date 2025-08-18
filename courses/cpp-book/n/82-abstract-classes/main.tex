@@ -1,0 +1,711 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\author{}
+\date{}
+
+\begin{document}
+
+82. Abstract classes
+
+Objectives
+
+\begin{itemize}
+\tightlist
+\item
+  Understand the purpose of a pure virtual function
+\item
+  Write pure virtual function
+\item
+  Understand the purpose of abstract classes
+\item
+  Write and use abstract classes
+\end{itemize}
+
+Abstract base classes
+
+Abstract classes are abstract in the sense that they do not create
+objects. The actual objects are created in a nonabstract subclass of the
+abstract class. Members variables are declared and methods defined in
+the subclass.
+
+They are used for specifying an \textbf{interface}. An interface is the
+collection of signatures of all methods of the class. The
+\textbf{signature} of a function or method is made up of the name and
+parameter types. The interface of a class tells you what an object of
+the class is capable of doing.
+
+Allows software designers to design an abstract interface without
+exposing implementation details.
+
+Here are some examples
+
+Abstract baseSubclasses
+
+ShapeCircle, Square, \ldots{}
+
+HardDriveWesternDigital, Seagate, \ldots{}
+
+You create an abstract class by defining a class with \textbf{at least
+one} pure virtual function.
+
+A \textbf{pure virtual function} is a method in a class that is declared
+but not defined (i.e., has prototype but no body). To tell C++ that a
+virtual method is pure, just attach \textbf{``= 0''} to the right of the
+method.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class P
+
+\{
+
+public:
+
+\textbf{virtual} void f() \textbf{= 0};
+
+private:
+
+\textbf{}int x;
+
+\};
+
+int main()
+
+\{
+
+P p;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+A class is abstract if there is \textbf{at least one} pure virtual
+function.
+
+Suppose C inherits P, and P is abstract. If C does not define (i.e. give
+bodies to) all the pure virtual functions of P, then C is still
+abstract.
+
+Pure virtual functions are virtual.
+
+If objects can be instantiated from a class, the class is said to be
+\textbf{concrete} (i.e, not pure virtual functions).
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class Shape2D
+
+\{
+
+public:
+
+virtual void draw() const = 0;
+
+virtual void rotate(int angle) = 0;
+
+\};
+
+class Circle: public Shape2D
+
+\{
+
+public:
+
+Circle(int x0, int y0, int r0)
+
+: x(x0),y(y0),r(r0)
+
+\{\}
+
+void draw() const;
+
+void rotate(int angle);
+
+private:
+
+int x, y, r;
+
+\};
+
+void Circle::draw() const
+
+\{
+
+std::cout \textless\textless{} "draw circle\textbackslash n";
+
+\}
+
+void Circle::rotate(int angle)
+
+\{
+
+std::cout \textless\textless{} "rotate circle " \textless\textless{}
+angle
+
+\textless\textless{} " deg\textbackslash n";
+
+\}
+
+int main()
+
+\{\textbf{}
+
+Shape2D * s = new Circle(0, 0, 10);
+
+\textbf{ }s-\textgreater draw();
+
+s-\textgreater rotate(10);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Note that although you cannot create an object using an abstract class,
+i.e., the following is an error:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class P
+
+\{
+
+public:
+
+P(int x)
+
+: x\_(x)
+
+\{\}
+
+\textbf{}virtual void f() = 0;
+
+\};
+
+int main()
+
+\{
+
+P p(42); // WRONG!!! ERROR!!! BAD!!!
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Nonetheless a subclass of P can call the constructor of P:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class P
+
+\{
+
+public:
+
+P(int x)
+
+: x\_(x)
+
+\{\}
+
+virtual void f() = 0;
+
+\};
+
+class C: public P
+
+\{
+
+public:
+
+C(int x)
+
+: P(x) // OK!!!
+
+\{\}
+
+void f()
+
+\{\}
+
+\};
+
+int main()
+
+\{
+
+C c(42);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Design}
+
+VERY IMPORTANT!!! LISTEN!!! Notice the way I wrote the program
+
+The abstract class defines what objects of the subclasses \textbf{can}
+do. But in \emph{main()}, I only call methods \textbf{in the base
+class}.
+
+I let \textbf{polymorphism} decide which \textbf{specific method} to
+invoke during runtime.
+
+In \emph{main()}, I try my best to work with only the methods declared
+in the abstract base.
+
+Suppose I'm writing a game. There are many \emph{Shape2D} pointers to
+concrete objects created. I keep the pointers in a list. I can use a
+\emph{for}-loop to run through the pointers to get each to draw the
+object its pointing to. If you want to add more new type of objects to
+the game, just create a new concrete subclass from the abstract base.
+
+My \emph{main()} code \textbf{does not change}. That's the point.
+
+So first design your program by deciding \textbf{abstractly} what all
+objects in the concrete classes should ``do'' (their methods). Design
+the abstract base (interface) based on the above information. This
+becomes a contract for subclasses. Write your main code using only the
+abstract interface. Create concrete subclasses one at a time and test as
+you go along. Once the main code is done, you can ``plug'' in new
+subclasses without too many changes to the \emph{main()} code.
+
+\textbf{Example.} Consider a game. Here's a possible piece of code.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+while (1)
+
+\{
+
+\textbf{ }for (int i = 0; i \textless{} obj\_arr\_size; i++)
+
+\textbf{ }\{
+
+\textbf{ }obj = obj\_arr{[}i{]};
+
+\textbf{ }obj-\textgreater clear();
+
+\textbf{}if (obj-\textgreater hit(missile\_arr, missile\_arr\_size))
+
+\textbf{} obj-\textgreater explode();
+
+\textbf{}else
+
+\textbf{} obj-\textgreater move();
+
+\textbf{}obj-\textgreater draw();
+
+\textbf{ }\}
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Notice that if I need to add another kind of \emph{obj} to the game I
+just need to make sure that the new class supports
+
+\begin{itemize}
+\tightlist
+\item
+  clear
+\end{itemize}
+
+\begin{itemize}
+\item
+  hit
+\item
+  explode
+\item
+  move
+\item
+  draw
+
+  That's one of the powers of OO.
+\end{itemize}
+
+\textbf{Exercise.} You know that in C/C++, an array is homogeneous,
+i.e., an array can only hold values of one type. An \emph{int} array can
+only hold integer values. A \emph{double} array can only hold double
+values. We have a \emph{Rational} class. A \emph{Rational} array can
+only hold \emph{Rational} values. Create an array that contains 3 values
+of different types so that you can do the following:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+std::vector\textless{} ??? \textgreater{} v;
+
+// put something into v{[}0{]}, v{[}1{]}, v{[}2{]}
+
+for (int i = 0; i \textless{} 3; ++i)
+
+\{
+
+std::cout \textless\textless{} {[}... something to do with v{[}i{]}
+...{]}
+
+\textless\textless{} ' ';
+
+\}
+
+// Assume v{[}0{]} models 42, v{[}1{]} models 3.14, v{[}2{]}
+
+// models 1/2.
+
+std::cout \textless\textless{} '\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+so that you can this output:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+42 3.14 1/2\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Continuing the above, write a function that
+increments the values in the values in the above \emph{std::vector} by
+1.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+std::vector\textless{} ??? \textgreater{} v;
+
+// put something into v{[}0{]}, v{[}1{]}, v{[}2{]}
+
+for (int i = 0; i \textless{} 3; ++i)
+
+\{
+
+std::cout \textless\textless{} {[}... something to do with v{[}i{]}
+...{]}
+
+\textless\textless{} ' ';
+
+\}
+
+std::cout \textless\textless{} '\textbackslash n';
+
+increment(v);
+
+for (int i = 0; i \textless{} 3; ++i)
+
+\{
+
+std::cout \textless\textless{} {[}... something to do with v{[}i{]}
+...{]}
+
+\textless\textless{} ' ';
+
+\}
+
+std::cout \textless\textless{} '\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+so that you get this output:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+42 3.14 1/2
+
+43 4.14 3/1\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The above exercise is very important. In your programs that you have
+been writing (since CISS240), you work with integers and doubles more or
+less separately, mixing them only when necessary. In fact integers are
+collected together into the \emph{int} type. Doubles are collected
+together into the \emph{double} type. This exercise says if you know
+enough C/C++, you can treat then on equal footing and they can be mixed
+together. When do you need to know this? Well \ldots{} when you write
+more complex software such as a compiler, your integers and doubles
+appear together in the same string as C/C++ program. And you compiler
+(g++ or some other compiler) actually has to handle these values in a
+``uniform way''. In other words your compiler has lots of algorithms
+that does not differentiate between \emph{int} and \emph{double} values.
+(Of course some do.)
+
+Note that you can create such a \emph{std::vector\textless{} T
+\textgreater{}} of different types \emph{T}. But
+\emph{std::vector\textless{} int \textgreater{}},
+\emph{std::vector\textless{} double \textgreater{}},
+\emph{std::vector\textless{} Rational \textgreater{}} are all separate
+things. And sure, you can write a function template to print values of
+\emph{std::vector\textless{} T \textgreater{}}. But the function to
+print \emph{std::vector\textless{} int \textgreater{}} that is
+instantiated is different from the function to print
+\emph{std::vector\textless{} double \textgreater{}}.
+
+So the way in which template classes/functions/structs handle multiple
+types is \textbf{very different} from the way in which abstract base
+classes and polymorphism handle problems involving multiple types.
+
+\textbf{Exercise.} Continuing the above, let you increment function
+allow you to specify the increment amount of \emph{int} or \emph{double}
+or \emph{Rational} type:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+std::vector\textless{} ??? \textgreater{} v;
+
+// put something into v{[}0{]}, v{[}1{]}, v{[}2{]}
+
+for (int i = 0; i \textless{} 3; ++i)
+
+\{
+
+std::cout \textless\textless{} {[}... something to do with v{[}i{]}
+...{]}
+
+\textless\textless{} ' ';
+
+\}
+
+std::cout \textless\textless{} '\textbackslash n';
+
+increment(v, 1);
+
+increment(v, 0.1);
+
+increment(v, Rational(1, 3));\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(What should a \emph{double} be after you add 1/3 to it? I'm not talking
+about the value. I'm talking about the type.) The above description is a
+skeleton and might require quite a few changes here and there.
+
+\textbf{Exercise. }You can given three classes:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+Scissors
+
+\{\};
+
+Paper
+
+\{\};
+
+Stone
+
+\{\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+When you print a \emph{Scissors} object, you see \emph{scissors. }When
+you print a \emph{Paper} object, you see \emph{paper. }When you print a
+\emph{Stone} scissors object, you see \emph{stone}. Create a
+\emph{std::vector} of 3 values so that when you print them, you see
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+paper scissors stone\tabularnewline
+\bottomrule
+\end{longtable}
+
+In a loop, let the first two values compete. paper scissors beats paper,
+etc. Remove the loser from the vector. If the two values are the same,
+that's a draw, and you keep both. Move on to the next two and let them
+compete. For the above you get
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+paper scissors stone
+
+scissors stone
+
+stone\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+If you have the following initialization
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+paper paper scissors stone paper stone stone\tabularnewline
+\bottomrule
+\end{longtable}
+
+you will get the following when they compete:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+paper paper scissors stone paper stone stone
+
+paper paper scissors stone paper stone stone
+
+paper scissors stone paper stone stone
+
+paper stone paper stone stone
+
+paper paper stone stone
+
+paper paper stone
+
+paper paper\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You may add methods to the classes. The above description is a skeleton
+and might require quite a few changes here and there.
+
+Exercise. Write enough classes to achieve the following.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+SineFunction s; // s models sin(x)
+
+CosineFunction c; // c models cos(x)
+
+MonomialFunction x(1); // x models x
+
+MonomialFunction x2(2); // x2 models x\^{}2
+
+ConstFunction c(1); // c models constant function 1
+
+std::cout \textless\textless{} s \textless\textless{} ' '
+\textless\textless{} c \textless\textless{} ' ' \textless\textless{} x '
+' \textless\textless{} x2
+
+\textless\textless{} ' ' \textless\textless{} c '\textbackslash n';
+
+// prints sin(x) cos(x) x x\^{}2 1
+
+SumFunction f(x, s); // f models x + sin(x)
+
+std::cout \textless\textless{} f \textless\textless{}
+'\textbackslash n'; // prints x + sin(x)
+
+ProdFunction g(x, s); // g models x * sin(x)
+
+std::cout \textless\textless{} g \textless\textless{}
+'\textbackslash n'; // prints 1 * sin(x) + x * cos(x)
+
+std::cout \textless\textless{} Derivative(x) \textless\textless{}
+'\textbackslash n'; // prints 1
+
+std::cout \textless\textless{} Derivative(x2) \textless\textless{}
+'\textbackslash n'; // prints 2 * x
+
+std::cout \textless\textless{} Derivative(s) \textless\textless{}
+'\textbackslash n'; // prints cos(x)
+
+std::cout \textless\textless{} Derivative(f) \textless\textless{}
+'\textbackslash n'; // prints 1 + cos(x)\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The above is a skeleton and might require quite a few changes here and
+there. (Can you do \emph{SumFunction f(x, SumFunction(s, c))}?)
+
+\end{document}

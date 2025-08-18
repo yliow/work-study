@@ -1,0 +1,2338 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\author{}
+\date{}
+
+\begin{document}
+
+17. 1D Arrays
+
+Objectives
+
+\begin{itemize}
+\tightlist
+\item
+  Declare an array
+\item
+  Declare and initialize an array with or without a size
+\item
+  Access an element of an array using the \emph{{[}{]}} operator
+\item
+  Loop over the elements of an array
+\end{itemize}
+
+Subscripts
+
+Suppose you have the following code:
+
+int x = 0, y = 0, z = 0;
+
+std::cin \textgreater\textgreater{} x;
+
+std::cin \textgreater\textgreater{} y;
+
+std::cin \textgreater\textgreater{} z;
+
+Note that you're doing the \emph{same thing} to three variables. There's
+a C++ concept that allows you (more or less) to say
+
+loop through variables x, y, z and perform input for each
+
+This sure looks like a loop.
+
+To implement this idea, C++ uses the concept of a subscript. You have
+already seen this in your math classes: Suppose one of your math
+instructors has variables x\textsubscript{0}, x\textsubscript{1},
+x\textsubscript{2}, and x\textsubscript{3}. He/she might write the
+following on the board: ``For each x\textsubscript{i} with i = 0, 1, 2,
+3, we want to let x\textsubscript{i }be 42.''
+
+It's the same idea. Your instructor wanted to do something to all the
+variables x\textsubscript{0}, x\textsubscript{1}, x\textsubscript{2},
+and x\textsubscript{3. }But instead of saying ``Set x\textsubscript{0
+}to 42'', ``Set x\textsubscript{1 }to 42'', ``Set x\textsubscript{2} to
+42'', ``Set x\textsubscript{3 }to 42'', your math instructor was smart
+enough to say:``For each x\textsubscript{i} with i = 0, 1, 2, 3, we want
+to set x\textsubscript{i }be 42''. He/she is basically using subscripts.
+
+C++ supports the same way of applying operations through a bunch of
+variables, and not just one.
+
+That's the concept of an \emph{\textbf{array}} of values.
+
+Declaring arrays
+
+We have seen many types: \emph{int}, \emph{double} (and \emph{float}),
+\emph{bool}, and \emph{char}. These are called basic (or primitive)
+types. There are others.
+
+Now we want to talk about creating a variable which is made up of a
+\textbf{collection} of \textbf{values} of the \textbf{same type}. In
+other words such a variable contains more than one value.
+
+Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int a{[}3{]};
+
+a{[}0{]} = 4;
+
+a{[}1{]} = 2;
+
+a{[}2{]} = 42;
+
+std::cout \textless\textless{} a{[}0{]} \textless\textless{} std::endl;
+
+int x = a{[}1{]};
+
+std::cout \textless\textless{} x \textless\textless{} std::endl; \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+This is how you visualize an array. The following is a picture
+describing the memory of \emph{main()}. Compare \emph{a} to \emph{x} in
+the picture.
+
+So this is how you declare an array:
+
+\emph{ {[}type{]} {[}array name{]}{[} {[}size{]} {]};}
+
+As a programmer, you can think of \emph{a{[}0{]}}, \emph{a{[}1{]}},
+\emph{a{[}2{]}} as integer variables inside the array variable \emph{a}.
+But really \emph{a} itself is the variable.
+
+WATCHOUT! There are \textbf{two uses of }\emph{\textbf{{[}{]}}}. During
+the declaration of the array it is used to specify the \textbf{size} of
+the array. When accessing a value of the array, \emph{{[}{]}} is used to
+specify the \textbf{index} of the value. Make sure you see the
+difference!
+
+Although I'm calling \emph{a{[}0{]}}, \emph{a{[}1{]}}, and
+\emph{a{[}2{]}} the values into array \emph{a}, you can \textbf{think of
+them as integer variables}. Therefore you \emph{\textbf{do}} know how to
+use them.
+
+You might say: ``Well what's the point? Can't we just use three
+variables such as \emph{x}, \emph{y}, and \emph{z} instead of
+\emph{a{[}0{]}}, \emph{a{[}1{]}}, and \emph{a{[}2{]}}???'' Don't worry
+we'll come to that very soon.
+
+\textbf{Exercise.} Add two lines of code to the above code segment.
+First assign the sum of \emph{a{[}0{]}} and \emph{a{[}1{]}} to
+\emph{a{[}2{]}}. Second print \emph{a{[}2{]}}.
+
+Exercise. Declare an array \emph{b} of 4 doubles. Set \emph{b{[}0{]}} to
+\emph{3.1}, \emph{b{[}1{]}} to \emph{3.14}, \emph{b{[}2{]}} to
+\emph{3.141}, and \emph{b{[}3{]}} to \emph{3.1415}. Compute and display
+the average of all the values in \emph{b}.
+
+\textbf{Exercise.} Declare an array \emph{prime} of 5 booleans. Set
+\emph{prime{[}0{]}} to \emph{true} if 0 is a prime, otherwise set
+\emph{prime{[}0{]}} to \emph{false}. Set \emph{prime{[}1{]}} to
+\emph{true} if 1 is a prime, otherwise set \emph{prime{[}1{]}} to
+\emph{false}. Etc. Print all the values in \emph{prime} starting with
+the value at index 0 with consecutive values separated by a space. (You
+should see two 1's.)
+
+Declaring an array with initialization
+
+Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int a{[}3{]} = \{4, 2, 42\};
+
+std::cout \textless\textless{} a{[}0{]} \textless\textless{} std::endl;
+
+int x = a{[}1{]};
+
+std::cout \textless\textless{} x \textless\textless{} std::endl; \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+This declares \emph{a} as an array of 3 integers and initialize
+\emph{a{[}0{]}} to 4, \emph{a{[}1{]}} to 2, and \emph{a{[}2{]}} to 42.
+
+\textbf{Exercise.} What if you declare an integer array without
+initialization and immediately print all the values in the array. What
+do you think you will get? Test it out with your compiler.
+
+You can partially initialize an integer array. Uninitialized values will
+be automatically initialized to zero.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int a{[}3{]} = \{4\};
+
+std::cout \textless\textless{} a{[}1{]} \textless\textless{} std::endl;
+\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+If on the other hand \emph{a} is an array of \emph{doubles}, then the
+uninitialized values are set to 0.0.
+
+You can also declare an array \textbf{without specifying the size} if
+you have an initializer. In that case the size will be the number of
+values in the initializer:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+double a{[}{]} = \{1.1, 3.3, 5.5, 7.7\}; \tabularnewline
+\bottomrule
+\end{longtable}
+
+In the above example a is an array of four doubles. In other words the
+above statement is the same as this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+double a{[}4{]} = \{1.1, 3.3, 5.5, 7.7\}; \tabularnewline
+\bottomrule
+\end{longtable}
+
+Gotchas
+
+Here are some gotchas.
+
+\textbf{Exercise.} Correct this statement which declares an array
+\emph{x} of four doubles.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+double{[}4{]} x;\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Does this work? Correct it!
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double a{[}4{]};
+
+a = \{1.1, 3.3, 5.5, 7.7\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Does this work?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int size;
+
+std::cout \textless\textless{} "how many integers in the array? ";
+
+std::cin \textgreater\textgreater{} size;
+
+int a{[}size{]} = \{0\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+POINT: \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+
+\textbf{Exercise.} (Assignment operator) Does this work?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+bool a{[}4{]} = \{true, true, false\};
+
+bool b{[}4{]};
+
+b = a; // trying to copy all the values in a into b\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Correct it.
+
+\textbf{Exercise.} (Output of an array) Does this work?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int a{[}4{]} = \{0, 1, 2, 42\};
+
+std::cout \textless\textless{} a \textless\textless{} std::endl; //
+trying to print all
+
+// the values in a\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The {[} {]} operator
+
+Here's an example from the previous section.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int a{[}3{]} = \{4, 2, 42\};
+
+std::cout \textless\textless{} a{[}0{]} \textless\textless{} std::endl;
+
+int x = a{[}1{]};
+
+std::cout \textless\textless{} x \textless\textless{} std::endl; \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Actually you can specify an index value using any \textbf{integer
+expression}. Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int a{[}3{]} = \{4, 2, 42\};
+
+int i = 0
+
+std::cout \textless\textless{} a{[}i{]} \textless\textless{} std::endl;
+
+int x = a{[}i + 1{]};
+
+std::cout \textless\textless{} x \textless\textless{} std::endl; \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In fact this is the reason why we have arrays ... Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int a{[}3{]} = \{4, 2, 42\};
+
+for (int i = 0; i \textless{} 3; ++i)
+
+\{
+
+std::cout \textless\textless{} a{[}i{]} \textless\textless{}
+std::endl;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The following code declares an array and populates it with integers
+entered by the user:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int y{[}5{]} = \{0\};
+
+for (int i = 0; i \textless{} 5; ++i)
+
+\{
+
+std::cin \textgreater\textgreater{} y{[}i{]};\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Compare this to this code:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int y0 = 0, y1 = 0, y2 = 0, y3 = 0, y4 = 0;
+
+std::cin \textgreater\textgreater{} y0 \textgreater\textgreater{} y1
+\textgreater\textgreater{} y2 \textgreater\textgreater{} y3
+\textgreater\textgreater{} y4;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+They more or less achieve the same thing, right? Now suppose instead of
+5 variables, there are 1000 variables. The first version becomes:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int y{[}1000{]} = \{0\};
+
+for (int i = 0; i \textless{} 1000; ++i)
+
+\{
+
+std::cin \textgreater\textgreater{} y{[}i{]};\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Now let's see how much time you'd need to modify the \emph{std::cin}
+statement if you have not heard of arrays:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int y0 = 0, y1 = 0, y2 = 0, y3 = 0, y4 = 0, ...;
+
+std::cin \textgreater\textgreater{} y0 \textgreater\textgreater{} y1
+\textgreater\textgreater{} y2 \textgreater\textgreater{} y3
+\textgreater\textgreater{} y4 \textgreater\textgreater{} y5
+\textgreater\textgreater{} ...;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+YIKES!!!
+
+Get the point of arrays now?
+
+\hfill\break
+In other words previously our for-loop allows us to iteratively execute
+a block of statements. With the array, the for-loop allows us to execute
+a block of statements on one variable from a huge list of variables one
+at a time (if you think of an element of an array as a variable).
+Previously our for-loop executes a bunch of statements on a single
+variable (or maybe two or three). But here we apply the same computation
+across a bunch of variables. POWERFUL IDEA!
+
+In the next few sections, I'll show you how to apply this principle in
+different scenarios.
+
+One final thing before I show you different uses of the array. It's
+always a good idea not to hardcode constants, remember? The size of an
+array is not an exception. Therefore
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int y{[}1000{]} = \{0\};
+
+for (int i = 0; i \textless{} 1000; ++i)
+
+\{
+
+std::cin \textgreater\textgreater{} y{[}i{]};\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+should be
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+const int SIZE = 1000;
+
+int y{[}SIZE{]} = \{0\};
+
+for (int i = 0; i \textless{} SIZE; ++i)
+
+\{
+
+std::cin \textgreater\textgreater{} y{[}i{]};\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+For our example in this set of notes I will not use constants for array
+sizes since the code is very short. But when the program is longer (such
+as your assignments) you should use constants.
+
+There's another way to avoid hardcoding the size of an array. The
+function \emph{sizeof()} will tell you the mount of memory used by the
+computer to store the value of a variable. Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x = 0;
+
+double y = 0.0;
+
+char z = 'a';
+
+int a{[}5{]} = \{0\};
+
+std::cout \textless\textless{} sizeof(x) \textless\textless{}
+'\textbackslash n'
+
+\textless\textless{} sizeof(y) \textless\textless{} '\textbackslash n'
+
+\textless\textless{} sizeof(z) \textless\textless{} '\textbackslash n'
+
+\textless\textless{} sizeof(a) \textless\textless{} '\textbackslash n';
+
+std::cout \textless\textless{} sizeof(int) \textless\textless{}
+'\textbackslash n'
+
+\textless\textless{} sizeof(double) \textless\textless{}
+'\textbackslash n'
+
+\textless\textless{} sizeof(char) \textless\textless{}
+'\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+So here's how you can determine the number of elements in an array. Try
+this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int a{[}5{]} = \{0\};
+
+double b{[}10{]} = \{0\};
+
+char c{[}100{]};
+
+std::cout \textless\textless{} sizeof(a) / sizeof(int)
+\textless\textless{} '\textbackslash n';
+
+std::cout \textless\textless{} sizeof(b) / sizeof(double)
+\textless\textless{} '\textbackslash n';
+
+std::cout \textless\textless{} sizeof(c) / sizeof(char)
+\textless\textless{} '\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Get it?
+
+One final thing. You should NEVER use an index value outside the bound
+of your array. In other words if the size of your array a is 5, you MUST
+not access \emph{a{[}5{]}} or \emph{a{[}1000{]}}; you should only access
+\emph{a{[}0{]}}, \emph{a{[}1{]}}, \emph{a{[}2{]}}, \emph{a{[}3{]}}, and
+\emph{a{[}4{]}.}
+
+As mentioned earlier in the section on gotchas, you cannot assign
+arrays:
+
+int a{[}3{]} = \{1, 2, 3\};
+
+int b{[}3{]};
+
+b = a;// BAD BAD BAD!!!
+
+This is what you have to do:
+
+int a{[}3{]} = \{1, 2, 3\};
+
+int b{[}3{]};
+
+for (int i = 0; i \textless{} 3; ++i)
+
+\{
+
+b{[}i{]} = a{[}i{]};\\
+\}
+
+\textbf{Exercise.} Declare an array of 10 integers; call this array
+\emph{dice}. Using a for-loop, put random integers 1 to 6 into the
+array. Using another for-loop, print all the values in the array.
+
+Max and min of an array of values
+
+\textbf{Exercise.} The following program computes the maximum value in
+variables a, b, c, d, e:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double a = 5.4;
+
+double b = 1.2;
+
+double c = 5.9;
+
+double d = 3.14;
+
+double e = 2.718;
+
+double max = a;
+
+if (max \textless{} b) max = b;
+
+if (max \textless{} c) max = c;
+
+if (max \textless{} d) max = d;
+
+if (max \textless{} e) max = e;\strut
+\end{minipage}\tabularnewline
+\tabularnewline
+\bottomrule
+\end{longtable}
+
+We can use arrays instead:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double a{[}{]} = \{5.4, 1.2, 5.9, 3.14, 2.718\};
+
+double max = a{[}0{]};
+
+for (int i = 1; i \textless{} 5; ++i)
+
+\{
+
+if (max \textless{} a{[}i{]}) max = a{[}i{]};
+
+std::cout \textless\textless{} max \textless\textless{} std::endl;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+If you don't see it, just unroll the for-loop.
+
+Neat isn't it?
+
+Of course you can also compute the minimum:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double a{[}{]} = \{5.4, 1.2, 5.9, 3.14, 2.718\};
+
+double min = a{[}0{]};
+
+for (int i = 1; i \textless{} 5; ++i)
+
+\{
+
+if (min \textgreater{} a{[}i{]}) min = a{[}i{]};
+
+std::cout \textless\textless{} min \textless\textless{} std::endl;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Sum of an array of values
+
+You can easily compute the sum of the values in an array:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+double a{[}{]} = \{5.4, 1.2, 5.9, 3.14, 2.718\};
+
+double sum = 0.0;
+
+for (int i = 0; i \textless{} 5; ++i)
+
+\{
+
+sum += a{[}i{]};
+
+std::cout \textless\textless{} sum \textless\textless{} std::endl;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Modify the above to so that instead of computing the
+sum of the values in the array a, your program computes the product of
+the values in the array.
+
+\textbf{Exercise.} Declare an array of 1,000,000 random doubles with
+values between 0.0 and 1.0 using the \emph{rand()} function. If the
+\emph{rand()} is a good random number generator, you would expect the
+average of the 1,000,000 to be close to 0.5. Compute the average of the
+values in the array and print it.
+
+\textbf{Exercise.} Declare an array of 1,000,000 random doubles with
+values between 0.0 and 1.0 using the \emph{rand()} function. Compute the
+standard deviation of the numbers. (The formula for the standard
+deviation is in an earlier assignment.)
+
+Linear search for a value in an array
+
+Suppose now we want to look for a value in an array and set a boolean
+variable to true exactly where the value is found. This is how you do
+it:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+char x{[}{]} = \{'h', 'e', 'l', 'l', 'o'\};
+
+char target = ' ';
+
+std::cin \textgreater\textgreater{} target;
+
+bool found = false;
+
+for (int i = 0; i \textless{} 5; ++i)
+
+\{
+
+if (x{[}i{]} == target)
+
+\{
+
+found = true;
+
+break;
+
+\}
+
+\}
+
+std::cout \textless\textless{} found \textless\textless{}
+std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Rewrite the above so that it does not have the break
+statement.
+
+You might be interested in the index of the array when the value first
+occurred. (And if it cannot be found, the index value is -1.) This is an
+example code:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+char x{[}{]} = \{'h', 'e', 'l', 'l', 'o'\};
+
+char target = ' ';
+
+std::cin \textgreater\textgreater{} target;
+
+int index = -1;
+
+for (int i = 0; i \textless{} 5; ++i)
+
+\{
+
+if (x{[}i{]} == target)
+
+\{
+
+index = i;
+
+break;
+
+\}
+
+\}
+
+std::cout \textless\textless{} index \textless\textless{}
+std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} The above code scans the array from the smallest
+index value to the largest. Rewrite it so the scanning starts from the
+largest index value.
+
+\textbf{Exercise.} Now write code to count the number of occurrences of
+a value in an array.
+
+Note that if a value is not in an array, in the worse case scenario, you
+have to scan the whole array to realize that the value is not present.
+On the average you need to scan n/2 elements where n is the size of the
+array.
+
+Random access
+
+It's important to understand that there's no reason that you must scan
+the array from the first index to the last or from the last to the
+first.
+
+You can and should think of the array as a collection of values and you
+have the freedom of accessing any value in the array.
+
+This leads us to a useful idea. Recall some of the ASCII art problems.
+One of the difficulties is that print follows a strict direction. On the
+output window, your print cursor must move top-to-bottom, left-to-right.
+
+Here's an ASCII problem. Prompt the user for two integers for variables
+i and j (from 0 to 9). The program prints two X's at column i and j. For
+instance if the user enters 0 and 3, the program prints
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+X X\tabularnewline
+\bottomrule
+\end{longtable}
+
+And if the user enters 2 7 the program prints
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+X X\tabularnewline
+\bottomrule
+\end{longtable}
+
+Now your program's logic should be like this:
+
+print i spaces
+
+print 'X'
+
+print j -- i -- 1 spaces
+
+print 'X'
+
+Correct? For instance when the user enters 2 and 7, we have i = 2 and j
+= 7. So the above pseudocode will actually execute
+
+print 2 spaces
+
+print 'X'
+
+print 4 spaces
+
+print 'X'
+
+which does give this
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+X X\tabularnewline
+\bottomrule
+\end{longtable}
+
+But WAIT!!! What if the user enters 7 and then 2? Then the first two
+lines of your pseudocode executes:
+
+print 7 spaces
+
+print 'X'
+
+...
+
+But now you need to go backwards ... and you can't! The print cursor can
+only go forward! So you really need to sort i and j. The correct
+algorithm is
+
+sort i, j in ascending order
+
+print i spaces
+
+print 'X'
+
+print j -- i -- 1 spaces
+
+print 'X'
+
+But there's another way to solve this problem. You can create an array
+of characters, put the 'X' in the array of characters and then print the
+array. Why would you do that? Because you have complete control over
+where you want to put characters into the array!
+
+declare array a of characters
+
+set a{[}i{]} to 'X'
+
+set a{[}j{]} to 'X'
+
+print all the values in a
+
+In C++ you have
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+std::cin \textgreater\textgreater{} char a{[}10{]};
+
+for (int i = 0; i \textless{} 10; i++)
+
+\{
+
+a{[}i{]} = ' ';\\
+\}
+
+int i = 0, j = 0;
+
+std::cin \textgreater\textgreater{} i \textgreater\textgreater{} j;
+
+a{[}i{]} = 'X';
+
+a{[}j{]} = 'X';
+
+for (int i = 0; i \textless{} 10; i++)
+
+\{
+
+std::cout \textless\textless{} a{[}i{]};\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The point here is to illustrate the fact that an array gives you random
+access to its values. At this point in the code:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+a{[}i{]} = 'X';
+
+a{[}j{]} = 'X';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+we don't really care if i is greater than j.
+
+\textbf{Exercise.} Do the same problem but allow the user to input four
+integers. (Try to do it without arrays!)
+
+Why arrays?
+
+The above explains only the syntax and how to work with arrays. It also
+explains that if you need to work with a lot of variables, performing
+the same operation on these variables (such as printing their values),
+then you might want to use an array.
+
+But \ldots{} probably the most important ``view'' of an array is that
+you should view it as a \textbf{storage container} of values. Why is
+that important?
+
+You see containers of values everywhere. For instance when you buy
+something online (say at amazon.com), amazon has to retrieve information
+on the product. The product information is in a container -- the
+products catalog database. At this point we only have a container (or
+array) of integer values or double values or boolean values or
+characters. Much later you will learn about containers of not just
+single values but aggregate values such as a container of customer data
+made up of firstname, lastname, email address, cellphone number, etc.
+
+An array allows us to store computation so that a program can save time
+when the program runs and avoid recomputation all the time.
+
+Read the above several times!!!
+
+So how does an array ``store computation'' and ``avoid recomputation''?
+
+Remember that we already know how to check if a number is prime: A
+positive integer n greater than 1 is a prime if we test n \% d for d =
+2, 3, 4, \ldots, n -- 1. If n \% d is 0, then d is a divisor and
+therefore n is not a prime. If n \% d is not zero for all d = 2, 3, 4,
+\ldots, n -- 1, then n must be a prime.
+
+The next thing I told you is that you can improve on the speed of the
+above algorithm by testing only d = 2, 3, 4, \ldots{} up to including
+the square root of n. For the case of n = 101, you only need to test d =
+2, 3, 4, \ldots, 10 instead of d = 2, 3, 4, \ldots, 100. That's a saving
+of 90\% \ldots{} !!!
+
+But \ldots{} there's \emph{yet} another way to speed up the program: you
+only need to test n \% d for d running through \emph{primes} up to the
+square root of n. Therefore for n = 101, you only need to test n \% d
+for d = 2, 3, 5, 7. So from d = 2, 3, 4, \ldots, 10 you go down to d =
+2, 3, 5, 7, from 9 values of d to 4. That's about 50\% \ldots{} !
+
+How would an array help?
+
+One way is to compute an array of 1000 primes before you run your
+program. Let's say the array is called:
+
+\emph{int prime{[}1000{]};}
+
+After that for every n you want to test for primality, you simply test n
+\% prime{[}i{]} for i = 0, 1, 2, \ldots{} and stop when prime{[}i{]} if
+greater than the square root of n. The only caveat is that this array is
+finite. So if you need to check for n \% d when d is larger than the
+1000\textsuperscript{th} prime then you need to perform some tests
+without using the \emph{prime} array. For instance, since the
+1000\textsuperscript{th} prime is 7919, and the square root of 1357931
+is 1165.30, to check if 1357931 is a prime we test
+
+1357931 \% 2
+
+1357931 \% 3
+
+1357931 \% 5
+
+\ldots{}
+
+1357931 \% 1637
+
+(the prime after 1637 is 1657 which is greater than 1165.30) and of
+course the primes 2, 3, 5, \ldots, 1637 are taken from our \emph{prime}
+array. By the way 1637 is the 259\textsuperscript{th} prime. Therefore
+there are 259 checks:
+
+1357931 \% 2
+
+1357931 \% 3
+
+1357931 \% 5
+
+\ldots{}
+
+1357931 \% 1637
+
+Using our crude method of testing
+
+1357931 \% 2
+
+1357931 \% 3
+
+1357931 \% 4
+
+1357931 \% 5
+
+...
+
+1357931 \% 1357930
+
+required 1357929 checks. If we test up to the square root of 1357929:
+
+1357931 \% 2
+
+1357931 \% 3
+
+1357931 \% 4
+
+1357931 \% 5
+
+...
+
+1357931 \% 1165
+
+we have to perform 1164 checks. In summary:
+
+\begin{itemize}
+\tightlist
+\item
+  Test 1357931 \% d for d = 2, 3, 4, \ldots, 1357930: 1357929 tests
+\item
+  Test 1357931 \% d for d = 2, 3, 4, \ldots, 1165: 1164 tests
+\item
+  Test 1357931 \% d for d = 2, 3, 5, \ldots, 11637: 259 tests
+\end{itemize}
+
+See the difference?
+
+The square of 7919 is 62710561. Therefore with an array of 1000 primes,
+we can check if n is a prime for n up to 62710561. If n is greater than
+62710561, then we need a larger \emph{prime} array.
+
+This is also the reason why Google works so fast. When you search for
+web pages containing ``dog'', Google would send you the relevant URLs in
+a split second because Google continually scans for billions of web
+pages, precomputes, and stores keywords of the web pages before you even
+ask for ``dog'' related web pages. The only difference is that Google
+stores the results in databases and not arrays.
+
+Bubblesort
+
+Recall that we have the follow earlier. Suppose you have four integer
+variables a, b, c, d. You want to sort the values in a, b, c, d into
+ascending order and put them into a, b, c, d. For instance if we
+initially have this:
+
+a = 5b = 3c = 6d = 0
+
+we want to end up with this:
+
+a = 0b = 3c = 5d = 6
+
+Recall that I gave you the \textbf{bubblesort algorithm} for doing that:
+
+Pass 1:
+
+swap the values in a, b so that a \textless= b
+
+swap the values in b, c so that b \textless= c
+
+swap the values in c, d so that c \textless= d
+
+// at this point the largest value of a, b, c, d must be in d
+
+Pass 2:
+
+swap the values in a, b so that a \textless= b
+
+swap the values in b, c so that b \textless= c
+
+// at this point the largest value of a, b, c must be in c
+
+Pass 3:
+
+swap the values in a, b so that a \textless= b
+
+// at this point the largest value of a, b must be in b
+
+{[}Don't recall any of the above? Quickly review your previous notes on
+bubblesort!!! Now!!!{]}
+
+Of course you know what's going to happen next.
+
+We're going to sort values in an array!!! (cheers ... clapping ... and
+wild whistling).
+
+Let's do this slowly. Using the above pseudocode but with a, b, c, d
+replaced by a{[}0{]}, a{[}1{]}, a{[}2{]}, a{[}3{]}, we have the
+following:
+
+Pass 1:
+
+swap the values in a{[}0{]}, a{[}1{]} so that a{[}0{]} \textless=
+a{[}1{]}
+
+swap the values in a{[}1{]}, a{[}2{]} so that a{[}1{]} \textless=
+a{[}2{]}
+
+swap the values in a{[}2{]}, a{[}3{]} so that a{[}2{]} \textless=
+a{[}3{]}
+
+// at this point the largest value of a{[}0{]}, ..., a{[}3{]} must be in
+a{[}3{]}
+
+Pass 2:
+
+swap the values in a{[}0{]}, a{[}1{]} so that a{[}0{]} \textless=
+a{[}1{]}
+
+swap the values in a{[}1{]}, a{[}2{]} so that a{[}1{]} \textless=
+a{[}2{]}
+
+// at this point the largest value of a{[}0{]}, ..., a{[}2{]} must be in
+a{[}2{]}
+
+Pass 3:
+
+swap the values in a{[}0{]}, a{[}1{]} so that a{[}0{]} \textless=
+a{[}1{]}
+
+// at this point the largest value of a{[}0{]}, a{[}1{]} must be in
+a{[}1{]}
+
+We can rewrite Pass 1 as a for-loop:
+
+Pass 1:
+
+for i = 0, 1, 2:
+
+swap the values in a{[}i{]}, a{[}i+1{]} so that a{[}i{]} \textless=
+a{[}i+1{]}
+
+See it? Pass 2 looks like this:
+
+Pass 2:
+
+for i = 0, 1:
+
+swap the values in a{[}i{]}, a{[}i+1{]} so that a{[}i{]} \textless=
+a{[}i+1{]}
+
+Hmmm ... Pass 2 looks like Pass 1 ... You can combine them like this:
+
+Pass 1 and 2:
+
+for j = 2, 1:
+
+for i = 0, ..., j:
+
+swap the values in a{[}i{]}, a{[}i+1{]} so that a{[}i{]} \textless=
+a{[}i+1{]}
+
+See that? What about Pass 3? Pass 3 looks like this (I'm writing this as
+a for-loop just to see the pattern):
+
+Pass 3:
+
+for i = 0:
+
+swap the values in a{[}i{]}, a{[}i+1{]} so that a{[}i{]} \textless=
+a{[}i+1{]}
+
+AHA! This can also be combined with Pass 1 and Pass 2:
+
+Pass 1 and 2 and 3:
+
+for j = 2, 1, 0:
+
+for i = 0, ..., j:
+
+swap the values in a{[}i{]}, a{[}i+1{]} so that a{[}i{]} \textless=
+a{[}i+1{]}
+
+Note that this is for an array of size 4. What about an array of size 5?
+Do you see that the first value of j in the above (i.e. 2) comes from 4
+-- 2. In general if you have an array with size SIZE, the bubblesort to
+sort in ascending order is this:
+
+for j = SIZE -- 2, ..., 1, 0:
+
+for i = 0, ..., j:
+
+swap the values in a{[}i{]}, a{[}i+1{]} so that a{[}i{]} \textless=
+a{[}i+1{]}
+
+Now we translate this to C++:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+for (int j = SIZE -- 2; j \textgreater= 0; -\/-j)
+
+\{
+
+for (int i = 0; i \textless= j; ++i)
+
+\{
+
+if (a{[}i{]} \textgreater{} a{[}i+1{]})
+
+\{
+
+int t = a{[}i{]};
+
+a{[}i{]} = a{[}i+1{]};
+
+a{[}i+1{]} = t;
+
+\}\\
+\}
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Make sure you understand and memorize this!!!
+
+\textbf{Exercise.} Using the above code, create an array of 100 random
+integers from 0 to 1000. Sort the array in ascending order and print all
+the integers. Check visually that the output does give you integers in
+ascending order.
+
+\textbf{Exercise.} Redo the previous exercise, sorting the array in
+\emph{\textbf{descending}} order.
+
+\textbf{Exercise.} Note that the bubblesort algorithm (ascending or
+descending version) or course works for an array of doubles as well.
+Create an array of 100 random doubles from 0.0 to 1.0, sort it in
+ascending order and print the values of the array so that you can
+visually check that the values in the array is in ascending order.
+
+Binary search
+
+One reason for sorting an array is to improve search. Once an array is
+sorted in ascending order we can perform a \textbf{binary search} on the
+array. Let's do a simple example before we talk about code.
+
+Suppose you have the following list of numbers:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+i01234567
+
+a{[}i{]}15689101115\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+and you want to search for the number 10; 10 is our target. You can
+start from the leftmost and scan to the right until the number is found.
+Here's another way of doing it. Put your left finger at index 0 and your
+right finger at index 7:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+i01234567
+
+a{[}i{]}15689101115
+
+leftright\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Look at the middle index between left and right. This is
+
+(left + right) / 2 = (0 + 7) / 2 = 7 / 2 = 3
+
+(don't forget it's integer division!). So put your nose at index 3 (or
+one of your toes): nose = 3
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+i01234567
+
+a{[}i{]}15689101115
+
+leftnoseright\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Now ask yourself this question:
+
+a{[}nose{]} = a{[}3{]} = 8 which is less than the target (i.e. 10)
+
+where should you look? a{[}left{]}, ..., a{[}nose-1{]} or
+a{[}nose+1{]},...,a{[}right{]}?
+
+Is it obvious (because the array is ascending) that the target (if
+present in the array) must be in a{[}nose+1{]}, ..., a{[}right{]}.
+Right?
+
+So let's put our left finger at nose + 1, i.e. left = nose + 1. We now
+have
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+i01234567
+
+a{[}i{]}15689101115
+
+leftright\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Let's repeat the process:
+
+nose = (left + right) / 2 = (4 + 7) / 2 = 11 / 2 = 5
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+i01234567
+
+a{[}i{]}15689101115
+
+leftnoseright\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+And
+
+a{[}nose{]} is target
+
+TARGET IS FOUND!
+
+What about a scenario where the target is \emph{\textbf{not}} found?
+Then at some point left and right will cross over each other. Let me
+explain with an example.
+
+Say we look for target = 7. Again we start with this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+i01234567
+
+a{[}i{]}15689101115
+
+leftright\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+And
+
+nose = (left + right) / 2 = 3
+
+and the picture is:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+i01234567
+
+a{[}i{]}15689101115
+
+leftnoseright\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Since
+
+a{[}nose{]} \textgreater{} target
+
+we look search for target in a{[}left{]}, ..., a{[}nose-1{]}, i.e. we
+set
+
+right = nose -- 1 = 3 -- 1 = 2
+
+and the picture is now
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+i01234567
+
+a{[}i{]}15689101115
+
+leftright\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Again we compute the midpoint between left and right:
+
+nose = (left + right) / 2 = (0 + 2) / 2 = 1
+
+i.e.,
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+i01234567
+
+a{[}i{]}15689101115
+
+leftnoseright\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+We have
+
+a{[}nose{]} = a{[}1{]} = 5 is less than target
+
+So we look in a{[}nose+1{]}, ..., a{[}right{]}, i.e.
+
+left = nose + 1 = 1 + 1 = 2
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+i01234567
+
+a{[}i{]}15689101115
+
+left
+
+right\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+We look for the mid point again:
+
+nose = (left + right) / 2 = (2 + 2) / 2 = 2
+
+and the picture becomes:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+i01234567
+
+a{[}i{]}15689101115
+
+left
+
+nose
+
+right\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\protect\hypertarget{anchor}{}{}
+
+Since
+
+a{[}nose{]} = 6 is less than the target
+
+We set
+
+left = nose + 1 = 3
+
+Now note that left is actually greater than right!!!
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+i01234567
+
+a{[}i{]}15689101115
+
+rightleft\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+This means that the target cannot be found.
+
+Now I'm ready to give you the code. This will set \emph{index} to the
+index where the target is found. If it is not found \emph{index} is set
+to -1. The name of the array is \emph{x} and the size of the array is
+\emph{SIZE}.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int lower = 0;
+
+int upper = SIZE - 1;
+
+int mid = 0;
+
+int index = -1;
+
+while (lower \textless= upper)
+
+\{
+
+mid = (lower + upper) / 2;
+
+if (x{[}mid{]} \textless{} target)
+
+\{
+
+lower = mid + 1;
+
+\}
+
+else if (x{[}mid{]} \textgreater{} target)
+
+\{
+
+upper = mid -- 1;
+
+\}
+
+else
+
+\{
+
+index = mid;
+
+break;
+
+\}
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hfill\break
+Now if you have an array of length n that is not sorted, linear
+searching will require on the average n/2 searches. The worse case
+requires n searches. What about binary search? In the worse case
+scenario, it takes log\textsubscript{2}n. Here's a table of comparison:
+
+nlinear search (n)binary search (log\textsubscript{2}n)
+
+10103.3
+
+1001006.6
+
+1000100010.0
+
+1000000100000019.9
+
+1000000000100000000029.9
+
+See the difference? Better organization and a good search algorithm
+implies less time in data retrieval.
+
+{[}For math geeks, if you have taken Calculus you know that the gap
+between n and log\textsubscript{2}n widens. Specifically, by l'Hôpital's
+rule, the limit of n/(log\textsubscript{2}n) as n approaches infinity is
+in fact infinity.{]}
+
+Why is the worse case log\textsubscript{2}n? Well look at the algorithm.
+In each iteration, you cut down the search space by ½ right? Supposing
+the worse case, your search space reaches one value. So the sizes of the
+search spaces looks like this:
+
+n → n/2 → n/4 → n/8 → ... → 1
+
+and you go through say k iterations. In other words you have
+
+n/2\textsuperscript{k} = 1
+
+i.e.
+
+2\textsuperscript{k} = n
+
+If you take log-to-base-2 you get
+
+log\textsubscript{2 }2\textsuperscript{k} = log\textsubscript{2 }n,
+i.e., the number of iteration k = log\textsubscript{2}n
+
+Details on the study of algorithms and measure of what we call ``time
+complexity'' is found in CISS350 (Data Structure and Advanced
+algorithms) and CISS358 (Algorithmic Analysis). Deep studies in the
+extent of computability is found in CISS362 (Automata theory) where one
+is even interested in questions like ``What are computers? Are there
+computational problems that cannot be solved by an algorithm or by a
+computer?''
+
+Example: Party Planning Problem
+
+You are planning a party for a group of friends who live on the same
+street:
+
+\includegraphics[width=0.1654in,height=0.2598in]{Pictures/100000000000004A000000743CDC9D0F60A89B5D.png}
+
+\includegraphics[width=0.1654in,height=0.2598in]{Pictures/100000000000004A000000743CDC9D0F60A89B5D.png}\includegraphics[width=0.1654in,height=0.2598in]{Pictures/100000000000004A000000743CDC9D0F60A89B5D.png}\includegraphics[width=0.1654in,height=0.2598in]{Pictures/100000000000004A000000743CDC9D0F60A89B5D.png}\includegraphics[width=0.1654in,height=0.2598in]{Pictures/100000000000004A000000743CDC9D0F60A89B5D.png}\includegraphics[width=0.1654in,height=0.2598in]{Pictures/100000000000004A000000743CDC9D0F60A89B5D.png}
+
+0 1 2 3 4 5 6 7 8 9 10 11 12
+
+Here (including yourself), you have people living at 1, 4, 4, 9, 10, 12.
+(Note: there are two people living at 4.) Suppose you host the party at
+9. Then the total distance traveled by everyone to the house at 9 is
+
+\textbar1 -- 9\textbar{} + \textbar4 -- 9\textbar{} + \textbar4 --
+9\textbar{} + \textbar10 -- 9\textbar{} + \textbar12 -- 9\textbar{} = 8
++ 5 + 5 + 1 + 3 = 22
+
+You want to be a good host. So your goal is to find an address (i.e., an
+integer) so the that total distance traveled by everyone to the address
+is the smallest possible. If there are two address that gives the same
+minimal total distance, you pick the smaller address.
+
+You may assume there are at most 100000 addresses.
+
+Your program first accepts an integer n for the total number of
+addresses. It then accepts the n addresses (i.e., integers) and then
+prints the best address to hold the party.
+
+For instance for the above test case, your console would look like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+6
+
+1 4 4 9 10 12
+
+9\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+if your program thinks address 9 is the best.
+
+WARNING: Incoming hint on next page.
+
+Hint
+
+There are 2 ways to solve this problem. Based on what you know, the
+following is the slower algorithm \ldots{}
+
+Suppose the number of addresses is stored in \emph{\textbf{n}} and the
+addresses are stored in array \emph{\textbf{x}}.
+
+You test every house \emph{\textbf{x{[}i{]}}}. In other words for each
+\emph{\textbf{x{[}i{]}}}, compute the total distance traveled by
+everyone going to address \emph{\textbf{x{[}i{]}}}. You compute a
+running minimum of these distances.
+
+Of course there's a loop over all the potential party address
+\emph{\textbf{x{[}i{]}}} for \emph{\textbf{i}} running from 0 to
+\emph{\textbf{n -- 1}}. And for each address \emph{\textbf{x{[}i{]}}},
+you'll need to compute the total distance traveled to
+\emph{\textbf{x{[}i{]}}}, i.e., you need to add up all the
+\textbar{}\emph{\textbf{x{[}}\textbf{j}\textbf{{]}}} --
+\emph{\textbf{x{[}i{]}}}\textbar{} for j running over 0,1,\ldots,n-1.
+The \textbar{}\emph{\textbf{x{[}}\textbf{j}\textbf{{]}}} --
+\emph{\textbf{x{[}i{]}}}\textbar{} is the absolute value of
+\emph{\textbf{x{[}}\textbf{j}\textbf{{]}}} -- \emph{\textbf{x{[}i{]}}}.
+You use the \emph{\textbf{fabs}} function. I have already used this in
+the computation of the roots of a function.
+
+Since you are performing a running minimum computation, you will need a
+\emph{\textbf{min}} variable. Note that your problem does not print the
+\emph{\textbf{min}} -- you actually want the address
+\emph{\textbf{x{[}i{]}}}. This is very similar to the algorithm for
+computing the maximum value of a function in the chapter on for-loops.
+So besides variable \emph{\textbf{min}}, need also need a
+\emph{\textbf{min\_i}} where \emph{\textbf{x{[}min\_i{]}}} is the
+desired address.
+
+Example: Cellular automata
+
+A \textbf{cellular automata (CA)} is simply a grid of values where the
+value at a point in the grid can change its value. The way such a value
+v changes depends on the values near v.
+
+CAs are studied in math, CS, physics, biology, social science, etc. You
+name it. They can be as practical as image processing where they are
+used to remove noise from images to create cleaner images. Yet they can
+be as abstract and complex as you like -- they appear in AI, dynamical
+systems, and chaos theory. You can find lots of information about
+cellular automata on the web -- go ahead and check out the CA entry at
+wikipedia.
+
+Let me be more specific by looking at a simple example. Suppose we look
+at a 1-dimensional CA with these values:
+
+0,0,1,1,0,1,1,1
+
+This CA is made up of 8 cells. The values are either 0 or 1. So a CA can
+be as simple as an array.
+
+Now suppose the value at a cell changes according to these rules:
+
+\begin{itemize}
+\item
+  If the value is 1 and together with the values on its left and right,
+  there are three or one 1s, then the value becomes 0. Otherwise it
+  stays as 1. In other words, if the value is 1 and either the left or
+  right neighbor is 1 (but not both), then 1 stays as 1. Otherwise it
+  becomes 0. You can think of it this way:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Companionship: If 1 has exactly one companion, he/she/it lives on.
+    If 1 has no companion, it dies.
+  \item
+    Overcrowding: If 1 has too many companions, overcrowding kills
+    he/she/it.
+  \end{itemize}
+\item
+  If this value is 0, and together with the values on its left and
+  right, there are two 1s, then the value becomes 1. Otherwise it stays
+  as 0. You can think of it this way:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Reproduction: If a spot is available, then the 1 on the left and
+    right produces a 1. A reproduction (i.e., 0 → 1) occurs only when
+    there are two adjacent 1s next to the 0.
+  \end{itemize}
+\end{itemize}
+
+For instance, the overcrowding rule gives is this:
+
+1,1,1
+
+↓
+
+0
+
+So applying this rule to the value at index 6 we get
+
+0,0,1,1,0,1,1,1
+
+↓
+
+0,0,1,1,0,1,0,1
+
+I'll write the rule as 111 → 0 instead of
+
+1,1,1
+
+↓
+
+0
+
+Here are more examples:
+
+\begin{itemize}
+\tightlist
+\item
+  Using the rule 001 → 0, we get
+\end{itemize}
+
+0,0,1,1,0,1,1,1
+
+↓
+
+\_,0,\_,\_,\_,\_,\_,\_
+
+\begin{itemize}
+\tightlist
+\item
+  Using the rule 011 → 1, we get
+\end{itemize}
+
+0,0,1,1,0,1,1,1
+
+↓
+
+\_,\_,1,\_,\_,\_,\_,\_
+
+\begin{itemize}
+\tightlist
+\item
+  Using the rule 101 → 1, we get
+\end{itemize}
+
+0,0,1,1,0,1,1,1
+
+↓
+
+\_,\_,\_,\_,1,\_,\_,\_
+
+In general the new i-th value depends on the current (i-1)-th, i-th,
+(i+1)th values:
+
+\_,\_,\_,\_,?,\_,\_,\_
+
+↓ ↓ ↓
+
+\textbackslash{} ↓ /
+
+\textbackslash↓/
+
+↓
+
+\_,\_,\_,\_,?,\_,\_,\_
+
+The value at the ends (the first and last) do not have two neighbors. So
+we will not change the values at the left and right end points:
+
+0,0,1,1,0,1,1,1
+
+↓ ↓
+
+0,\_,\_,\_,\_,\_,\_,1
+
+(There are other ways to compute the value of the cells at end points.
+For instance you can view the CA as being wrapped around at the end
+points so that the new value for the first cell depends on the values of
+first, second, and last cell).
+
+So using the above rules we get the following behavior
+
+0,0,1,1,0,1,1,1
+
+0,0,1,1,1,1,0,1
+
+You can think of the above as an evolving CA that changes with time.
+With three times we get
+
+0,0,1,1,0,1,1,1 (time 0)
+
+0,0,1,1,1,1,0,1 (time 1)
+
+0,0,1,0,0,1,1,1 (time 2)
+
+etc.
+
+We will use CA to generate some ASCII art by printing the values of the
+cells in 1D CA: If the value is 0, we print a space and if the value is
+1 we print X. We will let our CA run through a certain number of time
+steps, printing the CA for each time step. For instance the above CA
+goes through three time steps:
+
+0,0,1,1,0,1,1,1
+
+0,0,1,1,1,1,0,1
+
+0,0,1,0,0,1,1,1
+
+and we print
+
++-\/-\/-\/-\/-\/-\/-\/-+
+
+\textbar{} XX XXX\textbar{}
+
+\textbar{} XXXX X\textbar{}
+
+\textbar{} X XXX \textbar{}
+
++-\/-\/-\/-\/-\/-\/-\/-+
+
+We will use a 1D CA of size 2 * n + 1 where n is an input from the user.
+We will run this for n time steps. We will start off with a CA with a 1
+in the middle of the 1D array and 0 elsewhere. The set of rules to use
+is:
+
+000 → 0
+
+001 → 1
+
+010 → 0
+
+011 → 1
+
+100 → 1
+
+101 → 0
+
+110 → 1
+
+111 → 0
+
+Here's the pseudocode:
+
+declare an array ca of size 2*500 + 1.
+
+note that the maximum size of the ca is 2*500 + 1.
+
+declare an array t of size 2*500 + 1.
+
+get n from user (at most 500), size of the ca is 2 * n + 1.
+
+note that we will only use ca{[}0{]}, \ldots, ca{[}2*n{]}.
+
+set the values in ca to all 0s except for a 1 in the middle.
+
+// time = 0
+
+print ca (for value 1 print 'X' and for value 0 print ' '; use a loop).
+
+for time = 1, 2, ..., n - 1:
+
+\{
+
+for each value in ca,
+
+apply above rules and fill corresponding value in t
+
+copy values in t back to ca (use a loop).
+
+print ca (for value 1 print 'X' and for value 0 print ' ').
+
+\}
+
+Note that you can specify n = 500 for a maximum CA of size 2 * 500 + 1 =
+1001. However, you can't see the ASCII art clearly on your console
+window because of wraparound. You can probably right-click and choose a
+smaller font size and larger window size and then you can see the ASCII
+art up to about n = 100. For larger sizes, you can save the output to a
+document (say MS Word), choose a really tiny font and a larger page size
+and print it out.
+
+NOTE: Recall that a number such as 1425 is just 1*1000 + 4*100 + 2*10 +
+5. You can extract the 1, 4, 2, and 5 from 1425 by using integer
+division / and integer mod \%. This is viewing an integer ``written in
+base 10''. If I give you 1,0,1 or any sequence of zeroes and ones, then
+it's sometimes convenient to convert that into a single integer. For
+instance you can convert 1,0,1 into 5 using ``binary representation'' --
+I'll explain the conversion in a bit. But first, why would you want to
+do that? Well,
+
+compare this
+
+\emph{int a = 1, b = 0, c = 1; // 1,0,1}
+
+if (a == 1 \&\& b == 0 \&\& c == 1)
+
+\{
+
+...
+
+\}
+
+with this:
+
+\emph{int d = 5; // 1,0,1 converted to 5}
+
+if (d == 5)
+
+\{
+
+...
+
+\}
+
+Clearly the second code fragment is simpler because after the conversion
+there's only one variable and not three. Also, because you are comparing
+a single integer value, you can use a switch:
+
+\emph{switch (d)}
+
+\{
+
+case 5:
+
+...
+
+break;
+
+\}
+
+But what is a nice way to convert 1,0,1 to an integer? You use the same
+idea as base 10 representation of numbers but instead of powers of 10,
+you use powers of 2:
+
+1,0,1 → 1*4 + 0*2 + 1*1
+
+Here's another example:
+
+10111 → 1*16 + 0*8 + 1*4 + 1*2 + 1*1
+
+In the case of our CA, the three ``bits'' determining how to change a
+bit can be converted to an integer. The rules:
+
+000 → 0
+
+001 → 1
+
+010 → 0
+
+011 → 1
+
+100 → 1
+
+101 → 0
+
+110 → 1
+
+111 → 0
+
+if you convert the 0s and 1s on the left to base 10 numbers, becomes
+
+0 → 0
+
+1 → 1
+
+2 → 0
+
+3 → 1
+
+4 → 1
+
+5 → 0
+
+6 → 1
+
+7 → 0
+
+Exercises
+
+Q1. Declare an array of 1000 integers. Set a{[}0{]} to 0 and a{[}1{]} to
+1. For the remain values in the array, set each value to the sum of the
+previous two values. For instance set a{[}2{]} to the sum of a{[}0{]}
+and a{[}1{]}. Set a{[}3{]} to the sum of a{[}1{]} and a{[}2{]}. Etc. In
+general set a{[}i{]} to the sum of a{[}i-1{]} and a{[}i-2{]} for
+appropriate values of a{[}i{]}. In other words, the value at an index
+position is the sum of the values at two previous positions. Print all
+the values in your array. Visually verify the correctness of the values.
+The first values are of course
+
+0, 1, 1, 2, 3, 5, 8, 13, 21, \ldots{}
+
+This is the famous Fibonacci sequence and appears in many areas of
+science including math, computer science, physics, etc.
+
+Q2. Declare an array of 100 random doubles between 0.0 and 1.0. Now set
+all the elements of the array with \emph{\textbf{even}} index values to
+0.0. Print all the values in your array. Visually verify your work.
+
+Q3. Declare an array of 20 characters. Initialize all the value of the
+array to the space character. In a while-loop continually print the
+characters separated by spaces, prompt the user for an index position
+and a character and set the value in the array to the character
+specified by the user. If the user enters -1 for the index, the program
+ends the while-loop and print the characters. Here is an execution:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+index: \textbf{0}
+
+character: \textbf{h}
+
+h
+
+index: \textbf{1}
+
+character: \textbf{e}
+
+h e
+
+index: \textbf{2}
+
+character: \textbf{l}
+
+\hfill\break
+h e l
+
+index: \textbf{3}
+
+character: \textbf{l}
+
+h e l l
+
+index: \textbf{4}
+
+character: \textbf{o}
+
+h e l l o
+
+index: \textbf{6}
+
+character: \textbf{w}
+
+h e l l o w
+
+index: \textbf{7}
+
+character: \textbf{o}
+
+h e l l o w o
+
+index: \textbf{8}
+
+character: \textbf{r}
+
+h e l l o w o r
+
+index: \textbf{9}
+
+character: \textbf{l}
+
+h e l l o w o r l
+
+index: \textbf{10}
+
+character: \textbf{d}
+
+h e l l o w o r l d
+
+index: \textbf{11}
+
+character: \textbf{!}
+
+h e l l o w o r l d !
+
+index: \textbf{-1}
+
+final: hello world! \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Q4. Write a program that generates 10 random integers between 0 and 9
+(inclusive), puts these values into an array, prints the integers in the
+array, counts the number of even integers in the array using a for-loop,
+and prints the number of even integers in the array.
+
+Q5. Write a program that generates 10 random integers between 0 and 9
+(inclusive), puts these values into an array, prints the integers in the
+array, counts the number of even integers in the array from the first
+index to either the last index or to the first 9 in the array, and
+prints the number of even integers (up to when you stop) in the array.
+
+Q6. For a tic-tac-toe game, one could use an array of 9 characters to
+denote the characters on the tic-tac-toe board. In other words, if we
+create this variable:
+
+char board{[}9{]};
+
+then \emph{board{[}0{]}} is the character at the top left corner of the
+tic-tac-toe board, ..., and \emph{board{[}8{]}} is the bottom right
+corner of the board. Rewrite our tic-tac-toe game using this variable.
+In fact with arrays you can write your game for any n-by-n board:
+
+const int SIZE = 5;
+
+char board{[}SIZE * SIZE{]};
+
+Here's a hint. The code for drawing the tic-tac-toe board would look
+something like this:
+
+for (int i = 0; i \textless{} SIZE * SIZE; ++i)
+
+\{
+
+if (i \% SIZE \textless{} SIZE -- 1)
+
+\{
+
+// print board{[}i{]} and '\textbar'
+
+\}
+
+else
+
+\{
+
+// print board{[}i{]}, newline,
+
+// and the row divider line
+
+\}\\
+\}
+
+Summary
+
+An array is a variable containing values of the same type. The format of
+the statement to declare an array variable is as follows:
+
+\emph{ {[}type{]} {[}array name{]}{[} {[}size{]} {]};}
+
+where \emph{{[}type{]}} is the type of values you want to put into this
+array and \emph{{[}size{]}} is the number of elements in this array. For
+instance to declare an array z of 10 booleans do this:
+
+\emph{bool z{[}10{]};}
+
+You can declare with initialization. The following declares an array
+\emph{y} of 5 \emph{int}s with
+
+int y{[}5{]} = \{10, 11, 12, 13, 14\};
+
+You can omit the size:
+
+int y{[}{]} = \{10, 11, 12, 13, 14\};
+
+in that case the size is the number of initial values. You can declare
+and initialize partially:
+
+int y{[}10{]} = \{10, 11, 12, 13, 14\};
+
+In the case the remaining 5 are initialized to 0.
+
+If \emph{x} is an array of size 10, then you have access to
+\emph{a{[}i{]}} for \emph{i} = 0, 1, 2, ..., 9. You can (and should)
+think of \emph{a{[}i{]}} as a variable. The value of \emph{i} used to
+access an element of the array is called the \textbf{index} of that
+elements; the variable \emph{i} is called an \textbf{index variable}. In
+general you can access an element with the integer value of an evaluated
+integer expression. In particular you can write loops to scan the
+elements of an array.
+
+In particular you can write a for-loop to search for an element in the
+array, sum the values in an array, compute the maximum and minimum of an
+array, etc.
+
+The bubblesort algorithm sorts an array. The algorithm ``bubbles'' the
+largest element to the largest index value of the array. You can rewrite
+the algorithm to bubble the smallest element to the smallest index
+value.
+
+The binary search algorithm searches a sorted array more efficiently
+than a linear search.
+
+\end{document}

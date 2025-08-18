@@ -1,0 +1,1090 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\author{}
+\date{}
+
+\begin{document}
+
+­68. Array of Objects
+
+Objectives
+
+\begin{itemize}
+\tightlist
+\item
+  Review Array and pointer
+\item
+  Use Arrays to store objects
+\item
+  Build static sized Array Objects
+\item
+  Build static sized Array Object Pointers
+\item
+  Build dynamic sized Array Object
+\item
+  Build dynamic sized Array Object Pointers
+\end{itemize}
+
+Review
+
+As you know, the size of the array is fixed:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+const int SIZE = 5;
+
+int x{[}2 * SIZE{]}; // OK
+
+int y{[}42{]}; // OK
+
+int i = 5;
+
+int z{[}i{]}; // WRONG!!!\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+For a ``dynamic'' array, i.e., an array whose size can be variable, you
+can use a pointer.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int * p = new int{[}5{]}; // OK
+
+const int SIZE = 5;
+
+int * q = new int {[}2 * SIZE{]}; // OK
+
+int i = 5;
+
+int * r = new int{[}i{]}; // OK!!!\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Memory allocated to a pointer must be de-allocated by the programmer:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int i = 5;
+
+int * r = new int{[}i{]};
+
+// do something with r{[}0{]},...,r{[}i -- 1{]}
+
+delete {[}{]} r;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Memory can be allocated to a pointer more than once. The sizes can be
+different.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int * r = new int{[}5{]};
+
+// ... do something with r{[}0{]},...,r{[}4{]}
+
+delete {[}{]} r;
+
+...
+
+r = new int;
+
+// ... do something with *r;
+
+delete r;
+
+...
+
+r = new int{[}10{]};
+
+// ... do something with r{[}0{]},...,r{[}9{]}
+
+delete {[}{]} r;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Like a pointer to a structure variable, if p points to an object with
+instance variable \emph{x}, then
+
+(*p).x is the same as p-\textgreater x
+
+Similarly if the object has method \emph{m()}, then invoking
+
+\emph{(*p).m()} is the same as \emph{p-\textgreater m()}
+
+Use \emph{-\textgreater{} }instead of \emph{*.}
+
+Array of Objects
+
+So far objects are created individually.
+
+What if you want to create an array of objects
+
+C obj{[}10{]};
+
+where \emph{C} is the class?
+
+Try the following example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Int.h
+
+\#include \textless iostream\textgreater{}
+
+class Int
+
+\{
+
+public:
+
+Int(int x=0)
+
+: x\_(x)
+
+\{
+
+std::cout \textless\textless{} "Int ... x\_: " \textless\textless{} x\_
+
+\textless\textless{} std::endl;
+
+\}
+
+private:
+
+int x\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include ``Int.h''
+
+int main()
+
+\{
+
+Int a{[}10{]};
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The Point: Each \emph{a{[}i{]} (i=0,...,9)} is constructed using the
+default constructor. When you declare an array of objects each object in
+the array calls the default constructor.
+
+You \textbf{must} have a default constructor if you want to have an
+array of objects. (Don't forget that if you don't specify any
+constructor, C++ will give you a default constructor.)
+
+Of course you can still call the constructor one at a time like this if
+you wish:
+
+Int a{[}3{]} = \{Int(3), Int(-1), Int(42)\};
+
+Now try to run this (why does it not work):
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// vec2d.h
+
+\#include \textless iostream\textgreater{}
+
+class vec2d
+
+\{
+
+public:
+
+vec2d(double x, double y)
+
+: x\_(x), y\_(y)
+
+\{\}
+
+private:
+
+double x\_, y\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include ``vec2d.h''
+
+int main()
+
+\{
+
+vec2d v{[}10{]};
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The point: Each of the \emph{v{[}0{]},...,v{[}9{]}} calls \emph{vec2d()}
+(the default constructor) to initialize itself. But there is no default
+constructor in \emph{vec2d}. There's only one constructor and it must
+receive two doubles.
+
+Remember that! If you want to declare an array of objects without an
+initializer list, you \textbf{MUST} have the default constructor used to
+construct the objects in the array.
+
+\textbf{Exercise. }Fix the following class so that an array of
+\emph{WeatherControl} objects can be created with all instance variables
+initialized to 10.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// WeatherCtrl.h
+
+\#ifndef WEATHERCTRL\_H
+
+\#define WEATHERCTRL\_H
+
+class WeatherCtrl
+
+\{
+
+public:
+
+WeatherCtrl(double temp, double pressure)
+
+: temp\_(temp), pressure\_(pressure)
+
+\{\}
+
+double get\_temp() const \{ return temp\_; \}
+
+double get\_pressure() const \{ return pressure\_; \}
+
+void set\_temp(double);
+
+void set\_pressure(double);
+
+private:
+
+double temp\_;
+
+double pressure\_;
+
+\};
+
+\#endif\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Suppose we have the following class:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Int
+
+\{
+
+public:
+
+Int(int x)
+
+: x\_(x)
+
+\{\}
+
+private:
+
+int x\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Now suppose you want to create an array of \emph{Int} objects with
+
+Int a{[}10{]}; // want a{[}i{]}.x = i
+
+First Method:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Int
+
+\{
+
+public:
+
+Int (int x = 0)
+
+: x\_(x) \{\}
+
+void set(int a) \{x\_ = a;\}
+
+private:
+
+int x\_;
+
+\};
+
+int main()
+
+\{
+
+Int a{[}10{]};
+
+for (int i = 0; i \textless{} 10; i++)
+
+a{[}i{]}.set(i);
+
+...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+So note that in the above each \emph{a{[}i{]}.x} was first set to
+\emph{0} by the constructor ... then \emph{a{[}i{]}.x} was set to
+\emph{i}.
+
+\textbf{The Point}: \emph{a{[}i{]}.x} was set two values.
+
+This is no big deal for the \emph{Int} class because not a lot of work
+was done in the constructor. But... what if a certain class \emph{C}
+does a lot of work in the constructor? Example: \emph{C} has
+\emph{1000000} member variables and the default constructor sets all to
+\emph{0} and then you need to set them all to \emph{i}?
+
+Second method:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int main()
+
+\{
+
+Int * a{[}10{]};
+
+for (int i = 0; i \textless{} 10; ++i)
+
+a{[}i{]} = new Int(i);
+
+// do something with *(a{[}i{]})
+
+...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{The point:} Each \emph{a{[}i{]}} is not an object, but a pointer
+to an object. We can then construct the object in the heap with whatever
+constructor call that we choose and then point \emph{a{[}i{]}} to the
+object.
+
+\textbf{The point:}There is no constructor call when you do
+
+Int * a{[}10{]};
+
+or when you do
+
+Int * p;
+
+\textbf{The point:} There is no ``default constructor call'' for
+pointers. Pointers are not objects.
+
+Let's compare the two methods.
+
+In the first method, when we create an array of objects the default
+constructor is called for each object.
+
+In the second method, for the array of pointers to objects, you can call
+a constructor for each object in the heap that each pointer of the array
+points to.
+
+How do you deallocate memory correctly for the second method?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+Int * a{[}10{]};
+
+for (int i = 0; i \textless{} 10; ++i)
+
+a{[}i{]} = new Int(i);
+
+// do something with *(a{[}i{]})
+
+for (int i = 0; i \textless{} 10; ++i)
+
+delete a{[}i{]};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Compare the above with this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+Int * a = new Int{[}10{]};
+
+for (int i = 0; i \textless{} 10; ++i)
+
+a{[}i{]}.set(i);
+
+delete {[}{]} a;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Make sure you see the difference between
+
+\begin{itemize}
+\tightlist
+\item
+  Array of Pointers
+\item
+  Pointer to an Array
+\end{itemize}
+
+Note that for the second method:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int main()
+
+\{
+
+Int * a{[}10{]};
+
+for (int i = 0; i \textless{} 10; ++i)
+
+a{[}i{]} = new Int(i);
+
+// do something with *(a{[}i{]})
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The size of the array is fixed. To have a ``dynamic'' array where the
+size can change, you can use a pointer.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int size;
+
+std::cin \textgreater\textgreater{} size; // enter integer
+\textgreater{} 0
+
+Int ** a = new Int*{[}size{]};
+
+for (int i = 0; i \textless{} 10; ++i)
+
+a{[}i{]} = new Int(i);
+
+...
+
+// Exercise on pointers to objects:
+
+// Assign 43 to x of Int object a{[}0{]}
+
+// is point to. \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The above is analogous to this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int size;
+
+std::cin \textgreater\textgreater{} size; // enter integer
+\textgreater{} 0
+
+Int ** a = new Int*{[}size{]};
+
+for (int i = 0; i \textless{} 10; ++i)
+
+a{[}i{]} = new Int(i);
+
+// ... do something with *a{[}i{]}
+
+for (int i = 0; i \textless{} size; ++i)
+
+delete a{[}i{]};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Note:
+
+Int ** a = new Int*{[}size{]};
+
+Int ** b = new (Int*){[}size{]}; \textbf{//WRONG!!!}
+
+Comparison:
+
+Int a{[}10{]}; //Fixed size, default constructor
+
+Int * b{[}10{]}; //Fixed, can call constructor
+
+Int ** c = new Int*{[}size{]}; // variable size and can
+
+// call constructor.
+
+What if you want to do this:
+
+Date a{[}10{]}; // all 10 initialized to 12/25/2009
+
+Date b{[}20{]}; // all 20 initialized to 12/25/2010
+
+Keep default year, month, day values in Date class for initialization
+purposes. Allow defaults to be changed. But default values for the
+constructor is fixed.
+
+See notes on Static for details. Such values are more associated with
+the class than with individual objects.
+
+\textbf{Exercise. }Write a program that does this:
+
+\begin{itemize}
+\tightlist
+\item
+  Prompt the user for s.
+\item
+  Create a dynamic array of size s of Int objects initializing them so
+  that you get a Fibonacci sequence.
+\item
+  For instance if you enter 7 the integers modeled in the array are:
+\end{itemize}
+
+1, 1, 2, 3, 5, 8, 13
+
+You can also have 2-dim array of objects.
+
+Example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+Int a{[}5{]}{[}6{]}; // default constructor called on each
+
+// a{[}i{]}{[}j{]}
+
+for (int i = 0; i \textless{} 5; i++)
+
+for (int j = 0; j \textless{} 6; j++)
+
+a{[}i{]}{[}j{]}.set(42);\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In this example, the array has fixed sizes, and you loose control over
+the constructor call.
+
+Use an array of object pointers to control constructor call
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+Int * a{[}5{]}{[}6{]}; // 5-by-6 array of Int *
+
+for (int i = 0; i \textless{} 5; i++)
+
+for (int j = 0; j \textless{} 6; j++)
+
+a{[}i{]}{[}j{]} = new Int(42);
+
+// do something useful with *(a{[}i{]}{[}j{]})
+
+for (int i = 0; i \textless{} 5; i++)
+
+for (int j = 0; j \textless{} 6; j++)
+
+delete a{[}i{]}{[}j{]};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The above is an array of \textbf{fixed} sizes.
+
+So... what if you want the sizes to be dynamic?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int rows, columns;
+
+// ... prompt user for rows columns
+
+Int * a{[}rows{]}{[}columns{]}; // WRONG!!!\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The following is a 2-dimensional dynamic array of objects, i.e., the row
+and column size can be variables. However, the value in the array are
+objects (not pointers yet \ldots{} we'll get to that in a bit...)
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int rows = 5, columns = 6;
+
+Int ** a = new Int*{[}rows{]}; // a{[}0{]}, ..., a{[}rows-1{]}
+
+// are all Int * values
+
+for (int i = 0; i \textless{} rows; ++i)
+
+\{
+
+a{[}i{]} = new Int{[}columns{]}; // a{[}i{]}{[}j{]} for j = 0,...,
+
+// columns-1 are Int
+
+for (int j = 0; j \textless{} columns; ++j)
+
+a{[}i{]}{[}j{]} = 42;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int rows = 5, columns = 6;
+
+Int ** a = new Int*{[}rows{]}; // a{[}0{]}, ..., a{[}rows-1{]}
+
+// are all Int * values
+
+for (int i = 0; i \textless{} rows; ++i)
+
+\{
+
+a{[}i{]} = new Int{[}columns{]}; // a{[}i{]}{[}j{]} for j = 0,...,
+
+// columns-1 are Int
+
+for (int j = 0; j \textless{} columns; ++j)
+
+a{[}i{]}{[}j{]} = 42;
+
+\}
+
+// do something with a{[}i{]}{[}j{]}
+
+// De-allocate memory used by a{[}0{]}, \ldots, a{[}rows-1{]} and a
+
+for (int i = 0; i \textless{} rows; i++)
+
+delete {[}{]} a{[}i{]};
+
+delete {[}{]} a;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Exercise. Write a program that does this:
+
+\begin{itemize}
+\tightlist
+\item
+  prompts the user for the row and column size of a 2-dim array of
+  integer values. (Just the regular int).
+\end{itemize}
+
+\begin{itemize}
+\tightlist
+\item
+  Fill the 2-dim array with random integers.
+\item
+  Print the values in the array in a 2-dim grid.
+\item
+  Compute the row, column, and overall average of all the values (up to
+  1 decimal place).
+\item
+  Deallocate Memory used.
+\item
+  Here is what a 3 by 3 case looks like
+\end{itemize}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+0 3 3 \textbar2.0
+
+2 9 0 \textbar3.6
+
+8 2 6 \textbar5.3
+
+-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-+
+
+3.3 4.6 3.0 3.6\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise. }Run this program. Explain why it does not work.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int floors = 3, rooms\_per\_floor = 10;
+
+WeatherControl ** wc = new WeatherControl*{[}floors{]};
+
+for (int floor = 0; floor \textless{} floors; ++floor)
+
+\{
+
+wc{[}floor{]} = new WeatherControl{[}rooms\_per\_floor{]};
+
+\}
+
+delete {[}{]} wc;
+
+for (int floor = 0; floor \textless{} floors; ++floor)
+
+\{
+
+delete {[}{]} wc{[}floor{]};
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+From previous example, each \emph{a{[}i{]}{[}j{]}} is an \emph{Int}
+object. You lose control over calling constructor.
+
+Now we want the row and column sizes to be dynamic and the values in the
+array to be pointers so that we can call the constructor for each
+pointer\ldots{}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int rows = 5, columns = 6;
+
+Int *** a = new Int**{[}rows{]};
+
+for (int i = 0; i \textless{} rows; i++)
+
+\{
+
+a{[}i{]} = new Int*{[}columns{]};
+
+for (int j = 0; j \textless{} columns; j++)
+
+a{[}i{]}{[}j{]} = new Int(42);
+
+\}
+
+// do something with (*a){[}i{]}{[}j{]}
+
+for (int i = 0; i \textless{} rows; i++)
+
+\{
+
+for (int j = 0; j \textless{} columns; j++)
+
+delete a{[}i{]}{[}j{]};
+
+delete {[}{]} a{[}i{]};
+
+\}
+
+delete {[}{]} a;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Here a summary:
+
+\begin{itemize}
+\tightlist
+\item
+  For a static sized 2-dim array of \emph{Int} objects:
+\end{itemize}
+
+Int a{[}3{]}{[}5{]}
+
+\begin{itemize}
+\tightlist
+\item
+  For a static sized 2-dim array of \emph{Int} pointers:
+\end{itemize}
+
+Int * a{[}3{]}{[}5{]}
+
+\begin{itemize}
+\tightlist
+\item
+  For a dynamic sized 2-dim array of \emph{Int} objects:
+\end{itemize}
+
+Int ** a
+
+\begin{itemize}
+\tightlist
+\item
+  For a dynamic sized 2-dim array of \emph{Int} pointers:
+\end{itemize}
+
+Int *** a
+
+The point:
+
+Int *** a
+
+Exercise.
+
+\begin{itemize}
+\tightlist
+\item
+  Create a 2-dim (dynamic) array of \emph{Int} object pointers. The size
+  of the first and second dim is randomly chosen from integer
+  1,2,...,10.
+\item
+  Initialize the pointers by allocating memory for \emph{Int} objects
+  and initializing the \emph{Int} objects with integers randomly chosen
+  from 1,2,...,10
+\item
+  Print all the integer values ``in'' this array in a 2-dim grid.
+\end{itemize}
+
+All the arrays up to this point have been rectangular, i.e., the arrays
+as a container values look like this.
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+\endhead
+& &\tabularnewline
+& &\tabularnewline
+& &\tabularnewline
+\bottomrule
+\end{longtable}
+
+Create an array that is triangular, i.e. for row 0
+
+there are 3 columns, for row 1 there are 2 columns, etc. (They are
+called jagged arrays.)
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+\endhead
+& &\tabularnewline
+& &\tabularnewline
+& &\tabularnewline
+\bottomrule
+\end{longtable}
+
+For the static size 3-dim array of \emph{Int} objects:
+
+Int a{[}3{]}{[}6{]}{[}4{]}
+
+For the static size 3-dim array of \emph{Int} pointers:
+
+Int * a{[}3{]}{[}6{]}{[}4{]}
+
+For the dynamic size 3-dim array of \emph{Int} objects:
+
+Int *** a
+
+For the dynamic size 3-dim array of \emph{Int} pointers:
+
+Int **** a
+
+Phew!!!!
+
+\textbf{Exercise.} In a function \emph{f(a, b, c)} create a dynamic
+array of \emph{Int} pointers with sizes \emph{a, b, c}. Initialize all
+the pointers by allocating the memory and initializing the objects the
+pointer points to with a random integer. Make sure you de-allocate
+memory used.
+
+In your \emph{main()}, write a \emph{for} loop that calls \emph{f(10,
+10, 10)} and print a message for each iteration of the loop. If the
+printing of the messages slows down, it tells you that you probably have
+a memory leak.
+
+\textbf{Exercise. }Write a class that models a dynamic 2-dim array of
+integers. The following usage will tell you how it works:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+IntDynArr a(5,6); // 5-by-6 int array
+
+a(1, 2) = 42; // set ``a{[}1{]}{[}2{]}'' to 42
+
+std::cout \textless\textless{} a(1, 2) \textless\textless{}
+std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Hint: \emph{a(1, 2)} is \emph{a.operator()(1, 2)}. You need to define
+\emph{int \& operator(int, int)}.
+
+\textbf{Exercise.} Rewrite your class so you can execute this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+IntDynArr a(5, 6);
+
+a{[}1{]}{[}2{]} = 42;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Hint: Note that
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+a{[}1{]}{[}2{]}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Is not \emph{a.operator{[}{]}{[}{]}(1,2)} because there is no
+\emph{{[}{]}{[}{]}} operator!!! Instead \emph{a{[}1{]}{[}2{]}} is
+\emph{a.operator{[}{]}(1).operator{[}{]}(2)}
+
+Summary
+
+The objects in an array are initialized using the default constructor.
+
+If you want to get away from using the default constructor (i.e., you
+want to explicitly call the constructor) but still want a static sized
+array, you can use an array of pointers.
+
+If you want to get away from using the default constructor (i.e., you
+want to explicitly call the constructor) and you want to get away from a
+static sized array, you can use a pointer to an array of pointers.
+
+\end{document}

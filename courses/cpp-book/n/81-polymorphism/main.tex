@@ -1,0 +1,2045 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\author{}
+\date{}
+
+\begin{document}
+
+81. Polymorphism
+
+Objectives
+
+\begin{itemize}
+\tightlist
+\item
+  Write virtual methods
+\item
+  Understand and use polymorphism
+\item
+  Understand and use virtual destructor
+\end{itemize}
+
+Constructor
+
+\textbf{Polymorphism} = ``many forms''
+
+VERY IMPORTANT!!! LISTEN!!!
+
+Suppose class \emph{C} is a subclass of \emph{P}. You already know that
+the following is valid:
+
+\emph{C c; }
+
+\emph{P p;}
+
+p = c;
+
+However the following will not compile:
+
+\emph{c = p;}
+
+In particular the following is also valid:
+
+\emph{C c; }
+
+P * p = \&c; // p points to c
+
+And this is also valid:
+
+\emph{C c; }
+
+P \& ref = c; // ref references c
+
+Suppose both \emph{P} and \emph{C} have methods \emph{f()}. If I call
+
+\emph{p-\textgreater f();}
+
+which \emph{f()} is invoked? (or \emph{ref.f()} in the case where
+\emph{ref} is a reference).
+
+All you need to do is to do this experiment:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class P
+
+\{
+
+public:
+
+void f()
+
+\{
+
+std::cout \textless\textless{} "P::f\textbackslash n";
+
+\}
+
+\};
+
+class C: public P
+
+\{
+
+public:
+
+void f()
+
+\{
+
+std::cout \textless\textless{} "C::f\textbackslash n";
+
+\}
+
+\};
+
+int main()
+
+\{
+
+C c;
+
+P * p = \&c;
+
+p→f(); // parent's f
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+AHA! \ldots{} the parent's f() is called! This should be a surprise to
+you.
+
+After all we always think of
+
+p-\textgreater f();
+
+as
+
+(*p).f();
+
+and since (*p) is the object c, then should the above be
+
+c.f();
+
+and therefore should the code be calling the f() in C. But remember that
+
+from the previous set of notes on inheritance, when you perform
+
+p = c;
+
+what happens is that there's type conversion happening behind your
+
+back:
+
+p = P(c);
+
+so that the information in C and not in P is in fact lost. That's one
+way of
+
+remembering that the f() called is P::f().
+
+Summary time \ldots{} so remember that our p
+
+P * p = \&c;
+
+is very special. In a sense it has \textbf{two natures}:
+
+\begin{itemize}
+\item
+  From the type in the declaration P * p, p is related to type P.
+\item
+  However from the value that p points to, p = \&c, p is related to
+  value of type C.
+\end{itemize}
+
+And for the choice of method f(),
+
+p-\textgreater f();
+
+the method in the parent is chosen.
+
+Exercise. Suppose G is the parent class of P (using public inheritance)
+and P is the parent class of C (using public inheritance). Suppose in G,
+P, and C classes, there is a method
+
+\emph{void m() \{ \ldots{} \}}
+
+Suppose have this code fragment:
+
+\emph{G * p;}
+
+C c;
+
+p = \&c;
+
+p-\textgreater m();
+
+Which \emph{m()} was called?
+
+Virtual Methods
+
+Recall that we have this
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class P
+
+\{
+
+public:
+
+void f()
+
+\{
+
+std::cout \textless\textless{} "P::f\textbackslash n";
+
+\}
+
+\};
+
+class C: public P
+
+\{
+
+public:
+
+void f()
+
+\{
+
+std::cout \textless\textless{} "C::f\textbackslash n";
+
+\}
+
+\};
+
+int main()
+
+\{
+
+C c;
+
+P * p = \&c;
+
+p-\textgreater f();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The f() that is called is P::f().
+
+Now what if I actually want C::f(), i.e., the f() in the child class?
+
+Now we declare a method to be \textbf{virtual} in the base class.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class P\{
+
+public:
+
+\textbf{virtual} void f() \{ std::cout \textless\textless{}
+"D::f\textbackslash n"; \}
+
+\};
+
+class C: public P
+
+\{
+
+public:
+
+void f() \{ std::cout \textless\textless{} "C::f\textbackslash n"; \}
+
+\};
+
+int main()
+
+\{
+
+C c;
+
+D * p = \&c;
+
+p-\textgreater f();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+We say that P::f() is \textbf{virtual}.
+
+The fact that P::f()is virtual also makes C::f() virtual as well. This
+
+means that if C1 is a subclass of C and we do
+
+C c;
+
+C1 c1;
+
+P * p = c;
+
+p-\textgreater f(); // C::f() is called
+
+P * p1 = c1;
+
+p1-\textgreater f(); // C1::f() is called
+
+Because of that, although it's not necessary, it's common to put the
+word
+
+virtual next to the f() in C as well:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class P
+
+\{
+
+public:
+
+virtual void f() \{ std::cout \textless\textless{}
+"P::f\textbackslash n"; \}
+
+\};
+
+class C : public P
+
+\{
+
+public:
+
+\textbf{ virtual }void f() \{ std::cout \textless\textless{}
+"C::f\textbackslash n"; \}
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Dynamic \& Static Binding
+
+In the earlier sections, we saw that there are two ways to choose the
+f()
+
+to execute, either P::f() or C::f().
+
+\textbf{Dynamic binding }refers to the choice of method (between
+
+the parent method and the child method with the same name) where the
+
+method is virtual. This is also called \textbf{late binding}
+
+\textbf{Static binding }refers to the choice of method (between the
+parent method and the child method with the same name) where the method
+is not virtual. This is also known as \textbf{early binding}.
+
+C c;
+
+P * p = c;
+
+Why is it called dynamic (or late) or static (or early)?
+
+Make sure you run the following really important example \ldots{}
+
+Suppose C0 and C1 are both subclass of P. There are virtual functions f
+defined in P, C0, C1.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class P
+
+\{
+
+public:
+
+virtual void f() \{ std::cout \textless\textless{}
+"P::f\textbackslash n"; \}
+
+\};
+
+class C: public P
+
+\{
+
+public:
+
+virtual void f() \{ std::cout \textless\textless{}
+"C::f\textbackslash n"; \}
+
+\};
+
+class C1: public P
+
+\{
+
+public:
+
+virtual void f() \{ std::cout \textless\textless{}
+"C1::f\textbackslash n"; \}
+
+\};
+
+int main()
+
+\{
+
+P * p;
+
+C c;
+
+C1 c1;
+
+int i;
+
+std::cout \textless\textless{} "Do you want C or C1? (0 or 1) ";
+
+std::cin \textgreater\textgreater{} i;
+
+if (i == 0)
+
+\{
+
+p = \&c;
+
+\}
+
+else
+
+\{
+
+p = \&c1;
+
+\}
+
+p-\textgreater f();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In the above, the decision of which f() (C::f() or C1::f()) to use is
+
+\textbf{not known during compilation }but is known \textbf{only during
+runtime},. Therefore the binding is \textbf{late }and is \textbf{dynamic
+}(depending on runtime situation).
+
+On the other hand, if f() is not virtual -- remove the virtual keyword
+-- and no matter what you enter, you always execute P::f(). Therefore
+
+which f() is used is known during compilation (it's P::f()) -- it's
+known even before you execute the program since it's already known
+during compile time. Therefore the decision is \textbf{early}. After the
+program is compiled, you \textbf{cannot }change the f() -- the choice of
+f() is \textbf{static }and \textbf{not dynamic.}
+
+\textbf{}P * p;
+
+C c;
+
+p = \&c;
+
+WARNING: Static here refers to static \textbf{binding}, i.e., which f()
+is
+
+the p-\textgreater f() bound to. Do not be confused with static
+members!!!
+
+Make sure you do the following exercises!
+
+\textbf{Exercise. }What will happen if you have a stack of classes in an
+
+inheritance hierarchy like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class P
+
+\{
+
+public:
+
+virtual void f() \{ std::cout \textless\textless{}
+"P::f\textbackslash n"; \}
+
+\};
+
+class C: public P
+
+\{
+
+public:
+
+virtual void f() \{ std::cout \textless\textless{}
+"C::f\textbackslash n"; \}
+
+\};
+
+class C1: public C
+
+\{
+
+public:
+
+virtual void f() \{ std::cout \textless\textless{}
+"C1::f\textbackslash n"; \}
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+and you have
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+C1 c1;
+
+P * p;
+
+p = \&c1;
+
+p-\textgreater f();\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+What is the output? (Or is there a compilation or runtime error?)
+
+\textbf{Exercise. }What will happen if you have a stack of classes in an
+
+inheritance hierarchy like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class P
+
+\{
+
+public:
+
+virtual void f() \{ std::cout \textless\textless{}
+"P::f\textbackslash n"; \}
+
+\};
+
+class C: public P
+
+\{
+
+public:
+
+virtual void f() \{ std::cout \textless\textless{}
+"C::f\textbackslash n"; \}
+
+\};
+
+class C1: public C
+
+\{
+
+public:
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+and you have
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+C1 c1;
+
+P * p;
+
+p = \&c1;
+
+p-\textgreater f();\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+What is the output? (Or is there a compilation or runtime error?)
+
+\textbf{Exercise. }Continuing with the above classes, can you run this
+program with input of 0? What is the output?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+P * p;
+
+C c0;
+
+C1 c1;
+
+int i;
+
+std::cout \textless\textless{} "Do you want C0 or C1? (0 or 1) ";
+
+std::cin \textgreater\textgreater{} i;
+
+p = (i == 0 ? \&c0 : \&c1);
+
+p-\textgreater f();\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+No virtual \ldots{} or what if there are no virtual methods
+
+What if C++ does not have dynamic binding? You're forced to write ugly
+code, placing some method selection computation within your code. This
+
+is sometimes known as the \textbf{``type field''} method.
+
+Here's the code from before where we avoid using the virtual keyword:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class P
+
+\{
+
+public:
+
+void f() \{ std::cout \textless\textless{} "P::f()\textbackslash n"; \}
+
+\};
+
+class C: public P
+
+\{
+
+public:
+
+void f() \{ std::cout \textless\textless{} "C::f()\textbackslash n"; \}
+
+\};
+
+int main()
+
+\{
+
+C c;
+
+P * p = \&c;
+
+p-\textgreater f();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+How can we ``reach'' \emph{C::f()}??
+
+We add a field to keep track of the class an object comes from and
+
+instead of calling we create a function that accepts and determine
+
+(based on the type field) which to execute.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+const int PTYPE = 0;
+
+const int CTYPE = 1;
+
+class P
+
+\{
+
+public:
+
+P() : type\_(PTYPE) \{\}
+
+void f() \{ std::cout \textless\textless{} "P::f()\textbackslash n"; \}
+
+void set\_type(int t0) \{ type\_ = t0; \}
+
+int get\_type() \{ return type\_; \}
+
+private:
+
+int type\_;
+
+\};
+
+class C : public P
+
+\{
+
+public:
+
+C() \{ set\_type(CTYPE); \}
+
+void f() \{ std::cout \textless\textless{} "C::f()\textbackslash n"; \}
+
+\};
+
+void f(const P * p)
+
+\{
+
+switch (p-\textgreater get\_type())
+
+\{
+
+case PTYPE:
+
+p-\textgreater f();
+
+break;
+
+case CTYPE:
+
+const C * q = (const C *)(p);
+
+q-\textgreater f();
+
+break;
+
+\}
+
+\}
+
+int main()
+
+\{
+
+C c;
+
+P * p = \&c;
+
+f(p);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Why is it important? Polymorphism
+
+Whenever you have an object with methods with a similar name and you
+
+can't decide which one method to call until during runtime, then you
+will
+
+need polymorphism.
+
+Suppose you have an array of pointers to the BasicSpaceship class.
+
+Also, SpecialSpaceship is a subclss of BasicSpaceship. In both classes
+you have an update() method. The update() method is different for the
+two classes: the method basically moves the objects to a new position on
+the screen.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+BasicSpaceShip * s = new BasicSpaceShip*{[}100{]};
+
+int M = randint(); // random int from 0 to 99
+
+for (int i = 0; i \textless{} M; i++)
+
+\{
+
+s{[}i{]} = new SpecialSpaceShip();
+
+\}
+
+for (int i = M; i \textless{} 100; i++)
+
+\{
+
+s{[}i{]} = new BasicSpaceShip();
+
+\}
+
+while (1)
+
+\{
+
+for (int i = 0; i \textless{} 100; i++)
+
+\{
+
+s{[}i{]}-\textgreater update();
+
+\}
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Note that in the while-loop:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+while (1)
+
+\{
+
+for (int i = 0; i \textless{} 100; i++)
+
+\{
+
+s{[}i{]}-\textgreater update();
+
+\}
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You do not know what type of spaceship is\textbf{ }s{[}3{]} and
+therefore you do
+
+not know which update method was invoked. The update method is
+
+selected during runtime.
+
+Why is this important? Because if one day you want to add another type
+
+of spaceship:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+BasicSpaceShip * s = new BasicSpaceShip*{[}100{]};
+
+int M = randint(); // rand int from 0 to 99
+
+for (int i = 0; i \textless{} M/2; i++)
+
+\{
+
+s{[}i{]} = new SpecialSpaceShip();
+
+\}
+
+for (int i = M/2; i \textless{} M; i++)
+
+\{
+
+s{[}i{]} = new BasicSpaceShip();
+
+\}
+
+for (int i = M; i \textless{} 100; i++)
+
+\{
+
+s{[}i{]} = new VeryBasicSpaceShip();
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+This means that the while loop does not need to change:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+while (1)
+
+\{
+
+for (int i = 0; i \textless{} M; i++)
+
+\{
+
+s{[}i{]}-\textgreater update();
+
+\}
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In fact s{[}3{]} can even point to something different within the loop
+and
+
+everything still works:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+while (1)
+
+\{
+
+for (int i = 0; i \textless{} M; i++)
+
+\{
+
+s{[}i{]}-\textgreater update();
+
+\}
+
+delete s{[}3{]};
+
+switch (rand() \% 3)
+
+\{
+
+case 0: s{[}3{]} = new SpecialSpaceShip(); break;
+
+case 1: s{[}3{]} = new BasicSpaceShip(); break;
+
+case 2: s{[}3{]} = new VeryBasicSpaceShip(); break;
+
+\}
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Or for instance in your simulation, if s{[}3{]} is initially pointing to
+a
+
+SuperShip object but when hit, it points to a VeryBasicShip object.
+
+As long as s{[}3{]} points to a subclass of BasicSpaceShip that has an
+
+update() method, the while loop will work.
+
+In general:
+
+\begin{itemize}
+\tightlist
+\item
+  You analyze a system and look for objects and classify them into
+  classes.
+\item
+  You then study what the objects do -- as general as possible within
+  the class.
+\item
+  Design the most general parent classes. Write down relevant methods in
+  parent classes and write specific methods in the children classes.
+\end{itemize}
+
+In your main program:
+
+\begin{itemize}
+\tightlist
+\item
+  In the initialization, you might have pointers (or references) to
+  refer to specific children
+\item
+  After the initialization code, refer as much as possible to the
+  methods in the parents
+\end{itemize}
+
+Going back to the simple game. Suppose game objects (spaceships)
+
+move about on their own, and dies when they collide. Thinking as
+generally as possible, the while loop might look something like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+while (1)
+
+\{
+
+for (int i = 0; i \textless{} M; i++) ship{[}i{]}-\textgreater move();
+
+for (int i = 0; i \textless{} M; i++)
+
+\{
+
+for (int j = i+1; j \textless{} M; j++)
+
+if (ship{[}i{]}-\textgreater collideswith(ship{[}j{]}))
+
+\{
+
+ship{[}i{]}-\textgreater dies();
+
+ship{[}j{]}-\textgreater dies();
+
+\}
+
+\}
+
+for (int i = 0; i \textless{} M; i++) ship{[}i{]}-\textgreater draw();
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+This tells you that the parent class must have the following methods
+
+which the specific child classes must overwrite:
+
+\begin{itemize}
+\tightlist
+\item
+  move
+\item
+  collideswith
+\item
+  dies
+\item
+  draw
+\end{itemize}
+
+In the initialization, as long as the pointers \emph{ship{[}i{]}} point
+to a class that
+
+subclasses the parent class, the program would work. In particular
+
+\begin{itemize}
+\tightlist
+\item
+  You can switch out subclasses
+\item
+  You can add new subclasses (as long as they subclass the parent class
+  and has the above four methods)
+\end{itemize}
+
+This is a simple example where there's only one main parent class. In
+
+general there are (of course) many parent classes.
+
+For more complicated examples you would have to do into OO
+
+analysis/design and design patterns. Take CISS438.
+
+Note from the above example, the methods of the parent class (example:
+
+draw) might do nothing:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class BasicSpaceShip
+
+\{
+
+public:
+
+void draw() \{\} // empty body
+
+\};
+
+class SpecialSpaceShip
+
+\{
+
+public:
+
+void draw() \{ /* actual drawing code */ \}
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+This might be the case where every subclass of BasicSpaceShip has their
+own draw() method, which means that the draw() of
+
+BasicSpaceShip class is never used anyway.
+
+The only purpose of the draw method in the parent is to allow
+
+polymorphism to select the child's draw method.
+
+There's a way to tell C++ that a method in a parent is meant to be empty
+
+and to be fulfilled by a child -- see the next section on pure virtual
+method
+
+and abstract base class. Abstract base class are abstract in the sense
+
+that you cannot use them to instantiate objects. Their purpose is only
+to
+
+act as a parent for subclasses so that you can perform polymorphism.
+
+This style of programming is called polymorphism. One would say the
+
+code is polymorphic. Or, if the pointer points to the child but was
+
+declared as a pointer to a parent class:
+
+P * p;
+
+one would say that is polymorphic, or the object pointed to is
+
+polymorphic, i.e., sometimes \emph{p} points to a class \emph{C0} object
+and sometimes it points to a class \emph{C1} object.
+
+Some people also say the class in this case is a polymorphic type.
+
+Don't forget that I mentioned earlier that you can also use reference
+for
+
+polymorphic programming:
+
+P \& ref = c0;
+
+In this case you would say ref is polymorphic.
+
+Virtual constructors and destructors
+
+Constructors cannot be virtual \ldots{} try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class P
+
+\{
+
+public:
+
+virtual P() \{\}
+
+\};
+
+class C: public P
+
+\{
+
+public:
+
+virtual C() \{\}
+
+\};
+
+int main()
+
+\{
+
+P * p = new C;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+A virtual function is about choosing the right method when an object
+
+invokes the method. But that implies that the object exists. In the
+above:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+P * p = new C;\tabularnewline
+\bottomrule
+\end{longtable}
+
+has nothing to do with executing a method through p.
+
+Therefore \ldots{} \textbf{if you plan to use polymorphism, make sure
+your constructors are not virtual}.
+
+The above can be caught by the compiler. So it's not as serious as the
+
+following problem. Make sure you run it!
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class P
+
+\{
+
+public:
+
+P() : p(new int) \{\}
+
+\textasciitilde P() \{ std::cout \textless\textless{}
+"P::\textasciitilde P()\textbackslash n"; \}
+
+private:
+
+int * p;
+
+\};
+
+class C: public P
+
+\{
+
+public:
+
+C() : q(new int) \{\}
+
+\textasciitilde C() \{ std::cout \textless\textless{}
+"C::\textasciitilde C()\textbackslash n"; delete q; \}
+
+int * q;
+
+\};
+
+int main()
+
+\{
+
+P * p = new C;
+
+delete p;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Read the output very carefully.
+
+Why is this a problem? The destructor called is the destructor in the
+
+parent. Of course the object to destroy is a child class object (which
+
+includes a parent part), not just the parent class object. The above
+code
+
+therefore will cause a \textbf{memory leak }because the resource used by
+the child class is not released.
+
+Now try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class P
+
+\{
+
+public:
+
+P() : p(new int) \{\}
+
+\textbf{ virtual }\textasciitilde P() \{ std::cout \textless\textless{}
+"P::\textasciitilde P()\textbackslash n"; \}
+
+private:
+
+int * p;
+
+\};
+
+class C: public P
+
+\{
+
+public:
+
+C() : q(new int) \{\}
+
+\textasciitilde C() \{ std::cout \textless\textless{}
+"C::\textasciitilde C()\textbackslash n"; delete q; \}
+
+int * q;
+
+\};
+
+int main()
+
+\{
+
+P * p = new C;
+
+delete p;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You should see two outputs. Why? Because of polymorphism, when you
+
+do
+
+delete p;
+
+the destructor used is C::\textasciitilde C(). But remember from the
+notes on
+
+inheritance that this would execute the body of C::\textasciitilde C()
+and then
+
+P::\textasciitilde P() would be executed.
+
+Therefore \ldots{} \textbf{if you plan to use polymorphism}
+
+with your (parent) class, and you perform
+
+\textbf{delete on your pointer, you must have a public virtual
+destructor.}
+
+Of course if the child object executes its destructor on its own, then
+that
+
+would be a different story since the pointer is then not responsible for
+the
+
+deallocation. For instance
+
+if (true)
+
+\{
+
+C c;
+
+P * p = \&c;
+
+\} // c goes out of scope and called c::\textasciitilde C()
+
+Packaging auto destructor
+
+Now look at this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class P
+
+\{
+
+public:
+
+\textbf{ }virtual \textasciitilde P() \{ std::cout \textless\textless{}
+"P::\textasciitilde P()\textbackslash n"; \}
+
+void m() \{ std::cout \textless\textless{} "P::m()\textbackslash n"; \}
+
+private:
+
+\};
+
+class C: public P
+
+\{
+
+public:
+
+C() : q(new int) \{\}
+
+\textasciitilde C() \{ std::cout \textless\textless{}
+"C::\textasciitilde C()\textbackslash n"; delete q; \}
+
+void m() \{ std::cout \textless\textless{} "C::m()\textbackslash n"; \}
+
+int * q;
+
+\};
+
+int main()
+
+\{
+
+P * p = new C;
+
+p-\textgreater m();
+
+delete p;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+This allows us to work with objects through polymorphism. But this is
+achieved through pointers. Recall a benefit of classes -- you can auto
+execute the destructor when an object is going out of scope. In the
+above example, we have to remember to deallocate the memory used by the
+object that \emph{p} points to:
+
+delete p;
+
+Using the idea in the chapter on destructor, we do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class P
+
+\{
+
+public:
+
+\textbf{ }virtual \textasciitilde P() \{ std::cout \textless\textless{}
+"P::\textasciitilde P()\textbackslash n"; \}
+
+void m() \{ std::cout \textless\textless{} "P::m()\textbackslash n"; \}
+
+private:
+
+\};
+
+class C: public P
+
+\{
+
+public:
+
+C() : q(new int) \{\}
+
+\textasciitilde C() \{ std::cout \textless\textless{}
+"C::\textasciitilde C()\textbackslash n"; delete q; \}
+
+void m() \{ std::cout \textless\textless{} "C::m()\textbackslash n"; \}
+
+int * q;
+
+\};
+
+class autoP
+
+\{
+
+public:
+
+autoP()
+
+: p\_(new C)
+
+\{\}
+
+\textasciitilde autoP()
+
+\{ delete p\_; \}
+
+void m() \{ p\_-\textgreater m(); \}
+
+private:
+
+P * p\_;
+
+\};
+
+int main()
+
+\{
+
+autoP p;
+
+p.m();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Of course we need to figure out what to do with the copy constructor and
+\emph{operator=}. If you don't plan to do that, you can put the
+prototypes in the \emph{private} section.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class P
+
+\{
+
+public:
+
+P() : p(new int) \{\}
+
+\textbf{ }virtual \textasciitilde P() \{ std::cout \textless\textless{}
+"P::\textasciitilde P()\textbackslash n"; \}
+
+void m() \{ std::cout \textless\textless{} "P::m()\textbackslash n"; \}
+
+private:
+
+int * p;
+
+\};
+
+class C: public P
+
+\{
+
+public:
+
+C() : q(new int) \{\}
+
+\textasciitilde C() \{ std::cout \textless\textless{}
+"C::\textasciitilde C()\textbackslash n"; delete q; \}
+
+void m() \{ std::cout \textless\textless{} "C::m()\textbackslash n"; \}
+
+int * q;
+
+\};
+
+class autoP
+
+\{
+
+public:
+
+autoP()
+
+: p\_(new C)
+
+\{\}
+
+\textasciitilde autoP()
+
+\{ delete p\_; \}
+
+void m() \{ p\_-\textgreater m(); \}
+
+private:
+
+autoP(const autoP \& p);
+
+const auto P \& operator=(const autoP \&);
+
+P * p\_;
+
+\};
+
+int main()
+
+\{
+
+autoP p;
+
+p.m();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+If you do want to allow copy constructor and \emph{operator=}, you have
+to decide on what they should do, i.e., after
+
+autoP p0;
+
+autoP p1;
+
+p1 = p0;
+
+does \emph{p1} points to the same object that \emph{p0} points to or is
+the object that \emph{p1} points to have the same values as the object
+that \emph{p0} points to (i.e., it's a copy)?
+
+By the way, since the parent destructor is virtual, calling delete in
+autoP will execute the destructor in the child class. But what is the
+parent also has some memory allocation in its constructor like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class P
+
+\{
+
+public:
+
+P() : p(new int) \{\}
+
+\textbf{ }virtual \textasciitilde P() \{ std::cout \textless\textless{}
+"P::\textasciitilde P()\textbackslash n"; \}
+
+void m() \{ std::cout \textless\textless{} "P::m()\textbackslash n"; \}
+
+private:
+
+int * p;
+
+\};
+
+class C: public P
+
+\{
+
+public:
+
+C() : q(new int) \{\}
+
+\textasciitilde C() \{ std::cout \textless\textless{}
+"C::\textasciitilde C()\textbackslash n"; delete q; \}
+
+void m() \{ std::cout \textless\textless{} "C::m()\textbackslash n"; \}
+
+int * q;
+
+\};
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Then the child has to deallocate the memory allocation in the parent.
+Assuming the pointer in the parent is private, one might want to do
+this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class P
+
+\{
+
+public:
+
+P() : p(new int) \{\}
+
+\textbf{ }virtual \textasciitilde P() \{ std::cout \textless\textless{}
+"P::\textasciitilde P()\textbackslash n"; \}
+
+void m() \{ std::cout \textless\textless{} "P::m()\textbackslash n"; \}
+
+void deallocate() \{ delete p; \}
+
+private:
+
+int * p;
+
+\};
+
+class C: public P
+
+\{
+
+public:
+
+C() : q(new int) \{\}
+
+\textasciitilde C()
+
+\{
+
+std::cout \textless\textless{} "C::\textasciitilde C()\textbackslash n";
+
+deallocate();
+
+delete q;
+
+\}
+
+void m() \{ std::cout \textless\textless{} "C::m()\textbackslash n"; \}
+
+int * q;
+
+\};
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Why is inheritance ``less flexible'' than object composition?
+
+You will see, after you have written more programs using OOP, that
+inheritance is not as flexible as object composition.
+
+Why is that?
+
+The reason is because \textbf{inheritance cannot be changed during
+runtime}.
+
+Abstractly speaking if class \emph{C} is a subclass of \emph{D}, then a
+\emph{C} object \emph{c} has
+
+\emph{c.D::x}
+
+where \emph{x} is a member (whether it is a member variable or a
+method). That cannot be changed. However if \emph{C} has a pointer
+\emph{x} that can point to either \emph{D} or \emph{E}, at one point in
+time, you can have
+
+\emph{c.x}points to a \emph{D} object
+
+and at another time
+
+\emph{c.x}points to an \emph{E} object
+
+This is possible if \emph{c.x} is a \emph{P} pointer where \emph{P} is a
+parent of both \emph{D} and E.
+
+As an example, suppose you have
+
+class Car
+
+\{
+
+private:
+
+SteeringWheel steering\_wheel\_;
+
+\};
+
+\emph{SelfDrivingCar} wants to have a steering wheel and since a self
+driving car is a car, you would do this:
+
+class Car
+
+\{
+
+private:
+
+SteeringWheel steering\_wheel\_;
+
+\};
+
+class SelfDrivingCar: public Car
+
+\{
+
+\};
+
+But what if you want to model a self driving car that has a joystick
+instead of a steering wheel? Then you can't. Unless you do
+
+class Car
+
+\{
+
+private:
+
+SteeringWheel steering\_wheel\_;
+
+\};
+
+class SelfDrivingCar: public Car
+
+\{
+
+private:
+
+SteeringJoystick * steering\_joystick\_;
+
+\};
+
+If a self driving car \emph{self-driving\_car} wants a steering
+joystick, the object would then create a steering jobstick object from
+
+class SteeringJoystick
+
+\{ ... \};
+
+on the heap and point it's \emph{steering\_joystick\_} pointer to this
+object.
+
+BUT \ldots{} then the \emph{self-driving\_car} object would have a
+steering wheel:
+
+self-driving\_car.steering\_wheel\_
+
+and a steering joystick as well:
+
+*(self-driving\_car.steering\_joystick\_)
+
+Assuming you only want one steering device, this would be a waste of
+memory, and plus it would open up lots of confusion and incorrect code
+in the future. Redundant data is always bad.
+
+The point is that your self driving car is of type \emph{SelfDrivingCar}
+and it has inherited a steering wheel from the \emph{Car} class. This
+cannot change unless you change the code.
+
+How would we solve this problem where a self driving car can have either
+a steering wheel or a steering joystick? Furthermore you want the
+flexibility of changing it during your program's runtime (dynamic).
+
+First you do this:
+
+class SteeringDevice
+
+\{ \ldots{} \};
+
+class SteeringWheel: public SteeringDevice
+
+\{ \ldots{} \};
+
+class SteeringJoystick: public SteeringDevice
+
+\{ \ldots{} \};
+
+This combines steering wheels and steering joysticks under a common
+``concept'' or class. You can then do this:
+
+class Car
+
+\{
+
+public:
+
+Car():
+
+: steering\_device\_(new SteeringWheel)
+
+\{\}
+
+// Of course you need to overload the // destructor, copy constructor,
+and
+
+// operator=.
+
+private:
+
+SteeringDevice * steering\_device\_;
+
+\};
+
+Now a car can have the choice of changing its steering device to either
+a steering wheel or a steering joystick during runtime:
+
+class Car
+
+\{
+
+public:
+
+...
+
+void set\_to\_steering\_joystick()
+
+\{
+
+delete steering\_device\_;
+
+steering\_device\_ = new SteeringJoystick;
+
+\}
+
+private:
+
+SteeringDevice * steering\_device\_;
+
+\};
+
+class SelfDrivingCar: public Car
+
+\{\};
+
+Then you can do
+
+SelfDrivingCar tesla;
+
+... drive with steering wheel ...
+
+tesla.set\_to\_steering\_joystick();
+
+... drive with steering joystick ...
+
+But wait a minute \ldots{} at least with respect to the steering device,
+do you see that inheritance is not even necessary!!! Of course if you
+don't want the program to be too dynamic you can always fix the steering
+device during constructor call. So suppose all self-driving cars now use
+joysticks:
+
+class Car
+
+\{
+
+public:
+
+Car(int steering\_type=0)
+
+\{
+
+if (steering\_type == 0)
+
+steering\_device\_ =
+
+new SteeringWheel;
+
+else:
+
+steering\_device\_ =
+
+new SteeringJoystick;
+
+\}
+
+private:
+
+SteeringDevice * steering\_device\_;
+
+\};
+
+class SelfDrivingCar: public Car
+
+\{
+
+public:
+
+SelfDrivingCar()
+
+: Car(1)
+
+\{\}
+
+\};
+
+But of course in this case again inheritance seems to be useless again
+since you can do
+
+Car car(1);
+
+to get a car with joystick. Therefore there must be other factors
+specific to self driving cars not present in cars to warrant a class
+just for self-driving cars.
+
+\end{document}

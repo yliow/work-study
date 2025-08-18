@@ -1,0 +1,2525 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage[normalem]{ulem}
+% Avoid problems with \sout in headers with hyperref
+\pdfstringdefDisableCommands{\renewcommand{\sout}{}}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\author{}
+\date{}
+
+\begin{document}
+
+60. Classes
+
+Objectives
+
+\begin{itemize}
+\tightlist
+\item
+  Understand the relationship between \emph{struct} and \emph{class}
+\item
+  Create classes
+\item
+  Write methods that accept parameters of basic type
+\item
+  Write methods that accept object parameters
+\item
+  Write methods that accept object reference parameters
+\item
+  Write functions that accept object parameters
+\item
+  Write functions that return objects
+\item
+  Declare arrays of objects using the default constructor
+\item
+  Declare and use pointers to objects
+\end{itemize}
+
+Object-oriented Thingies
+
+So far you have been using C++ in a particular way. The programming
+style (or paradigm) you have been using is called \textbf{structured
+programming}.
+
+You can recognize structured programming when you see blocks of code
+including but not limited to the following:
+
+\begin{itemize}
+\tightlist
+\item
+  branching such as if and if-else
+\item
+  loops such as for-loop, while-loop
+\item
+  functions
+\end{itemize}
+
+But this is not the only paradigm. The next paradigm we will focus on is
+called \textbf{Object-Oriented Programming, OOP}.
+
+(There are many other styles/paradigms of programming. For instance, you
+will learn functional programming in CISS445. Then there's
+aspect-oriented programming \ldots)
+
+Both structured programming and OOP came out around 60s. Structured
+programming was popularized in the 80s through the introduction of the
+Pascal language by N. Wirth. (I learned that when I was in college.)
+Although OOP also came out around that time, it took off only around the
+90s. So in terms of widespread use, OOP is actually pretty ``new'' or
+``recent''. (But in the computer science world, anything older than 5
+years is considered ``old'' ...)
+
+While structured programming and OOP refer to using certain language
+features to \textbf{write} programs, structured analysis and
+object-oriented analysis refers to high level \textbf{analysis} of a
+program (usually using diagrams) with a view toward implementing the
+ideas using a structured or an object-oriented language respectively.
+
+Some research shows that once a program goes beyond 100,000 lines,
+structured programming methodology breaks down because of the complexity
+of the project. (That's not to say that it cannot be done and that's
+also not saying that OO is the only way to handle large projects.)
+
+Instead of going through all the philosophical reasons why OO is
+superior to old-style programming (such as structured programming), as
+many books do, we'll go through examples. It's pointless to discuss
+philosophy first because if you have not seen OO language features, it
+would be hard to judge. So ...
+
+\emph{Date} class version 1
+
+We want to implement a \emph{Date} type.
+
+First I use \emph{struct} to package up year, month, day and have some
+useful functions:
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{init} to set the month, day, year value of a \emph{Date}
+  variable
+\item
+  \emph{add\_y} to add a year increment value to \emph{Date} variable
+\item
+  \emph{add\_m} to add a month increment value to \emph{Date} variable
+\item
+  \emph{add\_d} to add a day increment value to \emph{Date} variable
+\end{itemize}
+
+Here we go (and this is nothing new) ...
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.h
+
+\#ifndef DATE\_H
+
+\#define DATE\_H
+
+struct Date
+
+\{
+
+int yyyy\_, mm\_, dd\_;
+
+\};
+
+void init(Date \&, int, int, int);
+
+void print(const Date \&);
+
+void add\_y(Date \&, int);
+
+void add\_m(Date \&, int);
+
+void add\_d(Date \&, int);
+
+\#endif\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.cpp
+
+\#include "Date.h"
+
+void init(Date \& date, int yyyy, int mm, int dd)
+
+\{
+
+date.yyyy\_ = yyyy;
+
+date.mm\_ = mm;
+
+date.dd\_ = dd;
+
+\}
+
+void print(const Date \& date)
+
+\{
+
+std::cout \textless\textless{} date.yyyy\_ \textless\textless{} '/'
+
+\textless\textless{} date.mm\_ \textless\textless{} '/'
+
+\textless\textless{} date.dd\_ \textless\textless{} '\textbackslash n';
+
+\}
+
+void add\_y(Date \& date, int inc)
+
+\{
+
+date.yyyy\_ += inc ;
+
+\}
+
+// etc.\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// main.cpp
+
+\#include "Date.h"
+
+int main()
+
+\{
+
+Date today, yesterday;
+
+init(today, 2014, 12, 25);
+
+print(today);
+
+init(yesterday, 2014, 12, 24);
+
+print(yesterday);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Now in your \emph{main.cpp}, go ahead and call \emph{add\_d(yesterday,
+1)} and then \emph{print(yesterday)}.
+
+Note that the above \emph{main()} that uses the \emph{Date} type
+(\emph{Date.h} and \emph{Date.cpp}) does not need to know about the
+details (i.e., the members) of a \emph{Date} variable: you do not need
+to know that a \emph{Date} variable such as \emph{today} contains
+\emph{yyyy\_}, \emph{mm\_}, \emph{dd\_}.
+
+This is the beginning of the concepts of \textbf{information hiding} and
+\textbf{encapsulation}.
+
+Specifically, in the above, we collect up the concepts of a year, a
+month and a day and create the concept of a date. That's
+\textbf{encapsulation}.
+
+Encapsulation allows you to \textbf{think at a higher level} of
+abstraction. It's easier to focus on higher level concepts once lower
+level details are encapsulated.
+
+Note that in version 1 the functions are not tied to \emph{Date} struct.
+
+We want to think of the functions as ``belonging'' to the \emph{Date}
+struct.
+
+You can actually put the functions into the \emph{struct} definition to
+get \textbf{member functions} .
+
+So we get a \emph{struct} with \textbf{member variables} and
+\textbf{member functions} in one package.
+
+After moving the functions into the \emph{struct}, you need to make some
+modifications.
+
+\textbf{Exercise.} Complete the \emph{add\_m} and \emph{add\_d}
+functions.
+
+\emph{Date} class version 2
+
+Make the following changes:
+
+\textbf{In }\emph{\textbf{Date.h}}\textbf{:} move the function
+prototypes into the \emph{struct} and remove all first parameters which
+are \emph{Date} reference parameters.
+
+\textbf{In }\emph{\textbf{Date.cpp}}\textbf{:} remove all first
+parameters which are \emph{Date} reference parameters and remove
+``\emph{date.}'' in the body of all functions.
+
+\textbf{In }\emph{\textbf{main.cpp}}\textbf{:} move all \emph{Date}
+variables which are first arguments outside the function call. Add a dot
+after these \emph{Date} variables.
+
+Here are the files with the changes:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.h
+
+\#ifndef DATE\_H
+
+\#define DATE\_H
+
+struct Date
+
+\{
+
+int yyyy\_, mm\_, dd\_;
+
+void init(\sout{Date \&,} int, int, int);
+
+void print(\sout{const Date \&});
+
+void add\_y(\sout{Date \&,} int);
+
+void add\_m(\sout{Date \&,} int);
+
+void add\_d(\sout{Date \&,} int);
+
+\};
+
+\#endif\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.cpp
+
+\#include "Date.h"
+
+void \textbf{Date::}init(\sout{Date \& date,} int yyyy, int mm, int dd)
+
+\{
+
+\sout{date.}yyyy\_ = yyyy;
+
+\sout{date.}mm\_= mm;
+
+\sout{date.}dd\_= dd;
+
+\}
+
+void \textbf{Date::}print(\sout{const Date \& date})
+
+\{
+
+std::cout \textless\textless{} \sout{date.}yyyy\_ \textless\textless{}
+'/'
+
+\textless\textless{} \sout{date.}mm\_ \textless\textless{} '/'
+
+\textless\textless{} \sout{date.}dd\_\textless\textless{}
+'\textbackslash n';
+
+\}
+
+void \textbf{Date::}add\_y(\sout{Date \& date,} int inc)
+
+\{
+
+\sout{date.}yyyy\_+= inc ;
+
+\}
+
+// etc.\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// main.cpp
+
+\#include "Date.h"
+
+int main()
+
+\{
+
+Date today, yesterday;
+
+\textbf{today.}init(\sout{today,} 2014, 12, 25);
+
+\textbf{today.}print(\sout{today});
+
+\textbf{yesterday.}init(\sout{yesterday,} 2014, 12, 24);
+
+\textbf{yesterday.}print(\sout{yesterday});
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Here's what you get:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.h
+
+\#ifndef DATE\_H
+
+\#define DATE\_H
+
+struct Date
+
+\{
+
+int yyyy\_, mm\_, dd\_;
+
+void init(int, int, int);
+
+void print();
+
+void add\_y(int);
+
+void add\_m(int);
+
+void add\_d(int);
+
+\};
+
+\#endif\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.cpp
+
+\#include "Date.h"
+
+void Date::init(int yyyy, int mm, int dd)
+
+\{
+
+yyyy\_ = yyyy;
+
+mm\_ = mm;
+
+dd\_ = dd;
+
+\}
+
+void Date::print()
+
+\{
+
+std::cout \textless\textless{} yyyy\_ \textless\textless{} '/'
+
+\textless\textless{} mm\_ \textless\textless{} '/'
+
+\textless\textless{} dd\_ \textless\textless{} '\textbackslash n';
+
+\}
+
+void Date::add\_y(int inc)
+
+\{
+
+yyyy\_ += inc ;
+
+\}
+
+// etc.\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// main.cpp
+
+\#include "Date.h"
+
+int main()
+
+\{
+
+Date today, yesterday;
+
+\textbf{today.init(2014, 12, 25);}
+
+today.print();
+
+yesterday.init(2014, 12, 24);
+
+yesterday.print();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+As stated earlier, we put the function prototypes into the \emph{struct}
+definition.
+
+Note that in \emph{Date.cpp}, we need to put \emph{\textbf{Date::}} in
+front of the implementation of the member functions. This is because the
+\emph{Date} \emph{struct} creates a scope. Therefore outside the
+\emph{struct}, you need to say ``the \emph{init} function \textbf{of
+}\emph{\textbf{Date}}''. If you just call it \emph{init,} C++ will think
+of some \emph{init} function outside the \emph{Date} \emph{struct}. This
+means that C++ actually allows you to do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.h
+
+...
+
+struct Date
+
+\{
+
+...
+
+void init(int, int, int);
+
+...
+
+\};
+
+void init(int, int, int);
+
+\#endif\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In the code, you can see the concept of ``variable calls a function''.
+For instance, you see \emph{today.init(2014, 12, 25)}.
+
+In the implementation of \emph{Date::init}, you see \emph{yyyy\_},
+\emph{mm\_}, and \emph{dd\_}. Which \emph{yyyy\_} are we talking about?
+There's the \emph{yyyy\_} of \emph{today} and the \emph{yyyy\_} of
+\emph{yesterday}!!! Well, in the body of \emph{Date::init},
+
+\emph{yyyy\_} refers to \emph{yyyy\_} of the variable calling
+\emph{init()}
+
+\emph{mm\_} refers to \emph{mm\_} of the variable calling \emph{init()}
+
+\emph{dd\_} refers to \emph{dd\_} of the variable calling \emph{init()}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+int main()
+
+\{
+
+...
+
+\textbf{today.init(2014, 12, 25);}
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+int main()
+
+\{
+
+...
+
+\textbf{yesterday.init(2014, 12, 24);}
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Note that
+
+\begin{itemize}
+\tightlist
+\item
+  functions are part of \emph{Date}
+\item
+  \emph{Date} variables can invoke \emph{Date} member functions
+\item
+  Member functions ``know'' which variables invoked them and which
+  \emph{yyyy\_}, \emph{mm\_}, \emph{dd\_} they should work with.
+\item
+  For instance, \emph{today.mm\_} : Refers to the member variable
+  \emph{mm\_} in \emph{today}
+\item
+  For instance, \emph{today.print()} : Calls/invokes the \emph{print()}
+  member function of \emph{today} and while executing the function,
+  \emph{yyyy\_} refers to the \emph{yyyy\_} of \emph{today.}
+\end{itemize}
+
+Make sure you see the differences between version 1 and 2!!!
+
+\textbf{Exercise.} Write a \emph{struct} \emph{Robot} with the following
+members:
+
+\begin{itemize}
+\item
+  \emph{int x}: the x-coordinate of the position
+\item
+  \emph{int y}: the y-coordinate of the position
+\item
+  \emph{void init(int a, int b)}: sets the \emph{x}, \emph{y} values to
+  \emph{a}, \emph{b} respectively
+\item
+  \emph{void print()}: prints the \emph{x}, \emph{y} values
+\item
+  \emph{void moveLeft(int steps)}: sets \emph{x} to \emph{x -- steps}
+\item
+  \emph{void moveRight(int steps)}: sets \emph{x} to \emph{x + steps}
+\item
+  \emph{void moveUp(int steps)}: sets \emph{y} to \emph{y + steps}
+\item
+  \emph{void moveDown(int steps)}: sets \emph{y} to \emph{y -- steps}
+
+  Write a program to test your \emph{Robot} structure:
+\item
+  Declare and initialize \emph{c3p0} of \emph{Robot} type to \emph{\{5,
+  5\}}
+\item
+  Call \emph{c3p0.print()}
+\item
+  Call \emph{c3p0.moveLeft(2)}
+\item
+  Call \emph{c3p0.print()}
+\item
+  Call \emph{c3p0.moveRight(3)}
+\item
+  Call \emph{c3p0.print()}
+\item
+  Call \emph{c3p0.moveUp(-4)}
+\item
+  Call \emph{c3p0.print()}
+\item
+  Call \emph{c3p0.moveDown(5)}
+\item
+  Call \emph{c3p0.print()}
+\end{itemize}
+
+In the above exercise, you will have statements such as
+
+\emph{c3p0.moveRight(3);}
+
+You can and \textbf{should }think of the \emph{Robot} variable
+\emph{c3p0} as having the \textbf{ability} to \emph{moveRight} by 3 on
+its own. In other words, you want to think of the \emph{Robot} as having
+some \textbf{autonomous ability} to perform the \emph{moveRight}
+operation. That is one very important philosophy behind packaging
+functions into a \emph{struct} so that they become members (i.e. member
+functions) as the \emph{struct} variable. In fact, historically, the
+earliest example of a programming language that allows this is from the
+MIT AI lab in the late 50s.
+
+This is very different from say if you do
+
+\emph{Robot\_moveRight(c3p0, 3);}
+
+Written this way, it reads more like \textbf{your} program is
+\textbf{controlling} the \emph{Robot c3p0 }and making him/her/it move.
+
+For complex software engineering, we want to analyze and develop
+software not by focusing on data and functions separately, but rather by
+focusing on data \textbf{with} their functions. This is achieved in
+version 2 above. For instance, look at
+
+\emph{today.init(12, 25, 2003);}
+
+You think of the\emph{ init() }function as being part of \emph{today},
+just like you have \emph{today.mm\_}, \emph{today.dd\_},
+\emph{today.yyyy\_ }etc.
+
+In fact, to emphasize again that \emph{today} has the autonomous ability
+to execute \emph{init()}, I will frequently say:
+
+\emph{\textbf{today }}\textbf{invokes }\emph{\textbf{init()}}
+
+and not ``your program invokes the \emph{init()} of \emph{today}''.
+
+\textbf{Exercise. }Add the following member function in the header file
+of your \emph{Date}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.h
+
+struct Date
+
+\{
+
+int yyyy\_, mm\_, dd\_;
+
+...
+
+void add\_m\_d(int, int);
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+And of course in your \emph{Date.cpp}, you have:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.cpp
+
+\#include "Date.h"
+
+...
+
+void Date::add\_m\_d(int inc\_mm, int inc\_dd)
+
+\{
+
+mm\_ += inc\_mm;
+
+dd\_ += inc\_dd;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Now \ldots{} and here's the point of this exercise \ldots{} instead of
+writing code to directly modify the member variables, use member
+functions instead because you already have member functions to increment
+the \emph{mm\_} and the \emph{dd\_} member variables. In other words,
+\emph{Date} variables can call their member functions and in a member
+function, you can call another member function.
+
+\textbf{Exercise.} Check your \emph{add\_y}, \emph{add\_m},
+\emph{add\_d} functions and verify that the \emph{Date} variable is
+correct after the increments. For instance if the month is greater than
+12, what must you do? Also, assuming a \emph{Date} is correct, after
+calling add\_d, what must you do if the dd\_ is greater than 40? Did you
+check the number of days for February for leap years and non-leap years?
+
+\textbf{Exercise. }Now implement the following function that allows you
+to increment the \emph{yyyy\_}, \emph{mm\_}, \emph{dd\_} members by 3
+integer values passed into the following function:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.h
+
+struct Date
+
+\{
+
+int yyyy\_, mm\_, dd\_;
+
+...
+
+void add\_y\_m\_d(int, int, int);
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} The above passes in 3 integer values to be used for
+incrementing the \emph{yyyy\_}, \emph{mm\_}, \emph{dd\_} member values
+of the \emph{struct} variable invoking the function. Well \ldots{} a
+\emph{Date} variable already contains 3 values, the \emph{yyyy\_},
+\emph{mm\_}, and \emph{dd\_}. So why not pass in a \emph{Date} value
+instead? Now implement the following function that allows you to
+increment the \emph{yyyy\_}, \emph{mm\_}, \emph{dd\_} members by a
+\emph{Date} value passed into the following function:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.h
+
+struct Date
+
+\{
+
+int yyyy\_, mm\_, dd\_;
+
+...
+
+void add\_date(const Date \& d);
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Create a function in \emph{Robot} called
+\emph{moveLeftUp()} that calls \emph{moveLeft()} and \emph{moveUp()}.
+Test!!!
+
+Structured vs OO
+
+We don't have classes and objects yet (what are they anyway?) But even
+with what we have done so far, we can ask ...
+
+Why? Why are we writing code this way.
+
+The main reason is to control complexity \ldots{}
+
+Structured programming focuses on functions. You start with a goal/task
+(big function) and subdivide task into simpler subtask (simpler
+functions).
+
+Data is passed between functions. Structured programming and structured
+analysis tend to separate the computational task and the data involved.
+
+OOP and OO analysis tend to focus on both data and functions together at
+the same time. At a higher level of design and engineering, we think of
+OO analysis and design as finding objects and their responsibilities
+(functions), i.e., what the objects do. So in the discipline of OO
+analysis and design, we tend to think of and find high level concepts
+and analyze what the variable (i.e., the objects) associated with that
+high level concept should be be capable of doing.
+
+Let me give you an example.
+
+Suppose I work for a bank and I need to print a daily report of all the
+transactions (deposit to an account, withdrawal from an account, closing
+of an account, opening of an account, changing the address of the
+customer, etc.)
+
+Structured thinking means this: I want to print a report. To do that, I
+need to read the database for all transaction. For each transaction,
+there's an transaction ID, the customer ID, a transaction type, etc. Now
+for each customer ID, I will read the customer file, look for the
+matching customer ID, read his firstname and lastname, etc. Next, for
+this transaction, I have to look up the meaning of the transaction from
+the transaction type (for instance say 1 means open account, 2 means
+close account, 3 means deposit, etc.) I get the description of the
+transaction ID from some file, so if the transaction is 1, the
+description for this entry is ``Open Account'', ``Close Account'', etc.
+This style of thinking is called structured analysis and design. And the
+type of code you write to reflect this way of thinking tends to have a
+certain look -- structured programming code.
+
+The object-oriented way is different. You want to think of a report as
+being made up of transaction objects. Each transaction object of course
+has some type and some description (``Open Account'', ``Close Account'',
+etc.), but the main program will not get the transaction description.
+Rather for each transaction, you will probably call
+
+\emph{transaction.getDescription()}
+
+in other words, each transaction object has the ability to provide
+useful computations. You think of ``telling the transaction to do its
+work on its own'' and you wait for the description to be returned
+(probably a string). Also, each transaction knows (on its own) that it's
+a transaction for a particular customer. So to know more about the
+customer, you would ask transaction to tell you who is the customer:
+
+\emph{Customer customer = transaction.getCustomer();}
+
+And with this customer object now available, you ask the customer to
+give you his/her first and last name (probably string) say for printing:
+
+std::cout \textless\textless{} customer.getLastName()
+\textless\textless{} ``, ``
+
+\textless\textless{} customer.getFirstName()
+
+\textless\textless{} \ldots{}
+
+So as you can see, the style of thinking (the OO analysis and design)
+will give rise to very different code:
+
+for each transaction in today's collection of transactions:
+
+I ask the transaction for the transaction description and print it.
+
+I then ask the transaction for the time when it was created and print
+the date and time.
+
+I then ask the transaction for firstname and lastname of the customer
+responsible for this transaction this will result in the transaction
+asking the cusomter involved for his/her firstname and lastname. The
+customer gives his/her firstname and lastname to the transaction and the
+transaction passes the firstname and lastname back to me.
+
+Note that when I ask a transaction for the firstname and lastname of the
+customer, the transaction talks to the customer (object) and asks the
+customer to provide his/her first and last name. When an object needs to
+perform some computation it will either do it himself/herself or will
+talk to some other object to do the work.
+
+You don't need to know the full picture of structured thinking and OO
+thinking. The above is to give you a quick overview of the different
+philosophy between the two.
+
+The goal in this course is to teach you the basics of OO syntax and the
+language features. You will NOT be able to engineer beautiful and well
+constructed OO systems immediately. In fact it takes a very long time to
+be an expert in either the structured or the object-oriented style of
+analyzing and designing systems. Right now, my goal is to give you the
+basic syntax and language features of an OO language. It will take many
+years before you will become a true OO guru because the road is
+challenging, tough, and is just extreme fun. (Which, frankly speaking,
+is a good thing -- if OO is something you can learn in 1-2 years, you
+wouldn't expect it to be fun or worth much, would you?)
+
+Information Hiding and Encapsulation
+
+We also want to control another type of complexity.
+
+There are many ways to implement a \emph{struct} and the member
+functions. Outsiders using the \emph{struct} should not have access to
+its member variables.
+
+In fact outsiders should \textbf{not} even know how things are
+implemented in the \emph{struct}. For instance, in the \emph{Date}
+\emph{struct}, you implemented the member variables with three integer
+variables names \emph{yyyy\_}, \emph{mm\_}, \emph{dd\_}.
+
+\hfill\break
+\textbf{Information hiding} refers to hiding implementation details from
+users of your struct library which can very well change in the future.
+
+Look at the struct definition:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.h
+
+...
+
+struct Date
+
+\{
+
+int yyyy\_, mm\_, dd\_;
+
+void init(int, int, int);
+
+void print();
+
+void add\_y(int);
+
+void add\_m(int);
+
+void add\_d(int);
+
+\};
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+With complete documentation of the member functions, we can use the Date
+type without actually knowing the implementation of the data member
+variables or the member functions.
+
+If someone wants to use your Date library in a different way, he/she
+just has to submit a feature request to you. For instance suppose he/she
+wants to have a print member function that prints with a '-' separating
+the year, month, and day instead of a '/'. You can just add a new print
+member function:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.h
+
+...
+
+struct Date
+
+\{
+
+int yyyy\_, mm\_, dd\_;
+
+void init(int, int, int);
+
+void print();
+
+void print\_with\_dash();
+
+...
+
+\};
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Now why should users of your library not know about the existence of
+\emph{yyyy\_}, \emph{mm\_}, \emph{dd\_}??? Is that just paranoia?
+
+The problem with letting outsiders know about the internal
+implementation of the \emph{Date} struct (i.e., information about the
+member variables) is that someone with itchy fingers will write
+something like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include "Date.h"\\
+
+int main()
+
+\{
+
+...
+
+Date today;
+
+...
+
+std::cout \textless\textless{} today.yyyy\_ \textless\textless{} '-'
+
+\textless\textless{} today.mm\_ \textless\textless{} '-'
+
+\textless\textless{} today.dd\_ \textless\textless{} '\textbackslash n';
+
+...
+
+return 0; \\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Now you might say \ldots{} ``So what? It does work, correct?''
+
+Well \ldots{} here's the problem. Say you have exposed the internal
+implementation of your struct. And you let others in your company use
+the member variables. After some time, the code in your company will
+have lots of access to the internals of the \emph{Date} struct:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include "Date.h"
+
+int main()
+
+\{
+
+...
+
+Date today;
+
+...
+
+std::cout \textless\textless{} today.\textbf{yyyy\_}
+\textless\textless{} '-'
+
+\textless\textless{} today.\textbf{mm\_} \textless\textless{} '-'
+
+\textless\textless{} today.\textbf{dd\_} \textless\textless{}
+'\textbackslash n';
+
+...
+
+if (today.\textbf{yyyy\_} \textgreater{} 2020)
+
+\{
+
+...
+
+\}
+
+for (int i = 1; i \textless{} yesterday.\textbf{dd\_}; ++i)
+
+\{
+
+...
+
+\}
+
+return 0; \\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+One fine day, you realize that it's a waste to use 3 integers to
+implement the internals of your \emph{Date} struct. You can clearly fit
+the \emph{yyyy\_}, \emph{mm\_}, \emph{dd\_} into a single integer!!! In
+other words it would have been better if you did this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.h
+
+...
+
+struct Date
+
+\{
+
+int yyyymmdd\_;
+
+void init(int, int, int);
+
+...
+
+\};
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.cpp
+
+...
+
+void Date::init(int yyyy, int mm, int dd)
+
+\{
+
+yyyymmdd\_ = yyyy * 10000 + mm * 100 + dd;
+
+\}
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+For instance, whereas the members variables of the old \emph{today}
+looks like this:
+
+\emph{today.yyyy\_ = 2014}
+
+\emph{today.mm\_ = 12}
+
+today.dd\_ = 25
+
+the new \emph{today} would look like this:
+
+\emph{today.yyyymmdd\_ = 20141225}
+
+Wow \ldots{} not bad! If your main program (say something that prints a
+financial report) uses 100 \emph{Date} variables, you're saving a lot of
+memory. But \ldots{} there's a problem \ldots{} remember this program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include "Date.h"
+
+int main()
+
+\{
+
+...
+
+Date today;
+
+...
+
+std::cout \textless\textless{} today.\textbf{yyyy\_}
+\textless\textless{} '-'
+
+\textless\textless{} today.\textbf{mm\_} \textless\textless{} '-'
+
+\textless\textless{} today.\textbf{dd\_} \textless\textless{}
+'\textbackslash n';
+
+...
+
+if (today.\textbf{yyyy\_} \textgreater{} 2020)
+
+\{
+
+...
+
+\}
+
+for (int i = 1; i \textless{} yesterday.\textbf{dd\_}; ++i)
+
+\{
+
+...
+
+\}
+
+return 0; \\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+It uses \emph{yyyy\_}, \emph{mm\_}, and \emph{dd\_}. After changing your
+Date to the new one that uses \emph{yyyymmdd\_} as member variable, the
+above program will not compile. If there are 5 appearances of the
+old-style member variables, that's OK. But if your company has 10 people
+writing code that uses the internals of the old \emph{struct} for the
+past 6 months and 100000 lines of code is written, there will be a LOT
+of work changing everyone's code!!!
+
+It's a lot better if they had asked you for the following features:
+
+\emph{print\_with\_dash() }prints Date with '\emph{-}' instead of
+'\emph{/}'
+
+\emph{get\_year() }computes and returns the value of the year
+
+\emph{get\_day() }computes and return the value of the day
+
+and written their code like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include "Date.h"
+
+int main()
+
+\{
+
+...
+
+Date today;
+
+...
+
+today.\textbf{print\_with\_dash()};
+
+...
+
+if (today.\textbf{get\_year()} \textgreater{} 2020)
+
+\{
+
+...
+
+\}
+
+for (int i = 1; i \textless{} yesterday.\textbf{get\_day()}; ++i)
+
+\{
+
+...
+
+\}
+
+return 0; \\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Now, regardless of whether you're implementing the \emph{Date} struct
+with \emph{yyyy\_}, \emph{mm\_}, \emph{dd\_} or with \emph{yyyymmdd\_},
+their code will ALWAYS work.
+
+The point: if you provide features through functions and tell others not
+to use the internal member variables, then when you need to change your
+code, you need only need to change the members functions in your
+\emph{Date} library. Period.
+
+\textbf{Exercise. }Add a \emph{get\_year()}, \emph{get\_month()},
+\emph{get\_day()} in your \emph{Date} library. Test it with this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include "Date.h"
+
+int main()
+
+\{
+
+Date today;
+
+today.init(2014, 12, 25);
+
+std::cout \textless\textless{} today.get\_year() \textless\textless{}
+'\textbackslash n';
+
+std::cout \textless\textless{} today.get\_month) \textless\textless{}
+'\textbackslash n';
+
+std::cout \textless\textless{} today.get\_day() \textless\textless{}
+'\textbackslash n';
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Add a \emph{set\_year(int)}, \emph{set\_month(int)},
+\emph{set\_day(int)} in your \emph{Date} library. Test it with this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include "Date.h"
+
+int main()
+
+\{
+
+Date today;
+
+today.init(2014, 12, 25);
+
+today.set\_year(1770);
+
+std::cout \textless\textless{} today.get\_year() \textless\textless{}
+'\textbackslash n'; // 1770
+
+...
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Member functions to get and set basic values in the struct variable
+(regardless of how you implement the internals) are called
+\textbf{getters} and \textbf{setters}. Getters are member functions that
+get basic lower level concepts. Setters are members functions that set
+some internal variables to some other values.
+
+The struct allows us to put member variables underneath another variable
+(example: hiding \emph{yyyy\_}, \emph{mm\_}, \emph{dd\_} inside today)
+besides putting functions inside struct variables. So it's hiding things
+in a header file. But \ldots{}
+
+The struct does \textbf{not} enforce \textbf{strict information hiding}.
+
+Sure, you can tell others not to use \emph{yyyy\_}, \emph{mm\_},
+\emph{dd\_}. But they can be stubborn and insist on using them.
+
+So \ldots{}
+
+\emph{Date} class version 3 (the real deal)
+
+Now do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.h
+
+\#ifndef DATE\_H
+
+\#define DATE\_H
+
+\textbf{class} Date
+
+\{
+
+public:
+
+void init(int, int, int);
+
+void print();
+
+void add\_y(int);
+
+void add\_m(int);
+
+void add\_d(int);
+
+// etc.
+
+private:
+
+int yyyy\_, mm\_, dd\_;
+
+\};
+
+\#endif\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.cpp
+
+\#include \textless iostream\textgreater{}
+
+\#include "Date.h"
+
+void Date::init(int yyyy, int mm, int dd)
+
+\{
+
+yyyy\_ = yyyy;
+
+mm\_ = mm;
+
+dd\_ = dd;
+
+\}
+
+void Date::print()
+
+\{
+
+std::cout \textless\textless{} yyyy\_ \textless\textless{} '/'
+
+\textless\textless{} mm\_ \textless\textless{} '/'
+
+\textless\textless{} dd\_ \textless\textless{} '\textbackslash n';
+
+\}
+
+void Date::add\_y(int inc)
+
+\{
+
+yyyy\_ += inc ;
+
+\}
+
+// etc.\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// main.cpp
+
+\#include \textless iostream\textgreater{}
+
+\#include "Date.h"
+
+int main()
+
+\{
+
+Date today, yesterday;
+
+today.init(2014, 12, 25);
+
+today.print();
+
+yesterday.init(2014, 12, 24);
+
+yesterday.print();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Note that there's no change in \emph{main.cpp}.
+
+The \emph{struct} is now called a \emph{\textbf{class}}.
+
+Note the \emph{public} and \emph{private} sections in the \emph{Date}
+class. Try the following code:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// main.cpp
+
+\#include "Date.h"
+
+int main()
+
+\{
+
+Date today, yesterday;
+
+today.init(2014, 12, 25);
+
+\textbf{today.dd\_ = 1;}
+
+...
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Read the error message from your C++ compiler. Get it?
+
+Basically: Anything under \emph{public} is accessible outside the
+\emph{Date} class. Anything under \emph{private} is not. (We'll see
+exceptions later). Inside the \emph{Date} class, everything is freely
+available. For instance, since \emph{Date::init()} is part of the
+\emph{Date} class, of course the function body of \emph{Date::init()}
+can access \emph{yyyy\_}. But \emph{main()} is \textbf{outside} the
+\emph{Date} class. So \emph{main()} \textbf{cannot} touch
+\emph{today.yyyy\_} directly.
+
+The practice of putting \emph{yyyy\_}, \emph{mm\_}, \emph{dd\_} under
+the private section to disallow access from outside the class is called
+data or information hiding. This is a form of encapsulation.
+
+You can also put member functions into the private section as well. And
+you can have as many private and public sections as you wish.
+
+\textbf{Exercise.} Create a dummy private member function:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.h
+
+\#ifndef DATE\_H
+
+\#define DATE\_H
+
+class Date
+
+\{
+
+public:
+
+void init(int, int, int);
+
+void print();
+
+void add\_y(int);
+
+void add\_m(int);
+
+void add\_d(int);
+
+// etc.
+
+private:
+
+int yyyy\_, mm\_, dd\_;
+
+void f();
+
+\};
+
+\#endif\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+(You can make it do whatever you want.) Now call \emph{today.f()} in
+your \emph{main()}.
+
+Now for some very important techno jargon \ldots{}
+
+The above \emph{Date} is a \textbf{class}. You can think of a class as a
+rubber stamp for creating a certain kind of values. A value created from
+a class includes values such as member variables. But it also contains
+member functions. Such a value is called an \textbf{object}..
+
+Sometimes we will call the name of the object as object as well. For
+instance when I do this:
+
+\emph{Date today;}
+
+You can think of \emph{today} as the name of a chunk of memory in your
+computer's RAM. I will usually call \emph{today} an object. However
+(depending on who you talk to), sometimes, \emph{today} is called an
+\textbf{instance} of the \emph{Date} class. Make sure you think about
+the difference between the name \emph{today} and the chunk of memory in
+your RAM that \emph{today} refers to. I will however use object and
+instance interchangeably.
+
+In C++, the variables inside the class are called \textbf{member
+variables}. For instance \emph{yyyy\_} is a member variable of
+\emph{today}. I will also say that \emph{yyyy\_} is a member variable of
+Date. Outside of C++, when you talk about object-oriented programming in
+general, the general term is \textbf{instance variable}. So when you
+talk to someone using an object-oriented language such as Python or
+Java, do not use the term member variable -- use instance variable.
+That's the safest thing to do. In other words, instance variable is a
+general OOP concept while member variable is a C++ term.
+
+In C++, objects also have functions -- we call them \textbf{member
+functions}. In general OOP, you would call them \textbf{methods}.
+
+So, in general, an object contains instance variables and methods. Get
+it?
+
+The point of a class is to (1) bundle data and methods together into
+objects and also to (2) provide some access control mechanism so that
+outsiders of the class cannot access certain parts of the class (or
+certain parts of the objects). The act of doing (1) and (2) is called
+\textbf{encapsulation}.
+
+\textbf{Information hiding} refers to hiding the internal representation
+of the objects from outsiders of the class.
+
+The above is a class. It's split into the header file and the cpp file.
+The header file specifies the interface of the class, i.e., the function
+prototypes in the public section(s) tell the outside world what an
+object can do and what they need to do anything. The cpp file implements
+the behavior promised in the header file. As long as the resulting
+object fulfills the promises made by the interface in the header file,
+nobody using your code cares how you implement the interface.
+
+Source code that uses a class is called a \textbf{client} of the
+class.\textbf{ }For instance, our \emph{main.cpp} is a client of the
+\emph{Date} class.
+
+By default, every member of a \emph{class} in C++ is \emph{private}.
+
+In C++, a \emph{struct} is just a \emph{class} where every member
+(member variable or member function) is \emph{public}, i.e.,
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\textbf{struct} X
+
+\{
+
+\ldots{}
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+is just
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\textbf{class} X
+
+\{
+
+public:
+
+\ldots{}
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Scope
+
+It's important to note that the \emph{Date::init} refer to the
+\emph{init} function inside the \emph{Date} class, i.e., \emph{init} is
+inside the scope called \emph{Date}. That's right: classes create scopes
+just like the block of your for-loop forms a scope. The only difference
+is that in the case of the class, the scope has a name: its name is the
+name of the class.
+
+It's perfectly OK to have another \emph{init} function OUTSIDE the class
+like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.h
+
+...
+
+class Date
+
+\{
+
+public:
+
+void init(int, int, int);
+
+...
+
+private:
+
+int yyyy\_, mm\_, dd\_;
+
+\};
+
+void init(int, int, int);
+
+\#endif\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// main.cpp
+
+\#include \textless iostream\textgreater{}
+
+\#include "Date.h"
+
+int main()
+
+\{
+
+Date today, yesterday;
+
+today.init(2014, 12, 25);
+
+\textbf{init(0, 0, 0);}
+
+...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In C++, functions outside a class are sometimes called \textbf{nonmember
+functions}.
+
+\textbf{Exercise. }Does this compile?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.h
+
+...
+
+class Date
+
+\{
+
+public:
+
+...
+
+void f();
+
+void g();
+
+...
+
+\};
+
+\#endif\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.cpp
+
+...
+
+void Date::f()
+
+\{
+
+g();\\
+\}
+
+void Date::g()
+
+\{
+
+\}
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// main.cpp
+
+\#include \textless iostream\textgreater{}
+
+\#include "Date.h"
+
+int main()
+
+\{
+
+Date today, yesterday;
+
+today.init(2014, 12, 25);
+
+init(0, 0, 0);
+
+...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Class and Type
+
+In C++, a class is a type (in the sense of C++!!!). This means that, two
+classes are different types even if their internals are the same:
+
+\emph{class X}
+
+\{
+
+int i;
+
+\};
+
+class Y
+
+\{
+
+int i;
+
+\};
+
+This means that the following will actually compile:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class X
+
+\{
+
+\};
+
+class Y
+
+\{
+
+\};
+
+void f(const X \& obj)
+
+\{
+
+std::cout \textless\textless{} "f(X)" \textless\textless{} std::endl;
+
+\}
+
+void f(const Y \& obj)
+
+\{
+
+std::cout \textless\textless{} "f(Y)" \textless\textless{} std::endl;
+
+\}
+
+int main()
+
+\{
+
+X a;
+
+f(a);
+
+Y b;
+
+f(b);\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Why? Because in C++, a function is distinguished by the name of the
+function and its prototype, i.e., C++ supports function overloading.
+
+Passing and returning objects
+
+It's OK to have object parameters and it's also OK to return objects.
+
+\textbf{Exercise.} Now include an \emph{equals} method that accepts a
+\emph{Date} object and then returns \emph{true} if the \emph{Date}
+object has the same values as the object invoking the method.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.h
+
+...
+
+class Date
+
+\{
+
+public:
+
+...
+
+bool equals(const Date \&);
+
+...
+
+private:
+
+int yyyy\_, mm\_, dd\_;
+
+\};
+
+\#endif\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.cpp
+
+...
+
+bool Date::equals(const Date \& date)
+
+\{
+
+\}
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// main.cpp
+
+\#include \textless iostream\textgreater{}
+
+\#include "Date.h"
+
+int main()
+
+\{
+
+Date today, yesterday;
+
+today.init(2014, 12, 25);
+
+today2.init(2014, 12, 25);
+
+std::cout \textless\textless{} today.equals(today2) \textless\textless{}
+'\textbackslash n';
+
+...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{\hfill\break
+Exercise.} Now include an \emph{add} method that accepts a \emph{Date}
+object and then returns a \emph{Date} object with values obtained by
+adding the values of the object invoking the call with the object passed
+in.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.h
+
+...
+
+class Date
+
+\{
+
+public:
+
+...
+
+Date add(const Date \&);
+
+...
+
+private:
+
+int yyyy\_, mm\_, dd\_;
+
+\};
+
+\#endif\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Date.cpp
+
+...
+
+Date Date::add(const Date \& date)
+
+\{
+
+\}
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// main.cpp
+
+\#include \textless iostream\textgreater{}
+
+\#include "Date.h"
+
+int main()
+
+\{
+
+Date today, yesterday;
+
+today.init(2014, 12, 25);
+
+Date one;
+
+one.init(1, 1, 1);
+
+Date x = today.add(one);
+
+std::cout \textless\textless{} x \textless\textless{}
+'\textbackslash n';
+
+...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Make sure that the date returned is valid!!!
+
+\textbf{Exercise.} Write a method \emph{neq} (i.e., not equals) for
+\emph{Date} that does the obvious thing.
+
+\textbf{Exercise.} Write a method \emph{lt} (i.e., less than) for
+\emph{Date} that does the obvious thing. Then write \emph{le} (i.e.,
+less than or equals), then \emph{gt} (greater than), and then \emph{ge}
+(greater than or equals).
+
+Note that for the above methods, you should write them in such a way
+that they emulate expressions that you're used to using. For example,
+\emph{x \textless= 2} would do something like this: \emph{x.le(2)}. So
+the object passed into the \emph{le()} (or other) function should be the
+value on the right of the expression, and the object calling the method
+is on the left. This will be discussed more later.
+
+With the above you can now do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+Date start;
+
+start.init(1, 1, 1970);
+
+Date end;
+
+end.init(1, 1, 2015);
+
+Date oneday;
+
+oneday.init(0, 0, 1);
+
+for (Date d = start; d \textless= end; d = d.add(oneday))
+
+\{
+
+d.print();
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Default \emph{operator=}
+
+The assignment operator = copies values of members from one object to
+another. So, if \emph{date1} and \emph{date2} are \emph{Date} object,
+then
+
+\emph{date1 = date2;}
+
+will have the same effect as
+
+\emph{date1.mm\_ = date2.mm\_;}
+
+\emph{date1.dd\_ = date2.dd\_;}
+
+\emph{date1.yyyy\_ = date2.yyyy\_;}
+
+This is just like assignment between \emph{struct} variables. So no big
+surprises here.
+
+You can re-define \emph{operator=}. There are cases where you should.
+We'll see this later.
+
+Array of Objects
+
+\textbf{Exercise.} Be brave \ldots{} Can you create an array of objects?
+Declare an array of \emph{Date} objects. Set them to whatever dates you
+choose and print all of them.
+
+Pointers to Objects
+
+Make sure you review pointers \ldots{} again!!!
+
+You can of course create pointers to objects:
+
+\emph{Date * p = new Date();}
+
+\emph{p-\textgreater add\_y(1); // i.e. (*p).add\_y(1)}
+
+...
+
+\emph{delete p;}
+
+Note the \emph{-\textgreater{}} operator. This is just like for the case
+of \emph{struct}. In other words, if \emph{p} is a pointer and \emph{m}
+is a member, then \emph{(*p).m} is the same as \emph{p-\textgreater m} .
+Likewise to call the \emph{init()} of the \emph{Date} \emph{p} is
+pointing to, you do:
+
+\emph{p-\textgreater init(1, 1, 2003).}
+
+\textbf{Exercise.} Create a \emph{Date} pointer \emph{tomorrow}.
+Allocate memory for \emph{tomorrow}. Set the \emph{Date} object that
+\emph{tomorrow} points to so that the \emph{Date} object is 2014/12/26.
+Print the object that points to.
+
+\textbf{Exercise.} Convert the \emph{Robot} \emph{struct} from earlier
+to a \emph{class}. Create a pointer \emph{c3p0} to a \emph{Robot}
+object. Print its location, move right by 3 units then print its
+location again. Deallocate memory for \emph{c3p0}.
+
+\textbf{Exercises.}
+
+\begin{itemize}
+\tightlist
+\item
+  Write a \emph{Time} class. The member variables (instance variables)
+  are \emph{hour}, \emph{min}, \emph{sec} (\emph{int} of course!) using
+  the 24-hour format, i.e. hour is 0..23, min is 0..59, sec is 0..59.
+  The member functions (methods) are
+\end{itemize}
+
+\begin{itemize}
+\tightlist
+\item
+  void init(int, int, int)
+\item
+  void print()
+\item
+  int get\_hour()
+\item
+  int get\_min()
+\item
+  int get\_sec()
+\item
+  void set\_hour(int)
+\item
+  void set\_min(int)
+\item
+  void set\_sec(int)
+\item
+  void add\_hour(int)
+\item
+  void add\_min(int)
+\item
+  void add\_sec(int)
+\item
+  The \emph{add\_hour}, \emph{add\_min}, \emph{add\_sec} must ensure
+  that the resulting \emph{Time} is valid. Of course you should test
+  your \emph{Time} class!
+\item
+  Create a pointer \emph{p} to a \emph{Time} object, allocate memory for
+  \emph{p}, and call all the available methods through \emph{p.
+  }Deallocate memory at the end.
+\item
+  Create an array of 1000 pointers to \emph{Time} objects, allocate
+  memory for all of them, set the first to time 00:00:00, the second to
+  00:00:01, etc. and print their values. Deallocate memory for every
+  pointer.
+\item
+  Declare a \emph{Time} pointer \emph{q} and allocate 1000 \emph{Time}
+  objects for \emph{q} and do as above. Deallocate memory for \emph{q}.
+\end{itemize}
+
+\textbf{Exercise.} Does this program compile? (Private section before
+public)
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class X
+
+\{
+
+private:
+
+int x;
+
+public:
+
+void n();
+
+\};
+
+void X::n()
+
+\{
+
+\}
+
+int main()
+
+\{
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Does this compile? (Everything private)
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class X
+
+\{
+
+private:
+
+int x;
+
+void n();
+
+\};
+
+void X::n()
+
+\{
+
+\}
+
+int main()
+
+\{
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Does this compile? (Everything public)
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class X
+
+\{
+
+public:
+
+int x;
+
+void n();
+
+\};
+
+void X::n()
+
+\{
+
+\}
+
+int main()
+
+\{
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Does this compile? (Missing prototype)
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class X
+
+\{
+
+private:
+
+int x;
+
+\};
+
+void X::n()
+
+\{
+
+\}
+
+int main()
+
+\{
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Does this program compile? (Several public)
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class X
+
+\{
+
+public:
+
+int x;
+
+private:
+
+int y;
+
+public:
+
+int z;
+
+\};
+
+int main()
+
+\{
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+UML
+
+\textbf{UML (Unified modeling language)} is a standard language for
+modeling objects. It is an industrial standard for communication and it
+is used for designing systems.
+
+\textbf{UP (Unified Process)} is a very popular process in software
+development. UP is tightly related to \textbf{RUP (Rational Unified
+Process)} where UML comes from, and RUP is used by \textgreater50\% of
+the Fortune 500 companies
+
+The following is a simplified version of the \textbf{class diagram} for
+Date:
+
+Here's a slightly more decorated version:
+
+\end{document}

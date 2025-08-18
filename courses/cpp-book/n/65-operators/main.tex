@@ -1,0 +1,2149 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\author{}
+\date{}
+
+\begin{document}
+
+65. Operator Overloading
+
+Objectives
+
+\begin{itemize}
+\tightlist
+\item
+  Overloading Operators
+\end{itemize}
+
+Review
+
+The name of some methods are awkward to use.
+
+For certain data (objects) we are more used to operators rather than
+method names.
+
+Consider the following:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Fraction.h
+
+class Fraction
+
+\{
+
+public:
+
+Fraction(int n=0, int d=1)
+
+: n\_(n), d\_(d)
+
+\{\}
+
+Fraction plus(const Fraction \&) const;
+
+void print() const;
+
+private:
+
+int n\_, d\_; // numerator,denominator
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Fraction.cpp
+
+\#include "Fraction.h"
+
+Fraction Fraction::plus(const Fraction \& a) const
+
+\{
+
+return Fraction(n\_ * a.d\_ + d\_ * a.n\_, d\_ * a.d\_);
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include ``Fraction.h''
+
+int main()
+
+\{
+
+Fraction a(1,3), b(1,4); // a=1/3 and b=1/4
+
+Fraction c = a.plus(b); // basically, c = a + b
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+So, if we want \emph{c = a + b * c -- d}, it would have to look like
+
+c = (a.plus(b.mult(c))).subtract(d)
+
+YUCK!!!
+
+Operator as a Method
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Fraction.h
+
+class Fraction
+
+\{
+
+public:
+
+Fraction(int n=0, int d=1)
+
+: n\_(n), d\_(d)
+
+\{\}
+
+Fraction operator+(const Fraction \&) const;
+
+private:
+
+int n\_, d\_; // numerator,denominator
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Fraction.cpp
+
+\#include "Fraction.h"
+
+Fraction Fraction::operator+(const Fraction \& b) const
+
+\{
+
+return Fraction(n\_ * b.d\_ + d\_ * b.n\_, d\_ * b.d\_);
+
+\} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Re-defining \emph{+}, so that we have \emph{+} for \emph{int},
+\emph{double}, and \emph{Fraction}.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include ``Fraction.h''
+
+int main()
+
+\{
+
+Fraction a(1,3), b(1,4);
+
+Fraction c = a + b;
+
+Fraction d = a.operator+(b);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Most programming languages allow you to define operators (with their own
+syntax). There are languages that do not have operator overloading.
+Example: Java.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Fraction.cpp
+
+\#include ``Fraction.h''
+
+Fraction Fraction::operator*(const Fraction \& b) const
+
+\{
+
+return Fraction(n\_ * b.n\_, d\_ * b.d\_);
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Test it:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include ``Fraction.h''
+
+int main()
+
+\{
+
+Fraction a(1, 3), b(1, 4);
+
+Fraction c = a * b;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Operator in/outside the class
+
+In general suppose \emph{a,b} are objects of class \emph{C}.
+
+C++ will interpret \emph{a + b} as either
+
+\emph{a + b }is the same as\emph{ a.operator+(b)}
+
+or
+
+\emph{a + b }is the same as\emph{ operator+(a, b)}
+
+For \emph{a.operator+(b)}, C++ will look for \emph{operator+} in the
+class \emph{C} (i.e., the class of \emph{a}) that accepts \emph{b}
+(object of class \emph{C})
+
+For \emph{operator+(a, b)}, C++ will look for an \emph{operator+} not in
+any class that accepts \emph{a,b} of class \emph{C}
+
+For instance, for \emph{Fraction} class
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Fraction
+
+\{
+
+public:
+
+...
+
+Fraction operator+(const Fraction \& b) const \{...\}
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+will let you execute \emph{a + b} where \emph{a,b} are \emph{Fraction}
+objects as \emph{a.operator+(b)}
+
+... or ...
+
+... if you prefer an operator \textbf{outside} the class:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Fraction
+
+\{
+
+public:
+
+...
+
+\};
+
+Fraction operator+(const Fraction \& a, const Fraction \& b)
+
+\{
+
+...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+will let you execute \emph{a + b}, where \emph{a,b} are \emph{Fraction}
+objects, as \emph{operator+(a, b)}.
+
+It is preferable to have an operator in a class if possible. You
+\textbf{cannot} have both:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Fraction
+
+\{
+
+public:
+
+Fraction operator+(const Fraction \& b) const
+
+\{
+
+...
+
+\}
+
+\};
+
+// \textbf{DANGER!} can't have both above and the following together
+
+Fraction operator+(const Fraction \& a, const Fraction \& b)
+
+\{
+
+...
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Why? Because C++ does not know which \emph{operator+} to use if you give
+C++ both options. So you should only have either:
+
+\emph{ Fraction Fraction::operator+(const Fraction \&) const}
+
+or
+
+Fraction operator+(const Fraction \&,
+
+const Fraction \&)
+
+but not both.
+
+You can overload the following:
+
++ - * / \% \^{} \& \textbar{}
+
++= -= *= /= \%= \^{}= \&= \textbar=
+
+! = \textless{} \textgreater{} \textless\textless{}
+\textgreater\textgreater{} \textasciitilde{} {[} {]}
+
+!= == \textless= \textgreater= \textless\textless=
+\textgreater\textgreater=
+
+\&\& \textbar\textbar{} ++ -\/- -\textgreater* , -\textgreater{} ()
+
+new new{[}{]} delete delete{[}{]}
+
+Warning: You cannot define your own functions for
+
+\emph{::..*?:sizeof}
+
+Precedence rules
+
+Usual precedence rules apply automatically. So if you have
+\emph{operator+} and \emph{operator*} for class C, then
+
+\emph{a = b + c * d;}
+
+is the same as
+
+\emph{a = b + (c * d);}
+
+i.e.,
+
+\emph{a = b.operator+(c.operator*(d));}
+
+\textbf{Reminder:} Review precedence rules from CISS240.
+
+Binary \& unary operators
+
+Some operators are binary (example \emph{*}), some are unary (example
+\emph{!}), and some are both (example \emph{-})
+
+\emph{C a = b -- c;}
+
+\emph{C d = -b;}
+
+The function/method called is based on signature:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C
+
+\{
+
+...
+
+C operator-();
+
+C operator-(C);
+
+...
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In general for operator \emph{\textless op\textgreater{}}
+
+\emph{ a \textless op\textgreater{} b }is the same as\emph{
+a.operator\textless op\textgreater(b) }
+
+or operator\textless op\textgreater(a,b)
+
+\emph{ \textless op\textgreater a }is the same as\emph{
+a.operator\textless op\textgreater() }
+
+or
+
+operator\textless op\textgreater(a)
+
+\emph{ a\textless op\textgreater{} }is the same as\emph{
+a.operator\textless op\textgreater(int) }
+
+or
+
+operator\textless op\textgreater(a,int)
+
+Here's how C++ looks for operators to execute for \emph{+} (unary and
+binary), \emph{+=, ++} (pre and post)
+
+\emph{+a }is the same as\emph{ a.operator+() or operator+(a)}
+
+a += b is the same as a.operator+=(b) or operator+=(a,b)
+
+a + b is the same as a.operator+(b) or operator+(a,b) ++a is the same as
+a.operator++() or operator++(a)
+
+a++ is the same as a.operator++(0) or operator++(a,0)
+
+Pre and post operators
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Int
+
+\{
+
+public:
+
+Int(int x=0)
+
+: x\_(x)
+
+\{\}
+
+void operator++()
+
+\{
+
+std::cout \textless\textless{} "pre\textbackslash n"; ++x\_;
+
+\}
+
+void operator++(int a)
+
+\{
+
+std::cout \textless\textless{} "post " \textless\textless{} a
+\textless\textless{} "\textbackslash n"; x\_++;
+
+\}
+
+int get() \{ return x\_; \}
+
+private:
+
+int x\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int main()
+
+\{
+
+C x(4);
+
+++x;
+
+std::cout \textless\textless{} x.get() \textless\textless{}
+"\textbackslash n";
+
+x++;
+
+std::cout \textless\textless{} x.get() \textless\textless{}
+"\textbackslash n";
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+C++ translates \emph{++x} and \emph{x++} as:
+
+\emph{++x} is the same as \emph{x.operator++()}
+
+\emph{x++} is the same as \emph{x.operator++(0)}
+
+i.e., for post operators, C++ calls operator with a value of 0.
+
+\textbf{Exercise:} Overload the operators needed for the following code
+to run:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int main()
+
+\{
+
+Int i(5), j(9), k(0);
+
+j = i++; j = ++i;
+
+i = j-\/-; i = -\/-j;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Restriction on arguments
+
+Whether the operator is unary or binary is fixed. Just try to recall
+their meanings from CISS240. For example, \emph{\%} (remainder operator)
+is a \textbf{binary} operator: \emph{3 \% 5} is meaningful; \emph{5\%}
+has no meaning. So you cannot overload \emph{operator\%} by declaring
+and defining a unary \emph{\%}:
+
+\emph{C C::operator\%()}
+
+\emph{operator\%} \textbf{must} be
+
+\emph{C C::operator\%(C) }
+
+or
+
+\emph{C C::operator\%(const C \&)}
+
+etc.
+
+Other correct declarations:
+
+\emph{C* operator\&();}
+
+See operators \emph{{[}{]}, (), -\textgreater,} etc. later.
+
+Hiding pre-defined operators
+
+Here are the pre-defined class operators:
+
+\emph{=\&,}
+
+If you do not want these pre-defined operators to be callable, just
+declare them as private. You need \textbf{not} define them:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C
+
+\{
+
+private:
+
+C \& operator=(const C \&);
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Operators \textless op\textgreater{} and \textless op\textgreater=
+
+Defining \emph{+} does not give you \emph{+=} automatically.
+
+Here's some advice: define + in terms of \emph{+=}, \emph{-} in terms of
+\emph{-=}, etc. For instance:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Int
+
+\{
+
+public:
+
+...
+
+Int \& operator+=(const Int \& c)
+
+\{
+
+x\_ += c.x\_;
+
+return (*this);
+
+\}
+
+Int operator+(Int c) const
+
+\{
+
+return (Int(*this) += c);
+
+\}
+
+...
+
+private:
+
+int x\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+A \textbf{nonmember function} is just a function not in a class (i.e.,
+not a method). If the function works with objects from a particular
+class, then the function is included with the class. You should
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Put the function prototype in the header file (\emph{*.h})
+\item
+  Define the function in the implementation file (\emph{*.cpp})
+\item
+  Note that the function prototype is outside the class declaration
+\end{enumerate}
+
+Since the function prototype is out the class, it does \textbf{not} have
+access to the private members of the class. You can overwrite this for
+efficiency
+
+(later). Note that here \emph{+=} is more efficient than \emph{+}, same
+for integer \emph{+} and \emph{+=}. Also note that we want to do
+
+\emph{(a += b) += b; }
+
+\emph{c = (a += b); // i.e., a+=b; c=a;}
+
+That's why \emph{operator+=} returns a reference to \emph{*this}.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Int
+
+\{
+
+public:
+
+...
+
+\textbf{Int \&} operator+=(const C \& c)
+
+\{
+
+x += c.x;
+
+\textbf{ return (*this);}
+
+\}
+
+...
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+And \emph{operator+} can be written like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Int
+
+\{
+
+public:
+
+...
+
+Int operator+(const Int c) const
+
+\{
+
+\textbf{return (Int(*this) += c);}
+
+\}
+
+...
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Commutation
+
+At this point for \emph{Int} objects \emph{a} and \emph{b}, \emph{a + b}
+and \emph{b + a} make sense.
+
+a\emph{ + b }is
+
+C++ will look for \emph{a.operator+(b)} or \emph{operator+(a,b)}. BUT
+... what if you want to do \emph{a + 1} or \emph{1 + a}? We'll talk
+about \emph{1 + a} first ...
+
+If \emph{a} is an \emph{Int} object,
+
+\emph{1 + a} is
+
+\emph{1} is not an object so \emph{1.operator+(a)} does not make sense.
+
+Therefore, \textbf{you will need to define this function outside the
+}\emph{\textbf{Int}}\textbf{ class:}
+
+\emph{Int operator+(int c, const Int \& a);}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Int.h
+
+class Int
+
+\{
+
+public:
+
+...
+
+Int \& operator+=(const Int \& c);
+
+Int operator+(Int c) const
+
+\{
+
+return (Int(*this) += c);
+
+\}
+
+...
+
+private:
+
+int x\_;
+
+\};
+
+Int operator+(int, const Int \&);\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Int.cpp
+
+...
+
+Int operator+(int a, const int \& b)
+
+\{
+
+return Int(a) + b;
+
+\}
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You have the same issue if you want to do this:
+
+\emph{Int a(6); }
+
+\emph{Int b = 5 * a;}
+
+is the same as
+
+\emph{Int b = operator*(5,a);}
+
+\textbf{You will need to define the function outside the
+}\emph{\textbf{Int}}\textbf{ class:}
+
+\emph{Int operator*(int c, const Int \& a);}
+
+Now back to the other case: \emph{a + 1}. If you have a class \emph{C},
+then
+
+\emph{C c = 1; }
+
+is the same as
+
+\emph{C c(1);}
+
+If \emph{C(1)} is a valid constructor call. In this case, the
+constructor was called \textbf{implicitly}. That means that for the
+\emph{Int} class,
+
+\emph{Int i(42), j(0);}
+
+\emph{j = i + 1; // becomes j = i + Int(1);}
+
+So you do \textbf{not} need \emph{operator+(const Int\&, int);}
+
+Exercise: How many constructor calls are there? Where?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class Int
+
+\{
+
+public:
+
+Int(int x)
+
+: x\_(x)
+
+\{
+
+std::cout \textless\textless{} "Int\textbackslash n";
+
+\}
+
+Int operator+(const Int \& i)
+
+\{
+
+return Int(x\_ + i.x\_);
+
+\}
+
+private:
+
+int x\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include ``Int.h''
+
+int main()
+
+\{
+
+Int i(42), j(0);
+
+j = i + 1;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+operator{[}{]}
+
+If \emph{c} is a \emph{C} object, C++ translates \emph{c{[}n{]}} like
+this:
+
+\emph{c{[}n{]} }is the same as\emph{ c.operator{[}{]}(n)}
+
+\emph{operator{[}{]}} must be a member function.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class IntDynArr
+
+\{
+
+public:
+
+IntDynArr(int s)
+
+: size\_(s), p\_(new int{[}s{]})
+
+\{\}
+
+\textasciitilde IntDynArr() \{ delete {[}{]} p\_; \}
+
+\textbf{int operator{[}{]}(int n)} \{ return p\_{[}n{]}; \}
+
+private:
+
+int size\_;
+
+int * p\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int main()
+
+\{
+
+IntDynArr c(100);
+
+std::cout \textless\textless{} c{[}5{]} \textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+But what about this?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int main()
+
+\{
+
+IntDynArr c(100);
+
+c{[}5{]} = 23; // ERROR!
+
+std::cout \textless\textless{} c{[}5{]} \textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class IntDynArr
+
+\{
+
+public:
+
+IntDynArr(int s)
+
+: size\_(s), p\_(new int{[}s{]})
+
+\{\}
+
+\textasciitilde IntDynArr() \{ delete {[}{]} p\_; \}
+
+...
+
+\textbf{int \& operator{[}{]}(int n)}
+
+\{
+
+return p\_{[}n{]};
+
+\}
+
+...
+
+private:
+
+int size\_;
+
+int * p\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Of course you can includes checks like \emph{size \textgreater= 0} for
+constructor, and argument of \emph{{[}{]}} is within bounds:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+int \& operator{[}{]}(int n)
+
+\{
+
+if (n \textgreater= 0 \&\& n \textless{} size)
+
+return p\_{[}n{]};
+
+\}
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+But what if \emph{n \textless{} 0} or \emph{n \textgreater= size}?
+
+Later, we will handle such errors with \textbf{exceptions}.
+
+Now include
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+int \& operator{[}{]}(int n) const
+
+\{
+
+if (n \textgreater= 0 \&\& n \textless{} size)
+
+return p\_{[}n{]};
+
+\}
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+What is the point of this?
+
+operator()
+
+Suppose you have class \emph{C} and \emph{c} is an object of class
+\emph{C}. C++ translates \emph{c(a)} like this:
+
+\emph{c(a) }is the same as\emph{ c.operator()(a)}
+
+\textbf{The point:} makes object look like a function
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Square
+
+\{
+
+public:
+
+int operator()(int x)
+
+\{
+
+return x * x;
+
+\}
+
+\};
+
+int main()
+
+\{
+
+Square square;
+
+std::cout \textless\textless{} square(5);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Why not just use functions? Make object remember previous
+computation(s).
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Square
+
+\{
+
+public:
+
+Square()
+
+: last\_square\_(-1)
+
+\{\}
+
+int operator()(int x)
+
+\{
+
+if (last\_square\_ != -1 \&\& x == last\_x\_)
+
+\{
+
+return last\_square\_;
+
+\}
+
+else
+
+\{
+
+last\_x\_ = x;
+
+last\_square\_ = x * x;
+
+return last\_square\_;
+
+\}
+
+\}
+
+private:
+
+int last\_x\_, last\_square\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+This is helpful if you frequently compute the last square and the
+computation of \emph{x * x} costs more than the computation of the
+boolean values in the code.
+
+You can also remember not just the history of one computation, but use
+an array.
+
+Some computations are so intensive that some form of ``history'' of
+computations is absolutely necessary.
+
+Here's the Fibonacci sequence:
+
+0, 1, 1, 2, 3, 5, 8, 13, 21, ...
+
+You start off with 0, 1. Subsequent terms are the sum of the previous
+two. Here's a simple Fibonacci function:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int fib(int n)
+
+\{
+
+if (n == 0)
+
+return 0;
+
+else if (n == 1)
+
+return 1;
+
+else
+
+return fib(n--1) + fib(n--2);
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Try to execute \emph{fib} for high values of \emph{n}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+for (int n = 0; n \textless{} 100; n++)
+
+\{
+
+Std::cout \textless\textless{} n \textless\textless{} ','
+\textless\textless{} fib(n) \textless\textless{} '\textbackslash n';
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Why is it so slow? \emph{fib(90)} calls \emph{fib(89)} and
+\emph{fib(88)} and adds their return values. f\emph{ib(89) }calls
+\emph{fib(88)} and \emph{fib(87)} and adds their return values. Etc.
+There are many re-computations!!!
+
+Let's remedy this by making a class:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Fibonacci
+
+\{
+
+public:
+
+Fibonacci()
+
+\{
+
+lookup\_{[}0{]} = 0;
+
+lookup\_{[}1{]} = 1;
+
+for (int i = 2; i \textless{} 100; i++)
+
+\{
+
+lookup\_{[}i{]} = -1;
+
+\}
+
+\}
+
+private:
+
+int lookup\_{[}100{]};
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In \emph{lookup\_}, if \emph{lookup\_{[}i{]}} is \emph{-1}, it means
+that the \emph{i}th value of Fibonacci has not been stored in
+\emph{lookup\_{[}i{]}} yet.
+
+Now add \emph{operator()}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int Fibonacci::operator(int n)
+
+\{
+
+if (n \textless{} 100) // within lookup\_'s range
+
+\{
+
+// not stored in lookup\_ yet
+
+if (lookup\_{[}n{]} == -1)
+
+lookup\_{[}n{]} = (*this)(n - 1) + (*this)(n - 2);
+
+return lookup\_{[}n{]};
+
+\}
+
+else // outside lookup\_'s range
+
+\{
+
+return (*this)(n - 1) + (*this)(n -- 2);
+
+\}
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Now test this version of the Fibonacci computation:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+Fibonacci fib;
+
+for (int n = 0; n \textless{} 100; n++)
+
+\{
+
+std::cout \textless\textless{} n \textless\textless{} ','
+\textless\textless{} fib(n) \textless\textless{} '\textbackslash n';
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Another reason to use objects that look like function: the computation
+involves two (or more) values but one of them does not change. Store
+that unchanging value in the object.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class AddBy
+
+\{
+
+public:
+
+AddBy(int x) : x\_(x) \{\}
+
+int operator()(int y) \{ return x\_ + y; \}
+
+private:
+
+int x\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Test it with:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+AddBy f(5);
+
+std::cout \textless\textless{} f(3) \textless\textless{} ','
+\textless\textless{} f(11) \textless\textless{} '\textbackslash n';
+
+AddBy g(10);
+
+std::cout \textless\textless{} g(3) \textless\textless{} ','
+\textless\textless{} g(11) \textless\textless{}
+'\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You can also provide methods to modify the \emph{x\_} in the class.
+
+operator=
+
+The default \emph{=} operator will perform member-wise copy. For
+example: If you have the following class
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class vec2i
+
+\{
+
+private:
+
+int x\_, y\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+and you have objects \emph{p, q} of \emph{vec2i}. Then \emph{p=q} will
+have the same effect as \emph{p.x\_ = q.x\_}, \emph{p.y\_ = q.y\_}.
+
+\textbf{WARNING:} You might actually not want \emph{operator=} to behave
+as above. Why? Can you think of some examples where the default
+\emph{operator=} is bad?
+
+You can overwrite the default \emph{=} by creating your own
+\emph{operator=} .
+
+You definitely want to do this if your object holds on to some form of
+system resource. Example: There is a pointer in your object.
+
+The default \emph{operator=} is called the \textbf{default copy
+operator} (not to be confused with the copy constructor which is a
+constructor that has an object as parameter). Note that you can do this:
+
+\emph{SomeClass a, b, c, d;}
+
+a = b = c = d;
+
+This is because the second statement is
+
+a = (b = (c = d));
+
+i.e.,
+
+a = (b = (c.operator=(d)));
+
+This implies that \emph{c.operator=(d)} has a return value. This will be
+mentioned later.
+
+operator= Returning Value
+
+What do we want to achieve with
+
+\emph{a = b = c = d;}
+
+We want to set \emph{c} to \emph{d}, then \emph{b} to \emph{c}.
+Therefore in
+
+\emph{a = (b = (c.operator=(d)));}
+
+we want (basically)
+
+\emph{c = d;}
+
+a = b = c;
+
+Therefore for a class \emph{C} we want \emph{operator=} to look like
+this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+C \& C::operator=(const C \& c)
+
+\{
+
+... some code ...
+
+return (*this);
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+What if we have the following instead? Why is this version a bad idea?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+C C::operator=(const C \& c)
+
+\{
+
+... some code ...
+
+return (*this);
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Assignment of same object}
+
+Depending on what you want to do, you usually do not want to change the
+object \emph{obj1} if you execute \emph{obj1 = obj2} if \emph{obj2} is
+actually the same as \emph{obj1}.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+C \& C::operator=(const C \& x)
+
+\{
+
+if (this == \&x)
+
+return (*this);
+
+... some code ...
+
+return (*this);
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Cascading operator=
+
+Note that if you have
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class vec2iTemperature
+
+\{
+
+private:
+
+vec2i p\_;
+
+double temp\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+and objects \emph{t1, t2} of \emph{vec2iTemperature}, then \emph{t1 =
+t2} is the same as \emph{t1.p\_ = t2.p\_} and \emph{t1.temp\_ =
+t2.temp\_}. \emph{t1.p\_ = t2.p\_} will call the \emph{=} of
+\emph{vec2i}. The above puts object inside object. See later section on
+object composition.
+
+Initialization
+
+\textbf{Reminder:} The following does not call \emph{operator=}
+
+\emph{Date d = today;}
+
+The above is actually an initialization and not an assignment.
+Initialization always involves the constructor. In the above case, the
+copy constructor is called. In other words, the above is the same as
+
+\emph{Date d(today);}
+
+Avoiding member-wise copy
+
+If your object is going to use some resource that requires code to
+manually acquire and release, you \textbf{must} write your own
+
+-- constructor (to acquire resource)
+
+-- destructor (to release resource)
+
+-- copy constructor (to prevent memberwise copy)
+
+-- \emph{operator=} (to prevent memberwise copy)
+
+Here's a standard example where the ``resource'' is memory ...
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class IntPointer
+
+\{
+
+public:
+
+IntPointer()
+
+: p\_(new int)
+
+\{\}
+
+IntPointer(const IntPointer \& intptr)
+
+: p\_(new int)
+
+\{
+
+*p\_ = *(intptr.p\_);
+
+\}
+
+\textasciitilde IntPointer() \{ delete p\_; \}
+
+IntPointer \& operator=(const IntPointer \& intptr)
+
+\{
+
+if (this == \&intptr)
+
+\{
+
+return (*this);
+
+\}
+
+*p\_ = *(intptr.p\_);
+
+return (*this);
+
+\}
+
+private:
+
+int * p\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You should document your \emph{IntPointer} to let the user know that
+\emph{IntPointer} objects do not share memory. Why? Because if you use
+the regular pointers:
+
+\emph{int * p = new int;}
+
+int * q;
+
+q = p;
+
+then \emph{p} and \emph{q} do point to the same integer value.
+
+\textbf{Exercise.} What about \emph{IntDynArr}? Write the copy
+constructor and \emph{operator=}.
+
+\textbf{Exercise. }What about \emph{IntArr}?
+
+operator\textgreater\textgreater{} and
+\emph{o}perator\textless\textless{}
+
+You've been using \emph{\textless\textless{}} and
+\emph{\textgreater\textgreater{}} since day 1 of CISS240. From your
+previous notes you know that you can overload
+\emph{operator\textgreater\textgreater{}} and
+\emph{operator\textless\textless.} You also know from CISS240 that you
+can output
+
+\emph{int, char{[}{]}, double}, etc., i.e., C++ has overloaded
+\emph{operator\textgreater\textgreater{}} in iostream.h .You also know
+that you can do
+
+\emph{std::cout \textless\textless{} "A" \textless\textless{} 3
+\textless\textless{} 5.5;}
+
+So the operators return an object.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#ifndef INT\_H
+
+\#define INT\_H
+
+class Int
+
+\{
+
+public:
+
+Int(int x0 = 0) : x\_(x0) \{\}
+
+int get() const \{ return x\_; \}
+
+...
+
+void operator\textless\textless(std::ostream \&, const Int \&);
+
+...
+
+private:
+
+int x\_;
+
+\};
+
+\#endif\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include "Int.h"
+
+void operator\textless\textless(std::ostream \& cout, const Int \& c)
+
+\{
+
+cout \textless\textless{} c.get();
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include "Int.h"
+
+int main()
+
+\{
+
+Int c(42);
+
+std::cout \textless\textless{} c;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Cascading operator\textless\textless{}
+
+If you want to do the following:
+
+\emph{Int c(42);}
+
+std::cout \textless\textless{} c \textless\textless{}
+"\textbackslash n";
+
+you need to return an \emph{ostream} object from your
+\emph{operator\textless\textless{}} so that the above becomes
+
+\emph{Int c(42);}
+
+\emph{operator\textless\textless(operator\textless\textless(std::cout,
+c), "\textbackslash n");}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#ifndef INT\_H
+
+\#define INT\_H
+
+class Int
+
+\{
+
+public:
+
+Int(int a)
+
+: x(a)
+
+\{\}
+
+int get() const \{ return x; \}
+
+private:
+
+int x;
+
+\};
+
+std::ostream \& operator\textless\textless(std::ostream \&, const Int
+\&);
+
+\#endif\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include "Int.h"
+
+std::ostream \& operator\textless\textless(std::ostream \& cout, const
+Int \& c) \{
+
+cout \textless\textless{} c.get();
+
+return cout;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include "Int.h"
+
+int main()
+
+\{
+
+Int c(42), d(43);
+
+std::cout \textless\textless{} c \textless\textless{} ","
+\textless\textless{} d \textless\textless{} "\textbackslash n";
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Friends
+
+You can let \emph{operator\textless\textless{}} have access to the
+private members of the object by making your
+\emph{operator\textless\textless{}} a \textbf{friend} in your class. We
+will re-visit friends later.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#ifndef INT\_H
+
+\#define INT\_H
+
+class C
+
+\{
+
+public:
+
+Int(int x0 = 0)
+
+: x\_(x0)
+
+\{\}
+
+int get() const \{ return x\_; \}
+
+\textbf{friend} std::ostream \& operator\textless\textless(std::ostream
+\&, const Int \&);
+
+private:
+
+int x\_;
+
+\};
+
+\#endif\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include ``Int.h"
+
+std::ostream \& operator\textless\textless(std::ostream \& cout, const
+Int \& c)
+
+\{
+
+cout \textless\textless{} \textbf{c.x\_};
+
+return cout;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include ``Int.h"
+
+int main()
+
+\{
+
+Int c(42),d(43);
+
+std::cout \textless\textless{} c \textless\textless{} ","
+\textless\textless{} d \textless\textless{} "\textbackslash n";
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In general, if the header of a function \emph{f} is a friend in a class
+\emph{C}, then \emph{f} has access to things in private section of class
+\emph{C}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C
+
+\{
+
+public:
+
+\textbf{friend void f(C \& c);}
+
+private:
+
+int x\_;
+
+void m() \{ x++; \}
+
+\}
+
+void f(C \& c)
+
+\{
+
+c.x\_ = 0; // f can access c.x\_ (private)
+
+c.m(); // f can access c.m (private)
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Do NOT declare too many friends in a class -- this breaks the principle
+of information hiding and makes the class harder to maintain in case you
+
+need private members variables or methods in the future.
+
+Of course friends can be completely avoided.
+
+operator\textgreater\textgreater{}
+
+For input, just change \emph{ostream} to \emph{istream}. Everything else
+is pretty similar. You should be able to figure the differences out
+yourself. Here's an example to guide you.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#ifndef FRACTION\_H
+
+\#define FRACTION\_H
+
+class Fraction
+
+\{
+
+public:
+
+Fraction(int a, int b)
+
+: n\_(a), d\_(b)
+
+\{\}
+
+friend std::istream \& operator\textgreater\textgreater(std::istream \&,
+Fraction \&);
+
+friend std::ostream \& operator\textless\textless(std::ostream \&, const
+Fraction \&);
+
+private:
+
+int n\_, d\_;
+
+\};
+
+\#endif\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include ``Fraction.h"
+
+std::ostream \& operator\textless\textless(std::ostream \& cout, const
+Fraction \& r)
+
+\{
+
+cout \textless\textless{} r.n\_ \textless\textless{} "/"
+\textless\textless{} r.d\_;
+
+return cout;
+
+\}
+
+std::istream \& operator\textgreater\textgreater(std::istream \& cin,
+Fraction \& r)
+
+\{
+
+cin \textgreater\textgreater{} r.n\_ \textgreater\textgreater{} r.d\_;
+
+return cin;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include ``Fraction.h"
+
+int main()
+
+\{
+
+Fraction c(0,1), d(0,1);
+
+std::cout \textless\textless{} c \textless\textless{} ","
+\textless\textless{} d \textless\textless{} "\textbackslash n";
+
+std::cin \textgreater\textgreater{} c \textgreater\textgreater{} d;
+
+std::cout \textless\textless{} c \textless\textless{} ","
+\textless\textless{} d \textless\textless{} "\textbackslash n";
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\end{document}

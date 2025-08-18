@@ -1,0 +1,315 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\author{}
+\date{}
+
+\begin{document}
+
+41. Structure templates
+
+Objectives
+
+\begin{itemize}
+\tightlist
+\item
+  Write structure templates
+\item
+  Instantiate structure templates by creating structure variables
+\end{itemize}
+
+Structure template\\
+
+Once you understand the concept of a function template, it's not too
+surprising when you see a structure template:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template \textless{} typename T \textgreater{}
+
+struct vec2
+
+\{
+
+\emph{ T} x, y;
+
+\};
+
+int main()
+
+\{\\
+vec2\textless{} int \textgreater{} p = \{1, 2\};
+
+std::cout \textless\textless{} p.x \textless\textless{} ','
+\textless\textless{} p.y \textless\textless{} std::endl;
+
+vec2\textless{} double \textgreater{} q = \{1.1, 2.2\};
+
+std::cout \textless\textless{} q.x \textless\textless{} ','
+\textless\textless{} q.y \textless\textless{} std::endl;
+
+return 0;
+
+\} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Neat right? And of course we can use them both at the same time when you
+have template functions supporting structure templates. In this case you
+will see a templatized structure parameter.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+template \textless{} typename T \textgreater{}
+
+struct vec2
+
+\{
+
+T x, y;
+
+\};
+
+template \textless{} typename T \textgreater{}
+
+void println(const vec2\textless{} T \textgreater{} \& p)
+
+\{
+
+std::cout \textless\textless{} p.x \textless\textless{} ','
+\textless\textless{} p.y \textless\textless{} std::endl;
+
+\}
+
+int main()
+
+\{
+
+vec2\textless{} int \textgreater{} p = \{1, 2\};
+
+println\textless{} int \textgreater(p);
+
+vec2\textless{} double \textgreater{} q = \{1.1, 2.2\};
+
+println\textless{} double \textgreater(q);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Add this function template to your program above.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+template \textless{} typename T \textgreater{}
+
+struct vec2
+
+\{
+
+T x, y;
+
+\};
+
+template \textless{} typename T \textgreater{}
+
+void println(const vec2\textless{} T \textgreater{} \& p)
+
+\{
+
+std::cout \textless\textless{} p.x \textless\textless{} ','
+\textless\textless{} p.y \textless\textless{} std::endl;
+
+\}
+
+template \textless{} typename T \textgreater{}
+
+vec2\textless{} T \textgreater{} add(const vec2\textless{} T
+\textgreater{} \& p,
+
+const vec2\textless{} T \textgreater{} \& q)
+
+\{
+
+vec2\textless{} T \textgreater{} r;
+
+r.x = p.x + q.x;
+
+r.y = p.y + q.y;
+
+return r;
+
+\}
+
+int main()
+
+\{
+
+vec2\textless{} int \textgreater{} p = \{1, 2\};
+
+println\textless{} int \textgreater(p);
+
+vec2\textless{} double \textgreater{} q = \{1.1, 2.2\};
+
+println\textless{} double \textgreater(q);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Read the code carefully. What does it do? Test this function.
+
+\textbf{Exercise.} Here's a structure template:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template \textless{} typename T \textgreater{}
+
+struct Array
+
+\{
+
+T x{[}1000{]};
+
+int length;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Write a function \emph{init()} so that \emph{init(a)}will set
+\emph{a.length} to 0. Write another function \emph{append()} so that
+\emph{append(a, x)} will ``add x to a''. Write a function
+\emph{println()} so that \emph{println(a)} will print the values in
+\emph{a} i.e., \emph{a.x{[}0{]}}, \emph{a.x{[}1{]}}, \ldots,
+\emph{a.x{[}a.length - 1{]}}.
+
+Template parameters need not be types. They can be integers too. Try
+this ...
+
+\textbf{Exercise.} Here's a structure template:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+template \textless{} typename T, int N \textgreater{}
+
+struct Array
+
+\{
+
+T x{[}N{]};
+
+int length;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Here's a struct variable created using the above:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+Array\textless{} int, 1000 \textgreater{} a; // a.x is size 1000 int
+array \tabularnewline
+\bottomrule
+\end{longtable}
+
+Write a function \emph{init()} so that \emph{init(a)}will set
+\emph{a.length} to 0. Write another function \emph{append()} so that
+\emph{append(a, x)} will ``add x to a''. Write a function
+\emph{println()} so that \emph{println(a)} will print the values in
+\emph{a} i.e., \emph{a.x{[}0{]}}, \emph{a.x{[}1{]}}, \ldots,
+\emph{a.x{[}a.length - 1{]}}.
+
+Header Files
+
+Here is the most important rule for writing function templates: the
+whole function must be in the header file.
+
+This is very different from your regular functions where you put the
+prototype in the header file and the actual definition of the function
+in a cpp file.
+
+(Note that struct templates, like structs, should also be in the header
+file.)
+
+Make sure you remember that or you will get an error when you compile
+your program.
+
+\end{document}

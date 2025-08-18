@@ -1,0 +1,1453 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\author{}
+\date{}
+
+\begin{document}
+
+71. Exceptions and assertions
+
+Objectives:
+
+\begin{itemize}
+\tightlist
+\item
+  Understand the flow of control when an exception is thrown.
+\item
+  Write code to throw exception
+\item
+  Write exception handling code to catch and process exceptions.
+\item
+  Write assertions.
+\item
+  Understand the difference between exceptions and assertions.
+\end{itemize}
+
+Exceptions
+
+Exceptions are error control devices. Here's the big picture ...
+
+Suppose you write a piece of code. Say function \emph{f()} calls
+function \emph{g(),} and something terrible happens in \emph{g()}.
+\emph{g()} can tell \emph{f()} that something really bad happened in
+different ways. For instance the return value of \emph{g()} can be an
+error code. Another way is to get \emph{g()} to set a global variable to
+some error code; \emph{f()} can check this global variable after
+execution has returned back to \emph{f()}. In both cases, you control
+the flow of execution to handle some error.
+
+There's a better way. It involves \textbf{exceptions}.
+
+In the case of exceptions, to tell the calling function something has
+gone wrong, you \textbf{throw} an object or value back to the calling
+function; this object/value is called the \textbf{exception}. The
+calling function can choose to \textbf{catch} the exception or not. But
+the interesting thing is that if \emph{h()} calls \emph{f()} and
+\emph{f()} calls \emph{g()} and \emph{g()} throws an exception back, if
+\emph{f()} does not catch it but \emph{h()} does, then the flow of
+execution goes to the code in h() that catches the exception (or error).
+
+That's the big picture. Now how do you try to catch the error? If
+\emph{f()} wants to catch an exception, it must wrap the code where an
+exception might occur in a \textbf{try-block}. The try-block is followed
+by a \textbf{catch-block}. If \emph{g()} throws an object or value of
+some type, say it's an integer, then your catch must specify that it's
+trying to catch an integer exception:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void f()
+
+\{
+
+\textbf{try}\\
+\textbf{\{}
+
+// code
+
+g();
+
+// more code\\
+\textbf{\}}
+
+catch (int i)\\
+\{
+
+// code to clean up the mess caused
+
+// by the error\\
+\textbf{\}}\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+What about on \emph{g()}'s side? If something goes wrong \emph{g()}
+throws an integer back. This is achieved by:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void g()
+
+\{
+
+// ... some code ...
+
+throw 5;
+
+// ... some code ...\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Your code can catch exceptions of different types, not necessarily an
+integer. It can even be an object.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void g()
+
+\{
+
+std::cout \textless\textless{} "g(): about to throw 5
+...\textbackslash n";
+
+throw 5;
+
+std::cout \textless\textless{} "g(): after throw 5 ...\textbackslash n";
+
+\}
+
+void f()
+
+\{
+
+try\\
+\{
+
+std::cout \textless\textless{} "f(): about to call g()
+...\textbackslash n";
+
+g();
+
+std::cout \textless\textless{} "f(): after calling g()
+...\textbackslash n";
+
+\}
+
+catch (int i)\\
+\{
+
+std::cout \textless\textless{} "f(): caught int " \textless\textless{} i
+\textless\textless{} '\textbackslash n';
+
+\}\\
+\}
+
+int main()
+
+\{
+
+f();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Run the following programs/experiments and \textbf{trace their
+execution}. That is in fact the reason for exceptions: they alter the
+flow of normal program execution.
+
+Program 1. A Simple Example
+
+Run this program. Then uncomment the \emph{throw} statement and run it
+again.
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+WARNING: Depending on your compiler, you might need to write
+\emph{std::exception} instead of \emph{exception}. You might or might
+not need to \emph{\#include} exception.
+
+\emph{\textbf{exception}}\textbf{ }is a class that comes with your
+compiler. In this case I'm throwing a standard \emph{exception} object.
+You can actually throw any object or any value. If you prefer, you can
+create your own class for an exception object to throw, or you can just
+throw any value (\emph{int}, \emph{double}, \emph{bool}, etc.)
+
+This is really handy. Why? Suppose you're writing a program without
+exceptions and the code looks like the following, i.e., \emph{f()} calls
+\emph{g()}, \emph{g()} calls \emph{h()}, and \emph{h()} calls
+\emph{i()}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void i()
+
+\{
+
+...\\
+\}
+
+void h()
+
+\{
+
+...
+
+i();
+
+...\\
+\}
+
+void g()
+
+\{
+
+...
+
+h();
+
+...\\
+\}
+
+void f()
+
+\{
+
+...
+
+g();
+
+...\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Here's a diagram that describes the function call relationship:
+
+f → g → h → i
+
+where the → means "calls".
+
+After it's done you analyze your code and realize that some errors might
+occur in \emph{i()}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void i()
+
+\{
+
+...
+
+z = x / y; // oops what if y is zero???
+
+...\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Suppose you want \emph{f()} to handle this error. Then you might need to
+pass an error code back to \emph{f()} like this (we return 0 for no
+error and 1 if there's an error). This means that the error code must
+pass from \emph{i} to \emph{h}, \emph{h} must pass the error code to
+\emph{g}, and \emph{g} must pass the error code to \emph{f}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\textbf{int} i()
+
+\{
+
+...
+
+// return 1 if there's an error
+
+\textbf{if (y == 0) }
+
+return 1;
+
+z = x / y; // oops what if y is zero???
+
+...\\
+\textbf{return 0; }// return 0 if there's no error\\
+\}
+
+\textbf{int} h()
+
+\{
+
+...
+
+\textbf{if (i() != 0) return 1;}
+
+...
+
+\textbf{return 0;}\\
+\}
+
+\textbf{int} g()
+
+\{
+
+...
+
+if (h() != 0) return 1;
+
+...
+
+\textbf{return 0;}\\
+\}
+
+void f()
+
+\{
+
+...
+
+if (g() != 0)
+
+\{
+
+// ... do some error
+
+// handling ...\\
+\}
+
+...\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Boy ... what a pain!!! Look at the amount of changes you need to make!!!
+Not to worry ... exceptions to the rescue ...
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+void i()
+
+\{
+
+...
+
+\textbf{if (y == 0) throw exception();}
+
+z = x / y; // oops what if y is zero???
+
+...\\
+\}
+
+void h()
+
+\{
+
+...
+
+i();
+
+...
+
+\}
+
+void g()
+
+\{
+
+...
+
+h();
+
+...
+
+\}
+
+void f()
+
+\{
+
+...
+
+try
+
+\{
+
+g();
+
+\textbf{\}}
+
+\textbf{catch (exception \& e)}
+
+\textbf{\{}
+
+\textbf{ // ... do some error}
+
+\textbf{ // handling ...}\\
+\textbf{\}}
+
+...\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Much cleaner!!!
+
+The important thing is this ...
+
+You only need to modify the function code that might run into an error
+and the function that should handle the error. In other words you only
+need to change \emph{i()} and \emph{f()}. We say that \emph{i()} is the
+thrower and \emph{f()} is the catcher.
+
+Now, just imagine the nightmare if you have a chain of 20 function
+calls: You would need to modify 20 functions from the thrower all the
+way back to the catcher.
+
+In a real piece of software, the exception handling code can for
+instance print a message to the user to let them know that an email was
+sent to the company and bug fixes will come soon. The program can (for
+instance) shut down or maybe restart.
+
+Program 3. Rethrowing an exception
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+This is helpful when the error handling involves several functions
+within the function call stack.
+
+Program 4. Writing your own exception
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Here's an example on handling division by zero.
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise:} Write a \emph{Stack} class to contain integers;
+suppose the maximum capacity of the stack is 5 (example: you use an
+array to keep the values). Write a \emph{StackException} class to handle
+overflow and underflow errors. (Skeleton answer on the next page.)
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+catch (\textbf{StackException \& e})
+
+\{
+
+std::cout \textless\textless{} "stack error" \textless\textless{}
+std::endl;
+
+\}
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Program 5. Exception objects with members
+
+Of course you can put anything in your exception object. Here's an
+example where our own handcrafted exception class, \emph{MyException},
+contains an integer error code.
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Program 6. Catching Multiple Exceptions
+
+Of course there's no reason to believe that in a chunk of code (say in a
+function) there is only one possible error. The following show you that
+a function, in the example that would be \emph{main()}, can be a catcher
+to two different types of exceptions.
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise} Recall a previous exercise:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless cmath\textgreater{}
+
+\#include \textless ctime\textgreater{}
+
+class StackException
+
+\{\};
+
+class Stack
+
+\{
+
+public:
+
+...
+
+void push(int i)\\
+\{
+
+if (size == 5)
+
+throw StackException();
+
+...\\
+\}
+
+int pop()\\
+\{
+
+\textbf{if (size == 0) }
+
+throw StackException();
+
+...\\
+\}
+
+...\\
+\};
+
+int main()
+
+\{
+
+srand((unsigned) time(NULL));
+
+Stack stack;
+
+try
+
+\{
+
+while (1)
+
+\{
+
+int option;
+
+std::cin \textgreater\textgreater{} option;
+
+switch (option)
+
+\{
+
+case 0: stack.push(rand()); break;
+
+case 1: stack.pop(); break;\\
+\}
+
+std::cout \textless\textless{} stack \textless\textless{} std::endl;
+
+\}
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+catch (\textbf{StackException e})
+
+\{
+
+std::cout \textless\textless{} "stack error" \textless\textless{}
+std::endl;
+
+\}
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Modify the program by replacing StackException with two new classes,
+\emph{StackOverflowException} and \emph{StackUnderflowException}, to
+handle the two different errors. The code in \emph{main()} should catch
+both errors.
+
+By the way it's a good idea to keep exceptions which are thrown only in
+a class together with the class itself in the same header file. It makes
+the exception class easier to find.
+
+Program 7. What if the exception is not caught?
+
+First try this and see what happens when an exception is thrown but no
+one is catching it:
+
+\begin{longtable}[]{@{}@{}}
+\toprule
+\endhead
+\bottomrule
+\end{longtable}
+
+Get it?
+
+Memory Allocation Exception
+
+You know that if the system is not able to allocate memory for a
+pointer,
+
+\emph{int * p = new int{[}some\_big\_number{]};}
+
+the program might (1) crash and stop or (2) the pointer value returned
+is 0. (For the case of g++, when the requested memory cannot be
+fulfilled, the program crashes.)
+
+In case (2), say you're writing network game and the new operator
+returns 0 you might want to do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int * p = new int{[}some\_big\_number{]};
+
+if (p == NULL)
+
+\{
+
+// Ooops ... system ran out of memory ...
+
+// Print some error message, clean up
+
+// (release resources like network
+
+// connections, database connections, etc.),
+
+// and stop the program\\
+\}
+
+else
+
+\{
+
+// continue what you wanted to do\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In case (1) where the system crashes and stop, it actually throws an
+exception. (For newer C++ compilers (1) is actually the norm.) The
+reason why the program crashes and stops is because the exception is not
+caught. The exception object thrown is from the class
+\emph{std::bad\_alloc}. Run this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless exception\textgreater{}
+
+int main()
+
+\{
+
+try
+
+\{
+
+int * p = new int{[}1000000{]};
+
+std::cout \textless\textless{} "ok" \textless\textless{} std::endl;
+
+\}
+
+catch (\textbf{std::bad\_alloc} \& e)
+
+\{
+
+std::cout \textless\textless{} "bad!!!\textbackslash n";
+
+\}
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Your system should be able to provide memory for \emph{p} to point to.
+Next modify it like so ...
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+...
+
+try
+
+\{
+
+while (1)
+
+\{
+
+int * p = new int{[}1000000{]};
+
+std::cout \textless\textless{} "ok" \textless\textless{} std::endl;
+
+\}
+
+\}
+
+...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+... and system is bound to run out of memory for allocation.
+
+So in the case where your C++ compiler throws a \emph{std::bad\_alloc}
+exception when the new operator cannot be satisfied, you can do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless exception\textgreater{}
+
+int main()
+
+\{
+
+try
+
+\{
+
+game(); // run the game
+
+\}
+
+catch (\textbf{std::bad\_alloc} \& e)
+
+\{
+
+// Ooops ... system ran out of memory ...
+
+// Print some error message,
+
+// clean up (release resources like
+
+// network connections, database
+
+// connections, etc.).
+
+\}
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+But ...
+
+What if the compiler you're using is older and does not thrown a
+\emph{std::bad\_alloc} object when there's not enough memory or for some
+reason you do not want the compiler to throw a \emph{std::bad\_alloc}
+object when the new operator cannot be satisfied?
+
+First of all you can disable throwing. Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless exception\textgreater{}
+
+\#include \textless new\textgreater{}
+
+int main()
+
+\{
+
+try
+
+\{
+
+while (1)
+
+\{\\
+int * p = new \textbf{(std::nothrow)} int{[}1000000{]};
+
+std::cout \textless\textless{} "ok" \textless\textless{} std::endl;
+
+\}
+
+\}
+
+catch (std::bad\_alloc \& e)
+
+\{
+
+std::cout \textless\textless{} "bad!!!\textbackslash n";
+
+\}
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+This will cause \emph{p} to be set to \emph{NULL} if there's not enough
+memory for allocation.
+
+Most modern C++ compilers \emph{\textbf{do}} throw an exception when
+there's not enough memory. But anyway if you have a compiler that does
+not (or you prefer not to) and the compiler understands
+\emph{std::nothrow} and you want to throw your own memory exception
+object, you can do the following:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless exception\textgreater{}
+
+\#include \textless new\textgreater{}
+
+class MemoryAllocationException \{\};
+
+int main()
+
+\{
+
+try
+
+\{
+
+while (1)
+
+\{\\
+int *p = new (std::nothrow) int{[}1000000{]};
+
+\textbf{if (p == NULL) }
+
+throw MemoryAllocationException();
+
+std::cout \textless\textless{} "ok" \textless\textless{} std::endl;
+
+\}
+
+\}
+
+catch (\textbf{MemoryAllocationException} \& e)
+
+\{
+
+std::cout \textless\textless{} "bad!!!\textbackslash n";
+
+\}
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Other Scenarios
+
+Suppose you have an \emph{LongInt} class for the modeling and
+computation of integer values that are larger than what the \emph{int}
+provides. Then one possible place where you want to raise an error
+(besides memory allocation error) if the division-by-zero error.
+Therefore your \emph{LongInt} class might look like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// File: LongInt.h
+
+class DivByZeroException \{\};
+
+class LongInt
+
+\{
+
+...
+
+LongInt \& operator/=(const LongInt \& i)
+
+\{
+
+if (i == 0) throw DivByZeroException();
+
+...
+
+return (*this);\\
+\}
+
+...\\
+\}; \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Your main program might then look like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// File: main.cpp
+
+\#include \textless iostream\textgreater{}
+
+\#include \textless exception\textgreater{}
+
+\#include "LongInt.h"
+
+int main()
+
+\{
+
+std::cout \textless\textless{} "predict the next-day stock "
+
+\textless\textless{} "price of Google!!!\textbackslash n"
+
+\textless\textless{} "enter \textbackslash n"
+
+\textless\textless{} "1. current price\textbackslash n"
+
+\textless\textless{} "2. your weight\textbackslash n"
+
+\textless\textless{} "3. today's highest temperature\textbackslash n"
+
+\textless\textless{} "4. some random number\textbackslash n";
+
+try
+
+\{
+
+LongInt I, J, K, L;
+
+std::cin \textgreater\textgreater{} I \textgreater\textgreater{} J
+\textgreater\textgreater{} K \textgreater\textgreater{} L;
+
+std::cout \textless\textless{} (I + L * J / K) \textless\textless{}
+std::endl;\\
+\}
+
+catch (std::bad\_alloc \& e)
+
+\{
+
+std::cout \textless\textless{} "out of mem!!! buy more"
+
+\textless\textless{} "ram!!!\textbackslash n";\\
+\}
+
+catch (DivByZeroException \& e)
+
+\{
+
+std::cout \textless\textless{} "oops ... highest temp "
+
+\textless\textless{} "cannot be zero\textbackslash n";\\
+\}\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Another common thing that is done when something severe has occured is
+to log the error, i.e. write some useful error/debugging message to a
+file, and possible send the file to the author of the program. You've
+seen this before when a program unexpectedly crashes and a window pops
+up, informs you that an error has occured and asks you if you want to
+send the error to Microsoft (or some other company). That program was
+probably contains exception handling.
+
+Bad Usage of Exceptions
+
+From previous examples you see that exceptions can be used to alter flow
+of execution in situations where some type of error has occurs. Of
+course you can use this to alter the flow of execution in any situation,
+but that would be a WRONG usage of exceptions. Here's one such bad use
+of exceptions:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+class A \{\};
+
+class B \{\};
+
+class C \{\};
+
+class D \{\};
+
+class F \{\};
+
+int main()
+
+\{
+
+while (1)
+
+\{
+
+try
+
+\{
+
+double score;
+
+std::cin \textgreater\textgreater{} score;
+
+if (score \textgreater= 90)
+
+\{
+
+throw A();
+
+\}
+
+else if (score \textgreater= 80)
+
+\{
+
+throw B();
+
+\}
+
+else if (score \textgreater= 70)
+
+\{
+
+throw C();
+
+\}
+
+else if (score \textgreater= 60)
+
+\{
+
+throw D();
+
+\}
+
+else
+
+\{
+
+throw F();\\
+\}\\
+\}
+
+catch (A e)
+
+\{
+
+std::cout \textless\textless{} "You got A!!!\textbackslash n";\\
+\}
+
+catch (B e)
+
+\{
+
+std::cout \textless\textless{} "You got B!!!\textbackslash n";\\
+\}
+
+catch (C e)
+
+\{
+
+std::cout \textless\textless{} "You got C!!!\textbackslash n";\\
+\}\\
+catch (D e)
+
+\{
+
+std::cout \textless\textless{} ""You got D!!!\textbackslash n";\\
+\}\\
+catch (F e)
+
+\{
+
+std::cout \textless\textless{} ""You got F!!!\textbackslash n";\\
+\}\\
+\}
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Study the above carefully. Of course you know that the following is
+better:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+int main()
+
+\{
+
+while (1)
+
+\{
+
+double score;
+
+std::cin \textgreater\textgreater{} score;
+
+if (score \textgreater= 90)
+
+\{
+
+std::cout \textless\textless{} "You got A!!!\textbackslash n";
+
+\}
+
+else if (score \textgreater= 80)
+
+\{
+
+std::cout \textless\textless{} "You got B!!!\textbackslash n";
+
+\}
+
+else if (score \textgreater= 70)
+
+\{
+
+std::cout \textless\textless{} "You got C!!!\textbackslash n";
+
+\}
+
+else if (score \textgreater= 60)
+
+\{
+
+std::cout \textless\textless{} "You got D!!!\textbackslash n";
+
+\}
+
+else
+
+\{
+
+std::cout \textless\textless{} "You got F!!!\textbackslash n";\\
+\}
+
+\}
+
+return 0;\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The type of error you want to handle with exceptions are usually those
+that are pretty severe, in the sense that the program usually has to
+shutdown completely and possibly it would have to do some form of
+resource clean up (example: release memory usage, release some exclusive
+hold of hardware resource, etc.)
+
+Assertions
+
+Compile and run this program. For this example, I'll be using g++.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless cassert\textgreater{}
+
+int q(int x, int y)
+
+\{
+
+assert(y != 0);
+
+return x / y;
+
+\}
+
+int main()
+
+\{
+
+std::cout \textless\textless{} q(1, 1) \textless\textless{} std::endl;
+
+std::cout \textless\textless{} q(1, 0) \textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+When I run this I get the following:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+{[}student@localhost assert{]}\$ g++ *.cpp
+
+{[}student@localhost assert{]}\$ ./a.out
+
+1
+
+a.out: main.cpp:6: int q(int, int): Assertion `y != 0' failed.
+
+Aborted (core dumped)\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Now compile and run it this way:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+{[}student@localhost assert{]}\$ g++ *.cpp \textbf{-DNDEBUG}
+
+{[}student@localhost assert{]}\$ ./a.out
+
+1
+
+Floating point exception (core dumped)
+
+{[}student@localhost assert{]}\$ \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Assertions are also used to catch errors. You can turn on or off
+assertion checking. In the second execution above, when you turn off
+assertion checking, the integer division goes through, causing a
+division-by-zero exception.
+
+You can also compile with assertions turned off in this manner by
+writing your code this way:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#define NDEBUG
+
+\#include \textless cassert\textgreater{}
+
+int q(int x, int y)
+
+\{
+
+assert(y != 0);
+
+return x / y;
+
+\}
+
+int main()
+
+\{
+
+std::cout \textless\textless{} q(1, 1) \textless\textless{} std::endl;
+
+std::cout \textless\textless{} q(1, 0) \textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+and compiling in the usual way:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+{[}student@localhost assert{]}\$ g++ *.cpp
+
+{[}student@localhost assert{]}\$ ./a.out
+
+1
+
+Floating point exception (core dumped)\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+While you can create a try-catch block to catch exceptions, you
+\textbf{cannot catch assertions}. So assertions are meant for catching
+programming errors. Once caught you will can figure out what's wrong
+with the code and fix it. In the above example, the function \emph{q()}
+should never be used with \emph{0} as the second argument.
+
+The boolean condition for an assertion is meant to never ever happen.
+Here's an example to differentiate between exceptions and assertions.
+
+Suppose you have a program that prompts the user for a filename. It's
+entirely possible that the user enters the filename wrongly so that
+opening the file is an error. This can happen and you can't possibly
+prevent the user from entering wrong data! On the other hand, if you are
+writing a program that performs some kind of bit computation using an
+integer for a bit and there's a helper function that accepts this bit (0
+or 1), then the input must be 0 or 1. Sending in 42 is an error. So in
+this case, using an assertion to check that the input is 0 or 1 is the
+correct type of error checking.
+
+So error checking for an error that can happen should be handled with
+exceptions while error check for an error that should never happen
+should be handled with assertions.
+
+Note that the reason why you can easily turn off assertions when you
+compile is because during software development, you would turn on
+assertions and when you want to deliver the software product, you would
+compile with assertions turned off so as not to waste CPU cycles.
+
+By the way, \emph{assert} is not a function. It's a macro. See notes on
+preprocessor directives.
+
+(There's also a \emph{static\_assert()} that checks a boolean condition
+that can be evaluated during compile time.)
+
+\end{document}

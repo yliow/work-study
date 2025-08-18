@@ -1,0 +1,885 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\author{}
+\date{}
+
+\begin{document}
+
+69. Object Members
+
+Objectives
+
+\begin{itemize}
+\tightlist
+\item
+  Create a class with object members
+\item
+  Use an implicit member constructor to instantiate objects
+\item
+  Use an explicit member constructor to instantiate objects
+\item
+  Learn the order in which member destructors are called
+\item
+  Use delegation to shorten code
+\end{itemize}
+
+Object Members
+
+No surprises: you can have members which are \textbf{objects}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class ClubMember
+
+\{
+
+private:
+
+int member\_id\_;
+
+\textbf{Date signup\_date\_; }
+
+\};
+
+int main()
+
+\{
+
+ClubMember john; // john.signup\_date\_ is a
+
+// Date object.
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Here's another example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class MyVehicle
+
+\{
+
+private:
+
+char vin\_{[}100{]};
+
+\textbf{Vehicle vehicle\_; }
+
+Date purchase\_date\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Member Constructor: Implicit
+
+Consider this example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C
+
+\{
+
+public:
+
+C() \{ std::cout \textless\textless{} "C()\textbackslash n"; \}
+
+\};
+
+class D
+
+\{
+
+private:
+
+C c;
+
+\};
+
+int main()
+
+\{
+
+D d;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The class \emph{D} contains a member \emph{c} that is an object from
+class \emph{C}. When creating \emph{d}, the member \emph{d.c }calls its
+default constructor \emph{C::C()} automatically.
+
+No constructor found
+
+Now we'll look at a very common case that you may run into: the case
+when your compiler cannot find a constructor to call. For example,
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C
+
+\{
+
+public:
+
+C(int a)
+
+: x\_(a)
+
+\{
+
+std::cout \textless\textless{} "C()\textbackslash n";
+
+\}
+
+private:
+
+int x\_;
+
+\};
+
+class D
+
+\{
+
+private:
+
+C c\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Error:} no appropriate constructor. Why? Examine the above code
+carefully. Notice that the class \emph{C} contains a constructor that
+takes an \emph{int} parameter.
+
+So what's the problem? Well, if an object of type \emph{D} were created,
+then it would have to create its member, \emph{c}. However, an
+\emph{int} parameter for the constructor is necessary to create an
+object of type \emph{C} (since \emph{C} does not have a default
+constructor). The question is, assuming this code actually works, where
+would the \emph{int} parameter come from? This produces an error because
+there is \textbf{no} \emph{int} parameter passed into the constructor.
+
+No surprise there. Recall that you must pass in all parameters for any
+function that takes them.
+
+Member constructor: explicit
+
+So what if I don't want to call the default constructor (the constructor
+that does not have any parameters), but some other constructor?? You can
+actually specify your constructor call ...
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C
+
+\{
+
+public:
+
+C(int x)
+
+: x\_(x)
+
+\{
+
+std::cout \textless\textless{} "C()\textbackslash n";
+
+\}
+
+private:
+
+int x\_;
+
+\};
+
+class D
+
+\{
+
+public:
+
+D(int x)
+
+: \textbf{c\_(a)}
+
+\{\}
+
+private:
+
+C c\_;
+
+\};
+
+int main()
+
+\{
+
+D d = D(0);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Member \emph{c\_} calls constructor \emph{C::C(int)} explicitly.
+
+Here's another example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class ClubMember
+
+\{
+
+public:
+
+ClubMember(int id, const Date \& d)
+
+: member\_id\_(id), \textbf{signup\_date\_(d)}
+
+\{\}
+
+private:
+
+int member\_id\_;
+
+Date signup\_date\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\emph{signup\_date} calls \emph{Date::Date(const Date \&)}, i.e., the
+copy constructor explicitly.
+
+\textbf{Exercise:} Add a \emph{get\_signup\_date()} method to the above
+class that does the obvious. Test your code with
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int main()
+
+\{
+
+ClubMember john(42, Date(2015, 1, 1));
+
+john.get\_signup\_date().print();
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Member destructor
+
+Let's look at what happens with member destructors. Consider this
+example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C
+
+\{
+
+public:
+
+C(int a): x\_(a)
+
+\{
+
+std::cout \textless\textless{} "C()\textbackslash n";
+
+\}
+
+\textasciitilde C()
+
+\{
+
+std::cout \textless\textless{} "\textasciitilde C()\textbackslash n";
+
+\}
+
+private:
+
+int x\_;
+
+\};
+
+class D
+
+\{
+
+public:
+
+D(int a)
+
+: c\_(a)
+
+\{\}
+
+\textasciitilde D()
+
+\{
+
+std::cout \textless\textless{} "\textasciitilde D()\textbackslash n";
+
+\}
+
+private:
+
+C c\_;
+
+\};
+
+int main()
+
+\{
+
+C c = C(0);
+
+D d = D(1);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+When object \emph{d} does out of scope, destructor of \emph{D}, i.e.
+\emph{D::\textasciitilde D()}, is called. In
+\emph{D::\textasciitilde D()}, member \emph{c} calls its destructor
+\emph{C::\textasciitilde C()}.
+
+Constructor and destructor call order
+
+If object \emph{obj} has object members
+
+obj1, obj2, obj3
+
+declared in that order, then the constructor calls for the members are
+in this order:
+
+\emph{obj1, obj2, obj3 }
+
+When \emph{obj} goes out of scope and the \emph{obj} calls its
+destructor, then the order of destructor calls for members is:
+
+\emph{obj3, obj2, obj1}
+
+Composition
+
+Putting object(s) inside an object is called \textbf{composition}.
+That's one method of software re-use. There's also another type of
+software re-use in object-oriented programming called
+\textbf{inheritance}. You'll see that in many cases (but not all cases)
+, composition is better than inheritance.
+
+Exercise. Complete the following circle class
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Circle.h
+
+class Circle
+
+\{
+
+public:
+
+Circle(int x0, int y0, int r0);
+
+void move(int dx, int dy)
+
+\{
+
+x\_ += dx; y\_ += dy;
+
+\}
+
+void print() const;
+
+private:
+
+int x\_, y\_, r\_;
+
+\}; \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// Circle.cpp
+
+void Circle::print() const
+
+\{
+
+std::cout \textless\textless{} "center: (" \textless\textless{} x\_
+\textless\textless{} ", " \textless\textless{} y\_
+
+\textless\textless{} ")" \textless\textless{} ", radius:"
+\textless\textless{} r\_ \textless\textless{} '\textbackslash n';
+
+\}
+
+// Add other method definitions here\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+And test it with this program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int main()
+
+\{
+
+Circle c(10, 10, 5);
+
+c.print();
+
+for (int i = 0; i \textless{} 10; i++)
+
+\{
+
+c.move(2, 3);
+
+c.print();
+
+\}
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Now finish the following class:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class vec2i
+
+\{
+
+public:
+
+// constructor
+
+// operator +=
+
+// operator\textless\textless{}
+
+private:
+
+int x\_, y\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+And rewrite your circle class:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Circle
+
+\{
+
+public:
+
+Circle(\textbf{const vec2i \& v}, int r0);
+
+void move(\textbf{const vec2i \& v}) \{ ... \}
+
+void print(\textbf{const vec2i \& v}) \{ ... \}
+
+private:
+
+\textbf{vec2i center\_;}
+
+int r\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+And test it with this program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int main()
+
+\{
+
+Circle c(vec2i(10, 10), 5);
+
+c.print();
+
+vec2i v(2, 3);
+
+for (int i = 0; i \textless{} 10; i++)
+
+\{
+
+c.move(v);
+
+c.print();
+
+\}
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Delegation
+
+The following is a common practice:
+
+\begin{itemize}
+\tightlist
+\item
+  Suppose every object of class \emph{D} contains an object of class
+  \emph{C}.
+\end{itemize}
+
+\begin{itemize}
+\tightlist
+\item
+  Suppose every object of class \emph{C} has a method called \emph{m()}.
+\end{itemize}
+
+\begin{itemize}
+\tightlist
+\item
+  Then \emph{D} can have a method call \emph{m()} that calls the
+  \emph{m()} of class \emph{C}.
+\end{itemize}
+
+For instance,
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C
+
+\{
+
+public:
+
+\textbf{void m() }
+
+\{
+
+std::cout \textless\textless{} "C::m() ...\textbackslash n";
+
+\}
+
+\};
+
+class D
+
+\{
+
+public:
+
+\textbf{void m()}
+
+\{
+
+std::cout \textless\textless{} "D::m() ...\textbackslash n";
+
+\textbf{c.m(); }
+
+\}
+
+private:
+
+C c;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+So when you call \emph{d.m()}, \emph{d} actually calls \emph{c.m()} to
+do the work.
+
+Here's another example:
+
+Suppose you have a \emph{vec2d} class (a vector class of 2 doubles).
+Suppose you have a \emph{GameObject} class with a \emph{vec2d} member
+called \emph{pos} (the position vector in the screen). Suppose each
+\emph{vec2d} object has a \emph{get\_x()} method. Then you might want to
+have a \emph{get\_x()} method in the \emph{GameObject} class. This
+method calls the \emph{p.get\_x() }method.
+
+\emph{GameObject alien; }
+
+std::cout \textless\textless{} alien.get\_x() \textless\textless{}
+'\textbackslash n';
+
+Otherwise you would have to do this:
+
+GameObject alien;
+
+std::cout \textless\textless{} alien.get\_pos().get\_x()
+\textless\textless{} '\textbackslash n';
+
+In software, if you see something like
+
+\emph{alien.get\_pos().get\_x() }
+
+with two ``\emph{.}'' operators (the ``member operator''), then the
+delegation technique should probably be used. In well written software,
+there shouldn't be too many ``\emph{.}'' operators like the above. This
+is very subjective, but some recommend at most two ``\emph{.}''. So the
+following is considered bad:
+
+\emph{alien.get\_rocket().load().fire() }
+
+Maybe have this instead:
+
+\emph{alien.fire\_rocket() }
+
+In fact some experts say there should be at most one ``\emph{.}''
+
+\textbf{Exercise.} Complete the following class
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class TicTacToe
+
+\{
+
+public:
+
+// constructor TicTacToe(int size):
+
+// initialize board to point size-by-size
+
+// chars of and set chars to ' '
+
+// copy constructor
+
+// destructor
+
+// set(int i, int j, char c): board{[}i{]}{[}j{]} = c
+
+// get(int i, int j): return board{[}i{]}{[}j{]}
+
+// operator\textless\textless{}
+
+private:
+
+int size;
+
+char * board;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Test it with this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int main()
+
+\{
+
+TicTacToe ttt(3);
+
+ttt.set(0, 0, 'X');
+
+ttt.set(1, 1, 'X');
+
+ttt.set(2, 2, 'O');
+
+std::cout \textless\textless{} ttt \textless\textless{} std::endl;
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Now rewrite the \emph{TicTacToe} class so that it uses a class that
+models pointers to arrays of \emph{chars}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class CharDynArr
+
+\{
+
+public:
+
+// constructor CharDynArr(int size):
+
+// initialize p to point to char{[}size{]}
+
+// array is not initialized.
+
+// copy constructor
+
+// destructor
+
+// operator{[}{]} does the obvious thing
+
+private:
+
+int size;
+
+char * p;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Now modify your \emph{TicTacToe} class to use the above
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class TicTacToe
+
+\{
+
+public:
+
+...
+
+private:
+
+int size;
+
+\textbf{CharDynArr board; }
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\end{document}

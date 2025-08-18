@@ -1,0 +1,1890 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\usepackage[normalem]{ulem}
+% Avoid problems with \sout in headers with hyperref
+\pdfstringdefDisableCommands{\renewcommand{\sout}{}}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\author{}
+\date{}
+
+\begin{document}
+
+18. Characters and C-strings
+
+Objectives
+
+\begin{itemize}
+\tightlist
+\item
+  Declare character variables with or without initialization
+\item
+  Output and input character values
+\item
+  Use operators for character type
+\item
+  Understand the relationship between characters and ASCII decimal
+  values
+\item
+  Declare C-string variables with or without initialization
+\item
+  Use C-string functions
+\end{itemize}
+
+Containers
+
+We're already talked about arrays (arrays of ints, arrays of doubles,
+etc.) Usually we use all the slots in the arrays. However an array can
+be used to model \textbf{containers}. What do I mean by that? For
+instance suppose you want to write a program to contain student IDs of
+current students who are at least 7 feet tall. (Not a big list I suppose
+\ldots) In fall 2009 the list might contain:
+
+3145673, 4135778, 2356317
+
+in spring 2009 it might be
+
+3145673, 4135778, 2356317, 5678246
+
+and in fall 2010 it might be
+
+2356317, 5678246
+
+As you can see the number of things in the list changes.
+
+An array can be used to model a container. It can be done in two ways
+(at least!) You can keep an extra variable to indicate the number of
+things modeled by the array. For instance try this program that prompts
+the user for ids to be added to the id array and terminates when the
+user enters -1.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int length = 0;
+
+int id{[}10{]};
+
+while (1)
+
+\{
+
+if (length == 10)
+
+\{
+
+std::cout \textless\textless{} "oops ... I'm full!\textbackslash n";
+
+break;\\
+\}
+
+int x;
+
+std::cin \textgreater\textgreater{} x;
+
+if (x == -1) break;
+
+id{[}length{]} = x;
+
+length++;
+
+for (int i = 0; i \textless{} length; i++)
+
+\{
+
+std::cout \textless\textless{} id{[}i{]} \textless\textless{} ' ';\\
+\}
+
+std::cout \textless\textless{} '\textbackslash n';\\
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In this case \emph{\textbf{length}} is used to indicate that the actual
+student ids are
+
+\emph{id{[}0{]}, id{[}1{]}, \ldots, id{[}length-1{]}}
+
+and the rest
+
+\emph{id{[}length{]}, id{[}length+1{]}, \ldots, id{[}999{]}}
+
+are unused.
+
+A second way to model a container is to use a special \textbf{sentinel}
+value to denote \textbf{``end-of-data''}. Try this program that does the
+same thing as above except that I'm using -9999 to mark the end-of-data.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int id{[}10{]} = \{-9999\};
+
+while (1)
+
+\{
+
+// find length
+
+int length = 0;
+
+for (int i = 0; i \textless{} 10; i++)
+
+\{
+
+if (id{[}i{]} == -9999)
+
+\{
+
+length = i;
+
+break;
+
+\}
+
+\}
+
+if (length == 9)
+
+\{
+
+std::cout \textless\textless{} "oops ... I'm full!\textbackslash n";
+
+break;
+
+\}
+
+int x;
+
+std::cin \textgreater\textgreater{} x;
+
+if (x == -1) break;
+
+id{[}length{]} = x;
+
+id{[}length + 1{]} = -9999;
+
+// print values in container
+
+int i = 0;
+
+while (id{[}i{]} != -9999)
+
+\{
+
+std::cout \textless\textless{} id{[}i{]} \textless\textless{} ' ';
+
+i++;
+
+\}
+
+std::cout \textless\textless{} '\textbackslash n';
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Note that the array begins with
+
+-9999, \ldots{}
+
+(the \ldots{} after the -9999) If I entered 42, the array becomes
+
+42, -9999, \ldots{}
+
+And if I entered 135 as the next number, the array becomes
+
+42, 135, -9999, \ldots{}
+
+Note that when using a sentinel to implement a container
+
+\begin{itemize}
+\tightlist
+\item
+  When adding the end of the container you always need to search for the
+  sentinel value (more or less to compute the length of the container)
+\item
+  The number of values you can put into the container is always
+  \textbf{one less than the actual size} of the container. Why? Because
+  the sentinel value takes up on of the spots in the array!
+\end{itemize}
+
+We'll be talking about C-strings in this set of notes. You'll see that
+the C-string uses the second method to describe characters in a string.
+
+Characters
+
+Recall that this is a character:
+
+'A'
+
+That's nothing new. To declare a character variable you do this:
+
+\emph{char c;}
+
+You can of course initialize it too:
+
+\emph{char c = 'A';}
+
+And of course you already know that you can output and input characters:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+std::cout \textless\textless{} 'A' \textless\textless{} std::endl;
+
+char c = 'A';
+
+std::cout \textless\textless{} c \textless\textless{} std::endl;
+
+std::cin \textgreater\textgreater{} c;
+
+std::cout \textless\textless{} c \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Another thing you already know is that you can compare characters:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+char c = 'A';
+
+std::cout \textless\textless{} "gimme an A: ";
+
+std::cin \textgreater\textgreater{} c;
+
+if (c == 'A')
+
+\{
+
+std::cout \textless\textless{} "thanks!";
+
+\}
+
+else
+
+\{
+
+std::cout \textless\textless{} "r u the troublemaker-type?";
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+ASCII: Characters and integers
+
+One important thing you should know is that the character type is
+actually an integer type. You can typecast between the two. Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+std::cout \textless\textless{} (int) 'A' \textless\textless{} std::endl;
+
+std::cout \textless\textless{} int('A') \textless\textless{} std::endl;
+
+char c = 'A';
+
+std::cout \textless\textless{} (int) c \textless\textless{} std::endl;
+
+std::cout \textless\textless{} int(c) \textless\textless{}
+std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+As you can see the integer value corresponding to character 'A' is 65.
+Now try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+std::cout \textless\textless{} (char) 65 \textless\textless{} std::endl;
+
+std::cout \textless\textless{} char(65) \textless\textless{}
+std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The translation between characters and integer value is provided by the
+so-called ASCII table. You can google the web to read more about the
+ASCII standard and its history. You can also go straight to
+wikipedia.com and search for ``ascii''. Here's one such table. Look for
+'A' and you see that the integer value corresponding to 'A' is 65 (look
+under the ``Dec'' column - ``Dec'' means the integer value is in base 10
+\emph{\textbf{dec}}imal notation.)
+
+\includegraphics[width=6.9846in,height=4.8701in]{Pictures/10000000000002CB000001E83D872810C8DA2306.png}
+
+\textbf{Exercise.} What is the ASCII value of 'Z'? (You can of course
+use the web ... but it's easier just to write a program).
+
+Now with the ASCII value of 'Z', fill in the blank and run this program
+... WAIT!!! ... can you figure out what it does BEFORE running the
+program?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+for (int i = 65; i \textless= \_\_\_\_\_; ++i)
+
+\{
+
+std::cout \textless\textless{} (char) i \textless\textless{} std::endl;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In fact since characters can be automatically typecasted to integers you
+can do this too:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+for (int i = 'A'; i \textless= 'Z'; ++i)
+
+\{
+
+std::cout \textless\textless{} (char) i \textless\textless{} std::endl;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} What is the ASCII value of 'Z' and '5'? (Use the
+above ASCII table.) Is the following true or false?
+
+'Z' \textless{} '5'
+
+Now verify your guess by running this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+std::cout \textless\textless{} ('Z' \textless{} '5')
+\textless\textless{} std::endl;\tabularnewline
+\bottomrule
+\end{longtable}
+
+\emph{\textbf{YET}} another way to do this is to realize that there are
+arithmetic operators on the character type. First try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+std::cout \textless\textless{} 'A' + 1 \textless\textless{}
+std::endl;\tabularnewline
+\bottomrule
+\end{longtable}
+
+This tells you that 'A' is automatically typecasted to it's ASCII value.
+Now you can do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+std::cout \textless\textless{} (char)('A' + 1) \textless\textless{}
+std::endl;\tabularnewline
+\bottomrule
+\end{longtable}
+
+\emph{\textbf{Finally}} ... run this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+for (char c = 'A'; c \textless= 'Z'; ++c)
+
+\{
+
+std::cout \textless\textless{} c \textless\textless{} std::endl;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+This tells us that besides == and !=, the character type has the boolean
+operators \textless, \textless=, \textgreater, \textgreater=. Basically
+these comparison operators compare the ASCII value of the character. And
+of course you have arithmetic operators since the character type is an
+integer type.
+
+So you see ... characters are actually numbers ... at least in the
+computer.
+
+Digit Character to Integer Value
+
+Here's a neat trick.
+
+Suppose you want to ``translate'' the character \emph{'0'} to integer
+\emph{0}, character \emph{'1'} to integer \emph{1}, ..., character
+'\emph{9'} to \emph{9''}. One way is to do this: Suppose \emph{c} is a
+character with character \emph{'0'} or \emph{'1'} or \ldots{} or
+\emph{'9'}, and you want \emph{i} which is an \emph{int} to be \emph{0}
+if \emph{c} is \emph{'0'}, \emph{1} if \emph{c} is \emph{'1'}, etc. You
+can do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+char c = ' ';
+
+std::cin \textgreater\textgreater{} c;
+
+int i = 0;
+
+switch (c)
+
+\{
+
+case '0': i = 0;
+
+break;
+
+case '1': i = 1;
+
+break;
+
+case '2': i = 2;
+
+break;
+
+case '3': i = 3;
+
+break;
+
+case '4': i = 4;
+
+break;
+
+case '5': i = 5;
+
+break;
+
+case '6': i = 6;
+
+break;
+
+case '7': i = 7;
+
+break;
+
+case '8': i = 8;
+
+break;
+
+case '9': i = 9;
+
+break;
+
+\}
+
+std::cout \textless\textless{} i \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Or you can also use a stack of if-else. Make sure you run this program.
+
+That's great. It works. But it shows you're a newbie!!! Here's the smart
+way to do it. Notice that the ASCII table for '0', '1', ..., '9' is
+this:
+
+characterASCII integer valuevalue that you want
+
+'0'480
+
+'1'491
+
+'2'502
+
+'3'513
+
+'4'524
+
+'5'535
+
+'6'546
+
+'7'557
+
+'8'568
+
+'9'579
+
+Do you see a pattern? (SPOILERS AHEAD)
+
+The point is that the character '0', ..., '9' appear in order in the
+ASCII table. Look at the table again:
+
+characterASCII integer valuetranslated value
+
+'0'480 = 48 -- 48
+
+'1'491 = 49 -- 48
+
+'2'502 = 50 -- 48
+
+'3'513 = 51 -- 48
+
+'4'524 = 52 -- 48
+
+'5'535 = 53 -- 48
+
+'6'546 = 54 -- 48
+
+'7'557 = 55 -- 48
+
+'8'568 = 56 -- 48
+
+'9'579 = 57 -- 48
+
+which is the same as
+
+characterASCII integer valuetranslated value
+
+'0'480 = int('0' -- '0')
+
+'1'491 = int('1' -- '0')
+
+'2'502 = int('2' -- '0')
+
+'3'513 = int('3' -- '0')
+
+'4'524 = int('4' -- '0')
+
+'5'535 = int('5' -- '0')
+
+'6'546 = int('6' -- '0')
+
+'7'557 = int('7' -- '0')
+
+'8'568 = int('8' -- '0')
+
+'9'579 = int('9' -- '0')
+
+In all cases, if c is a character '0',...,'9' the integer value you want
+is ...
+
+c -- '0'
+
+\textbf{That's all!!! }In other words, this program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+char c = ' ';
+
+std::cin \textgreater\textgreater{} c;
+
+int i = 0;
+
+switch (c)
+
+\{
+
+case '0': i = 0;
+
+break;
+
+case '1': i = 1;
+
+break;
+
+case '2': i = 2;
+
+break;
+
+case '3': i = 3;
+
+break;
+
+case '4': i = 4;
+
+break;
+
+case '5': i = 5;
+
+break;
+
+case '6': i = 6;
+
+break;
+
+case '7': i = 7;
+
+break;
+
+case '8': i = 8;
+
+break;
+
+case '9': i = 9;
+
+break;
+
+\}
+
+std::cout \textless\textless{} i \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+can be \textbf{rewritten} as:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+char c = ' ';
+
+std::cin \textgreater\textgreater{} c;
+
+int i = c - '0';
+
+std::cout \textless\textless{} i \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+I don't know about you. But I prefer the second version!!! Make sure you
+run this program.
+
+\textbf{Exercise.} Write a program that prompts the user for a, b, c,
+\ldots, z (i.e. lowercase letters) and prints 0, 1, 2, \ldots, 25
+respectively.
+
+\textbf{Exercise.} Write a program that prompts the user for a, b, c,
+\ldots, z, A, B, C, \ldots, Z (i.e. lower and uppercase letters) and
+prints 0 for a or A, 1 for b or B, 2 for c or C, \ldots, 25 for z or Z
+respectively.
+
+C-strings
+
+A \textbf{C-string} is nothing more than an array of characters. The
+only thing different between a C-string and an array of integers (say)
+is that the \textbf{special escape character '\textbackslash0'} (the 0
+is the \textbf{number} 0, not the letter O) is used to mark the
+\textbf{end-of-string}. This is a special character just like
+'\textbackslash n' or '\textbackslash t' because '\textbackslash0',
+'\textbackslash n', '\textbackslash t' are not ``visible'' characters.
+
+Try to print '\textbackslash0' and you won't see a thing:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+std::cout \textless\textless{} '\textbackslash0' \textless\textless{}
+std::endl;\tabularnewline
+\bottomrule
+\end{longtable}
+
+(There are in fact lots of invisible characters.)
+
+The point of the end-of-string marker '\textbackslash0', is to end some
+string processing. This is what I mean. Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+char spam{[}{]} = \{'a', 'b', 'c', '\textbackslash0', 'd', 'e'\};
+
+std::cout \textless\textless{} spam \textless\textless{}
+std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In this case the ``processing'' is the print statement:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+std::cout \textless\textless{} spam \textless\textless{}
+std::endl;\tabularnewline
+\bottomrule
+\end{longtable}
+
+The \emph{'\textbackslash0'} basically tells the print statement that
+printing should stop after printing the third character \emph{'c'}. The
+output looks like this:
+
+\emph{abc}
+
+Note another thing ... \textbf{You can actually print a character
+array!!!} Remember that you cannot do that for an array of integers,
+doubles, or booleans. You have to write a for-loop in those case. As a
+reminder try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int x{[}{]} = \{1, 2, 3, 4, 5\};
+
+std::cout \textless\textless{} x \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Let's go back to the above example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+char spam{[}{]} = \{'a', 'b', 'c', '\textbackslash0', 'd', 'e'\};
+
+std::cout \textless\textless{} spam \textless\textless{}
+std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Note that it does NOT mean that the size of the array is 3; it is true
+that three characters are printed. There are actually 6 characters in
+the array:
+
+'a', 'b', 'c', '\textbackslash0', 'd', 'e'
+
+So you need to distinguish the difference between the
+\emph{\textbf{size}} of the string \emph{spam} and its
+\emph{\textbf{length}} which is defined to be the number of characters
+up to, but not including, the first \emph{'\textbackslash0'}.
+
+Informally when we think of
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+char spam{[}{]} = \{'a', 'b', 'c', '\textbackslash0', 'd', 'e'\};
+\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{as a string}, we say that it is made up of 'a', 'b', 'c'. But
+\textbf{as a character array} is made up of six characters. Make sure
+you remember that.
+
+You can think of the character '\textbackslash0' in the array
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+char spam{[}{]} = \{'a', 'b', 'c', '\textbackslash0', 'd', 'e'\};
+\tabularnewline
+\bottomrule
+\end{longtable}
+
+as a sentinel value to mark the end of data for the string represented
+as an array. The character '\textbackslash0' is also called the
+\textbf{null character}. This is the reason why C-strings are also
+called \textbf{null-terminated strings}.
+
+Exercise. What are the lengths and sizes of the following variables?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+char ham{[}{]} = \{'3', '.', '\textbackslash0', '1', '4'\};
+
+char eggs{[}{]} = \{'\textbackslash0', 'b', '\textbackslash0', 'a'\};
+\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You can verify your answers by counting the number of characters
+printed:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+std::cout \textless\textless{} ham \textless\textless{} std::endl;
+
+std::cout \textless\textless{} eggs \textless\textless{}
+std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+There is a shorthand for \{'a', 'b', 'c', '\textbackslash0'\}. Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+char spam{[}{]} = "abc"
+
+std::cout \textless\textless{} spam \textless\textless{}
+std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Note in this case that spam has size 4 (there are 4 characters in the
+array) and length 3 (there are 3 characters before the first
+'\textbackslash0'); "abc" is
+
+\emph{\{'a', 'b', 'c', \textbf{'\textbackslash0'}\}.}
+
+Exercise. What is the length and size of the following variable?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+char spam{[}100{]} = "ab\textbackslash0cd";\tabularnewline
+\bottomrule
+\end{longtable}
+
+Exercise. What is the length and size of the following variable?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+char spam{[}{]} = "ab\textbackslash0cd";\tabularnewline
+\bottomrule
+\end{longtable}
+
+Exercise. What are the length and size of the following variable?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+char spam{[}100{]} = "";\tabularnewline
+\bottomrule
+\end{longtable}
+
+Of course you can do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+std::cout \textless\textless{} \textbf{"abc\textbackslash0de"}
+\textless\textless{} std::endl;\tabularnewline
+\bottomrule
+\end{longtable}
+
+You have already seen this ...
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+std::cout \textless\textless{} "hello world" \textless\textless{}
+std::endl;\tabularnewline
+\bottomrule
+\end{longtable}
+
+during the first week of class. Now you know that \emph{"hello world"}
+is an array of characters. It's just the character array made up of the
+following characters:
+
+'h','e','l','l','o',' ','w','o','r','l','d','\textbackslash0'
+
+(Don't forget the '\textbackslash0'!!!)
+
+\textbf{Exercise.} Can you do the following?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+std::cout \textless\textless{} \{'a', 'b', 'c'\} \textless\textless{}
+std::endl;\tabularnewline
+\bottomrule
+\end{longtable}
+
+If you have a long string you can break it up like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+char foo{[}{]} = \textbf{"abc"}
+
+\textbf{ "def"};
+
+std::cout \textless\textless{} foo \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Basically C++ will join it up for you so that the above code is the same
+as this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+char foo{[}{]} = \textbf{"abcdef"};
+
+std::cout \textless\textless{} foo \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Can you do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+std::cout \textless\textless{} \textbf{"abc" "def"} \textless\textless{}
+std::endl;\tabularnewline
+\bottomrule
+\end{longtable}
+
+Can you do the same for integers?
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+std::cout \textless\textless{} 123\textbf{ }456 \textless\textless{}
+std::endl;\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} You now know that although you cannot print an array
+of integers with \emph{std::cout} (you need to write a for-loop), you
+can print an array of characters (it will only print up to
+'\emph{\textbackslash0'}). What about input? Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+char s{[}100{]};
+
+std::cin \textgreater\textgreater{} s; // type in abcde
+
+std::cout \textless\textless{} s \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Not too shocking right?
+
+\textbf{Exercise.} Run the above program again and enter this as input:
+
+\emph{hello world}
+
+What do you see?
+
+The problem with \emph{std::cin} is that is that \emph{std::cin} cuts up
+inputs at spaces, tabs, or newline (i.e. whitespaces). So for the above
+exercise, C++ will only give the string \emph{\textbf{"}hello\textbf{"}}
+to variable s. If you do want spaces to go into your string variable,
+then you need to do something else for input. Check out a later section
+on the \emph{getline()} function.
+
+The \emph{strlen()} function
+
+C-strings are so useful that several functions are provided with your
+compiler so that you can work effectively with them. Depending on your
+compiler, you might need to do this when you want to use these C-string
+functions:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless cstring\textgreater{}
+
+... YOUR PROGRAM ...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+If your compiler is really old then you might need to do this instead:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include "string.h"
+
+... YOUR PROGRAM ...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Here's the first function ...
+
+The function strlen() returns the \textbf{length} of the string
+parameter. This is called the \textbf{string length function}. Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+std::cout \textless\textless{} strlen("abc") \textless\textless{}
+std::endl;
+
+std::cout \textless\textless{} strlen("a\textbackslash0c")
+\textless\textless{} std::endl;
+
+std::cout \textless\textless{} strlen("") \textless\textless{}
+std::endl;
+
+char s{[}{]} = "abc";
+
+std::cout \textless\textless{} strlen(s) \textless\textless{} std::endl;
+
+char t{[}{]} = "ab\textbackslash0c";
+
+std::cout \textless\textless{} strlen(t) \textless\textless{} std::endl;
+
+char u{[}100{]} = "";
+
+std::cout \textless\textless{} strlen(u) \textless\textless{}
+std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+By the way, what if your compiler does not have the \emph{strlen()}
+function? Well the code to perform the same thing as the \emph{strlen()}
+function is very simple. You just loop through the character array until
+you see \emph{'\textbackslash0'}. You have a counter that counts the
+number of characters scanned until \emph{'\textbackslash0'}, not
+including the \emph{'\textbackslash0'} character. Here you go:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+char x{[}100{]} = "abc";
+
+int len = 0;
+
+while (x{[}len{]} != '\textbackslash0')
+
+\{
+
+len++;
+
+\}
+
+std::cout \textless\textless{} len \textless\textless{}
+'\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Run the program. Change it to this and run it again:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+char x{[}100{]} = "hello world";
+
+int len = 0;
+
+while (x{[}len{]} != '\textbackslash0')
+
+\{
+
+len++;
+
+\}
+
+std::cout \textless\textless{} len \textless\textless{}
+'\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+There's actually a ``problem'' with the \emph{strlen()} function. You
+see ... if a person accidentally calls the \emph{strlen()} function with
+a character array that does \emph{\textbf{not}} contain a
+\emph{'\textbackslash0'}, the function can actually go beyond the array
+bound. This might crash the program. Here's an example:
+
+char x{[}{]} = \{'a', 'b', 'c'\};
+
+std::cout \textless\textless{} strlen(x) \textless\textless{} std::endl;
+
+This is what we call a \textbf{buffer overflow}: Your string length
+function will access a value in the array \emph{x} that is actually
+outside \emph{x}. We'll come back to this issue later.
+
+Other C-string functions
+
+In fact there are MANY standard string functions that come with all C
+compilers. Here are some of the most basic ones. Experiment with this
+code and figure out what the string functions do:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+char s{[}100{]} = "aaa";
+
+char t{[}100{]} = "bbb";
+
+char u{[}100{]};
+
+// string copy function
+
+// overwrite the string in u with the string in
+
+// s
+
+strcpy(u, s);
+
+std::cout \textless\textless{} u \textless\textless{} std::endl;
+
+// string concatenation function
+
+// put the string in t to the end of the string
+
+// in u
+
+strcat(u, t);
+
+std::cout \textless\textless{} u \textless\textless{} std::endl;
+
+// WARNING: You cannot do strcat(u, u), i.e., the
+
+// two arguments of the function must be different.
+
+// string comparison function
+
+// 0 is returned when the strings are
+
+// the same. Otherwise a nonzero value is
+
+// returned.
+
+int i = strcmp(u, s);
+
+std::cout \textless\textless{} i \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You might wonder what nonzero value is returned by \emph{strcmp()} when
+the strings are different.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+std::cout \textless\textless{} strcmp("a", "b") \textless\textless{}
+std::endl;
+
+std::cout \textless\textless{} strcmp("a", "c") \textless\textless{}
+std::endl;
+
+std::cout \textless\textless{} strcmp("a", "d") \textless\textless{}
+std::endl;
+
+std::cout \textless\textless{} strcmp("a", "z") \textless\textless{}
+std::endl;
+
+std::cout \textless\textless{} strcmp("a", "!") \textless\textless{}
+std::endl;
+
+std::cout \textless\textless{} strcmp("a", "ba") \textless\textless{}
+std::endl;
+
+std::cout \textless\textless{} strcmp("b", "a") \textless\textless{}
+std::endl;
+
+std::cout \textless\textless{} strcmp("c", "a") \textless\textless{}
+std::endl;
+
+std::cout \textless\textless{} strcmp("d", "a") \textless\textless{}
+std::endl;
+
+std::cout \textless\textless{} strcmp("ba", "a") \textless\textless{}
+std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+See it yet? (Hint: Check an ASCII table.)
+
+There are other C-string functions but you will need to know a little
+more in order to understand how to use them.
+
+The \emph{strnlen()}, \emph{strncmp()}, \emph{strncat()} functions
+
+All the string functions we talked about run into problems if the
+character arrays passed into these function do not contain
+'\textbackslash0' resulting in buffer overflow.
+
+In fact this is one scenario of the so-called \textbf{buffer overflow
+attack}, a technique used in many virus software (malware).
+
+Accompanying these functions are similar functions that allow you to
+specify a stopping point. For instance in the case of strlen() (the
+string length function) there is a function called
+
+strnlen()
+
+Besides passing in a string, you also pass in a maximum possible length
+for the string.
+
+char s{[}100{]} = ""; // s{[}0{]} = '\textbackslash0';
+
+std::cin \textgreater\textgreater{} s;
+
+std::cout \textless\textless{} \textbf{strnlen}(s, \textbf{99})
+\textless\textless{} std::endl;
+
+Note that I pass in 99 and not 100. If s has a \textbf{size of 100}
+the\includegraphics[width=2.4484in,height=1.4882in]{Pictures/100000000000016A000000DC2854AEEECF9FE6F2.png}
+\textbf{maximum possible length is 99} since in this case the
+\textbf{last character is used by \sout{by} '\textbackslash0'}.
+Therefore \emph{s} (of size 100) has a maximum length of 99.
+
+\textbf{Exercise.} What is the output of this code:
+
+The accompanying safer functions for strcmp() and strcat() are strncmp()
+and strncat(). So we have the following \emph{\textbf{pairs}} of
+functions:
+
+strlen()strnlen()
+
+strcmp()strncmp()
+
+strcat()strncat()
+
+Try this program:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+char s{[}100{]} = "aaa";
+
+char t{[}100{]} = "bbb";
+
+char u{[}100{]};
+
+// string copy function
+
+// In this case at most 100 chars are copied
+
+// from s to u
+
+strncpy(u, s, 100);
+
+std::cout \textless\textless{} u \textless\textless{} std::endl;
+
+// string concatenation function
+
+// In this case at most 100 chars are
+
+// concatenated from t to u
+
+strncat(u, t, 100);
+
+std::cout \textless\textless{} u \textless\textless{} std::endl;
+
+// string comparison function
+
+// In this case at most 100 characters are
+
+// compared.
+
+int i = strncmp(u, s, 100);
+
+std::cout \textless\textless{} i \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The only problem in the above example is the call to strncat() function.
+You see if \emph{u} already has a string of length 10, then only 90
+characters are left for concatenation. If \emph{t} has length greater
+than that, the program might crash. Therefore it's safe to write this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+// string concatenation function
+
+// In this case at most 100 chars are
+
+// concatenated from t to u
+
+strncat(u, t, 100 -- strnlen(u, 100));
+
+std::cout \textless\textless{} u \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+But in this case some character might not be copied from \emph{t} to
+\emph{u}. Depending on what your program is supposed to do, you might
+want to print an error message and halt the program.
+
+The \emph{std::cin.getline()} function
+
+Recall that there is a problem with input of strings ...
+
+\emph{std::cin} cuts up inputs at spaces, tabs, or newline (i.e.
+whitespaces). So if you run this code:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+char s{[}100{]};
+
+std::cin \textgreater\textgreater{} s;
+
+std::cout \textless\textless{} s \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+with this input
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+to be or not to be\tabularnewline
+\bottomrule
+\end{longtable}
+
+you will find that the output is
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+to\tabularnewline
+\bottomrule
+\end{longtable}
+
+In other words C++ chops up the input at spaces, tabs and newlines. So
+\emph{s} is only assigned the string \emph{"to"}.
+
+Now \ldots{} what ever happened to the rest of the input:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+be or not to be\tabularnewline
+\bottomrule
+\end{longtable}
+
+?!? Try this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+char s{[}100{]};
+
+char t{[}100{]};
+
+char u{[}100{]};
+
+std::cin \textgreater\textgreater{} s \textgreater\textgreater{} t
+\textgreater\textgreater{} u;
+
+std::cout \textless\textless{} s \textless\textless{} '\textbackslash n'
+\textless\textless{} t \textless\textless{} '\textbackslash n'
+\textless\textless{} u \textless\textless{} '\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+with input
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+i'm zaphad beeblebrox\tabularnewline
+\bottomrule
+\end{longtable}
+
+Get it?
+
+\textbf{Exercise.} What if you entered 5 spaces at the
+\emph{\textbf{beginning}} of the input like this
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\emph{ \textbf{i'm zaphad beeblebrox}}\tabularnewline
+\bottomrule
+\end{longtable}
+
+What is the value of \emph{s} in this case?
+
+So how do you handle the problem of spaces and tabs? What if you really
+want spaces and tabs to go into a string? Then you have to use another
+function. Try running this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+char s{[}100{]};
+
+std::cin.getline(s, 100);
+
+std::cout \textless\textless{} s \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+with this input:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+to be or not to be\tabularnewline
+\bottomrule
+\end{longtable}
+
+Note that the \emph{std::cin.getline()} function also allows you to
+specify the size of \emph{s}. In the above example, C++ will only read
+in at most 99 characters, reserving the last for '\textbackslash0'. This
+prevents buffer overflow.
+
+The \emph{std::cin.getline()} function will assign all the characters up
+to but not including \emph{'\textbackslash n'} (when you press the enter
+key you are including a
+
+\emph{'\textbackslash n'} in your input. In other words \emph{getline()}
+cuts up input at the \emph{'\textbackslash n'} character.
+
+The \emph{std::cin.getline()} function can actually do a lot more. You
+can get it to cut up input at any character you specify. For instance
+\emph{ }
+
+std::cin.getline(s, 100, '\textbackslash t');
+
+will cut up input at \emph{'\textbackslash t'} (tab) characters. (The
+\emph{'\textbackslash t'} in this case is sometimes called the stop
+character.)
+
+Try this
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+char s{[}10{]};
+
+char t{[}10{]};
+
+char u{[}10{]};
+
+std::cin.getline(s, 10, ',');
+
+std::cin.getline(t, 10, ',');
+
+std::cin.getline(u, 10, ',');
+
+std::cout \textless\textless{} '{[}' \textless\textless{} s
+\textless\textless{} "{]}\textbackslash n"
+
+\textless\textless{} '{[}' \textless\textless{} t \textless\textless{}
+"{]}\textbackslash n"
+
+\textless\textless{} '{[}' \textless\textless{} u \textless\textless{}
+"{]}\textbackslash n" ;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+with input
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+aaa, bbb ,c c c,\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} What happens when you run the above program with this
+input
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+0123456789,b,c,\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{ }
+
+\emph{std::cin} and \emph{std::cin.getline()}
+
+The \textbf{extremely important thing} to remember is that
+\emph{std::cin} does not work well with \emph{std::cin.getline()}.
+
+\textbf{Exercise.} Try to mix \emph{std::cin} and
+\emph{std::cin.getline()} like this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+char s{[}100{]};
+
+int i;
+
+std::cin \textgreater\textgreater{} i;
+
+std::cout \textless\textless{} i \textless\textless{} std::endl;
+
+std::cin.getline(s, 100);
+
+std::cout \textless\textless{} s \textless\textless{} std::endl;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Run the program and see what happens.
+
+Type conversion: C-strings to numerics
+
+We've been using the \emph{std::cin} for inputs and it works for input
+of integer values, double values, C-string values, etc. We saw above
+that the problem is that \emph{std::cin} cuts up input at whitespaces.
+The \emph{std::cin.getline()} does work by really taking in everything
+as input. But the problem is that it works for strings.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless iostream\textgreater{}
+
+\#include \textless cstdlib\textgreater{}
+
+int main()
+
+\{
+
+char s{[}100{]} = "123";
+
+char t{[}100{]} = "12.3";
+
+int i = strtol(s, NULL, 10);
+
+double d = strtod(t, NULL);
+
+std::cout \textless\textless{} i \textless\textless{} '\textbackslash n'
+\textless\textless{} d \textless\textless{} '\textbackslash n';
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The functions above are
+
+strtol()string-to-long-integer
+
+strtod() string-to-double
+
+The \emph{strtol()} converts the string to a \emph{\textbf{long int}}
+whose largest possible value might be larger than your usual
+\emph{\textbf{int}}.
+
+I'll explain the \emph{NULL} business later. Right now I just want to
+get the usage of the functions to you now so that you can use it.
+
+Type conversion: numerics to C-strings
+
+Of course you also need to know how to convert an int or a double to a
+C-string. There are several ways to do this.
+
+Here's the first method in C-style (i.e. using a C function)
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\#include \textless cstdio\textgreater{} // or \#include
+\textless stdio.h\textgreater{}
+
+...
+
+char c{[}100{]};
+
+int i = 42;
+
+double d = 3.14;
+
+\textbf{sprintf(c, "\%d", i);}
+
+std::cout \textless\textless{} c \textless\textless{}
+'\textbackslash n';
+
+\textbf{sprintf(c, "\%f", d);}
+
+std::cout \textless\textless{} c \textless\textless{}
+'\textbackslash n';\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The second method uses C++ features:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+\textbf{\#include \textless sstream\textgreater{}}
+
+\textbf{\textbf{}}
+
+\textbf{\textbf{...}}
+
+\textbf{\textbf{}}
+
+\textbf{\textbf{ char c{[}100{]};}}
+
+\textbf{\textbf{ int i = 123;}}
+
+double d = 3.14;
+
+\textbf{\textbf{}}
+
+\textbf{ std::stringstream out;}
+
+\textbf{}
+
+\textbf{ out \textless\textless{} i;}
+
+\textbf{ strcpy(c, out.str().c\_str());}
+
+\textbf{\textbf{ std::cout \textless\textless{} c \textless\textless{}
+'\textbackslash n';}}
+
+\textbf{\textbf{}}
+
+\textbf{\textbf{ }out \textless\textless{} d;}
+
+\textbf{ strcpy(c, out.str().c\_str());}
+
+\textbf{\textbf{ std::cout \textless\textless{} c \textless\textless{}
+'\textbackslash n';}}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Exercise
+
+\textbf{Exercise.} Write a program that prompts the user for a string
+and prints the character that occurs most frequently in the string.
+
+\textbf{Exercise.} Write a program that prompts the user for a string
+and checks if the string is a palindrome. The check should ignore
+non-letters and the case of letters. For instance ``madam, I'm Adam'' is
+a palindrome.
+
+\textbf{Exercise.} Write a program that prompts the user for a string,
+that allows user to perform a substitution of characters. For instance,
+if the user enters ``hello world'' and then request to have l replaced
+by r.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+input: hello world
+
+source: l
+
+target: r
+
+hello world
+
+l-\textgreater r
+
+-\/-rr- -\/-\/-r-
+
+source: d
+
+target: e
+
+hello world
+
+l-\textgreater r, d-\textgreater e
+
+-\/-rr- -\/-\/-re
+
+source: l
+
+target: o
+
+l-\textgreater o, d-\textgreater e
+
+hello world
+
+-\/-oo- -\/-\/-oe
+
+source: w
+
+target: o
+
+*** invalid target: o is already a target
+
+target: i
+
+l-\textgreater o, d-\textgreater e, w-\textgreater i
+
+hello world
+
+-\/-oo- i-\/---oe
+
+source: + \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The program quits when the user enters + for source. This simple program
+can be used to help you solve a type of encrypted text called
+substitution cipher..
+
+\textbf{Exercise. }Write a program that prompts the user for two strings
+and checks if the second string occurs as a substring of the first. If
+so the index where the second occurs in the first is printed. Otherwise
+-1 is printed.
+
+\textbf{Exercise.} Write a program that accepts a string from the user
+and a window column size and prints the string in the console window
+with the given size. For instance if the user entered ``it was a dark
+and stormy night \ldots'' and a size of 10, then the output is
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+it was a
+
+dark and
+
+stormy
+
+night ...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Note that at most 10 characters from the string is printed per row. If
+the user entered 15 for the size then the output is
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+it was a dark
+
+and stormy
+
+night ...\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Exercise.} Write a program accepts a string that is an integer
+expression, interprets the expression, perform the appropriate
+operations and prints the results. For instance is the user enters the
+string ``1 + 2'', the program prints 3. If the user enters ``1 -- 2 + 3
+* 4'' the program prints 11. The program should handle +, -, *, /, \%
+and integer values.
+
+\end{document}

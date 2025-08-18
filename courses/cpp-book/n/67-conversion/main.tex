@@ -1,0 +1,694 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\author{}
+\date{}
+
+\begin{document}
+
+67. Conversion
+
+Objectives
+
+\begin{itemize}
+\tightlist
+\item
+  Use constructors for conversion
+\item
+  Overload conversion operators
+\item
+  Define constructors explicitly
+\end{itemize}
+
+Conversion using a constructor
+
+C++ will generate an automatic conversion using a constructor call if
+necessary in order to find a best match for a method.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Int
+
+\{
+
+public:
+
+Int(int a)
+
+: x\_(a)
+
+\{\}
+
+void m(Int c) \{ std::cout \textless\textless{} x\_ \textless\textless{}
+'\textbackslash n'; \}
+
+private:
+
+int x\_;
+
+\}; \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int main()
+
+\{
+
+Int c(0), d(1);
+
+c.m(d);
+
+\textbf{c.m(2);}
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+However, there is an exception: The constructor is \textbf{not} invoked
+for the left-hand side of \emph{.} And \emph{-\textgreater{}}:
+\emph{3.m(1)} will not become \emph{C(3).m(1)}. You still might want to
+write your own \emph{m(int)} for efficiency.
+
+But there are problems with conversion using constructors:
+
+\begin{itemize}
+\tightlist
+\item
+  You cannot convert \textbf{to} built-in types (int, double, etc.)
+  because they are not objects
+\item
+  You cannot convert from an object of class \emph{C} to an object of
+  class \emph{D} (without changing the declaration of \emph{D})
+\end{itemize}
+
+So ...
+
+Conversion operators
+
+Suppose \emph{D} is a type (class or built-in type like int, double,
+...) and \emph{C} is a class. You can define a \textbf{conversion
+operator} from \emph{C} to \emph{D}. This should look like
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C
+
+\{
+
+public:
+
+...
+
+operator D();
+
+...
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+WARNING: Do not specify a return type. C++ knows that the return type
+will be \emph{D}. Also, conversion operators are usually \emph{const}.
+
+Let's make an addition to our \emph{Int} class
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Int \{
+
+public:
+
+Int(int a)
+
+: x\_(a)
+
+\{\}
+
+\textbf{operator int() const \{ return x\_; \}}
+
+private:
+
+int x\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int main()
+
+\{
+
+Int c(0);
+
+std::cout \textless\textless{} \textbf{(int) c} \textless\textless{} " "
+\textless\textless{} \textbf{int(c)};
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\emph{(int) c} and \emph{int(c)} are the same as \emph{c.operator
+int()}.
+
+Here's another example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class D
+
+\{
+
+public:
+
+D(int a, int b)
+
+: x\_(a), y\_(b)
+
+\{\}
+
+void print()
+
+\{
+
+std::cout \textless\textless{} "(" \textless\textless{} x\_
+\textless\textless{} "," \textless\textless{} y\_ \textless\textless{}
+")\textbackslash n";
+
+\}
+
+private:
+
+int x\_, y\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Int
+
+\{
+
+public:
+
+Int(int a)
+
+: x\_(a)
+
+\{\}
+
+operator D() \{ return D(x\_,x\_); \}
+
+private:
+
+int x\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int main()
+
+\{
+
+Int c(2);
+
+((D)c).print();
+
+D(c).print();
+
+return 0;
+
+\} \strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Automatic Conversion}
+
+C++ will automatically generate a call to conversion operators if
+necessary to find a best match for a method.
+
+\textbf{WARNING:} C++ will only generate one automatic conversion for
+each value.
+
+\textbf{WARNING:} Default conversions are used first (example
+\emph{double()}).
+
+C++ will use user-defined conversion only when necessary. No errors
+during compilation.
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class D
+
+\{
+
+public:
+
+D(int a, int b)
+
+: x\_(a), y\_(b)
+
+\{\}
+
+private:
+
+int x\_, y\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class Int
+
+\{
+
+public:
+
+Int(int a)
+
+: x\_(a)
+
+\{\}
+
+operator D()
+
+\{
+
+std::cout \textless\textless{} ``Int::D()\textbackslash n";
+
+return D(x\_,x\_);
+
+\}
+
+void m(D d)
+
+\{
+
+std::cout \textless\textless{} "m(D)\textbackslash n";
+
+\}
+
+private:
+
+int x\_;
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+int main()
+
+\{
+
+Int c0(2), c1(3);
+
+c0.m(c1);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class E \{\};
+
+class D
+
+\{
+
+public:
+
+operator E()
+
+\{
+
+...
+
+\}
+
+\};
+
+class C
+
+\{
+
+public:
+
+operator D()
+
+\{
+
+...
+
+\}
+
+\};
+
+int main()
+
+\{
+
+E e1 = D(C());
+
+E e2 = D();
+
+\textbf{E e3 = C();}
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{ERROR:} \textbf{Two} automatic conversions needed, \emph{C} to
+\emph{D} to \emph{E}. i.e. C++ will \textbf{not} convert
+
+\emph{E e3 = C() }
+
+to
+
+\emph{E e3 = E(D(C()))}
+
+Here's another example:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class D \{\};
+
+class C
+
+\{
+
+public:
+
+operator D() \{ std::cout \textless\textless{} "C::D()\textbackslash n";
+\}
+
+\};
+
+void f(D d) \{ std::cout \textless\textless{} "f(D)\textbackslash n"; \}
+
+void f(double d) \{ std::cout \textless\textless{}
+"f(double)\textbackslash n"; \}
+
+int main()
+
+\{
+
+f(1);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Notice that the default conversion to a \emph{double() }was used instead
+of the \emph{C::D() }conversion.
+
+Advice
+
+Do not have too many conversion operators. Doing so might lead to
+ambiguities. For instance, suppose you have conversion operators from
+\emph{C} to \emph{D} and vice versa; you also have \emph{operator+} in
+\emph{C} and \emph{D}. If you run the following code
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+C c;
+
+D d;
+
+c + d;\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+you'll see that your compiler does not know if it should do
+
+\emph{D(c) + d }using\emph{ D::operator+}
+
+or\emph{ }
+
+\emph{c + C(d) }using\emph{ C::operator+}
+
+Here's another tip: If you have two classes \emph{C} and \emph{D} where
+\emph{C} is ``included'' in D, then it's better to have automatic
+conversion from \emph{C} to \emph{D}. Consider the following example:
+
+Let's say you have an \emph{Int} class and a \emph{Fraction} class. You
+should have a \emph{operator Fraction()} declared in the \emph{Int}
+class. Note that you can achieve the same thing by having a constructor
+of the form:
+
+\emph{Fraction(const Int \&) const;}
+
+Explicit
+
+You can prevent automatic type conversion via constructors. Here's an
+example:
+
+\emph{\textbf{explicit} Fraction(int);}
+
+In this case, C++ will \textbf{not} perform automatic type conversion
+from an \emph{int} to a \emph{Fraction}.
+
+Here's an example of what you've already seen before:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C
+
+\{
+
+public:
+
+C(int i)
+
+\{\}
+
+\};
+
+void f(C c)
+
+\{
+
+\}
+
+int main()
+
+\{
+
+f(1);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You should already know that this will not produce any errors;
+\emph{f(1)} automatically becomes \emph{f(C(1))}. However, if you run
+this
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C
+
+\{
+
+public:
+
+\textbf{explicit} C(int i)
+
+\{\}
+
+\};
+
+void f(C c)
+
+\{
+
+\}
+
+int main()
+
+\{
+
+f(1);
+
+return 0;
+
+\}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+You'll get an error! The compiler does not know what to do because we
+did not define a way for an \emph{int} to be converted to a \emph{C}
+object.
+
+Note that
+
+\begin{itemize}
+\tightlist
+\item
+  Only constructors can be made explicit.
+\item
+  You cannot make type conversion operators which are not a constructor
+  explicit.
+\end{itemize}
+
+Here's an example of the second restriction:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{0.97\columnwidth}\raggedright
+class C
+
+\{
+
+explicit C(int); // OK
+
+\textbf{ explicit} operator int() const; // \textbf{BAD!}
+
+\};\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{In the future}, C++ will allow all type conversion to be made
+\emph{explicit}. (NOTE: C++11 (i.e., C++ 2011) supports \emph{explicit}
+for type conversion.)
+
+Now, suppose the \emph{Fraction} class has the constructor
+\emph{Fraction(int)} and \emph{operator int()}. If we run
+
+\emph{Fraction r(1, 2); }
+
+std::cout \textless\textless{} r + 1 \textless\textless{}
+'\textbackslash n';
+
+Which is used? int(r) + 1 or r + Fraction(1)? \textbf{If} operator int()
+is explicit. Then the above would execute
+
+r + Fraction(1)
+
+\end{document}
