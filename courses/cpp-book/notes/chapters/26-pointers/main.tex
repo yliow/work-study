@@ -3,7 +3,7 @@
 \textsc{Objectives}
 
 \begin{itemize}
-\tightlist
+
 \item
   Declare pointers
 \item
@@ -70,7 +70,7 @@ All the reasons have to do with using pointers to achieve some computational goa
 Because the landscape of pointers is huge let me tell you what's the plan
 
 \begin{itemize}
-\tightlist
+
 \item
   First I will talk about general concepts related to pointers: memory
   addresses, pointer values, pointer operations, etc. Another basic
@@ -117,7 +117,6 @@ So far the model of the space where variables live does not have any organizatio
 Now for a more accurate model \ldots{}
 
 \begin{itemize}
-\tightlist
 \item
   A computer's memory is made up of a linear collection of memory cells
   - each is a byte (i.e. 8 bits)
@@ -130,20 +129,36 @@ Now for a more accurate model \ldots{}
 \begin{python}
 from latextool_basic import *
 p = Plot()
-
-pbox0 = Rect(0, 0, 2, 2, label='...', linewidth=0.0)
-pbox1 = Rect0, 0, 2, 2, label='0101010', linewidth=0.1)
-pbox2 = Rect(0, 0, 2, 2, label='1010001', linewidth=0.1)
-pbox3 = Rect(0, 0, 2, 2, label='00011011', linewidth=0.1)
-pbox4 = Rect(0, 0, 2, 2, label='01000100', linewidth=0.1)
-pbox5 = Rect(0, 0, 2, 2, label='01100000', linewidth=0.1)
-pbox6 = Rect(0, 0, 2, 2, label='...', linewidth=0.0)
-pbox7 = Rect(0, 0, 2, 2, label='00100101', linewidth=0.1)
-pbox8 = Rect(0, 0, 2, 2, label='11110010', linewidth=0.1)
-pbox9 = Rect(0, 0, 2, 2, label='00110101', linewidth=0.1)
-pbox10 = Rect(0, 0, 2, 2, label='10010001', linewidth=0.1)
-
-p += pbox
+#p += Grid(x0=-5, x1=5, y0=-2, y1=10)
+p += ellipse(-3, 4, 0, 5, linecolor='red')
+p += Rect(-3, 8, 0, 9, label='1245057', linewidth=0.0)
+p += Rect(-3, 7, 0, 8, label='1245056', linewidth=0.0)
+p += Rect(-3, 6, 0, 7, label='1245055', linewidth=0.0)
+p += Rect(-3, 5, 0, 6, label='1245054', linewidth=0.0)
+p += Rect(-3, 4, 0, 5, label='1245053', linewidth=0.0)
+p += Rect(0, 9, 3, 10, label='...', linewidth=0.0)
+p += Rect(0, 8, 3, 9, label='0101010', linewidth=0.1)
+p += Rect(0, 7, 3, 8, label='1010001', linewidth=0.1)
+p += Rect(0, 6, 3, 7, label='00011011', linewidth=0.1)
+p += Rect(0, 5, 3, 6, label='01000100', linewidth=0.1)
+p += Rect(0, 4, 3, 5, label='01100000', linewidth=0.2, linecolor='red')
+p += Rect(5, 4, 7, 5, label='Cell', linewidth=0.2, linecolor='red')
+p += Line(points=[(5,4.5), (3,4.5)], linecolor='red',linewidth=0.15, endstyle='>')
+p += Rect(-7, 4, -5, 5, label='Address', linewidth=0.2, linecolor='red')
+p += Line(points=[(-5,4.5),(-3,4.5)], linecolor='red',linewidth=0.15, endstyle='>')
+p += Rect(7, 6.5, 11.5, 8.5, label='VERY IMPORTANT!!!', linewidth=0.2, linecolor='red')
+p += Line(points=[(7, 7.5), (4, 7)], linecolor='red',linewidth=0.15, endstyle='>')
+p += Rect(-3, 2, 0, 3, label='3', linewidth=0)
+p += Rect(-3, 1, 0, 2, label='2', linewidth=0)
+p += Rect(-3, 0, 0, 1, label='1', linewidth=0)
+p += Rect(-3, -1, 0, 0, label='0', linewidth=0)
+#
+p += Rect(0, 3, 3, 4, label='...', linewidth=0.0)
+p += Rect(0, 2, 3, 3, label='00100101', linewidth=0.1)
+p += Rect(0, 1, 3, 2, label='11110010', linewidth=0.1)
+p += Rect(0, 0, 3, 1, label='00110101', linewidth=0.1)
+p += Rect(0, -1, 3, 0, label='10010001', linewidth=0.1)
+p += Rect(0, -2, 3, -1, label='...', linewidth=0.0)
 
 print(p)
 \end{python}
@@ -158,152 +173,95 @@ C++ (on a 32-bit machine) will allocate 4 bytes.
 
 Also, when you declare two variables in the same scope, the memory used do not overlap -- they occupy different memory spaces.
 
-Memory addresses and memory address of a variable
+\newpage\EMPHASIZE{Memory addresses and memory address of a variable}
 
-In C++, if \emph{x} is a variable, the \textbf{memory address} of
-\emph{x} is \emph{\textbf{\&x}}.
+In C++, if \emph{x} is a variable, the \textbf{memory address} of \emph{x} is \emph{\textbf{\&x}}.
 
 Try this:
 
 \begin{consolethree}[escapeinside=||]
-
 int x = 123;
 
 std::cout << "val of x = " << x << '\n'
-
-<< "addr of x = " << \textbf{\&x} << '\n';
+          << "addr of x = " << \textbf{\&x} << '\n';
 \end{consolethree}
 
-%% My output:
+My output:
 
-%% \begin{consolethree}[escapeinside=||]
+\begin{consolethree}[escapeinside=||]
+val of x is 123
 
-%% val of x is 123
+addr of x is 1245052
+\end{consolethree}
+(Your output is most probably going to be different from mine.) The \textbf{\&} in the above is called the \textbf{address-of operator}.
 
-%% addr of x is 1245052\strut
-%% \end{consolethree}
-%% (Your output is most probably going to be different from mine.) The
-%% \textbf{\&} in the above is called the \textbf{address-of operator}.
+Two things you must know right away \ldots{}
 
-%% Two things you must know right away \ldots{}
+First, technically speaking \emph{\&x} is the \textbf{address of the }\emph{\textbf{value}}\textbf{ of }\emph{\textbf{x}}. But I will sometimes call \emph{\&x} the \textbf{address of}\emph{\textbf{x}} since that's the common practice.
 
-%% First, technically speaking \emph{\&x} is the \textbf{address of the
-%% }\emph{\textbf{value}}\textbf{ of }\emph{\textbf{x}}. But I will
-%% sometimes call \emph{\&x} the \textbf{address of
-%% }\emph{\textbf{x}\textbf{ }}since that's the common practice.
+Second, in reality, an \emph{int} value takes up more than 1 byte. For a 32-bit machine, the value of \emph{x} is spread out among 4 bytes: Recall that to see how many bytes are used to store an integer value you can do this:
 
-%% Second, in reality, an \emph{int} value takes up more than 1 byte. For a
-%% 32-bit machine, the value of \emph{x} is spread out among 4 bytes:
-%% Recall that to see how many bytes are used to store an integer value you
-%% can do this:
+\begin{consolethree}[escapeinside=||]
+std::cout << sizeof(int)
+          << std::endl;
+\end{consolethree}
+So in the above example when the program says that the address of \emph{x} is 1245052, it means that the \emph{int} value 123 occupies the memory at addresses 1245052, 1245053, 1245054, 1245055. The \textbf{address of }\emph{\textbf{x}} actually refers to the \textbf{starting address}, i.e., address of the first byte, i.e. 1245052.
 
-%% \begin{consolethree}[escapeinside=||]
-%% std::cout << sizeof(int) <<
-%% std::endl;\tabularnewline
-%% \bottomrule
-%% \end{longtable}
+You don't have to worry about how the value 123 is ``spread out'' among 4 bytes. But briefly, the integer 123 (to human beings) is a bunch of bits (to a 32-bit computer):
+\begin{center}
+00000000000000000000000001111011
+\end{center}
+(Details will be covered in CISS360.) So here's where you will find the value of our \emph{x} from above:
 
-%% So in the above example when the program says that the address of
-%% \emph{x} is 1245052, it means that the \emph{int} value 123 occupies the
-%% memory at addresses 1245052, 1245053, 1245054, 1245055. The
-%% \textbf{address of }\emph{\textbf{x}} actually refers to the
-%% \textbf{starting address}, i.e., address of the first byte, i.e.
-%% 1245052.
+Notice that 123 is translated to 32 bits. Each byte can hold 8 bits. That's why the bits of an integer requires 4 bytes. At this point, we don't need to worry how the 123 is translated into bits. So I will usually simplify the above picture of your computer's memory by drawing this:
 
-%% You don't have to worry about how the value 123 is ``spread out'' among
-%% 4 bytes. But briefly, the integer 123 (to human beings) is a bunch of
-%% bits (to a 32-bit computer):
+Let me summarize ...
 
-%% 00000000000000000000000001111011
+\begin{itemize}
+\item
+  A computer's memory is made up of bytes.
+\item
+  Associated to each byte is its address and its contents (value).
+\item
+  The value of a variable occupies memory, possibly more than 1 byte.
+\item
+  If \emph{x} is a variable, then in C++
+\item
+  \emph{x} refers to the contents (value)
+\item
+  \emph{\&x} refers to the beginning address of its value, i.e., the
+  address of the first byte of its value
+\end{itemize}
 
-%% (Details will be covered in CISS360.) So here's where you will find the
-%% value of our \emph{x} from above:
+By the way the address printed when you run your program might contain things like a, c, e, etc. That's because the address is actually printed in \textbf{hexadecimals}, i.e., \textbf{numbers in base 16}. (You will also learn more about hexadecimals in CISS360.) Certain compilers allow you to typecast hexadecimal values into \emph{int} value. Try the following (don't panic and call 911 if your compiler won't let you):
 
-%% Notice that 123 is translated to 32 bits. Each byte can hold 8 bits.
-%% That's why the bits of an integer requires 4 bytes. At this point, we
-%% don't need to worry how the 123 is translated into bits. So I will
-%% usually simplify the above picture of your computer's memory by drawing
-%% this:
+\begin{consolethree}[escapeinside=||]
+int x = 123;
 
-%% Let me summarize ...
+std::cout << "val of x: " << x
+          << '\n' << "addr of x: " << \textbf{int(\&x)}
+          << '\n';
+\end{consolethree}
+If it does not work, you can use any scientific calculator to convert from hex to decimals yourself. Most scientific calculators nowadays have the ability to convert between base 10 to base 2, 8, and 16.
 
-%% \begin{itemize}
-%% \tightlist
-%% \item
-%%   A computer's memory is made up of bytes.
-%% \item
-%%   Associated to each byte is its address and its contents (value).
-%% \item
-%%   The value of a variable occupies memory, possibly more than 1 byte.
-%% \item
-%%   If \emph{x} is a variable, then in C++
-%% \item
-%%   \emph{x} refers to the contents (value)
-%% \item
-%%   \emph{\&x} refers to the beginning address of its value, i.e., the
-%%   address of the first byte of its value
-%% \end{itemize}
+In almost all programming languages, a hexadecimal number starts with 0x. So you might see something like this when working with address values:
+\begin{center}
+0x013251a2
+\end{center}
+The actual base 16 hexadecimal is 13251a2.
 
-%% By the way the address printed when you run your program might contain
-%% things like a, c, e, etc. That's because the address is actually printed
-%% in \textbf{hexadecimals}, i.e., \textbf{numbers in base 16}. (You will
-%% also learn more about hexadecimals in CISS360.) Certain compilers allow
-%% you to typecast hexadecimal values into \emph{int} value. Try the
-%% following (don't panic and call 911 if your compiler won't let you):
+Technically speaking the memory address is an \textbf{unsigned integer}, i.e., it does not have a negative sign, i.e., it's a positive integer. So you can convert your memory address value to an unsigned integer like this:
 
-%% \begin{consolethree}[escapeinside=||]
+\begin{consolethree}[escapeinside=||]
+int x = 123;
 
-%% int x = 123;
+std::cout << "val of x: " << x
+          << '\n' << "addr of x: "
+          << |\textbf{(unsigned int)(\&x)}| << '\n';
+\end{consolethree}
+An \emph{\textbf{unsigned int}} can only represent integers up to $2^{32}$ -- 1. If you have a newer laptop, your address values are very likely larger than 2\^{}32 -- 1. If your compiler yells at you, instead of type casting with \emph{\textbf{unsigned int}}, use \emph{\textbf{unsigned long long int}}.
 
-%% std::cout << "val of x: " << x
-%% << '\n'
-
-%% << "addr of x: " <<
-%% \textbf{int(\&x)}
-
-%% << '\n';\strut
-%% \end{consolethree}
-%% If it does not work, you can use any scientific calculator to convert
-%% from hex to decimals yourself. Most scientific calculators nowadays have
-%% the ability to convert between base 10 to base 2, 8, and 16.
-
-%% In almost all programming languages, a hexadecimal number starts with
-%% 0x. So you might see something like this when working with address
-%% values:
-
-%% 0x013251a2
-
-%% The actual base 16 hexadecimal is 13251a2.
-
-%% Technically speaking the memory address is an \textbf{unsigned integer},
-%% i.e., it does not have a negative sign, i.e., it's a positive integer.
-%% So you can convert your memory address value to an unsigned integer like
-%% this:
-
-%% \begin{consolethree}[escapeinside=||]
-
-%% int x = 123;
-
-%% std::cout << "val of x: " << x
-%% << '\n'
-
-%% << "addr of x: "
-
-%% << \textbf{(unsigned int)(\&x)}
-
-%% << '\n';\strut
-%% \end{consolethree}
-%% An \emph{\textbf{unsigned int}} can only represent integers up to
-%% 2\^{}32 -- 1. If you have a newer laptop, your address values are very
-%% likely larger than 2\^{}32 -- 1. If your compiler yells at you, instead
-%% of type casting with \emph{\textbf{unsigned int}}, use
-%% \emph{\textbf{unsigned long long int}}.
-
-%% An \emph{\textbf{unsig}\textbf{n}\textbf{ed int}} is really a type. So
-%% you can declare an \emph{\textbf{unsigned int}} variable. By the way,
-%% you have actually already seen \emph{\textbf{unsigned int}} when using
-%% \emph{\textbf{srand()}}. Likewise \emph{\textbf{unsigned long long int}}
-%% is also a type.
+An \emph{\textbf{unsigned int}} is really a type. So you can declare an \emph{\textbf{unsigned int}} variable. By the way, you have actually already seen \emph{\textbf{unsigned int}} when using \emph{\textbf{srand()}}. Likewise \emph{\textbf{unsigned long long int}} is also a type.
 
 %% \textbf{Exercise.} Find a scientific calculator program that can convert
 %% between base 10 and base 2, 8, and 16. (If you have time, use the web
@@ -311,7 +269,7 @@ std::cout << "val of x = " << x << '\n'
 %% will be covered in detail in CISS360.)
 
 %% \begin{itemize}
-%% \tightlist
+%% 
 %% \item
 %%   Convert 42 into base 2, 6, 16.
 %% \item
@@ -340,7 +298,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% \begin{enumerate}
 %% \def\labelenumi{(\alph{enumi})}
-%% \tightlist
+%% 
 %% \item
 %%   Declare an \emph{unsigned int} variable \emph{i} and initialize it
 %%   with value 42. Print \emph{i}. Get a positive integer from the user
@@ -373,7 +331,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% \begin{enumerate}
 %% \def\labelenumi{(\alph{enumi})}
-%% \tightlist
+%% 
 %% \item
 %%   How many bytes does a character variable/value use?
 %% \item
@@ -793,7 +751,7 @@ std::cout << "val of x = " << x << '\n'
 %% MAKE SURE YOU SEE THE DIFFERENCE BETWEEN \emph{p} and \emph{*p}!!!:
 
 %% \begin{itemize}
-%% \tightlist
+%% 
 %% \item
 %%   \emph{p} is 124500
 %% \item
@@ -831,7 +789,7 @@ std::cout << "val of x = " << x << '\n'
 %% in two ways and can be used in two ways, for reading and for writing:
 
 %% \begin{itemize}
-%% \tightlist
+%% 
 %% \item
 %%   you can use \emph{*p} to \textbf{read} the value that \emph{p} points
 %%   to
@@ -869,7 +827,7 @@ std::cout << "val of x = " << x << '\n'
 %% is is both an lvalue and an rvalue.
 
 %% \begin{itemize}
-%% \tightlist
+%% 
 %% \item
 %%   Is 42 an lvalue? An rvalue?
 %% \item
@@ -2934,7 +2892,7 @@ std::cout << "val of x = " << x << '\n'
 %% 12 bytes. So for the method that returns the maximum value, I have to
 
 %% \begin{itemize}
-%% \tightlist
+%% 
 %% \item
 %%   copy two \emph{long double}s values (24 bytes) onto the stack
 %% \item
@@ -2944,7 +2902,7 @@ std::cout << "val of x = " << x << '\n'
 %% For the pointer method that returns an address, I have to
 
 %% \begin{itemize}
-%% \tightlist
+%% 
 %% \item
 %%   copy two addresses (8 bytes) of \emph{long double} variables onto the
 %%   stack
@@ -3422,7 +3380,7 @@ std::cout << "val of x = " << x << '\n'
 %% Look at the picture: It's REALLY important to understand that
 
 %% \begin{itemize}
-%% \tightlist
+%% 
 %% \item
 %%   pointer \emph{p} consumes memory and
 %% \item
@@ -3525,7 +3483,7 @@ std::cout << "val of x = " << x << '\n'
 %% behavior:
 
 %% \begin{itemize}
-%% \tightlist
+%% 
 %% \item
 %%   When you declare it in a block, the variable is created, the memory
 %%   for the value is also created, and you have access to its name.
@@ -3574,7 +3532,7 @@ std::cout << "val of x = " << x << '\n'
 %% creates an \emph{int} value for \emph{p} to point to. Note that
 
 %% \begin{itemize}
-%% \tightlist
+%% 
 %% \item
 %%   \textbf{the value of }\emph{\textbf{p}}\textbf{ (an address) is still
 %%   automatic ... but }
@@ -3607,7 +3565,7 @@ std::cout << "val of x = " << x << '\n'
 %% variable \emph{p} and called \emph{new},
 
 %% \begin{itemize}
-%% \tightlist
+%% 
 %% \item
 %%   Since \emph{p} is automatic: the pointer \emph{p} is destroyed and the
 %%   memory used for the address in \emph{p} reclaimed, but
@@ -3724,7 +3682,7 @@ std::cout << "val of x = " << x << '\n'
 %% Here are some really important points:
 
 %% \begin{itemize}
-%% \tightlist
+%% 
 %% \item
 %%   Delete pointers ASAP when you don't need them anymore.
 %% \item
@@ -4274,7 +4232,7 @@ std::cout << "val of x = " << x << '\n'
 %% Now think about this: What is \emph{*q}? Using \emph{*p} as a guide,
 
 %% \begin{itemize}
-%% \tightlist
+%% 
 %% \item
 %%   \emph{p} points to \emph{x} therefore \emph{*p} is the value of
 %%   \emph{x}, i.e., \emph{*p is }42,
@@ -4305,7 +4263,7 @@ std::cout << "val of x = " << x << '\n'
 %% }right?\textbf{ }
 
 %% \begin{itemize}
-%% \tightlist
+%% 
 %% \item
 %%   \emph{p} points to \emph{x} therefore \emph{*p} is \emph{x}
 %% \item
@@ -4357,7 +4315,7 @@ std::cout << "val of x = " << x << '\n'
 %% Get it? Make sure you see that
 
 %% \begin{itemize}
-%% \tightlist
+%% 
 %% \item
 %%   \emph{\&p} is 124504, \emph{p} is 124500, \emph{*p} is 42
 %% \item
