@@ -1,0 +1,4699 @@
+\newpage\EMPHASIZE{26. Pointers}
+
+\textsc{Objectives}
+
+\begin{itemize}
+\tightlist
+\item
+  Declare pointers
+\item
+  Assign values to pointers, address-of operator, and NULL
+\item
+  Comparison of address values
+\item
+  Use pointers as function parameters modify values
+\item
+  Use pointers as function parameters speedup function call
+\item
+  Returning references and pointers
+\item
+  Dynamic memory manage for non-array values
+\item
+  Memory deallocation and preventing memory leaks
+\end{itemize}
+
+Now we come to a concept that is extremely useful and powerful in CS.
+
+Drumroll \ldots{} \emph{pointers!!!}
+
+Pointers are variables that can hold physical memory addresses. By pointing a pointer to any memory location in your computer, you can access the data at that point in your computer's memory. Both data and code are stored in your computer memory. Therefore with pointers you can access any data and code. This has several consequences.
+
+\begin{itemize}
+\item
+  Pointers allow you to write a function that allows pass-by- reference.
+  In fact your references should really be thought of as pointers under
+  the hood.
+\item
+  In terms of data, pointers allow you to access a part of your
+  program's memory called the free store or memory heap. This allows you
+  to control memory usage and have better control over memory
+  management, requesting memory only when you need it and releasing it
+  back to the system when it's not needed.
+\item
+  By embedding pointer values into data, we can create very complex
+  relations between data values by linking them together. This allows
+  you to build data structures to model trees, graphs, etc. Graphs are
+  probably one of the most important mathematical structures in CS. A
+  road network is basically a graph. A computer network is basically a
+  graph. Social graph that describes person-to-person relationship in
+  social media is basically a graph. Etc., etc., etc., etc., etc.
+  \ldots{} !!!
+\item
+  Since code also lives in your computer's memory, pointers can also
+  point to code such as functions. With pointers, you can actually pass
+  functions (technically speaking the memory location of functions) into
+  functions, i.e., functions can become arguments.
+\end{itemize}
+
+\begin{itemize}
+\item
+  Nowadays, hardware devices are usually ``mapped'' to memory locations
+  too. That means that pointers can also be used to access devices to
+  perform I/O.
+\item
+  Etc!!! \ldots{} not to mention bizarre things like code that rewrites
+  itself.
+\end{itemize}
+
+All the reasons have to do with using pointers to achieve some computational goals. Another really important reason why pointers are important is this: Pointers are not just some abstract idea of computations in the theoretical sense. Pointers are fundamental to actual computer architecture in the sense that pointers or memory addresses are understood by your hardware. For many programming languages, you cannot access pointers or memory addresses directly. Those languages will hide pointers away from programmers by providing some language feature(s) to achieve the same goal, bypassing pointers and memory addresses. This is no big deal if all you want to do is to achieve the high level computational goals. However, if you do need to dive into the guts of your computer, you will have to know pointers very well. This also means that people who are trained only in a language that does not provide means to access pointer or memory addresses will have problems doing low-level programming or will have problems fully understanding areas such as assembly language programming and computer architecture. And low level programming does happen in the real world for instance in the case of systems programming and game development.
+
+Because the landscape of pointers is huge let me tell you what's the plan
+
+\begin{itemize}
+\tightlist
+\item
+  First I will talk about general concepts related to pointers: memory
+  addresses, pointer values, pointer operations, etc. Another basic
+  concept you need to know is pointer arithmetic. But I'll delay pointer
+  arithmetic till the second set of notes on pointers so that we can go
+  into some applications of pointers quickly
+\item
+  For the first application of pointers, we'll see that pointers allow
+  us to directly access and manipulation data from anywhere. In
+  particular, a function can access data that is in another function.
+  You recall that this is exactly what references are used for. In fact
+  your C++ compiler actually converts references to pointers. So
+  understanding pointers is absolutely crucial to understanding
+  references. And if you know pointers well, you don't even need
+  references. In fact in the original C language -- the ancestor of C++
+  -- there is no concept of references.
+\item
+  The second application is similar to the first: we'll call functions
+  with pointers (we'll also look at passing in reference) and possibly
+  returning pointers (we'll also look at returning reference). In this
+  case, the goal is to speed up function call.
+\item
+  For the third application, we'll go into an area in your computer
+  called the heap and perform dynamic memory management ourselves. (The
+  heap is also called the free store.) This means that we can ask the
+  heap to give us an \emph{int} value when we need it and give the
+  \emph{int} value back to the heap when we're done with it. This is
+  very different from using an \emph{int} value that belongs to an
+  \emph{int} variable. For an \emph{int} variable, the value exists when
+  you declare the \emph{int} variable. The value is given back to the
+  computer when the variable goes out of scope. You don't have as much
+  control over memory usage for your regular variables. To use the heap
+  ... you must use pointers.
+\end{itemize}
+
+In the next set of notes on pointers, I'll talk about pointer arithmetic, the relationship between pointers and arrays, and dynamic memory management of (dynamic) arrays.
+
+Here we go \ldots{} !!!
+
+\newpage\EMPHASIZE{Memory}
+
+So far the model of the space where variables live does not have any organization. It's just a collection of cells with names and values.
+
+Now for a more accurate model \ldots{}
+
+\begin{itemize}
+\tightlist
+\item
+  A computer's memory is made up of a linear collection of memory cells
+  - each is a byte (i.e. 8 bits)
+\item
+  Each memory cell has a numeric address, its memory address
+\item
+  Each memory cell can hold 1 byte of data (1 byte = 8 bits)
+\end{itemize}
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+pbox0 = Rect(0, 0, 2, 2, label='...', linewidth=0.0)
+pbox1 = Rect0, 0, 2, 2, label='0101010', linewidth=0.1)
+pbox2 = Rect(0, 0, 2, 2, label='1010001', linewidth=0.1)
+pbox3 = Rect(0, 0, 2, 2, label='00011011', linewidth=0.1)
+pbox4 = Rect(0, 0, 2, 2, label='01000100', linewidth=0.1)
+pbox5 = Rect(0, 0, 2, 2, label='01100000', linewidth=0.1)
+pbox6 = Rect(0, 0, 2, 2, label='...', linewidth=0.0)
+pbox7 = Rect(0, 0, 2, 2, label='00100101', linewidth=0.1)
+pbox8 = Rect(0, 0, 2, 2, label='11110010', linewidth=0.1)
+pbox9 = Rect(0, 0, 2, 2, label='00110101', linewidth=0.1)
+pbox10 = Rect(0, 0, 2, 2, label='10010001', linewidth=0.1)
+
+p += pbox
+
+#cbox = Rect(0,-4,2,-2, label='C', linewidth=0.1)
+#c2p = Line(points=[cbox.top(), pbox.bottom()], linewidth=0.1, endstyle='>')
+#p += cbox
+#p += c2p
+
+print(p)
+\end{python}
+
+Remember: Each memory cell has \textbf{two} quantities, the \textbf{memory address} and the \textbf{content.}
+
+Notice that memory addresses are \textbf{integer values}.
+
+When you declare a variable, based on the type, C++ will allocate the correct number of bytes for that variable. For example, for an \emph{int}, your
+
+C++ (on a 32-bit machine) will allocate 4 bytes.
+
+Also, when you declare two variables in the same scope, the memory used do not overlap -- they occupy different memory spaces.
+
+Memory addresses and memory address of a variable
+
+In C++, if \emph{x} is a variable, the \textbf{memory address} of
+\emph{x} is \emph{\textbf{\&x}}.
+
+Try this:
+
+\begin{consolethree}[escapeinside=||]
+
+int x = 123;
+
+std::cout << "val of x = " << x << '\n'
+
+<< "addr of x = " << \textbf{\&x} << '\n';
+\end{consolethree}
+
+%% My output:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% val of x is 123
+
+%% addr of x is 1245052\strut
+%% \end{consolethree}
+%% (Your output is most probably going to be different from mine.) The
+%% \textbf{\&} in the above is called the \textbf{address-of operator}.
+
+%% Two things you must know right away \ldots{}
+
+%% First, technically speaking \emph{\&x} is the \textbf{address of the
+%% }\emph{\textbf{value}}\textbf{ of }\emph{\textbf{x}}. But I will
+%% sometimes call \emph{\&x} the \textbf{address of
+%% }\emph{\textbf{x}\textbf{ }}since that's the common practice.
+
+%% Second, in reality, an \emph{int} value takes up more than 1 byte. For a
+%% 32-bit machine, the value of \emph{x} is spread out among 4 bytes:
+%% Recall that to see how many bytes are used to store an integer value you
+%% can do this:
+
+%% \begin{consolethree}[escapeinside=||]
+%% std::cout << sizeof(int) <<
+%% std::endl;\tabularnewline
+%% \bottomrule
+%% \end{longtable}
+
+%% So in the above example when the program says that the address of
+%% \emph{x} is 1245052, it means that the \emph{int} value 123 occupies the
+%% memory at addresses 1245052, 1245053, 1245054, 1245055. The
+%% \textbf{address of }\emph{\textbf{x}} actually refers to the
+%% \textbf{starting address}, i.e., address of the first byte, i.e.
+%% 1245052.
+
+%% You don't have to worry about how the value 123 is ``spread out'' among
+%% 4 bytes. But briefly, the integer 123 (to human beings) is a bunch of
+%% bits (to a 32-bit computer):
+
+%% 00000000000000000000000001111011
+
+%% (Details will be covered in CISS360.) So here's where you will find the
+%% value of our \emph{x} from above:
+
+%% Notice that 123 is translated to 32 bits. Each byte can hold 8 bits.
+%% That's why the bits of an integer requires 4 bytes. At this point, we
+%% don't need to worry how the 123 is translated into bits. So I will
+%% usually simplify the above picture of your computer's memory by drawing
+%% this:
+
+%% Let me summarize ...
+
+%% \begin{itemize}
+%% \tightlist
+%% \item
+%%   A computer's memory is made up of bytes.
+%% \item
+%%   Associated to each byte is its address and its contents (value).
+%% \item
+%%   The value of a variable occupies memory, possibly more than 1 byte.
+%% \item
+%%   If \emph{x} is a variable, then in C++
+%% \item
+%%   \emph{x} refers to the contents (value)
+%% \item
+%%   \emph{\&x} refers to the beginning address of its value, i.e., the
+%%   address of the first byte of its value
+%% \end{itemize}
+
+%% By the way the address printed when you run your program might contain
+%% things like a, c, e, etc. That's because the address is actually printed
+%% in \textbf{hexadecimals}, i.e., \textbf{numbers in base 16}. (You will
+%% also learn more about hexadecimals in CISS360.) Certain compilers allow
+%% you to typecast hexadecimal values into \emph{int} value. Try the
+%% following (don't panic and call 911 if your compiler won't let you):
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 123;
+
+%% std::cout << "val of x: " << x
+%% << '\n'
+
+%% << "addr of x: " <<
+%% \textbf{int(\&x)}
+
+%% << '\n';\strut
+%% \end{consolethree}
+%% If it does not work, you can use any scientific calculator to convert
+%% from hex to decimals yourself. Most scientific calculators nowadays have
+%% the ability to convert between base 10 to base 2, 8, and 16.
+
+%% In almost all programming languages, a hexadecimal number starts with
+%% 0x. So you might see something like this when working with address
+%% values:
+
+%% 0x013251a2
+
+%% The actual base 16 hexadecimal is 13251a2.
+
+%% Technically speaking the memory address is an \textbf{unsigned integer},
+%% i.e., it does not have a negative sign, i.e., it's a positive integer.
+%% So you can convert your memory address value to an unsigned integer like
+%% this:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 123;
+
+%% std::cout << "val of x: " << x
+%% << '\n'
+
+%% << "addr of x: "
+
+%% << \textbf{(unsigned int)(\&x)}
+
+%% << '\n';\strut
+%% \end{consolethree}
+%% An \emph{\textbf{unsigned int}} can only represent integers up to
+%% 2\^{}32 -- 1. If you have a newer laptop, your address values are very
+%% likely larger than 2\^{}32 -- 1. If your compiler yells at you, instead
+%% of type casting with \emph{\textbf{unsigned int}}, use
+%% \emph{\textbf{unsigned long long int}}.
+
+%% An \emph{\textbf{unsig}\textbf{n}\textbf{ed int}} is really a type. So
+%% you can declare an \emph{\textbf{unsigned int}} variable. By the way,
+%% you have actually already seen \emph{\textbf{unsigned int}} when using
+%% \emph{\textbf{srand()}}. Likewise \emph{\textbf{unsigned long long int}}
+%% is also a type.
+
+%% \textbf{Exercise.} Find a scientific calculator program that can convert
+%% between base 10 and base 2, 8, and 16. (If you have time, use the web
+%% and learn to convert between base 10 and base 2, 8, 16 by hand -- this
+%% will be covered in detail in CISS360.)
+
+%% \begin{itemize}
+%% \tightlist
+%% \item
+%%   Convert 42 into base 2, 6, 16.
+%% \item
+%%   Convert base 16 a0234d1 to base 10.
+%% \end{itemize}
+
+%% \textbf{Exercise.} Declare two integer variables like this:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x;
+
+%% int y;\strut
+%% \end{consolethree}
+%% and print their addresses (in base 10). How far apart are the addresses
+%% of the two integer values of the variables? (Use your scientific
+%% calculator for subtracting two hexadecimal address values if you need
+%% to.) If the address differs by 4 (and the sizeof int is 4), then there's
+%% no gap between the memory occupied by the first and the second since an
+%% integer occupies 4 bytes. This means that your compiler is very
+%% efficient and is putting the value of \emph{x} and \emph{y} next to each
+%% other. (The address of the second variable is probably smaller.)
+
+%% \textbf{Exercise.} This simple exercise is meant to make your brain
+%% remember \emph{unsigned int}.
+
+%% \begin{enumerate}
+%% \def\labelenumi{(\alph{enumi})}
+%% \tightlist
+%% \item
+%%   Declare an \emph{unsigned int} variable \emph{i} and initialize it
+%%   with value 42. Print \emph{i}. Get a positive integer from the user
+%%   and give this value to \emph{i}. Print \emph{i}.
+%% \item
+%%   Write a simple program that computes the sum 1 + 2 + \ldots{} +
+%%   \emph{i} where \emph{i} is provided by the user. Print the sum. In
+%%   your program, since all integer values used are positive, you must
+%%   only use \emph{unsigned int} variables.
+%% \end{enumerate}
+
+%% \textbf{Exercise.} Declare a \emph{double} variable \emph{x}. Print it's
+%% address. Now declare another \emph{double} variable \emph{y} and print
+%% the address of \emph{y}. There shouldn't be a gap between the
+%% \emph{double} values of the above variables if they are declared next to
+%% each other. From the program can you deduce the number of bytes used to
+%% store a \emph{double}? Verify your guess by executing this:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% double x = 3.14159;
+
+%% std::cout << sizeof(double) <<
+%% std::endl;
+
+%% std::cout << sizeof(x) <<
+%% std::endl;\strut
+%% \end{consolethree}
+%% Exercise.
+
+%% \begin{enumerate}
+%% \def\labelenumi{(\alph{enumi})}
+%% \tightlist
+%% \item
+%%   How many bytes does a character variable/value use?
+%% \item
+%%   How many bytes does a boolean variable/value use?
+%% \end{enumerate}
+
+%% \textbf{Exercise.} Declare an array of integers:
+
+%% \begin{consolethree}[escapeinside=||]
+%% int x{[}3{]};\tabularnewline
+%% \bottomrule
+%% \end{longtable}
+
+%% and print their address of \emph{x{[}0{]}} and \emph{x{[}1{]}} and
+%% \emph{x{[}2{]}}. How far apart are they? Are the addresses ascending or
+%% descending?
+
+%% WARNING!!!
+
+%% Note that \emph{\&} is now used in two totally different ways!!!
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x;
+
+%% int \& y = x; // int \& is a type
+
+%% std::cout << \&x; // \& is the address-of
+%% operator\strut
+%% \end{consolethree}
+%% Remember that!
+
+%% Pointer Variable
+
+%% At this point, you should ask the following question: ``If you can put
+%% \emph{int} values into \emph{int} variables, \emph{double} values into
+%% \emph{double} variables, \emph{bool} values into \emph{bool} variables
+%% \ldots{} surely I can put address values into variables, right?'' (If
+%% you did not ask that, then you're not learning actively! Wake up!)
+
+%% So here we go \ldots{}
+
+%% A \textbf{pointer variable} is a variable whose value is a memory
+%% address. Run this:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 1;
+
+%% int * p;
+
+%% p = \&x;
+
+%% std::cout << \&x << ' '
+
+%% << p << std::endl;\strut
+%% \end{consolethree}
+%% We say that \emph{p} \textbf{points to} \emph{x} (well ... technically,
+%% \emph{p} points to the \emph{\textbf{value}} of \emph{x}.) To declare a
+%% pointer variable you use this format:
+
+%% \emph{{[}type{]}} * \emph{{[}pointer{]}};
+
+%% You can of course do this, i.e. declaration with initialization:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 1;
+
+%% int * p = \&x;
+
+%% std::cout << \&x << ' '
+%% << p << std::endl;\strut
+%% \end{consolethree}
+%% Here's the format of a statement that declares a pointer with
+%% initialization:
+
+%% \emph{{[}type{]}} * \emph{{[}pointer{]} = {[}address of same type{]}};
+
+%% A very common convention is to begin the name of a pointer with \emph{p}
+%% or \emph{p\_}. It's also common to include the name of the concept the
+%% pointer points to in the name:
+
+%% \textbf{Exercise.} Complete this code segment. \emph{psalary} should
+%% point to \emph{salary:}
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% double salary = 100.23;
+
+%% \_\_\_\_\_\_ * psalary = \_\_\_\_\_\_\_\_\_;\strut
+%% \end{consolethree}
+%% Verify!!! \ldots{} i.e., print the address of \emph{salary} and
+%% \emph{psalary} and make sure they are the same.
+
+%% \textbf{Exercise.} Can you assign the address of a type of value to a
+%% pointer variable of another type? Answer: \_\_\_\_\_\_\_\_\_\_\_\_\_.
+%% Try this:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% double x = 1.2;
+
+%% int * p = \&x; // trying to point an int pointer
+
+%% // to a double\strut
+%% \end{consolethree}
+%% You \textbf{cannot} initialize a pointer with the pointer value of a
+%% \textbf{different type}.
+
+%% \textbf{Exercise.} Here's an \emph{int} array:
+
+%% \begin{consolethree}[escapeinside=||]
+%% int x{[}{]} = \{2, 3, 5, 7, 11, 13\};\tabularnewline
+%% \bottomrule
+%% \end{longtable}
+
+%% Declare an \emph{int} pointer, say call it \emph{p}, that points to the
+%% value 11 in the array. Verify! Next, print the address of the value 13
+%% and 7 in \emph{x}.
+
+%% \textbf{Exercise.} Here's a C-string:
+
+%% \begin{consolethree}[escapeinside=||]
+%% char x{[}{]} = "hello world";\tabularnewline
+%% \bottomrule
+%% \end{longtable}
+
+%% Declare a \emph{char} pointer, say call it \emph{p}, that points to the
+%% 'w' in the string. Verify!
+
+%% Mental Picture
+
+%% Look at this code:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 42;
+
+%% int * p;
+
+%% p = \&x;\strut
+%% \end{consolethree}
+%% Suppose the \emph{int} value of x is at memory location 124500 in the
+%% computer and the memory location is at 124504. The computer's memory
+%% would look like this:
+
+%% Here's the memory model that you are already used to:
+
+%% To indicate that the value 42 of variable x is at memory address 124500,
+%% I will draw this:
+
+%% Well \ldots{} actually important thing is the \textbf{relationship}
+%% between \emph{p} and the value of \emph{x}: Think of \emph{p} as knowing
+%% where to find the value of \emph{x}. So we usually have this mental
+%% picture in mind when we talk about pointers:
+
+%% Sometimes, I will even simplify the mental picture by drawing this:
+
+%% (Later, we'll see how to access access the value of x using p.)
+
+%% Note that the arrow drawn in the diagram is to help us (human beings)
+%% see quickly what value a pointer is pointing to. Your computer only
+%% works with numbers (as in bits). The arrows in the drawing above are
+%% only a visual guide for us to see pointer relations quickly. There are
+%% no ``hardware arrows'' in your computer or CPU!!! Remember that!!!
+
+%% \textbf{Exercise. }In a code fragment, there are two variables \emph{i}
+%% and \emph{j}, both of \emph{int} type. The value of \emph{i} is 5000 and
+%% the value of \emph{j} is 6000. The value of \emph{i} is at address
+%% 108080 and the address of the value of \emph{j} is 501200. In addition,
+%% there are two pointer variables \emph{p} and \emph{q} such that \emph{p}
+%% points to the value of \emph{j} and \emph{q} points to the value of
+%% \emph{i}. Draw the memory model labeling everything (variable name,
+%% value, and address). Include arrows to relate pointers to the values the
+%% pointers point to.
+
+%% \textbf{Exercise. }Same as above except that both \emph{p} and \emph{q}
+%% points to the value of \emph{j}.
+
+%% \textbf{Exercise.} Draw the memory model at the end of the following
+%% code fragment where the addresses of \emph{pi{[}0{]}}, \emph{pi{[}1{]}},
+%% \emph{pi{[}2{]}}, \emph{pi{[}3{]}}, \emph{pi{[}4{]}} are 8000, 8008,
+%% 8016, 8024, 8032, 8040.
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% double pi{[}{]} = \{3.1, 3.14, 3.141, 3.1415, 3.14159\};
+
+%% double * p = \&pi{[}1{]};\strut
+%% \end{consolethree}
+%% \textbf{Exercise.} Draw the memory model at the end of the following
+%% code fragment:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x{[}{]} = \{2, 3, 5, 7, 11\};
+
+%% int * p = \&x{[}3{]};
+
+%% int * q = \&x{[}1{]};\strut
+%% \end{consolethree}
+%% (In this case, addresses of \emph{x{[}0{]}}, \emph{x{[}1{]}}, \ldots{}
+%% are not given, so just draw the simplified mental picture.)
+
+%% \textbf{Exercise.} Given the following:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 42; // address is 5000
+
+%% double y = 3.1415; // address is 5004
+
+%% char z = '\$'; // address is 5012
+
+%% bool b = true; // address is 5016\strut
+%% \end{consolethree}
+%% Declare 4 pointers (of the right type!) to point the each of the above
+%% variables. Draw the memory model.
+
+%% \textbf{Exercise.} Write a code fragment so that you get the following
+%% memory model:
+
+%% Common Gotcha
+
+%% This is a very common gotcha:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 0, y = 1;
+
+%% int * p = \&x, q = \&y, r = \&x;\strut
+%% \end{consolethree}
+%% It won't work (does not compile) because the above actually means this:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 0, y = 1;
+
+%% int * p = \&x;
+
+%% int q = \&y;
+
+%% int r = \&x;\strut
+%% \end{consolethree}
+%% It should be
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 0, y = 1;
+
+%% int * p = \&x, * q = \&y, * r = \&x;\strut
+%% \end{consolethree}
+%% or (better) just write this:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 0, y = 1;
+
+%% int * p = \&x;
+
+%% int * q = \&y;
+
+%% int * r = \&x;\strut
+%% \end{consolethree}
+%% Memory address values and NULL
+
+%% Up to this point I never assign constant address values directly to
+%% pointer variables like this:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 42; // say the value of x is at
+
+%% // address 1205000
+
+%% int * p = 1205000; // p points to the value of x\strut
+%% \end{consolethree}
+%% To begin with, the address of x is usually different each time you run
+%% your program and is definitely different on a different computer. So the
+%% above would be a terrible idea.
+
+%% In general, assigning a constant to a pointer variable is rare. This
+%% happens when you're doing something very special such as very low level
+%% programming where you need to access hardware or doing embedded systems
+%% programming. For instance, say you know that an \emph{unsigned int}
+%% value at memory location 20500080 is used for communication with a
+%% hardware device, you would do something like this:
+
+%% \begin{consolethree}[escapeinside=||]
+%% unsigned int * device = (unsigned int *) 20500080;\tabularnewline
+%% \bottomrule
+%% \end{longtable}
+
+%% After that, whenever the device outputs a value, it's sent to the
+%% \emph{unsigned int} at this location and \emph{device} pointer will be
+%% used to access this value.
+
+%% Unless otherwise stated, for CISS240, 245, 350, you will never assign or
+%% work directly with a constant memory address value. The only exception
+%% is the memory address \textbf{0}. However instead of using memory
+%% address 0 like this:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int * p = 0;
+
+%% double * q = 0;
+
+%% char * r = 0;\strut
+%% \end{consolethree}
+%% you use the predefined constant \emph{\textbf{NULL}} like this:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int * p = NULL;
+
+%% double * q = NULL;
+
+%% char * r = NULL;\strut
+%% \end{consolethree}
+%% In order to use \emph{NULL}, you might have to \emph{\#include
+%% < cstddef\textgreater{}} at the top of your code:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% \#include < iostream\textgreater{}
+
+%% \#include < cstddef\textgreater{}
+
+%% int main()
+
+%% \{
+
+%% int * p = NULL;
+
+%% double * q = NULL;
+
+%% char * r = NULL;
+
+%% return 0;
+
+%% \}\strut
+%% \end{consolethree}
+%% Just to keep everything uniform, just make sure you include cstddef.
+
+%% So what is the value at address 0???
+
+%% Well the only important thing you need to know is this: \textbf{you are
+%% not allowed to access the value at address 0. }Therefore \ldots{}
+
+%% \emph{\textbf{NULL}}\textbf{ is only used to indicate that a pointer
+%% variable is not pointing to anything useful}. (You can also use
+%% \emph{\textbf{nullptr}} instead of \emph{\textbf{NULL}}. For C++11
+%% compliant compilers, \emph{\textbf{nullptr}} and \emph{\textbf{NULL}}
+%% are the same. C++11 ISO/IEC 14882 was released 9/2011.)
+
+%% Because of the above, \emph{NULL} is sometimes used to initialize a
+%% pointer variable before it is being used:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 1;
+
+%% int * p = NULL; // p does not point to anything yet
+
+%% ... p is not used for anything useful ...
+
+%% p = \&x; // now point p to x
+
+%% ... now p is used to do something useful ...\strut
+%% \end{consolethree}
+%% \textbf{Exercise.} Print \emph{NULL}. (Don't forget to type cast.) What
+%% do you see? Remember!
+
+%% For a pointer p with NULL value, the picture is of course like this:
+
+%% It's common to draw it like this:
+
+%% or like this:
+
+%% Dereferencing Pointers
+
+%% Recall: If \emph{p} is a pointer, then the value of \emph{p} is the
+%% \textbf{memory address} of the value \emph{p} is pointing to.
+
+%% You can access the \textbf{value} \emph{p} is pointing to. That's call
+%% \textbf{dereferencing} \emph{p} and you do it using \emph{\textbf{*p}}.
+%% The \emph{*} used in this way is called the \textbf{dereferencing
+%% operator}. It's also called the indirection operator.
+
+%% Try this:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 42;
+
+%% int * p;
+
+%% p = \&x;
+
+%% std::cout << x << ' '
+%% << *p << '\n';
+
+%% x = 0;
+
+%% std::cout << x << ' '
+%% << *p << '\n';
+
+%% *p = 42;
+
+%% std::cout << x << ' '
+%% << *p << '\n';\strut
+%% \end{consolethree}
+%% Suppose \emph{\&x} is 124500, then the memory model looks like this:
+
+%% MAKE SURE YOU SEE THE DIFFERENCE BETWEEN \emph{p} and \emph{*p}!!!:
+
+%% \begin{itemize}
+%% \tightlist
+%% \item
+%%   \emph{p} is 124500
+%% \item
+%%   \emph{*p} is 42
+%% \end{itemize}
+
+%% \textbf{WARNING:}
+
+%% There are now \textbf{3 different meanings for *}!!!
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 2 * 3; // * = multiplication
+
+%% int * p = \&x; // * = for pointer type
+
+%% std::cout << x
+
+%% << ',' << *p // * = for
+%% dereferencing
+
+%% << '\n';\strut
+%% \end{consolethree}
+%% It's really important to remember that if a pointer \emph{p} points to a
+%% box, then the dereference of \emph{p}, i.e. \emph{*p}, refer to the
+%% contents or the ``inside'' of the box.
+
+%% In particular, if I give you this picture without showing you the name
+%% of the variable with a value of 23:
+
+%% you tell me right away that \emph{*p} is 23. You don't need to know the
+%% variable name of that box.
+
+%% Note that \emph{*p} refers to the contents of the box \emph{p} points to
+%% in two ways and can be used in two ways, for reading and for writing:
+
+%% \begin{itemize}
+%% \tightlist
+%% \item
+%%   you can use \emph{*p} to \textbf{read} the value that \emph{p} points
+%%   to
+%% \item
+%%   you can use \emph{*p} to \textbf{overwrite} the value \emph{p} points
+%%   to
+%% \end{itemize}
+
+%% For instance:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 42;
+
+%% int * p = \&x;
+
+%% int i;
+
+%% i = *p; // read the value that p points to (and
+
+%% // give it to i)
+
+%% *p = 100; // write the value (i.e. 100) onto the
+
+%% // value that p points to\strut
+%% \end{consolethree}
+%% So \emph{*p} can appear on either the right or the left of the
+%% assignment operator.
+
+%% \hfill\break
+
+%% \textbf{Exercise.} An \textbf{lvalue} is something that can appear on
+%% the left of = (the assignment operator). An \textbf{rvalue} is something
+%% that can appear on the the right of =. You have just seen that \emph{*p}
+%% is is both an lvalue and an rvalue.
+
+%% \begin{itemize}
+%% \tightlist
+%% \item
+%%   Is 42 an lvalue? An rvalue?
+%% \item
+%%   Suppose \emph{x} is a variable. Is \emph{x} an lvalue? An rvalue?
+%% \item
+%%   Suppose \emph{c} is a constant. Is \emph{c} an lvalue? An rvalue?
+%% \item
+%%   Suppose \emph{f()} is a function with void return type. Is \emph{f} an
+%%   lvalue? An rvalue?
+%% \item
+%%   Suppose \emph{f()} is a function with \emph{int} return type. Is
+%%   \emph{f} an lvalue? An rvalue?
+%% \end{itemize}
+
+%% Let me repeat the above. Suppose the address value in \emph{p} is
+%% 124500. Then if you see something like
+
+%% \begin{consolethree}[escapeinside=||]
+%% a = b + *p + c;\tabularnewline
+%% \bottomrule
+%% \end{longtable}
+
+%% you should think of it as
+
+%% \begin{consolethree}[escapeinside=||]
+%% a = b + (the value at address 124500) + c;\tabularnewline
+%% \bottomrule
+%% \end{longtable}
+
+%% And if you see
+
+%% \begin{consolethree}[escapeinside=||]
+%% *p = b + c;\tabularnewline
+%% \bottomrule
+%% \end{longtable}
+
+%% you should think of it as
+
+%% \begin{consolethree}[escapeinside=||]
+%% store value of (b + c) at address 124500\tabularnewline
+%% \bottomrule
+%% \end{longtable}
+
+%% In summary,
+
+%% \begin{longtable}[]{@{}lll@{}}
+%% \toprule
+%% \endhead
+%% *p & Statement & Same as\tabularnewline
+%% lvalue & *p = \ldots{} & store \ldots{} in memory at address
+%% \emph{p}\tabularnewline
+%% rvalue & \ldots{} = \ldots{} *p \ldots{} & \ldots{} = \ldots{} (value in
+%% memory at address \emph{p}) ...\tabularnewline
+%% \bottomrule
+%% \end{longtable}
+
+%% \textbf{Exercise.} Add one statement to the following:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 0;
+
+%% int * p = \&x;
+
+%% // add one statement here to change the value of x
+
+%% // to 42. Do NOT use the variable name x in your
+
+%% // statement.
+
+%% std::cout << x <<
+%% '\n';\strut
+%% \end{consolethree}
+%% \textbf{Exercise.} Add one statement to this code fragment so that the
+%% output is 3.1415:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% // p is a pointer variable that points to a double
+
+%% // add one statement below this line
+
+%% std::cout << *p <<
+%% '\n';\strut
+%% \end{consolethree}
+%% \textbf{Exercise.} What is the output of this program:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 2;
+
+%% int * p = \&x;
+
+%% *p = *p + *p;
+
+%% std::cout << x <<
+%% '\n';\strut
+%% \end{consolethree}
+%% (Hint: Draw a picture)
+
+%% Exercise. What is the output of this program?
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 2;
+
+%% int y = 42;
+
+%% int * p = \&x;
+
+%% int * q = \&y;
+
+%% std::cout << *p + *q <<
+%% '\n';\strut
+%% \end{consolethree}
+%% (Hint: Draw a picture)
+
+%% Exercise. What is the output of this program?
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 2;
+
+%% int y = 42;
+
+%% int * p = \&x;
+
+%% int * q = \&y;
+
+%% *p = *p * 2 + *q;
+
+%% std::cout << x << ' '
+%% << y << '\n';\strut
+%% \end{consolethree}
+%% (Hint: Draw a ...)
+
+%% Exercise. What is the output of this program?
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 2;
+
+%% int y = 42;
+
+%% int * p = \&x;
+
+%% int * q = \&y;
+
+%% *p = *p * *q;
+
+%% std::cout << x << ' '
+%% << y << '\n';\strut
+%% \end{consolethree}
+%% (Hint: Draw, draw, draw ...)
+
+%% Exercise. What is the output of this program?
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 2;
+
+%% int y = 42;
+
+%% int * p = \&x;
+
+%% int * q = \&x;
+
+%% *p = *p * *q;
+
+%% *q = 42;
+
+%% std::cout << x << ' '
+%% << y << '\n';
+
+%% std::cout << *p << ' '
+%% << *q << '\n';\strut
+%% \end{consolethree}
+%% (Hint: Draw...)
+
+%% Exercise. Do a simple addition program using the following skeleton.
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 0, y = 0;
+
+%% int * p = \&x;
+
+%% int * q = \&y;
+
+%% // Statement to prompt the user for an integer and
+
+%% // put it into x. Do NOT use x in your statement.
+
+%% // Statement to prompt the user for an integer and
+
+%% // put it into y. Do NOT use y in your statement.
+
+%% std::cout << x + y <<
+%% '\n';\strut
+%% \end{consolethree}
+%% \textbf{Exercise.} Declare a \emph{double} variable called \emph{d} and
+%% initialize it to 3.14. Declare a \emph{double} pointer to point to
+%% \emph{d}; call it \emph{q}. Print \emph{d} and \emph{*q}. Add 1 to the
+%% value of \emph{d} using \emph{d}. Print \emph{d} and \emph{*q}. Add 1 to
+%% the value of \emph{d} but using \emph{q}. Print \emph{d} and \emph{q}.
+
+%% \textbf{Exercise.} What is the output of this code fragment:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x{[}{]} = \{5, 4, 3, 2, 1\};
+
+%% for (int i = 4; i \textgreater= 0; -\/-i)
+
+%% \{
+
+%% int * p = \&x{[}i{]};
+
+%% std::cout << (*p) << std::endl;
+
+%% \}\strut
+%% \end{consolethree}
+%% \textbf{Exercise.} Here's a program you are familiar with:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int s = 0;
+
+%% for (int i = 0; i <= 100; i++)
+
+%% \{
+
+%% s += i;
+
+%% std::cout << i << ' '
+%% << s << '\n';\\
+%% \}
+
+%% std::cout << "1 + ... + 100 = " << s
+%% << '\n';\strut
+%% \end{consolethree}
+%% I'm going to add a pointer:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int s = 0;
+
+%% int * p = \&s;
+
+%% for (int i = 0; i <= 100; i++)
+
+%% \{
+
+%% s += i;
+
+%% std::cout << i << ' '
+%% << s << '\n';\\
+%% \}
+
+%% std::cout << "1 + ... + 100 = " << s
+%% << '\n';\strut
+%% \end{consolethree}
+%% Now modify the program so that it works the same as before but the
+%% variable name \emph{s} is not used after the statement that declares
+%% \emph{p}:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int s = 0;
+
+%% int * p = \&s;
+
+%% // Modify code below so that variable name s is not
+
+%% // used.
+
+%% for (int i = 0; i < 100; i++)
+
+%% \{
+
+%% s += i;
+
+%% std::cout << i << ' '
+%% << s << '\n';\\
+%% \}
+
+%% std::cout << "1 + ... + 100 = " << s
+%% << '\n';\strut
+%% \end{consolethree}
+%% \textbf{Exercise.} If you see this picture
+
+%% can you tell me what is the type of x?
+
+%% \textbf{Exercise.} If you see this
+
+%% \begin{consolethree}[escapeinside=||]
+%% double x = a{[}*b{]}; \tabularnewline
+%% \bottomrule
+%% \end{longtable}
+
+%% can you tell me what is the type of \emph{b}?
+
+%% \textbf{Exercise.} If you see this
+
+%% \begin{consolethree}[escapeinside=||]
+%% std::cout << x \% (*y); \tabularnewline
+%% \bottomrule
+%% \end{longtable}
+
+%% can you tell me what is the type of \emph{y}?
+
+%% \textbf{Exercise.} Complete this:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% void nextprime(int * p)
+
+%% \{
+
+%% \}
+
+%% int main()
+
+%% \{
+
+%% int x = 7;
+
+%% nextprime(\&x); // x becomes 11
+
+%% std::cout << x << std::endl;
+
+%% nextprime(\&x); // x becomes 13
+
+%% std::cout << x << std::endl;
+
+%% nextprime(\&x); // x becomes 17
+
+%% std::cout << x << std::endl;
+
+%% return 0;\\
+%% \}\strut
+%% \end{consolethree}
+%% \textbf{Exercise.} Can you apply the pre- and post-increment operators
+%% to \emph{*p} where \emph{p} is a pointer to an \emph{int}?
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% ++(*p);
+
+%% (*p)++;
+
+%% -\/-(*p);
+
+%% (*p)-\/-;\strut
+%% \end{consolethree}
+%% Do you need the parentheses? Can you apply the augmented assignment
+%% operators to \emph{*p?}
+
+%% Note that if you do not assign a memory address to your pointer, it
+%% would have an arbitrary address value, pointing to some arbitrary value.
+%% Reading that value might result result in printing something that looks
+%% like garbage. It might even cause your program to crash if you do not
+%% have access rights to that location!!!
+
+%% Another thing to note is that the dereferencing operator works with an
+%% address -- it does not have to be applied to a pointer. In other words
+%% if you're doing this:
+
+%% \begin{consolethree}[escapeinside=||]
+%% std::cout << *p <<
+%% std::endl;\tabularnewline
+%% \bottomrule
+%% \end{longtable}
+
+%% and if you know that \emph{p} has value 124500, then the above can also
+%% be
+
+%% \begin{consolethree}[escapeinside=||]
+%% std::cout << *124500 <<
+%% std::endl;\tabularnewline
+%% \bottomrule
+%% \end{longtable}
+
+%% \textbf{Exercise. }First get a strong cup of coffee \ldots{} now
+%% \ldots{} What is the output? Or is there an error?
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% \#include < iostream\textgreater{}
+
+%% int * f(int * x)
+
+%% \{
+
+%% return x;\\
+%% \}
+
+%% int f(int x)
+
+%% \{
+
+%% return x;\\
+%% \}
+
+%% int main()
+
+%% \{
+
+%% int a = 21;
+
+%% std::cout << *f(\&a) + f(a) <<
+%% std::endl;
+
+%% return 0;\\
+%% \}\strut
+%% \end{consolethree}
+%% Verify! (Draw a picture if you need to.)
+
+%% \textbf{Exercise. }Sip your coffee \ldots{} another one \ldots{} What is
+%% the output? Or is there an error?
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% \#include < iostream\textgreater{}
+
+%% int h(int * z)
+
+%% \{
+
+%% return *z;\\
+%% \}
+
+%% int * g(int * y)
+
+%% \{
+
+%% return y;\\
+%% \}\\
+
+%% int * f(int * x)
+
+%% \{
+
+%% return (\&x == NULL ? NULL : g(x));
+
+%% \}
+
+%% int main()
+
+%% \{
+
+%% int a = 21;
+
+%% std::cout << *f(\&a) + h(\&a) <<
+%% std::endl;
+
+%% return 0;\\
+%% \}\strut
+%% \end{consolethree}
+%% Verify!
+
+%% Assignment Operator
+
+%% It's not too surprising that you can do assignments on pointers \ldots{}
+
+%% First try to guess what this does:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 42;
+
+%% int y = 123;
+
+%% int * p = \&x;
+
+%% int * q = \&y;
+
+%% std::cout << *p <<
+%% "\n";
+
+%% p = q;
+
+%% std::cout << *p <<
+%% "\n";\strut
+%% \end{consolethree}
+%% Now run it and verify.
+
+%% Here are some pictures. Up to this point:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 42;
+
+%% int y = 123;
+
+%% int * p = \&x;
+
+%% int * q = \&y;
+
+%% std::cout << *p <<
+%% "\n";\strut
+%% \end{consolethree}
+%% the memory model looks like this:
+
+%% The next statement
+
+%% \begin{consolethree}[escapeinside=||]
+%% p = q;\tabularnewline
+%% \bottomrule
+%% \end{longtable}
+
+%% gives the memory address in \emph{q} to \emph{p}. Since \emph{q} has the
+%% memory address of \emph{y}, this means that \emph{p} ends up with the
+%% memory address of \emph{y}. So we get
+
+%% Since \emph{p} points to \emph{y}, or rather, \emph{p} point to the
+%% \emph{int} box that contains the value of \emph{y}, of course \emph{*p}
+%% gives us \emph{123}.
+
+%% Let me explain everything above all over again, this time using (made
+%% up) memory addresses \ldots{} \textbf{PAY ATTENTION!}
+
+%% Here's the above code again, except that I've included some made-up
+%% addresses for the value of \emph{x} and the value of \emph{y}:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 42; // value of x is at address 80000
+
+%% int y = 123; // value of y is at address 80004
+
+%% ...\strut
+%% \end{consolethree}
+%% At this point in the code
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 42; // value of x is at address 80000
+
+%% int y = 123; // value of y is at address 80004
+
+%% int * p = \&x; // p = 80000
+
+%% int * q = \&y; // q = 80004
+
+%% std::cout << *p <<
+%% "\n";\strut
+%% \end{consolethree}
+%% the picture looks like this:
+
+%% and if I draw in arrows for pointers to help us see the pointer-to-value
+%% relationship it would look like this:
+
+%% Next, the statement
+
+%% \begin{consolethree}[escapeinside=||]
+%% p = q;\tabularnewline
+%% \bottomrule
+%% \end{longtable}
+
+%% gives the value of \emph{q} to \emph{p}. The value of \emph{q} is 80004.
+%% Therefore the value of \emph{p} becomes 80004. The diagram now looks
+%% like this:
+
+%% And if I now draw the arrows, I have
+
+%% Get it?
+
+%% \textbf{Exercise.} First draw memory models for this:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 42; // address 10000
+
+%% int y = 43; // address 10004
+
+%% int * p = \&x;
+
+%% // Draw picture 1
+
+%% std::cout << \&x << ' '
+%% << \&y << ' ' << p
+%% << '\n';
+
+%% p = \&y;
+
+%% // Draw picture 2
+
+%% std::cout << \&x << ' '
+%% << \&y << ' ' << p
+%% << '\n';\strut
+%% \end{consolethree}
+%% Verify your picture by running your program.
+
+%% \textbf{Exercise.} Draw the memory models for the following:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 42; // address 80000
+
+%% int y = 123; // address 80004
+
+%% int * p = \&x;
+
+%% int * q = \&y;
+
+%% // Draw picture 1
+
+%% std::cout << \&x << ' '
+%% << \&y << ' '
+
+%% << p << ' ' << q
+%% << '\n';
+
+%% p = \&y;
+
+%% // Draw picture 2
+
+%% std::cout << \&x << ' '
+%% << \&y << ' '
+
+%% << p << ' ' << q
+%% << '\n';
+
+%% q = \&x;
+
+%% // Draw picture 3
+
+%% std::cout << \&x << ' '
+%% << \&y << ' '
+
+%% << p << ' ' << q
+%% << '\n';\strut
+%% \end{consolethree}
+%% \textbf{Exercise.} What is the output?
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int i = 42; // address 5000
+
+%% int j = 5; // address 5004
+
+%% int k = -2; // address 5008
+
+%% int * p = \&i;
+
+%% int * q = \&j;
+
+%% int * r = p;
+
+%% p = q;
+
+%% q = r;
+
+%% std::cout << *p << ' '
+%% << *q << ' ' << *r
+%% << '\n'; \strut
+%% \end{consolethree}
+%% (Hint: Draw a picture)
+
+%% \textbf{Exercise.} You are brainstorming with your team in one of the
+%% company's meeting rooms. Your boss pops in to say hi on his way to get
+%% coffee and he notices the following diagram on the whiteboard. Someone
+%% is tracing a piece of code on the whiteboard:
+
+%% On his way back, your boss glanced at the whiteboard and sees this:
+
+%% You notice he was shaking his head as he walked away. Why?
+
+%% \textbf{Exercise.} What is the output?
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int i = 1;
+
+%% int j = 2;
+
+%% int k = 3;
+
+%% int * p = \&k;
+
+%% int * q = \&i;
+
+%% int * r = \&j;
+
+%% *p = *q + *r;
+
+%% p = q;
+
+%% *p = *q + *r;
+
+%% p = r;
+
+%% *p = *q + *r;
+
+%% std::cout << i << ' '
+%% << j << ' ' << k
+%% << '\n';
+
+%% std::cout << *p << ' '
+%% << *q << ' ' << *r
+%% << '\n'; \strut
+%% \end{consolethree}
+%% Exercise. What is the output? Or is there an error?
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int i = 1;
+
+%% int j = 2;
+
+%% int k = 3;
+
+%% int * p = \&k;
+
+%% int * q = \&i;
+
+%% int * r = \&j;
+
+%% *p = *q + *r;
+
+%% p = q;
+
+%% *p = *q + *r;
+
+%% p = r;
+
+%% *p = *q + *r;
+
+%% std::cout << i << ' '
+%% << j << ' ' << k
+%% << '\n';
+
+%% std::cout << *p << ' '
+%% << *q << ' ' << *r
+%% << '\n'; \strut
+%% \end{consolethree}
+%% Comparison
+
+%% You can only compare pointers \textbf{of the same type}\emph{\textbf{.}}
+
+%% You can compare compatible pointers using
+
+%% \emph{==}, \emph{!=}, \emph{<}, \emph{<=},
+%% \emph{\textgreater{}}, \emph{\textgreater=}
+
+%% because pointers are memory address and hence can be converted to
+%% integers and therefore can be compared just like integers. Try this
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 0;
+
+%% int y = 1;
+
+%% int * p = \&x;
+
+%% int * q = \&y;
+
+%% std::cout << (p == q) <<
+%% "\n";\strut
+%% \end{consolethree}
+%% and this:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 0;
+
+%% char c = 'a';
+
+%% int * p = \&x;
+
+%% char * r = \&c;
+
+%% std::cout << (p == r) <<
+%% "\n";\strut
+%% \end{consolethree}
+%% Of course if two pointers point to the same memory address, then you get
+%% true when you compare their memory address values:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 42;
+
+%% int * p = \&x;
+
+%% int * q = \&x;
+
+%% std::cout << (p == q) <<
+%% "\n";\strut
+%% \end{consolethree}
+%% Recall that variables declared in a block are lined up so that variables
+%% declared earlier will have a small address value.
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 0;
+
+%% int y = 1;
+
+%% int * p = \&x;
+
+%% int * q = \&y;
+
+%% std::cout << (unsigned int)(p) << '
+%% '
+
+%% << (unsigned int)(q) <<
+%% '\n';
+
+%% std::cout << (p < q) <<
+%% '\n';\strut
+%% \end{consolethree}
+%% In the above, you see that the address of x (i.e., the address of the
+%% value of x) is smaller that the address of y.
+
+%% \textbf{Exercise.} TRUE or FALSE: The output is 1 since the value that
+%% \emph{p} and \emph{q} points to are the same (i.e., 42).
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 42;
+
+%% int y = 42;
+
+%% int * p = \&x;
+
+%% int * q = \&y;
+
+%% std::cout << (p == q) <<
+%% "\n";\strut
+%% \end{consolethree}
+%% \textbf{Exercise.} What is the output?
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 0;
+
+%% int y = 1;
+
+%% int z = 2;
+
+%% int * p = \&x;
+
+%% int * q = \&y;
+
+%% int * r = \&z;
+
+%% *r = 0;
+
+%% r = q;
+
+%% *p = 0;
+
+%% p = q;
+
+%% *q = 0;
+
+%% std::cout << (p == q) << ' '
+%% << (q != r) <<
+%% '\n';\strut
+%% \end{consolethree}
+%% \textbf{Exercise.} What is the output?
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% \#include < iostream\textgreater{}
+
+%% int f(int * x, int * y)
+
+%% \{
+
+%% return (x == y ? *x : *x + *y);
+
+%% \}
+
+%% int main()
+
+%% \{
+
+%% int a = 2;
+
+%% int b = 3;
+
+%% std::cout << f(\&a, \&b) + f(\&a, \&a)
+
+%% << std::endl;
+
+%% return 0;\\
+%% \}\strut
+%% \end{consolethree}
+%% \textbf{Exercise.} What is the output? Or is there an error?
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% \#include < iostream\textgreater{}
+
+%% int f(int * x)
+
+%% \{
+
+%% return (x == NULL ? -1 : *x);
+
+%% \}
+
+%% int main()
+
+%% \{
+
+%% int a = 2;
+
+%% std::cout << f(\&a) << ' '
+%% << f(NULL)
+
+%% << std::endl;
+
+%% return 0;\\
+%% \}\strut
+%% \end{consolethree}
+%% {[}HINT: What is \emph{NULL} again? What does it represent?{]}
+
+%% Pointer Power \#1: Assessing value anywhere
+
+%% Here comes the first application of pointers \ldots{} a really important
+%% one \ldots{} we can use pointers to access a variable's memory anywhere
+%% we like. (This is not new since references are exactly for that purpose.
+%% You want to review references now.)
+
+%% First of all recall the following:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% \#include < iostream\textgreater{}
+
+%% void swap(int x, int y)
+
+%% \{
+
+%% int t = x;
+
+%% x = y;
+
+%% y = t;\\
+%% \}
+
+%% int main()
+
+%% \{
+
+%% int x = 0, y = 1;
+
+%% std::cout << x << ' '
+%% << y << '\n';
+
+%% swap(x, y);
+
+%% std::cout << x << ' '
+%% << y << '\n';
+
+%% return 0;\\
+%% \}\strut
+%% \end{consolethree}
+%% Of course the function uses pass-by-value. The \emph{x} and \emph{y} in
+%% \emph{swap()} has nothing to do with the \emph{x} and \emph{y} in
+%% \emph{main()} and therefore \emph{swap()} cannot possibly change the
+%% values of variables in \emph{main()}.
+
+%% Now look at this:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% \#include < iostream\textgreater{}
+
+%% void swap(int \& x, int \& y)
+
+%% \{
+
+%% int t = x;
+
+%% x = y;
+
+%% y = t;\\
+%% \}
+
+%% int main()
+
+%% \{
+
+%% int x = 0, y = 1;
+
+%% std::cout << x << ' '
+%% << y << '\n';
+
+%% swap(x, y);
+
+%% std::cout << x << ' '
+%% << y << '\n';
+
+%% return 0;\\
+%% \}\strut
+%% \end{consolethree}
+%% This second \emph{swap()} function uses pass-by-reference and it does
+%% swap the values of two variables in \emph{main()}.
+
+%% With your understanding of pointers, run and explain this:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% \#include < iostream\textgreater{}
+
+%% void swap(int * x, int * y)
+
+%% \{
+
+%% int t = *x;
+
+%% *x = *y;
+
+%% *y = t;\\
+%% \}
+
+%% int main()
+
+%% \{
+
+%% int x = 0, y = 1;
+
+%% std::cout << x << ' '
+%% << y << '\n';
+
+%% swap(\&x, \&y);
+
+%% std::cout << x << ' '
+%% << y << '\n';
+
+%% return 0;\\
+%% \}\strut
+%% \end{consolethree}
+%% Therefore pointers can be used as parameters to modify values of
+%% variables in the calling function, i.e., they can be used to achieve the
+%% same results as references. Actually references are secretly pointers!
+
+%% Understand this very important idea: pointers allow you to access any
+%% value you like from anywhere in your code as long as know where to find
+%% the value (and you have access rights to that value):
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% \#include < iostream\textgreater{}
+
+%% void j(int * x)
+
+%% \{
+
+%% *x = 42; // TADA!
+
+%% \}
+
+%% void i(int * x)
+
+%% \{
+
+%% j(x);
+
+%% \}
+
+%% void h(int * x)
+
+%% \{
+
+%% i(x);
+
+%% \}
+
+%% void f(int * x)
+
+%% \{
+
+%% h(x);
+
+%% \}
+
+%% int main ()
+
+%% \{
+
+%% int x = 0;
+
+%% f(\&x);
+
+%% std::cout << x << std::endl;\\
+%% return 0;
+
+%% \}\strut
+%% \end{consolethree}
+%% Here's another example. This version of reciprocating \emph{x} does not
+%% work:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% \#include < iostream\textgreater{}
+
+%% void reciprocal(double x)
+
+%% \{
+
+%% x = 1.0 / x;\\
+%% \}
+
+%% int main()
+
+%% \{
+
+%% double x = 2.0;
+
+%% reciprocal(x);
+
+%% std::cout << x <<
+%% '\n'; // x is still 2.0
+
+%% return 0;
+
+%% \}\strut
+%% \end{consolethree}
+%% This one does work, using reference:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% \#include < iostream\textgreater{}
+
+%% void reciprocal(double \& x)
+
+%% \{
+
+%% x = 1.0 / x;\\
+%% \}
+
+%% int main()
+
+%% \{
+
+%% double x = 2.0;
+
+%% reciprocal(x);
+
+%% std::cout << x <<
+%% '\n'; // x is 0.5
+
+%% return 0;
+
+%% \}\strut
+%% \end{consolethree}
+%% And this one does work, using pointers:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% \#include < iostream\textgreater{}
+
+%% void reciprocal(double * x)
+
+%% \{
+
+%% *x = 1.0 / *x;\\
+%% \}
+
+%% int main()
+
+%% \{
+
+%% double x = 2.0;
+
+%% reciprocal(\&x);
+
+%% std::cout << x <<
+%% '\n'; // x is 0.5
+
+%% return 0;
+
+%% \}\strut
+%% \end{consolethree}
+%% Now's your turn \ldots{}
+
+%% \textbf{Exercise. }Here's an increment function that does not work:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% \#include < iostream\textgreater{}
+
+%% void inc(int x)
+
+%% \{
+
+%% x++;\\
+%% \}
+
+%% int main()
+
+%% \{
+
+%% int a = 42;
+
+%% inc(a);
+
+%% std::cout << a << std::endl; // a is
+%% still 42
+
+%% return 0;\\
+%% \}\strut
+%% \end{consolethree}
+%% And here's one that works, using reference variables:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% \#include < iostream\textgreater{}
+
+%% void inc(int \& x)
+
+%% \{
+
+%% x++;\\
+%% \}
+
+%% int main()
+
+%% \{
+
+%% int a = 42;
+
+%% inc(a);
+
+%% std::cout << a << std::endl; // a is
+%% 43
+
+%% return 0;\\
+%% \}\strut
+%% \end{consolethree}
+%% Complete the following program so that the new increment works, except
+%% that the parameter is a pointer and not a reference:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% void inc(int * x)
+
+%% \{\\
+%% \}
+
+%% int main()
+
+%% \{
+
+%% int a = 42;
+
+%% inc(\&a);
+
+%% std::cout << a << std::endl; // you
+%% should get 43
+
+%% return 0;\\
+%% \}\strut
+%% \end{consolethree}
+%% \textbf{Exercise. }Complete the \emph{array\_append()} function (which
+%% adds a value to the array \emph{x} and increments the value of the
+%% length variable of the array. The expected output is \emph{2 3 5 7}.
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% \#include < iostream\textgreater{}
+
+%% void array\_println(int x{[}{]}, int xlen)
+
+%% \{
+
+%% for (int i = 0; i < xlen; ++i)
+
+%% \{
+
+%% std::cout << x{[}i{]} << ' ';
+
+%% \}
+
+%% std::cout << std::endl;\\
+%% \}
+
+%% void array\_append(int x{[}{]}, int * xlen, int value)
+
+%% \{\\
+%% \}
+
+%% int main()
+
+%% \{
+
+%% int x{[}10{]} = \{2, 3, 5\};
+
+%% int xlen = 3;
+
+%% array\_append(x, \&xlen, 7);
+
+%% array\_println(x, xlen);
+
+%% return 0;\\
+%% \}\strut
+%% \end{consolethree}
+%% \textbf{Exercise. }Here's a function that acts like an integer input
+%% function:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% \#include < iostream\textgreater{}
+
+%% void scanf(int * x)
+
+%% \{\\
+%% \}
+
+%% int main()
+
+%% \{
+
+%% int a = 0;
+
+%% scanf(\&a);
+
+%% std::cout << a << std::endl;
+
+%% return 0;\\
+%% \}\strut
+%% \end{consolethree}
+%% Complete this so that when you run it and enter 42, there's an output of
+%% 42.
+
+%% \textbf{Exercise.} This is similar to the above:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% \#include < iostream\textgreater{}
+
+%% void scanf(double * x)
+
+%% \{\\
+%% \}
+
+%% int main()
+
+%% \{
+
+%% double a = 0;
+
+%% scanf(\&a);
+
+%% std::cout << a << std::endl;
+
+%% return 0;\\
+%% \}\strut
+%% \end{consolethree}
+%% Test it!!!
+
+%% Constantness for pointers
+
+%% Recall that for a regular variable like this:
+
+%% \begin{consolethree}[escapeinside=||]
+%% int x = 42;\tabularnewline
+%% \bottomrule
+%% \end{longtable}
+
+%% to make \emph{x} constant so that its value cannot change, you do this:
+
+%% \begin{consolethree}[escapeinside=||]
+%% const int x = 42;\tabularnewline
+%% \bottomrule
+%% \end{longtable}
+
+%% Making a variable constant is a protection mechanism to prevent change
+%% in the case when a variable should not be changed. (Make sure you review
+%% the notes on constants.)
+
+%% The above is old stuff. Now for something new \ldots{}
+
+%% Because a pointer is associated with two values, an address and a value
+%% the pointer points to, you can ``const'' two values associated with a
+%% pointer. First let me describe the ideas, then I'll talk about the
+%% syntax.
+
+%% Look at the following picture of a pointer \emph{p} pointing to 42 (at
+%% address 5002048):
+
+%% If \emph{p} is a \textbf{constant pointer}, then the pointer value of
+%% \emph{p} is a constant and therefore cannot change.
+
+%% However if \emph{p} is a \textbf{pointer to constant}, then the value
+%% that \emph{p} points to cannot be changed through using \emph{*p}:
+
+%% Easy right?
+
+%% Now let's talk about the syntax \ldots{}
+
+%% In the case of a pointer, say:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 42;
+
+%% int * p = \&x;\strut
+%% \end{consolethree}
+%% If you do not want the memory address value in \emph{p} to be changed,
+%% you want \emph{p} to be a \textbf{constant pointer}, you do this:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 42;
+
+%% int * \textbf{const} p = \&x;\strut
+%% \end{consolethree}
+%% Note where \emph{const} is placed: to the right of \emph{*}.
+
+%% \textbf{Exercise.} To make sure you remember the above, first run this
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 0, y = 1;
+
+%% int * p = \&x;
+
+%% std::cout << *p <<
+%% '\n';
+
+%% p = \&y;
+
+%% std::cout << *p <<
+%% '\n'; \strut
+%% \end{consolethree}
+%% Everything works just fine. Now make \emph{p} a constant pointer like
+%% this:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 0, y = 1;
+
+%% int * \textbf{const} p = \&x;
+
+%% std::cout << *p <<
+%% '\n';
+
+%% p = \&y; // compiler complaints!!!
+
+%% std::cout << *p <<
+%% '\n'; \strut
+%% \end{consolethree}
+%% Get it?
+
+%% What about the case where \emph{p} points to a constant value? First run
+%% this
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 0;
+
+%% \textbf{const} int * p = \&x;
+
+%% std::cout << *p <<
+%% '\n';\strut
+%% \end{consolethree}
+%% No problems. Now try this:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 0;
+
+%% \textbf{const} int * p = \&x;
+
+%% std::cout << *p <<
+%% '\n';
+
+%% *p = 42; // compiler complaints!!!\strut
+%% \end{consolethree}
+%% That's it!
+
+%% There is however one very important thing you must remember. Run this:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 0, y = 1;
+
+%% \textbf{const} int * p = \&x;
+
+%% std::cout << x << ' '
+%% << *p << '\n';
+
+%% x = 42; // OK ... x is a variable
+
+%% std::cout << x << ' '
+%% << *p << '\n';\strut
+%% \end{minipage}\tabularnewline
+%% \bottomrule
+%% \end{longta\begin{longtable}[]{@{}l@{}}
+%% \toprule
+%% \endheadble}
+
+%% Note: \textbf{If }\emph{\textbf{p}}\textbf{ points to a
+%% }\emph{\textbf{const int}}\textbf{, it doesn't mean that the
+%% }\emph{\textbf{int }}\textbf{value can't change -\/- it's just that you
+%% cannot change it using }\emph{\textbf{*p}}\textbf{.} In the above, we
+%% change the value using \emph{x. }Get it?
+
+%% Here is a table the summarizes all the cases:
+
+%% Can change \emph{p}? Can change \emph{*p}?
+
+%% Is \emph{p =} \ldots{} OK? Is \emph{*p =} \ldots{} OK?
+
+%% int * pYES YES
+
+%% const int * pYES NO
+
+%% int * const pNO YES
+
+%% const int * const pNO NO
+
+%% Here's an important \textbf{memory aid} (this might not be in your
+%% textbook): You \textbf{read} the pointer type \textbf{backwards}. For
+%% instance, if you see this declaration:
+
+%% const int * const p
+
+%% you read it in this direction:
+
+%% const int * const p
+
+%% so that you say ``\emph{p} is a constant pointer to an integer
+%% constant''. Here are all the 4 possible constantness cases for a pointer
+%% declaration:
+
+%% You say:
+
+%% int * p``p is a pointer to int''
+
+%% const int * p``p is a pointer to int const''
+
+%% int * const p``p is a const pointer to int''
+
+%% const int * const p``p is a const pointer to int const''
+
+%% Two important things to note ...
+
+%% \textbf{A constant pointer must be initialized.} (This is just like a
+%% regular constant integer variable -- all constants must be initialized.)
+%% This means:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int * const p; // WRONG!!!
+
+%% p = \&x; // TOO LATE!!!
+
+%% const int * const q; // WRONG AGAIN!!
+
+%% q = \&y; // TOO LATE BOZO!!!\strut
+%% \end{consolethree}
+%% \textbf{A non-constant pointer cannot point to a constant.} For instance
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% const int x = 42;
+
+%% int * p0 = \&x; // WRONG!!!
+
+%% int * const p1 = \&x; // WRONG!!! \strut
+%% \end{consolethree}
+%% Why? Because in this case, \emph{p} is supposed to point to an
+%% \emph{int} (not \emph{const int}) Therefore \emph{p} can change the
+%% value that it points to using \emph{*p}. But that value is a
+%% \emph{const}! That's a contradiction!
+
+%% \textbf{Exercise.} Is this OK?
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% const int x = 42;
+
+%% const int * p = \&x;
+
+%% int * const q = p;\strut
+%% \end{consolethree}
+%% Here are some exercises to tease your brain.
+
+%% \textbf{Exercise.} Does the following code fragment compile?
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 42, y = 24;
+
+%% int * p = \&x;
+
+%% p = \&y; // OK?
+
+%% *p = 42; // OK?\strut
+%% \end{consolethree}
+%% Verify on your own.
+
+%% \textbf{Exercise.} Does the following code fragment compile?
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% double x = 3.14, y = 2.71;
+
+%% double * const p = \&x;
+
+%% p = \&y; // OK?
+
+%% *p = 0; // OK?\strut
+%% \end{consolethree}
+%% Verify on your own.
+
+%% \textbf{Exercise.} Does the following code fragment compile?
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% char x = 'a', y = 'b';
+
+%% const char * p = \&x;
+
+%% p = \&y; // OK?
+
+%% *p = 0; // OK?\strut
+%% \end{consolethree}
+%% Verify on your own.
+
+%% \textbf{Exercise.} Does the following code fragment compile?
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% bool x = true, y = false;
+
+%% const bool * const p = \&x;
+
+%% p = \&y; // OK?
+
+%% *p = 0; // OK?\strut
+%% \end{consolethree}
+%% Verify on your own.
+
+%% \textbf{Exercise.} Which of the following pointer declarations with
+%% initialization works?
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% const char x = '\#';
+
+%% char * p0 = \&x;
+
+%% char * const p1 = \&x;
+
+%% const char * p2 = \&x;
+
+%% const char * const p3 = \&x;\strut
+%% \end{consolethree}
+%% \textbf{Exercise.} Does this compile? If it does, what's the output?
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% double a = 3.14;
+
+%% const double * p = \&a;
+
+%% *p = a + *p;
+
+%% std::cout << a << ' '
+%% << *p << '\n';\strut
+%% \end{consolethree}
+%% \textbf{Exercise.} Does this compile? If it does, what's the output?
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% double a = 3.14;
+
+%% const double * p = \&a;
+
+%% a = a + *p;
+
+%% std::cout << a << ' '
+%% << *p << '\n';\strut
+%% \end{consolethree}
+%% Connection between pointers and references
+
+%% The previous section shows you that the behavior of pass-by-references
+%% can be achieved by pass-by-value where the value passed into a function
+%% is a pointer value (i.e., address value).
+
+%% As I've mentioned before when you use pass-by-reference, your compiler
+%% actually converts your function to one using pointers.
+
+%% To illustrate the connection further run this program:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 42;
+
+%% int \& r = x; // r is a reference to x
+
+%% int * p = \&x; // p is a pointer to x
+
+%% std::cout << x << ' '
+%% << r << ' ' << *p
+%% << '\n';
+
+%% std::cout << \&x << ' '
+%% << \&r << ' ' << p
+%% << '\n';\strut
+%% \end{consolethree}
+%% You will see that if \emph{r} is a reference to \emph{x}, the address of
+%% \emph{r}, i.e. \emph{\&r}, is the same as \emph{\&x}. This means that
+%% the value \emph{r} refers to resides at the address of \emph{x}, i.e.,
+%% the output of the second line contains the same address.
+
+%% Let me repeat: The address of a reference variable is the address of the
+%% value the reference is referring to. Therefore if \emph{r} reference x
+%% and \emph{p} points to \emph{x}, then
+
+%% \emph{\&r} and \emph{p }are the same
+
+%% and
+
+%% \emph{r} and \emph{*p }are the same.
+
+%% Think, understand, and remember!
+
+%% Differences between pointers and references
+
+%% The above might lead you to think that pointers and references are the
+%% same (except for syntax). There are actually lots of differences between
+%% pointers and references. With your understanding of pointers, let's take
+%% a closer look \ldots{}
+
+%% 1. There's a pointer value, \emph{NULL}, that can be assigned to all
+%% pointers. This frequently acts as a default pointer value. Recall that
+%% \emph{NULL} does not point to anything useful. References (of any type)
+%% MUST refer to a value of a variable (or constant) of the same type --
+%% there's no such thing as \emph{NULL} reference. So a function that
+%% accepts a pointer has the option of being called with ``nothing'':
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% void print\_cash(int * p\_cash\_in\_cents = NULL)
+
+%% \{
+
+%% if (p\_cash\_in\_cents == NULL)
+
+%% \{
+
+%% std::cout << "no cash!!!\n"
+
+%% \}
+
+%% else
+
+%% \{
+
+%% int dollar = *p\_cash\_in\_cents / 100.0;
+
+%% int cents = *p\_cash\_in\_cents
+
+%% -- dollar * 100.0;
+
+%% std::cout << '\$' << dollar
+%% << '.'
+
+%% << cents << '\n';
+
+%% \}
+
+%% \}\strut
+%% \end{consolethree}
+%% 2. A pointer can be a constant pointer or non-constant pointer:
+
+%% \begin{consolethree}[escapeinside=||]
+%% \tabularnewline
+%% \bottomrule
+%% \end{longtable}
+
+%% For a non-constant pointer, the address value in the pointer can change
+%% so that it can point to another value.
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% p = \&x; *p++; // increments x
+
+%% p = \&y; *p++; // increments y
+
+%% p = \&z; *p++; // increments z\strut
+%% \end{consolethree}
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 0, y = 0, z = 0;
+
+%% int \& r = x; r++; // increments x
+
+%% r = y; r++; // increments y ... NO!!!\strut
+%% \end{consolethree}
+%% The fact that a pointer can point to different values is actually
+%% extremely important later when it comes to pointers and arrays.
+
+%% Pointer Power \#2: Speeding up function calls
+
+%% Now for our second application of pointers (and references): speeding up
+%% function calls by passing in pointer values (or references) in order to
+%% avoid copying of values
+
+%% First look at this very simple (and old) program:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% \#include < iostream\textgreater{}
+
+%% int max(int x, int y)
+
+%% \{
+
+%% return (x \textgreater{} y ? x : y);
+
+%% \}\\
+
+%% int main()
+
+%% \{
+
+%% int a;
+
+%% std::cin \textgreater\textgreater{} a;
+
+%% int b;
+
+%% std::cin \textgreater\textgreater{} b;
+
+%% int x = max(a, b);
+
+%% std::cout << x <<
+%% '\n';
+
+%% return 0;\\
+%% \}\strut
+%% \end{consolethree}
+%% No big deal.
+
+%% Now run this
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% \#include < iostream\textgreater{}
+
+%% int * max(int * x, int * y)
+
+%% \{
+
+%% if (*x \textgreater{} *y)
+
+%% \{
+
+%% return x;
+
+%% \}
+
+%% else
+
+%% \{
+
+%% return y;
+
+%% \}\\
+%% \}\\
+
+%% int main()
+
+%% \{
+
+%% int a;
+
+%% std::cin \textgreater\textgreater{} a;
+
+%% int b;
+
+%% std::cin \textgreater\textgreater{} b;
+
+%% int * p = max(\&a, \&b);
+
+%% std::cout << *p <<
+%% '\n';
+
+%% std::cout << \&a << ' '
+%% << \&b << ' ' << p
+%% << '\n';
+
+%% return 0;\\
+%% \}\strut
+%% \end{consolethree}
+%% It's helpful if you draw a picture of the computation and explain what's
+%% happening. Don't panic \ldots{} just draw the picture and explain slowly
+%% and carefully.
+
+%% You can clean up the \emph{max()} function above like this:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int * max(int * x, int * y)
+
+%% \{
+
+%% return (*x \textgreater{} *y ? x : y);
+
+%% \}\strut
+%% \end{consolethree}
+%% This is what's going on in the program: instead of computing and
+%% returning the maximum of two values, the function actually returns a
+%% pointer value that points to the address of the variable with the larger
+%% value.
+
+%% We can even do this: Note that the above max function has pointer
+%% parameters whose pointer values do not change -- we can make them
+%% constant pointers. They also do not change the value they point to -- we
+%% can make them point to constant integers. So we can do this:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% \#include < iostream\textgreater{}
+
+%% const int * const max(const int * const x,
+
+%% const int * const y)
+
+%% \{
+
+%% return (*x \textgreater{} *y ? x : y);
+
+%% \}\\
+
+%% int main()
+
+%% \{
+
+%% int a;
+
+%% std::cin \textgreater\textgreater{} a;
+
+%% int b;
+
+%% std::cin \textgreater\textgreater{} b;
+
+%% const int * const p = max(\&a, \&b);
+
+%% std::cout << *p <<
+%% '\n';
+
+%% std::cout << \&a << ' '
+%% << \&b << ' ' << p
+%% << '\n';
+
+%% return 0;\\
+%% \}\strut
+%% \end{consolethree}
+%% or this:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% \#include < iostream\textgreater{}
+
+%% const int * const max(const int * const x,
+
+%% const int * const y)
+
+%% \{
+
+%% return (*x \textgreater{} *y ? x : y);
+
+%% \}\\
+
+%% int main()
+
+%% \{
+
+%% int a;
+
+%% std::cin \textgreater\textgreater{} a;
+
+%% int b;
+
+%% std::cin \textgreater\textgreater{} b;
+
+%% std::cout << *max(\&a, \&b) <<
+%% '\n';
+
+%% std::cout << \&a << ' '
+%% << \&b << ' '
+
+%% << max(\&a, \&b) <<
+%% '\n';
+
+%% return 0;\\
+%% \}\strut
+%% \end{consolethree}
+%% Note that you can also do this using references. Study the following
+%% program carefully:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% \#include < iostream\textgreater{}
+
+%% const int \& max(const int \& x, const int \& y)
+
+%% \{
+
+%% return (x \textgreater{} y ? x : y);
+
+%% \}\\
+
+%% int main()
+
+%% \{
+
+%% int a;
+
+%% std::cin \textgreater\textgreater{} a;
+
+%% int b;
+
+%% std::cin \textgreater\textgreater{} b;
+
+%% const int \& r = max(a, b);
+
+%% std::cout << r <<
+%% '\n';
+
+%% std::cout << \&a << ' '
+%% << \&b << ' ' <<
+%% \&r
+
+%% << '\n';
+
+%% return 0;\\
+%% \}\strut
+%% \end{consolethree}
+%% Now why would you want to pass in and return a pointer (or references)
+%% to one of the variables that contains the maximum value and not compute
+%% and return the maximum value??? Isn't the first method a lot simpler?!?
+
+%% Because the pointer (or reference method) can save memory (and
+%% potentially time). How so?
+
+%% When you compute the maximum value and return that value, you have to
+%% create that value and put it somewhere for returning. (Recall the
+%% stack?) For returning the maximum of two doubles, I have to save a
+%% double value onto the stack -- that's 8 bytes. For the pointer method
+%% (and similarly for the reference method), I have to save the pointer
+%% address of the variable holding the maximum value onto the stack. A
+%% pointer address is 32-bits (on a 32-bit machine) which is 4 bytes. Also,
+%% remember that using pass-by-value, the two doubles would have to saved
+%% onto the stack for the max function to retrieve.
+
+%% And what if the two values I'm computing with actually takes more bytes?
+%% Then the difference is even greater. For instance in C++, there's a
+%% \emph{long double} type. On my computer, the \emph{long double} occupies
+%% 12 bytes. So for the method that returns the maximum value, I have to
+
+%% \begin{itemize}
+%% \tightlist
+%% \item
+%%   copy two \emph{long double}s values (24 bytes) onto the stack
+%% \item
+%%   compute and return a \emph{long double} (12 bytes)
+%% \end{itemize}
+
+%% For the pointer method that returns an address, I have to
+
+%% \begin{itemize}
+%% \tightlist
+%% \item
+%%   copy two addresses (8 bytes) of \emph{long double} variables onto the
+%%   stack
+%% \item
+%%   compute the address (4 bytes) for returning.
+%% \end{itemize}
+
+%% There's of course a cost involved for the pointer method -- I have to
+%% dereference the pointers. But in any case, when the values to be used
+%% for computing occupies a huge amount of space, the pointer (or
+%% reference) method is preferred.
+
+%% \textbf{Exercise.} This is a very important exercise!!! (A very common
+%% mistake):
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int * max(int * x, int * y)
+
+%% \{
+
+%% int q;
+
+%% q = (*x \textgreater{} *y ? *x : *y);
+
+%% return \&q;
+
+%% \}\strut
+%% \end{consolethree}
+%% What's the problem? (Draw a picture!!!) There's an analogous one using
+%% references:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int \& max(int x, int y)
+
+%% \{
+
+%% int q;
+
+%% q = (x \textgreater{} y ? x : y);
+
+%% return q;
+
+%% \}\strut
+%% \end{consolethree}
+%% Here's a general principle: \textbf{Never return a pointer that points
+%% to a local variable in a function!!!} Because the pointer will point to
+%% a value that will be destroyed when you exit the function!!! In the same
+%% way: \textbf{Never return a reference that refers to a local variable in
+%% a function!!!}
+
+%% Protecting function from accidentally changing data
+
+%% Before we go on to the next use of pointers, let's look at the previous
+%% section on functions that accept pointers and/or references.
+
+%% Recall that if you have a function that accepts variables which are
+%% ``big'',
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int f(long long int x, long double y)
+
+%% \{
+
+%% return (x \textgreater{} y ? 0 : 1);
+
+%% \}
+
+%% int main()
+
+%% \{
+
+%% long long int x = 42;
+
+%% long double y = 3.14;
+
+%% int x = f(x, y);
+
+%% return 0;\\
+%% \}\strut
+%% \end{consolethree}
+%% Then the act of making a function call is faster if you pass in pointers
+%% (or references) because the data to be passed in is not copied, only the
+%% addresses of the data are passed in:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int f(long long int \& px, long double \& py)
+
+%% \{
+
+%% return (*px \textgreater{} *py ? 0 : 1);
+
+%% \}
+
+%% int main()
+
+%% \{
+
+%% long long int x = 42;
+
+%% long double y = 3.14;
+
+%% f(\&x, \&y);
+
+%% return 0;\\
+%% \}\strut
+%% \end{consolethree}
+%% Note that the larger the data, the more crucial it is to use pointers or
+%% references.
+
+%% If \emph{f()} is meant to change the \emph{x} and y back in
+%% \emph{main()}, then of course you must pass in pointers or references.
+
+%% However if \emph{f()} is not meant to change \emph{x} and \emph{y} back
+%% in \emph{main()}, then passing pointers (or references) into \emph{f()}
+%% can be dangerous since f() can potentially change the \emph{x} and
+%% \emph{y} in \emph{main()}. To overcome this, you pass in
+%% pointer-to-constants (or constant reference):
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int f(const long long int * px,
+
+%% const long double * py)
+
+%% \{
+
+%% return (*px \textgreater{} *py ? 0 : 1);
+
+%% \}\strut
+%% \end{consolethree}
+%% or
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% void f(const long long int \& x,
+
+%% const long double \& y)
+
+%% \{
+
+%% return (x \textgreater{} y ? 0 : 1);
+
+%% \}\strut
+%% \end{consolethree}
+%% In general do the following for a function call \emph{f(..., x, ...)}
+%% (say from\emph{ main()}) where \emph{x} has type \emph{T}:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% void f(..., T x, ...)
+
+%% \{
+
+%% ... x ...
+
+%% \}
+
+%% int main()
+
+%% \{
+
+%% T x;
+
+%% f(..., x, ...);\\
+%% \}\strut
+%% \end{consolethree}
+%% Do the following:
+
+%% \textbf{CASE 1.} If \emph{f()} needs to change the \emph{x} in
+%% \emph{main()}, then parameter \emph{x} needs to be a reference
+%% \textbf{(pass-by-reference)}:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% void f(..., T \& x, ...)
+
+%% \{
+
+%% ... x ...
+
+%% \}
+
+%% int main()
+
+%% \{
+
+%% T x;
+
+%% f(..., x, ...);\\
+%% \}\strut
+%% \end{consolethree}
+%% or parameter \emph{x} should be changed to a pointer
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% void f(..., T * x, ...)
+
+%% \{
+
+%% ... *x ...
+
+%% \}
+
+%% int main()
+
+%% \{
+
+%% T x;
+
+%% f(..., \&x, ...);\\
+%% \}\strut
+%% \end{consolethree}
+%% \textbf{CASE 2A.} If \emph{f()} does not need to change the \emph{x} in
+%% \emph{main()}, and \emph{x} in \emph{main()} does not use much memory,
+%% NO CHANGE IN ABOVE.
+
+%% \textbf{CASE 2B.} If \emph{f()} does not need to change the \emph{x} in
+%% \emph{main()}, and \emph{x} in \emph{main()} uses a lot of memory, then
+%% parameter \emph{x} need to be a pointer to a constant:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% void f(..., const T * const x, ...)
+
+%% \{
+
+%% ... *x ...
+
+%% \}
+
+%% int main()
+
+%% \{
+
+%% T x;
+
+%% f(..., \&x, ...);\\
+%% \}\strut
+%% \end{consolethree}
+%% Or you can use a constant reference:
+%% \textbf{(pass-by-constant-reference)}
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% void f(..., const T \& x, ...)
+
+%% \{
+
+%% ... x ...
+
+%% \}
+
+%% int main()
+
+%% \{
+
+%% T x;
+
+%% f(..., x, ...);\\
+%% \}\strut
+%% \end{consolethree}
+%% Chaining
+
+%% Look at this (this is old stuff \ldots{} no biggy):
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% void inc(int * p)
+
+%% \{
+
+%% *\textbf{p = *p + 1; // OR: ++(*p)}
+
+%% \}
+
+%% int main()
+
+%% \{
+
+%% int x = 0;
+
+%% inc(\&x); inc(\&x); inc(\&x);
+
+%% std::cout << x << std::endl;
+
+%% return 0;\\
+%% \}\strut
+%% \end{consolethree}
+%% Now look at this version:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% \textbf{int *} inc(int * p)
+
+%% \{
+
+%% *p = *p + 1;
+
+%% \textbf{return p;}
+
+%% \}
+
+%% int main()
+
+%% \{
+
+%% int x = 0;
+
+%% inc(inc(inc(\&x)));
+
+%% std::cout << x << std::endl;
+
+%% return 0;\\
+%% \}\strut
+%% \end{consolethree}
+%% Study the above code very carefully!!! (Chaining will be used a lot
+%% later when woirking with classes and objects.)
+
+%% When a function accepts a pointer value and returns the same pointer
+%% value, that function allows chaining, i.e., calling the function
+%% multiple times using the same pointer value.
+
+%% Study this version too (this one does not use references -- the idea is
+%% the same):
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int * const inc(int * const p)
+
+%% \{
+
+%% *p = *p + 1;
+
+%% return p;
+
+%% \}
+
+%% int main()
+
+%% \{
+
+%% int x = 0;
+
+%% inc(inc(inc(\&x)));
+
+%% std::cout << x << std::endl;
+
+%% return 0;\\
+%% \}\strut
+%% \end{consolethree}
+%% (i.e., the pointer can be constant.) Study this one that uses
+%% references::
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int \& inc(int \& r)
+
+%% \{
+
+%% r = r + 1;
+
+%% return r;
+
+%% \}
+
+%% int main()
+
+%% \{
+
+%% int x = 0;
+
+%% inc(inc(inc(x)));
+
+%% std::cout << x << std::endl;
+
+%% return 0;\\
+%% \}\strut
+%% \end{consolethree}
+%% \textbf{Exercise.} Now's your turn. Write functions that will allow this
+%% to happen:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int prime = 5;
+
+%% nextprime(nextprime(nextprime(\&prime))) // prime = 13\strut
+%% \end{consolethree}
+%% where \emph{nextprime(p)} will set \emph{*p} to the prime that is
+%% \emph{\textgreater{} *p}. When you're done, do a version that uses
+%% pass-by-reference:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int prime = 5;
+
+%% nextprime(nextprime(nextprime(prime))) // prime = 13\strut
+%% \end{consolethree}
+%% \textbf{Exercise.} How about this one:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int index = 0;
+
+%% int x{[}{]} = \{3, 5, 7, 9, 2\};
+
+%% inc(\&index, x); \strut
+%% \end{consolethree}
+%% where \emph{inc(\&index, x)} increments \emph{x{[}index{]}} and
+%% increment \emph{index} by 1, and returns \emph{\&index}. To increments
+%% the first three values of the array x, we can do this:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int index = 0;
+
+%% int x{[}{]} = \{3, 5, 7, 9, 2);
+
+%% inc(inc(inc(\&index, x), x), x); \strut
+%% \end{consolethree}
+%% Pointer Power \#3: Dynamic memory management
+
+%% Now we are ready to talk about \textbf{dynamic memory management. }For
+%% now I will focus on memory management for a single value of basic type.
+%% In the next set of notes, we'll talk about dynamic memory management for
+%% arrays.
+
+%% In our examples like
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 1;
+
+%% int * p = \&x;\strut
+%% \end{consolethree}
+%% we always declare another variable for \emph{p} to point to. You can
+%% also point \emph{p} to an integer value which is \textbf{not} associated
+%% to an integer variable.
+
+%% Try this:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int * p;
+
+%% p = \textbf{new int};
+
+%% *p = 42;
+
+%% std::cout << *p << std::endl;\strut
+%% \end{consolethree}
+%% or
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int * p = \textbf{new int};
+
+%% *p = 42
+
+%% std::cout << *p << std::endl;\strut
+%% \end{consolethree}
+%% You should think of
+
+%% p = new int;
+
+%% as creating an \emph{int} value \emph{\textbf{somewhere} }in the
+%% computer's memory and giving the memory address of this value to
+%% \emph{p}. We say that we are \textbf{allocating memory} for \emph{p} (to
+%% point to). The integer value created is \emph{\textbf{not}} associated
+%% with an integer variable -- there's no integer variable name involved:
+
+%% Look at the picture: It's REALLY important to understand that
+
+%% \begin{itemize}
+%% \tightlist
+%% \item
+%%   pointer \emph{p} consumes memory and
+%% \item
+%%   the value \emph{p} points to also consumes memory.
+%% \end{itemize}
+
+%% Make sure you see the difference between the two. Not distinguishing the
+%% two is the cause of many confusion later on when you learn more about
+%% memory management.
+
+%% Exercise. What is the output of this program if the user entered 5?
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int * x = new int;
+
+%% int * y = new int;
+
+%% *y = 1;
+
+%% std::cin \textgreater\textgreater{} *x;
+
+%% *x = *x + *y;
+
+%% std::cout << *x << ' '
+%% << *y << '\n';\strut
+%% \end{consolethree}
+%% In general you can \emph{new} any type: you can \emph{new} a
+%% \emph{double}, a \emph{char}, a \emph{bool}, etc.
+
+%% Remember \emph{NULL}? If you have declared a pointer \emph{p}, but you
+%% have not allocated memory for \emph{p}, then \emph{*p} of course should
+%% not be used. And one way to remind yourself that \emph{p} has not been
+%% allocated is to initialize it to \emph{NULL:}
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int * p = NULL;
+
+%% // etc.
+
+%% // now you need an integer \ldots{}
+
+%% if (p == NULL)
+
+%% \{
+
+%% p = new int;
+
+%% \}
+
+%% // Now use *p\strut
+%% \end{consolethree}
+%% Exercise. What is the output of this program?
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int * x = new int;
+
+%% *x = 1;
+
+%% double * y = new double;
+
+%% *y = 5.1;
+
+%% for (int i = 0; i <= *y; i++)
+
+%% \{
+
+%% *x *= 2;\\
+%% \}
+
+%% std::cout << *x <<
+%% '\n';\strut
+%% \end{consolethree}
+%% Exercise. What's the problem here?
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int * x = new double;
+
+%% *x = 42;
+
+%% std::cout << *x <<
+%% '\n';\strut
+%% \end{consolethree}
+%% For
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int * p = new int;
+
+%% *p = 42;\strut
+%% \end{consolethree}
+%% \emph{\textbf{where}} is this int value that \emph{p} points to???
+
+%% The free store or memory heap
+
+%% Our variables up to this point (except for pointer variables) have this
+%% behavior:
+
+%% \begin{itemize}
+%% \tightlist
+%% \item
+%%   When you declare it in a block, the variable is created, the memory
+%%   for the value is also created, and you have access to its name.
+%% \item
+%%   When you exit the block where the variable is declared, the variable
+%%   name and its value are destroyed.
+%% \end{itemize}
+
+%% Note in particular that the scope and value of the variable goes hand in
+%% hand. (Remember: The scope of a variable is where you can access the
+%% variable's name.) Such variables are called \textbf{automatic
+%% variables}. Because the memory used for their variables are destroyed
+%% and reclaimed automatically when the variable goes out of scope -- you
+%% don't have to manipulate the memory.
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% if (i \textgreater{} 0)
+
+%% \{
+
+%% int x = 42;
+
+%% ...
+
+%% \} // x dies when x goes out of scope. The memory
+
+%% // used by x is reclaimed automatically by the
+
+%% // the program.\strut
+%% \end{consolethree}
+%% You can actually do this:
+
+%% \begin{consolethree}[escapeinside=||]
+%% auto int x = 42;\tabularnewline
+%% \bottomrule
+%% \end{longtable}
+
+%% but that's redundant \ldots{} C/C++ variables are automatic by default.
+
+%% When you allocate memory for pointers, the values they point to are
+%% different. For instance you have already seen that
+
+%% \emph{int * p = new int;}
+
+%% creates an \emph{int} value for \emph{p} to point to. Note that
+
+%% \begin{itemize}
+%% \tightlist
+%% \item
+%%   \textbf{the value of }\emph{\textbf{p}}\textbf{ (an address) is still
+%%   automatic ... but }
+%% \item
+%%   \textbf{the value }\emph{\textbf{p}}\textbf{ points to (an
+%%   }\emph{\textbf{int}}\textbf{) is not automatic}.
+%% \end{itemize}
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% if (i \textgreater{} 0)
+
+%% \{
+
+%% int * p = new int;
+
+%% ...
+
+%% \} // p dies when p goes out of scope. The memory
+
+%% // used by p is reclaimed automatically by the
+
+%% // program. BUT the value p was pointing to is not
+
+%% // reclaimed!!! \strut
+%% \end{consolethree}
+%% This is \textbf{extremely important!!!}
+
+%% This means that: When you leave the block where you declare a pointer
+%% variable \emph{p} and called \emph{new},
+
+%% \begin{itemize}
+%% \tightlist
+%% \item
+%%   Since \emph{p} is automatic: the pointer \emph{p} is destroyed and the
+%%   memory used for the address in \emph{p} reclaimed, but
+%% \item
+%%   Since *\emph{p} is not automatic: the memory that \emph{p} points to
+%%   is not reclaimed by the computer. We'll talk about how to reclaim the
+%%   memory later.
+%% \end{itemize}
+
+%% But anyway where exactly is the memory \emph{p} points to? It's an an
+%% area called the \textbf{free store}, also called the \textbf{memory
+%% heap}. You basically request for memory space using the \emph{new}
+%% command.
+
+%% So our computational model now has the following pieces:
+
+%% The free store will \textbf{keep track of which part of its memory is
+%% already in use} via \emph{new}. A piece of memory allocated to a pointer
+%% variable will be marked as used. That way, \textbf{two calls to
+%% }\emph{\textbf{new}}\textbf{ will not give two pointers the same piece
+%% of memory}.
+
+%% char * p = new char;
+
+%% int * q = new int;
+
+%% double * r = new double;
+
+%% Memory Leaks
+
+%% I already said that memory allocated via \emph{new} is \textbf{not}
+%% released back to the free store automatically. \textbf{This is a very
+%% important point!!!}
+
+%% What will happen after calling the following \emph{f} five times?
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% void f()
+
+%% \{
+
+%% int * p = new int;
+
+%% \}
+
+%% int main()
+
+%% \{
+
+%% ...
+
+%% f(); f(); f(); f(); f();
+
+%% ...
+
+%% \}\strut
+%% \end{consolethree}
+%% After some time \ldots{}
+
+%% The problem \ldots{}
+
+%% Memory allocated is not released back to free store after use!!! When
+%% this happens too frequently, you will run out of memory. Your program
+%% might crash!!! The above problem is called a \textbf{memory leak} --
+%% memory allocated was not deallocated.
+
+%% \textbf{Exercise.} Run this program.
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int main()
+
+%% \{\\
+%% while (1)
+
+%% \{
+
+%% int * p = new int;
+
+%% \}
+
+%% return 0;
+
+%% \}\strut
+%% \end{consolethree}
+%% What will happen after a couple of minutes? Why?
+
+%% Again \ldots{} memory allocated from the free store is \textbf{not}
+%% automatically reclaimed/released when you exit the block where the
+%% memory was allocated. The integer \emph{p} of \emph{f()} is pointing to
+%% is not released.
+
+%% What should we do then??? \ldots{}
+
+%% delete
+
+%% After doing a \emph{new}, you can return the memory back to the heap by
+%% doing a \emph{delete}. For instance:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int * p = new int;
+
+%% // ... do something here with *p ...
+
+%% delete p;\strut
+%% \end{consolethree}
+%% After \emph{delete p}, the heap will \textbf{mark the memory that p is
+%% pointing to as available} (i.e. not in use). This is called
+%% \textbf{deallocating} the memory that \emph{p} is using or
+%% \textbf{releasing} the memory \emph{p} is using back to the heap.
+
+%% Here are some really important points:
+
+%% \begin{itemize}
+%% \tightlist
+%% \item
+%%   Delete pointers ASAP when you don't need them anymore.
+%% \item
+%%   As much as possible, delete pointers in the same block where you
+%%   new'ed them. You should see new and delete for a pointer in the same
+%%   block. (There are exceptions.)
+%% \end{itemize}
+
+%% After a pointer is deleted it should not be dereferenced. If you need
+%% memory again, you just do another \emph{new}:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% if (x \textgreater{} 42)
+
+%% \{
+
+%% int * p = new int;
+
+%% // ... do something with *p ...
+
+%% delete p;
+
+%% // DO NOT USE *p HERE
+
+%% p = new int;
+
+%% // ... do something with *p ...
+
+%% delete p;
+
+%% // DO NOT USE *p HERE
+
+%% \}
+
+%% // p is destroyed \strut
+%% \end{consolethree}
+%% Note that when \emph{p} is pointing to memory not in the heap obtained
+%% by \emph{new}, then you do NOT \emph{delete p}. For instance:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 42;
+
+%% int * p = \&42;
+
+%% int * q = new int;
+
+%% delete p; // BAD!!!
+
+%% delete q; // OK\strut
+%% \end{consolethree}
+%% And of course you do not release if you did not \emph{new} it:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% double * p;
+
+%% \emph{delete p; // Huh????} \strut
+%% \end{consolethree}
+%% Put in a different way: you cannot give a memory back to the heap if you
+%% did not get it from the heap to begin with.
+
+%% The tendency is to forget to deallocate and then re-allocate, like this:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int * p;
+
+%% // I need an int ...
+
+%% p = new int;
+
+%% // ... now use *p
+
+%% // 1000 lines later \ldots{}
+
+%% // Lack of sleep ... I need an int ...
+
+%% p = new int;
+
+%% // ... now use *p
+
+%% // 1000 lines later ...
+
+%% // Amnesia kicks in ... I need an int ...
+
+%% p = new int;
+
+%% // ... now use *p\strut
+%% \end{consolethree}
+%% Can you say ``memory leak''?!?! So deallocate ASAP!!! Don't argue!!!
+
+%% \textbf{Exercise.} The following program does compile and does run. But
+%% it has a problem. Fix it by adding ONE statement.
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% \#include < iostream\textgreater{}
+
+%% int sum(int n)
+
+%% \{
+
+%% int s = 0;
+
+%% int * i = new int;
+
+%% for (*i = 0; *i <= n; ++(*i))
+
+%% \{
+
+%% s += *i;
+
+%% \}
+
+%% return s;
+
+%% \}
+
+%% int main()
+
+%% \{
+
+%% std::cout << sum(10) <<
+%% '\n';
+
+%% return 0;\\
+%% \}\strut
+%% \end{consolethree}
+%% \textbf{Exercise. }Fixit time \ldots{} (you are only allowed to delete
+%% one statement.)
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% \#include < iostream\textgreater{}
+
+%% void average(double x{[}{]})
+
+%% \{\\
+%% double x = 0;
+
+%% double * px = \&x;
+
+%% for (int i = 0; i < 10; ++i)
+
+%% \{
+
+%% *px += x{[}i{]};\\
+%% \}
+
+%% x = *px / 10;
+
+%% delete px;
+
+%% return x;
+
+%% \}\\
+
+%% int main()
+
+%% \{
+
+%% double x{[}5{]} = \{1.1, 2.1, 2.3, 3.2, 3.4\};
+
+%% std::cout << average(x) <<
+%% std::endl;
+
+%% return 0;
+
+%% \emph{\}} \strut
+%% \end{consolethree}
+%% Exercise. The following program prompts the user for two integer values
+%% and then prints the sum. Do NOT use integer or double variables. You can
+%% only use pointers. In fact I have already declared all the variables you
+%% need, i.e., two pointer variables. You must allocate and deallocate
+%% memory correctly.
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% \#include < iostream\textgreater{}
+
+%% int main()
+
+%% \{
+
+%% int * p;
+
+%% int * q;
+
+%% // allocate memory for p
+
+%% // allocate memory for q
+
+%% // prompt for integer value and store at integer
+
+%% // that p points to
+
+%% // prompt for integer value and store at integer
+
+%% // that q points to
+
+%% // print the sum of integers that p and q point
+
+%% // to
+
+%% // deallocate memory used by q
+
+%% // deallocate memory used by p
+
+%% return 0;\\
+%% \}\strut
+%% \end{consolethree}
+%% Exercise. Write a number guessing game. First generate a random integer
+%% in the range 1..10. Then prompt the user for an integer value. If
+%% his/her guess is correct, print ``you got it!''. If his/her guess is too
+%% low, print ``too low!'' and prompt him/her again. If his/her guess is
+%% too high, print ``too high!'' and prompt him/her again. OK \ldots{}
+%% here's the point, you can only use pointer variables and you must
+%% allocate and deallocate memory for your pointers correctly.
+
+%% Exercise. Deallocate memory appropriately.
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int f(int a)
+
+%% \{
+
+%% int x = a;
+
+%% int * y = \&a;
+
+%% x = a + *y;
+
+%% return 2 * x;
+
+%% \}
+
+%% int g(int a)
+
+%% \{
+
+%% int * y = new int;
+
+%% if (a < 0)
+
+%% \{
+
+%% int x = f(2 * a);
+
+%% int * y = new int;
+
+%% y = a + 1;
+
+%% x = 2 * *y;
+
+%% return x;
+
+%% \}
+
+%% *y = a + 1;
+
+%% a = 2 * a;
+
+%% return a;\\
+%% \}
+
+%% \hspace{0pt}int main()
+
+%% \{
+
+%% std::cout << g(42) << std::endl;
+
+%% return 0;\\
+%% \}\strut
+%% \end{consolethree}
+%% Exercise. Deallocate memory appropriately.
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int f(int a)
+
+%% \{
+
+%% int x = a;
+
+%% int * y = \&a;
+
+%% x = a + *y;
+
+%% return 2 * x;
+
+%% \}
+
+%% int g(int a)
+
+%% \{
+
+%% int * y = new int;
+
+%% if (a < 0)
+
+%% \{
+
+%% int x = f(2 * a);
+
+%% int * y = new int;
+
+%% y = a + 1;
+
+%% x = 2 * *y;
+
+%% return x;
+
+%% \}
+
+%% *y = a + 1;
+
+%% a = 2 * a;
+
+%% return a;\\
+%% \}
+
+%% int main()
+
+%% \{
+
+%% std::cout << g(42) << std::endl;
+
+%% return 0;\\
+%% \}\strut
+%% \end{consolethree}
+%% Use of NULL for memory management
+
+%% Recall that \emph{NULL} is a predefined constant for 0 (as an address)
+%% and it's used to denote an invalid address. We can use \emph{NULL} to
+%% denote the fact that a pointer has not been allocated.
+
+%% Look at this:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int * p = NULL;
+
+%% // *p is not used yet
+
+%% ...
+
+%% // Now you're ready to use an int on the heap
+
+%% p = new int;
+
+%% // use *p
+
+%% ...
+
+%% // Now you don't need the int on the heap anymore
+
+%% delete p;
+
+%% p = NULL;
+
+%% ...\strut
+%% \end{consolethree}
+%% If you always set your pointer \emph{p} to \emph{NULL} when memory is
+%% not allocated for \emph{p} to point to, then you can always check your
+%% pointer against \emph{NULL} like this:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int * p = NULL;
+
+%% ...
+
+%% if (p == NULL)
+
+%% \{
+
+%% p = new int;
+
+%% \}
+
+%% // use *p ...
+
+%% delete p;
+
+%% p = NULL;
+
+%% ...
+
+%% if (p == NULL)
+
+%% \{
+
+%% p = new int;
+
+%% \}
+
+%% // use *p ...
+
+%% delete p;
+
+%% p = NULL;
+
+%% ...\strut
+%% \end{consolethree}
+%% Why use the free store?
+
+%% You might ask \ldots{} why bother requesting for an \emph{int} inside
+%% the free store?
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int * p = new int;
+
+%% // ... now use *p
+
+%% delete p;\strut
+%% \end{consolethree}
+%% That's so much trouble \ldots{} why not just create a plain \emph{int}
+%% variable:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x;
+
+%% // ... now use x\strut
+%% \end{consolethree}
+%% That is true!
+
+%% Actually the notes from the previous section is just to show you how to
+%% use the memory heap. In most cases, you use the heap by requesting for a
+%% \emph{\textbf{very huge}} chunk of memory from the free store and not
+%% for a single \emph{int}. In other words, dynamic memory management is
+%% useful only for large memory usage. As an example, consider the
+%% following scenario:
+
+%% Suppose you have some type \emph{T} that requires a huge amount of
+%% memory. Say a variable of type \emph{T} is some kind of an image for a
+%% game and a variable of type \emph{T} holds one megabytes of pixel data.
+%% Maybe you need 3 such variables:
+
+%% \emph{T bigvar0, bigvar1, bigvar2;}
+
+%% In this case all these 3 huge variables will consume 3 MB of memory.
+
+%% But what if you don't always need them at the same time? Say \ldots{}
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% T bigvar0, bigvar1, bigvar2;
+
+%% // use bigvar0 for 10 min
+
+%% // use bigvar1 for 10 min
+
+%% // use bigvar1 and bigvar2 for 10 min
+
+%% // use bigvar0 for 10 min \strut
+%% \end{consolethree}
+%% Then you might want to do this instead:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% T *bigvar0, *bigvar1, *bigvar2;
+
+%% bigvar0 = new T; // 1 MB used
+
+%% // use bigvar0 for 10 min
+
+%% delete bigvar0; // 0 MB used
+
+%% bigvar1 = new T; // 1 MB used
+
+%% // use bigvar1 for 10 min
+
+%% bigvar2 = new T; // 2 MB used
+
+%% // use bigvar1 and bigvar2 for 10 min
+
+%% delete bigvar1; // 1 MB used
+
+%% delete bigvar2; // 0 MB used
+
+%% bigvar0 = new T; // 1 MB used
+
+%% // use bigvar0 for 10 min
+
+%% delete bigvar0; // 0 MB used\strut
+%% \end{consolethree}
+%% This means that you actually only need about 2 MB of memory at any point
+%% in time while running the program, not 3 MB.
+
+%% Get it?
+
+%% Later I'll talk about requesting not just memory for a value, but a
+%% whole array of values. When the array size is huge, this will take up a
+%% lot or memory even if each value in the array is only an \emph{int}. For
+%% instance:
+
+%% \emph{int x{[}1000000{]};}
+
+%% takes up 4 x 1,000,000 = 4,000,000 bytes. Dynamic memory management is
+%% also important when it comes to managing objects (see CISS245, CISS350)
+%% since objects usually occupy more memory.
+
+%% Pointer to Pointer to Pointer to \ldots{}
+
+%% Now take a \emph{\textbf{deep}} breath \ldots{}
+
+%% Look at this:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 42;
+
+%% int * p = \&x;\strut
+%% \end{consolethree}
+%% Here's the memory model:
+
+%% So \emph{p} has the memory address of some value (in this case an
+%% \emph{int} value). But wait a minute\ldots{} memory address are also
+%% values \ldots{} so the value of \emph{p} is also somewhere in memory
+%% too. For instance suppose the address of the value of x is 124500 and
+%% that value is stored in \emph{p} and the value of \emph{p} is stored in
+%% 124504:
+
+%% Since 124504 is also an address, surely you can store 124504 into a
+%% variable too. In fact, yes, you can. Looking at this:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 42;
+
+%% int * p = \&x;
+
+%% int ** q = \&p;\strut
+%% \end{consolethree}
+%% While we say the type of \emph{p} is ``pointer to \emph{int}'', for
+%% \emph{q} we say the type is ``pointer to pointer to \emph{int}''.
+%% Suppose the address of the value of \emph{q} is 124508. Here's the
+%% memory model
+
+%% And here's the simplified picture:
+
+%% Now think about this: What is \emph{*q}? Using \emph{*p} as a guide,
+
+%% \begin{itemize}
+%% \tightlist
+%% \item
+%%   \emph{p} points to \emph{x} therefore \emph{*p} is the value of
+%%   \emph{x}, i.e., \emph{*p is }42,
+%% \item
+%%   \emph{q} points to \emph{p} therefore \emph{*q} is the value of
+%%   \emph{p}
+%% \end{itemize}
+
+%% So \emph{*q} must be the memory address value stored in pointer variable
+%% \emph{p}.
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 42;
+
+%% int * p = \&x;
+
+%% int ** q = \&p;
+
+%% std::cout << x << ' '
+%% << *p << '\n';
+
+%% std::cout << p << ' '
+%% << *q << '\n';\strut
+%% \end{consolethree}
+%% But wait ... since \emph{p} is \emph{*q}, you can dereference \emph{p
+%% \ldots{} so you should be able to dereference *q and get \ldots{}
+%% }right?\textbf{ }
+
+%% \begin{itemize}
+%% \tightlist
+%% \item
+%%   \emph{p} points to \emph{x} therefore \emph{*p} is \emph{x}
+%% \item
+%%   \emph{q} points to \emph{p} therefore \emph{*q} is \emph{p and **q} is
+%%   \emph{*p} which is \emph{x}
+%% \end{itemize}
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 42;
+
+%% int * p = \&x;
+
+%% int ** q = \&p;
+
+%% std::cout << x << ' '
+%% << *p << '\n';
+
+%% std::cout << p << ' '
+%% << *q << '\n';
+
+%% std::cout << x << ' '
+%% << *p << ' ' <<
+%% **q << '\n';\strut
+%% \end{consolethree}
+%% Thinking of the dereferencing operator \emph{*} as ``follow the arrow
+%% and go into a box'', you can think of \emph{**} as following
+%% \textbf{two} arrows and peek into the box you arrive at.
+
+%% Correct?
+
+%% To understand the above better, you can go all the way into the actual
+%% memory. For instance suppose the value of \emph{x} lives at address
+%% 124500. Remember that an \emph{int} occupies 4 bytes (for 32 bit
+%% machines). And in the computer's memory, the 42 is stored as a bunch of
+%% 0s and 1s. But for simplicity, let's just ignore the 0s and 1s of 42 and
+%% conceptually put 42 into the memory:
+
+%% I'm putting \emph{x} next to 124500 just to remind us that the address
+%% of \emph{x} is 124500. Next, \emph{p} has the address of \emph{x}.
+%% Memory address also takes up 4 bytes (again assuming we're using a
+%% 32-bit machines). Suppose the address of the value of \emph{p} 124504:
+
+%% Now it becomes really clear that even \emph{p} has an address: the value
+%% of \emph{p} (which is a memory address value) sits at address 124504,
+%% i.e., \emph{\&p} is 124504. Right? Suppose the address of the value of
+%% \emph{q}, is 124508. The memory looks like this;
+
+%% Get it? Make sure you see that
+
+%% \begin{itemize}
+%% \tightlist
+%% \item
+%%   \emph{\&p} is 124504, \emph{p} is 124500, \emph{*p} is 42
+%% \item
+%%   \emph{\&q} is 124508, \emph{q} is 124504, \emph{*q} is 124500
+%% \end{itemize}
+
+%% You see that in some sense knowing low level details actually helps you
+%% understand completely what pointers really are and you can see pointer
+%% to pointer very easily. (Or even pointer to pointer to pointer to
+%% pointer!)
+
+%% Of course the three type \emph{int}, \emph{int*}, \emph{int**} are
+%% different and obviously you should not assign them to each other (with
+%% the exception of 0 which can be assigned to any pointer). So the
+%% following is WRONG:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int x = 42;
+
+%% int * y = x; // ABOMINABLE ... giving int to int*
+
+%% int ** z = x; // HORRORS ... giving int to int**
+
+%% z = y; // UNSPEAKABLE ... giving int* to int** \strut
+%% \end{consolethree}
+%% \textbf{Exercise.} What is the type of \emph{p}?
+
+%% Write a statement that adds \emph{0.5} to the \emph{3.14} value in the
+%% picture using only \emph{p}.
+
+%% \textbf{Exercise.} At one point in the execution of a program, you have
+%% the following memory model:
+
+%% Write one statement that will change the value of \emph{**p} by
+%% incrementing it with the value of \emph{**q}. Use \emph{p} and \emph{q}
+%% and not hard-coded constants.
+
+%% \textbf{Exercise.} At one point in the execution of a program, you have
+%% the following memory model:
+
+%% Is it possible to execute one or more statements to get the following:
+
+%% If it is, write the statements (use the least number). If it isn't
+%% explain why.
+
+%% \textbf{Exercise.} At one point in the execution of a program, you have
+%% the following memory model:
+
+%% Is it possible to execute one or more statements to get the following:
+
+%% If it is, write the statements (use the least number please). If it
+%% isn't explain why.
+
+%% \textbf{Exercise.} At one point in the execution of a program, you have
+%% the following memory model:
+
+%% Is it possible to execute one or more statements to get the following:
+
+%% If it is, write the statements (use the least number please). If it
+%% isn't explain why.
+
+%% \textbf{Exercise.} What is the output? (Or is it an error?)
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int i = 42;
+
+%% int * p = \&i;
+
+%% int ** q = \&p;
+
+%% std::cout << *p << ' '
+%% << **q << '\n'; \strut
+%% \end{consolethree}
+%% (Hint: Draw!!!)
+
+%% \textbf{Exercise.} What is the output? (Or is it an error?)
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int i = 42;
+
+%% int * p = \&i;
+
+%% int ** q = \&p;
+
+%% int *** r = \&q;
+
+%% std::cout << *p << ' '
+%% << **q << ' ' <<
+%% ***r << '\n'; \strut
+%% \end{consolethree}
+%% \textbf{Exercise.} What is the output? (Or is it an error?)
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int i = 42;
+
+%% int * p = \&i;
+
+%% int ** q = \&p;
+
+%% int *** r = \&q;
+
+%% ***r = 0;
+
+%% std::cout << *p << ' '
+%% << **q << ' ' <<
+%% ***r << '\n'; \strut
+%% \end{consolethree}
+%% \textbf{Exercise.} What is the output? (Or is it an error?)
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int i = 42;
+
+%% int * p = \&i;
+
+%% int * q = *\&p;
+
+%% std::cout << *p << ' '
+%% << *q << '\n'; \strut
+%% \end{consolethree}
+%% \textbf{Exercise.} What is the output? (Or is it an error?)
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int i = 42;
+
+%% int * p = \&i;
+
+%% int *** q = \&\&p;
+
+%% std::cout << *p << ' '
+%% << *q << '\n'; \strut
+%% \end{consolethree}
+%% \textbf{Exercise.} What is the output? (Or is it an error?)
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% int i = 42;
+
+%% int * p = \&i;
+
+%% int * q = \&(*p);
+
+%% std::cout << *p << ' '
+%% << *q << '\n'; \strut
+%% \end{consolethree}
+%% Functions that change pointer values
+
+%% Recall that a function can change a value back in the caller. You can
+%% either pass in pointers or use pass-by-reference: Always keep this
+%% example in mind:
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% // DOES NOT WORK!!!
+
+%% // void inc(int x)
+
+%% // \{
+
+%% // x++;\\
+%% // \}
+
+%% void inc(int * x) // or ``int * const x''
+
+%% \{
+
+%% (*x)++;\\
+%% \}
+
+%% void inc(int \& x)
+
+%% \{
+
+%% x++;\\
+%% \}
+
+%% int main()
+
+%% \{
+
+%% int x = 42;
+
+%% inc(\&x); // x is 43
+
+%% inc(x); // x is 44\\
+%% \}\strut
+%% \end{consolethree}
+%% The same idea can be used to change the value of anything you like
+%% \ldots{} including changing the value of pointers.
+
+%% \textbf{Exercise.} Explain what's happening in the program below. Is
+%% there a problem? How would you fix it?
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% \#include < iostream\textgreater{}
+
+%% \#include < cstddef\textgreater{}
+
+%% void setnull(int * p)
+
+%% \{
+
+%% p = NULL;\\
+%% \}
+
+%% int main()
+
+%% \{
+
+%% int * p;
+
+%% setnull(p);
+
+%% std::cout << (unsigned int) p <<
+%% std::endl; // 0?
+
+%% return 0;\\
+%% \}\strut
+%% \end{consolethree}
+%% \textbf{Exercise.} Explain what's happening in the program below. Is
+%% there a problem? How would you fix it?
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% \#include < iostream\textgreater{}
+
+%% \#include < cstddef\textgreater{}
+
+%% void swap(int * p, int * q)
+
+%% \{
+
+%% int * t = p;
+
+%% p = q;
+
+%% q = t;\\
+%% \}
+
+%% int main()
+
+%% \{
+
+%% int x = 0, y = 42;
+
+%% int * p = \&x, * q = \&y;
+
+%% std::cout << *p << ' '
+%% << *q << '\n'; // 0 42
+
+%% swap(p, q); // p should point to x
+
+%% // q should point to y
+
+%% // Do you get 42 0?
+
+%% std::cout << *p << ' '
+%% << *q << '\n';
+
+%% return 0;\\
+%% \}\strut
+%% \end{consolethree}
+%% \textbf{Exercise.} Explain what's happening in the program below. Is
+%% there a problem?
+
+%% \begin{consolethree}[escapeinside=||]
+
+%% void mynew(int * p)
+
+%% \{
+
+%% p = new int;\\
+%% \}
+
+%% int main()
+
+%% \{
+
+%% int * p;
+
+%% mynew(p);
+
+%% *p = 42;
+
+%% return 0;\\
+%% \}\strut
+%% \end{consolethree}
+%% \textbf{Exercise.} Explain what's happening in the program below. Is
+%% there a problem?
+
+%% \begin{consolethree}[escapeinside=||]          
+%% void mydelete(int * p)
+
+%% \{
+
+%% delete p;\\
+%% \}
+
+%% int main()
+
+%% \{
+
+%% int * p;
+
+%% mydelete(p);
+
+%% return 0;\\
+%% \}\strut
+%% \end{consolethree}
+
+%% \textbf{Exercise.} The following function \emph{copy()} copies the data
+%% that one pointer is pointing to to the other pointer. In more details,
+%% \emph{copy(p, q)} will
+
+%% \begin{itemize}
+%% \item
+%%   Allocate memory for \emph{p} (if \emph{p} has not been allocated
+%%   memory; \emph{p} has value \emph{NULL} if it has not been allocated
+%%   memory)
+%% \item
+%%   Copy the integer \emph{q} points to over to the integer \emph{p}
+%%   points to.
+%% \item
+%%   Deallocate the memory \emph{q} points to and set \emph{q} to
+%%   \emph{NULL}.
+
+%%   Test it!
+%% \end{itemize}
