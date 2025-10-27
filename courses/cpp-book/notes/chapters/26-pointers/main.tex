@@ -3,7 +3,7 @@
 \textsc{Objectives}
 
 \begin{itemize}
-\tightlist
+
 \item
   Declare pointers
 \item
@@ -70,7 +70,7 @@ All the reasons have to do with using pointers to achieve some computational goa
 Because the landscape of pointers is huge let me tell you what's the plan
 
 \begin{itemize}
-\tightlist
+
 \item
   First I will talk about general concepts related to pointers: memory
   addresses, pointer values, pointer operations, etc. Another basic
@@ -117,7 +117,6 @@ So far the model of the space where variables live does not have any organizatio
 Now for a more accurate model \ldots{}
 
 \begin{itemize}
-\tightlist
 \item
   A computer's memory is made up of a linear collection of memory cells
   - each is a byte (i.e. 8 bits)
@@ -130,27 +129,43 @@ Now for a more accurate model \ldots{}
 \begin{python}
 from latextool_basic import *
 p = Plot()
-
-pbox0 = Rect(0, 0, 2, 2, label='...', linewidth=0.0)
-pbox1 = Rect0, 0, 2, 2, label='0101010', linewidth=0.1)
-pbox2 = Rect(0, 0, 2, 2, label='1010001', linewidth=0.1)
-pbox3 = Rect(0, 0, 2, 2, label='00011011', linewidth=0.1)
-pbox4 = Rect(0, 0, 2, 2, label='01000100', linewidth=0.1)
-pbox5 = Rect(0, 0, 2, 2, label='01100000', linewidth=0.1)
-pbox6 = Rect(0, 0, 2, 2, label='...', linewidth=0.0)
-pbox7 = Rect(0, 0, 2, 2, label='00100101', linewidth=0.1)
-pbox8 = Rect(0, 0, 2, 2, label='11110010', linewidth=0.1)
-pbox9 = Rect(0, 0, 2, 2, label='00110101', linewidth=0.1)
-pbox10 = Rect(0, 0, 2, 2, label='10010001', linewidth=0.1)
-
-p += pbox
+#p += Grid(x0=-5, x1=5, y0=-2, y1=10)
+p += ellipse(-3, 4, 0, 5, linecolor='red')
+p += Rect(-3, 8, 0, 9, label='1245057', linewidth=0.0)
+p += Rect(-3, 7, 0, 8, label='1245056', linewidth=0.0)
+p += Rect(-3, 6, 0, 7, label='1245055', linewidth=0.0)
+p += Rect(-3, 5, 0, 6, label='1245054', linewidth=0.0)
+p += Rect(-3, 4, 0, 5, label='1245053', linewidth=0.0)
+p += Rect(0, 9, 3, 10, label='...', linewidth=0.0)
+p += Rect(0, 8, 3, 9, label='0101010', linewidth=0.1)
+p += Rect(0, 7, 3, 8, label='1010001', linewidth=0.1)
+p += Rect(0, 6, 3, 7, label='00011011', linewidth=0.1)
+p += Rect(0, 5, 3, 6, label='01000100', linewidth=0.1)
+p += Rect(0, 4, 3, 5, label='01100000', linewidth=0.2, linecolor='red')
+p += Rect(5, 4, 7, 5, label='Cell', linewidth=0.2, linecolor='red')
+p += Line(points=[(5,4.5), (3,4.5)], linecolor='red',linewidth=0.15, endstyle='>')
+p += Rect(-7, 4, -5, 5, label='Address', linewidth=0.2, linecolor='red')
+p += Line(points=[(-5,4.5),(-3,4.5)], linecolor='red',linewidth=0.15, endstyle='>')
+p += Rect(7, 6.5, 11.5, 8.5, label='VERY IMPORTANT!!!', linewidth=0.2, linecolor='red')
+p += Line(points=[(7, 7.5), (4, 7)], linecolor='red',linewidth=0.15, endstyle='>')
+p += Rect(-3, 2, 0, 3, label='3', linewidth=0)
+p += Rect(-3, 1, 0, 2, label='2', linewidth=0)
+p += Rect(-3, 0, 0, 1, label='1', linewidth=0)
+p += Rect(-3, -1, 0, 0, label='0', linewidth=0)
+#
+p += Rect(0, 3, 3, 4, label='...', linewidth=0.0)
+p += Rect(0, 2, 3, 3, label='00100101', linewidth=0.1)
+p += Rect(0, 1, 3, 2, label='11110010', linewidth=0.1)
+p += Rect(0, 0, 3, 1, label='00110101', linewidth=0.1)
+p += Rect(0, -1, 3, 0, label='10010001', linewidth=0.1)
+p += Rect(0, -2, 3, -1, label='...', linewidth=0.0)
 
 print(p)
 \end{python}
 
-Remember: Each memory cell has \textbf{two} quantities, the \textbf{memory address} and the \textbf{content.}
+Remember: Each memory cell has \EMPHASIZE{two} quantities, the \EMPHASIZE{memory address} and the \EMPHASIZE{content.}
 
-Notice that memory addresses are \textbf{integer values}.
+Notice that memory addresses are \EMPHASIZE{integer values}.
 
 When you declare a variable, based on the type, C++ will allocate the correct number of bytes for that variable. For example, for an \emph{int}, your
 
@@ -158,733 +173,690 @@ C++ (on a 32-bit machine) will allocate 4 bytes.
 
 Also, when you declare two variables in the same scope, the memory used do not overlap -- they occupy different memory spaces.
 
-Memory addresses and memory address of a variable
+\newpage\EMPHASIZE{Memory addresses and memory address of a variable}
 
-In C++, if \emph{x} is a variable, the \textbf{memory address} of
-\emph{x} is \emph{\textbf{\&x}}.
+In C++, if \verb!x! is a variable, the \EMPHASIZE{memory address} of \verb!x! is \EMPHASIZE{\texttt{\&x}}.
+
+Try this:
+
+\begin{consolethree}[escapeinside=||]
+int x = 123;
+
+std::cout << "val of x = " << x << '\n'
+          << "addr of x = " << \EMPHASIZE{\&x} << '\n';
+\end{consolethree}
+
+My output:
+
+\begin{consolethree}[escapeinside=||]
+val of x is 123
+
+addr of x is 1245052
+\end{consolethree}
+(Your output is most probably going to be different from mine.) The \EMPHASIZE{\&} in the above is called the \EMPHASIZE{address-of operator}.
+
+Two things you must know right away \ldots{}
+
+First, technically speaking \emph{\&x} is the \EMPHASIZE{address of the }\emph{\EMPHASIZE{value}}\EMPHASIZE{ of }\texttt{\EMPHASIZE{x}}. But I will sometimes call \texttt{\&x} the \EMPHASIZE{address of }\texttt{\EMPHASIZE{x}} since that's the common practice.
+
+Second, in reality, an \texttt{int} value takes up more than 1 byte. For a 32-bit machine, the value of \texttt{x} is spread out among 4 bytes: Recall that to see how many bytes are used to store an integer value you can do this:
+
+\begin{consolethree}[escapeinside=||]
+std::cout << sizeof(int) << std::endl;
+\end{consolethree}
+So in the above example when the program says that the address of \texttt{x} is 1245052, it means that the \texttt{int} value 123 occupies the memory at addresses 1245052, 1245053, 1245054, 1245055. The \EMPHASIZE{address of }\texttt{\EMPHASIZE{x}} actually refers to the \EMPHASIZE{starting address}, i.e., address of the first byte, i.e. 1245052.
+
+You don't have to worry about how the value 123 is ``spread out'' among 4 bytes. But briefly, the integer 123 (to human beings) is a bunch of bits (to a 32-bit computer):
+\begin{center}
+00000000000000000000000001111011
+\end{center}
+(Details will be covered in CISS360.) So here's where you will find the value of our \texttt{x} from above:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Rect(-3, 8, 0, 9, label='1245057', linewidth=0.0)
+p += Rect(-3, 7, 0, 8, label='1245056', linewidth=0.0)
+p += Rect(-3, 6, 0, 7, label='1245055', linewidth=0.0)
+p += Rect(-3, 5, 0, 6, label='1245054', linewidth=0.0)
+p += Rect(-3, 4, 0, 5, label='1245053', linewidth=0.0)
+p += Rect(-3, 3, 0, 4, label='1245052', linewidth=0.0)
+p += Rect(-3, 0, 0, 1, label='0', linewidth=0.0)
+p += Rect(0, 9, 3, 10, label='...', linewidth=0.0)
+
+p += Rect(0, 8, 3, 9, label=' ', linewidth=0.1)
+p += Rect(0, 7, 3, 8, label=' ', linewidth=0.1)
+p += Rect(0, 6, 3, 7, label='01111011', linewidth=0.1)
+p += Rect(0, 5, 3, 6, label='00000000', linewidth=0.1)
+p += Rect(0, 4, 3, 5, label='00000000', linewidth=0.1)
+p += Rect(0, 3, 3, 4, label='00000000', linewidth=0.1)
+p += Rect(0, 2, 3, 3, label=' ', linewidth=0.1)
+p += Rect(0, 2, 3, 3, label=' ', linewidth=0.1)
+p += Rect(0, 1, 3, 2, label='...', linewidth=0.0)
+p += Rect(0, 0, 3, 1, label=' ', linewidth=0.1)
+
+print(p)
+\end{python}
+Notice that 123 is translated to 32 bits. Each byte can hold 8 bits. That's why the bits of an integer requires 4 bytes. At this point, we don't need to worry how the 123 is translated into bits. So I will usually simplify the above picture of your computer's memory by drawing this:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Rect(-3, 8, 0, 9, label='1245057', linewidth=0.0)
+p += Rect(-3, 7, 0, 8, label='1245056', linewidth=0.0)
+p += Rect(-3, 6, 0, 7, label='1245055', linewidth=0.0)
+p += Rect(-3, 5, 0, 6, label='1245054', linewidth=0.0)
+p += Rect(-3, 4, 0, 5, label='1245053', linewidth=0.0)
+p += Rect(-3, 3, 0, 4, label='1245052', linewidth=0.0)
+p += Rect(-3, 0, 0, 1, label='0', linewidth=0.0)
+p += Rect(0, 9, 3, 10, label='...', linewidth=0.0)
+
+p += Rect(0, 3, 3, 7, label='\EMPHASIZE{123}', background='blue!10!white', linewidth=0.0)
+p += Rect(0, 8, 3, 9, label=' ', linewidth=0.1)
+p += Rect(0, 7, 3, 8, label=' ', linewidth=0.1)
+p += Rect(0, 6, 3, 7, label=' ', linewidth=0.02)
+p += Rect(0, 5, 3, 6, label=' ', linewidth=0.02)
+p += Rect(0, 4, 3, 5, label=' ', linewidth=0.02)
+p += Rect(0, 3, 3, 4, label=' ', linewidth=0.02)
+p += Rect(0, 2, 3, 3, label=' ', linewidth=0.1)
+p += Rect(0, 2, 3, 3, label=' ', linewidth=0.1)
+p += Rect(0, 1, 3, 2, label='...', linewidth=0.0)
+p += Rect(0, 0, 3, 1, label=' ', linewidth=0.1)
+
+print(p)
+\end{python}
+Let me summarize ...
+
+\begin{itemize}
+\item
+  A computer's memory is made up of bytes.
+\item
+  Associated to each byte is its address and its contents (value).
+\item
+  The value of a variable occupies memory, possibly more than 1 byte.
+\item
+  If \texttt{x} is a variable, then in C++
+\item
+  \texttt{x} refers to the contents (value)
+\item
+  \texttt{\&x} refers to the beginning address of its value, i.e., the
+  address of the first byte of its value
+\end{itemize}
+
+By the way the address printed when you run your program might contain things like a, c, e, etc. That's because the address is actually printed in \EMPHASIZE{hexadecimals}, i.e., \EMPHASIZE{numbers in base 16}. (You will also learn more about hexadecimals in CISS360.) Certain compilers allow you to typecast hexadecimal values into \texttt{int} value. Try the following (don't panic and call 911 if your compiler won't let you):
+
+\begin{consolethree}[escapeinside=||]
+int x = 123;
+
+std::cout << "val of x: " << x
+          << '\n' << "addr of x: " << |\textbf{int(\&x)}|
+          << '\n';
+\end{consolethree}
+%i forgot how to insert this in the margin, include this in the later passes when sideboxes are put into the chapter
+%|\sidebox{'An integer can be written (expressed) in many ways ... in\\-base 10 or decimal (usual way)\\-base 16 or hexadecimal\\-base 8 or octals\\-base 2 or bits'}{}|
+If it does not work, you can use any scientific calculator to convert from hex to decimals yourself. Most scientific calculators nowadays have the ability to convert between base 10 to base 2, 8, and 16.
+
+In almost all programming languages, a hexadecimal number starts with 0x. So you might see something like this when working with address values:
+\begin{center}
+0x013251a2
+\end{center}
+The actual base 16 hexadecimal is 13251a2.
+
+Technically speaking the memory address is an \EMPHASIZE{unsigned integer}, i.e., it does not have a negative sign, i.e., it's a positive integer. So you can convert your memory address value to an unsigned integer like this:
+
+\begin{consolethree}[escapeinside=||]
+int x = 123;
+std::cout << "val of x: " << x
+          << '\n' << "addr of x: "
+          << |\EMPHASIZE{(unsigned int)(\&x)}|
+          << '\n';
+\end{consolethree}
+An \texttt{\textbf{unsigned int}} can only represent integers up to $2^{32}$ -- 1. If you have a newer laptop, your address values are very likely larger than 2\^{}32 -- 1. If your compiler yells at you, instead of type casting with \texttt{\textbf{unsigned int}}, use \texttt{\textbf{unsigned long long int}}.
+
+An \texttt{\textbf{unsigned int}} is really a type. So you can declare an \texttt{\textbf{unsigned int}} variable. By the way, you have actually already seen \texttt{\textbf{unsigned int}} when using \texttt{\textbf{srand()}}. Likewise \texttt{\textbf{unsigned long long int}} is also a type.
+
+\begin{ex} Find a scientific calculator program that can convert between base 10 and base 2, 8, and 16. (If you have time, use the web and learn to convert between base 10 and base 2, 8, 16 by hand -- this will be covered in detail in CISS360.)
+\begin{itemize}
+\item
+  Convert 42 into base 2, 6, 16.
+\item
+  Convert base 16 a0234d1 to base 10.
+\end{itemize}
+\end{ex}
+
+\begin{ex}
+Declare two integer variables like this:
+\begin{consolethree}[escapeinside=||]
+int x;
+int y;
+\end{consolethree}
+and print their addresses (in base 10). How far apart are the addresses of the two integer values of the variables? (Use your scientific calculator for subtracting two hexadecimal address values if you need to.) If the address differs by 4 (and the sizeof int is 4), then there's no gap between the memory occupied by the first and the second since an integer occupies 4 bytes. This means that your compiler is very efficient and is putting the value of \texttt{x} and \texttt{y} next to each other. (The address of the second variable is probably smaller.)
+\end{ex}
+\begin{ex}
+This simple exercise is meant to make your brain remember \texttt{unsigned int}.
+
+\begin{enumerate}
+\item
+  Declare an \texttt{unsigned int} variable \texttt{i} and initialize it
+  with value 42. Print \texttt{i}. Get a positive integer from the user
+  and give this value to \texttt{i}. Print \texttt{i}.
+\item
+  Write a simple program that computes the sum 1 + 2 + \ldots{} +
+  \texttt{i} where \texttt{i} is provided by the user. Print the sum. In
+  your program, since all integer values used are positive, you must
+  only use \texttt{unsigned int} variables.
+\end{enumerate}
+\end{ex}
+
+\begin{ex}
+Declare a \texttt{double} variable \texttt{x}. Print it's address. Now declare another \texttt{double} variable \texttt{y} and print the address of \texttt{y}. There shouldn't be a gap between the \texttt{double} values of the above variables if they are declared next to each other. From the program can you deduce the number of bytes used to store a \texttt{double}? Verify your guess by executing this:
+\begin{consolethree}[escapeinside=||]
+double x = 3.14159;
+std::cout << sizeof(double) << std::endl;
+std::cout << sizeof(x) << std::endl;
+\end{consolethree}
+\end{ex}
+\begin{ex}
+\begin{enumerate}
+\item
+  How many bytes does a character variable/value use?
+\item
+  How many bytes does a boolean variable/value use?
+\end{enumerate}
+\end{ex}
+\begin{ex}
+Declare an array of integers:
+\begin{consolethree}[escapeinside=||]
+int x[3];
+\end{consolethree}
+
+and print their address of \texttt{x[0]} and \texttt{x[1]} and
+\texttt{x[2]}. How far apart are they? Are the addresses ascending or
+descending?
+
+\EMPHASIZE{WARNING!!!}
+
+Note that \texttt{\&} is now used in two totally different ways!!!
+
+\begin{consolethree}[escapeinside=||]
+int x;
+int & y = x;     // int & is a type
+std::cout << &x; // & is the address-of operator
+\end{consolethree}
+Remember that!
+
+\newpage\EMPHASIZE{Pointer Variable}
+
+At this point, you should ask the following question: ``If you can put
+\texttt{int} values into \texttt{int} variables, \texttt{double} values into
+\texttt{double} variables, \texttt{bool} values into \texttt{bool} variables
+\ldots{} surely I can put address values into variables, right?'' (If
+you did not ask that, then you're not learning actively! Wake up!)
+
+So here we go \ldots{}
+
+A \EMPHASIZE{pointer variable} is a variable whose value is a memory
+address. Run this:
+\begin{consolethree}[escapeinside=||]
+int x = 1;
+int * p;|\tikzmarknode{c26p0_anchor}||\sidebox{c26p0}{\texttt{p} is a pointer to an \texttt{int}}|
+p = &x;         
+std::cout << &x << ' '
+          << p << std::endl;|\DrawArrowVH{c26p0}{c26p0_anchor}|
+\end{consolethree}
+We say that \texttt{p} \EMPHASIZE{points to} \texttt{x} (well ... technically, \texttt{p} points to the \texttt{\textbf{value}} of \texttt{x}.) To declare a pointer variable you use this format:
+\begin{center}
+\texttt{[type]} * \texttt{[pointer]};
+\end{center}
+You can of course do this, i.e. declaration with initialization:
+
+\begin{consolethree}[escapeinside=||]
+int x = 1;
+int * p = &x;
+std::cout << &x << ' ' << p << std::endl;
+\end{consolethree}
+Here's the format of a statement that declares a pointer with
+initialization:
+
+\begin{center}
+\texttt{[type]} * \texttt{[pointer] = [address of same type]};
+\end{center}
+
+A very common convention is to begin the name of a pointer with \texttt{p} or \texttt{p_}. It's also common to include the name of the concept the pointer points to in the name:
+
+\begin{ex}
+Complete this code segment. \texttt{psalary} should
+point to \texttt{salary:}
+
+\begin{consolethree}[escapeinside=||]
+double salary = 100.23;
+
+______ * psalary = _________;
+\end{consolethree}
+Verify!!! \ldots{} i.e., print the address of \texttt{salary} and \texttt{psalary} and make sure they are the same.
+\end{ex}
+
+\begin{ex}
+Can you assign the address of a type of value to a pointer variable of another type? Answer: \verb!_____________.! Try this:
+
+\begin{consolethree}[escapeinside=||]
+double x = 1.2;
+int * p = &x; // trying to point an int pointer
+              // to a double
+\end{consolethree}
+\end{ex}
+You \EMPHASIZE{cannot} initialize a pointer with the pointer value of a
+\EMPHASIZE{different type}.
+
+\begin{ex}
+Here's an \texttt{int} array:
+
+\begin{consolethree}[escapeinside=||]
+int x[] = {2, 3, 5, 7, 11, 13};
+\end{consolethree}
+\end{ex}
+Declare an \texttt{int} pointer, say call it \texttt{p}, that points to the value 11 in the array. Verify! Next, print the address of the value 13 and 7 in \texttt{x}.
+
+\begin{ex}
+Here's a C-string:
+
+\begin{consolethree}[escapeinside=||]
+char x[] = "hello world";
+\end{consolethree}
+\end{ex}
+Declare a \texttt{char} pointer, say call it \texttt{p}, that points to the
+'w' in the string. Verify!
+
+\newpage\EMPHASIZE{Mental Picture}
+
+Look at this code:
+
+\begin{consolethree}[escapeinside=||]
+int x = 42;
+int * p;
+p = &x;
+\end{consolethree}
+Suppose the \texttt{int} value of x is at memory location 124500 in the computer and the memory location is at 124504. The computer's memory would look like this:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Rect(-3, 9, 0, 10, label='124508', linewidth=0.0)
+p += Rect(-3, 8, 0, 9, label='124507', linewidth=0.0)
+p += Rect(-3, 7, 0, 8, label='124506', linewidth=0.0)
+p += Rect(-3, 6, 0, 7, label='124505', linewidth=0.0)
+p += Rect(-3, 5, 0, 6, label='124504', linewidth=0.0)
+p += Rect(-3, 4, 0, 5, label='124503', linewidth=0.0)
+p += Rect(-3, 3, 0, 4, label='124502', linewidth=0.0)
+p += Rect(-3, 2, 0, 3, label='124501', linewidth=0.0)
+p += Rect(-3, 1, 0, 2, label='124500', linewidth=0.0)
+#
+p += Rect(-3, -1, 0, 3, label='\EMPHASIZE{42}', linewidth=0.0, background='gray!5!white!')
+p += Rect(-3, 3, 0, 7, label='\EMPHASIZE{124500}', linewidth=0.0, background='gray!10!white!')
+#
+p += Rect(0, 10, 3, 11, label='...', linewidth=0)
+p += Rect(0, 9, 3, 10, label=' ', linewidth=0.1)
+p += Rect(0, 8, 3, 9, label=' ', linewidth=0.05)
+p += Rect(0, 7, 3, 8, label=' ', linewidth=0.05)
+p += Rect(0, 6, 3, 7, label=' ', linewidth=0.05)
+p += Rect(0, 5, 3, 6, label=' ', linewidth=0.05)
+p += Rect(0, 4, 3, 5, label=' ', linewidth=0.05)
+p += Rect(0, 3, 3, 4, label=' ', linewidth=0.05)
+p += Rect(0, 2, 3, 3, label=' ', linewidth=0.05)
+p += Rect(0, 1, 3, 2, label=' ', linewidth=0.05)
+p += Rect(0, 0, 3, 1, label=' ', linewidth=0.05)
+p += Rect(0, -1, 3, 0, label=' ', linewidth=0.05)
+p += Rect(0, -2, 3, -1, label=' ', linewidth=0.05)
+p += Rect(0, -3, 3, -2, label='..', linewidth=0)
+print(p)
+\end{python}
+
+Here's the memory model that you are already used to:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+bawx = Rect(0, 0, 3, 7, linewidth=0.05)
+
+\end{python}
+
+To indicate that the value 42 of variable x is at memory address 124500,
+I will draw this:
+
+Well \ldots{} actually important thing is the \EMPHASIZE{relationship} between \texttt{p} and the value of \texttt{x}: Think of \texttt{p} as knowing where to find the value of \texttt{x}. So we usually have this mental picture in mind when we talk about pointers:
+
+Sometimes, I will even simplify the mental picture by drawing this:
+
+(Later, we'll see how to access access the value of x using p.)
+
+Note that the arrow drawn in the diagram is to help us (human beings)
+see quickly what value a pointer is pointing to. Your computer only
+works with numbers (as in bits). The arrows in the drawing above are
+only a visual guide for us to see pointer relations quickly. There are
+no ``hardware arrows'' in your computer or CPU!!! Remember that!!!
+
+\textbf{Exercise. }In a code fragment, there are two variables \texttt{i}
+and \texttt{j}, both of \texttt{int} type. The value of \texttt{i} is 5000 and
+the value of \texttt{j} is 6000. The value of \texttt{i} is at address
+108080 and the address of the value of \texttt{j} is 501200. In addition,
+there are two pointer variables \texttt{p} and \texttt{q} such that \texttt{p}
+points to the value of \texttt{j} and \texttt{q} points to the value of
+\texttt{i}. Draw the memory model labeling everything (variable name,
+value, and address). Include arrows to relate pointers to the values the
+pointers point to.
+
+\textbf{Exercise. }Same as above except that both \texttt{p} and \texttt{q}
+points to the value of \texttt{j}.
+
+\textbf{Exercise.} Draw the memory model at the end of the following
+code fragment where the addresses of \texttt{pi[0]}, \texttt{pi[1]},
+\texttt{pi[2]}, \texttt{pi[3]}, \texttt{pi[4]} are 8000, 8008,
+8016, 8024, 8032, 8040.
+
+\begin{consolethree}[escapeinside=||]
+
+double pi[] = {3.1, 3.14, 3.141, 3.1415, 3.14159};
+
+double * p = \&pi[1];
+\end{consolethree}
+\textbf{Exercise.} Draw the memory model at the end of the following
+code fragment:
+
+\begin{consolethree}[escapeinside=||]
+
+int x[] = {2, 3, 5, 7, 11};
+
+int * p = \&x[3];
+
+int * q = \&x[1];
+\end{consolethree}
+(In this case, addresses of \texttt{x[0]}, \texttt{x[1]}, \ldots{}
+are not given, so just draw the simplified mental picture.)
+
+\textbf{Exercise.} Given the following:
+
+\begin{consolethree}[escapeinside=||]
+
+int x = 42; // address is 5000
+
+double y = 3.1415; // address is 5004
+
+char z = '\$'; // address is 5012
+
+bool b = true; // address is 5016
+\end{consolethree}
+Declare 4 pointers (of the right type!) to point the each of the above
+variables. Draw the memory model.
+
+\textbf{Exercise.} Write a code fragment so that you get the following
+memory model:
+
+Common Gotcha
+
+This is a very common gotcha:
+
+\begin{consolethree}[escapeinside=||]
+
+int x = 0, y = 1;
+
+int * p = \&x, q = \&y, r = \&x;
+\end{consolethree}
+It won't work (does not compile) because the above actually means this:
+
+\begin{consolethree}[escapeinside=||]
+
+int x = 0, y = 1;
+
+int * p = \&x;
+
+int q = \&y;
+
+int r = \&x;
+\end{consolethree}
+It should be
+
+\begin{consolethree}[escapeinside=||]
+
+int x = 0, y = 1;
+
+int * p = \&x, * q = \&y, * r = \&x;
+\end{consolethree}
+or (better) just write this:
+
+\begin{consolethree}[escapeinside=||]
+
+int x = 0, y = 1;
+
+int * p = \&x;
+
+int * q = \&y;
+
+int * r = \&x;
+\end{consolethree}
+Memory address values and NULL
+
+Up to this point I never assign constant address values directly to
+pointer variables like this:
+
+\begin{consolethree}[escapeinside=||]
+
+int x = 42; // say the value of x is at
+
+// address 1205000
+
+int * p = 1205000; // p points to the value of x
+\end{consolethree}
+To begin with, the address of x is usually different each time you run
+your program and is definitely different on a different computer. So the
+above would be a terrible idea.
+
+In general, assigning a constant to a pointer variable is rare. This
+happens when you're doing something very special such as very low level
+programming where you need to access hardware or doing embedded systems
+programming. For instance, say you know that an \texttt{unsigned int}
+value at memory location 20500080 is used for communication with a
+hardware device, you would do something like this:
+
+\begin{consolethree}[escapeinside=||]
+unsigned int * device = (unsigned int *) 20500080;\tabularnewline
+\bottomrule
+\end{longtable}
+
+After that, whenever the device outputs a value, it's sent to the
+\texttt{unsigned int} at this location and \texttt{device} pointer will be
+used to access this value.
+
+Unless otherwise stated, for CISS240, 245, 350, you will never assign or
+work directly with a constant memory address value. The only exception
+is the memory address \textbf{0}. However instead of using memory
+address 0 like this:
+
+\begin{consolethree}[escapeinside=||]
+
+int * p = 0;
+
+double * q = 0;
+
+char * r = 0;
+\end{consolethree}
+you use the predefined constant \texttt{\textbf{NULL}} like this:
+
+\begin{consolethree}[escapeinside=||]
+
+int * p = NULL;
+
+double * q = NULL;
+
+char * r = NULL;
+\end{consolethree}
+In order to use \texttt{NULL}, you might have to \texttt{\#include
+< cstddef\textgreater{}} at the top of your code:
+
+\begin{consolethree}[escapeinside=||]
+
+\#include < iostream\textgreater{}
+
+\#include < cstddef\textgreater{}
+
+int main()
+
+{
+
+int * p = NULL;
+
+double * q = NULL;
+
+char * r = NULL;
+
+return 0;
+
+}
+\end{consolethree}
+Just to keep everything uniform, just make sure you include cstddef.
+
+So what is the value at address 0???
+
+Well the only important thing you need to know is this: \textbf{you are
+not allowed to access the value at address 0. }Therefore \ldots{}
+
+\texttt{\textbf{NULL}}\textbf{ is only used to indicate that a pointer
+variable is not pointing to anything useful}. (You can also use
+\texttt{\textbf{nullptr}} instead of \texttt{\textbf{NULL}}. For C++11
+compliant compilers, \texttt{\textbf{nullptr}} and \texttt{\textbf{NULL}}
+are the same. C++11 ISO/IEC 14882 was released 9/2011.)
+
+Because of the above, \texttt{NULL} is sometimes used to initialize a
+pointer variable before it is being used:
+
+\begin{consolethree}[escapeinside=||]
+
+int x = 1;
+
+int * p = NULL; // p does not point to anything yet
+
+... p is not used for anything useful ...
+
+p = \&x; // now point p to x
+
+... now p is used to do something useful ...
+\end{consolethree}
+\textbf{Exercise.} Print \texttt{NULL}. (Don't forget to type cast.) What
+do you see? Remember!
+
+For a pointer p with NULL value, the picture is of course like this:
+
+It's common to draw it like this:
+
+or like this:
+
+Dereferencing Pointers
+
+Recall: If \texttt{p} is a pointer, then the value of \texttt{p} is the
+\textbf{memory address} of the value \texttt{p} is pointing to.
+
+You can access the \textbf{value} \texttt{p} is pointing to. That's call
+\textbf{dereferencing} \texttt{p} and you do it using \texttt{\textbf{*p}}.
+The \texttt{*} used in this way is called the \textbf{dereferencing
+operator}. It's also called the indirection operator.
 
 Try this:
 
 \begin{consolethree}[escapeinside=||]
 
-int x = 123;
+int x = 42;
 
-std::cout << "val of x = " << x << '\n'
+int * p;
 
-<< "addr of x = " << \textbf{\&x} << '\n';
+p = \&x;
+
+std::cout << x << ' '
+<< *p << '\n';
+
+x = 0;
+
+std::cout << x << ' '
+<< *p << '\n';
+
+*p = 42;
+
+std::cout << x << ' '
+<< *p << '\n';
+\end{consolethree}
+Suppose \texttt{\&x} is 124500, then the memory model looks like this:
+
+MAKE SURE YOU SEE THE DIFFERENCE BETWEEN \texttt{p} and \texttt{*p}!!!:
+
+\begin{itemize}
+\item
+  \texttt{p} is 124500
+\item
+  \texttt{*p} is 42
+\end{itemize}
+
+\textbf{WARNING:}
+
+There are now \textbf{3 different meanings for *}!!!
+
+\begin{consolethree}[escapeinside=||]
+int x = 2 * 3;           // * = multiplication
+int * p = &x;            // * = for pointer type
+std::cout << x
+          << ',' << *p   // * = for dereferencing
+          << '\n';
+\end{consolethree}
+It's really important to remember that if a pointer \texttt{p} points to a box, then the dereference of \texttt{p}, i.e. \texttt{*p}, refer to the contents or the ``inside'' of the box.
+
+In particular, if I give you this picture without showing you the name of the variable with a value of 23:
+
+you tell me right away that \texttt{*p} is 23. You don't need to know the variable name of that box.
+
+Note that \texttt{*p} refers to the contents of the box \texttt{p} points to in two ways and can be used in two ways, for reading and for writing:
+
+\begin{itemize}
+\item
+  you can use \texttt{*p} to \textbf{read} the value that \texttt{p} points
+  to
+\item
+  you can use \texttt{*p} to \textbf{overwrite} the value \texttt{p} points
+  to
+\end{itemize}
+
+For instance:
+
+\begin{consolethree}[escapeinside=||]
+int x = 42;
+int * p = &x;
+int i;
+i = *p; // read the value that p points to (and
+// give it to i)
+*p = 100; // write the value (i.e. 100) onto the
+// value that p points to
 \end{consolethree}
 
-%% My output:
 
-%% \begin{consolethree}[escapeinside=||]
-
-%% val of x is 123
-
-%% addr of x is 1245052\strut
-%% \end{consolethree}
-%% (Your output is most probably going to be different from mine.) The
-%% \textbf{\&} in the above is called the \textbf{address-of operator}.
-
-%% Two things you must know right away \ldots{}
-
-%% First, technically speaking \emph{\&x} is the \textbf{address of the
-%% }\emph{\textbf{value}}\textbf{ of }\emph{\textbf{x}}. But I will
-%% sometimes call \emph{\&x} the \textbf{address of
-%% }\emph{\textbf{x}\textbf{ }}since that's the common practice.
-
-%% Second, in reality, an \emph{int} value takes up more than 1 byte. For a
-%% 32-bit machine, the value of \emph{x} is spread out among 4 bytes:
-%% Recall that to see how many bytes are used to store an integer value you
-%% can do this:
-
-%% \begin{consolethree}[escapeinside=||]
-%% std::cout << sizeof(int) <<
-%% std::endl;\tabularnewline
-%% \bottomrule
-%% \end{longtable}
-
-%% So in the above example when the program says that the address of
-%% \emph{x} is 1245052, it means that the \emph{int} value 123 occupies the
-%% memory at addresses 1245052, 1245053, 1245054, 1245055. The
-%% \textbf{address of }\emph{\textbf{x}} actually refers to the
-%% \textbf{starting address}, i.e., address of the first byte, i.e.
-%% 1245052.
-
-%% You don't have to worry about how the value 123 is ``spread out'' among
-%% 4 bytes. But briefly, the integer 123 (to human beings) is a bunch of
-%% bits (to a 32-bit computer):
-
-%% 00000000000000000000000001111011
-
-%% (Details will be covered in CISS360.) So here's where you will find the
-%% value of our \emph{x} from above:
-
-%% Notice that 123 is translated to 32 bits. Each byte can hold 8 bits.
-%% That's why the bits of an integer requires 4 bytes. At this point, we
-%% don't need to worry how the 123 is translated into bits. So I will
-%% usually simplify the above picture of your computer's memory by drawing
-%% this:
-
-%% Let me summarize ...
-
-%% \begin{itemize}
-%% \tightlist
-%% \item
-%%   A computer's memory is made up of bytes.
-%% \item
-%%   Associated to each byte is its address and its contents (value).
-%% \item
-%%   The value of a variable occupies memory, possibly more than 1 byte.
-%% \item
-%%   If \emph{x} is a variable, then in C++
-%% \item
-%%   \emph{x} refers to the contents (value)
-%% \item
-%%   \emph{\&x} refers to the beginning address of its value, i.e., the
-%%   address of the first byte of its value
-%% \end{itemize}
-
-%% By the way the address printed when you run your program might contain
-%% things like a, c, e, etc. That's because the address is actually printed
-%% in \textbf{hexadecimals}, i.e., \textbf{numbers in base 16}. (You will
-%% also learn more about hexadecimals in CISS360.) Certain compilers allow
-%% you to typecast hexadecimal values into \emph{int} value. Try the
-%% following (don't panic and call 911 if your compiler won't let you):
-
-%% \begin{consolethree}[escapeinside=||]
-
-%% int x = 123;
-
-%% std::cout << "val of x: " << x
-%% << '\n'
-
-%% << "addr of x: " <<
-%% \textbf{int(\&x)}
-
-%% << '\n';\strut
-%% \end{consolethree}
-%% If it does not work, you can use any scientific calculator to convert
-%% from hex to decimals yourself. Most scientific calculators nowadays have
-%% the ability to convert between base 10 to base 2, 8, and 16.
-
-%% In almost all programming languages, a hexadecimal number starts with
-%% 0x. So you might see something like this when working with address
-%% values:
-
-%% 0x013251a2
-
-%% The actual base 16 hexadecimal is 13251a2.
-
-%% Technically speaking the memory address is an \textbf{unsigned integer},
-%% i.e., it does not have a negative sign, i.e., it's a positive integer.
-%% So you can convert your memory address value to an unsigned integer like
-%% this:
-
-%% \begin{consolethree}[escapeinside=||]
-
-%% int x = 123;
-
-%% std::cout << "val of x: " << x
-%% << '\n'
-
-%% << "addr of x: "
-
-%% << \textbf{(unsigned int)(\&x)}
-
-%% << '\n';\strut
-%% \end{consolethree}
-%% An \emph{\textbf{unsigned int}} can only represent integers up to
-%% 2\^{}32 -- 1. If you have a newer laptop, your address values are very
-%% likely larger than 2\^{}32 -- 1. If your compiler yells at you, instead
-%% of type casting with \emph{\textbf{unsigned int}}, use
-%% \emph{\textbf{unsigned long long int}}.
-
-%% An \emph{\textbf{unsig}\textbf{n}\textbf{ed int}} is really a type. So
-%% you can declare an \emph{\textbf{unsigned int}} variable. By the way,
-%% you have actually already seen \emph{\textbf{unsigned int}} when using
-%% \emph{\textbf{srand()}}. Likewise \emph{\textbf{unsigned long long int}}
-%% is also a type.
-
-%% \textbf{Exercise.} Find a scientific calculator program that can convert
-%% between base 10 and base 2, 8, and 16. (If you have time, use the web
-%% and learn to convert between base 10 and base 2, 8, 16 by hand -- this
-%% will be covered in detail in CISS360.)
-
-%% \begin{itemize}
-%% \tightlist
-%% \item
-%%   Convert 42 into base 2, 6, 16.
-%% \item
-%%   Convert base 16 a0234d1 to base 10.
-%% \end{itemize}
-
-%% \textbf{Exercise.} Declare two integer variables like this:
-
-%% \begin{consolethree}[escapeinside=||]
-
-%% int x;
-
-%% int y;\strut
-%% \end{consolethree}
-%% and print their addresses (in base 10). How far apart are the addresses
-%% of the two integer values of the variables? (Use your scientific
-%% calculator for subtracting two hexadecimal address values if you need
-%% to.) If the address differs by 4 (and the sizeof int is 4), then there's
-%% no gap between the memory occupied by the first and the second since an
-%% integer occupies 4 bytes. This means that your compiler is very
-%% efficient and is putting the value of \emph{x} and \emph{y} next to each
-%% other. (The address of the second variable is probably smaller.)
-
-%% \textbf{Exercise.} This simple exercise is meant to make your brain
-%% remember \emph{unsigned int}.
-
-%% \begin{enumerate}
-%% \def\labelenumi{(\alph{enumi})}
-%% \tightlist
-%% \item
-%%   Declare an \emph{unsigned int} variable \emph{i} and initialize it
-%%   with value 42. Print \emph{i}. Get a positive integer from the user
-%%   and give this value to \emph{i}. Print \emph{i}.
-%% \item
-%%   Write a simple program that computes the sum 1 + 2 + \ldots{} +
-%%   \emph{i} where \emph{i} is provided by the user. Print the sum. In
-%%   your program, since all integer values used are positive, you must
-%%   only use \emph{unsigned int} variables.
-%% \end{enumerate}
-
-%% \textbf{Exercise.} Declare a \emph{double} variable \emph{x}. Print it's
-%% address. Now declare another \emph{double} variable \emph{y} and print
-%% the address of \emph{y}. There shouldn't be a gap between the
-%% \emph{double} values of the above variables if they are declared next to
-%% each other. From the program can you deduce the number of bytes used to
-%% store a \emph{double}? Verify your guess by executing this:
-
-%% \begin{consolethree}[escapeinside=||]
-
-%% double x = 3.14159;
-
-%% std::cout << sizeof(double) <<
-%% std::endl;
-
-%% std::cout << sizeof(x) <<
-%% std::endl;\strut
-%% \end{consolethree}
-%% Exercise.
-
-%% \begin{enumerate}
-%% \def\labelenumi{(\alph{enumi})}
-%% \tightlist
-%% \item
-%%   How many bytes does a character variable/value use?
-%% \item
-%%   How many bytes does a boolean variable/value use?
-%% \end{enumerate}
-
-%% \textbf{Exercise.} Declare an array of integers:
-
-%% \begin{consolethree}[escapeinside=||]
-%% int x{[}3{]};\tabularnewline
-%% \bottomrule
-%% \end{longtable}
-
-%% and print their address of \emph{x{[}0{]}} and \emph{x{[}1{]}} and
-%% \emph{x{[}2{]}}. How far apart are they? Are the addresses ascending or
-%% descending?
-
-%% WARNING!!!
-
-%% Note that \emph{\&} is now used in two totally different ways!!!
-
-%% \begin{consolethree}[escapeinside=||]
-
-%% int x;
-
-%% int \& y = x; // int \& is a type
-
-%% std::cout << \&x; // \& is the address-of
-%% operator\strut
-%% \end{consolethree}
-%% Remember that!
-
-%% Pointer Variable
-
-%% At this point, you should ask the following question: ``If you can put
-%% \emph{int} values into \emph{int} variables, \emph{double} values into
-%% \emph{double} variables, \emph{bool} values into \emph{bool} variables
-%% \ldots{} surely I can put address values into variables, right?'' (If
-%% you did not ask that, then you're not learning actively! Wake up!)
-
-%% So here we go \ldots{}
-
-%% A \textbf{pointer variable} is a variable whose value is a memory
-%% address. Run this:
-
-%% \begin{consolethree}[escapeinside=||]
-
-%% int x = 1;
-
-%% int * p;
-
-%% p = \&x;
-
-%% std::cout << \&x << ' '
-
-%% << p << std::endl;\strut
-%% \end{consolethree}
-%% We say that \emph{p} \textbf{points to} \emph{x} (well ... technically,
-%% \emph{p} points to the \emph{\textbf{value}} of \emph{x}.) To declare a
-%% pointer variable you use this format:
-
-%% \emph{{[}type{]}} * \emph{{[}pointer{]}};
-
-%% You can of course do this, i.e. declaration with initialization:
-
-%% \begin{consolethree}[escapeinside=||]
-
-%% int x = 1;
-
-%% int * p = \&x;
-
-%% std::cout << \&x << ' '
-%% << p << std::endl;\strut
-%% \end{consolethree}
-%% Here's the format of a statement that declares a pointer with
-%% initialization:
-
-%% \emph{{[}type{]}} * \emph{{[}pointer{]} = {[}address of same type{]}};
-
-%% A very common convention is to begin the name of a pointer with \emph{p}
-%% or \emph{p\_}. It's also common to include the name of the concept the
-%% pointer points to in the name:
-
-%% \textbf{Exercise.} Complete this code segment. \emph{psalary} should
-%% point to \emph{salary:}
-
-%% \begin{consolethree}[escapeinside=||]
-
-%% double salary = 100.23;
-
-%% \_\_\_\_\_\_ * psalary = \_\_\_\_\_\_\_\_\_;\strut
-%% \end{consolethree}
-%% Verify!!! \ldots{} i.e., print the address of \emph{salary} and
-%% \emph{psalary} and make sure they are the same.
-
-%% \textbf{Exercise.} Can you assign the address of a type of value to a
-%% pointer variable of another type? Answer: \_\_\_\_\_\_\_\_\_\_\_\_\_.
-%% Try this:
-
-%% \begin{consolethree}[escapeinside=||]
-
-%% double x = 1.2;
-
-%% int * p = \&x; // trying to point an int pointer
-
-%% // to a double\strut
-%% \end{consolethree}
-%% You \textbf{cannot} initialize a pointer with the pointer value of a
-%% \textbf{different type}.
-
-%% \textbf{Exercise.} Here's an \emph{int} array:
-
-%% \begin{consolethree}[escapeinside=||]
-%% int x{[}{]} = \{2, 3, 5, 7, 11, 13\};\tabularnewline
-%% \bottomrule
-%% \end{longtable}
-
-%% Declare an \emph{int} pointer, say call it \emph{p}, that points to the
-%% value 11 in the array. Verify! Next, print the address of the value 13
-%% and 7 in \emph{x}.
-
-%% \textbf{Exercise.} Here's a C-string:
-
-%% \begin{consolethree}[escapeinside=||]
-%% char x{[}{]} = "hello world";\tabularnewline
-%% \bottomrule
-%% \end{longtable}
-
-%% Declare a \emph{char} pointer, say call it \emph{p}, that points to the
-%% 'w' in the string. Verify!
-
-%% Mental Picture
-
-%% Look at this code:
-
-%% \begin{consolethree}[escapeinside=||]
-
-%% int x = 42;
-
-%% int * p;
-
-%% p = \&x;\strut
-%% \end{consolethree}
-%% Suppose the \emph{int} value of x is at memory location 124500 in the
-%% computer and the memory location is at 124504. The computer's memory
-%% would look like this:
-
-%% Here's the memory model that you are already used to:
-
-%% To indicate that the value 42 of variable x is at memory address 124500,
-%% I will draw this:
-
-%% Well \ldots{} actually important thing is the \textbf{relationship}
-%% between \emph{p} and the value of \emph{x}: Think of \emph{p} as knowing
-%% where to find the value of \emph{x}. So we usually have this mental
-%% picture in mind when we talk about pointers:
-
-%% Sometimes, I will even simplify the mental picture by drawing this:
-
-%% (Later, we'll see how to access access the value of x using p.)
-
-%% Note that the arrow drawn in the diagram is to help us (human beings)
-%% see quickly what value a pointer is pointing to. Your computer only
-%% works with numbers (as in bits). The arrows in the drawing above are
-%% only a visual guide for us to see pointer relations quickly. There are
-%% no ``hardware arrows'' in your computer or CPU!!! Remember that!!!
-
-%% \textbf{Exercise. }In a code fragment, there are two variables \emph{i}
-%% and \emph{j}, both of \emph{int} type. The value of \emph{i} is 5000 and
-%% the value of \emph{j} is 6000. The value of \emph{i} is at address
-%% 108080 and the address of the value of \emph{j} is 501200. In addition,
-%% there are two pointer variables \emph{p} and \emph{q} such that \emph{p}
-%% points to the value of \emph{j} and \emph{q} points to the value of
-%% \emph{i}. Draw the memory model labeling everything (variable name,
-%% value, and address). Include arrows to relate pointers to the values the
-%% pointers point to.
-
-%% \textbf{Exercise. }Same as above except that both \emph{p} and \emph{q}
-%% points to the value of \emph{j}.
-
-%% \textbf{Exercise.} Draw the memory model at the end of the following
-%% code fragment where the addresses of \emph{pi{[}0{]}}, \emph{pi{[}1{]}},
-%% \emph{pi{[}2{]}}, \emph{pi{[}3{]}}, \emph{pi{[}4{]}} are 8000, 8008,
-%% 8016, 8024, 8032, 8040.
-
-%% \begin{consolethree}[escapeinside=||]
-
-%% double pi{[}{]} = \{3.1, 3.14, 3.141, 3.1415, 3.14159\};
-
-%% double * p = \&pi{[}1{]};\strut
-%% \end{consolethree}
-%% \textbf{Exercise.} Draw the memory model at the end of the following
-%% code fragment:
-
-%% \begin{consolethree}[escapeinside=||]
-
-%% int x{[}{]} = \{2, 3, 5, 7, 11\};
-
-%% int * p = \&x{[}3{]};
-
-%% int * q = \&x{[}1{]};\strut
-%% \end{consolethree}
-%% (In this case, addresses of \emph{x{[}0{]}}, \emph{x{[}1{]}}, \ldots{}
-%% are not given, so just draw the simplified mental picture.)
-
-%% \textbf{Exercise.} Given the following:
-
-%% \begin{consolethree}[escapeinside=||]
-
-%% int x = 42; // address is 5000
-
-%% double y = 3.1415; // address is 5004
-
-%% char z = '\$'; // address is 5012
-
-%% bool b = true; // address is 5016\strut
-%% \end{consolethree}
-%% Declare 4 pointers (of the right type!) to point the each of the above
-%% variables. Draw the memory model.
-
-%% \textbf{Exercise.} Write a code fragment so that you get the following
-%% memory model:
-
-%% Common Gotcha
-
-%% This is a very common gotcha:
-
-%% \begin{consolethree}[escapeinside=||]
-
-%% int x = 0, y = 1;
-
-%% int * p = \&x, q = \&y, r = \&x;\strut
-%% \end{consolethree}
-%% It won't work (does not compile) because the above actually means this:
-
-%% \begin{consolethree}[escapeinside=||]
-
-%% int x = 0, y = 1;
-
-%% int * p = \&x;
-
-%% int q = \&y;
-
-%% int r = \&x;\strut
-%% \end{consolethree}
-%% It should be
-
-%% \begin{consolethree}[escapeinside=||]
-
-%% int x = 0, y = 1;
-
-%% int * p = \&x, * q = \&y, * r = \&x;\strut
-%% \end{consolethree}
-%% or (better) just write this:
-
-%% \begin{consolethree}[escapeinside=||]
-
-%% int x = 0, y = 1;
-
-%% int * p = \&x;
-
-%% int * q = \&y;
-
-%% int * r = \&x;\strut
-%% \end{consolethree}
-%% Memory address values and NULL
-
-%% Up to this point I never assign constant address values directly to
-%% pointer variables like this:
-
-%% \begin{consolethree}[escapeinside=||]
-
-%% int x = 42; // say the value of x is at
-
-%% // address 1205000
-
-%% int * p = 1205000; // p points to the value of x\strut
-%% \end{consolethree}
-%% To begin with, the address of x is usually different each time you run
-%% your program and is definitely different on a different computer. So the
-%% above would be a terrible idea.
-
-%% In general, assigning a constant to a pointer variable is rare. This
-%% happens when you're doing something very special such as very low level
-%% programming where you need to access hardware or doing embedded systems
-%% programming. For instance, say you know that an \emph{unsigned int}
-%% value at memory location 20500080 is used for communication with a
-%% hardware device, you would do something like this:
-
-%% \begin{consolethree}[escapeinside=||]
-%% unsigned int * device = (unsigned int *) 20500080;\tabularnewline
-%% \bottomrule
-%% \end{longtable}
-
-%% After that, whenever the device outputs a value, it's sent to the
-%% \emph{unsigned int} at this location and \emph{device} pointer will be
-%% used to access this value.
-
-%% Unless otherwise stated, for CISS240, 245, 350, you will never assign or
-%% work directly with a constant memory address value. The only exception
-%% is the memory address \textbf{0}. However instead of using memory
-%% address 0 like this:
-
-%% \begin{consolethree}[escapeinside=||]
-
-%% int * p = 0;
-
-%% double * q = 0;
-
-%% char * r = 0;\strut
-%% \end{consolethree}
-%% you use the predefined constant \emph{\textbf{NULL}} like this:
-
-%% \begin{consolethree}[escapeinside=||]
-
-%% int * p = NULL;
-
-%% double * q = NULL;
-
-%% char * r = NULL;\strut
-%% \end{consolethree}
-%% In order to use \emph{NULL}, you might have to \emph{\#include
-%% < cstddef\textgreater{}} at the top of your code:
-
-%% \begin{consolethree}[escapeinside=||]
-
-%% \#include < iostream\textgreater{}
-
-%% \#include < cstddef\textgreater{}
-
-%% int main()
-
-%% \{
-
-%% int * p = NULL;
-
-%% double * q = NULL;
-
-%% char * r = NULL;
-
-%% return 0;
-
-%% \}\strut
-%% \end{consolethree}
-%% Just to keep everything uniform, just make sure you include cstddef.
-
-%% So what is the value at address 0???
-
-%% Well the only important thing you need to know is this: \textbf{you are
-%% not allowed to access the value at address 0. }Therefore \ldots{}
-
-%% \emph{\textbf{NULL}}\textbf{ is only used to indicate that a pointer
-%% variable is not pointing to anything useful}. (You can also use
-%% \emph{\textbf{nullptr}} instead of \emph{\textbf{NULL}}. For C++11
-%% compliant compilers, \emph{\textbf{nullptr}} and \emph{\textbf{NULL}}
-%% are the same. C++11 ISO/IEC 14882 was released 9/2011.)
-
-%% Because of the above, \emph{NULL} is sometimes used to initialize a
-%% pointer variable before it is being used:
-
-%% \begin{consolethree}[escapeinside=||]
-
-%% int x = 1;
-
-%% int * p = NULL; // p does not point to anything yet
-
-%% ... p is not used for anything useful ...
-
-%% p = \&x; // now point p to x
-
-%% ... now p is used to do something useful ...\strut
-%% \end{consolethree}
-%% \textbf{Exercise.} Print \emph{NULL}. (Don't forget to type cast.) What
-%% do you see? Remember!
-
-%% For a pointer p with NULL value, the picture is of course like this:
-
-%% It's common to draw it like this:
-
-%% or like this:
-
-%% Dereferencing Pointers
-
-%% Recall: If \emph{p} is a pointer, then the value of \emph{p} is the
-%% \textbf{memory address} of the value \emph{p} is pointing to.
-
-%% You can access the \textbf{value} \emph{p} is pointing to. That's call
-%% \textbf{dereferencing} \emph{p} and you do it using \emph{\textbf{*p}}.
-%% The \emph{*} used in this way is called the \textbf{dereferencing
-%% operator}. It's also called the indirection operator.
-
-%% Try this:
-
-%% \begin{consolethree}[escapeinside=||]
-
-%% int x = 42;
-
-%% int * p;
-
-%% p = \&x;
-
-%% std::cout << x << ' '
-%% << *p << '\n';
-
-%% x = 0;
-
-%% std::cout << x << ' '
-%% << *p << '\n';
-
-%% *p = 42;
-
-%% std::cout << x << ' '
-%% << *p << '\n';\strut
-%% \end{consolethree}
-%% Suppose \emph{\&x} is 124500, then the memory model looks like this:
-
-%% MAKE SURE YOU SEE THE DIFFERENCE BETWEEN \emph{p} and \emph{*p}!!!:
-
-%% \begin{itemize}
-%% \tightlist
-%% \item
-%%   \emph{p} is 124500
-%% \item
-%%   \emph{*p} is 42
-%% \end{itemize}
-
-%% \textbf{WARNING:}
-
-%% There are now \textbf{3 different meanings for *}!!!
-
-%% \begin{consolethree}[escapeinside=||]
-
-%% int x = 2 * 3; // * = multiplication
-
-%% int * p = \&x; // * = for pointer type
-
-%% std::cout << x
-
-%% << ',' << *p // * = for
-%% dereferencing
-
-%% << '\n';\strut
-%% \end{consolethree}
-%% It's really important to remember that if a pointer \emph{p} points to a
-%% box, then the dereference of \emph{p}, i.e. \emph{*p}, refer to the
-%% contents or the ``inside'' of the box.
-
-%% In particular, if I give you this picture without showing you the name
-%% of the variable with a value of 23:
-
-%% you tell me right away that \emph{*p} is 23. You don't need to know the
-%% variable name of that box.
-
-%% Note that \emph{*p} refers to the contents of the box \emph{p} points to
-%% in two ways and can be used in two ways, for reading and for writing:
-
-%% \begin{itemize}
-%% \tightlist
-%% \item
-%%   you can use \emph{*p} to \textbf{read} the value that \emph{p} points
-%%   to
-%% \item
-%%   you can use \emph{*p} to \textbf{overwrite} the value \emph{p} points
-%%   to
-%% \end{itemize}
-
-%% For instance:
-
-%% \begin{consolethree}[escapeinside=||]
-
-%% int x = 42;
-
-%% int * p = \&x;
-
-%% int i;
-
-%% i = *p; // read the value that p points to (and
-
-%% // give it to i)
-
-%% *p = 100; // write the value (i.e. 100) onto the
-
-%% // value that p points to\strut
-%% \end{consolethree}
-%% So \emph{*p} can appear on either the right or the left of the
-%% assignment operator.
-
-%% \hfill\break
+So \texttt{*p} can appear on either the right or the left of the
+assignment operator.
 
 %% \textbf{Exercise.} An \textbf{lvalue} is something that can appear on
 %% the left of = (the assignment operator). An \textbf{rvalue} is something
-%% that can appear on the the right of =. You have just seen that \emph{*p}
+%% that can appear on the the right of =. You have just seen that \texttt{*p}
 %% is is both an lvalue and an rvalue.
 
 %% \begin{itemize}
-%% \tightlist
+%% 
 %% \item
 %%   Is 42 an lvalue? An rvalue?
 %% \item
-%%   Suppose \emph{x} is a variable. Is \emph{x} an lvalue? An rvalue?
+%%   Suppose \texttt{x} is a variable. Is \texttt{x} an lvalue? An rvalue?
 %% \item
-%%   Suppose \emph{c} is a constant. Is \emph{c} an lvalue? An rvalue?
+%%   Suppose \texttt{c} is a constant. Is \texttt{c} an lvalue? An rvalue?
 %% \item
-%%   Suppose \emph{f()} is a function with void return type. Is \emph{f} an
+%%   Suppose \texttt{f()} is a function with void return type. Is \texttt{f} an
 %%   lvalue? An rvalue?
 %% \item
-%%   Suppose \emph{f()} is a function with \emph{int} return type. Is
-%%   \emph{f} an lvalue? An rvalue?
+%%   Suppose \texttt{f()} is a function with \texttt{int} return type. Is
+%%   \texttt{f} an lvalue? An rvalue?
 %% \end{itemize}
 
-%% Let me repeat the above. Suppose the address value in \emph{p} is
+%% Let me repeat the above. Suppose the address value in \texttt{p} is
 %% 124500. Then if you see something like
 
 %% \begin{consolethree}[escapeinside=||]
@@ -920,9 +892,9 @@ std::cout << "val of x = " << x << '\n'
 %% \endhead
 %% *p & Statement & Same as\tabularnewline
 %% lvalue & *p = \ldots{} & store \ldots{} in memory at address
-%% \emph{p}\tabularnewline
+%% \texttt{p}\tabularnewline
 %% rvalue & \ldots{} = \ldots{} *p \ldots{} & \ldots{} = \ldots{} (value in
-%% memory at address \emph{p}) ...\tabularnewline
+%% memory at address \texttt{p}) ...\tabularnewline
 %% \bottomrule
 %% \end{longtable}
 
@@ -941,7 +913,7 @@ std::cout << "val of x = " << x << '\n'
 %% // statement.
 
 %% std::cout << x <<
-%% '\n';\strut
+%% '\n';
 %% \end{consolethree}
 %% \textbf{Exercise.} Add one statement to this code fragment so that the
 %% output is 3.1415:
@@ -953,7 +925,7 @@ std::cout << "val of x = " << x << '\n'
 %% // add one statement below this line
 
 %% std::cout << *p <<
-%% '\n';\strut
+%% '\n';
 %% \end{consolethree}
 %% \textbf{Exercise.} What is the output of this program:
 
@@ -966,7 +938,7 @@ std::cout << "val of x = " << x << '\n'
 %% *p = *p + *p;
 
 %% std::cout << x <<
-%% '\n';\strut
+%% '\n';
 %% \end{consolethree}
 %% (Hint: Draw a picture)
 
@@ -983,7 +955,7 @@ std::cout << "val of x = " << x << '\n'
 %% int * q = \&y;
 
 %% std::cout << *p + *q <<
-%% '\n';\strut
+%% '\n';
 %% \end{consolethree}
 %% (Hint: Draw a picture)
 
@@ -1002,7 +974,7 @@ std::cout << "val of x = " << x << '\n'
 %% *p = *p * 2 + *q;
 
 %% std::cout << x << ' '
-%% << y << '\n';\strut
+%% << y << '\n';
 %% \end{consolethree}
 %% (Hint: Draw a ...)
 
@@ -1021,7 +993,7 @@ std::cout << "val of x = " << x << '\n'
 %% *p = *p * *q;
 
 %% std::cout << x << ' '
-%% << y << '\n';\strut
+%% << y << '\n';
 %% \end{consolethree}
 %% (Hint: Draw, draw, draw ...)
 
@@ -1045,7 +1017,7 @@ std::cout << "val of x = " << x << '\n'
 %% << y << '\n';
 
 %% std::cout << *p << ' '
-%% << *q << '\n';\strut
+%% << *q << '\n';
 %% \end{consolethree}
 %% (Hint: Draw...)
 
@@ -1068,29 +1040,29 @@ std::cout << "val of x = " << x << '\n'
 %% // put it into y. Do NOT use y in your statement.
 
 %% std::cout << x + y <<
-%% '\n';\strut
+%% '\n';
 %% \end{consolethree}
-%% \textbf{Exercise.} Declare a \emph{double} variable called \emph{d} and
-%% initialize it to 3.14. Declare a \emph{double} pointer to point to
-%% \emph{d}; call it \emph{q}. Print \emph{d} and \emph{*q}. Add 1 to the
-%% value of \emph{d} using \emph{d}. Print \emph{d} and \emph{*q}. Add 1 to
-%% the value of \emph{d} but using \emph{q}. Print \emph{d} and \emph{q}.
+%% \textbf{Exercise.} Declare a \texttt{double} variable called \texttt{d} and
+%% initialize it to 3.14. Declare a \texttt{double} pointer to point to
+%% \texttt{d}; call it \texttt{q}. Print \texttt{d} and \texttt{*q}. Add 1 to the
+%% value of \texttt{d} using \texttt{d}. Print \texttt{d} and \texttt{*q}. Add 1 to
+%% the value of \texttt{d} but using \texttt{q}. Print \texttt{d} and \texttt{q}.
 
 %% \textbf{Exercise.} What is the output of this code fragment:
 
 %% \begin{consolethree}[escapeinside=||]
 
-%% int x{[}{]} = \{5, 4, 3, 2, 1\};
+%% int x[] = {5, 4, 3, 2, 1};
 
 %% for (int i = 4; i \textgreater= 0; -\/-i)
 
-%% \{
+%% {
 
-%% int * p = \&x{[}i{]};
+%% int * p = \&x[i];
 
 %% std::cout << (*p) << std::endl;
 
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% \textbf{Exercise.} Here's a program you are familiar with:
 
@@ -1100,16 +1072,16 @@ std::cout << "val of x = " << x << '\n'
 
 %% for (int i = 0; i <= 100; i++)
 
-%% \{
+%% {
 
 %% s += i;
 
 %% std::cout << i << ' '
 %% << s << '\n';\\
-%% \}
+%% }
 
 %% std::cout << "1 + ... + 100 = " << s
-%% << '\n';\strut
+%% << '\n';
 %% \end{consolethree}
 %% I'm going to add a pointer:
 
@@ -1121,20 +1093,20 @@ std::cout << "val of x = " << x << '\n'
 
 %% for (int i = 0; i <= 100; i++)
 
-%% \{
+%% {
 
 %% s += i;
 
 %% std::cout << i << ' '
 %% << s << '\n';\\
-%% \}
+%% }
 
 %% std::cout << "1 + ... + 100 = " << s
-%% << '\n';\strut
+%% << '\n';
 %% \end{consolethree}
 %% Now modify the program so that it works the same as before but the
-%% variable name \emph{s} is not used after the statement that declares
-%% \emph{p}:
+%% variable name \texttt{s} is not used after the statement that declares
+%% \texttt{p}:
 
 %% \begin{consolethree}[escapeinside=||]
 
@@ -1148,16 +1120,16 @@ std::cout << "val of x = " << x << '\n'
 
 %% for (int i = 0; i < 100; i++)
 
-%% \{
+%% {
 
 %% s += i;
 
 %% std::cout << i << ' '
 %% << s << '\n';\\
-%% \}
+%% }
 
 %% std::cout << "1 + ... + 100 = " << s
-%% << '\n';\strut
+%% << '\n';
 %% \end{consolethree}
 %% \textbf{Exercise.} If you see this picture
 
@@ -1166,11 +1138,11 @@ std::cout << "val of x = " << x << '\n'
 %% \textbf{Exercise.} If you see this
 
 %% \begin{consolethree}[escapeinside=||]
-%% double x = a{[}*b{]}; \tabularnewline
+%% double x = a[*b]; \tabularnewline
 %% \bottomrule
 %% \end{longtable}
 
-%% can you tell me what is the type of \emph{b}?
+%% can you tell me what is the type of \texttt{b}?
 
 %% \textbf{Exercise.} If you see this
 
@@ -1179,7 +1151,7 @@ std::cout << "val of x = " << x << '\n'
 %% \bottomrule
 %% \end{longtable}
 
-%% can you tell me what is the type of \emph{y}?
+%% can you tell me what is the type of \texttt{y}?
 
 %% \textbf{Exercise.} Complete this:
 
@@ -1187,13 +1159,13 @@ std::cout << "val of x = " << x << '\n'
 
 %% void nextprime(int * p)
 
-%% \{
+%% {
 
-%% \}
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% int x = 7;
 
@@ -1210,10 +1182,10 @@ std::cout << "val of x = " << x << '\n'
 %% std::cout << x << std::endl;
 
 %% return 0;\\
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% \textbf{Exercise.} Can you apply the pre- and post-increment operators
-%% to \emph{*p} where \emph{p} is a pointer to an \emph{int}?
+%% to \texttt{*p} where \texttt{p} is a pointer to an \texttt{int}?
 
 %% \begin{consolethree}[escapeinside=||]
 
@@ -1223,10 +1195,10 @@ std::cout << "val of x = " << x << '\n'
 
 %% -\/-(*p);
 
-%% (*p)-\/-;\strut
+%% (*p)-\/-;
 %% \end{consolethree}
 %% Do you need the parentheses? Can you apply the augmented assignment
-%% operators to \emph{*p?}
+%% operators to \texttt{*p?}
 
 %% Note that if you do not assign a memory address to your pointer, it
 %% would have an arbitrary address value, pointing to some arbitrary value.
@@ -1244,7 +1216,7 @@ std::cout << "val of x = " << x << '\n'
 %% \bottomrule
 %% \end{longtable}
 
-%% and if you know that \emph{p} has value 124500, then the above can also
+%% and if you know that \texttt{p} has value 124500, then the above can also
 %% be
 
 %% \begin{consolethree}[escapeinside=||]
@@ -1262,21 +1234,21 @@ std::cout << "val of x = " << x << '\n'
 
 %% int * f(int * x)
 
-%% \{
+%% {
 
 %% return x;\\
-%% \}
+%% }
 
 %% int f(int x)
 
-%% \{
+%% {
 
 %% return x;\\
-%% \}
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% int a = 21;
 
@@ -1284,7 +1256,7 @@ std::cout << "val of x = " << x << '\n'
 %% std::endl;
 
 %% return 0;\\
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% Verify! (Draw a picture if you need to.)
 
@@ -1297,29 +1269,29 @@ std::cout << "val of x = " << x << '\n'
 
 %% int h(int * z)
 
-%% \{
+%% {
 
 %% return *z;\\
-%% \}
+%% }
 
 %% int * g(int * y)
 
-%% \{
+%% {
 
 %% return y;\\
-%% \}\\
+%% }\\
 
 %% int * f(int * x)
 
-%% \{
+%% {
 
 %% return (\&x == NULL ? NULL : g(x));
 
-%% \}
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% int a = 21;
 
@@ -1327,7 +1299,7 @@ std::cout << "val of x = " << x << '\n'
 %% std::endl;
 
 %% return 0;\\
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% Verify!
 
@@ -1353,7 +1325,7 @@ std::cout << "val of x = " << x << '\n'
 %% p = q;
 
 %% std::cout << *p <<
-%% "\n";\strut
+%% "\n";
 %% \end{consolethree}
 %% Now run it and verify.
 
@@ -1370,7 +1342,7 @@ std::cout << "val of x = " << x << '\n'
 %% int * q = \&y;
 
 %% std::cout << *p <<
-%% "\n";\strut
+%% "\n";
 %% \end{consolethree}
 %% the memory model looks like this:
 
@@ -1381,19 +1353,19 @@ std::cout << "val of x = " << x << '\n'
 %% \bottomrule
 %% \end{longtable}
 
-%% gives the memory address in \emph{q} to \emph{p}. Since \emph{q} has the
-%% memory address of \emph{y}, this means that \emph{p} ends up with the
-%% memory address of \emph{y}. So we get
+%% gives the memory address in \texttt{q} to \texttt{p}. Since \texttt{q} has the
+%% memory address of \texttt{y}, this means that \texttt{p} ends up with the
+%% memory address of \texttt{y}. So we get
 
-%% Since \emph{p} points to \emph{y}, or rather, \emph{p} point to the
-%% \emph{int} box that contains the value of \emph{y}, of course \emph{*p}
-%% gives us \emph{123}.
+%% Since \texttt{p} points to \texttt{y}, or rather, \texttt{p} point to the
+%% \texttt{int} box that contains the value of \texttt{y}, of course \texttt{*p}
+%% gives us \texttt{123}.
 
 %% Let me explain everything above all over again, this time using (made
 %% up) memory addresses \ldots{} \textbf{PAY ATTENTION!}
 
 %% Here's the above code again, except that I've included some made-up
-%% addresses for the value of \emph{x} and the value of \emph{y}:
+%% addresses for the value of \texttt{x} and the value of \texttt{y}:
 
 %% \begin{consolethree}[escapeinside=||]
 
@@ -1401,7 +1373,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% int y = 123; // value of y is at address 80004
 
-%% ...\strut
+%% ...
 %% \end{consolethree}
 %% At this point in the code
 
@@ -1416,7 +1388,7 @@ std::cout << "val of x = " << x << '\n'
 %% int * q = \&y; // q = 80004
 
 %% std::cout << *p <<
-%% "\n";\strut
+%% "\n";
 %% \end{consolethree}
 %% the picture looks like this:
 
@@ -1430,8 +1402,8 @@ std::cout << "val of x = " << x << '\n'
 %% \bottomrule
 %% \end{longtable}
 
-%% gives the value of \emph{q} to \emph{p}. The value of \emph{q} is 80004.
-%% Therefore the value of \emph{p} becomes 80004. The diagram now looks
+%% gives the value of \texttt{q} to \texttt{p}. The value of \texttt{q} is 80004.
+%% Therefore the value of \texttt{p} becomes 80004. The diagram now looks
 %% like this:
 
 %% And if I now draw the arrows, I have
@@ -1460,7 +1432,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% std::cout << \&x << ' '
 %% << \&y << ' ' << p
-%% << '\n';\strut
+%% << '\n';
 %% \end{consolethree}
 %% Verify your picture by running your program.
 
@@ -1502,7 +1474,7 @@ std::cout << "val of x = " << x << '\n'
 %% << \&y << ' '
 
 %% << p << ' ' << q
-%% << '\n';\strut
+%% << '\n';
 %% \end{consolethree}
 %% \textbf{Exercise.} What is the output?
 
@@ -1526,7 +1498,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% std::cout << *p << ' '
 %% << *q << ' ' << *r
-%% << '\n'; \strut
+%% << '\n'; 
 %% \end{consolethree}
 %% (Hint: Draw a picture)
 
@@ -1571,7 +1543,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% std::cout << *p << ' '
 %% << *q << ' ' << *r
-%% << '\n'; \strut
+%% << '\n'; 
 %% \end{consolethree}
 %% Exercise. What is the output? Or is there an error?
 
@@ -1605,16 +1577,16 @@ std::cout << "val of x = " << x << '\n'
 
 %% std::cout << *p << ' '
 %% << *q << ' ' << *r
-%% << '\n'; \strut
+%% << '\n'; 
 %% \end{consolethree}
 %% Comparison
 
-%% You can only compare pointers \textbf{of the same type}\emph{\textbf{.}}
+%% You can only compare pointers \textbf{of the same type}\texttt{\textbf{.}}
 
 %% You can compare compatible pointers using
 
-%% \emph{==}, \emph{!=}, \emph{<}, \emph{<=},
-%% \emph{\textgreater{}}, \emph{\textgreater=}
+%% \texttt{==}, \texttt{!=}, \texttt{<}, \texttt{<=},
+%% \texttt{\textgreater{}}, \texttt{\textgreater=}
 
 %% because pointers are memory address and hence can be converted to
 %% integers and therefore can be compared just like integers. Try this
@@ -1630,7 +1602,7 @@ std::cout << "val of x = " << x << '\n'
 %% int * q = \&y;
 
 %% std::cout << (p == q) <<
-%% "\n";\strut
+%% "\n";
 %% \end{consolethree}
 %% and this:
 
@@ -1645,7 +1617,7 @@ std::cout << "val of x = " << x << '\n'
 %% char * r = \&c;
 
 %% std::cout << (p == r) <<
-%% "\n";\strut
+%% "\n";
 %% \end{consolethree}
 %% Of course if two pointers point to the same memory address, then you get
 %% true when you compare their memory address values:
@@ -1659,7 +1631,7 @@ std::cout << "val of x = " << x << '\n'
 %% int * q = \&x;
 
 %% std::cout << (p == q) <<
-%% "\n";\strut
+%% "\n";
 %% \end{consolethree}
 %% Recall that variables declared in a block are lined up so that variables
 %% declared earlier will have a small address value.
@@ -1681,13 +1653,13 @@ std::cout << "val of x = " << x << '\n'
 %% '\n';
 
 %% std::cout << (p < q) <<
-%% '\n';\strut
+%% '\n';
 %% \end{consolethree}
 %% In the above, you see that the address of x (i.e., the address of the
 %% value of x) is smaller that the address of y.
 
 %% \textbf{Exercise.} TRUE or FALSE: The output is 1 since the value that
-%% \emph{p} and \emph{q} points to are the same (i.e., 42).
+%% \texttt{p} and \texttt{q} points to are the same (i.e., 42).
 
 %% \begin{consolethree}[escapeinside=||]
 
@@ -1700,7 +1672,7 @@ std::cout << "val of x = " << x << '\n'
 %% int * q = \&y;
 
 %% std::cout << (p == q) <<
-%% "\n";\strut
+%% "\n";
 %% \end{consolethree}
 %% \textbf{Exercise.} What is the output?
 
@@ -1730,7 +1702,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% std::cout << (p == q) << ' '
 %% << (q != r) <<
-%% '\n';\strut
+%% '\n';
 %% \end{consolethree}
 %% \textbf{Exercise.} What is the output?
 
@@ -1740,15 +1712,15 @@ std::cout << "val of x = " << x << '\n'
 
 %% int f(int * x, int * y)
 
-%% \{
+%% {
 
 %% return (x == y ? *x : *x + *y);
 
-%% \}
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% int a = 2;
 
@@ -1759,7 +1731,7 @@ std::cout << "val of x = " << x << '\n'
 %% << std::endl;
 
 %% return 0;\\
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% \textbf{Exercise.} What is the output? Or is there an error?
 
@@ -1769,15 +1741,15 @@ std::cout << "val of x = " << x << '\n'
 
 %% int f(int * x)
 
-%% \{
+%% {
 
 %% return (x == NULL ? -1 : *x);
 
-%% \}
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% int a = 2;
 
@@ -1787,9 +1759,9 @@ std::cout << "val of x = " << x << '\n'
 %% << std::endl;
 
 %% return 0;\\
-%% \}\strut
+%% }
 %% \end{consolethree}
-%% {[}HINT: What is \emph{NULL} again? What does it represent?{]}
+%% [HINT: What is \texttt{NULL} again? What does it represent?]
 
 %% Pointer Power \#1: Assessing value anywhere
 
@@ -1806,18 +1778,18 @@ std::cout << "val of x = " << x << '\n'
 
 %% void swap(int x, int y)
 
-%% \{
+%% {
 
 %% int t = x;
 
 %% x = y;
 
 %% y = t;\\
-%% \}
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% int x = 0, y = 1;
 
@@ -1830,12 +1802,12 @@ std::cout << "val of x = " << x << '\n'
 %% << y << '\n';
 
 %% return 0;\\
-%% \}\strut
+%% }
 %% \end{consolethree}
-%% Of course the function uses pass-by-value. The \emph{x} and \emph{y} in
-%% \emph{swap()} has nothing to do with the \emph{x} and \emph{y} in
-%% \emph{main()} and therefore \emph{swap()} cannot possibly change the
-%% values of variables in \emph{main()}.
+%% Of course the function uses pass-by-value. The \texttt{x} and \texttt{y} in
+%% \texttt{swap()} has nothing to do with the \texttt{x} and \texttt{y} in
+%% \texttt{main()} and therefore \texttt{swap()} cannot possibly change the
+%% values of variables in \texttt{main()}.
 
 %% Now look at this:
 
@@ -1845,18 +1817,18 @@ std::cout << "val of x = " << x << '\n'
 
 %% void swap(int \& x, int \& y)
 
-%% \{
+%% {
 
 %% int t = x;
 
 %% x = y;
 
 %% y = t;\\
-%% \}
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% int x = 0, y = 1;
 
@@ -1869,10 +1841,10 @@ std::cout << "val of x = " << x << '\n'
 %% << y << '\n';
 
 %% return 0;\\
-%% \}\strut
+%% }
 %% \end{consolethree}
-%% This second \emph{swap()} function uses pass-by-reference and it does
-%% swap the values of two variables in \emph{main()}.
+%% This second \texttt{swap()} function uses pass-by-reference and it does
+%% swap the values of two variables in \texttt{main()}.
 
 %% With your understanding of pointers, run and explain this:
 
@@ -1882,18 +1854,18 @@ std::cout << "val of x = " << x << '\n'
 
 %% void swap(int * x, int * y)
 
-%% \{
+%% {
 
 %% int t = *x;
 
 %% *x = *y;
 
 %% *y = t;\\
-%% \}
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% int x = 0, y = 1;
 
@@ -1906,7 +1878,7 @@ std::cout << "val of x = " << x << '\n'
 %% << y << '\n';
 
 %% return 0;\\
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% Therefore pointers can be used as parameters to modify values of
 %% variables in the calling function, i.e., they can be used to achieve the
@@ -1922,39 +1894,39 @@ std::cout << "val of x = " << x << '\n'
 
 %% void j(int * x)
 
-%% \{
+%% {
 
 %% *x = 42; // TADA!
 
-%% \}
+%% }
 
 %% void i(int * x)
 
-%% \{
+%% {
 
 %% j(x);
 
-%% \}
+%% }
 
 %% void h(int * x)
 
-%% \{
+%% {
 
 %% i(x);
 
-%% \}
+%% }
 
 %% void f(int * x)
 
-%% \{
+%% {
 
 %% h(x);
 
-%% \}
+%% }
 
 %% int main ()
 
-%% \{
+%% {
 
 %% int x = 0;
 
@@ -1963,9 +1935,9 @@ std::cout << "val of x = " << x << '\n'
 %% std::cout << x << std::endl;\\
 %% return 0;
 
-%% \}\strut
+%% }
 %% \end{consolethree}
-%% Here's another example. This version of reciprocating \emph{x} does not
+%% Here's another example. This version of reciprocating \texttt{x} does not
 %% work:
 
 %% \begin{consolethree}[escapeinside=||]
@@ -1974,14 +1946,14 @@ std::cout << "val of x = " << x << '\n'
 
 %% void reciprocal(double x)
 
-%% \{
+%% {
 
 %% x = 1.0 / x;\\
-%% \}
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% double x = 2.0;
 
@@ -1992,7 +1964,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% return 0;
 
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% This one does work, using reference:
 
@@ -2002,14 +1974,14 @@ std::cout << "val of x = " << x << '\n'
 
 %% void reciprocal(double \& x)
 
-%% \{
+%% {
 
 %% x = 1.0 / x;\\
-%% \}
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% double x = 2.0;
 
@@ -2020,7 +1992,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% return 0;
 
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% And this one does work, using pointers:
 
@@ -2030,14 +2002,14 @@ std::cout << "val of x = " << x << '\n'
 
 %% void reciprocal(double * x)
 
-%% \{
+%% {
 
 %% *x = 1.0 / *x;\\
-%% \}
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% double x = 2.0;
 
@@ -2048,7 +2020,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% return 0;
 
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% Now's your turn \ldots{}
 
@@ -2060,14 +2032,14 @@ std::cout << "val of x = " << x << '\n'
 
 %% void inc(int x)
 
-%% \{
+%% {
 
 %% x++;\\
-%% \}
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% int a = 42;
 
@@ -2077,7 +2049,7 @@ std::cout << "val of x = " << x << '\n'
 %% still 42
 
 %% return 0;\\
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% And here's one that works, using reference variables:
 
@@ -2087,14 +2059,14 @@ std::cout << "val of x = " << x << '\n'
 
 %% void inc(int \& x)
 
-%% \{
+%% {
 
 %% x++;\\
-%% \}
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% int a = 42;
 
@@ -2104,7 +2076,7 @@ std::cout << "val of x = " << x << '\n'
 %% 43
 
 %% return 0;\\
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% Complete the following program so that the new increment works, except
 %% that the parameter is a pointer and not a reference:
@@ -2113,12 +2085,12 @@ std::cout << "val of x = " << x << '\n'
 
 %% void inc(int * x)
 
-%% \{\\
-%% \}
+%% {\\
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% int a = 42;
 
@@ -2128,50 +2100,50 @@ std::cout << "val of x = " << x << '\n'
 %% should get 43
 
 %% return 0;\\
-%% \}\strut
+%% }
 %% \end{consolethree}
-%% \textbf{Exercise. }Complete the \emph{array\_append()} function (which
-%% adds a value to the array \emph{x} and increments the value of the
-%% length variable of the array. The expected output is \emph{2 3 5 7}.
+%% \textbf{Exercise. }Complete the \texttt{array_append()} function (which
+%% adds a value to the array \texttt{x} and increments the value of the
+%% length variable of the array. The expected output is \texttt{2 3 5 7}.
 
 %% \begin{consolethree}[escapeinside=||]
 
 %% \#include < iostream\textgreater{}
 
-%% void array\_println(int x{[}{]}, int xlen)
+%% void array_println(int x[], int xlen)
 
-%% \{
+%% {
 
 %% for (int i = 0; i < xlen; ++i)
 
-%% \{
+%% {
 
-%% std::cout << x{[}i{]} << ' ';
+%% std::cout << x[i] << ' ';
 
-%% \}
+%% }
 
 %% std::cout << std::endl;\\
-%% \}
+%% }
 
-%% void array\_append(int x{[}{]}, int * xlen, int value)
+%% void array_append(int x[], int * xlen, int value)
 
-%% \{\\
-%% \}
+%% {\\
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
-%% int x{[}10{]} = \{2, 3, 5\};
+%% int x[10] = {2, 3, 5};
 
 %% int xlen = 3;
 
-%% array\_append(x, \&xlen, 7);
+%% array_append(x, \&xlen, 7);
 
-%% array\_println(x, xlen);
+%% array_println(x, xlen);
 
 %% return 0;\\
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% \textbf{Exercise. }Here's a function that acts like an integer input
 %% function:
@@ -2182,12 +2154,12 @@ std::cout << "val of x = " << x << '\n'
 
 %% void scanf(int * x)
 
-%% \{\\
-%% \}
+%% {\\
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% int a = 0;
 
@@ -2196,7 +2168,7 @@ std::cout << "val of x = " << x << '\n'
 %% std::cout << a << std::endl;
 
 %% return 0;\\
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% Complete this so that when you run it and enter 42, there's an output of
 %% 42.
@@ -2209,12 +2181,12 @@ std::cout << "val of x = " << x << '\n'
 
 %% void scanf(double * x)
 
-%% \{\\
-%% \}
+%% {\\
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% double a = 0;
 
@@ -2223,7 +2195,7 @@ std::cout << "val of x = " << x << '\n'
 %% std::cout << a << std::endl;
 
 %% return 0;\\
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% Test it!!!
 
@@ -2236,7 +2208,7 @@ std::cout << "val of x = " << x << '\n'
 %% \bottomrule
 %% \end{longtable}
 
-%% to make \emph{x} constant so that its value cannot change, you do this:
+%% to make \texttt{x} constant so that its value cannot change, you do this:
 
 %% \begin{consolethree}[escapeinside=||]
 %% const int x = 42;\tabularnewline
@@ -2254,14 +2226,14 @@ std::cout << "val of x = " << x << '\n'
 %% pointer. First let me describe the ideas, then I'll talk about the
 %% syntax.
 
-%% Look at the following picture of a pointer \emph{p} pointing to 42 (at
+%% Look at the following picture of a pointer \texttt{p} pointing to 42 (at
 %% address 5002048):
 
-%% If \emph{p} is a \textbf{constant pointer}, then the pointer value of
-%% \emph{p} is a constant and therefore cannot change.
+%% If \texttt{p} is a \textbf{constant pointer}, then the pointer value of
+%% \texttt{p} is a constant and therefore cannot change.
 
-%% However if \emph{p} is a \textbf{pointer to constant}, then the value
-%% that \emph{p} points to cannot be changed through using \emph{*p}:
+%% However if \texttt{p} is a \textbf{pointer to constant}, then the value
+%% that \texttt{p} points to cannot be changed through using \texttt{*p}:
 
 %% Easy right?
 
@@ -2273,18 +2245,18 @@ std::cout << "val of x = " << x << '\n'
 
 %% int x = 42;
 
-%% int * p = \&x;\strut
+%% int * p = \&x;
 %% \end{consolethree}
-%% If you do not want the memory address value in \emph{p} to be changed,
-%% you want \emph{p} to be a \textbf{constant pointer}, you do this:
+%% If you do not want the memory address value in \texttt{p} to be changed,
+%% you want \texttt{p} to be a \textbf{constant pointer}, you do this:
 
 %% \begin{consolethree}[escapeinside=||]
 
 %% int x = 42;
 
-%% int * \textbf{const} p = \&x;\strut
+%% int * \textbf{const} p = \&x;
 %% \end{consolethree}
-%% Note where \emph{const} is placed: to the right of \emph{*}.
+%% Note where \texttt{const} is placed: to the right of \texttt{*}.
 
 %% \textbf{Exercise.} To make sure you remember the above, first run this
 
@@ -2300,9 +2272,9 @@ std::cout << "val of x = " << x << '\n'
 %% p = \&y;
 
 %% std::cout << *p <<
-%% '\n'; \strut
+%% '\n'; 
 %% \end{consolethree}
-%% Everything works just fine. Now make \emph{p} a constant pointer like
+%% Everything works just fine. Now make \texttt{p} a constant pointer like
 %% this:
 
 %% \begin{consolethree}[escapeinside=||]
@@ -2317,11 +2289,11 @@ std::cout << "val of x = " << x << '\n'
 %% p = \&y; // compiler complaints!!!
 
 %% std::cout << *p <<
-%% '\n'; \strut
+%% '\n'; 
 %% \end{consolethree}
 %% Get it?
 
-%% What about the case where \emph{p} points to a constant value? First run
+%% What about the case where \texttt{p} points to a constant value? First run
 %% this
 
 %% \begin{consolethree}[escapeinside=||]
@@ -2331,7 +2303,7 @@ std::cout << "val of x = " << x << '\n'
 %% \textbf{const} int * p = \&x;
 
 %% std::cout << *p <<
-%% '\n';\strut
+%% '\n';
 %% \end{consolethree}
 %% No problems. Now try this:
 
@@ -2344,7 +2316,7 @@ std::cout << "val of x = " << x << '\n'
 %% std::cout << *p <<
 %% '\n';
 
-%% *p = 42; // compiler complaints!!!\strut
+%% *p = 42; // compiler complaints!!!
 %% \end{consolethree}
 %% That's it!
 
@@ -2362,24 +2334,24 @@ std::cout << "val of x = " << x << '\n'
 %% x = 42; // OK ... x is a variable
 
 %% std::cout << x << ' '
-%% << *p << '\n';\strut
+%% << *p << '\n';
 %% \end{minipage}\tabularnewline
 %% \bottomrule
 %% \end{longta\begin{longtable}[]{@{}l@{}}
 %% \toprule
 %% \endheadble}
 
-%% Note: \textbf{If }\emph{\textbf{p}}\textbf{ points to a
-%% }\emph{\textbf{const int}}\textbf{, it doesn't mean that the
-%% }\emph{\textbf{int }}\textbf{value can't change -\/- it's just that you
-%% cannot change it using }\emph{\textbf{*p}}\textbf{.} In the above, we
-%% change the value using \emph{x. }Get it?
+%% Note: \textbf{If }\texttt{\textbf{p}}\textbf{ points to a
+%% }\texttt{\textbf{const int}}\textbf{, it doesn't mean that the
+%% }\texttt{\textbf{int }}\textbf{value can't change -\/- it's just that you
+%% cannot change it using }\texttt{\textbf{*p}}\textbf{.} In the above, we
+%% change the value using \texttt{x. }Get it?
 
 %% Here is a table the summarizes all the cases:
 
-%% Can change \emph{p}? Can change \emph{*p}?
+%% Can change \texttt{p}? Can change \texttt{*p}?
 
-%% Is \emph{p =} \ldots{} OK? Is \emph{*p =} \ldots{} OK?
+%% Is \texttt{p =} \ldots{} OK? Is \texttt{*p =} \ldots{} OK?
 
 %% int * pYES YES
 
@@ -2399,7 +2371,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% const int * const p
 
-%% so that you say ``\emph{p} is a constant pointer to an integer
+%% so that you say ``\texttt{p} is a constant pointer to an integer
 %% constant''. Here are all the 4 possible constantness cases for a pointer
 %% declaration:
 
@@ -2427,7 +2399,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% const int * const q; // WRONG AGAIN!!
 
-%% q = \&y; // TOO LATE BOZO!!!\strut
+%% q = \&y; // TOO LATE BOZO!!!
 %% \end{consolethree}
 %% \textbf{A non-constant pointer cannot point to a constant.} For instance
 
@@ -2437,12 +2409,12 @@ std::cout << "val of x = " << x << '\n'
 
 %% int * p0 = \&x; // WRONG!!!
 
-%% int * const p1 = \&x; // WRONG!!! \strut
+%% int * const p1 = \&x; // WRONG!!! 
 %% \end{consolethree}
-%% Why? Because in this case, \emph{p} is supposed to point to an
-%% \emph{int} (not \emph{const int}) Therefore \emph{p} can change the
-%% value that it points to using \emph{*p}. But that value is a
-%% \emph{const}! That's a contradiction!
+%% Why? Because in this case, \texttt{p} is supposed to point to an
+%% \texttt{int} (not \texttt{const int}) Therefore \texttt{p} can change the
+%% value that it points to using \texttt{*p}. But that value is a
+%% \texttt{const}! That's a contradiction!
 
 %% \textbf{Exercise.} Is this OK?
 
@@ -2452,7 +2424,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% const int * p = \&x;
 
-%% int * const q = p;\strut
+%% int * const q = p;
 %% \end{consolethree}
 %% Here are some exercises to tease your brain.
 
@@ -2466,7 +2438,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% p = \&y; // OK?
 
-%% *p = 42; // OK?\strut
+%% *p = 42; // OK?
 %% \end{consolethree}
 %% Verify on your own.
 
@@ -2480,7 +2452,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% p = \&y; // OK?
 
-%% *p = 0; // OK?\strut
+%% *p = 0; // OK?
 %% \end{consolethree}
 %% Verify on your own.
 
@@ -2494,7 +2466,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% p = \&y; // OK?
 
-%% *p = 0; // OK?\strut
+%% *p = 0; // OK?
 %% \end{consolethree}
 %% Verify on your own.
 
@@ -2508,7 +2480,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% p = \&y; // OK?
 
-%% *p = 0; // OK?\strut
+%% *p = 0; // OK?
 %% \end{consolethree}
 %% Verify on your own.
 
@@ -2525,7 +2497,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% const char * p2 = \&x;
 
-%% const char * const p3 = \&x;\strut
+%% const char * const p3 = \&x;
 %% \end{consolethree}
 %% \textbf{Exercise.} Does this compile? If it does, what's the output?
 
@@ -2538,7 +2510,7 @@ std::cout << "val of x = " << x << '\n'
 %% *p = a + *p;
 
 %% std::cout << a << ' '
-%% << *p << '\n';\strut
+%% << *p << '\n';
 %% \end{consolethree}
 %% \textbf{Exercise.} Does this compile? If it does, what's the output?
 
@@ -2551,7 +2523,7 @@ std::cout << "val of x = " << x << '\n'
 %% a = a + *p;
 
 %% std::cout << a << ' '
-%% << *p << '\n';\strut
+%% << *p << '\n';
 %% \end{consolethree}
 %% Connection between pointers and references
 
@@ -2578,22 +2550,22 @@ std::cout << "val of x = " << x << '\n'
 
 %% std::cout << \&x << ' '
 %% << \&r << ' ' << p
-%% << '\n';\strut
+%% << '\n';
 %% \end{consolethree}
-%% You will see that if \emph{r} is a reference to \emph{x}, the address of
-%% \emph{r}, i.e. \emph{\&r}, is the same as \emph{\&x}. This means that
-%% the value \emph{r} refers to resides at the address of \emph{x}, i.e.,
+%% You will see that if \texttt{r} is a reference to \texttt{x}, the address of
+%% \texttt{r}, i.e. \texttt{\&r}, is the same as \texttt{\&x}. This means that
+%% the value \texttt{r} refers to resides at the address of \texttt{x}, i.e.,
 %% the output of the second line contains the same address.
 
 %% Let me repeat: The address of a reference variable is the address of the
-%% value the reference is referring to. Therefore if \emph{r} reference x
-%% and \emph{p} points to \emph{x}, then
+%% value the reference is referring to. Therefore if \texttt{r} reference x
+%% and \texttt{p} points to \texttt{x}, then
 
-%% \emph{\&r} and \emph{p }are the same
+%% \texttt{\&r} and \texttt{p }are the same
 
 %% and
 
-%% \emph{r} and \emph{*p }are the same.
+%% \texttt{r} and \texttt{*p }are the same.
 
 %% Think, understand, and remember!
 
@@ -2604,34 +2576,34 @@ std::cout << "val of x = " << x << '\n'
 %% pointers and references. With your understanding of pointers, let's take
 %% a closer look \ldots{}
 
-%% 1. There's a pointer value, \emph{NULL}, that can be assigned to all
+%% 1. There's a pointer value, \texttt{NULL}, that can be assigned to all
 %% pointers. This frequently acts as a default pointer value. Recall that
-%% \emph{NULL} does not point to anything useful. References (of any type)
+%% \texttt{NULL} does not point to anything useful. References (of any type)
 %% MUST refer to a value of a variable (or constant) of the same type --
-%% there's no such thing as \emph{NULL} reference. So a function that
+%% there's no such thing as \texttt{NULL} reference. So a function that
 %% accepts a pointer has the option of being called with ``nothing'':
 
 %% \begin{consolethree}[escapeinside=||]
 
-%% void print\_cash(int * p\_cash\_in\_cents = NULL)
+%% void print_cash(int * p_cash_in_cents = NULL)
 
-%% \{
+%% {
 
-%% if (p\_cash\_in\_cents == NULL)
+%% if (p_cash_in_cents == NULL)
 
-%% \{
+%% {
 
 %% std::cout << "no cash!!!\n"
 
-%% \}
+%% }
 
 %% else
 
-%% \{
+%% {
 
-%% int dollar = *p\_cash\_in\_cents / 100.0;
+%% int dollar = *p_cash_in_cents / 100.0;
 
-%% int cents = *p\_cash\_in\_cents
+%% int cents = *p_cash_in_cents
 
 %% -- dollar * 100.0;
 
@@ -2640,9 +2612,9 @@ std::cout << "val of x = " << x << '\n'
 
 %% << cents << '\n';
 
-%% \}
+%% }
 
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% 2. A pointer can be a constant pointer or non-constant pointer:
 
@@ -2660,7 +2632,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% p = \&y; *p++; // increments y
 
-%% p = \&z; *p++; // increments z\strut
+%% p = \&z; *p++; // increments z
 %% \end{consolethree}
 %% \begin{consolethree}[escapeinside=||]
 
@@ -2668,7 +2640,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% int \& r = x; r++; // increments x
 
-%% r = y; r++; // increments y ... NO!!!\strut
+%% r = y; r++; // increments y ... NO!!!
 %% \end{consolethree}
 %% The fact that a pointer can point to different values is actually
 %% extremely important later when it comes to pointers and arrays.
@@ -2687,15 +2659,15 @@ std::cout << "val of x = " << x << '\n'
 
 %% int max(int x, int y)
 
-%% \{
+%% {
 
 %% return (x \textgreater{} y ? x : y);
 
-%% \}\\
+%% }\\
 
 %% int main()
 
-%% \{
+%% {
 
 %% int a;
 
@@ -2711,7 +2683,7 @@ std::cout << "val of x = " << x << '\n'
 %% '\n';
 
 %% return 0;\\
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% No big deal.
 
@@ -2723,28 +2695,28 @@ std::cout << "val of x = " << x << '\n'
 
 %% int * max(int * x, int * y)
 
-%% \{
+%% {
 
 %% if (*x \textgreater{} *y)
 
-%% \{
+%% {
 
 %% return x;
 
-%% \}
+%% }
 
 %% else
 
-%% \{
+%% {
 
 %% return y;
 
-%% \}\\
-%% \}\\
+%% }\\
+%% }\\
 
 %% int main()
 
-%% \{
+%% {
 
 %% int a;
 
@@ -2764,23 +2736,23 @@ std::cout << "val of x = " << x << '\n'
 %% << '\n';
 
 %% return 0;\\
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% It's helpful if you draw a picture of the computation and explain what's
 %% happening. Don't panic \ldots{} just draw the picture and explain slowly
 %% and carefully.
 
-%% You can clean up the \emph{max()} function above like this:
+%% You can clean up the \texttt{max()} function above like this:
 
 %% \begin{consolethree}[escapeinside=||]
 
 %% int * max(int * x, int * y)
 
-%% \{
+%% {
 
 %% return (*x \textgreater{} *y ? x : y);
 
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% This is what's going on in the program: instead of computing and
 %% returning the maximum of two values, the function actually returns a
@@ -2800,15 +2772,15 @@ std::cout << "val of x = " << x << '\n'
 
 %% const int * const y)
 
-%% \{
+%% {
 
 %% return (*x \textgreater{} *y ? x : y);
 
-%% \}\\
+%% }\\
 
 %% int main()
 
-%% \{
+%% {
 
 %% int a;
 
@@ -2828,7 +2800,7 @@ std::cout << "val of x = " << x << '\n'
 %% << '\n';
 
 %% return 0;\\
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% or this:
 
@@ -2840,15 +2812,15 @@ std::cout << "val of x = " << x << '\n'
 
 %% const int * const y)
 
-%% \{
+%% {
 
 %% return (*x \textgreater{} *y ? x : y);
 
-%% \}\\
+%% }\\
 
 %% int main()
 
-%% \{
+%% {
 
 %% int a;
 
@@ -2868,7 +2840,7 @@ std::cout << "val of x = " << x << '\n'
 %% '\n';
 
 %% return 0;\\
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% Note that you can also do this using references. Study the following
 %% program carefully:
@@ -2879,15 +2851,15 @@ std::cout << "val of x = " << x << '\n'
 
 %% const int \& max(const int \& x, const int \& y)
 
-%% \{
+%% {
 
 %% return (x \textgreater{} y ? x : y);
 
-%% \}\\
+%% }\\
 
 %% int main()
 
-%% \{
+%% {
 
 %% int a;
 
@@ -2909,7 +2881,7 @@ std::cout << "val of x = " << x << '\n'
 %% << '\n';
 
 %% return 0;\\
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% Now why would you want to pass in and return a pointer (or references)
 %% to one of the variables that contains the maximum value and not compute
@@ -2930,23 +2902,23 @@ std::cout << "val of x = " << x << '\n'
 
 %% And what if the two values I'm computing with actually takes more bytes?
 %% Then the difference is even greater. For instance in C++, there's a
-%% \emph{long double} type. On my computer, the \emph{long double} occupies
+%% \texttt{long double} type. On my computer, the \texttt{long double} occupies
 %% 12 bytes. So for the method that returns the maximum value, I have to
 
 %% \begin{itemize}
-%% \tightlist
+%% 
 %% \item
-%%   copy two \emph{long double}s values (24 bytes) onto the stack
+%%   copy two \texttt{long double}s values (24 bytes) onto the stack
 %% \item
-%%   compute and return a \emph{long double} (12 bytes)
+%%   compute and return a \texttt{long double} (12 bytes)
 %% \end{itemize}
 
 %% For the pointer method that returns an address, I have to
 
 %% \begin{itemize}
-%% \tightlist
+%% 
 %% \item
-%%   copy two addresses (8 bytes) of \emph{long double} variables onto the
+%%   copy two addresses (8 bytes) of \texttt{long double} variables onto the
 %%   stack
 %% \item
 %%   compute the address (4 bytes) for returning.
@@ -2964,7 +2936,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% int * max(int * x, int * y)
 
-%% \{
+%% {
 
 %% int q;
 
@@ -2972,7 +2944,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% return \&q;
 
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% What's the problem? (Draw a picture!!!) There's an analogous one using
 %% references:
@@ -2981,7 +2953,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% int \& max(int x, int y)
 
-%% \{
+%% {
 
 %% int q;
 
@@ -2989,7 +2961,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% return q;
 
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% Here's a general principle: \textbf{Never return a pointer that points
 %% to a local variable in a function!!!} Because the pointer will point to
@@ -3009,15 +2981,15 @@ std::cout << "val of x = " << x << '\n'
 
 %% int f(long long int x, long double y)
 
-%% \{
+%% {
 
 %% return (x \textgreater{} y ? 0 : 1);
 
-%% \}
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% long long int x = 42;
 
@@ -3026,7 +2998,7 @@ std::cout << "val of x = " << x << '\n'
 %% int x = f(x, y);
 
 %% return 0;\\
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% Then the act of making a function call is faster if you pass in pointers
 %% (or references) because the data to be passed in is not copied, only the
@@ -3036,15 +3008,15 @@ std::cout << "val of x = " << x << '\n'
 
 %% int f(long long int \& px, long double \& py)
 
-%% \{
+%% {
 
 %% return (*px \textgreater{} *py ? 0 : 1);
 
-%% \}
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% long long int x = 42;
 
@@ -3053,18 +3025,18 @@ std::cout << "val of x = " << x << '\n'
 %% f(\&x, \&y);
 
 %% return 0;\\
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% Note that the larger the data, the more crucial it is to use pointers or
 %% references.
 
-%% If \emph{f()} is meant to change the \emph{x} and y back in
-%% \emph{main()}, then of course you must pass in pointers or references.
+%% If \texttt{f()} is meant to change the \texttt{x} and y back in
+%% \texttt{main()}, then of course you must pass in pointers or references.
 
-%% However if \emph{f()} is not meant to change \emph{x} and \emph{y} back
-%% in \emph{main()}, then passing pointers (or references) into \emph{f()}
-%% can be dangerous since f() can potentially change the \emph{x} and
-%% \emph{y} in \emph{main()}. To overcome this, you pass in
+%% However if \texttt{f()} is not meant to change \texttt{x} and \texttt{y} back
+%% in \texttt{main()}, then passing pointers (or references) into \texttt{f()}
+%% can be dangerous since f() can potentially change the \texttt{x} and
+%% \texttt{y} in \texttt{main()}. To overcome this, you pass in
 %% pointer-to-constants (or constant reference):
 
 %% \begin{consolethree}[escapeinside=||]
@@ -3073,11 +3045,11 @@ std::cout << "val of x = " << x << '\n'
 
 %% const long double * py)
 
-%% \{
+%% {
 
 %% return (*px \textgreater{} *py ? 0 : 1);
 
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% or
 
@@ -3087,106 +3059,106 @@ std::cout << "val of x = " << x << '\n'
 
 %% const long double \& y)
 
-%% \{
+%% {
 
 %% return (x \textgreater{} y ? 0 : 1);
 
-%% \}\strut
+%% }
 %% \end{consolethree}
-%% In general do the following for a function call \emph{f(..., x, ...)}
-%% (say from\emph{ main()}) where \emph{x} has type \emph{T}:
+%% In general do the following for a function call \texttt{f(..., x, ...)}
+%% (say from\texttt{ main()}) where \texttt{x} has type \texttt{T}:
 
 %% \begin{consolethree}[escapeinside=||]
 
 %% void f(..., T x, ...)
 
-%% \{
+%% {
 
 %% ... x ...
 
-%% \}
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% T x;
 
 %% f(..., x, ...);\\
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% Do the following:
 
-%% \textbf{CASE 1.} If \emph{f()} needs to change the \emph{x} in
-%% \emph{main()}, then parameter \emph{x} needs to be a reference
+%% \textbf{CASE 1.} If \texttt{f()} needs to change the \texttt{x} in
+%% \texttt{main()}, then parameter \texttt{x} needs to be a reference
 %% \textbf{(pass-by-reference)}:
 
 %% \begin{consolethree}[escapeinside=||]
 
 %% void f(..., T \& x, ...)
 
-%% \{
+%% {
 
 %% ... x ...
 
-%% \}
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% T x;
 
 %% f(..., x, ...);\\
-%% \}\strut
+%% }
 %% \end{consolethree}
-%% or parameter \emph{x} should be changed to a pointer
+%% or parameter \texttt{x} should be changed to a pointer
 
 %% \begin{consolethree}[escapeinside=||]
 
 %% void f(..., T * x, ...)
 
-%% \{
+%% {
 
 %% ... *x ...
 
-%% \}
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% T x;
 
 %% f(..., \&x, ...);\\
-%% \}\strut
+%% }
 %% \end{consolethree}
-%% \textbf{CASE 2A.} If \emph{f()} does not need to change the \emph{x} in
-%% \emph{main()}, and \emph{x} in \emph{main()} does not use much memory,
+%% \textbf{CASE 2A.} If \texttt{f()} does not need to change the \texttt{x} in
+%% \texttt{main()}, and \texttt{x} in \texttt{main()} does not use much memory,
 %% NO CHANGE IN ABOVE.
 
-%% \textbf{CASE 2B.} If \emph{f()} does not need to change the \emph{x} in
-%% \emph{main()}, and \emph{x} in \emph{main()} uses a lot of memory, then
-%% parameter \emph{x} need to be a pointer to a constant:
+%% \textbf{CASE 2B.} If \texttt{f()} does not need to change the \texttt{x} in
+%% \texttt{main()}, and \texttt{x} in \texttt{main()} uses a lot of memory, then
+%% parameter \texttt{x} need to be a pointer to a constant:
 
 %% \begin{consolethree}[escapeinside=||]
 
 %% void f(..., const T * const x, ...)
 
-%% \{
+%% {
 
 %% ... *x ...
 
-%% \}
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% T x;
 
 %% f(..., \&x, ...);\\
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% Or you can use a constant reference:
 %% \textbf{(pass-by-constant-reference)}
@@ -3195,20 +3167,20 @@ std::cout << "val of x = " << x << '\n'
 
 %% void f(..., const T \& x, ...)
 
-%% \{
+%% {
 
 %% ... x ...
 
-%% \}
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% T x;
 
 %% f(..., x, ...);\\
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% Chaining
 
@@ -3218,15 +3190,15 @@ std::cout << "val of x = " << x << '\n'
 
 %% void inc(int * p)
 
-%% \{
+%% {
 
 %% *\textbf{p = *p + 1; // OR: ++(*p)}
 
-%% \}
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% int x = 0;
 
@@ -3235,7 +3207,7 @@ std::cout << "val of x = " << x << '\n'
 %% std::cout << x << std::endl;
 
 %% return 0;\\
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% Now look at this version:
 
@@ -3243,17 +3215,17 @@ std::cout << "val of x = " << x << '\n'
 
 %% \textbf{int *} inc(int * p)
 
-%% \{
+%% {
 
 %% *p = *p + 1;
 
 %% \textbf{return p;}
 
-%% \}
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% int x = 0;
 
@@ -3262,7 +3234,7 @@ std::cout << "val of x = " << x << '\n'
 %% std::cout << x << std::endl;
 
 %% return 0;\\
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% Study the above code very carefully!!! (Chaining will be used a lot
 %% later when woirking with classes and objects.)
@@ -3278,17 +3250,17 @@ std::cout << "val of x = " << x << '\n'
 
 %% int * const inc(int * const p)
 
-%% \{
+%% {
 
 %% *p = *p + 1;
 
 %% return p;
 
-%% \}
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% int x = 0;
 
@@ -3297,7 +3269,7 @@ std::cout << "val of x = " << x << '\n'
 %% std::cout << x << std::endl;
 
 %% return 0;\\
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% (i.e., the pointer can be constant.) Study this one that uses
 %% references::
@@ -3306,17 +3278,17 @@ std::cout << "val of x = " << x << '\n'
 
 %% int \& inc(int \& r)
 
-%% \{
+%% {
 
 %% r = r + 1;
 
 %% return r;
 
-%% \}
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% int x = 0;
 
@@ -3325,7 +3297,7 @@ std::cout << "val of x = " << x << '\n'
 %% std::cout << x << std::endl;
 
 %% return 0;\\
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% \textbf{Exercise.} Now's your turn. Write functions that will allow this
 %% to happen:
@@ -3334,17 +3306,17 @@ std::cout << "val of x = " << x << '\n'
 
 %% int prime = 5;
 
-%% nextprime(nextprime(nextprime(\&prime))) // prime = 13\strut
+%% nextprime(nextprime(nextprime(\&prime))) // prime = 13
 %% \end{consolethree}
-%% where \emph{nextprime(p)} will set \emph{*p} to the prime that is
-%% \emph{\textgreater{} *p}. When you're done, do a version that uses
+%% where \texttt{nextprime(p)} will set \texttt{*p} to the prime that is
+%% \texttt{\textgreater{} *p}. When you're done, do a version that uses
 %% pass-by-reference:
 
 %% \begin{consolethree}[escapeinside=||]
 
 %% int prime = 5;
 
-%% nextprime(nextprime(nextprime(prime))) // prime = 13\strut
+%% nextprime(nextprime(nextprime(prime))) // prime = 13
 %% \end{consolethree}
 %% \textbf{Exercise.} How about this one:
 
@@ -3352,21 +3324,21 @@ std::cout << "val of x = " << x << '\n'
 
 %% int index = 0;
 
-%% int x{[}{]} = \{3, 5, 7, 9, 2\};
+%% int x[] = {3, 5, 7, 9, 2};
 
-%% inc(\&index, x); \strut
+%% inc(\&index, x); 
 %% \end{consolethree}
-%% where \emph{inc(\&index, x)} increments \emph{x{[}index{]}} and
-%% increment \emph{index} by 1, and returns \emph{\&index}. To increments
+%% where \texttt{inc(\&index, x)} increments \texttt{x[index]} and
+%% increment \texttt{index} by 1, and returns \texttt{\&index}. To increments
 %% the first three values of the array x, we can do this:
 
 %% \begin{consolethree}[escapeinside=||]
 
 %% int index = 0;
 
-%% int x{[}{]} = \{3, 5, 7, 9, 2);
+%% int x[] = {3, 5, 7, 9, 2);
 
-%% inc(inc(inc(\&index, x), x), x); \strut
+%% inc(inc(inc(\&index, x), x), x); 
 %% \end{consolethree}
 %% Pointer Power \#3: Dynamic memory management
 
@@ -3381,10 +3353,10 @@ std::cout << "val of x = " << x << '\n'
 
 %% int x = 1;
 
-%% int * p = \&x;\strut
+%% int * p = \&x;
 %% \end{consolethree}
-%% we always declare another variable for \emph{p} to point to. You can
-%% also point \emph{p} to an integer value which is \textbf{not} associated
+%% we always declare another variable for \texttt{p} to point to. You can
+%% also point \texttt{p} to an integer value which is \textbf{not} associated
 %% to an integer variable.
 
 %% Try this:
@@ -3397,7 +3369,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% *p = 42;
 
-%% std::cout << *p << std::endl;\strut
+%% std::cout << *p << std::endl;
 %% \end{consolethree}
 %% or
 
@@ -3407,26 +3379,26 @@ std::cout << "val of x = " << x << '\n'
 
 %% *p = 42
 
-%% std::cout << *p << std::endl;\strut
+%% std::cout << *p << std::endl;
 %% \end{consolethree}
 %% You should think of
 
 %% p = new int;
 
-%% as creating an \emph{int} value \emph{\textbf{somewhere} }in the
+%% as creating an \texttt{int} value \texttt{\textbf{somewhere} }in the
 %% computer's memory and giving the memory address of this value to
-%% \emph{p}. We say that we are \textbf{allocating memory} for \emph{p} (to
-%% point to). The integer value created is \emph{\textbf{not}} associated
+%% \texttt{p}. We say that we are \textbf{allocating memory} for \texttt{p} (to
+%% point to). The integer value created is \texttt{\textbf{not}} associated
 %% with an integer variable -- there's no integer variable name involved:
 
 %% Look at the picture: It's REALLY important to understand that
 
 %% \begin{itemize}
-%% \tightlist
+%% 
 %% \item
-%%   pointer \emph{p} consumes memory and
+%%   pointer \texttt{p} consumes memory and
 %% \item
-%%   the value \emph{p} points to also consumes memory.
+%%   the value \texttt{p} points to also consumes memory.
 %% \end{itemize}
 
 %% Make sure you see the difference between the two. Not distinguishing the
@@ -3448,15 +3420,15 @@ std::cout << "val of x = " << x << '\n'
 %% *x = *x + *y;
 
 %% std::cout << *x << ' '
-%% << *y << '\n';\strut
+%% << *y << '\n';
 %% \end{consolethree}
-%% In general you can \emph{new} any type: you can \emph{new} a
-%% \emph{double}, a \emph{char}, a \emph{bool}, etc.
+%% In general you can \texttt{new} any type: you can \texttt{new} a
+%% \texttt{double}, a \texttt{char}, a \texttt{bool}, etc.
 
-%% Remember \emph{NULL}? If you have declared a pointer \emph{p}, but you
-%% have not allocated memory for \emph{p}, then \emph{*p} of course should
-%% not be used. And one way to remind yourself that \emph{p} has not been
-%% allocated is to initialize it to \emph{NULL:}
+%% Remember \texttt{NULL}? If you have declared a pointer \texttt{p}, but you
+%% have not allocated memory for \texttt{p}, then \texttt{*p} of course should
+%% not be used. And one way to remind yourself that \texttt{p} has not been
+%% allocated is to initialize it to \texttt{NULL:}
 
 %% \begin{consolethree}[escapeinside=||]
 
@@ -3468,13 +3440,13 @@ std::cout << "val of x = " << x << '\n'
 
 %% if (p == NULL)
 
-%% \{
+%% {
 
 %% p = new int;
 
-%% \}
+%% }
 
-%% // Now use *p\strut
+%% // Now use *p
 %% \end{consolethree}
 %% Exercise. What is the output of this program?
 
@@ -3490,13 +3462,13 @@ std::cout << "val of x = " << x << '\n'
 
 %% for (int i = 0; i <= *y; i++)
 
-%% \{
+%% {
 
 %% *x *= 2;\\
-%% \}
+%% }
 
 %% std::cout << *x <<
-%% '\n';\strut
+%% '\n';
 %% \end{consolethree}
 %% Exercise. What's the problem here?
 
@@ -3507,7 +3479,7 @@ std::cout << "val of x = " << x << '\n'
 %% *x = 42;
 
 %% std::cout << *x <<
-%% '\n';\strut
+%% '\n';
 %% \end{consolethree}
 %% For
 
@@ -3515,9 +3487,9 @@ std::cout << "val of x = " << x << '\n'
 
 %% int * p = new int;
 
-%% *p = 42;\strut
+%% *p = 42;
 %% \end{consolethree}
-%% \emph{\textbf{where}} is this int value that \emph{p} points to???
+%% \texttt{\textbf{where}} is this int value that \texttt{p} points to???
 
 %% The free store or memory heap
 
@@ -3525,7 +3497,7 @@ std::cout << "val of x = " << x << '\n'
 %% behavior:
 
 %% \begin{itemize}
-%% \tightlist
+%% 
 %% \item
 %%   When you declare it in a block, the variable is created, the memory
 %%   for the value is also created, and you have access to its name.
@@ -3545,17 +3517,17 @@ std::cout << "val of x = " << x << '\n'
 
 %% if (i \textgreater{} 0)
 
-%% \{
+%% {
 
 %% int x = 42;
 
 %% ...
 
-%% \} // x dies when x goes out of scope. The memory
+%% } // x dies when x goes out of scope. The memory
 
 %% // used by x is reclaimed automatically by the
 
-%% // the program.\strut
+%% // the program.
 %% \end{consolethree}
 %% You can actually do this:
 
@@ -3569,65 +3541,65 @@ std::cout << "val of x = " << x << '\n'
 %% When you allocate memory for pointers, the values they point to are
 %% different. For instance you have already seen that
 
-%% \emph{int * p = new int;}
+%% \texttt{int * p = new int;}
 
-%% creates an \emph{int} value for \emph{p} to point to. Note that
+%% creates an \texttt{int} value for \texttt{p} to point to. Note that
 
 %% \begin{itemize}
-%% \tightlist
+%% 
 %% \item
-%%   \textbf{the value of }\emph{\textbf{p}}\textbf{ (an address) is still
+%%   \textbf{the value of }\texttt{\textbf{p}}\textbf{ (an address) is still
 %%   automatic ... but }
 %% \item
-%%   \textbf{the value }\emph{\textbf{p}}\textbf{ points to (an
-%%   }\emph{\textbf{int}}\textbf{) is not automatic}.
+%%   \textbf{the value }\texttt{\textbf{p}}\textbf{ points to (an
+%%   }\texttt{\textbf{int}}\textbf{) is not automatic}.
 %% \end{itemize}
 
 %% \begin{consolethree}[escapeinside=||]
 
 %% if (i \textgreater{} 0)
 
-%% \{
+%% {
 
 %% int * p = new int;
 
 %% ...
 
-%% \} // p dies when p goes out of scope. The memory
+%% } // p dies when p goes out of scope. The memory
 
 %% // used by p is reclaimed automatically by the
 
 %% // program. BUT the value p was pointing to is not
 
-%% // reclaimed!!! \strut
+%% // reclaimed!!! 
 %% \end{consolethree}
 %% This is \textbf{extremely important!!!}
 
 %% This means that: When you leave the block where you declare a pointer
-%% variable \emph{p} and called \emph{new},
+%% variable \texttt{p} and called \texttt{new},
 
 %% \begin{itemize}
-%% \tightlist
+%% 
 %% \item
-%%   Since \emph{p} is automatic: the pointer \emph{p} is destroyed and the
-%%   memory used for the address in \emph{p} reclaimed, but
+%%   Since \texttt{p} is automatic: the pointer \texttt{p} is destroyed and the
+%%   memory used for the address in \texttt{p} reclaimed, but
 %% \item
-%%   Since *\emph{p} is not automatic: the memory that \emph{p} points to
+%%   Since *\texttt{p} is not automatic: the memory that \texttt{p} points to
 %%   is not reclaimed by the computer. We'll talk about how to reclaim the
 %%   memory later.
 %% \end{itemize}
 
-%% But anyway where exactly is the memory \emph{p} points to? It's an an
+%% But anyway where exactly is the memory \texttt{p} points to? It's an an
 %% area called the \textbf{free store}, also called the \textbf{memory
-%% heap}. You basically request for memory space using the \emph{new}
+%% heap}. You basically request for memory space using the \texttt{new}
 %% command.
 
 %% So our computational model now has the following pieces:
 
 %% The free store will \textbf{keep track of which part of its memory is
-%% already in use} via \emph{new}. A piece of memory allocated to a pointer
+%% already in use} via \texttt{new}. A piece of memory allocated to a pointer
 %% variable will be marked as used. That way, \textbf{two calls to
-%% }\emph{\textbf{new}}\textbf{ will not give two pointers the same piece
+%% }\texttt{\textbf{new}}\textbf{ will not give two pointers the same piece
 %% of memory}.
 
 %% char * p = new char;
@@ -3638,25 +3610,25 @@ std::cout << "val of x = " << x << '\n'
 
 %% Memory Leaks
 
-%% I already said that memory allocated via \emph{new} is \textbf{not}
+%% I already said that memory allocated via \texttt{new} is \textbf{not}
 %% released back to the free store automatically. \textbf{This is a very
 %% important point!!!}
 
-%% What will happen after calling the following \emph{f} five times?
+%% What will happen after calling the following \texttt{f} five times?
 
 %% \begin{consolethree}[escapeinside=||]
 
 %% void f()
 
-%% \{
+%% {
 
 %% int * p = new int;
 
-%% \}
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% ...
 
@@ -3664,7 +3636,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% ...
 
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% After some time \ldots{}
 
@@ -3681,32 +3653,32 @@ std::cout << "val of x = " << x << '\n'
 
 %% int main()
 
-%% \{\\
+%% {\\
 %% while (1)
 
-%% \{
+%% {
 
 %% int * p = new int;
 
-%% \}
+%% }
 
 %% return 0;
 
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% What will happen after a couple of minutes? Why?
 
 %% Again \ldots{} memory allocated from the free store is \textbf{not}
 %% automatically reclaimed/released when you exit the block where the
-%% memory was allocated. The integer \emph{p} of \emph{f()} is pointing to
+%% memory was allocated. The integer \texttt{p} of \texttt{f()} is pointing to
 %% is not released.
 
 %% What should we do then??? \ldots{}
 
 %% delete
 
-%% After doing a \emph{new}, you can return the memory back to the heap by
-%% doing a \emph{delete}. For instance:
+%% After doing a \texttt{new}, you can return the memory back to the heap by
+%% doing a \texttt{delete}. For instance:
 
 %% \begin{consolethree}[escapeinside=||]
 
@@ -3714,17 +3686,17 @@ std::cout << "val of x = " << x << '\n'
 
 %% // ... do something here with *p ...
 
-%% delete p;\strut
+%% delete p;
 %% \end{consolethree}
-%% After \emph{delete p}, the heap will \textbf{mark the memory that p is
+%% After \texttt{delete p}, the heap will \textbf{mark the memory that p is
 %% pointing to as available} (i.e. not in use). This is called
-%% \textbf{deallocating} the memory that \emph{p} is using or
-%% \textbf{releasing} the memory \emph{p} is using back to the heap.
+%% \textbf{deallocating} the memory that \texttt{p} is using or
+%% \textbf{releasing} the memory \texttt{p} is using back to the heap.
 
 %% Here are some really important points:
 
 %% \begin{itemize}
-%% \tightlist
+%% 
 %% \item
 %%   Delete pointers ASAP when you don't need them anymore.
 %% \item
@@ -3734,13 +3706,13 @@ std::cout << "val of x = " << x << '\n'
 %% \end{itemize}
 
 %% After a pointer is deleted it should not be dereferenced. If you need
-%% memory again, you just do another \emph{new}:
+%% memory again, you just do another \texttt{new}:
 
 %% \begin{consolethree}[escapeinside=||]
 
 %% if (x \textgreater{} 42)
 
-%% \{
+%% {
 
 %% int * p = new int;
 
@@ -3758,12 +3730,12 @@ std::cout << "val of x = " << x << '\n'
 
 %% // DO NOT USE *p HERE
 
-%% \}
+%% }
 
-%% // p is destroyed \strut
+%% // p is destroyed 
 %% \end{consolethree}
-%% Note that when \emph{p} is pointing to memory not in the heap obtained
-%% by \emph{new}, then you do NOT \emph{delete p}. For instance:
+%% Note that when \texttt{p} is pointing to memory not in the heap obtained
+%% by \texttt{new}, then you do NOT \texttt{delete p}. For instance:
 
 %% \begin{consolethree}[escapeinside=||]
 
@@ -3775,15 +3747,15 @@ std::cout << "val of x = " << x << '\n'
 
 %% delete p; // BAD!!!
 
-%% delete q; // OK\strut
+%% delete q; // OK
 %% \end{consolethree}
-%% And of course you do not release if you did not \emph{new} it:
+%% And of course you do not release if you did not \texttt{new} it:
 
 %% \begin{consolethree}[escapeinside=||]
 
 %% double * p;
 
-%% \emph{delete p; // Huh????} \strut
+%% \texttt{delete p; // Huh????} 
 %% \end{consolethree}
 %% Put in a different way: you cannot give a memory back to the heap if you
 %% did not get it from the heap to begin with.
@@ -3814,7 +3786,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% p = new int;
 
-%% // ... now use *p\strut
+%% // ... now use *p
 %% \end{consolethree}
 %% Can you say ``memory leak''?!?! So deallocate ASAP!!! Don't argue!!!
 
@@ -3827,7 +3799,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% int sum(int n)
 
-%% \{
+%% {
 
 %% int s = 0;
 
@@ -3835,25 +3807,25 @@ std::cout << "val of x = " << x << '\n'
 
 %% for (*i = 0; *i <= n; ++(*i))
 
-%% \{
+%% {
 
 %% s += *i;
 
-%% \}
+%% }
 
 %% return s;
 
-%% \}
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% std::cout << sum(10) <<
 %% '\n';
 
 %% return 0;\\
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% \textbf{Exercise. }Fixit time \ldots{} (you are only allowed to delete
 %% one statement.)
@@ -3862,19 +3834,19 @@ std::cout << "val of x = " << x << '\n'
 
 %% \#include < iostream\textgreater{}
 
-%% void average(double x{[}{]})
+%% void average(double x[])
 
-%% \{\\
+%% {\\
 %% double x = 0;
 
 %% double * px = \&x;
 
 %% for (int i = 0; i < 10; ++i)
 
-%% \{
+%% {
 
-%% *px += x{[}i{]};\\
-%% \}
+%% *px += x[i];\\
+%% }
 
 %% x = *px / 10;
 
@@ -3882,20 +3854,20 @@ std::cout << "val of x = " << x << '\n'
 
 %% return x;
 
-%% \}\\
+%% }\\
 
 %% int main()
 
-%% \{
+%% {
 
-%% double x{[}5{]} = \{1.1, 2.1, 2.3, 3.2, 3.4\};
+%% double x[5] = {1.1, 2.1, 2.3, 3.2, 3.4};
 
 %% std::cout << average(x) <<
 %% std::endl;
 
 %% return 0;
 
-%% \emph{\}} \strut
+%% \texttt{}} 
 %% \end{consolethree}
 %% Exercise. The following program prompts the user for two integer values
 %% and then prints the sum. Do NOT use integer or double variables. You can
@@ -3909,7 +3881,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% int main()
 
-%% \{
+%% {
 
 %% int * p;
 
@@ -3936,7 +3908,7 @@ std::cout << "val of x = " << x << '\n'
 %% // deallocate memory used by p
 
 %% return 0;\\
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% Exercise. Write a number guessing game. First generate a random integer
 %% in the range 1..10. Then prompt the user for an integer value. If
@@ -3952,7 +3924,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% int f(int a)
 
-%% \{
+%% {
 
 %% int x = a;
 
@@ -3962,17 +3934,17 @@ std::cout << "val of x = " << x << '\n'
 
 %% return 2 * x;
 
-%% \}
+%% }
 
 %% int g(int a)
 
-%% \{
+%% {
 
 %% int * y = new int;
 
 %% if (a < 0)
 
-%% \{
+%% {
 
 %% int x = f(2 * a);
 
@@ -3984,23 +3956,23 @@ std::cout << "val of x = " << x << '\n'
 
 %% return x;
 
-%% \}
+%% }
 
 %% *y = a + 1;
 
 %% a = 2 * a;
 
 %% return a;\\
-%% \}
+%% }
 
 %% \hspace{0pt}int main()
 
-%% \{
+%% {
 
 %% std::cout << g(42) << std::endl;
 
 %% return 0;\\
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% Exercise. Deallocate memory appropriately.
 
@@ -4008,7 +3980,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% int f(int a)
 
-%% \{
+%% {
 
 %% int x = a;
 
@@ -4018,17 +3990,17 @@ std::cout << "val of x = " << x << '\n'
 
 %% return 2 * x;
 
-%% \}
+%% }
 
 %% int g(int a)
 
-%% \{
+%% {
 
 %% int * y = new int;
 
 %% if (a < 0)
 
-%% \{
+%% {
 
 %% int x = f(2 * a);
 
@@ -4040,28 +4012,28 @@ std::cout << "val of x = " << x << '\n'
 
 %% return x;
 
-%% \}
+%% }
 
 %% *y = a + 1;
 
 %% a = 2 * a;
 
 %% return a;\\
-%% \}
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% std::cout << g(42) << std::endl;
 
 %% return 0;\\
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% Use of NULL for memory management
 
-%% Recall that \emph{NULL} is a predefined constant for 0 (as an address)
-%% and it's used to denote an invalid address. We can use \emph{NULL} to
+%% Recall that \texttt{NULL} is a predefined constant for 0 (as an address)
+%% and it's used to denote an invalid address. We can use \texttt{NULL} to
 %% denote the fact that a pointer has not been allocated.
 
 %% Look at this:
@@ -4088,11 +4060,11 @@ std::cout << "val of x = " << x << '\n'
 
 %% p = NULL;
 
-%% ...\strut
+%% ...
 %% \end{consolethree}
-%% If you always set your pointer \emph{p} to \emph{NULL} when memory is
-%% not allocated for \emph{p} to point to, then you can always check your
-%% pointer against \emph{NULL} like this:
+%% If you always set your pointer \texttt{p} to \texttt{NULL} when memory is
+%% not allocated for \texttt{p} to point to, then you can always check your
+%% pointer against \texttt{NULL} like this:
 
 %% \begin{consolethree}[escapeinside=||]
 
@@ -4102,11 +4074,11 @@ std::cout << "val of x = " << x << '\n'
 
 %% if (p == NULL)
 
-%% \{
+%% {
 
 %% p = new int;
 
-%% \}
+%% }
 
 %% // use *p ...
 
@@ -4118,11 +4090,11 @@ std::cout << "val of x = " << x << '\n'
 
 %% if (p == NULL)
 
-%% \{
+%% {
 
 %% p = new int;
 
-%% \}
+%% }
 
 %% // use *p ...
 
@@ -4130,11 +4102,11 @@ std::cout << "val of x = " << x << '\n'
 
 %% p = NULL;
 
-%% ...\strut
+%% ...
 %% \end{consolethree}
 %% Why use the free store?
 
-%% You might ask \ldots{} why bother requesting for an \emph{int} inside
+%% You might ask \ldots{} why bother requesting for an \texttt{int} inside
 %% the free store?
 
 %% \begin{consolethree}[escapeinside=||]
@@ -4143,32 +4115,32 @@ std::cout << "val of x = " << x << '\n'
 
 %% // ... now use *p
 
-%% delete p;\strut
+%% delete p;
 %% \end{consolethree}
-%% That's so much trouble \ldots{} why not just create a plain \emph{int}
+%% That's so much trouble \ldots{} why not just create a plain \texttt{int}
 %% variable:
 
 %% \begin{consolethree}[escapeinside=||]
 
 %% int x;
 
-%% // ... now use x\strut
+%% // ... now use x
 %% \end{consolethree}
 %% That is true!
 
 %% Actually the notes from the previous section is just to show you how to
 %% use the memory heap. In most cases, you use the heap by requesting for a
-%% \emph{\textbf{very huge}} chunk of memory from the free store and not
-%% for a single \emph{int}. In other words, dynamic memory management is
+%% \texttt{\textbf{very huge}} chunk of memory from the free store and not
+%% for a single \texttt{int}. In other words, dynamic memory management is
 %% useful only for large memory usage. As an example, consider the
 %% following scenario:
 
-%% Suppose you have some type \emph{T} that requires a huge amount of
-%% memory. Say a variable of type \emph{T} is some kind of an image for a
-%% game and a variable of type \emph{T} holds one megabytes of pixel data.
+%% Suppose you have some type \texttt{T} that requires a huge amount of
+%% memory. Say a variable of type \texttt{T} is some kind of an image for a
+%% game and a variable of type \texttt{T} holds one megabytes of pixel data.
 %% Maybe you need 3 such variables:
 
-%% \emph{T bigvar0, bigvar1, bigvar2;}
+%% \texttt{T bigvar0, bigvar1, bigvar2;}
 
 %% In this case all these 3 huge variables will consume 3 MB of memory.
 
@@ -4184,7 +4156,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% // use bigvar1 and bigvar2 for 10 min
 
-%% // use bigvar0 for 10 min \strut
+%% // use bigvar0 for 10 min 
 %% \end{consolethree}
 %% Then you might want to do this instead:
 
@@ -4214,7 +4186,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% // use bigvar0 for 10 min
 
-%% delete bigvar0; // 0 MB used\strut
+%% delete bigvar0; // 0 MB used
 %% \end{consolethree}
 %% This means that you actually only need about 2 MB of memory at any point
 %% in time while running the program, not 3 MB.
@@ -4223,10 +4195,10 @@ std::cout << "val of x = " << x << '\n'
 
 %% Later I'll talk about requesting not just memory for a value, but a
 %% whole array of values. When the array size is huge, this will take up a
-%% lot or memory even if each value in the array is only an \emph{int}. For
+%% lot or memory even if each value in the array is only an \texttt{int}. For
 %% instance:
 
-%% \emph{int x{[}1000000{]};}
+%% \texttt{int x[1000000];}
 
 %% takes up 4 x 1,000,000 = 4,000,000 bytes. Dynamic memory management is
 %% also important when it comes to managing objects (see CISS245, CISS350)
@@ -4234,7 +4206,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% Pointer to Pointer to Pointer to \ldots{}
 
-%% Now take a \emph{\textbf{deep}} breath \ldots{}
+%% Now take a \texttt{\textbf{deep}} breath \ldots{}
 
 %% Look at this:
 
@@ -4242,15 +4214,15 @@ std::cout << "val of x = " << x << '\n'
 
 %% int x = 42;
 
-%% int * p = \&x;\strut
+%% int * p = \&x;
 %% \end{consolethree}
 %% Here's the memory model:
 
-%% So \emph{p} has the memory address of some value (in this case an
-%% \emph{int} value). But wait a minute\ldots{} memory address are also
-%% values \ldots{} so the value of \emph{p} is also somewhere in memory
+%% So \texttt{p} has the memory address of some value (in this case an
+%% \texttt{int} value). But wait a minute\ldots{} memory address are also
+%% values \ldots{} so the value of \texttt{p} is also somewhere in memory
 %% too. For instance suppose the address of the value of x is 124500 and
-%% that value is stored in \emph{p} and the value of \emph{p} is stored in
+%% that value is stored in \texttt{p} and the value of \texttt{p} is stored in
 %% 124504:
 
 %% Since 124504 is also an address, surely you can store 124504 into a
@@ -4262,29 +4234,29 @@ std::cout << "val of x = " << x << '\n'
 
 %% int * p = \&x;
 
-%% int ** q = \&p;\strut
+%% int ** q = \&p;
 %% \end{consolethree}
-%% While we say the type of \emph{p} is ``pointer to \emph{int}'', for
-%% \emph{q} we say the type is ``pointer to pointer to \emph{int}''.
-%% Suppose the address of the value of \emph{q} is 124508. Here's the
+%% While we say the type of \texttt{p} is ``pointer to \texttt{int}'', for
+%% \texttt{q} we say the type is ``pointer to pointer to \texttt{int}''.
+%% Suppose the address of the value of \texttt{q} is 124508. Here's the
 %% memory model
 
 %% And here's the simplified picture:
 
-%% Now think about this: What is \emph{*q}? Using \emph{*p} as a guide,
+%% Now think about this: What is \texttt{*q}? Using \texttt{*p} as a guide,
 
 %% \begin{itemize}
-%% \tightlist
+%% 
 %% \item
-%%   \emph{p} points to \emph{x} therefore \emph{*p} is the value of
-%%   \emph{x}, i.e., \emph{*p is }42,
+%%   \texttt{p} points to \texttt{x} therefore \texttt{*p} is the value of
+%%   \texttt{x}, i.e., \texttt{*p is }42,
 %% \item
-%%   \emph{q} points to \emph{p} therefore \emph{*q} is the value of
-%%   \emph{p}
+%%   \texttt{q} points to \texttt{p} therefore \texttt{*q} is the value of
+%%   \texttt{p}
 %% \end{itemize}
 
-%% So \emph{*q} must be the memory address value stored in pointer variable
-%% \emph{p}.
+%% So \texttt{*q} must be the memory address value stored in pointer variable
+%% \texttt{p}.
 
 %% \begin{consolethree}[escapeinside=||]
 
@@ -4298,19 +4270,19 @@ std::cout << "val of x = " << x << '\n'
 %% << *p << '\n';
 
 %% std::cout << p << ' '
-%% << *q << '\n';\strut
+%% << *q << '\n';
 %% \end{consolethree}
-%% But wait ... since \emph{p} is \emph{*q}, you can dereference \emph{p
+%% But wait ... since \texttt{p} is \texttt{*q}, you can dereference \texttt{p
 %% \ldots{} so you should be able to dereference *q and get \ldots{}
 %% }right?\textbf{ }
 
 %% \begin{itemize}
-%% \tightlist
+%% 
 %% \item
-%%   \emph{p} points to \emph{x} therefore \emph{*p} is \emph{x}
+%%   \texttt{p} points to \texttt{x} therefore \texttt{*p} is \texttt{x}
 %% \item
-%%   \emph{q} points to \emph{p} therefore \emph{*q} is \emph{p and **q} is
-%%   \emph{*p} which is \emph{x}
+%%   \texttt{q} points to \texttt{p} therefore \texttt{*q} is \texttt{p and **q} is
+%%   \texttt{*p} which is \texttt{x}
 %% \end{itemize}
 
 %% \begin{consolethree}[escapeinside=||]
@@ -4329,39 +4301,39 @@ std::cout << "val of x = " << x << '\n'
 
 %% std::cout << x << ' '
 %% << *p << ' ' <<
-%% **q << '\n';\strut
+%% **q << '\n';
 %% \end{consolethree}
-%% Thinking of the dereferencing operator \emph{*} as ``follow the arrow
-%% and go into a box'', you can think of \emph{**} as following
+%% Thinking of the dereferencing operator \texttt{*} as ``follow the arrow
+%% and go into a box'', you can think of \texttt{**} as following
 %% \textbf{two} arrows and peek into the box you arrive at.
 
 %% Correct?
 
 %% To understand the above better, you can go all the way into the actual
-%% memory. For instance suppose the value of \emph{x} lives at address
-%% 124500. Remember that an \emph{int} occupies 4 bytes (for 32 bit
+%% memory. For instance suppose the value of \texttt{x} lives at address
+%% 124500. Remember that an \texttt{int} occupies 4 bytes (for 32 bit
 %% machines). And in the computer's memory, the 42 is stored as a bunch of
 %% 0s and 1s. But for simplicity, let's just ignore the 0s and 1s of 42 and
 %% conceptually put 42 into the memory:
 
-%% I'm putting \emph{x} next to 124500 just to remind us that the address
-%% of \emph{x} is 124500. Next, \emph{p} has the address of \emph{x}.
+%% I'm putting \texttt{x} next to 124500 just to remind us that the address
+%% of \texttt{x} is 124500. Next, \texttt{p} has the address of \texttt{x}.
 %% Memory address also takes up 4 bytes (again assuming we're using a
-%% 32-bit machines). Suppose the address of the value of \emph{p} 124504:
+%% 32-bit machines). Suppose the address of the value of \texttt{p} 124504:
 
-%% Now it becomes really clear that even \emph{p} has an address: the value
-%% of \emph{p} (which is a memory address value) sits at address 124504,
-%% i.e., \emph{\&p} is 124504. Right? Suppose the address of the value of
-%% \emph{q}, is 124508. The memory looks like this;
+%% Now it becomes really clear that even \texttt{p} has an address: the value
+%% of \texttt{p} (which is a memory address value) sits at address 124504,
+%% i.e., \texttt{\&p} is 124504. Right? Suppose the address of the value of
+%% \texttt{q}, is 124508. The memory looks like this;
 
 %% Get it? Make sure you see that
 
 %% \begin{itemize}
-%% \tightlist
+%% 
 %% \item
-%%   \emph{\&p} is 124504, \emph{p} is 124500, \emph{*p} is 42
+%%   \texttt{\&p} is 124504, \texttt{p} is 124500, \texttt{*p} is 42
 %% \item
-%%   \emph{\&q} is 124508, \emph{q} is 124504, \emph{*q} is 124500
+%%   \texttt{\&q} is 124508, \texttt{q} is 124504, \texttt{*q} is 124500
 %% \end{itemize}
 
 %% You see that in some sense knowing low level details actually helps you
@@ -4369,7 +4341,7 @@ std::cout << "val of x = " << x << '\n'
 %% to pointer very easily. (Or even pointer to pointer to pointer to
 %% pointer!)
 
-%% Of course the three type \emph{int}, \emph{int*}, \emph{int**} are
+%% Of course the three type \texttt{int}, \texttt{int*}, \texttt{int**} are
 %% different and obviously you should not assign them to each other (with
 %% the exception of 0 which can be assigned to any pointer). So the
 %% following is WRONG:
@@ -4382,18 +4354,18 @@ std::cout << "val of x = " << x << '\n'
 
 %% int ** z = x; // HORRORS ... giving int to int**
 
-%% z = y; // UNSPEAKABLE ... giving int* to int** \strut
+%% z = y; // UNSPEAKABLE ... giving int* to int** 
 %% \end{consolethree}
-%% \textbf{Exercise.} What is the type of \emph{p}?
+%% \textbf{Exercise.} What is the type of \texttt{p}?
 
-%% Write a statement that adds \emph{0.5} to the \emph{3.14} value in the
-%% picture using only \emph{p}.
+%% Write a statement that adds \texttt{0.5} to the \texttt{3.14} value in the
+%% picture using only \texttt{p}.
 
 %% \textbf{Exercise.} At one point in the execution of a program, you have
 %% the following memory model:
 
-%% Write one statement that will change the value of \emph{**p} by
-%% incrementing it with the value of \emph{**q}. Use \emph{p} and \emph{q}
+%% Write one statement that will change the value of \texttt{**p} by
+%% incrementing it with the value of \texttt{**q}. Use \texttt{p} and \texttt{q}
 %% and not hard-coded constants.
 
 %% \textbf{Exercise.} At one point in the execution of a program, you have
@@ -4431,7 +4403,7 @@ std::cout << "val of x = " << x << '\n'
 %% int ** q = \&p;
 
 %% std::cout << *p << ' '
-%% << **q << '\n'; \strut
+%% << **q << '\n'; 
 %% \end{consolethree}
 %% (Hint: Draw!!!)
 
@@ -4449,7 +4421,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% std::cout << *p << ' '
 %% << **q << ' ' <<
-%% ***r << '\n'; \strut
+%% ***r << '\n'; 
 %% \end{consolethree}
 %% \textbf{Exercise.} What is the output? (Or is it an error?)
 
@@ -4467,7 +4439,7 @@ std::cout << "val of x = " << x << '\n'
 
 %% std::cout << *p << ' '
 %% << **q << ' ' <<
-%% ***r << '\n'; \strut
+%% ***r << '\n'; 
 %% \end{consolethree}
 %% \textbf{Exercise.} What is the output? (Or is it an error?)
 
@@ -4480,7 +4452,7 @@ std::cout << "val of x = " << x << '\n'
 %% int * q = *\&p;
 
 %% std::cout << *p << ' '
-%% << *q << '\n'; \strut
+%% << *q << '\n'; 
 %% \end{consolethree}
 %% \textbf{Exercise.} What is the output? (Or is it an error?)
 
@@ -4493,7 +4465,7 @@ std::cout << "val of x = " << x << '\n'
 %% int *** q = \&\&p;
 
 %% std::cout << *p << ' '
-%% << *q << '\n'; \strut
+%% << *q << '\n'; 
 %% \end{consolethree}
 %% \textbf{Exercise.} What is the output? (Or is it an error?)
 
@@ -4506,7 +4478,7 @@ std::cout << "val of x = " << x << '\n'
 %% int * q = \&(*p);
 
 %% std::cout << *p << ' '
-%% << *q << '\n'; \strut
+%% << *q << '\n'; 
 %% \end{consolethree}
 %% Functions that change pointer values
 
@@ -4520,35 +4492,35 @@ std::cout << "val of x = " << x << '\n'
 
 %% // void inc(int x)
 
-%% // \{
+%% // {
 
 %% // x++;\\
-%% // \}
+%% // }
 
 %% void inc(int * x) // or ``int * const x''
 
-%% \{
+%% {
 
 %% (*x)++;\\
-%% \}
+%% }
 
 %% void inc(int \& x)
 
-%% \{
+%% {
 
 %% x++;\\
-%% \}
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% int x = 42;
 
 %% inc(\&x); // x is 43
 
 %% inc(x); // x is 44\\
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% The same idea can be used to change the value of anything you like
 %% \ldots{} including changing the value of pointers.
@@ -4564,14 +4536,14 @@ std::cout << "val of x = " << x << '\n'
 
 %% void setnull(int * p)
 
-%% \{
+%% {
 
 %% p = NULL;\\
-%% \}
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% int * p;
 
@@ -4581,7 +4553,7 @@ std::cout << "val of x = " << x << '\n'
 %% std::endl; // 0?
 
 %% return 0;\\
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% \textbf{Exercise.} Explain what's happening in the program below. Is
 %% there a problem? How would you fix it?
@@ -4594,18 +4566,18 @@ std::cout << "val of x = " << x << '\n'
 
 %% void swap(int * p, int * q)
 
-%% \{
+%% {
 
 %% int * t = p;
 
 %% p = q;
 
 %% q = t;\\
-%% \}
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% int x = 0, y = 42;
 
@@ -4624,7 +4596,7 @@ std::cout << "val of x = " << x << '\n'
 %% << *q << '\n';
 
 %% return 0;\\
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% \textbf{Exercise.} Explain what's happening in the program below. Is
 %% there a problem?
@@ -4633,14 +4605,14 @@ std::cout << "val of x = " << x << '\n'
 
 %% void mynew(int * p)
 
-%% \{
+%% {
 
 %% p = new int;\\
-%% \}
+%% }
 
 %% int main()
 
-%% \{
+%% {
 
 %% int * p;
 
@@ -4649,7 +4621,7 @@ std::cout << "val of x = " << x << '\n'
 %% *p = 42;
 
 %% return 0;\\
-%% \}\strut
+%% }
 %% \end{consolethree}
 %% \textbf{Exercise.} Explain what's happening in the program below. Is
 %% there a problem?
@@ -4657,38 +4629,38 @@ std::cout << "val of x = " << x << '\n'
 %% \begin{consolethree}[escapeinside=||]          
 %% void mydelete(int * p)
 
-%% \{
+%% {
 
 %% delete p;\\
-%% \}
+%% }
 
 %% int main()
 
-%% \{
+%% {             
 
 %% int * p;
 
 %% mydelete(p);
 
 %% return 0;\\
-%% \}\strut
+%% }
 %% \end{consolethree}
 
-%% \textbf{Exercise.} The following function \emph{copy()} copies the data
+%% \textbf{Exercise.} The following function \texttt{copy()} copies the data
 %% that one pointer is pointing to to the other pointer. In more details,
-%% \emph{copy(p, q)} will
+%% \texttt{copy(p, q)} will
 
 %% \begin{itemize}
 %% \item
-%%   Allocate memory for \emph{p} (if \emph{p} has not been allocated
-%%   memory; \emph{p} has value \emph{NULL} if it has not been allocated
+%%   Allocate memory for \texttt{p} (if \texttt{p} has not been allocated
+%%   memory; \texttt{p} has value \texttt{NULL} if it has not been allocated
 %%   memory)
 %% \item
-%%   Copy the integer \emph{q} points to over to the integer \emph{p}
+%%   Copy the integer \texttt{q} points to over to the integer \texttt{p}
 %%   points to.
 %% \item
-%%   Deallocate the memory \emph{q} points to and set \emph{q} to
-%%   \emph{NULL}.
+%%   Deallocate the memory \texttt{q} points to and set \texttt{q} to
+%%   \texttt{NULL}.
 
 %%   Test it!
 %% \end{itemize}

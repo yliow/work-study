@@ -1,22 +1,25 @@
 from latextool_basic import *
 p = Plot()
-#p += Grid(x0=0,y0=-4,x1=10,y1=4)
-D = '''
-Program execution in
-this block and looks for
-i. Program will keep
-looking in the next outer
-block until it's found or
-if not, we have an error
-'''
-code(p, D)
-p += Rect(7,-3,13,3,linewidth=0.15)
-p += Rect(7.5,-2.5,12.5,0.1,linewidth=0.15)
-p += Rect(8.5,0.5,11.5,2,linewidth=0.05)
-p += Rect(8.5,-2,11.5,-0.5,linewidth=0.05)
-#p += Rect(8.25,-1.45,8.25,-1.45,linewidth=0,label=r'i')
-p += Rect(8.25,1.3,8.25,1.3,linewidth=0,label=r'i')
-p += Circle(x=10,y=-1.2,r=0.5, linecolor='red',background='red')
-p += Line(points=[(10,-1.2),(10,0.3)],endstyle='>',linewidth=0.1,linecolor='red',linestyle='dashed')
+p += Rect(-3, 8, 0, 9, label='1245057', linewidth=0.0)
+p += Rect(-3, 7, 0, 8, label='1245056', linewidth=0.0)
+p += Rect(-3, 6, 0, 7, label='1245055', linewidth=0.0)
+p += Rect(-3, 5, 0, 6, label='1245054', linewidth=0.0)
+p += Rect(-3, 4, 0, 5, label='1245053', linewidth=0.0)
+p += Rect(-3, 3, 0, 4, label='1245052', linewidth=0.0)
+p += Rect(-3, 0, 0, 1, label='0', linewidth=0.0)
+p += Rect(0, 9, 3, 10, label='...', linewidth=0.0)
+
+p += Rect(0, 3, 3, 7, label='\EMPHASIZE{123}', background='blue!10!white', linewidth=0.0)
+p += Rect(0, 8, 3, 9, label=' ', linewidth=0.1)
+p += Rect(0, 7, 3, 8, label=' ', linewidth=0.1)
+p += Rect(0, 6, 3, 7, label=' ', linewidth=0.02)
+p += Rect(0, 5, 3, 6, label=' ', linewidth=0.02)
+p += Rect(0, 4, 3, 5, label=' ', linewidth=0.02)
+p += Rect(0, 3, 3, 4, label=' ', linewidth=0.02)
+p += Rect(0, 2, 3, 3, label=' ', linewidth=0.1)
+p += Rect(0, 2, 3, 3, label=' ', linewidth=0.1)
+p += Rect(0, 1, 3, 2, label='...', linewidth=0.0)
+p += Rect(0, 0, 3, 1, label=' ', linewidth=0.1)
+
 print(p)
 
