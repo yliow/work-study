@@ -1,0 +1,2256 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\author{}
+\date{}
+
+\begin{document}
+
+20b. Multi-dimensional Arrays
+
+Objectives
+
+\begin{itemize}
+\tightlist
+\item
+  Declare 2D arrays with or without initialization
+\item
+  Get and set a value in a 2D array
+\item
+  Scan a 2D array using loops
+\item
+  Pass a 2D array to a function
+\item
+  Work with an array of any dimension
+\end{itemize}
+
+2D Arrays
+
+Once you understand a 1-dimensional (1D) array, a 2-dimensional (2D)
+array is a piece of cake. Try this:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+int x{[}3{]}\textbf{{[}2{]}};
+
+x{[}0{]}{[}0{]} = 0;
+
+x{[}0{]}{[}1{]} = 1;
+
+x{[}1{]}{[}0{]} = 1;
+
+x{[}1{]}{[}1{]} = 2;
+
+x{[}2{]}{[}0{]} = 2;
+
+\emph{x{[}2{]}{[}1{]} = 3;}  \\
+\end{longtable}
+
+Sometimes we visualize the a 2D array like this:
+
+main
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule\noalign{}
+& \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0 & 1 \\
+1 & 2 \\
+2 & 3 \\
+\end{longtable}
+
+You can think of this array as having 3 rows and 2 columns.
+
+int x{[}3{]}{[}2{]};
+
+Of course how you draw \emph{x} is up to you. The computer actually
+stores the array in a different way.
+
+Sometimes instead of saying ``x is a 2-dimensional array of integers
+with size 3 for the first dimension and size 2 the second dimension''
+(phew) I will just say ``x is a 3-by-2 array of integers''.
+
+\textbf{Exercise.} Declare a 5-by-10 array y of doubles.
+
+Initialization
+
+Suppose you want to declare a 2D array of integers and initialize it to
+this:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+& & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0 & 0 & 0 \\
+0 & 0 & 0 \\
+0 & 0 & 0 \\
+\end{longtable}
+
+Of course you can do this:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+int x{[}3{]}{[}3{]};
+
+for (int row = 0; row \textless{} 3; row++)
+
+\{
+
+for (int col = 0; col \textless{} 3; col++)
+
+\{
+
+\vtop{\hbox{\strut  x{[}row{]}{[}col{]} = 0;}\hbox{\strut 
+\}}\hbox{\strut \}}} \\
+\end{longtable}
+
+But that would be a series of assignments and not initialization.
+
+You can initialize using the initializer list again. But in this case
+you should do this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+int x{[}3{]}{[}3{]} = \{\{0, 0, 0\}, \{0, 0, 0\}, \{0, 0, 0\}\}; \\
+\end{longtable}
+
+Of course:
+
+\{\{0, 0, 0\}, \{0, 0, 0\}, \{0, 0, 0\}\}
+
+Of course you can always write this (which is more readable) if you
+like:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+int x{[}3{]}{[}3{]} = \{\{0, 0, 0\},
+
+\{0, 0, 0\},
+
+\{0, 0, 0\}\}; \\
+\end{longtable}
+
+The easiest way to initialize all the values in an integer array to zero
+is this:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+int x{[}3{]}{[}3{]} = \{\{0\}\}; \\
+\end{longtable}
+
+This is similar to the case of 1D array where if you initialize some
+values in an array, then those without implicit initial values will be
+initialized to 0.
+
+\textbf{Exercise.} Suppose you want to set the second row of x to the
+values 2, 3, 4. Can you do this:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+int x{[}3{]}{[}3{]} = \{\{0\}\};
+
+x{[}2{]} = \{2, 3, 4\}; \\
+\end{longtable}
+
+\textbf{Exercise.} Declare a tic-tac-toe game board as a 2D array of
+characters. The board is 3-by-3. Initialize all the values of the array
+to the space character. Print all the values in your array to verify
+your initialization.
+
+\textbf{Exercise.} Declare a 3-by-3 array of characters and initialize
+it to this:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+& & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textquotesingle{} \textquotesingle{} & \textquotesingle{}
+\textquotesingle{} & \textquotesingle{} \textquotesingle{} \\
+\textquotesingle{} \textquotesingle{} &
+\textquotesingle X\textquotesingle{} & \textquotesingle{}
+\textquotesingle{} \\
+\textquotesingle X\textquotesingle{} &
+\textquotesingle X\textquotesingle{} &
+\textquotesingle X\textquotesingle{} \\
+\end{longtable}
+
+Write a double for-loop to print the contents. (This is a tetrad in the
+Tetris game.)
+
+\textbf{Exercise. }Continuing the above, set the array to the following
+with 4 assignment statements.
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+& & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textquotesingle{} \textquotesingle{} & \textquotesingle{}
+\textquotesingle{} & \textquotesingle X\textquotesingle{} \\
+\textquotesingle{} \textquotesingle{} &
+\textquotesingle X\textquotesingle{} &
+\textquotesingle X\textquotesingle{} \\
+\textquotesingle{} \textquotesingle{} & \textquotesingle{}
+\textquotesingle{} & \textquotesingle X\textquotesingle{} \\
+\end{longtable}
+
+Print the contents of the array to verify that your assignments work
+correctly.
+
+Scanning 2D arrays: Row-by-row, column-by-column
+
+Of course you can use loops to scan an array. Since there are two
+dimensions, it\textquotesingle s common to scan the array with a double
+for-loop, one for each dimension.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+int x{[}3{]}{[}2{]};
+
+for (int row = 0; row \textless{} 3; row++)
+
+\{
+
+for (int col = 0; col \textless{} 2; col++)
+
+\{
+
+\emph{\vtop{\hbox{\strut  x{[}row{]}{[}col{]} = row + col;}\hbox{\strut 
+\}}\hbox{\strut \}}}}  \\
+\end{longtable}
+
+main
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule\noalign{}
+& \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0 & 1 \\
+1 & 2 \\
+2 & 3 \\
+\end{longtable}
+
+This has the same effect as our previous program:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+int x{[}3{]}{[}2{]};
+
+x{[}0{]}{[}0{]} = 0;
+
+x{[}0{]}{[}1{]} = 1;
+
+x{[}1{]}{[}0{]} = 1;
+
+x{[}1{]}{[}1{]} = 2;
+
+x{[}2{]}{[}0{]} = 2;
+
+x{[}2{]}{[}1{]} = 3;  \\
+\end{longtable}
+
+Here\textquotesingle s the same code but with constants.
+I\textquotesingle ve also added a segment of code to print the values in
+the array. If I think of the first index as the ``row'' index and the
+second as the ``column'' index, the \emph{row} and \emph{col} variables
+will make the program easier to read too.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+const int ROW\_SIZE = 3;
+
+const int COL\_SIZE = 2;
+
+int x{[}\textbf{ROW\_SIZE}{]}{[}\textbf{COL\_SIZE}{]};
+
+for (int row = 0; row \textless{} \textbf{ROW\_SIZE}; row++)
+
+\{
+
+for (int col = 0; col \textless{} \textbf{COL\_SIZE}; col++)
+
+\{
+
+\vtop{\hbox{\strut  x{[}row{]}{[}col{]} = row + col;}\hbox{\strut 
+\}}\hbox{\strut \}}}
+
+for (int row = 0; row \textless{} ROW\_SIZE; row++)
+
+\{
+
+for (int col = 0; col \textless{} COL\_SIZE; col++)
+
+\{
+
+\vtop{\hbox{\strut  std::cout \textless\textless{} x{[}row{]}{[}col{]}
+\textless\textless{} \textquotesingle{} \textquotesingle;}\hbox{\strut 
+\}}}
+
+\vtop{\hbox{\strut  std::cout \textless\textless{} std::endl; // goto
+next line}\hbox{\strut \}}} \\
+\end{longtable}
+
+Note that with the constants, the program is more flexible to change.
+
+\textbf{Exercise. }Change the \emph{ROW\_SIZE} to 10 and
+\emph{COL\_SIZE} to 15 and run the program. Get it?
+
+Look at the above double for-loops. They look like this:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+for (int row = 0; row \textless{} ROW\_SIZE; row++)
+
+\{
+
+for (int col = 0; col \textless{} COL\_SIZE; col++)
+
+\{
+
+\vtop{\hbox{\strut \emph{ ... do something with x{[}row{]}{[}col{]} ...}
+\}}\hbox{\strut \}}} \\
+\end{longtable}
+
+if you use this as your mental picture of the array, where the first
+index value represents the row and the second represents the column:
+
+main
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule\noalign{}
+& \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0 & 1 \\
+1 & 2 \\
+2 & 3 \\
+\end{longtable}
+
+the scanning of the array looks like this:
+
+main
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule\noalign{}
+& \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0 & 1 \\
+1 & 2 \\
+2 & 3 \\
+\end{longtable}
+
+Now suppose (for some reason) you scan the array in this order:
+
+main
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule\noalign{}
+& \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0 & 1 \\
+1 & 2 \\
+2 & 3 \\
+\end{longtable}
+
+The second for-loop in this code scans the array this way:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+const int ROW\_SIZE = 3;
+
+const int COL\_SIZE = 2;
+
+int x{[}NUM\_ROWS{]}{[}NUM\_COLS{]};
+
+for (int row = 0; row \textless{} ROW\_SIZE; row++)
+
+\{
+
+for (int col = 0; col \textless{} COL\_SIZE; col++)
+
+\{
+
+\vtop{\hbox{\strut  x{[}row{]}{[}col{]} = row + col;}\hbox{\strut 
+\}}\hbox{\strut \}}}
+
+for (int col = 0; col \textless{} COL\_SIZE; col++)
+
+\{
+
+for (int row = 0; row \textless{} ROW\_SIZE; row++)
+
+\{
+
+\vtop{\hbox{\strut  std::cout \textless\textless{} x{[}row{]}{[}col{]}
+\textless\textless{} \textquotesingle{} \textquotesingle;}\hbox{\strut 
+\}}\hbox{\strut \}}}
+
+std::cout \textless\textless{} std::endl; \\
+\end{longtable}
+
+So just like the 1-dimensional array where you can scan forward or
+backward, you can scan a 2-dimensional array in different ways.
+
+\textbf{Exercise.} Write a while-loop that prompts the user for a row
+\emph{r}, column \emph{c} and value \emph{v} and set
+\emph{x{[}r{]}{[}c{]}} to \emph{v}. Print the whole array after each
+change to the array. If the user enters a negative value for \emph{r} or
+\emph{c}, exit the while-loop
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+const int ROW\_SIZE = 3;
+
+const int COL\_SIZE = 2;
+
+int x{[}ROW\_SIZE{]}{[}COL\_SIZE{]};
+
+for (int row = 0; row \textless{} ROW\_SIZE; row++)
+
+\{
+
+for (int col = 0; col \textless{} COL\_SIZE; col++)
+
+\{
+
+\vtop{\hbox{\strut  x{[}row{]}{[}col{]} = row + col;}\hbox{\strut 
+\}}\hbox{\strut \}}}
+
+for (int row = 0; row \textless{} ROW\_SIZE; row++)
+
+\{
+
+for (int col = 0; col \textless{} COL\_SIZE; col++)
+
+\{
+
+\vtop{\hbox{\strut  std::cout \textless\textless{} x{[}row{]}{[}col{]}
+\textless\textless{} \textquotesingle{} \textquotesingle;}\hbox{\strut 
+\}}}
+
+\vtop{\hbox{\strut  std::cout \textless\textless{}
+std::endl;}\hbox{\strut \}}}
+
+while (1)
+
+\{
+
+// Prompt for r. If r \textless{} 0, break the loop.
+
+// Prompt for c. If c \textless{} 0, break the loop.
+
+// Prompt for v and set x{[}r{]}{[}c{]} to v
+
+\vtop{\hbox{\strut  // Print the array}\hbox{\strut \}}} \\
+\end{longtable}
+
+Test your program.
+
+\textbf{Exercise.} Continuing with the above example, initialize the
+3-by-3 tic-tac-toe board to
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+& & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textquotesingle{} \textquotesingle{} &
+\textquotesingle O\textquotesingle{} & \textquotesingle{}
+\textquotesingle{} \\
+\textquotesingle{} \textquotesingle{} &
+\textquotesingle O\textquotesingle{} & \textquotesingle{}
+\textquotesingle{} \\
+\textquotesingle X\textquotesingle{} &
+\textquotesingle X\textquotesingle{} &
+\textquotesingle X\textquotesingle{} \\
+\end{longtable}
+
+and write code to check that \textquotesingle X\textquotesingle{} has a
+winning row. The code should detect a winning row for row 2. Now add
+code to detect either a winning row or winning column. The code should
+detect a winning column for this
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+& & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textquotesingle{} \textquotesingle{} &
+\textquotesingle O\textquotesingle{} &
+\textquotesingle X\textquotesingle{} \\
+\textquotesingle{} \textquotesingle{} &
+\textquotesingle O\textquotesingle{} &
+\textquotesingle X\textquotesingle{} \\
+\textquotesingle{} \textquotesingle{} & \textquotesingle{}
+\textquotesingle{} & \textquotesingle X\textquotesingle{} \\
+\end{longtable}
+
+\textbf{Exercise.} Declare an array of 5-by-10 integers. Assign random
+integers from 1 to 10 to the array. Print the array in a 5-by-10 grid of
+values separating values in each row by a space and separating each row
+with a newline. Compute and print the average of the values in the whole
+array.
+
+\textbf{Exercise.} Declare an array of 5-by-10 integers. Assign random
+integers from 1 to 10 to the array. Print the array in a 5-by-10 grid of
+values separating values in each row by a space and separating each row
+with a newline. Prompt the user for a row and print the average of the
+values in that row. Repeat this exercise but let the user specify a
+\emph{\textbf{column}}.
+
+\textbf{Exercise.} You work for the national weather service. You need
+to declare a 2D array of doubles for measuring temperature. For instance
+
+temp{[}5{]}{[}15{]}
+
+is the temperature at 5:15 hours. Declare the array to measure
+temperature for a day. Prompt the user for a default temperature and set
+all the values in the array to this default temperature. In a loop,
+prompt the user for the hour and minute and temperature and set the
+array accordingly. If the user enters negative value for either the hour
+or the minute or the temperature, stop prompting the user and print the
+temperature in a two dimensional grid of values with hour for the rows
+and minute for the columns and print the average temperature.
+
+\textbf{Exercise.} You\textquotesingle re given this code:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+const int ROW\_SIZE = 5;
+
+const int COL\_SIZE = 5;
+
+int x{[}ROW\_SIZE{]}{[}COL\_SIZE{]}= \{\{0\}\};
+
+// YOUR CODE
+
+for (int row = 0; row \textless{} ROW\_SIZE; row++)
+
+\{
+
+for (int col = 0; col \textless{} COL\_SIZE; col++)
+
+\{
+
+\vtop{\hbox{\strut  std::cout \textless\textless{} x{[}row{]}{[}col{]}
+\textless\textless{} \textquotesingle{} \textquotesingle;}\hbox{\strut 
+\}}}
+
+\vtop{\hbox{\strut  std::cout \textless\textless{}
+std::endl;}\hbox{\strut \}}}
+
+std::cout \textless\textless{} std::endl; \\
+\end{longtable}
+
+Write \emph{\textbf{a single for-loop}} that sets first and last row of
+the array to all 9. In other words the output should be
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+9 9 9 9 9
+
+0 0 0 0 0
+
+0 0 0 0 0
+
+0 0 0 0 0
+
+9 9 9 9 9 \\
+\end{longtable}
+
+\textbf{Exercise.} You\textquotesingle re given this code:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+const int ROW\_SIZE = 5;
+
+const int COL\_SIZE = 5;
+
+int x{[}ROW\_SIZE{]}{[}COL\_SIZE{]}= \{\{0\}\};
+
+// YOUR CODE
+
+for (int row = 0; row \textless{} ROW\_SIZE; row++)
+
+\{
+
+for (int col = 0; col \textless{} ROW\_SIZE; col++)
+
+\{
+
+\vtop{\hbox{\strut  std::cout \textless\textless{} x{[}row{]}{[}col{]}
+\textless\textless{} \textquotesingle{} \textquotesingle;}\hbox{\strut 
+\}}}
+
+\vtop{\hbox{\strut  std::cout \textless\textless{}
+std::endl;}\hbox{\strut \}}}
+
+std::cout \textless\textless{} std::endl; \\
+\end{longtable}
+
+Write two separate for-loops that sets first and last row and first and
+last column of the array to all 9. In other words the output should be
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+9 9 9 9 9
+
+9 0 0 0 9
+
+9 0 0 0 9
+
+9 0 0 0 9
+
+9 9 9 9 9 \\
+\end{longtable}
+
+(If the array is a character array which is initialized to spaces, and
+\textquotesingle X\textquotesingle{} are placed at the first and last
+row, first and last column, then the above shows you how to build a 2D
+world with boundary.)
+
+Scanning 2D arrays: Exotic paths in the array
+
+Now let\textquotesingle s try scanning the array in a different way. As
+a matter of fact we\textquotesingle ll only scan part of the array. You
+are given the following code which declares and initializes a 5-by-5
+integer array with 0s (the row size is the same as the column size.)
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+const int ROW\_SIZE = 5;
+
+int x{[}ROW\_SIZE{]}{[}ROW\_SIZE{]}= \{\{0\}\};
+
+// YOUR CODE
+
+for (int row = 0; row \textless{} ROW\_SIZE; row++)
+
+\{
+
+for (int col = 0; col \textless{} ROW\_SIZE; col++)
+
+\{
+
+\vtop{\hbox{\strut  std::cout \textless\textless{} x{[}row{]}{[}col{]}
+\textless\textless{} \textquotesingle{} \textquotesingle;}\hbox{\strut 
+\}}}
+
+\vtop{\hbox{\strut  std::cout \textless\textless{}
+std::endl;}\hbox{\strut \}}}
+
+std::cout \textless\textless{} std::endl; \\
+\end{longtable}
+
+We want to write a double for-loop that sets upper half right triangle
+of the array to all 9. In other words the output should be
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+9 9 9 9 9
+
+0 9 9 9 9
+
+0 0 9 9 9
+
+0 0 0 9 9
+
+0 0 0 0 9 \\
+\end{longtable}
+
+Notice that the row and column index values where the value should be
+set to 9 are
+
+row col
+
+0 0, 1, 2, 3, 4
+
+1 1, 2, 3, 4
+
+2 2, 3, 4
+
+3 3, 4
+
+4 4
+
+If you write a double for loop that prints the above row,col values you
+can easily access the value of that index position and set the value to
+9. So the first step is actually to write a program that prints
+
+row:0
+
+col:0
+
+col:1
+
+col:2
+
+col:3
+
+col: 4
+
+row:1
+
+col:1
+
+col: 2\\
+col: 3
+
+col:4
+
+etc.
+
+But ... \textbf{WAIT!!!} You\textquotesingle ve actually seen something
+like this before ... in the notes on for-loops. The code is similar to
+this:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+for (int i = 0; i \textless{} 5; i++)
+
+\{
+
+std::cout \textless\textless{} "i:" \textless\textless{} i
+\textless\textless{} std::endl;
+
+for (int j = i; j \textless{} 5; j++)
+
+\{
+
+\vtop{\hbox{\strut  std::cout \textless\textless{} " j:"
+\textless\textless{} j \textless\textless{} std::endl;}\hbox{\strut 
+\}}\hbox{\strut \}}} \\
+\end{longtable}
+
+If you don\textquotesingle t see it immediately, you had better check
+your notes on for-loops \ldots{} immediately!!!
+
+Since we now have control over the index values that we want, we
+complete the code:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+const int ROW\_SIZE = 5;
+
+int x{[}ROWS\_SIZE{]}{[}ROW\_SIZE{]}= \{\{0\}\};
+
+for (int row = 0; row \textless{} ROW\_SIZE; row++)
+
+\{
+
+for (int col = row; col \textless{} ROW\_SIZE; col++)
+
+\{
+
+\vtop{\hbox{\strut  x{[}row{]}{[}col{]} = 9;}\hbox{\strut 
+\}}\hbox{\strut \}}}
+
+for (int row = 0; row \textless{} ROW\_SIZE; row++)
+
+\{
+
+for (int col = 0; col \textless{} ROW\_SIZE; col++)
+
+\{
+
+\vtop{\hbox{\strut  std::cout \textless\textless{} x{[}row{]}{[}col{]}
+\textless\textless{} \textquotesingle{} \textquotesingle;}\hbox{\strut 
+\}}}
+
+\vtop{\hbox{\strut  std::cout \textless\textless{}
+std::endl;}\hbox{\strut \}}}
+
+std::cout \textless\textless{} std::endl; \\
+\end{longtable}
+
+\textbf{Exercise.} You\textquotesingle re given this code:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+const int ROW\_SIZE = 5;
+
+int x{[}ROW\_SIZE{]}{[}ROWS\_SIZE{]}= \{\{0\}\};
+
+// YOUR CODE
+
+for (int row = 0; row \textless{} ROW\_SIZE; row++)
+
+\{
+
+for (int col = 0; col \textless{} ROW\_SIZE; col++)
+
+\{
+
+\vtop{\hbox{\strut  std::cout \textless\textless{} x{[}row{]}{[}col{]}
+\textless\textless{} \textquotesingle{} \textquotesingle;}\hbox{\strut 
+\}}}
+
+\vtop{\hbox{\strut  std::cout \textless\textless{}
+std::endl;}\hbox{\strut \}}}
+
+std::cout \textless\textless{} std::endl; \\
+\end{longtable}
+
+Write a double for-loop that sets lower half left triangle of the array
+to all 9. In other words the output should be
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+9 0 0 0 0
+
+9 9 0 0 0
+
+9 9 9 0 0
+
+9 9 9 9 0
+
+9 9 9 9 9 \\
+\end{longtable}
+
+\textbf{Exercise.} You are given the following code:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+const int ROW\_SIZE = 5;
+
+int x{[}ROW\_SIZE{]}{[}ROW\_SIZE{]}= \{\{0\}\};
+
+// YOUR CODE
+
+for (int row = 0; row \textless{} ROW\_SIZE; row++)
+
+\{
+
+for (int col = 0; col \textless{} ROW\_SIZE; col++)
+
+\{
+
+\vtop{\hbox{\strut  std::cout \textless\textless{} x{[}row{]}{[}col{]}
+\textless\textless{} \textquotesingle{} \textquotesingle;}\hbox{\strut 
+\}}}
+
+\vtop{\hbox{\strut  std::cout \textless\textless{}
+std::endl;}\hbox{\strut \}}}
+
+std::cout \textless\textless{} std::endl; \\
+\end{longtable}
+
+Write a for-loop that sets the values on the main diagonal of the array
+to all 9s. In other words the output should be
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+9 0 0 0 0
+
+0 9 0 0 0
+
+0 0 9 0 0
+
+0 0 0 9 0
+
+0 0 0 0 9 \\
+\end{longtable}
+
+{[}Hint: What index values do you need? You need row = 0, col = 0, then
+row = 1, col = 1, then row = 2, col = 2, then row = 3, col = 3 and
+finally row = 4, col = 4.{]}
+
+\textbf{Exercise.} You are given the following code that declares a
+5-by-5 array of characters, initializing it with spaces.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+const int ROW\_SIZE = 5;
+
+char x{[}ROW\_SIZE{]}{[}ROW\_SIZE{]};
+
+for (int row = 0; row \textless{} ROW\_SIZE; row++)
+
+\{
+
+for (int col = 0; col \textless{} COL\_SIZE; col++)
+
+\{
+
+\vtop{\hbox{\strut  x{[}row{]}{[}col{]} = \textquotesingle{}
+\textquotesingle;}\hbox{\strut  \}}\hbox{\strut \}}}
+
+// YOUR CODE
+
+for (int row = 0; row \textless{} ROW\_SIZE; row++)
+
+\{
+
+for (int col = 0; col \textless{} ROW\_SIZE; col++)
+
+\{
+
+\vtop{\hbox{\strut  std::cout \textless\textless{}
+x{[}row{]}{[}col{]};}\hbox{\strut  \}}}
+
+\vtop{\hbox{\strut  std::cout \textless\textless{}
+std::endl;}\hbox{\strut \}}}
+
+std::cout \textless\textless{} std::endl; \\
+\end{longtable}
+
+Write a for-loop that sets the values on the main diagonal of the array
+to \emph{\textquotesingle*\textquotesingle{}}. In other words the output
+should be
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+*
+
+*
+
+*
+
+*
+
+* \\
+\end{longtable}
+
+{[}Hint: See previous example.{]} Now modify your code so that it
+produces this output:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+* *
+
+* *
+
+*
+
+* *
+
+* * \\
+\end{longtable}
+
+Of course that tells you that you can use a 2D array to do ASCII
+art!!!You can think of the 2D array as a drawing canvas. There is a big
+difference between the ASCII art problems in the notes for loops and
+using a 2D array. You can draw a star any where you like in the array.
+On the other hand, ASCII art using only loops and print statements
+requires you to print on the console window from left-to-right,
+row-by-row.
+
+There is however a restriction when using arrays for ASCII art: You have
+to specify the row and column sizes of your array. This is what you can
+do: You can specify a really huge 2D array (say 1000-by-1000) and then
+only use part of it for drawing.
+
+Functions
+
+Everything is similar to functions for 1-dimensional arrays except for
+one thing. \textbf{LISTEN UP!!!} When you wrote function prototypes or
+function headers to be general, instead of writing
+
+void f(int x{[}3{]});
+
+we write
+
+void f(int x{[}{]});
+
+When declaring a 2D array (of ints or doubles or bools or ...) you
+\textbf{must specify the size of the second dimension}. For instance
+this is \textbf{WRONG}
+
+void f(int x{[}{]}{[}{]});
+
+This is \textbf{CORRECT}:
+
+void f(int x{[}{]}{[}42{]});
+
+Here\textquotesingle s a simple example:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\#include \textless iostream\textgreater{}
+
+const int COL\_SIZE = 2;
+
+void print(int x{[}{]}{[}COL\_SIZE{]}, int numRows)
+
+\{
+
+for (int row = 0; row \textless{} numRows; row++)
+
+\{
+
+for (int col = 0; col \textless{} COL\_SIZE; col++)
+
+\{
+
+\vtop{\hbox{\strut  std::cout \textless\textless{} x{[}row{]}{[}col{]}
+\textless\textless{} \textquotesingle{} \textquotesingle;}\hbox{\strut 
+\}}}
+
+\vtop{\hbox{\strut  std::cout \textless\textless{} std::endl; // goto
+next line}\hbox{\strut  \}}\hbox{\strut \}}}
+
+\vtop{\hbox{\strut int main()}\hbox{\strut \{}}
+
+int x{[}2{]}{[}COL\_SIZE{]};
+
+x{[}0{]}{[}0{]} = 1;
+
+x{[}0{]}{[}1{]} = 2;
+
+x{[}1{]}{[}0{]} = 3;
+
+x{[}1{]}{[}1{]} = 4;
+
+print(x, 2);
+
+\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
+\end{longtable}
+
+Note that the code now seems to be highly ``nonsymmetric'': you do not
+have control over the second dimension.
+
+To make the code more symmetric, you might want to do this, especially
+if you do not need full generality for the first dimension:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\#include \textless iostream\textgreater{}
+
+const int ROW\_SIZE = 2;
+
+const int COL\_SIZE = 2;
+
+void print(int x{[}ROW\_SIZE{]}{[}COL\_SIZE{]})
+
+\{
+
+for (int row = 0; row \textless{} ROW\_SIZE; row++)
+
+\{
+
+for (int col = 0; col \textless{} COL\_SIZE; col++)
+
+\{
+
+\vtop{\hbox{\strut  std::cout \textless\textless{} x{[}row{]}{[}col{]}
+\textless\textless{} \textquotesingle{} \textquotesingle;}\hbox{\strut 
+\}}}
+
+\vtop{\hbox{\strut  std::cout \textless\textless{} std::endl; // goto
+next line}\hbox{\strut \}}\hbox{\strut \}}}
+
+\vtop{\hbox{\strut int main()}\hbox{\strut \{}}
+
+int x{[}ROW\_SIZE{]}{[}COL\_SIZE{]};
+
+x{[}0{]}{[}0{]} = 1;
+
+x{[}0{]}{[}1{]} = 2;
+
+x{[}1{]}{[}0{]} = 3;
+
+x{[}1{]}{[}1{]} = 4;
+
+print(x);
+
+\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
+\end{longtable}
+
+\textbf{Exercise.} Can you change values in a 2D array through a
+function? Write a simple program and verify.
+
+``Why do I need to specify the size for the second dimension?''
+
+Why? You have to wait till CISS3 ... oh well ... OK I\textquotesingle ll
+explain.
+
+Suppose you have this code:
+
+\emph{int x{[}4{]}{[}10{]};}
+
+std::cin \textgreater\textgreater{} x{[}2{]}{[}6{]};
+
+First of all, our mental picture of the values of array x looks like
+this:
+
+\begin{longtable}[]{@{}llllllllll@{}}
+\toprule\noalign{}
+& & & & & & & & & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+& & & & & & & & & \\
+& & & & & & & & & \\
+& & & & & & & & & \\
+& & & & & & & & & \\
+\end{longtable}
+
+(i.e., \emph{x} has 4 rows of 10 integers).
+
+Actually in your computer (at least up to this point in history!),
+memory is organized in a \textbf{linear} fashion, i.e., \textbf{on a
+straight line}. So here\textquotesingle s a picture of the memory with
+the part occupied by x shown. I\textquotesingle ve colored alternate
+blocks of 10 integers. The location in the computer\textquotesingle s
+memory for
+
+\emph{x{[}2{]}{[}6{]}} is shown.
+
+\begin{longtable}[]{@{}llllllllllllllllllllllllllllllllllllllll@{}}
+\toprule\noalign{}
+& & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & &
+& & & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+& & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & &
+& & & \\
+\end{longtable}
+
+How does C++ locate the value in the array that you want? C++ actually
+only remembers the location of \emph{x{[}0{]}{[}0{]}}.When you want
+\emph{x{[}2{]}{[}6{]}}, C++ computes the position of
+\emph{x{[}2{]}{[}6{]}} as an offset from \emph{x{[}0{]}{[}0{]}}.
+
+Now the location of \emph{x{[}2{]}{[}6{]}} is
+
+2 * 10 + 6
+
+away from the first value \emph{x{[}0{]}{[}0{]}}. Right? Once C++ knows
+the computer memory location of the value you want, it can then retrieve
+the value or assign a value to that spot.
+
+So ... one more time:
+
+\begin{itemize}
+\tightlist
+\item
+  Values are stored in memory which is organized in a straight line.
+\item
+  For an array, C++ remembers the position of the first element of the
+  array.
+\item
+  If your program needs \emph{x{[}i{]}{[}j{]}} of an array x, C++ will
+  compute the location of that value by computing it\textquotesingle s
+  offset from \emph{x{[}0{]}{[}0{]}}.
+\end{itemize}
+
+OK. So now look at the above example:
+
+\emph{int x{[}20{]}{[}10{]};}
+
+std::cin \textgreater\textgreater{} x{[}2{]}{[}6{]};
+
+If you need \emph{x{[}2{]}{[}6{]}}, C++ will look at the value that is
+
+2 * 10 + 6
+
+away from \emph{x{[}0{]}{[}0{]}}. But ... notice something? The offset
+is
+
+2 * 10 + 6
+
+which depends on 2 and 6 which is provided in your code when you write
+\emph{x{[}2{]}{[}6{]}}. But notice that it also depends on ...
+\textbf{the number 10:}
+
+2 * \textbf{10} + 6
+
+Where does that come from? It\textquotesingle s the \textbf{size of the
+second dimension}
+
+This is the reason why the size of the second dimension must be stated.
+Otherwise C++ does not know how to access a required value in the 2D
+array.
+
+Exercise: tic-tac-toe
+
+Write a tic-tac-toe program using a 2D array for the board.
+
+\textbf{Exercise.} Write a function
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+const int n = 3;
+
+void init(char board{[}n{]}{[}n{]}); \\
+\end{longtable}
+
+that initialization a tic-tao-toe board.. Note your program should have
+a global constant for the board size. That way if we change 3 to another
+size such as 5, you'll get a 5-by-5 tic-tac-toe board. So in your code
+do not assume the board size is 3-by-3.
+
+\textbf{Exercise.} Write a function to print the tic-tac-toe board:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+...
+
+void print(char board{[}n{]}{[}n{]}); \\
+\end{longtable}
+
+Suppose the board is filled with spaces and n is 3. Then the output is
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
++-+-+-+
+
+\textbar{} \textbar{} \textbar{} \textbar{}
+
++-+-+-+
+
+\textbar{} \textbar{} \textbar{} \textbar{}
+
++-+-+-+
+
+\textbar{} \textbar{} \textbar{} \textbar{}
+
++-+-+-+ \\
+\end{longtable}
+
+If row 0 and column 1 of the board has `X', then the output is
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
++-+-+-+
+
+\textbar{} \textbar X\textbar{} \textbar{}
+
++-+-+-+
+
+\textbar{} \textbar{} \textbar{} \textbar{}
+
++-+-+-+
+
+\textbar{} \textbar{} \textbar{} \textbar{}
+
++-+-+-+ \\
+\end{longtable}
+
+\textbf{Exercise.} Write a function that checks if there's a winning row
+at row r for character \emph{player}:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+bool has\_winning\_row(char board{[}n{]}{[}n{]}, int r,
+
+char player); \\
+\end{longtable}
+
+The character \emph{player} is either
+\emph{\textquotesingle X\textquotesingle{}} or
+\emph{\textquotesingle O\textquotesingle{}}.
+
+\textbf{Exercise.} Write a function that checks if there's a winning
+column at column c for character \emph{player}:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+bool has\_winning\_column(char board{[}n{]}{[}n{]}, int c,
+
+char player); \\
+\end{longtable}
+
+Character \emph{player} is either
+\emph{\textquotesingle X\textquotesingle{}} or
+\emph{\textquotesingle O\textquotesingle{}}.
+
+\textbf{Exercise.} Write a function that checks if there's a winning
+down-diagonal for character \emph{player}:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+bool has\_winning\_down\_diag(char board{[}n{]}{[}n{]}, int c,
+
+char player); \\
+\end{longtable}
+
+Character \emph{player} is either
+\emph{\textquotesingle X\textquotesingle{}} or
+\emph{\textquotesingle O\textquotesingle{}}. The down-diagonal is the
+diagonal on the board that goes from row 0, column 0 to row n -- 1,
+column n -- 1.
+
+\textbf{Exercise.} Write a function that checks if there's a winning
+up-diagonal for character \emph{player}:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+bool has\_winning\_up\_diag(char board{[}n{]}{[}n{]}, int c,
+
+char player); \\
+\end{longtable}
+
+Character \emph{player} is either
+\emph{\textquotesingle X\textquotesingle{}} or
+\emph{\textquotesingle O\textquotesingle{}}. The up-diagonal is the
+diagonal on the board that goes from row n-1, column 0 to row 0, column
+n -- 1.
+
+\textbf{Exercise.} Write a function that checks if the board if filled
+(i.e. no spaces left):
+
+\begin{longtable}[]{@{}l@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+bool is\_filled(char board{[}n{]}{[}n{]}); \\
+\end{longtable}
+
+Character \emph{player} is either
+\emph{\textquotesingle X\textquotesingle{}} or
+\emph{\textquotesingle O\textquotesingle{}}. The up-diagonal is the
+diagonal on the board that goes from row n-1, column 0 to row 0, column
+n -- 1.
+
+Make sure you test the above function thoroughly. Now complete the
+turn-based 2-player tic-tac-toe-game!
+
+\textbf{Exercise.} The above is a 2-player game. Try to write a
+tic-tac-toe game for 1 player playing against the computer.
+
+\textbf{Exercise.} Now write a 2-players chess game!
+
+A 2-d array as an array of 1-d arrays
+
+If you have a 2-d array like this:
+
+\emph{char h{[}{]}{[}3{]} = \{\{\textquotesingle*\textquotesingle,
+\textquotesingle{} \textquotesingle,
+\textquotesingle*\textquotesingle\},}
+
+\{\textquotesingle*\textquotesingle, \textquotesingle{}
+\textquotesingle, \textquotesingle*\textquotesingle\},
+
+\{\textquotesingle*\textquotesingle, \textquotesingle*\textquotesingle,
+\textquotesingle*\textquotesingle\},
+
+\{\textquotesingle*\textquotesingle, \textquotesingle{}
+\textquotesingle, \textquotesingle*\textquotesingle\},
+
+\{\textquotesingle*\textquotesingle, \textquotesingle{}
+\textquotesingle, \textquotesingle*\textquotesingle\}\};
+
+You can actually think of \emph{h{[}0{]}} (the first row) as an array of
+3 characters, \emph{h{[}1{]}} (the second row) as an array of 3
+characters, etc. You can therefore do this:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\#include \textless iostream\textgreater{}
+
+void print3char(char x{[}{]})
+
+\{
+
+for(int i = 0; i \textless{} 3; i++)
+
+\{
+
+\vtop{\hbox{\strut  std::cout \textless\textless{}
+x{[}i{]}}\hbox{\strut  \}}}
+
+\vtop{\hbox{\strut  std::cout \textless\textless{}
+std::endl;}\hbox{\strut \}}}
+
+int main()
+
+\{
+
+char h{[}{]}{[}3{]} = \{\{\textquotesingle*\textquotesingle,
+\textquotesingle{} \textquotesingle,
+\textquotesingle*\textquotesingle\},
+
+\{\textquotesingle*\textquotesingle, \textquotesingle{}
+\textquotesingle, \textquotesingle*\textquotesingle\},
+
+\{\textquotesingle*\textquotesingle, \textquotesingle*\textquotesingle,
+\textquotesingle*\textquotesingle\},
+
+\{\textquotesingle*\textquotesingle, \textquotesingle{}
+\textquotesingle, \textquotesingle*\textquotesingle\},
+
+\{\textquotesingle*\textquotesingle, \textquotesingle{}
+\textquotesingle, \textquotesingle*\textquotesingle\}\};
+
+print3char(h{[}0{]});
+
+\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
+\end{longtable}
+
+\textbf{Exercise.} Write a program that prompts the user to enter
+his/her first name and then last name and stores them both in an array
+called name. \emph{name} should be declared like so:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+char name{[}2{]}{[}256{]}; \\
+\end{longtable}
+
+Print the name that they entered with a ``Hi'' -- see execution below.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+What's you name? \emph{John Doe}
+
+Hi John Doe. \\
+\end{longtable}
+
+Exercise.
+
+Write a program that prompts the user for a sentence ending with a
+period of question mark. The program then prints the number of words
+entered by the user and list the words. Here's an execution:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Hi my name is John.
+
+5 words
+
+1. Hi
+
+2. my
+
+3. name
+
+4. is
+
+5. John \\
+\end{longtable}
+
+Here's another:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+How are you?
+
+3 words
+
+1. How
+
+2. are
+
+3. you \\
+\end{longtable}
+
+The user can enter at most 100 words.
+
+Exercise.
+
+Write a program that asks for a name and then say hi. Here's an
+execution
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+What's your name?
+
+My name is John.
+
+Hi John. \\
+\end{longtable}
+
+Here's another:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+What's your name?
+
+I'm Julie.
+
+Hi Julie. \\
+\end{longtable}
+
+And another:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+What's your name?
+
+Tom
+
+Hi Tom. Please learn to use the period. \\
+\end{longtable}
+
+And another:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+What's your name?
+
+I am tom.
+
+Hi Tom. Please learn to capitalize your name. \\
+\end{longtable}
+
+Even more dimensions!
+
+Is it too surprising for you when I say that you can have a
+3-dimensional array like this:
+
+double x{[}10{]}{[}15{]}{[}20{]};
+
+\textbf{Exercise.} Using a triple for-loop, initialize all values in the
+above x to 3.14.
+
+The 2-dimensional array helps us model data that is inherently
+2-dimensional. For instance:
+
+const int FLOOR\_SIZE = 5;
+
+const int NUM\_ROOMS = 20;
+
+int max\_occupancy{[}FLOOR\_SIZE{]}{[}NUM\_ROOMS{]};
+
+models the maximum occupancy for rooms in a building with 5 floors and
+20 rooms per floor. The data is inherently 2-dimensional. For instance
+max\_occupancy{[}3{]}{[}19{]} is the maximum occupancy of ROOM319 in the
+building.
+
+But three dimensional data occurs too. For instance if you want to model
+the presence of physical bodies in a 3-dimensional grid of 1-by-1-by-1
+cubic feet of space, you can have a 3-dimensional array of booleans:
+
+const int MAX\_X = 100;
+
+const int MAX\_Y = 100;
+
+const int MAX\_Z = 100;
+
+bool has\_body{[}MAX\_X{]}{[}MAX\_Y{]}{[}MAX\_Z{]};
+
+Or for instance in the Tetris game, you have tetrads. Each tetrad is a
+2-dimensional shape. For instance there\textquotesingle s the T tetrad:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+& & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textquotesingle{} \textquotesingle{} & \textquotesingle{}
+\textquotesingle{} & \textquotesingle{} \textquotesingle{} \\
+\textquotesingle{} \textquotesingle{} &
+\textquotesingle X\textquotesingle{} & \textquotesingle{}
+\textquotesingle{} \\
+\textquotesingle X\textquotesingle{} &
+\textquotesingle X\textquotesingle{} &
+\textquotesingle X\textquotesingle{} \\
+\end{longtable}
+
+But each tetrad has 4 orientations. Here are the other three
+orientations of the T tetrad:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+& & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textquotesingle{} \textquotesingle{} & \textquotesingle{}
+\textquotesingle{} & \textquotesingle X\textquotesingle{} \\
+\textquotesingle{} \textquotesingle{} &
+\textquotesingle X\textquotesingle{} &
+\textquotesingle X\textquotesingle{} \\
+\textquotesingle{} \textquotesingle{} & \textquotesingle{}
+\textquotesingle{} & \textquotesingle X\textquotesingle{} \\
+\end{longtable}
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+& & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textquotesingle X\textquotesingle{} &
+\textquotesingle X\textquotesingle{} &
+\textquotesingle X\textquotesingle{} \\
+\textquotesingle{} \textquotesingle{} &
+\textquotesingle X\textquotesingle{} & \textquotesingle{}
+\textquotesingle{} \\
+\textquotesingle{} \textquotesingle{} & \textquotesingle{}
+\textquotesingle{} & \textquotesingle{} \textquotesingle{} \\
+\end{longtable}
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+& & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textquotesingle X\textquotesingle{} & \textquotesingle{}
+\textquotesingle{} & \textquotesingle{} \textquotesingle{} \\
+\textquotesingle X\textquotesingle{} &
+\textquotesingle X\textquotesingle{} & \textquotesingle{}
+\textquotesingle{} \\
+\textquotesingle X\textquotesingle{} & \textquotesingle{}
+\textquotesingle{} & \textquotesingle{} \textquotesingle{} \\
+\end{longtable}
+
+Therefore all the diagrams for the T tetrad actually can be modeled with
+a 3-dimensional array of characters:
+
+const int ROTATIONS = 4;
+
+char t\_tetrad{[}ROTATIONS{]}{[}3{]}{[}3{]} =
+
+\{
+
+\{\{\textquotesingle{} \textquotesingle, \textquotesingle{}
+\textquotesingle, \textquotesingle{} \textquotesingle\},
+
+\{\textquotesingle{} \textquotesingle,
+\textquotesingle X\textquotesingle, \textquotesingle{}
+\textquotesingle\},
+
+\{\textquotesingle X\textquotesingle,
+\textquotesingle X\textquotesingle,
+\textquotesingle X\textquotesingle\}\},
+
+\{\{\textquotesingle{} \textquotesingle, \textquotesingle{}
+\textquotesingle, \textquotesingle X\textquotesingle\},
+
+\{\textquotesingle{} \textquotesingle,
+\textquotesingle X\textquotesingle,
+\textquotesingle X\textquotesingle\},
+
+\{\textquotesingle{} \textquotesingle, \textquotesingle{}
+\textquotesingle, \textquotesingle X\textquotesingle\}\},
+
+\{\{\textquotesingle X\textquotesingle,
+\textquotesingle X\textquotesingle,
+\textquotesingle X\textquotesingle\},
+
+\{\textquotesingle{} \textquotesingle,
+\textquotesingle X\textquotesingle, \textquotesingle{}
+\textquotesingle\},
+
+\{\textquotesingle{} \textquotesingle, \textquotesingle{}
+\textquotesingle, \textquotesingle{} \textquotesingle\}\},
+
+\{\{\textquotesingle X\textquotesingle, \textquotesingle{}
+\textquotesingle, \textquotesingle{} \textquotesingle\},
+
+\{\textquotesingle X\textquotesingle,
+\textquotesingle X\textquotesingle, \textquotesingle{}
+\textquotesingle\},
+
+\{\textquotesingle X\textquotesingle, \textquotesingle{}
+\textquotesingle, \textquotesingle{} \textquotesingle\}\}
+
+\};
+
+\textbf{Exercise.} Prompt the user for an integer from 0 to 3 and print
+the corresponding T tetrad. There should only be one single triple
+for-loop (not 4). For instance if the user enters 0 the program should
+print:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+X
+
+XXX \\
+\end{longtable}
+
+If the user enters 1 the program should print
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+X
+
+XX
+
+X \\
+\end{longtable}
+
+Squeezing the initializer
+
+By the way for the 2-dimensional and 3-dimensional case, you can
+actually initialize them with a 1-dimensional initializer. This is what
+I mean:
+
+First try this:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+char t{[}3{]}{[}3{]} = \{\{\textquotesingle O\textquotesingle,
+\textquotesingle X\textquotesingle, \textquotesingle{}
+\textquotesingle\},
+
+\{\textquotesingle X\textquotesingle,
+\textquotesingle O\textquotesingle, \textquotesingle{}
+\textquotesingle\},
+
+\{\textquotesingle{} \textquotesingle,
+\textquotesingle X\textquotesingle,
+\textquotesingle O\textquotesingle\}\};
+
+for (int i = 0; i \textless{} 3; i++)
+
+\{
+
+for (int j = 0; j \textless{} 3; j++)
+
+\{
+
+\vtop{\hbox{\strut  std::cout \textless\textless{}
+t{[}i{]}{[}j{]};}\hbox{\strut  \}}}
+
+\vtop{\hbox{\strut  std::cout \textless\textless{}
+std::endl;}\hbox{\strut \}}} \\
+\end{longtable}
+
+No surprises. Now try this:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\emph{char t{[}3{]}{[}3{]} =
+\textbf{\{\textquotesingle O\textquotesingle,
+\textquotesingle X\textquotesingle, \textquotesingle{}
+\textquotesingle,}}
+
+\textquotesingle X\textquotesingle, \textquotesingle O\textquotesingle,
+\textquotesingle{} \textquotesingle,
+
+\textquotesingle{} \textquotesingle, \textquotesingle X\textquotesingle,
+\textquotesingle O\textquotesingle\};
+
+for (int i = 0; i \textless{} 3; i++)
+
+\{
+
+for (int j = 0; j \textless{} 3; j++)
+
+\{
+
+\vtop{\hbox{\strut  std::cout \textless\textless{}
+t{[}i{]}{[}j{]};}\hbox{\strut  \}}}
+
+\vtop{\hbox{\strut  std::cout \textless\textless{}
+std::endl;}\hbox{\strut \}}} \\
+\end{longtable}
+
+As you can see, I\textquotesingle m using a 1-dimensional initializer to
+initialize my 2-dimensional array. You can do that. It\textquotesingle s
+not wrong. However it does make the program a little confusing
+sometimes. But I leave it to you. This implies that another way to
+initialize a 2-dimensional array of integers to 0 is this:
+
+int x{[}10{]}{[}10{]} = \{0\}; // do not need \{\{0\}\}
+
+And for a 3-dimensional case you can do this:
+
+int x{[}10{]}{[}10{]}{[}10{]} = \{0\};
+
+Exercises
+
+\textbf{Exercise.} Declare an array of 5-by-5 characters and write loops
+to assignment values to the array so that it looks like this:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule\noalign{}
+& & & & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textquotesingle X\textquotesingle{} &
+\textquotesingle X\textquotesingle{} &
+\textquotesingle X\textquotesingle{} &
+\textquotesingle X\textquotesingle{} &
+\textquotesingle X\textquotesingle{} \\
+\textquotesingle X\textquotesingle{} & \textquotesingle{}
+\textquotesingle{} & \textquotesingle{} \textquotesingle{} &
+\textquotesingle{} \textquotesingle{} &
+\textquotesingle X\textquotesingle{} \\
+\textquotesingle X\textquotesingle{} & \textquotesingle{}
+\textquotesingle{} & \textquotesingle{} \textquotesingle{} &
+\textquotesingle{} \textquotesingle{} &
+\textquotesingle X\textquotesingle{} \\
+\textquotesingle X\textquotesingle{} & \textquotesingle{}
+\textquotesingle{} & \textquotesingle{} \textquotesingle{} &
+\textquotesingle{} \textquotesingle{} &
+\textquotesingle X\textquotesingle{} \\
+\textquotesingle X\textquotesingle{} &
+\textquotesingle X\textquotesingle{} &
+\textquotesingle X\textquotesingle{} &
+\textquotesingle X\textquotesingle{} &
+\textquotesingle X\textquotesingle{} \\
+\end{longtable}
+
+(This builds a wall for a 5-by-5 maze.) Rewrite the code so that it
+works for any size by using a constant for the size.
+
+\textbf{Exercise.} Declare an array of 5-by-10 integers. Put random
+integers 0-9 into the array. Print the array. Write a code segment that
+swaps the values of row 2 and 3. Print the array again and visually
+verify that row 2 and 3 are swapped.
+
+\textbf{Exercise.} Write a function that accepts a 4-by-4 array of
+integers and returns true if for each row, the first non-zero value of
+each row is to the right of the previous one. For instance the following
+will return true:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule\noalign{}
+& & & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & 3 & 3 & 4 \\
+0 & 0 & 3 & 4 \\
+0 & 0 & 0 & 2 \\
+0 & 0 & 0 & 0 \\
+\end{longtable}
+
+\textbf{Exercise.} Write a function that accepts a 4-by-4 array of
+integers and returns true if and only if array as a matrix is symmetric.
+For instance, the following is symmetric:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule\noalign{}
+& & & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & 3 & 3 & 4 \\
+3 & 2 & 1 & 8 \\
+3 & 1 & 0 & 2 \\
+4 & 8 & 2 & 7 \\
+\end{longtable}
+
+Think of the diagonal with values 1, 2, 0, 7 as a mirror. So the example
+is symmetric since for example the entry at row 0, column 3 is the same
+as the entry at row 3, column 0, i.e. 4.
+
+\textbf{Exercise.} Given an integer array of size m-by-m, write a code
+segment to compute the sum of the entries on the main diagonal. For
+instance for the array:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+& & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & 2 & 3 \\
+4 & 5 & 6 \\
+7 & 8 & 9 \\
+\end{longtable}
+
+The sum is 1 + 5 + 9.
+
+\textbf{Exercise.} Given an integer array of size m-by-m, write a code
+segment to compute the sum of the entries on and above the main
+diagonal. For instance for the array:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+& & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & 2 & 3 \\
+4 & 5 & 6 \\
+7 & 8 & 9 \\
+\end{longtable}
+
+The sum is 1 + 2 + 3 + 5 + 6 + 9.
+
+\end{document}

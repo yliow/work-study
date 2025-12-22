@@ -1,0 +1,948 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\author{}
+\date{}
+
+\begin{document}
+
+25. Function Overloading
+
+Objectives
+
+\begin{itemize}
+\tightlist
+\item
+  Understand function signatures
+\item
+  Write overloaded functions
+\end{itemize}
+
+Too many function names to remember!
+
+This is an easy:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+int max(int x, int y)
+
+\{
+
+if (x \textless{} y) return y;
+
+\vtop{\hbox{\strut  else return x;}\hbox{\strut \}}} \\
+\end{longtable}
+
+But what if I want to compute the max of two doubles? If I use the
+above:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+int max(int, int);
+
+int main()
+
+\{
+
+std::cout \textless\textless{} max(3, 42) \textless\textless{}
+\textquotesingle{} \textquotesingle{}
+
+\textless\textless{} max(3.14, 2.718) \textless\textless{} std::endl;
+
+return 0;
+
+\}
+
+\vtop{\hbox{\strut }\hbox{\strut int max(int x, int y)}}
+
+\{
+
+if (x \textless{} y) return y;
+
+\vtop{\hbox{\strut  else return x;}\hbox{\strut \}}} \\
+\end{longtable}
+
+I will lose the fractional part of the true maximum (because when the
+function is called, \emph{x} will have a value of 3 and y will have a
+value of 2.)
+
+In other words 3.14 is typecasted to an integer before
+it\textquotesingle s given to \emph{x}.
+
+So I have to write another max function for doubles. To make sure I
+don\textquotesingle t have two functions with the same name I do this:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+int max(int, int);
+
+double max2(double, double);
+
+int main()
+
+\{
+
+std::cout \textless\textless{} max(3, 42) \textless\textless{}
+\textquotesingle{} \textquotesingle{}
+
+\textless\textless{} max2(3.14, 2.718) \textless\textless{} std::endl;
+
+return 0;
+
+\}
+
+\vtop{\hbox{\strut }\hbox{\strut int max(int x, int y)}}
+
+\{
+
+if (x \textless{} y) return y;
+
+\vtop{\hbox{\strut  else return x;}\hbox{\strut \}}}
+
+double max2(double x, double y)
+
+\{
+
+if (x \textless{} y) return y;
+
+\vtop{\hbox{\strut  else return x;}\hbox{\strut \}}} \\
+\end{longtable}
+
+Now the nightmare begins ...
+
+What if I want the max of an array of integers? An array of doubles?
+Looks like I need:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+int max(int, int);
+
+double max2(double, double);
+
+int max3(int{[}{]}, int len);
+
+double max4(double{[}{]}, int len);
+
+... \\
+\end{longtable}
+
+YIKES!!! HELP ME MAMA!!!
+
+MY HEAD IS GOING TO BLOW UP JUST REMEMBERING WHICH IS WHICH!!!
+
+Function Overloading
+
+This is from the previous section:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+int max(int, int);
+
+double max2(double, double);
+
+int main()
+
+\{
+
+std::cout \textless\textless{} max(3, 42) \textless\textless{}
+\textquotesingle{} \textquotesingle{}
+
+\textless\textless{} max2(3.14, 2.718) \textless\textless{} std::endl;
+
+\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}}
+
+\vtop{\hbox{\strut }\hbox{\strut int max(int x, int y)}}
+
+\{
+
+if (x \textless{} y) return y;
+
+\vtop{\hbox{\strut  else return x;}\hbox{\strut \}}}
+
+double max2(double x, double y)
+
+\{
+
+if (x \textless{} y) return y;
+
+\vtop{\hbox{\strut  else return x;}\hbox{\strut \}}} \\
+\end{longtable}
+
+Make this change:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+int max(int, int);
+
+double max(double, double);
+
+int main()
+
+\{
+
+std::cout \textless\textless{} max(3, 42) \textless\textless{}
+\textquotesingle{} \textquotesingle{}
+
+\textless\textless{} max(3.14, 2.718) \textless\textless{} std::endl;
+
+\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}}
+
+\vtop{\hbox{\strut }\hbox{\strut int max(int x, int y)}}
+
+\{
+
+if (x \textless{} y) return y;
+
+\vtop{\hbox{\strut  else return x;}\hbox{\strut \}}}
+
+double max(double x, double y)
+
+\{
+
+if (x \textless{} y) return y;
+
+\vtop{\hbox{\strut  else return x;}\hbox{\strut \} }} \\
+\end{longtable}
+
+Run it.
+
+:O
+
+How come C++ is not confused by two functions with the
+\emph{\textbf{same name}}?
+
+The reason is because C++ recognizes functions by their \textbf{names
+}\emph{\textbf{and}}\textbf{ the types of the parameters}. Here are the
+prototypes of the above function:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+int max(int, int);
+
+double max(double, double); \\
+\end{longtable}
+
+You can think of it this way: the integer \emph{max()} function is
+identified by \emph{(max, int, int)} and the double \emph{max()}
+function is identified by \emph{(max, double, double)}.
+
+You see what happens is that the actual function name of \emph{max(int,
+int)} might be \emph{max\_int\_int()} and the name of \emph{max(double,
+double) }might be \emph{max\_double\_double()}. I say ``might'' because
+it depends on the compiler. For instance another compiler might use
+\emph{max\_\_\_\_int\_\_\_\_int()} instead of \emph{max\_int\_int()}.
+This change of function name is called name mangling.
+
+The types of the parameters is called the \textbf{signature} of the
+function. So the signature of
+
+\begin{longtable}[]{@{}l@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+int max(int, int); \\
+\end{longtable}
+
+is \emph{(int, int)}.
+
+The important thing to remember that a function is identified by its
+\textbf{name} \emph{and} \textbf{signature}.
+
+Of course now that a function is determined by its name and signature,
+this tells you that you cannot have two different functions with the
+same name and signature. Therefore this is BAD:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+void bad(int x, double y, char z)
+
+\{
+
+std::cout \textless\textless{} "first bad ..." \textless\textless{}
+\textquotesingle\textbackslash n\textquotesingle;
+
+\vtop{\hbox{\strut  ...}\hbox{\strut \}}}
+
+int bad(int x, double y, char z)
+
+\{
+
+std::cout \textless\textless{} "second bad ..." \textless\textless{}
+\textquotesingle\textbackslash n\textquotesingle;
+
+\vtop{\hbox{\strut  ...}\hbox{\strut \}}} \\
+\end{longtable}
+
+Yes, yes, yes \ldots{} the return type is different \ldots{} but C++
+only looks at the name and the signature when choosing a function to
+execute.
+
+So we revise the way C++ searches for identifiers (i.e. names):
+
+\begin{itemize}
+\item
+  The search for variables is still the same
+\item
+  The search for functions when they are called is different.
+\item
+  \begin{quote}
+  If the function name can be found and the types of the arguments
+  passed in matches the function signature (the type of the parameters),
+  then that function is used.
+  \end{quote}
+\item
+  \begin{quote}
+  Otherwise, C++ will try to typecast the arguments to values that will
+  match a signature.
+  \end{quote}
+\end{itemize}
+
+Here\textquotesingle s one more example. Run it.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\#include \textless iostream\textgreater{}
+
+void f(int, int, int);
+
+void f(double, double, double);
+
+int main()
+
+\{
+
+f(1, 2, 3);
+
+f(1.1, 2.2, 3.3);
+
+return 0;
+
+\}
+
+void f(int x, int y, int z)
+
+\{
+
+std::cout \textless\textless{} "f(int, int, int)" \textless\textless{}
+std::endl;
+
+\}
+
+void f(double x, double y, double z)
+
+\{
+
+std::cout \textless\textless{} "f(double, double, double)"
+
+\textless\textless{} std::endl;
+
+\} \\
+\end{longtable}
+
+When you have several functions with the same name (but different
+signatures!), we say that the function is \textbf{overloaded}.
+
+Exercise. Here are two function prototypes:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+// computes the maximum value of the array passed in
+
+int max(int{[}{]}, int len);
+
+double max(double{[}{]}, int len); \\
+\end{longtable}
+
+Implement the function bodies and test them in a \emph{main()}.
+
+Exercise. Implement the following and test your code.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+// Functions return the minimum of values passed in
+
+// either through parameters or values in an array
+
+int min(int, int);
+
+double min(double, double);
+
+int min(int{[}{]}, int len);
+
+double min(double{[}{]}, int len); \\
+\end{longtable}
+
+Exercise. Implement and test your functions for the following
+prototypes:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+// area functions
+
+double area(double, double); // area of rectangle
+
+// with given sides
+
+double area(double); // area of circle with
+
+// given radius \\
+\end{longtable}
+
+Remember earlier in the semester when I said that there are two +
+operators. Example:
+
+1 + 2 integer addition operator
+
+1.2 + 3.4 double addition operator
+
+At that point I told you to remember this important distinction. This is
+very similar to function overloading, except that these are operators
+and not functions. We say that + is an \textbf{overloaded operator}. In
+CISS245 you will learn to define your own operators so for instance you
+can define your own operators including +.
+
+WARNING: \emph{const int} and \emph{int}
+
+Here\textquotesingle s a warning: ``const int'' is the same type as
+``int''. The ``const'' is about the nature of the value that a variable
+refers to, i.e. for
+
+const int x = 42;
+
+the const simply means that x is a constant variable. The type of value
+that x has is still an \emph{int}. Now why is this important in the
+context of function overloading? Well \ldots{} the above implies that
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+void f(int x)
+
+\{
+
+\}
+
+void f(const int x)
+
+\{
+
+\}
+
+int main()
+
+\{
+
+return 0;
+
+\} \\
+\end{longtable}
+
+will not compile because the two functions \emph{f} above have the same
+signature. Make sure you at least compile the above and read the error
+message from the compiler so that when this error bites you, you'll know
+why.
+
+\textbf{Exercise.} What about references? Are \emph{int\&} and
+\emph{int} considered the same too? In other words does the following
+compile:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+void f(int x)
+
+\{
+
+\}
+
+void f(int \& x)
+
+\{
+
+\}
+
+int main()
+
+\{
+
+return 0;
+
+\} \\
+\end{longtable}
+
+Why Overloading?
+
+The reason why we have function (and operator) overloading is clear:
+Many functions perform similar operations and we want to remember fewer
+names.
+
+This is also the case in Math. Not only is + used for addition of real
+numbers, it\textquotesingle s also used for things like addition of
+functions, addition of vectors, addition of matrices, etc. So having
+function/operator overloading in a programming language allows us to
+design software to match the mathematical language/symbols that we are
+used to.
+
+Even in daily use of the English language, we see the same word used
+similar but different situations: open a door, open a jar, open my
+wallet, open your mind, etc.
+
+Overloading is a software technique for controlling software
+complexities.
+
+(Some older programming languages do not have function overloading. Some
+don\textquotesingle t even allow you to define your own operators. Also,
+there are programming languages where overloading is not allowed. In
+fact there are programming languages where the symbol for adding
+integers is different from the symbol for adding doubles.)
+
+Return type warning
+
+I\textquotesingle ve already mentioned this \ldots{}
+but\textquotesingle s it\textquotesingle s such a common error that
+it\textquotesingle s a good idea to repeat it \ldots{}
+
+\ldots{} the \textbf{return type is }\emph{\textbf{not}}\textbf{ part of
+the identification of a function}. In other words the following is
+\textbf{incorrect}:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+int f(int); // identified as f, int
+
+double f(int); // identified as f, int \\
+\end{longtable}
+
+Why? Because of this ...
+
+Recall that it\textquotesingle s OK \emph{\textbf{not}} to use the
+return value of a function. For instance this is a valid piece of code:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+int f()
+
+\{
+
+return 42;
+
+\}
+
+int main()
+
+\{
+
+f(); // return value is not used
+
+\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
+\end{longtable}
+
+In fact even this is OK:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+int main()
+
+\{
+
+42;
+
+\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
+\end{longtable}
+
+Now suppose you have a C++ compiler (called Crazy C++) that identifies
+function by their names, signatures \textbf{and return types}. Then you
+have this \textbf{problem}:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+int f(int)
+
+\{\}
+
+double f(int) // should be different from above f()
+
+\{\}
+
+int main()
+
+\{
+
+f(42); // Crazy C++: ... which one to use???
+
+// the return type is not indicated!!!
+
+\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
+\end{longtable}
+
+Make sure you run this program.
+
+Type Casting and Ambiguous Invocation
+
+Recall that this is how C++ searches for functions (see above):
+
+\begin{itemize}
+\tightlist
+\item
+  If the function name can be found and the types of the arguments
+  passed in matches the function signature (the type of the parameters),
+  then that function is used.
+\item
+  Otherwise, C++ will try to typecast to something suitable.
+\end{itemize}
+
+Try this:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\#include \textless iostream\textgreater{}
+
+void f(int, int, int);
+
+int main()
+
+\{
+
+f(1, 2, 3);
+
+f(4.4, 5.5, 6.6);
+
+return 0;
+
+\}
+
+void f(int x, int y, int z)
+
+\{
+
+std::cout \textless\textless{} "f(int, int, int)" \textless\textless{}
+std::endl;
+
+\} \\
+\end{longtable}
+
+Now this:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\#include \textless iostream\textgreater{}
+
+void f(int, int, int);
+
+void f(double, double, double);
+
+int main()
+
+\{
+
+f(1, 2, 3);
+
+f(1.1, 2.2, 3.3);
+
+return 0;
+
+\}
+
+void f(int x, int y, int z)
+
+\{
+
+std::cout \textless\textless{} "f(int, int, int)" \textless\textless{}
+std::endl;
+
+\}
+
+void f(double x, double y, double z)
+
+\{
+
+std::cout \textless\textless{} "f(double, double, double)"
+
+\textless\textless{} std::endl;
+
+\} \\
+\end{longtable}
+
+So far so good \ldots{}
+
+But now ...
+
+\textbf{Exercise.} Add \emph{f(1, 2, 3.4);} to the main of the program
+above and run it.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+...
+
+int main()
+
+\{
+
+f(1, 2, 3);
+
+f(1.1, 2.2, 3.3);
+
+f(1, 2, 3.4);
+
+return 0;
+
+\}
+
+... \\
+\end{longtable}
+
+Does it work?
+
+There are two possibilities: C++ can call
+
+\emph{void f(int, int, int)} type cast 3.4 to 3
+
+\emph{void f(double, double, double) }type cast 1 to 1.0, 2 to 2.0
+
+If there are two or more possible function calls after attempts to type
+cast, C++ will choke and yell at you. This type of error is called
+\textbf{ambiguous invocation}.
+
+As mentioned before: Always be explicit in your code -\/- as much as
+possible avoid implicit typecasts that are done behind your back.
+Something like:
+
+int x = 0;
+
+double y = x;
+
+should be written
+
+int x = 0;
+
+double y = double(x);
+
+\textbf{Exercise.} Are there any ambiguous function calls? Find and
+circle if any.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
+\toprule\noalign{}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+void f(int x, int y, int z)
+
+\{\}
+
+void f(int x)
+
+\{\}
+
+void f()
+
+\{\}
+
+void f(int x, int y, double z)
+
+\{\}
+
+int main()
+
+\{
+
+f(1);
+
+f(1, 2, 3);
+
+f(1.1, 3.3, 4.4);
+
+\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
+\end{longtable}
+
+Verify with your C++.
+
+\end{document}
