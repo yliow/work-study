@@ -1,1774 +1,1075 @@
-% Options for packages loaded elsewhere
-\PassOptionsToPackage{unicode}{hyperref}
-\PassOptionsToPackage{hyphens}{url}
-%
-\documentclass[
-]{article}
-\usepackage{amsmath,amssymb}
-\usepackage{iftex}
-\ifPDFTeX
-  \usepackage[T1]{fontenc}
-  \usepackage[utf8]{inputenc}
-  \usepackage{textcomp} % provide euro and other symbols
-\else % if luatex or xetex
-  \usepackage{unicode-math} % this also loads fontspec
-  \defaultfontfeatures{Scale=MatchLowercase}
-  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
-\fi
-\usepackage{lmodern}
-\ifPDFTeX\else
-  % xetex/luatex font selection
-\fi
-% Use upquote if available, for straight quotes in verbatim environments
-\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
-\IfFileExists{microtype.sty}{% use microtype if available
-  \usepackage[]{microtype}
-  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
-}{}
-\makeatletter
-\@ifundefined{KOMAClassName}{% if non-KOMA class
-  \IfFileExists{parskip.sty}{%
-    \usepackage{parskip}
-  }{% else
-    \setlength{\parindent}{0pt}
-    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
-}{% if KOMA class
-  \KOMAoptions{parskip=half}}
-\makeatother
-\usepackage{xcolor}
-\usepackage{longtable,booktabs,array}
-\usepackage{calc} % for calculating minipage widths
-% Correct order of tables after \paragraph or \subparagraph
-\usepackage{etoolbox}
-\makeatletter
-\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
-\makeatother
-% Allow footnotes in longtable head/foot
-\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
-\makesavenoteenv{longtable}
-\setlength{\emergencystretch}{3em} % prevent overfull lines
-\providecommand{\tightlist}{%
-  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
-\ifLuaTeX
-  \usepackage{selnolig}  % disable illegal ligatures
-\fi
-\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
-\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
-\urlstyle{same}
-\hypersetup{
-  hidelinks,
-  pdfcreator={LaTeX via pandoc}}
+\newpage\EMPHASIZE{22. Reference Parameters}
 
-\author{}
-\date{}
-
-\begin{document}
-
-Objectives
-
+\textsc{Objectives}
 \begin{itemize}
-\tightlist
-\item
-  Understand and use reference variables
-\item
-  Write functions with reference parameters
+\item Understand and use reference variables
+\item Write functions with reference parameters
 \end{itemize}
 
-You have already seen references (or reference variables). This chapter
-is a quick review and some more information on references.
+You have already seen references (or reference variables). This chapter is a quick review and some more information on references.
 
-Problems with Our Functions
 
-What about writing a function to perform ``array assignment'', i.e., we
-want to do the following:
+\newpage\EMPHASIZE{Problems with Our Functions}
 
-int x{[}{]} = \{1,2,3\};
+What about writing a function to perform ``array assignment'', i.e., we want to do the following:
 
+\begin{consolethree}[escapeinside=||]
+int x[] = {1,2,3};
 int xSize = 3;
-
-int y{[}3{]};
-
+int y[3];
 int ySize = 3;
-
 arrayAssign(y, 3, x, 3); // like y = x
+\end{consolethree}
 
-That\textquotesingle s easy: Just write a for-loop in the function to
-pass the values from one to the other.
+That's easy: Just write a for-loop in the function to pass the values from one to the other.
 
-This works for arrays of the same size. What if I use a ``length'' for
-an array?
+This works for arrays of the same size. What if I use a ``length'' for an array?
 
-What I mean is that suppose I have an array of size 1000. I want to use
-the array like a container: I want to put values into the array and I
-want to pull values out of the array. The length of an array measures
-the number of things I put into the array that has not been taken out.
-For instance suppose I have the following:
+What I mean is that suppose I have an array of size 1000. I want to use the array like a container: I want to put values into the array and I want to pull values out of the array. The length of an array measures the number of things I put into the array that has not been taken out. For instance suppose I have the following:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-const int GOOGLE\_STOCK\_PRICE\_SIZE = 1000;
+\begin{consolethree}[escapeinside=||]
+const int GOOGLE_STOCK_PRICE_SIZE = 1000;
+double googleStockPrice[GOOGLE_STOCK_PRICE_SIZE];
+\end{consolethree}
 
-double googleStockPrice{[}GOOGLE\_STOCK\_PRICE\_SIZE{]}; \\
-\end{longtable}
+which records the stock as the day progresses. \texttt{googleStockPrice[0]} is the stock price of Google at 9:00AM when the stock market opens, and \texttt{googleStockPrice[1]} is the stock price at 9:01AM, etc. At 9:05AM, I have stock prices of Google for 9:00AM, 9:01AM, 9:02AM, 9:03AM, 9:04AM, 9:05AM, i.e. there are 6 values. Of course the array has a size of 1000. But only \texttt{googleStockPrice[i]} for i = 0, 1, 2, 3, 4, 5 are valid at that point in time. I can keep track of how many values (from index 0) are valid using an integer variable, say \texttt{googleStockPriceLen} (Len for length).
 
-which records the stock as the day progresses.
-\emph{googleStockPrice{[}0{]}} is the stock price of Google at 9:00AM
-when the stock market opens, and \emph{googleStockPrice{[}1{]}} is the
-stock price at 9:01AM, etc. At 9:05AM, I have stock prices of Google for
-9:00AM, 9:01AM, 9:02AM, 9:03AM, 9:04AM, 9:05AM, i.e. there are 6 values.
-Of course the array has a size of 1000. But only
-\emph{googleStockPrice{[}i{]}} for i = 0, 1, 2, 3, 4, 5 are valid at
-that point in time. I can keep track of how many values (from index 0)
-are valid using an integer variable, say \emph{googleStockPriceLen} (Len
-for length).
+\begin{consolethree}[escapeinside=||]
+const int GOOGLE_STOCK_PRICE_SIZE = 1000;
+double googleStockPrice[GOOGLE_STOCK_PRICE_SIZE];
+int googleStockPriceLen = 0;
+\end{consolethree}
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-const int GOOGLE\_STOCK\_PRICE\_SIZE = 1000;
+So make sure you see the difference between the two different measures of an array: one measures the \EMPHASIZE{total number of values the array can hold}, and the other measures \EMPHASIZE{the number of values that have been placed into the array that has not been taken out}.
 
-double googleStockPrice{[}GOOGLE\_STOCK\_PRICE\_SIZE{]};
+Now suppose we want to write an array assignment function for such a general situation (remember: you want functions to be re-usable, therefore you want to make them general enough), then you want to be able to do this:
 
-int googleStockPriceLen = 0; \\
-\end{longtable}
-
-So make sure you see the difference between the two different measures
-of an array: one measures the \textbf{total number of values the array
-can hold}, and the other measures \textbf{the number of values that have
-been placed into the array that has not been taken out}.
-
-Now suppose we want to write an array assignment function for such a
-general situation (remember: you want functions to be re-usable,
-therefore you want to make them general enough), then you want to be
-able to do this:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 const int XSIZE = 10;
-
-int x{[}XSIZE{]} = \{42, 41, 40\};
-
+int x[XSIZE] = {42, 41, 40};
 int xlen = 3;
-
 const int YSIZE = 10;
-
-int y{[}YSIZE{]};
-
+int y[YSIZE];
 int ylen = 0;
+arrayAssign(y, ylen, x, xlen); // sorta like y = x
+\end{consolethree}
 
-arrayAssign(y, ylen, x, xlen); // sorta like y = x \\
-\end{longtable}
+After the function call you want \texttt{y[0] = 42}, \texttt{y[1] =
+41}, \texttt{y[2] = 40} and \texttt{ylen = 3.}
 
-After the function call you want \emph{y{[}0{]} = 42}, \emph{y{[}1{]} =
-41}, \emph{y{[}2{]} = 40} and \emph{ylen = 3. }
+Now note this: A function can change the values of \texttt{y} which is an array. But the problem is that \texttt{ylen} is an integer variable and hence cannot be changed by a function when it is passed in as a pass-by-value parameter. Right? Here's an example:
 
-Now note this: A function can change the values of \emph{y} which is an
-array. But the problem is that \emph{ylen} is an integer variable and
-hence cannot be changed by a function when it is passed in as a
-pass-by-value parameter. Right? Here\textquotesingle s an example:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 void swap(int a, int b)
-
-\{
-
-int t = a;
-
-a = b;
-
-\vtop{\hbox{\strut  b = t;}\hbox{\strut \}}}
+{
+    int t = a;
+    a = b;
+    b = t;
+}
 
 int main()
+{
+    int x = 0;
+    int y = 42;
+    swap(x, y); // x, y NOT CHANGED!!!!!!!!!!!!!!!!!!
+    std::cout << x << ' ' << y << std::endl;
+    return 0;
+}
+\end{consolethree}
 
-\{
+One way to get around that is that you can return a value from a function and use that to change the value of \texttt{ylen} in the calling function. So the code using the array assignment function would look like this:
 
-int x = 0;
-
-int y = 42;
-
-swap(x, y); // x, y NOT CHANGED!!!!!!!!!!!!!!!!!!
-
-std::cout \textless\textless{} x \textless\textless{} \textquotesingle{}
-\textquotesingle{} \textless\textless{} y \textless\textless{}
-std::endl;
-
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
-
-One way to get around that is that you can return a value from a
-function and use that to change the value of \emph{ylen} in the calling
-function. So the code using the array assignment function would look
-like this:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 const int XSIZE = 10;
-
-int x{[}XSIZE{]} = \{42, 41, 40\};
-
+int x[XSIZE] = {42, 41, 40};
 int xlen = 3;
-
 const int YSIZE = 10;
-
-int y{[}YSIZE{]};
-
+int y[YSIZE];
 int ylen = 0;
+ylen = arrayAssign(y, x, xlen); // sorta like y = x
+\end{consolethree}
 
-ylen = arrayAssign(y, x, xlen); // sorta like y = x \\
-\end{longtable}
+That will work. \EMPHASIZE{But} the prototype of this function would look very different from other useful array functions. This is how a header file for all the useful array functions if you have one:
 
-That will work. \textbf{But} the prototype of this function would look
-very different from other useful array functions. This is how a header
-file for all the useful array functions if you have one:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 // array.h
+bool arrayEqual(int[], int, int[], int);
+bool arrayNotEqual(int[], int, int[], int);
+void bubbleSort(int[], int);
+int binarySearch(int[], int, int target);
+int arrayAssign(int[], int[], int);
+\end{consolethree}
 
-bool arrayEqual(int{[}{]}, int, int{[}{]}, int);
+One quality of a well-designed program is one with \EMPHASIZE{least surprises}. In all parameters, you always see an array followed by a length ... EXCEPT for the case of \texttt{arrayAssign()}.
 
-bool arrayNotEqual(int{[}{]}, int, int{[}{]}, int);
+There's another problem with using return values to change variables: If you want to change the value of two variables through one single function call you CAN'T. \EMPHASIZE{A function cannot return two values at the same time}. The following \EMPHASIZE{does NOT work}:
 
-void bubbleSort(int{[}{]}, int);
-
-int binarySearch(int{[}{]}, int, int target);
-
-int arrayAssign(int{[}{]}, int{[}{]}, int); \\
-\end{longtable}
-
-One quality of a well-designed program is one with \textbf{least
-surprises}. In all parameters, you always see an array followed by a
-length ... EXCEPT for the case of \emph{arrayAssign()}.
-
-There\textquotesingle s another problem with using return values to
-change variables: If you want to change the value of two variables
-through one single function call you CAN\textquotesingle T. \textbf{A
-function cannot return two values at the same time}. The following
-\textbf{does NOT work}:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\textbf{int,int} swap(int a, int b)
-
-\{
-
-int t = a;
-
-a = b;
-
-b = t;
-
-\vtop{\hbox{\strut  \textbf{return a, b // abominable}}\hbox{\strut \}}}
+\begin{consolethree}[escapeinside=||]
+int,int swap(int a, int b)
+{
+    int t = a;
+    a = b;
+    b = t;
+    return a, b // abominable
+}
 
 int main()
+{
+    int x = 0;
+    int y = 42;
+    x, y = swap(x, y); // :o
+    return 0;
+}
+\end{consolethree}
 
-\{
 
-int x = 0;
-
-int y = 42;
-
-\textbf{x, y = swap(x, y); // :o}
-
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
-
-Pass-by-Reference
+\newpage\EMPHASIZE{Pass-by-Reference}
 
 Now try this
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-void swap(int \textbf{\&} a, int \textbf{\&} b)
-
-\{
-
-int t = a;
-
-a = b;
-
-\vtop{\hbox{\strut  b = t;}\hbox{\strut \}}}
+\begin{consolethree}[escapeinside=||]
+void swap(int & a, int & b)
+{
+    int t = a;
+    a = b;
+    b = t;
+}
 
 int main()
+{
+    int x = 0;
+    int y = 42;
+    swap(x, y);
+    std::cout << x << ' ' << y << std::endl;
+    return 0;
+}
+\end{consolethree}
 
-\{
+The variables \texttt{a} and \texttt{b} are called \EMPHASIZE{reference variable}, in particular they are integer reference variables. They are different from the regular plain-jane variables. They \EMPHASIZE{do not have their own memory for keeping values}. They \textbf{refer} to other variables. A reference variable is an \EMPHASIZE{alias} of another variable.
+\newpage
+Now back to our program with the \texttt{swap()} function:
 
-int x = 0;
-
-int y = 42;
-
-swap(x, y);
-
-std::cout \textless\textless{} x \textless\textless{} \textquotesingle{}
-\textquotesingle{} \textless\textless{} y \textless\textless{}
-std::endl;
-
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
-
-The variables \emph{a} and \emph{b} are called \textbf{reference
-variable}, in particular they are integer reference variables. They are
-different from the regular plain-jane variables. They \textbf{do not
-have their own memory for keeping values}. They \textbf{refer} to other
-variables. A reference variable is an \textbf{alias} of another
-variable.
-
-Now back to our program with the \emph{swap()} function:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-void swap(int \textbf{\&} a, int \textbf{\&} b)
-
-\{
-
-int t = a;
-
-a = b;
-
-\vtop{\hbox{\strut  b = t;}\hbox{\strut \}}}
+\begin{consolethree}[escapeinside=||]
+void swap(int & a, int & b)
+{
+    int t = a;
+    a = b;
+    b = t;
+}
 
 int main()
+{
+    int x = 0;
+    int y = 42;
+    swap(x, y);
+    std::cout << x << ' ' << y << std::endl;
+    return 0;
+}
+\end{consolethree}
+\sidenote
+{
+\begin{tikzpicture}
+    \node[draw,text width=3cm,minimum height=3cm,minimum width=2cm, line width=0.05cm, inner sep=0.3cm] (a) at (-4,-2) {};
+    \node[draw,text width=3cm,minimum height=3cm,minimum width=2cm, line width=0.05cm, inner sep=0.3cm, yshift=-4cm] (b) at (a.south) {};
+    \node[xshift=-8mm, yshift=8mm] (a_arr) at (a.west) {};
+    \node[xshift=-8mm, yshift=8mm] (a0_arr) at (b.west) {};
+    \node[xshift=-6mm] (b_arr) at (a.west) {};
+    \node[xshift=-6mm, yshift=-1mm] (b0_arr) at (b.west) {};
+    \node[xshift=-6mm, yshift=-8mm] (c_arr) at (a.west) {};
+    \node[xshift=-6mm, yshift=-8mm] (c0_arr) at (b.west) {};
 
-\{
+    \node[text width=1mm,minimum height=1mm,minimum width=1mm, line width=0.05cm, inner sep=0.3cm, xshift=5mm, yshift=8mm] (aval) at (a.west) {\large{a}};
+    \node[text width=1mm,minimum height=1mm,minimum width=1mm, line width=0.05cm, inner sep=0.3cm, xshift=5mm] (bval) at (a.west) {\large{b}};
 
-int x = 0;
+    \node[text width=1mm,minimum height=1mm,minimum width=1mm, line width=0.05cm, inner sep=0.3cm, xshift=5mm, yshift=-8mm] (tval) at (a.west) {\large{t}};
+    \node[draw, text width=9mm,minimum height=1mm,minimum width=5mm, line width=0.05cm, inner sep=0.3cm, yshift=-8mm] (tvalbox) at (a.center) {\large{0}};
 
-int y = 42;
+    \node[text width=9mm,minimum height=1mm,minimum width=1mm, line width=0.05cm, inner sep=0.3cm, xshift=8mm, yshift=8mm] (xval) at (b.west) {\large{x}};
+    \node[draw, text width=9mm,minimum height=1mm,minimum width=5mm, line width=0.05cm, inner sep=0.3cm, yshift=8mm] (xvalbox) at (b.center) {\large{42}};
 
-swap(x, y);
+    \node[text width=9mm,minimum height=1mm,minimum width=5mm, line width=0.05cm, inner sep=0.3cm, xshift=8mm, yshift=-5mm] (yval) at (b.west) {\large{y}};
+    \node[draw, text width=9mm,minimum height=1mm,minimum width=5mm, line width=0.05cm, inner sep=0.3cm, yshift=-5mm] (yvalbox) at (b.center) {\large{0}};
 
-std::cout \textless\textless{} x \textless\textless{} \textquotesingle{}
-\textquotesingle{} \textless\textless{} y \textless\textless{}
-std::endl;
+    \draw [dashed, ultra thick, ->] (aval) -- (a_arr) -- (a0_arr) -- (xval);
+    \draw [dashed, ultra thick, ->] (bval) -- (b_arr) -- (b0_arr) -- (yval)[xshift=-5mm];
+    %this really doesnt look as good as i want it to, definitely needs another go after all other notes are finished
+    \node[draw, text width=5cm,minimum height=2cm,minimum width=5cm, line width=0.0mm, inner sep=0.5cm, yshift=2cm] (text0) at (a.north) {\normalsize{The memory models just before the return from \texttt{swap()} to \texttt{main()}. Note that a and b do not have their own memory for values}};
 
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
+\end{tikzpicture}
+}
 
-when \emph{main()} calls \emph{swap()}, the integer reference variable
-\emph{a} in \emph{swap()} will \textbf{refer} to the memory of \emph{x};
-it \textbf{does not receive a value} from \emph{x}. As a matter of fact,
-referring the diagram, you see that \emph{a} does not even have its own
-memory!
+when \texttt{main()} calls \texttt{swap()}, the integer reference variable \texttt{a} in \texttt{swap()} will \EMPHASIZE{refer} to the memory of \texttt{x}; it \EMPHASIZE{does not receive a value} from \texttt{x}. As a matter of fact, referring the diagram, you see that \texttt{a} does not even have its own memory!
 
-Likewise the integer reference variable \emph{b} in \emph{swap()} does
-not have have its own memory but rather it refers to the memory of
-\emph{y}.
+Likewise the integer reference variable \texttt{b} in \texttt{swap()} does not have have its own memory but rather it refers to the memory of \texttt{y}.
 
-We call this type of parameter passing \textbf{pass-by-reference}. We
-say that the \emph{a} in \emph{swap()} is a pass-by-reference parameter.
+We call this type of parameter passing \EMPHASIZE{pass-by-reference}. We say that the \texttt{a} in \texttt{swap()} is a pass-by-reference parameter.
 
-To simplify the scenario, let\textquotesingle s forget about functions
-and just look at reference variables alone. Try this:
+To simplify the scenario, let's forget about functions and just look at reference variables alone. Try this:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 int i = 5;
-
-int \& j = i;
-
-std::cout \textless\textless{} i \textless\textless{} \textquotesingle{}
-\textquotesingle{} \textless\textless{} j \textless\textless{}
-std::endl;
-
+int & j = i;
+std::cout << i << ' ' << j << std::endl;
 i = 42;
-
-std::cout \textless\textless{} i \textless\textless{} \textquotesingle{}
-\textquotesingle{} \textless\textless{} j \textless\textless{}
-std::endl;
-
+std::cout << i << ' ' << j << std::endl;
 j = 0;
+std::cout << i << ' ' << j << std::endl;
+\end{consolethree}
 
-std::cout \textless\textless{} i \textless\textless{} \textquotesingle{}
-\textquotesingle{} \textless\textless{} j \textless\textless{}
-std::endl; \\
-\end{longtable}
+As you can see \texttt{j} has type
 
-As you can see \emph{j} has type
+\texttt{int \&}
 
-\emph{int \&}
+i.e. \texttt{j} is an integer reference. It's initialized to \texttt{i}. That means that \texttt{j} refers to the memory of \texttt{i}.
 
-i.e. \emph{j} is an integer reference. It\textquotesingle s initialized
-to \emph{i}. That means that \emph{j} refers to the memory of \emph{i}.
+\begin{ex}
+Can you declare reference variables of doubles?
 
-\textbf{Exercise.} Can you declare reference variables of doubles?
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 double i = 3.14;
-
-\_\_\_\_\_\_\_\_\_ j = i; // declare j to be a reference to I
-
-std::cout \textless\textless{} i \textless\textless{} \textquotesingle{}
-\textquotesingle{} \textless\textless{} j \textless\textless{}
-std::endl;
-
+|\textbf{\_\_\_\_\_\_\_\_\_ j = i; // declare j to be a reference to I}|
+std::cout << i << ' ' << j << std::endl;
 i = 2.718;
-
-std::cout \textless\textless{} i \textless\textless{} \textquotesingle{}
-\textquotesingle{} \textless\textless{} j \textless\textless{}
-std::endl;
-
+std::cout << i << ' ' << j << std::endl;
 j = -1;
+std::cout << i << ' ' << j << std::endl;
+\end{consolethree}
+\end{ex}
 
-std::cout \textless\textless{} i \textless\textless{} \textquotesingle{}
-\textquotesingle{} \textless\textless{} j \textless\textless{}
-std::endl; \\
-\end{longtable}
-
-See how a reference variable behaves? \emph{j} refers to the memory of
-\emph{i}. \emph{j} is just another name for \emph{i};
-it\textquotesingle s an alias for \emph{i.}
+See how a reference variable behaves? \texttt{j} refers to the memory of \texttt{i}. \texttt{j} is just another name for \texttt{i}; it's an alias for \texttt{i.}
 
 In terms of our program
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-void swap(int \textbf{\&} a, int \textbf{\&} b)
-
-\{
-
-int t = a;
-
-a = b;
-
-\vtop{\hbox{\strut  b = t;}\hbox{\strut \}}}
+\begin{consolethree}[escapeinside=||]
+void swap(int |\textbf{\&}| a, int |\textbf{\&}| b)
+{
+    int t = a;
+    a = b;
+    b = t;
+}
 
 int main()
+{
+    int x = 0;
+    int y = 42;
+    swap(x, y);
+    std::cout << x << ' ' << y << std::endl;
+    return 0;
+}
+\end{consolethree}
 
-\{
+when \texttt{swap()} is called, the reference variable \texttt{a} is created and is assigned \texttt{x} which makes \texttt{a} a reference to \texttt{x} -- \texttt{a} uses the memory of \texttt{x.} Whatever you do to \texttt{a} in \texttt{swap()} therefore also change \texttt{x.}
 
-int x = 0;
+\begin{ex}
+Fix this program so that it works:
 
-int y = 42;
-
-swap(x, y);
-
-std::cout \textless\textless{} x \textless\textless{} \textquotesingle{}
-\textquotesingle{} \textless\textless{} y \textless\textless{}
-std::endl;
-
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
-
-when \emph{swap()} is called, the reference variable \emph{a} is created
-and is assigned \emph{x} which makes \emph{a} a reference to \emph{x} --
-\emph{a} uses the memory of \emph{x. }Whatever you do to \emph{a} in
-\emph{swap()} therefore also change \emph{x.}
-
-\textbf{Exercise.} Fix this program so that it works:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 void inc(int x)
-
-\{
-
-\vtop{\hbox{\strut  x++;}\hbox{\strut \}}}
+{
+    x++;
+}
 
 int main()
-
-\{
-
-int a = 42;
-
-inc(a);
-
-std::cout \textless\textless{} a \textless\textless{} std::endl; //
-should see 43
-
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
+{
+    int a = 42;
+    inc(a);
+    std::cout << a << std::endl; // should see 43
+    return 0;
+}
+\end{consolethree}
 
 (Of course this is just for demo. In a real world program, you should
 use ++ instead of writing a function for it!)
+\end{ex}
 
-\textbf{Exercise.} Complete this program:
+\begin{ex}
+Complete this program:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 // sort x, y, z in ascending order using bubblesort
-
-void sort(int \& x, int \& y, int \& z)
-
-\{
-
-\vtop{\hbox{\strut  ... CODE ...}\hbox{\strut \}}}
+void sort(int & x, int & y, int & z)
+{
+    ... CODE ...
+}
 
 int main()
+{
+    int x = 3, y = 5, z = 2;
+    sort(x, y, z);
+    std::cout << x << ' ' << y << ' ' << z
+              << std::endl; // should get: 2 3 5
+    return 0;
+}
+\end{consolethree}
+\end{ex}
 
-\{
+Advice: In general we only use references only when a function is meant to change the value of a variable that is passed in. We do not want accidental changes in the function to propagate back to the caller. In other words, use references only when you need to. Therefore you should minimize the use of reference variables.
 
-int x = 3, y = 5, z = 2;
 
-sort(x, y, z);
-
-std::cout \textless\textless{} x \textless\textless{} \textquotesingle{}
-\textquotesingle{} \textless\textless{} y \textless\textless{} z
-\textless\textless{} \textquotesingle{} \textquotesingle{}
-
-\textless\textless{} std::endl; // should get: 2 3 5
-
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
-
-Advice: In general we only use references only when a function is meant
-to change the value of a variable that is passed in. We do not want
-accidental changes in the function to propagate back to the caller. In
-other words, use references only when you need to. Therefore you should
-minimize the use of reference variables.
-
-Style
+\newpage\EMPHASIZE{Style}
 
 Instead of
 
-\emph{int \& x}
+\texttt{int \& x}
 
-It\textquotesingle s actually more common to write
+It's actually more common to write
 
-\emph{int\& x}
+\texttt{int\& x}
 
 Another style is this:
 
 int \&x;
 
-Gotcha
+
+\newpage\EMPHASIZE{Gotcha}
 
 Warning!!! This code fragment
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 int x = 42;
-
-int \& a = x, b = x, c = x; \\
-\end{longtable}
+int & a = x, b = x, c = x;
+\end{consolethree}
 
 means this:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 int x = 42;
-
-int \& a = x;
-
+int & a = x;
 int b = x;
+int c = x;
+\end{consolethree}
 
-int c = x; \\
-\end{longtable}
+If you really want \texttt{b} and \texttt{c} to be references, then you should do this:
 
-If you really want \emph{b} and \emph{c} to be references, then you
-should do this:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 int x = 42;
-
-int \& a = x, \textbf{\&} b = x, \textbf{\&} c = x; \\
-\end{longtable}
+int & a = x, |\EMPHASIZE{\& = x}, |\EMPHASIZE{\&}| c = x;
+\end{consolethree}
 
 or just declare one thing per line:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 int x = 42;
+int & a = x;
+int & b = x;
+int & c = x;
+\end{consolethree}
 
-int \& a = x;
 
-int \& b = x;
+\newpage\EMPHASIZE{Array assignment function}
 
-int \& c = x; \\
-\end{longtable}
+Let's get back to our array assignment function.
 
-Array assignment function
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
 
-Let\textquotesingle s get back to our array assignment function.
+void println(int x[], int len)
+{
+    for (int i = 0; i < len; i++)
+    {
+        std::cout << x[i] << ' ';
+    }
+    std::cout << std::endl;
+}
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless iostream\textgreater{}
-
-void println(int x{[}{]}, int len)
-
-\{
-
-for (int i = 0; i \textless{} len; i++)
-
-\{
-
-std::cout \textless\textless{} x{[}i{]} \textless\textless{}
-\textquotesingle{} \textquotesingle;
-
-\}
-
-\vtop{\hbox{\strut  std::cout \textless\textless{}
-std::endl;}\hbox{\strut \}}}
-
-void arrayAssign(int y{[}{]}, \textbf{int \& ylen},
-
-int x{[}{]}, int xlen)
-
-\{
-
-ylen = xlen;
-
-for (int i = 0; i \textless{} xlen; i++)
-
-\{
-
-\vtop{\hbox{\strut  y{[}i{]} = x{[}i{]};}\hbox{\strut 
-\}}\hbox{\strut \}}}
+void arrayAssign(int y[], |\EMPHASIZE{int \& ylen}|,
+                 int x[], int xlen)
+{
+    ylen = xlen;
+    for (int i = 0; i < xlen; i++)
+    {
+        y[i] = x[i];
+    }
+}
 
 int main()
+{
+    int x[] = {1, 2, 3};
+    int y[100];
+    int ylen = 0;
+    arrayAssign(y, ylen, x, 3);
+    println(y, ylen);
+    return 0;
+}
+\end{consolethree}
 
-\{
+(WARNING: the code does not check that \texttt{y} has enough space for the copying process.)
 
-int x{[}{]} = \{1, 2, 3\};
+Now's your turn:
 
-int y{[}100{]};
+\begin{ex}
+Write an \texttt{arrayConcat()} function (concatenation of arrays) that appends an array to another. In other words, if \texttt{x} is the array \texttt{\{1, 2, 3\}} and \texttt{y} is the array \texttt{\{6, 7, 8, 9\}}, after calling this function with \texttt{x} and \texttt{y}, you want \texttt{x} to be \texttt{\{1, 2, 3, 6, 7, 8, 9\}}.
 
-int ylen = 0;
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
 
-arrayAssign(y, ylen, x, 3);
+void println(int x[], int len)
+{
+    for (int i = 0; i < len; i++)
+    {
+        std::cout << x[i] << ' ';
+    }
+    std::cout << std::endl;
+}
 
-println(y, ylen);
-
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
-
-(WARNING: the code does not check that \emph{y} has enough space for the
-copying process.)
-
-Now\textquotesingle s your turn:
-
-\textbf{Exercise.} Write an \emph{arrayConcat()} function (concatenation
-of arrays) that appends an array to another. In other words, if \emph{x}
-is the array \emph{\{1, 2, 3\}} and \emph{y} is the array \emph{\{6, 7,
-8, 9\}}, after calling this function with \emph{x} and \emph{y}, you
-want \emph{x} to be \emph{\{1, 2, 3, 6, 7, 8, 9\}}.
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless iostream\textgreater{}
-
-void println(int x{[}{]}, int len)
-
-\{
-
-for (int i = 0; i \textless{} len; i++)
-
-\{
-
-std::cout \textless\textless{} x{[}i{]} \textless\textless{}
-\textquotesingle{} \textquotesingle;
-
-\}
-
-\vtop{\hbox{\strut  std::cout \textless\textless{}
-std::endl;}\hbox{\strut \}}}
-
-void arrayConcat(int x{[}{]}, int \& xlen,
-
-int y{[}{]}, int ylen)
-
-\{
-
-\vtop{\hbox{\strut  ... CODE ...}\hbox{\strut \}}}
+void arrayConcat(int x[], int & xlen,
+                 int y[], int ylen)
+{
+    ... CODE ...
+}
 
 int main()
+{
+    int x[100] = {1, 2, 3};
+    int xlen = 3;
+    int y[] = {6, 7, 8, 9};
+    int ylen = 4;
+    arrayConcat(x, xlen, y, ylen);
+    println(x, xlen); // 1 2 3 6 7 8 9
+    return 0;
+}
+\end{consolethree}
+\end{ex}
 
-\{
+\begin{ex}
+Write an \texttt{arrayPop()} function (pop a value from an array) that removes the last value from an array. The last value is returned from the function. After calling the function, the length is decremented by 1.
 
-int x{[}100{]} = \{1, 2, 3\};
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
 
-int xlen = 3;
+void println(int x[], int len)
+{
+    for (int i = 0; i < len; i++)
+    {
+        std::cout << x[i] << ' ';
+    }
+    std::cout << std::endl;
+}
 
-int y{[}100{]} = \{6, 7, 8, 9\};
+int arrayPop(int x[], int & xlen)
+{
+    ... CODE ...
+}
 
-int ylen = 4;
+int main()
+{
+    int x[100] = {1, 2, 3};
+    int xlen = 3;
+    int value = arrayPop(x, xlen);
+    std::cout << value << std::endl; // 3
+    println(x, xlen); // 1 2
+    return 0;
+}
+\end{consolethree}
+\end{ex}
 
-arrayConcat(x, xlen, y, ylen);
+\begin{ex}
+Write an \texttt{arrayPush()} function that pushes a value onto the end of an array. After the function is called, the length is incremented by 1.
 
-println(x, xlen);
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
 
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
+void println(int x[], int len)
+{
+    for (int i = 0; i < len; i++)
+    {
+        std::cout << x[i] << ' ';
+    }
+    std::cout << std::endl;
+}
 
-More examples
+void arrayPush(int x[], int & xlen, int value)
+{
+    ... CODE ...
+}
 
-\textbf{Exercise. }Can you create a reference that refers to a
-reference?
+int main()
+{
+    int x[100] = {1, 2, 3};
+    int xlen = 3;
+    arrayPush(x, xlen, 42);
+    println(x, xlen); // 1 2 3 42
+    return 0;
+}
+\end{consolethree}
+\end{ex}
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{ex}
+Write an \texttt{arrayConcat()} function (concatenation of arrays) that appends an array to another. In other words, if \texttt{x} is the array \texttt{\{1, 2, 3\}} and \texttt{y} is the array \texttt{\{6, 7, 8, 9\}}, after calling this function with \texttt{x} and \texttt{y}, you want \texttt{x} to be \texttt{\{1, 2, 3, 6, 7, 8, 9\}}.
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void println(int x[], int len)
+{
+    for (int i = 0; i < len; i++)
+    {
+        std::cout << x[i] << ' ';
+    }
+    std::cout << std::endl;
+}
+
+void arrayConcat(int x[], int & xlen,
+                 int y[], int ylen)
+{
+    ... CODE ...
+}
+
+int main()
+{
+    int x[100] = {1, 2, 3};
+    int xlen = 3;
+    int y[100] = {6, 7, 8, 9};
+    int ylen = 4;
+    arrayConcat(x, xlen, y, ylen);
+    println(x, xlen);
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+
+\newpage\EMPHASIZE{More examples}
+
+\begin{ex}
+Can you create a reference that refers to a reference?
+
+\begin{consolethree}[escapeinside=||]
 double i = 3.14;
-
-double \& j = i;
-
-double \& k = j; // k references j which references i
+double & j = i;
+double & k = j; // k references j which references i
 
 i = 2.718;
-
-std::cout \textless\textless{} i \textless\textless{} \textquotesingle{}
-\textquotesingle{} \textless\textless{} j \textless\textless{}
-\textquotesingle{} \textquotesingle{} \textless\textless{} k
-\textless\textless{} std::endl;
+std::cout << i << ' ' << j << ' ' << k << std::endl;
 
 j = 1.414;
-
-std::cout \textless\textless{} i \textless\textless{} \textquotesingle{}
-\textquotesingle{} \textless\textless{} j \textless\textless{}
-\textquotesingle{} \textquotesingle{} \textless\textless{} j
-\textless\textless{} std::endl;
+std::cout << i << ' ' << j << ' ' << j << std::endl;
 
 k = 0.693;
+std::cout << i << ' ' << j << ' ' << j << std::endl;
+\end{consolethree}
+\end{ex}
+\sidenote
+{
+\begin{tikzpicture}
+    \node[draw,text width=4cm,minimum height=4cm,minimum width=2cm, line width=0.1cm, inner sep=0.3cm] (a) at (-4, 2) {};
+    \node[xshift=-8mm, yshift=8mm] (ji_arr) at (a.west) {};
+    \node[xshift=-8mm, yshift=-8mm] (k_arr) at (a.west) {};
+    \node[xshift=-8mm, yshift=2mm] (j_arr) at (a.west) {};
+    \node[xshift=-8mm, yshift=-2mm] (kj_arr) at (a.west) {};
 
-std::cout \textless\textless{} i \textless\textless{} \textquotesingle{}
-\textquotesingle{} \textless\textless{} j \textless\textless{}
-\textquotesingle{} \textquotesingle{} \textless\textless{} j
-\textless\textless{} std::endl; \\
-\end{longtable}
+    \node[text width=1mm,minimum height=1mm,minimum width=1mm, line width=0.05cm, inner sep=0.3cm, xshift=5mm, yshift=8mm] (ival) at (a.west) {\normalsize{i}};
+    \node[draw, text width=9mm,minimum height=1mm,minimum width=5mm, line width=0.05cm, inner sep=0.3cm, yshift=8mm] (ivalbox) at (a.center) {\large{44}};
+    \node[text width=1mm,minimum height=1mm,minimum width=1mm, line width=0.05cm, inner sep=0.3cm, xshift=5mm] (jval) at (a.west) {\normalsize{j}};
 
-Here\textquotesingle s the relevant rule: \textbf{A reference can refer
-to another reference}. In other words, a reference variable can
-reference a variable or it can reference another reference variable.
+    \node[text width=1mm,minimum height=1mm,minimum width=1mm, line width=0.05cm, inner sep=0.3cm, xshift=5mm, yshift=-8mm] (kval) at (a.west) {\large{k}};
 
-\textbf{Exercise.} What is the output?
+   \draw [dashed, ultra thick, ->] (kval)[xshift=1mm] -- (k_arr) -- (kj_arr) -- (jval)[xshift=1mm];
+   \draw [dashed, ultra thick, ->] (jval)[xshift=1mm] -- (j_arr) -- (ji_arr) -- (ival)[xshift=1mm];
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-void f(int \& a, double c)
+\end{tikzpicture}
+}
+Here's the relevant rule: \EMPHASIZE{A reference can refer to another reference}. In other words, a reference variable can reference a variable or it can reference another reference variable.
 
-\{
+\begin{ex}
+What is the output?
 
-a = a + int(c);
+\begin{consolethree}[escapeinside=||]
+void f(int & a, double c)
+{
+    a = a + int(c);
+    c = 1.0;
+}
 
-\vtop{\hbox{\strut  c = 1.0;}\hbox{\strut \}}}
-
-void g(int \& b, double \& c)
-
-\{
-
-b *= 2 + int(c);
-
-c = 0.0;
-
-\vtop{\hbox{\strut  f(b, c);}\hbox{\strut \}}}
+void g(int & b, double & c)
+{
+    b *= 2 + int(c);
+    c = 0.0;
+    f(b, c);
+}
 
 int main()
-
-\{
-
-int x = 42;
-
-double y = 3.14;
-
-g(x, y);
-
-std::cout \textless\textless{} x \textless\textless{} \textquotesingle{}
-\textquotesingle{} \textless\textless{} y \textless\textless{}
-std::endl;
-
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
+{
+    int x = 42;
+    double y = 3.14;
+    g(x, y);
+    std::cout << x << ' ' << y << std::endl;
+    return 0;
+}
+\end{consolethree}
 
 (Suggestion: Drawing a memory model might help.)
+\end{ex}
 
-Here\textquotesingle s another rule: \textbf{References must be
-initialized. Once you declare a reference, it must immediately refer to
-the memory of another variable}. Try this:
+Here's another rule: \EMPHASIZE{References must be initialized. Once you declare a reference, it must immediately refer to the memory of another variable}. Try this:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 int i = 5;
+int & j; // create a reference variable ...
+j = i;   // ... and *then* make the reference
+\end{consolethree}
 
-int \& j; // create a reference variable ...
+\begin{ex}
+Does this work?
 
-j = i; // ... and *then* make the reference \\
-\end{longtable}
-
-\textbf{Exercise.} Does this work?
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 int i = 5;
-
-int \& j = i + 1; \\
-\end{longtable}
+int & j = i + 1;
+\end{consolethree}
 
 Or this?
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 int i = 5;
-
 int k = 6;
-
-int \& j = i + k; \\
-\end{longtable}
+int & j = i + k;
+\end{consolethree}
 
 Why?
+\end{ex}
 
-Yet another rule: \textbf{Variable references must be initialized to
-variables or another reference (not an expression) } (This one is kind
-of obvious.) Here\textquotesingle s an example:
+Yet another rule: \EMPHASIZE{Variable references must be initialized to variables or another reference (not an expression)} (This one is kind of obvious.) Here's an example:
 
-\textbf{Exercise.} Of course you know that you can do this:
+\begin{ex}
+Of course you know that you can do this:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 double x = 3.14;
-
-int y = x; \\
-\end{longtable}
+int y = x;
+\end{consolethree}
 
 What about this:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 double x = 3.14;
+int & y = x;
+\end{consolethree}
+\end{ex}
 
-int \& y = x; \\
-\end{longtable}
+Rules, rules, rules ... \EMPHASIZE{The type of a reference must match the type it's referring to}.
 
-Rules, rules, rules ... \textbf{The type of a reference must match the
-type it\textquotesingle s referring to}.
+\begin{ex}
+What is the output? (Or find the errors).
 
-\textbf{Exercise.} What is the output? (Or find the errors).
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-void swap(int \& b, int \& c)
-
-\{
-
-int t = b;
-
-b = c;
-
-\vtop{\hbox{\strut  c = t;}\hbox{\strut \}}}
+\begin{consolethree}[escapeinside=||]
+void swap(int & b, int & c)
+{
+    int t = b;
+    b = c;
+    c = t;
+}
 
 int main()
+{
+    int x = 42;
+    double y = 1.234;
+    swap(x, y);
+    std::cout << x << ' ' << y << std::endl;
+    return 0;
+}
+\end{consolethree}
+\end{ex}
 
-\{
+\begin{ex}
+What is the output? (Or is there an error?)
 
-int x = 42;
-
-double y = 1.234;
-
-swap(x, y);
-
-std::cout \textless\textless{} x \textless\textless{} \textquotesingle{}
-\textquotesingle{} \textless\textless{} y \textless\textless{}
-std::endl;
-
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
-
-\textbf{Exercise.} What is the output? (Or is there an error?)
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-void g(double \& b, double \& c)
-
-\{
-
-b *= 2 + int(c);
-
-\vtop{\hbox{\strut  c = 0.0;}\hbox{\strut \}}}
+\begin{consolethree}[escapeinside=||]
+void g(double & b, double & c)
+{
+    b *= 2 + int(c);
+    c = 0.0;
+}
 
 int main()
-
-\{
-
-int x = 42;
-
-double y = 3.14;
-
-g(x, y);
-
-std::cout \textless\textless{} x \textless\textless{} \textquotesingle{}
-\textquotesingle{} \textless\textless{} y \textless\textless{}
-std::endl;
-
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
+{
+    int x = 42;
+    double y = 3.14;
+    g(x, y);
+    std::cout << x << ' ' << y << std::endl;
+    return 0;
+}
+\end{consolethree}
 
 (Suggestion: Drawing a memory model might help.)
+\end{ex}
 
-\textbf{Exercise. }You now know this works:
+\begin{ex}
+You now know this works:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 int i = 0;
-
-int \& a = i; \\
-\end{longtable}
+int & a = i;
+\end{consolethree}
 
 What about the following?
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 int i = 0;
+const int & a = i;
+\end{consolethree}
 
-const int \& a = i; \\
-\end{longtable}
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 const int i = 0;
+const int & a = i;
+\end{consolethree}
 
-const int \& a = i; \\
-\end{longtable}
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 const int i = 0;
+int & a = i;
+\end{consolethree}
 
-int \& a = i; \\
-\end{longtable}
+Try all of them. Give a reason for those that does not work. For those that work, can you change the value of \texttt{i} using \texttt{i}?
 
-Try all of them. Give a reason for those that does not work. For those
-that work, can you change the value of \emph{i} using \emph{i}?
+\verb!i = 42;!
 
-\begin{longtable}[]{@{}l@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-i = 42; \\
-\end{longtable}
+Can you change the value of \texttt{i} using \texttt{a}?
 
-Can you change the value of \emph{i} using \emph{a}?
-
-\begin{longtable}[]{@{}l@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-a = 42; \\
-\end{longtable}
+\verb!a = 42;!
 
 Why?
+\end{ex}
 
-\textbf{Exercise.} What is the output? (Or find all the errors).
+\begin{ex}
+What is the output? (Or find all the errors).
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-void g(const int \& b, const double \& c)
-
-\{
-
-b *= 2 + c;
-
-c = 0.0;
-
-\vtop{\hbox{\strut  f(b, c);}\hbox{\strut \}}}
+\begin{consolethree}[escapeinside=||]
+void g(const int & b, const double & c)
+{
+    b *= 2 + c;
+    c = 0.0;
+    f(b, c);
+}
 
 int main()
+{
+    const int x = 42;
+    double y = 3.14;
+    g(x, y);
+    std::cout << x << ' ' << y << std::endl;
+    return 0;
+}
+\end{consolethree}
+\end{ex}
 
-\{
+\begin{ex}
+What is the output? (Or find all the errors).
 
-const int x = 42;
-
-double y = 3.14;
-
-g(x, y);
-
-std::cout \textless\textless{} x \textless\textless{} \textquotesingle{}
-\textquotesingle{} \textless\textless{} y \textless\textless{}
-std::endl;
-
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
-
-\textbf{Exercise.} What is the output? (Or find all the errors).
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-void g(int \& b, const double \& c)
-
-\{
-
-b *= 2 + c;
-
-c = 0.0;
-
-\vtop{\hbox{\strut  f(b, c);}\hbox{\strut \}}}
+\begin{consolethree}[escapeinside=||]
+void g(int & b, const double & c)
+{
+    b *= 2 + c;
+    c = 0.0;
+    f(b, c);
+}
 
 int main()
+{
+    const int x = 42;
+    double y = 3.14;
+    g(x, y);
+    std::cout << x << ' ' << y << std::endl;
+    return 0;
+}
+\end{consolethree}
+\end{ex}
 
-\{
+As mentioned before, a variable reference must reference a variable (or another reference). One exception is that \EMPHASIZE{a constant reference can refer to a constant}. Try this:
 
-const int x = 42;
+\verb!const int & i = 5;!
 
-double y = 3.14;
-
-g(x, y);
-
-std::cout \textless\textless{} x \textless\textless{} \textquotesingle{}
-\textquotesingle{} \textless\textless{} y \textless\textless{}
-std::endl;
-
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
-
-As mentioned before, a variable reference must reference a variable (or
-another reference). One exception is that \textbf{a constant reference
-can refer to a constant}. Try this:
-
-\begin{longtable}[]{@{}l@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-const int \& i = 5; \\
-\end{longtable}
-
-On the other hand the following won\textquotesingle t work since you
+On the other hand the following won't work since you
 already know that a reference must refer to a variable:
 
-\begin{longtable}[]{@{}l@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-int \& i = 5; \\
-\end{longtable}
+\verb!int & i = 5;!
 
-A \textbf{constant reference} is a reference that refers to a value and
+A \EMPHASIZE{constant reference} is a reference that refers to a value and
 treat that value as a constant.
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 int x = 42;
-
-const int \& y = x; // y is a const ref to x
+const int & y = x; // y is a const ref to x
 
 const int a = 0;
+const int & b = a; // b is a const ref to a
+\end{consolethree}
 
-const int \& b = a; // b is a const ref to a \\
-\end{longtable}
+It's very important to remember that if \texttt{x} is a non-constant variable and \texttt{y} is a constant reference to \texttt{x}, then you cannot change the value of \texttt{x} using \texttt{y} -- because \texttt{y} views the value of \texttt{x} as though it's constant. However \texttt{x} can still change it's value:
 
-It's very important to remember that if \emph{x} is a non-constant
-variable and \emph{y} is a constant reference to \emph{x}, then you
-cannot change the value of \emph{x} using \emph{y} -- because \emph{y}
-views the value of \emph{x} as though it's constant. However \emph{x}
-can still change it's value:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 int x = 42;
-
-const int \& y = x;
-
-std::cout \textless\textless{} x \textless\textless{} \textquotesingle{}
-\textquotesingle{} \textless\textless{} y \textless\textless{}
-\textquotesingle\textbackslash n\textquotesingle{}
+const int & y = x;
+std::cout << x << ' ' << y << '\n'
 
 x = 0; // changing x ... OK
+std::cout << x << ' ' << y << '\n'
 
-std::cout \textless\textless{} x \textless\textless{} \textquotesingle{}
-\textquotesingle{} \textless\textless{} y \textless\textless{}
-\textquotesingle\textbackslash n\textquotesingle{}
+y = -1; // changing x using y ... BAD!!!
+\end{consolethree}
 
-y = -1; // changing x using y ... BAD!!! \\
-\end{longtable}
+\begin{ex}
+What is the output? (Or find the error)
 
-\textbf{Exercise.} What is the output? (Or find the error)
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless iostream\textgreater{}
-
-int f(int x{[}{]}, int \& len)
-
-\{
-
-int p = 1;
-
-for (int i = 0; i \textless{} len; i++)
-
-\{
-
-\vtop{\hbox{\strut  p *= x{[}i{]};}\hbox{\strut  \}}}
-
-return p;
-
-\}
+int f(int x[], int & len)
+{
+    int p = 1;
+    for (int i = 0; i < len; i++)
+    {
+        p *= x[i];
+    }
+    return p;
+}
 
 int main()
+{
+    int a[] = {1, 2, 3};
+    std::cout << f(a, 3) << std::endl;
+    return 0;
+}
+\end{consolethree}
+\end{ex}
 
-\{
+\begin{ex}
+After declaring a reference can the reference change the variable it's referring to? Does = work?
 
-int a{[}{]} = \{1, 2, 3\};
-
-std::cout \textless\textless{} f(a, 3) \textless\textless{} std::endl;
-
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
-
-\textbf{Exercise.} After declaring a reference can the reference change
-the variable it\textquotesingle s referring to? Does = work?
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 int x = 1;
-
 int y = 2;
-
-int \& z = x; // make z refer to x
-
+int & z = x; // make z refer to x
 z = 0;
-
-std::cout \textless\textless{} x \textless\textless{} \textquotesingle{}
-\textquotesingle{} \textless\textless{} y \textless\textless{}
-\textquotesingle{} \textquotesingle{} \textless\textless{} z
-\textless\textless{} std::endl;
+std::cout << x << ' ' << y << ' ' << z << std::endl;
 
 z = y; // make z refer to y ... can we?
-
 z = -1;
+std::cout << x << ' ' << y << ' ' << z << std::endl;
+\end{consolethree}
+\end{ex}
 
-std::cout \textless\textless{} x \textless\textless{} \textquotesingle{}
-\textquotesingle{} \textless\textless{} y \textless\textless{}
-\textquotesingle{} \textquotesingle{} \textless\textless{} z
-\textless\textless{} std::endl; \\
-\end{longtable}
+Here the rule: \EMPHASIZE{a reference variable cannot refer to another variable after it's initialization.}
 
-Here the rule: \textbf{a reference variable cannot refer to another
-variable after it's initialization.}
 
-Return value or pass-by-reference???
+\newpage\EMPHASIZE{Return value or pass-by-reference???}
 
 Now we have a dilemma ...
 
-The following is a simple \emph{square()} function:
+The following is a simple \texttt{square()} function:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 double square(double x)
-
-\{
-
-return x * x;
-
-\}
+{
+    return x * x;
+}
 
 int main()
-
-\{
-
-std::cout \textless\textless{} square(3.14) \textless\textless{}
-std::endl;
-
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
+{
+    std::cout << square(3.14) << std::endl;
+    return 0;
+}
+\end{consolethree}
 
 But you know that you can also do this:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-void square(double x, double \& theSquare)
-
-\{
-
-theSquare = x * x;
-
-\}
+\begin{consolethree}[escapeinside=||]
+void square(double x, double & theSquare)
+{
+    theSquare = x * x;
+}
 
 int main()
-
-\{
-
-double theSquare = 0.0;
-
-square(3.14, theSquare);
-
-std::cout \textless\textless{} theSquare \textless\textless{} std::endl;
-
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
+{
+    double theSquare = 0.0;
+    square(3.14, theSquare);
+    std::cout << theSquare << std::endl;
+    return 0;
+}
+\end{consolethree}
 
 Make sure you run it.
 
-Which should you use??? (Don\textquotesingle t you hate making decisions
-...)
+Which should you use??? (Don't you hate making decisions ...)
 
-In general, if your function is like a mathematical function that
-computes a value, then you should use a return value. (Principle of
-least surprise.)
+In general, if your function is like a mathematical function that computes a value, then you should use a return value. (Principle of least surprise.)
 
-For instance look at the above example. Notice how clumsy is the usage
-of the \emph{square()} function.
+For instance look at the above example. Notice how clumsy is the usage of the \texttt{square()} function.
 
-If you have a function that computes two values, then you might want to
-have to have two pass-by-reference variables. Of course you can have two
-different functions. Here\textquotesingle s an example:\\
+If you have a function that computes two values, then you might want to have to have two pass-by-reference variables. Of course you can have two different functions. Here's an example:
 
-Here\textquotesingle s functions:
+Here's functions:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-double max(int x{[}{]}, int len)
+\begin{consolethree}[escapeinside=||]
+double max(int x[], int len)
+{
+    double m = x[0];
+    for (int i = 1; i < len; i++)
+    {
+        if (m < x[i]) m = x[i];
+    }
+    return m;
+}
 
-\{
-
-double m = x{[}0{]};
-
-for (int i = 1; i \textless{} len; i++)
-
-\{
-
-\vtop{\hbox{\strut  if (m \textless{} x{[}i{]}) m =
-x{[}i{]};}\hbox{\strut  \}}}
-
-\vtop{\hbox{\strut  return m;}\hbox{\strut \}}}
-
-double min(int x{[}{]}, int len)
-
-\{
-
-double m = x{[}0{]};
-
-for (int i = 1; i \textless{} len; i++)
-
-\{
-
-\vtop{\hbox{\strut  if (m \textgreater{} x{[}i{]}) m =
-x{[}i{]};}\hbox{\strut  \}}}
-
-\vtop{\hbox{\strut  return m;}\hbox{\strut \}}} \\
-\end{longtable}
+double min(int x[], int len)
+{
+    double m = x[0];
+    for (int i = 1; i < len; i++)
+    {
+        if (m > x[i]) m = x[i];
+    }
+    return m;
+}
+\end{consolethree}
 
 You can combine them into one:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-void max\_min(int x{[}{]}, int len,
+\begin{consolethree}[escapeinside=||]
+void max_min(int x[], int len,
+             int & max, int & min)
+{
+    double max = x[0];
+    double min = x[0];
+    for (int i = 1; i < len; i++)
+    {
+        if (max < x[i]) max = x[i];
+        if (min > x[i]) min = x[i];
+    }
+}
+\end{consolethree}
 
-int \& max, int \& min)
+If your program(s) always have to compute both the maximum and minimum, then the second version might be more useful. In fact it's faster than calling both \texttt{max()} and \texttt{min()} which requires \EMPHASIZE{two} function calls and also \EMPHASIZE{two} scans of the array.
 
-\{
+However this means that one fine day, if you really need to compute only the minimum of an array, you have to call this function and you have to create a dummy variable for the max which is not going to be used:
 
-double max = x{[}0{]};
-
-double min = x{[}0{]};
-
-for (int i = 1; i \textless{} len; i++)
-
-\{
-
-if (max \textless{} x{[}i{]}) max = x{[}i{]};
-
-\vtop{\hbox{\strut  if (min \textgreater{} x{[}i{]}) min =
-x{[}i{]};}\hbox{\strut  \}}\hbox{\strut \}}} \\
-\end{longtable}
-
-If your program(s) always have to compute both the maximum and minimum,
-then the second version might be more useful. In fact
-it\textquotesingle s faster than calling both \emph{max()} and
-\emph{min()} which requires \textbf{two} function calls and also
-\textbf{two} scans of the array.
-
-However this means that one fine day, if you really need to compute only
-the minimum of an array, you have to call this function and you have to
-create a dummy variable for the max which is not going to be used:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 double x, y;
+max_min(a, 10, x, y); // a is some array of length 10
+... only x is used ...
+\end{consolethree}
 
-max\_min(a, 10, x, y); // a is some array of length 10
+Or you have to write a \texttt{min()} function.
 
-... only x is used ... \\
-\end{longtable}
+A basic principle of good software design is to design each function to perform one task and not two.
 
-Or you have to write a \emph{min()} function.
+Now if you look at our \texttt{swap()} function
 
-A basic principle of good software design is to design each function to
-perform one task and not two.
+\begin{consolethree}[escapeinside=||]
+void swap(int & a, int & b)
+{
+    int t = a;
+    a = b;
+    b = t;
+}
+\end{consolethree}
 
-Now if you look at our \emph{swap()} function
+It does not perform a numerical computation; there is really no return value. It performs a transformation on variables. That's why the design of this function is reasonable.
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-void swap(int \textbf{\&} a, int \textbf{\&} b)
 
-\{
-
-int t = a;
-
-a = b;
-
-\vtop{\hbox{\strut  b = t;}\hbox{\strut \}}} \\
-\end{longtable}
-
-It does not perform a numerical computation; there is really no return
-value. It performs a transformation on variables. That\textquotesingle s
-why the design of this function is reasonable.
-
-Prototypes for references
+\newpage\EMPHASIZE{Prototypes for references}
 
 How do you write function prototypes for pass-by-reference parameters?
-Easy! It\textquotesingle s the same as your other variables. For
-instance if you have this function:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-void f(int a, double \& b, char \& c, const bool \& b)
+Easy! It's the same as your other variables. For instance if you have this function:
 
-\{
-
-... code ...
-
-\} \\
-\end{longtable}
+\begin{consolethree}[escapeinside=||]
+void f(int a, double & b, char & c, const bool & b)
+{
+    ... code ...
+}
+\end{consolethree}
 
 The function prototype is just
 
-\begin{longtable}[]{@{}l@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-void f(int, double \&, char \&, const bool \&); \\
-\end{longtable}
+\verb!void f(int, double &, char &, const bool &);!
 
-That\textquotesingle s all there is to it. So there\textquotesingle s
+That's all there is to it. So there's
 nothing new here.
 
-\textbf{Exercise.} Given this code
+\begin{ex}
+Given this code
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless iostream\textgreater{}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
 
-int f(int \& a, double \& b)
-
-\{
-
-a++;
-
-b += a;
-
-\vtop{\hbox{\strut  return a * b}\hbox{\strut \}}}
+int f(int & a, double & b)
+{
+    a++;
+    b += a;
+    return a * b
+}
 
 int main()
-
-\{
-
-int x = 42;
-
-double y = 1;
-
-int z = f(x, y);
-
-std::cout \textless\textless{} x \textless\textless{} \textquotesingle{}
-\textquotesingle{} \textless\textless{} y \textless\textless{}
-\textquotesingle{} \textquotesingle{} \textless\textless{} z
-
-\textless\textless{} std::endl;
-
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
+{
+    int x = 42;
+    double y = 1;
+    int z = f(x, y);
+    std::cout << x << ' ' << y << ' ' << z
+              << std::endl;
+    return 0;
+}
+\end{consolethree}
 
 Rewrite it into this form:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless iostream\textgreater{}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
 
 // prototype of f() here
 
 int main()
+{
+    int x = 42;
+    double y = 1;
+    int z = f(x, y);
+    std::cout << x << ' ' << y << ' ' << z
+              << std::endl;
+    return 0;
+}
 
-\{
-
-int x = 42;
-
-double y = 1;
-
-int z = f(x, y);
-
-std::cout \textless\textless{} x \textless\textless{} \textquotesingle{}
-\textquotesingle{} \textless\textless{} y \textless\textless{}
-\textquotesingle{} \textquotesingle{} \textless\textless{} z
-
-\textless\textless{} std::endl;
-
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}}
-
-int f(int \& a, double \& b)
-
-\{
-
-a++;
-
-b += a;
-
-\vtop{\hbox{\strut  return a * b}\hbox{\strut \}}} \\
-\end{longtable}
+int f(int & a, double & b)
+{
+    a++;
+    b += a;
+    return a * b
+}
+\end{consolethree}
 
 Run your program to make sure that you did it correctly.
+\end{ex}
 
-\textbf{Exercise.} Here\textquotesingle s the \emph{swap()} example
-again.
+\begin{ex}
+Here's the \texttt{swap()} example again.
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-void swap(int \& b, int \& c)
-
-\{
-
-int t = b;
-
-b = c;
-
-\vtop{\hbox{\strut  c = t;}\hbox{\strut \}}}
+\begin{consolethree}[escapeinside=||]
+void swap(int & b, int & c)
+{
+    int t = b;
+    b = c;
+    c = t;
+}
 
 int main()
+{
+    int x = 42;
+    int y = 1;
+    swap(x, y);
+    std::cout << x << ' ' << y << std::endl;
+    return 0;
+}
+\end{consolethree}
 
-\{
+Write a header file for the \texttt{swap()} function. Implement the body of the \texttt{swap()} function in a separate source file. Test your program.
+\end{ex}
 
-int x = 42;
+\begin{ex}
+One of the parameters in \texttt{f()} need not be a reference.
 
-int y = 1;
-
-swap(x, y);
-
-std::cout \textless\textless{} x \textless\textless{} \textquotesingle{}
-\textquotesingle{} \textless\textless{} y \textless\textless{}
-std::endl;
-
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
-
-Write a header file for the \emph{swap()} function. Implement the body
-of the \emph{swap()} function in a separate source file. Test your
-program.
-
-Exercise. One of the parameters in \emph{f()} need not be a reference.
 Which one?
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-int f(int \& a, double \& b)
-
-\{
-
-b += a;
-
-\vtop{\hbox{\strut  return a * b}\hbox{\strut \}}} \\
-\end{longtable}
-
-\end{document}
+\begin{consolethree}[escapeinside=||]
+int f(int & a, double & b)
+{
+    b += a;
+    return a * b
+}
+\end{consolethree}
+\end{ex}

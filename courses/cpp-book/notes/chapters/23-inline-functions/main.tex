@@ -1,498 +1,255 @@
-% Options for packages loaded elsewhere
-\PassOptionsToPackage{unicode}{hyperref}
-\PassOptionsToPackage{hyphens}{url}
-%
-\documentclass[
-]{article}
-\usepackage{amsmath,amssymb}
-\usepackage{iftex}
-\ifPDFTeX
-  \usepackage[T1]{fontenc}
-  \usepackage[utf8]{inputenc}
-  \usepackage{textcomp} % provide euro and other symbols
-\else % if luatex or xetex
-  \usepackage{unicode-math} % this also loads fontspec
-  \defaultfontfeatures{Scale=MatchLowercase}
-  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
-\fi
-\usepackage{lmodern}
-\ifPDFTeX\else
-  % xetex/luatex font selection
-\fi
-% Use upquote if available, for straight quotes in verbatim environments
-\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
-\IfFileExists{microtype.sty}{% use microtype if available
-  \usepackage[]{microtype}
-  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
-}{}
-\makeatletter
-\@ifundefined{KOMAClassName}{% if non-KOMA class
-  \IfFileExists{parskip.sty}{%
-    \usepackage{parskip}
-  }{% else
-    \setlength{\parindent}{0pt}
-    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
-}{% if KOMA class
-  \KOMAoptions{parskip=half}}
-\makeatother
-\usepackage{xcolor}
-\usepackage{longtable,booktabs,array}
-\usepackage{calc} % for calculating minipage widths
-% Correct order of tables after \paragraph or \subparagraph
-\usepackage{etoolbox}
-\makeatletter
-\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
-\makeatother
-% Allow footnotes in longtable head/foot
-\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
-\makesavenoteenv{longtable}
-\setlength{\emergencystretch}{3em} % prevent overfull lines
-\providecommand{\tightlist}{%
-  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
-\ifLuaTeX
-  \usepackage{selnolig}  % disable illegal ligatures
-\fi
-\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
-\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
-\urlstyle{same}
-\hypersetup{
-  hidelinks,
-  pdfcreator={LaTeX via pandoc}}
+\newpage\EMPHASIZE{23. Inline Functions}
 
-\author{}
-\date{}
-
-\begin{document}
-
-23. Inline Functions
-
-Objectives
-
+\textsc{Objectives}
 \begin{itemize}
-\tightlist
-\item
-  Write inline functions
-\item
-  Understand the difference between an inline function and a non-inline
-  function
-\item
-  Write inline functions for multi-file compilation
+\item Write inline functions
+\item Understand the difference between an inline function and a non-inline function
+\item Write inline functions for multi-file compilation
 \end{itemize}
 
-This is a very short chapter because the concept of inline function is
-pretty simple from a beginner programmer's point of view. But later on
-you'll actually see inline functions popping up in many places (but in
-an implicit and hidden way) especially in C++ templates, generic
-programming, lambdas, metaprogramming. So understanding this concept is
-very important for \emph{other} C++ features.
+This is a very short chapter because the concept of inline function is pretty simple from a beginner programmer's point of view. But later on you'll actually see inline functions popping up in many places (but in an implicit and hidden way) especially in C++ templates, generic programming, lambdas, metaprogramming. So understanding this concept is very important for \textit{other} C++ features.
 
-Inline functions
+
+\newpage\EMPHASIZE{Inline functions}
 
 You have seen this before:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless iostream\textgreater{}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
 
 int max(int x, int y)
-
-\{
-
-if (x \textless{} y) return y;
-
-\vtop{\hbox{\strut  else return x;}\hbox{\strut \}}}
+{
+    if (x < y) return y;
+    else return x;
+}
 
 int main()
-
-\{
-
-int m = max(3, 5);
-
-std::cout \textless\textless{} m \textless\textless std::endl;
-
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
+{
+    int m = max(3, 5);
+    std::cout << m << std::endl;
+    return 0;
+}
+\end{consolethree}
 
 (For very simple if-else statements, the above style is OK.)
 
 Now add one single keyword:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless iostream\textgreater{}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
 
-\textbf{inline} int max(int x, int y)
-
-\{
-
-if (x \textless{} y) return y;
-
-\vtop{\hbox{\strut  else return x;}\hbox{\strut \}}}
+inline int max(int x, int y)
+{
+    if (x < y) return y;
+    else return x;
+}
 
 int main()
+{
+    int m = max(3, 5);
+    std::cout << m << std::endl;
+    return 0;
+}
+\end{consolethree}
 
-\{
+Note that it's common to see this coding style:
 
-int m = max(3, 5);
-
-std::cout \textless\textless{} m \textless\textless std::endl;
-
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
-
-Note that it\textquotesingle s common to see this coding style:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 inline
-
 int max(int x, int y)
-
-\{
-
-if (x \textless{} y) return y;
-
-\vtop{\hbox{\strut  else return x;}\hbox{\strut \}}} \\
-\end{longtable}
+{
+    if (x < y) return y;
+    else return x;
+}
+\end{consolethree}
 
 I suggest you use this style.
 
-In terms of what a function can \textbf{do}, it doesn\textquotesingle t
-make any difference if a function is inlined or not. The only difference
-is really in the speed of execution of the code.
+In terms of what a function can \textbf{do}, it doesn't make any difference if a function is inlined or not. The only difference is really in the speed of execution of the code.
 
-An \textbf{inline function} is not exactly a function. When you compile
-a program with an inline function, what happens is that the compiler
-(more or less) copies the code to the place where you called the inline
-function. In other words, when you get C++ to compile the following
-program:
+An \EMPHASIZE{inline function} is not exactly a function. When you compile a program with an inline function, what happens is that the compiler (more or less) copies the code to the place where you called the inline function. In other words, when you get C++ to compile the following program:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless iostream\textgreater{}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
 
 inline
-
 int max(int x, int y)
-
-\{
-
-if (x \textless{} y) return y;
-
-\vtop{\hbox{\strut  else return x;}\hbox{\strut \}}}
+{
+    if (x < y) return y;
+    else return x;
+}
 
 int main()
-
-\{
-
-int m = max(3, 5);
-
-std::cout \textless\textless{} m \textless\textless std::endl;
-
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
+{
+    int m = max(3, 5);
+    std::cout << m << std::endl;
+    return 0;
+}
+\end{consolethree}
 
 your compiler reads the program into its memory and changes it to this:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless iostream\textgreater{}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
 
 int main()
+{
+    int m;
+    if (3 < 5) m = 5;
+    else m = 3;
+    std::cout << m << std::endl;
+    return 0;
+}
+\end{consolethree}
 
-\{
+before generating the executable. There is really no \texttt{max()} function. In other words, an inline function is like a rubber stamp for a chunk of code.
 
-int m;
+If your code calls the inline \texttt{max()} function 100 times, the body of \texttt{max()} is copied 100 times.
 
-if (3 \textless{} 5) m = 5;
+Note that the copying of the body of the function to the places where the function is called is done when the compiler builds an executable file. Your actual cpp file is not changed; the above modification is done in the compiler's memory. You do not see the code duplicated in your source file.
 
-else m = 3;
+\begin{ex}
+Write an inline \texttt{min()} function. Test your function.
+\end{ex}
 
-std::cout \textless\textless{} m \textless\textless{} std::endl;
 
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
-
-before generating the executable. There is really no \emph{max()}
-function. In other words, an inline function is like a rubber stamp for
-a chunk of code.
-
-If your code calls the inline \emph{max()} function 100 times, the body
-of \emph{max()} is copied 100 times.
-
-Note that the copying of the body of the function to the places where
-the function is called is done when the compiler builds an executable
-file. Your actual cpp file is not changed; the above modification is
-done in the compiler\textquotesingle s memory. You do not see the code
-duplicated in your source file.
-
-\textbf{Exercise. }Write an inline \emph{min()} function. Test your
-function.
-
-Why inline functions?
+\newpage\EMPHASIZE{Why inline functions?}
 
 Why do we have inline functions?
 
-Like I said it\textquotesingle s faster (see caveat later). Why?
+Like I said it's faster (see caveat later). Why?
 
-Because there is some CPU cost in just making a function call. Look at
-the notes on Functions. Recall that to make a function call, the CPU
-must set up a stack which contains at least information on how to go
-back to the caller function. That takes time. It\textquotesingle s the
-same when a function call returns. In other words, just \textbf{the act
-of calling the function and returning from a function call} (i.e. not
-including the computation done in the body of function called)
-\textbf{takes time}. In fact it\textquotesingle s even possible that the
-cost of making a function call and returning from the call takes more
-time than the actual computation in the body of the function!!!
+Because there is some CPU cost in just making a function call. Look at the notes on Functions. Recall that to make a function call, the CPU must set up a stack which contains at least information on how to go back to the caller function. That takes time. It's the same when a function call returns. In other words, just \EMPHASIZE{the act of calling the function and returning from a function call} (i.e. not including the computation done in the body of function called) \textbf{takes time}. In fact it's even possible that the cost of making a function call and returning from the call takes more time than the actual computation in the body of the function!!!
 
-Inline functions calls do \emph{\textbf{not}} involve function calls at
-all because the inline function\textquotesingle s body has already been
-copied to the place where you make the function call.
+Inline functions calls do \textbf{\textit{not}} involve function calls at all because the inline function's body has already been copied to the place where you make the function call.
 
-``When should I inline a function?''
 
-Now you might say: ``In that case, let\textquotesingle s inline every
-function! That will make my program super fast!''
+\newpage\EMPHASIZE{``When should I inline a function?''}
+
+Now you might say: ``In that case, let's inline every function! That will make my program super fast!''
 
 Well ...
 
 Yes, you can inline any function.
 
-The problem is that the your program might become larger than what it
-should be.
+The problem is that the your program might become larger than what it should be.
 
-Good choices for functions to be changed to inline functions are those
-which are very small, especially those which are used frequently.
-Function bodies with only one or two lines of code are good candidates.
+Good choices for functions to be changed to inline functions are those which are very small, especially those which are used frequently. Function bodies with only one or two lines of code are good candidates.
 
 Now for some caveats \ldots{}
 
 \begin{itemize}
-\tightlist
-\item
-  If the compiler feels that the function body is too huge, it might
+\item If the compiler feels that the function body is too huge, it might
   actually ignore your request to inline a function. So an inline
-  function is only a \emph{\textbf{request}} to the compiler to inline
+  function is only a \textbf{\textit{request}} to the compiler to inline
   the function.
-\item
-  Some C++ compilers actually honor inline requests unless told it to do
+\item Some C++ compilers actually honor inline requests unless told it to do
   otherwise.
-\item
-  If too many functions are inlined, the executable binary code can be
+\item If too many functions are inlined, the executable binary code can be
   huge, which of course means that you need more memory to run the code
   which means that you might be slowing it down!!! If the executable
   binary code is too huge it might cause memory thrashing where memory
   pages constantly gets swapped in and out of your computer memory.
 \end{itemize}
 
-Multi-file compilation
 
-Although an inline function is similar to a regular function, there is
-\textbf{one difference} if you want to use inline functions in a
-multi-file project.
+\newpage\EMPHASIZE{Multi-file compilation}
 
-The whole inline function (with the function body) goes into the header
-file. You do NOT write prototypes for inline functions.
+Although an inline function is similar to a regular function, there is \EMPHASIZE{one difference} if you want to use inline functions in a multi-file project.
 
-Here\textquotesingle s our max example using a header file and a
-separate cpp file. It \emph{\textbf{won\textquotesingle t}} work. Try it
-now and look at the error message:
+The whole inline function (with the function body) goes into the header file. You do NOT write prototypes for inline functions.
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless iostream\textgreater{}
+Here's our max example using a header file and a separate cpp file. It \textbf{\textit{won't}} work. Try it now and look at the error message:
 
-\#include "test.h"
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "test.h"
 
 int main()
+{
+    std::cout << max(3, 5) << std::endl;
+    return 0;
+}
+\end{consolethree}
 
-\{
-
-std::cout \textless\textless{} max(3, 5) \textless\textless{} std::endl;
-
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 // test.h
-
-\#ifndef TEST\_H
-
-\#define TEST\_H
+#ifndef TEST_H
+#define TEST_H
 
 inline
-
 int max(int x, int y); // prototype of max
 
-\#endif \\
-\end{longtable}
+#endif
+\end{consolethree}
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 // test.cpp
-
-\#include "test.h"
+#include "test.h"
 
 inline
-
 int max(int x, int y) // definition of max
-
-\{
-
-if (x \textless{} y) return y;
-
-\vtop{\hbox{\strut  else return x;}\hbox{\strut \}}} \\
-\end{longtable}
+{
+    if (x < y) return y;
+    else return x;
+}
+\end{consolethree}
 
 Do this instead:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless iostream\textgreater{}
-
-\#include "test.h"
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "test.h"
 
 int main()
+{
+    std::cout << max(3, 5) << std::endl;
+    return 0;
+}
+\end{consolethree}
 
-\{
-
-std::cout \textless\textless{} max(3, 5) \textless\textless{} std::endl;
-
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 // test.h
-
-\#ifndef TEST\_H
-
-\#define TEST\_H
+#ifndef TEST_H
+#define TEST_H
 
 inline
-
 int max(int x, int y)
+{
+    if (x < y) return y;
+    else return x;
+}
 
-\{
-
-if (x \textless{} y) return y;
-
-\vtop{\hbox{\strut  else return x;}\hbox{\strut \}}}
-
-\#endif \\
-\end{longtable}
+#endif
+\end{consolethree}
 
 (You can get rid of the test.cpp file) Now it works.
 
-Remember that if you want to have multi-file projects and your inline
-functions are not in your main cpp file, then the \textbf{inline
-function bodies must be in header files}. Don't you forget that!
+Remember that if you want to have multi-file projects and your inline functions are not in your main cpp file, then the \EMPHASIZE{inline function bodies must be in header files}. Don't you forget that!
 
 Note that you can have prototypes for inlined function:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 // test.h
-
-\#ifndef TEST\_H
-
-\#define TEST\_H
+#ifndef TEST_H
+#define TEST_H
 
 int max(int x, int y);
 
 inline
-
 int max(int x, int y)
+{
+    if (x < y) return y;
+    else return x;
+}
 
-\{
+#endif
+\end{consolethree}
 
-if (x \textless{} y) return y;
+The inline keyword follows the function definition. You do not need the inline keyword for the prototype. Make sure you run this so that you remember how to write inlined prototypes. It will be very important when you get into very complex modern C++ programming.
 
-\vtop{\hbox{\strut  else return x;}\hbox{\strut \}}}
+You can also check that if you do use the inline keyword for the prototype, your compiler most likely will not give you an error.
 
-\#endif \\
-\end{longtable}
-
-The inline keyword follows the function definition. You do not need the
-inline keyword for the prototype. Make sure you run this so that you
-remember how to write inlined prototypes. It will be very important when
-you get into very complex modern C++ programming.
-
-You can also check that if you do use the inline keyword for the
-prototype, your compiler most likely will not give you an error.
-
-\textbf{Exercise.} In the above, add an inline \emph{min} function in
-the header file to compute the minimum of two integer functions and then
-an inline \emph{swap} function to swap the values of two integer
-variables.
-
-\end{document}
+\begin{ex}
+In the above, add an inline \texttt{min} function in the header file to compute the minimum of two integer functions and then an inline \texttt{swap} function to swap the values of two integer variables.
+\end{ex}

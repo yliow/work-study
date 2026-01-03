@@ -1,1489 +1,771 @@
-% Options for packages loaded elsewhere
-\PassOptionsToPackage{unicode}{hyperref}
-\PassOptionsToPackage{hyphens}{url}
-%
-\documentclass[
-]{article}
-\usepackage{amsmath,amssymb}
-\usepackage{iftex}
-\ifPDFTeX
-  \usepackage[T1]{fontenc}
-  \usepackage[utf8]{inputenc}
-  \usepackage{textcomp} % provide euro and other symbols
-\else % if luatex or xetex
-  \usepackage{unicode-math} % this also loads fontspec
-  \defaultfontfeatures{Scale=MatchLowercase}
-  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
-\fi
-\usepackage{lmodern}
-\ifPDFTeX\else
-  % xetex/luatex font selection
-\fi
-% Use upquote if available, for straight quotes in verbatim environments
-\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
-\IfFileExists{microtype.sty}{% use microtype if available
-  \usepackage[]{microtype}
-  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
-}{}
-\makeatletter
-\@ifundefined{KOMAClassName}{% if non-KOMA class
-  \IfFileExists{parskip.sty}{%
-    \usepackage{parskip}
-  }{% else
-    \setlength{\parindent}{0pt}
-    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
-}{% if KOMA class
-  \KOMAoptions{parskip=half}}
-\makeatother
-\usepackage{xcolor}
-\usepackage{longtable,booktabs,array}
-\usepackage{calc} % for calculating minipage widths
-% Correct order of tables after \paragraph or \subparagraph
-\usepackage{etoolbox}
-\makeatletter
-\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
-\makeatother
-% Allow footnotes in longtable head/foot
-\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
-\makesavenoteenv{longtable}
-\usepackage{graphicx}
-\makeatletter
-\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
-\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
-\makeatother
-% Scale images if necessary, so that they will not overflow the page
-% margins by default, and it is still possible to overwrite the defaults
-% using explicit options in \includegraphics[width, height, ...]{}
-\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
-% Set default figure placement to htbp
-\makeatletter
-\def\fps@figure{htbp}
-\makeatother
-\setlength{\emergencystretch}{3em} % prevent overfull lines
-\providecommand{\tightlist}{%
-  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
-\ifLuaTeX
-  \usepackage{selnolig}  % disable illegal ligatures
-\fi
-\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
-\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
-\urlstyle{same}
-\hypersetup{
-  hidelinks,
-  pdfcreator={LaTeX via pandoc}}
+\newpage\EMPHASIZE{24. Default Values}
 
-\author{}
-\date{}
-
-\begin{document}
-
-24. Default Values
-
-Objectives
-
+\textsc{Objectives}
 \begin{itemize}
-\tightlist
-\item
-  Write functions with default values
-\item
-  Use default values to extend a function
-\item
-  Write prototypes for functions with default values and implement the
-  bodies of such functions.
+\item Write functions with default values
+\item Use default values to extend a function
+\item Write prototypes for functions with default values and implement the bodies of such functions.
 \end{itemize}
 
-Default Values
+
+\newpage\EMPHASIZE{Default Values}
 
 Try this:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless iostream\textgreater{}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
 
-void printHeads(int numHeads\textbf{ = 1})
-
-\{
-
-std::cout \textless\textless{} "number of heads: " \textless\textless{}
-numHeads
-
-\textless\textless{} std::endl;
-
-\}
+void printHeads(int numHeads = 1)
+{
+    std::cout << "number of heads: " << numHeads
+              << std::endl;
+}
 
 int main()
+{
+    printHeads(); // NO ARGUMENT PASSED IN!!!
+    printHeads(42);
+    return 0;
+}
+\end{consolethree}
 
-\{
+(Forget about prototypes for the time being. They will come in a bit ...)
 
-printHeads(); // NO ARGUMENT PASSED IN!!!
+Parameter \texttt{numHeads} of function \texttt{printHeads()} is called a parameter with a \EMPHASIZE{default value}.
 
-printHeads(42);
+One obvious use of default values is that you can make it easier for other programmers to use your function: You choose the most common value for a parameter and make it the default value for that parameter. Any time someone (including yourself) uses the function in the ``most commonly used'' manner, he/she need not send in an argument.
 
-return 0;
+Here's another example:
 
-\} \\
-\end{longtable}
-
-(Forget about prototypes for the time being. They will come in a bit
-...)\\
-
-Parameter \emph{numHeads} of function \emph{printHeads()} is called a
-parameter with a \textbf{default value}.
-
-One obvious use of default values is that you can make it easier for
-other programmers to use your function: You choose the most common value
-for a parameter and make it the default value for that parameter. Any
-time someone (including yourself) uses the function in the ``most
-commonly used'' manner, he/she need not send in an argument.
-
-Here\textquotesingle s another example:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless iostream\textgreater{}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
 
 void printHello(int i = 0)
-
-\{
-
-std::cout \textless\textless{} "hello ";
-
-switch (i)
-
-\{
-
-case 0: std::cout \textless\textless{} "world\textbackslash n";
-
-break;
-
-case 1: std::cout \textless\textless{} "galaxy\textbackslash n";
-
-break;
-
-case 2: std::cout \textless\textless{} "universe\textbackslash n";
-
-break;
-
-case 3: std::cout \textless\textless{} "underverse\textbackslash n";
-
-break;
-
-\}
-
-\}
+{
+    std::cout << "hello ";
+    switch (i)
+    {
+        case 0: std::cout << "world\n"; break;
+        case 1: std::cout << "galaxy\n"; break;
+        case 2: std::cout << "universe\n"; break;
+        case 3: std::cout << "underverse\n"; break;
+    }
+}
 
 int main()
+{
+    printHello();
+    printHello(1);
+    return 0;
+}
+\end{consolethree}
 
-\{
-
-printHello();
-
-printHello(1);
-
-return 0;
-
-\} \\
-\end{longtable}
-
-Right now there are only \textbf{three rules} to remember: Think of the
-parameters of a function as parameters without default values and
-parameters with default values. \textbf{All the parameters with default
-values must be together} and appear \textbf{after those without default
-values}.
+Right now there are only \EMPHASIZE{three rules} to remember: Think of the parameters of a function as parameters without default values and parameters with default values. \EMPHASIZE{All the parameters with default values must be together} and appear \EMPHASIZE{after those without default values}.
 
 In other words this is OK:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-bool spam(int a, double b, \emph{\textbf{char c =
-\textquotesingle\$\textquotesingle, int d = 42}})
-
-\{
-
-...
-
-\} \\
-\end{longtable}
+\begin{consolethree}[escapeinside=||]
+bool spam(int a, double b, |\textbf{\underline{char c = '\$', int d = 42}}|)
+{
+    ...
+}
+\end{consolethree}
 
 But this is WRONG:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-bool spam(int a, \emph{\textbf{double b = 3.14,}} char c,
-\emph{\textbf{int d = 42}})
+\begin{consolethree}[escapeinside=||]
+bool spam(int a, |\textbf{\underline{double b = 3.14}}|, char c, |\textbf{\underline{int d = 42}}|)|\xsidebox[0cm]{0cm}{}{txt2}{\texttt{c} does not have a default value but appears after \texttt{b} which has a default value.}|
+{
+    ...
+}
+\end{consolethree}
 
-\{
-
-...
-
-\} \\
-\end{longtable}
-
-Make sure you try this or you won\textquotesingle t remember.
+Make sure you try this or you won't remember.
 
 So remember to group up the parameters into those with default values
-
 and those without. The ones without (if any) must come first.
 
 Another rule: \textbf{default values must be constants} (example:
 constant literals such as 5 or constant expressions.) In other words
 this is OK:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 const int X = 42;
-
-bool spam(int a, double b, char c = \textquotesingle\$\textquotesingle,
-int d = X+1)
-
-\{
-
-...
-
-\} \\
-\end{longtable}
+bool spam(int a, double b, char c = '$', int d = X+1)
+{
+    ...
+}
+\end{consolethree}
 
 But this is WRONG:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 int X = 42;
+bool spam(int a, double b, char c = '$', int d = X)
+{
+    ...
+}
+\end{consolethree}
 
-bool spam(int a, double b, char c = \textquotesingle\$\textquotesingle,
-int d = \emph{\textbf{X}})
+\begin{ex}
+What is the output (or circle the errors)? (Do this by hand)
 
-\{
-
-...
-
-\} \\
-\end{longtable}
-
-\textbf{Exercise.} What is the output (or circle the errors)? (Do this
-by hand)
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 int f(int a, int b = 4, int c = 5)
-
-\{
-
-\vtop{\hbox{\strut  return a + b + c;}\hbox{\strut \}}}
+{
+    return a + b + c;
+}
 
 int main()
-
-\{
-
-std::cout \textless\textless{} f(1, 2, 3) \textless\textless{}
-\textquotesingle{} \textquotesingle{} \textless\textless{} f(1, 2)
-\textless\textless{} \textquotesingle{} \textquotesingle{}
-
-\textless\textless{} f(1) \textless\textless{} std::endl;
-
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
+{
+    std::cout << f(1, 2, 3) << ' ' << f(1, 2) << ' '
+              << f(1) << std::endl;
+    return 0;
+}
+\end{consolethree}
 
 Now verify using your compiler.
+\end{ex}
 
-Last one: \textbf{You cannot have default values for array parameters.}
-For instance the following will not compile:
+Last one: \EMPHASIZE{You cannot have default values for array parameters.} For instance the following will not compile:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless iostream\textgreater{}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
 
-void print(int x{[}{]} = \{2, 3\})
-
-\{
-
-std::cout \textless\textless{} x{[}0{]} \textless\textless{}
-\textquotesingle{} \textquotesingle{} \textless\textless{} x{[}1{]};
-
-\}
+void print(int x[] = {2, 3})
+{
+    std::cout << x[0] << ' ' << x[1];
+}
 
 int main()
-
-\{
-
-print();
-
-return 0;
-
-\} \\
-\end{longtable}
+{
+    print();
+    return 0;
+}
+\end{consolethree}
 
 (See last section for exception.)
 
-\textbf{Exercise.} What is the output (or circle the errors)? (Do this
-by hand)
+\begin{ex}
+What is the output (or circle the errors)? (Do this by hand)
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 int f(int a = 3, int b, int c = 5)
-
-\{
-
-\vtop{\hbox{\strut  return a + b + c;}\hbox{\strut \}}}
+{
+    return a + b + c;
+}
 
 int main()
-
-\{
-
-std::cout \textless\textless{} f(1, 2, 3) \textless\textless{}
-std::endl;
-
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
+{
+    std::cout << f(1, 2, 3) << std::endl;
+    return 0;
+}
+\end{consolethree}
 
 Now verify using your compiler.
+\end{ex}
 
-\textbf{Exercise.} Write a function \emph{printDateTime()} that prints
-the date and time data passed in:
+\begin{ex}
+Write a function \texttt{printDateTime()} that prints the date and time data passed in:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 void printDateTime(int yyyy, int mm, int dd,
-
-int hh = 0, int mm = 0, int ss = 0)
-
-\{
-
-\vtop{\hbox{\strut  ... CODE ...}\hbox{\strut \}}}
+                   int hh = 0, int mm = 0, int ss = 0)
+{
+    ... CODE ...
+}
 
 int main()
-
-\{
-
-printDateTime(2007, 1, 15);
-
-printDateTime(2007, 1, 15, 14, 15, 59);
-
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
+{
+    printDateTime(2007, 1, 15);
+    printDateTime(2007, 1, 15, 14, 15, 59);
+    return 0;
+}
+\end{consolethree}
 
 Expected output:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{console}
 2007-01-15 00:00:00
-
-2007-01-15 14:15:59 \\
-\end{longtable}
+2007-01-15 14:15:59
+\end{console}
 
 After you are done, make January 1, 1970 the default date.
 
-{[}Hint: Use \emph{set::fill()} function.{]}
+[Hint: Use \texttt{std::fill()} function.]
+\end{ex}
 
-Default value parameter and nonconstant value
 
-One more example. Recall we have the \emph{isprime()} that returns
-\emph{true} if the values passed in is a prime number, otherwise
-\emph{false} is returned.
+\newpage\EMPHASIZE{Default value parameter and nonconstant value}
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+One more example. Recall we have the \texttt{isprime()} that returns \texttt{true} if the values passed in is a prime number, otherwise \texttt{false} is returned.
+
+\begin{consolethree}[escapeinside=||]
 bool isprime(int n)
+{
+    for (int i = 2; i <= sqrt((double)n); i++)
+    {
+        if (n % i == 0) return false;
+    }
+    return true;
+}
+\end{consolethree}
 
-\{
+Suppose for some reason you know something about n: if there is a prime divisor of n, then it must be at least 11. You might want to tell \texttt{isprime()} to start the search for a divisor from 11.
 
-for (int i = 2; i \textless= sqrt((double)n); i++)
+Let's modify the function preserving the older use:
 
-\{
-
-\vtop{\hbox{\strut  if (n \% i == 0) return false;}\hbox{\strut \}}}
-
-\emph{\vtop{\hbox{\strut  return true;}\hbox{\strut \}}}}  \\
-\end{longtable}
-
-Suppose for some reason you know something about n: if there is a prime
-divisor of n, then it must be at least 11. You might want to tell
-\emph{isprime()} to start the search for a divisor from 11.
-Let\textquotesingle s modify the function preserving the older use:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless isotream\textgreater{}
-
-\#include \textless cmath\textgreater{}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <cmath>
 
 bool isprime(int n, int start = 2)
-
-\{
-
-for (int i = start; i \textless= sqrt((double)n); i++)
-
-\{
-
-\vtop{\hbox{\strut  if (n \% i == 0) return false;}\hbox{\strut  \}}}
-
-\vtop{\hbox{\strut  return true;}\hbox{\strut \}}}
+{
+    for (int i = start; i <= sqrt((double)n); i++)
+    {
+        if (n % i == 0) return false;
+    }
+    return true;
+}
 
 int main()
+{
+    std::cout << isprime(5) << '\n'
+              << isprime(5, 3) << '\n'
+              << isprime(169, 11) << std::endl;
+    return 0;
+}
+\end{consolethree}
 
-\{
+Now let's try to generalize the upper bound of the search. Let's try this:
 
-std::cout \textless\textless{} isprime(5) \textless\textless{}
-\textquotesingle\textbackslash n\textquotesingle{}
-
-\textless\textless{} isprime(5, 3) \textless\textless{}
-\textquotesingle\textbackslash n\textquotesingle{}
-
-\textless\textless{} isprime(169, 11) \textless\textless{} std::endl;
-
-\emph{\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}}}  \\
-\end{longtable}
-
-Now let\textquotesingle s try to generalize the upper bound of the
-search. Let\textquotesingle s try this:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless isotream\textgreater{}
-
-\#include \textless cmath\textgreater{}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <cmath>
 
 bool isprime(int n,
-
-int start = 2\textbf{, }
-
-\textbf{ int end = sqrt((double)n)})
-
-\{
-
-for (int i = start; i \textless= end; i++)
-
-\{
-
-\vtop{\hbox{\strut  if (n \% i == 0) return false;}\hbox{\strut  \}}}
-
-\vtop{\hbox{\strut  return true;}\hbox{\strut \}}}
+             int start = 2,
+             |\textbf{int end = sqrt((double)n))}|
+{
+    for (int i = start; i <= end; i++)
+    {
+        if (n % i == 0) return false;
+    }
+    return true;
+}
 
 int main()
-
-\{
-
-std::cout \textless\textless{} isprime(5) \textless\textless{}
-\textquotesingle\textbackslash n\textquotesingle{}
-
-\textless\textless{} isprime(5, 3) \textless\textless{}
-\textquotesingle\textbackslash n\textquotesingle{}
-
-\textless\textless{} isprime(169, 11) \textless\textless{} std::endl;
-
-\emph{\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}}}  \\
-\end{longtable}
+{
+    std::cout << isprime(5) << '\n'
+              << isprime(5, 3) << '\n'
+              << isprime(169, 11) << std::endl;
+    return 0;
+}
+\end{consolethree}
 
 Does it work?
 
-It \textbf{won\textquotesingle t work} because remember you can only use
-constants for default values. So how do you set a parameter to ``default
-value'' that depends on an expression like the above? This is how you do
-it:
+It \EMPHASIZE{won't work} because remember you can only use constants for default values. So how do you set a parameter to ``default value'' that depends on an expression like the above? This is how you do it:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless isotream\textgreater{}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <cmath>
 
-\#include \textless cmath\textgreater{}
-
-bool isprime(int n, int start = 2, int end = \textbf{-1})
-
-\{
-
-if (end == -1) end = sqrt(double(n));
-
-for (int i = start; i \textless= end; i++)
-
-\{
-
-\vtop{\hbox{\strut  if (n \% i == 0) return false;}\hbox{\strut  \}}}
-
-\vtop{\hbox{\strut  return true;}\hbox{\strut \}}}
+bool isprime(int n, int start = 2, int end = -1)
+{
+    |\textbf{if (end == -1) end = sqrt(double(n));}|
+    for (int i = start; i <= end; i++)
+    {
+        if (n % i == 0) return false;
+    }
+    return true;
+}
 
 int main()
+{
+    std::cout << isprime(5) << '\n'
+              << isprime(5, 3) << '\n'
+              << isprime(169, 11) << '\n'
+              << isprime(21, 3, 7);
+    return 0;
+}
+\end{consolethree}
 
-\{
+Of course in this case we must choose a reasonable default value for parameter \texttt{end}. In the above case, I choose a value the user won't be using. This is similar to the use of the sentinel values in terminating a while-loop.
 
-std::cout \textless\textless{} isprime(5) \textless\textless{}
-\textquotesingle\textbackslash n\textquotesingle{}
+Note that a default values can be from a function call as long as the function call involves only constants. Make sure you run this:
 
-\textless\textless{} isprime(5, 3) \textless\textless{}
-\textquotesingle\textbackslash n\textquotesingle{}
-
-\textless\textless{} isprime(169, 11) \textless\textless{}
-\textquotesingle\textbackslash n\textquotesingle{}
-
-\textless\textless{} isprime(21, 3, 7)
-
-\emph{\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}}}  \\
-\end{longtable}
-
-Of course in this case we must choose a reasonable default value for
-parameter \emph{end}. In the above case, I choose a value the user
-won\textquotesingle t be using. This is similar to the use of the
-sentinel values in terminating a while-loop.
-
-Note that a default values can be from a function call as long as the
-function call involves only constants. Make sure you run this:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 int g(int x)
-
-\{
-
-return x * x;
-
-\}
+{
+    return x * x;
+}
 
 void f(int x, int y = g(42))
+{}
+\end{consolethree}
 
-\{\} \\
-\end{longtable}
 
-Function extension
+\newpage\EMPHASIZE{Function extension}
 
-As I\textquotesingle ve just mentioned, one reason for default values is
-to make a function convenient to use. You basically set parameter values
-to the most common values.
+As I've just mentioned, one reason for default values is to make a function convenient to use. You basically set parameter values to the most common values.
 
-There is actually \textbf{another use} of default values
-that\textquotesingle s not usually mentioned in some textbooks.
+There is actually \EMPHASIZE{another use} of default values that's not usually mentioned in some textbooks.
 
-Default values can be used to \textbf{extend the functionality} of a
-function without breaking existing code. Here\textquotesingle s what I
-mean.
+Default values can be used to \EMPHASIZE{extend the functionality} of a function without breaking existing code. Here's what I mean.
 
-Suppose you have a program that computes the average of an array of 3
-elements:
+Suppose you have a program that computes the average of an array of 3 elements:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-double avg(int x{[}{]})
-
-\{
-
-int s = 0;
-
-for (int i = 0; i \textless{} 3; i++)
-
-\{
-
-\vtop{\hbox{\strut  s += a{[}i{]};}\hbox{\strut  \}}}
-
-\vtop{\hbox{\strut  return s / 3.0;}\hbox{\strut \}}}
+\begin{consolethree}[escapeinside=||]
+double avg(int x[])
+{
+    int s = 0;
+    for (int i = 0; i < 3; i++)
+    {
+        s += a[i];
+    }
+    return s / 3.0;
+}
 
 int main()
+{
+    int x[] = {1, 2, 3};
+    std::cout << avg(x) << std::endl;
+    return 0;
+}
+\end{consolethree}
 
-\{
+What if you now want to average over 5 elements? You can write a new function that averages over 5 elements. Of course you know now that you should have written a function to average over general lengths.
 
-int x{[}{]} = \{1, 2, 3\};
+\begin{consolethree}[escapeinside=||]
+double avg(int x[])
+{
+    int s = 0;
+    for (int i = 0; i < 3; i++)
+    {
+        s += a[i];
+    }
+    return s / 3.0;
+}
 
-std::cout \textless\textless{} avg(x) \textless\textless{} std::endl;
-
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
-
-What if you now want to average over 5 elements? You can write a new
-function that averages over 5 elements. Of course you know now that you
-should have written a function to average over general lengths.
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-double avg(int x{[}{]})
-
-\{
-
-int s = 0;
-
-for (int i = 0; i \textless{} 3; i++)
-
-\{
-
-\vtop{\hbox{\strut  s += a{[}i{]};}\hbox{\strut  \}}}
-
-\vtop{\hbox{\strut  return s / 3.0;}\hbox{\strut \}}}
-
-double avg2(int x{[}{]}, int len)
-
-\{
-
-int s = 0;
-
-for (int i = 0; i \textless{} len; i++)
-
-\{
-
-\vtop{\hbox{\strut  s += a{[}i{]};}\hbox{\strut  \}}}
-
-\vtop{\hbox{\strut  return (double) s / len;}\hbox{\strut \}}}
+double avg2(int x[], int len)
+{
+    int s = 0;
+    for (int i = 0; i < len; i++)|\xsidebox[0cm]{0cm}{}{txt1}{BAD! Code duplication! The functions look almost the same.}|
+    {
+        s += a[i];
+    }
+    return (double) s / len;
+}
 
 int main()
+{
+    int x[] = {1, 2, 3};
+    std::cout << avg(x) << std::endl;
+    int y[] = {1, 2, 3, 4};
+    std::cout << avg2(y, 4) << std::endl;
+    return 0;
+}
+\end{consolethree}
 
-\{
+Another way would be to modify the original function. But of course all uses of the previous version of \texttt{avg()} must be changed; you need to add a size to the function call:
 
-int x{[}{]} = \{1, 2, 3\};
-
-std::cout \textless\textless{} avg(x) \textless\textless{} std::endl;
-
-int y{[}{]} = \{1, 2, 3, 4\};
-
-std::cout \textless\textless{} avg2(y, 4) \textless\textless{}
-std::endl;
-
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
-
-Another way would be to modify the original function. But of course all
-uses of the previous version of \emph{avg()} must be changed; you need
-to add a size to the function call:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-double avg(int x{[}{]}, int size)
-
-\{
-
-int s = 0;
-
-for (int i = 0; i \textless{} size; i++)
-
-\{
-
-\vtop{\hbox{\strut  s += a{[}i{]};}\hbox{\strut  \}}}
-
-\vtop{\hbox{\strut  return s / 3.0;}\hbox{\strut \}}}
+\begin{consolethree}[escapeinside=||]
+double avg(int x[], int size)
+{
+    int s = 0;
+    for (int i = 0; i < size; i++)
+    {
+        s += a[i];
+    }
+    return s / 3.0;
+}
 
 int main()
+{
+    int x[] = {1, 2, 3};
+    std::cout << avg(x, |\EMPHASIZE{3}|) << std::endl;|\xsidebox[0cm]{0cm}{}{txt0}{BAD! Each usage of the old function must change.}|
+    int y[] = {1, 2, 3, 4};
+    std::cout << avg(y, 4) << std::endl;
+    return 0;
+}
+\end{consolethree}
 
-\{
+That's no big deal for a small program. But for a large program with thousands of lines or more, the change can be costly.
 
-int x{[}{]} = \{1, 2, 3\};
+Here's another way to modify your \texttt{avg()} function without breaking existing usage:
 
-std::cout \textless\textless{} avg(x\textbf{, 3}) \textless\textless{}
-std::endl;
-
-int y{[}{]} = \{1, 2, 3, 4\};
-
-std::cout \textless\textless{} avg(y, 4) \textless\textless{} std::endl;
-
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
-
-That\textquotesingle s no big deal for a small program. But for a large
-program with thousands of lines or more, the change can be costly.
-
-Here\textquotesingle s another way to modify your \emph{avg()} function
-without breaking existing usage:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-double avg(int x{[}{]}, \textbf{int size = 3})
-
-\{
-
-int s = 0;
-
-for (int i = 0; i \textless{} size; i++)
-
-\{
-
-\vtop{\hbox{\strut  s += a{[}i{]};}\hbox{\strut  \}}}
-
-\vtop{\hbox{\strut  return (double) s / size;}\hbox{\strut \}}}
+\begin{consolethree}[escapeinside=||]
+double avg(int x[], |\textbf{int size = 3}|)
+{
+    int s = 0;
+    for (int i = 0; i < size; i++)
+    {
+        s += a[i];
+    }
+    return (double) s / size;
+}
 
 int main()
-
-\{
-
-int x{[}{]} = \{1, 2, 3\};
-
-std::cout \textless\textless{} avg(x) \textless\textless{} std::endl;
-
-int y{[}{]} = \{1, 2, 3, 4\};
-
-std::cout \textless\textless{} avg(y, 4) \textless\textless{} std::endl;
-
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
+{
+    int x[] = {1, 2, 3};
+    std::cout << avg(x) << std::endl;
+    int y[] = {1, 2, 3, 4};
+    std::cout << avg(y, 4) << std::endl;
+    return 0;
+}
+\end{consolethree}
 
 Get the point?
 
 One more example.
 
-For some programs it is common to ``clip'' a value. For instance if you
-want a value to be positive, after calling the function with the value,
-the same value is returned if the value is positive. If the value is
-negative, 0 is returned.
+For some programs it is common to ``clip'' a value. For instance if you want a value to be positive, after calling the function with the value, the same value is returned if the value is positive. If the value is negative, 0 is returned.
 
 \begin{itemize}
-\item
-  \begin{quote}
-  clip(5) returns 5
-  \end{quote}
-\item
-  \begin{quote}
-  clip(-3.44) returns 0
-  \end{quote}
+\item clip(5) returns 5
+\item clip(-3.44) returns 0
 \end{itemize}
 
-In other words the statement \emph{x = clip(x)} will ensure that
-\emph{x} is positive. Complete this program:
+In other words the statement \texttt{x = clip(x)} will ensure that
+\texttt{x} is positive. Complete this program:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 double clip(double x)
-
-\{
-
-if (x \textgreater= 0)
-
-return x;
-
-else
-
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}}
+{
+    if (x >= 0)
+        return x;
+    else
+        return 0;
+}
 
 int main()
+{
+    std::cout << clip(5.6) << std::endl   // 5.6
+              << clip(0) << std::endl     // 0
+              << clip(-1.23) << std::endl; // 0
+    return 0;
+}
+\end{consolethree}
 
-\{
+Now modify your clip so that it accepts a minimum clipping value. In other words, x = clip(x, 1) ensures that x is at least 1. Furthermore old test code must continue to work.
 
-std::cout \textless\textless{} clip(5.6) \textless\textless{} std::endl
-// 5.6
-
-\textless\textless{} clip(0) \textless\textless{} std::endl // 0
-
-\textless\textless{} clip(-1.23) \textless\textless{} std::endl; // 0
-
-return 0;
-
-\} \\
-\end{longtable}
-
-Now modify your clip so that it accepts a minimum clipping value. In
-other words, x = clip(x, 1) ensures that x is at least 1. Furthermore
-old test code must continue to work.
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 double clip(double x, double min = 0)
-
-\{
-
-if (x \textgreater= min)
-
-return x;
-
-else
-
-\vtop{\hbox{\strut  return min;}\hbox{\strut \}}}
+{
+    if (x >= min)
+        return x;
+    else
+        return min;
+}
 
 int main()
-
-\{
-
-std::cout \textless\textless{} clip(5.6) \textless\textless{} std::endl
-// 5.6
-
-\textless\textless{} clip(0) \textless\textless{} std::endl // 0
-
-\textless\textless{} clip(-1.23) \textless\textless{} std::endl // 0
-
-\textless\textless{} clip(5, 1.2) \textless\textless{} std::endl // 5
-
-\textless\textless{} clip(0.5, 1.2) \textless\textless{} std::endl //
-1.2
-
-\textless\textless{} clip(-3, 1.2) \textless\textless{} std::endl; //
-1.2
-
-return 0;
-
-\} \\
-\end{longtable}
+{
+    std::cout << clip(5.6) << std::endl      // 5.6
+              << clip(0) << std::endl        // 0
+              << clip(-1.23) << std::endl    // 0
+              << clip(5, 1.2) << std::endl   // 5
+              << clip(0.5, 1.2) << std::endl // 1.2
+              << clip(-3, 1.2) << std::endl; // 1.2
+    return 0;
+}
+\end{consolethree}
 
 See the use of default values now?
 
-Let's go one step further. Suppose the maximum possible value ever
-passed into the \emph{clip()} function is 1e100 (mathematically speaking
-this is 1 x 10\textsuperscript{100}). Let\textquotesingle s extend the
-\emph{clip()} function to accept a maximum clip value.
+Let's go one step further. Suppose the maximum possible value ever passed into the \texttt{clip()} function is 1e100 (mathematically speaking this is 1 x 10$^{100}$). Let's extend the \texttt{clip()} function to accept a maximum clip value.
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 double clip(double x,
-
-double min = 0, double max = 1e100)
-
-\{
-
-if (x \textless{} min)
-
-return min;
-
-else if (x \textgreater{} max)
-
-return max;
-
-\vtop{\hbox{\strut  return x;}\hbox{\strut \}}}
+            double min = 0, double max = 1e100)
+{
+    if (x < min)
+        return min;
+    else if (x > max)
+        return max;
+    return x;
+}
 
 int main()
+{
+    std::cout << clip(5.6) << std::endl      // 5.6
+              << clip(0) << std::endl        // 0
+              << clip(-1.23) << std::endl    // 0
+              << clip(5, 1.2) << std::endl   // 5
+              << clip(0.5, 1.2) << std::endl // 1
+              << clip(-3, 1.2) << std::endl  // 1
+              << clip(3, 0, 5) << std::endl  // 3
+              << clip(3, 4, 5) << std::endl  // 4
+              << clip(3, 0, 1) << std::endl; // 1
+    return 0;
+}
+\end{consolethree}
 
-\{
+I hope it's clear that the graph of the clip(x, min, max) (for fixed min and max) function is this:
 
-std::cout \textless\textless{} clip(5.6) \textless\textless{} std::endl
-// 5.6
+% \includegraphics[width=3.3335in,height=2.5in]{Pictures/1000000000000140000000F021743FC92E9323B2.png}
 
-\textless\textless{} clip(0) \textless\textless{} std::endl // 0
+Such functions that ``squeeze'' a value to within a range is common in many applications. For instance there's the Sigmoid function. This is used in artificial intelligence in the study of artificial brain neurons. Maybe you will study that when you take CISS450 Artificial Intelligence.
 
-\textless\textless{} clip(-1.23) \textless\textless{} std::endl // 0
+\begin{ex}
+Write a \texttt{randrange()} function that accepts integers a and b and returns a random integer n such that a <= n < b. Test your code with this:
 
-\textless\textless{} clip(5, 1.2) \textless\textless{} std::endl // 5
-
-\textless\textless{} clip(0.5, 1.2) \textless\textless{} std::endl // 1
-
-\textless\textless{} clip(-3, 1.2) \textless\textless{} std::endl // 1
-
-\textless\textless{} clip(3, 0, 5) \textless\textless{} std::endl // 3
-
-\textless\textless{} clip(3, 4, 5) \textless\textless{} std::endl // 4
-
-\textless\textless{} clip(3, 0, 1) \textless\textless{} std::endl; // 1
-
-return 0;
-
-\} \\
-\end{longtable}
-
-I hope it\textquotesingle s clear that the graph of the clip(x, min,
-max) (for fixed min and max) function is this:
-
-Such functions that ``squeeze'' a value to within a range is common in
-many applications. For instance there\textquotesingle s the Sigmoid
-function:
-
-\includegraphics[width=3.3335in,height=2.5in]{Pictures/1000000000000140000000F021743FC92E9323B2.png}
-
-This is used in artificial intelligence in the study of artificial brain
-neurons. Maybe you will study that when you take CISS450 Artificial
-Intelligence.
-
-\textbf{Exercise.} Write a \emph{randrange()} function that accepts
-integers a and b and returns a random integer n such that a \textless= n
-\textless{} b. Test your code with this:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 int randrange(int a, int b)
-
-\{
-
-\vtop{\hbox{\strut  ... CODE ...}\hbox{\strut \}}}
+{
+    ... CODE ...
+}
 
 int main()
+{
+    for (int i = 0; i < 10; i++)
+    {
+        std::cout << randrange(5, 15) << std::endl;
+    }
+    return 0;
+}
+\end{consolethree}
 
-\{
+Now modify your program so that it accepts a \texttt{step} variable. For instance if you call randrange(5, 15, 2), an integer randomly chosen from 5, 7, 9, 11, and 13 is returned; if you call randrange(5, 15, 3), an integer randomly chosen from 5, 8, 11, and 14 is returned;
+\end{ex}
 
-for (int i = 0; i \textless{} 10; i++)
-
-\{
-
-std::cout \textless\textless{} randrange(5, 15) \textless\textless{}
-std::endl;
-
-\}
-
-return 0;
-
-\} \\
-\end{longtable}
-
-Now modify your program so that it accepts a \emph{step} variable. For
-instance if you call randrange(5, 15, 2), an integer randomly chosen
-from 5, 7, 9, 11, and 13 is returned; if you call randrange(5, 15, 3),
-an integer randomly chosen from 5, 8, 11, and 14 is returned;
-
-Exercise. You are a programmer for Wal-art (they sell art supplies ...
-). Your boss told you to write a function to compute weekly pay. Write a
-function \emph{getSalary()} that accepts the number of hours (as a
-double) and computes the wage using this formula:
+\begin{ex}
+You are a programmer for Wal-art (they sell art supplies ...). Your boss told you to write a function to compute weekly pay. Write a function \texttt{getSalary()} that accepts the number of hours (as a double) and computes the wage using this formula:
 
 \begin{itemize}
-\tightlist
-\item
-  For each hour up to 40 hours, the hourly rate is 7.20
-\item
-  For each overtime hour (i.e. beyond 40 hours), the hourly rate is
-  8.30.
+\item For each hour up to 40 hours, the hourly rate is 7.20
+\item For each overtime hour (i.e. beyond 40 hours), the hourly rate is 8.30.
 \end{itemize}
 
-Test your code with this \emph{main()}
+Test your code with this \texttt{main()}
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 double getSalary(int hours)
-
-\{
-
-\vtop{\hbox{\strut  ... CODE ...}\hbox{\strut \}}}
+{
+    ... CODE ...
+}
 
 int main()
+{
+    std::cout << getSalary(30) << std::endl;
+    std::cout << getSalary(45.5) << std::endl;
+    return 0;
+}
+\end{consolethree}
 
-\{
+[... time passes ...nostalgic music ... scenes fade in and out ...]
 
-std::cout \textless\textless{} getSalary(30) \textless\textless{}
-std::endl;
+It's been 6 months and your \texttt{getSalary()} function has been used extensively in the information system. Your boss told you that the higher-ups have decided to create 3 types of hourly wage workers. The previous computation for the salary refers to an hourly wage worker oftype 0. For type 1, the hourly wage is 8.50/hour for hours up to 40 hours/week and 9.30 for each hour after 40 hours. For employee of type 2, the hourly wage is 10.50/hour; overtime hourly rate is the same as the regular hourly rate.
 
-std::cout \textless\textless{} getSalary(45.5) \textless\textless{}
-std::endl;
+Modify your \texttt{getSalary()} function so that previous usage is not broken. Test your code with this \texttt{main()}:
 
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
-
-{[}... time passes ...nostalgic music ... scenes fade in and out ...{]}
-It's been 6 months and your \emph{getSalary()} function has been used
-extensively in the information system. Your boss told you that the
-higher-ups have decided to create 3 types of hourly wage workers. The
-previous computation for the salary refers to an hourly wage worker of
-type 0. For type 1, the hourly wage is 8.50/hour for hours up to 40
-hours/week and 9.30 for each hour after 40 hours. For employee of type
-2, the hourly wage is 10.50/hour; overtime hourly rate is the same as
-the regular hourly rate.
-
-Modify your \emph{getSalary()} function so that previous usage is not
-broken. Test your code with this \emph{main()}:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 // *** NEED TO CHANGE ***
-
 double getSalary(int hours)
-
-\{
-
-\vtop{\hbox{\strut  ... OLD CODE ...}\hbox{\strut \}}}
+{
+    ... OLD CODE ...
+}
 
 int main()
+{
+    std::cout << getSalary(30) << std::endl;
+    std::cout << getSalary(45.5) << std::endl;
+    std::cout << getSalary(45.5, 0) << std::endl;
+    std::cout << getSalary(45.5, 1) << std::endl;
+    std::cout << getSalary(45.5, 2) << std::endl;
+    return 0;
+}
+\end{consolethree}
+\end{ex}
 
-\{
+Default values of basic types are all the same. However you cannot use default values for arrays in the ``obvious'' way:
 
-std::cout \textless\textless{} getSalary(30) \textless\textless{}
-std::endl;
+\begin{consolethree}[escapeinside=||]
+void f(int x[] = {1, 2, 3})
+{
+    ... code ...
+}
+\end{consolethree}
 
-std::cout \textless\textless{} getSalary(45.5) \textless\textless{}
-std::endl;
+The program will not even compile. In other words, the \EMPHASIZE{array initializer list cannot be used as a default value}.
 
-std::cout \textless\textless{} getSalary(45.5, 0) \textless\textless{}
-std::endl;
 
-std::cout \textless\textless{} getSalary(45.5, 1) \textless\textless{}
-std::endl;
-
-std::cout \textless\textless{} getSalary(45.5, 2) \textless\textless{}
-std::endl;
-
-\vtop{\hbox{\strut  return 0;}\hbox{\strut \}}} \\
-\end{longtable}
-
-Default values of basic types are all the same. However you cannot use
-default values for arrays in the ``obvious'' way:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-void f(int x{[}{]} = \{1, 2, 3\})
-
-\{
-
-... code ...
-
-\} \\
-\end{longtable}
-
-The program will not even compile. In other words, the \textbf{array
-initializer list cannot be used as a default value}.
-
-Prototypes for default values
+\newpage\EMPHASIZE{Prototypes for default values}
 
 First try this:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless iostream\textgreater{}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
 
 void printHeads(int = 1);
 
 int main()
-
-\{
-
-printHeads();
-
-printHeads(42);
-
-return 0;
-
-\}
+{
+    printHeads();
+    printHeads(42);
+    return 0;
+}
 
 void printHeads(int numHeads = 1)
+{
+    std::cout << "number of heads: " << numHeads
+              << std::endl;
+}
+\end{consolethree}
 
-\{
-
-std::cout \textless\textless{} "number of heads: " \textless\textless{}
-numHeads
-
-\textless\textless{} std::endl;
-
-\} \\
-\end{longtable}
-
-It does \textbf{not} work. Remember that!!!
+It does \EMPHASIZE{not} work. Remember that!!!
 
 Now try this:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless iostream\textgreater{}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
 
 void printHeads(int = 1);
 
 int main()
-
-\{
-
-printHeads();
-
-printHeads(42);
-
-return 0;
-
-\}
+{
+    printHeads();
+    printHeads(42);
+    return 0;
+}
 
 void printHeads(int numHeads)
-
-\{
-
-std::cout \textless\textless{} "number of heads: " \textless\textless{}
-numHeads
-
-\textless\textless{} std::endl;
-
-\} \\
-\end{longtable}
+{
+    std::cout << "number of heads: " << numHeads
+              << std::endl;
+}
+\end{consolethree}
 
 See the difference?
 
-The \textbf{default values appear only in the prototype if you want to
-have a prototype }and not in the function header when you define the
-function bodies.
+The \EMPHASIZE{default values appear only in the prototype if you want to have a prototype} and not in the function header when you define the function bodies.
 
-(This is not arbitrary. There's a reason for this. But you would need to
-know how compilers work to understand why this is the case. So for now
-you just have to remember this fact.)
+(This is not arbitrary. There's a reason for this. But you would need to know how compilers work to understand why this is the case. So for now you just have to remember this fact.)
 
-Of course if you don\textquotesingle t have a prototype, then you can
-include the default value in the function header -- but NOT if you have
-a prototype.
+Of course if you don't have a prototype, then you can include the default value in the function header -- but NOT if you have a prototype.
 
-That\textquotesingle s the only gotcha you should remember. This is a
-very common mistake for beginners.
+That's the only gotcha you should remember. This is a very common mistake for beginners.
 
-Multi-file compilation
 
-I have nothing to add here. Just remember that the \textbf{default
-values appear only in the function prototypes}, not in the function
-headers when defining function bodies (see previous section) if you want
-to give that function a prototype. In other words, this \textbf{does not
-work}:
+\newpage\EMPHASIZE{Multi-file compilation}
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless iostream\textgreater{}
+I have nothing to add here. Just remember that the \EMPHASIZE{default values appear only in the function prototypes}, not in the function headers when defining function bodies (see previous section) if you want to give that function a prototype. In other words, this \EMPHASIZE{does not work}:
 
-\#include "test.h"
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "test.h"
 
 int main()
+{
+    printHeads();
+    printHeads(42);
+    return 0;
+}
+\end{consolethree}
 
-\{
-
-printHeads();
-
-printHeads(42);
-
-return 0;
-
-\} \\
-\end{longtable}
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 // test.h
-
-\#ifndef TEST\_H
-
-\#define TEST\_H
+#ifndef TEST_H
+#define TEST_H
 
 void printHeads(int numHeads = 1);
 
-\#endif \\
-\end{longtable}
+#endif
+\end{consolethree}
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 // test.cpp
-
-\#include \textless iostream\textgreater{}
-
-\#include "test.h"
+#include <iostream>
+#include "test.h"
 
 void printHeads(int numHeads = 1)
-
-\{
-
-std::cout \textless\textless{} "number of heads: " \textless\textless{}
-numHeads
-
-\textless\textless{} std::endl;
-
-\} \\
-\end{longtable}
+{
+    std::cout << "number of heads: " << numHeads
+              << std::endl;
+}
+\end{consolethree}
 
 Modify your test.cpp:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
+\begin{consolethree}[escapeinside=||]
 // test.cpp
-
-\#include \textless iostream\textgreater{}
-
-\#include "test.h"
+#include <iostream>
+#include "test.h"
 
 void printHeads(int numHeads)
-
-\{
-
-std::cout \textless\textless{} "number of heads: " \textless\textless{}
-numHeads
-
-\textless\textless{} std::endl;
-
-\} \\
-\end{longtable}
+{
+    std::cout << "number of heads: " << numHeads
+              << std::endl;
+}
+\end{consolethree}
 
 and it works. Make sure you run this.
 
-\textbf{Exercise.} Identify all the errors in this header file:
+\begin{ex}
+Identify all the errors in this header file:
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#ifndef BLAH\_H
+\begin{consolethree}[escapeinside=||]
+#ifndef BLAH_H
+#define BLAH_H
 
-\#define BLAH\_H
+int[] spam(int = 0, char, int[] = {2, 3, 5, 7},
+           int a = 1, int b = 2, int c = a + b);
 
-int{[}{]} spam(int = 0, char, int{[}{]} = \{2, 3, 5, 7\},
-
-int a = 1, int b = 2, int c = a + b);
-
-\#end \\
-\end{longtable}
+#end
+\end{consolethree}
 
 (There are 5).
+\end{ex}
 
-Default value for array parameter
 
-Recall that You cannot have default values for array parameters. For
-instance the following will not compile:
+\newpage\EMPHASIZE{Default value for array parameter}
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless iostream\textgreater{}
+Recall that You cannot have default values for array parameters. For instance the following will not compile:
 
-void print(int x{[}{]} = \{2, 3\})
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
 
-\{
-
-std::cout \textless\textless{} x{[}0{]} \textless\textless{}
-\textquotesingle{} \textquotesingle{} \textless\textless{} x{[}1{]};
-
-\}
+void print(int x[] = {2, 3})
+{
+    std::cout << x[0] << ' ' << x[1];
+}
 
 int main()
+{
+    print();
+    return 0;
+}
+\end{consolethree}
 
-\{
+There's an exception: \EMPHASIZE{The only exception is an array of characters.} In this case, \EMPHASIZE{your array parameter must be an array of constant characters}:
 
-print();
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
 
-return 0;
-
-\} \\
-\end{longtable}
-
-There's an exception: \textbf{The only exception is an array of
-characters. }In this case, \textbf{your array parameter must be an array
-of constant characters}:
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\#include \textless iostream\textgreater{}
-
-void printHello(\textbf{const} char s{[}{]} = "world")
-
-\{
-
-std::cout \textless\textless{} "hello " \textless\textless{} s
-\textless\textless{} std::endl;
-
-\}
+void printHello(|\EMPHASIZE{const}| char s[] = "world")
+{
+    std::cout << "hello " << s << std::endl;
+}
 
 int main()
+{
+    printHello();
+    printHello("underverse");
+    return 0;
+}
+\end{consolethree}
 
-\{
+This means that in the \texttt{printHello()} function you cannot change the characters in parameter \texttt{s}.
 
-printHello();
+\begin{ex}
+Remove \texttt{const} from the above and try to compile.
+\end{ex}
 
-printHello("underverse");
+\begin{ex}
+Write a function \texttt{print\_dollar\_amt()} such that
 
-return 0;
-
-\} \\
-\end{longtable}
-
-This means that in the \emph{printHello()} function you cannot change
-the characters in parameter \emph{s}.
-
-\textbf{Exercise.} Remove \emph{const} from the above and try to
-compile.
-
-\textbf{Exercise.} Write a function \emph{print\_dollar\_amt()} such
-that
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 0\tabcolsep) * \real{1.0000}}@{}}
-\toprule\noalign{}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-print\_dollar\_amt(123); // prints \$1.23
-
-print\_dollar\_amt(123, 45); // prints \$123.45 \\
-\end{longtable}
-
-\end{document}
+\begin{consolethree}[escapeinside=||]
+print_dollar_amt(123);     // prints $1.23
+print_dollar_amt(123, 45); // prints $123.45
+\end{consolethree}
+\end{ex}
