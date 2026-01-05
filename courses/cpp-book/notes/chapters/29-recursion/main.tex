@@ -1,0 +1,3063 @@
+\newpage\EMPHASIZE{29. Recursion}
+
+\textsc{Objectives}
+\begin{itemize}
+\item Write a recursive function
+\item Trace a recursive function by hand
+\end{itemize}
+
+In this set of notes, you will see that I'm not going to introduce new
+C/C++ syntax. Instead we will be using recursion to solve problems. When
+used appropriately, recursion sometimes results in shorter code.
+It's also easier to check that a recursive problem works
+correctly than one that is not recursive.
+
+For those of you who are mathematically inclined (read: math geeks), the
+foundation of recursion is the principle of mathematical induction. This
+means that if you have a recursive program, to prove that the program is
+correct you have to prove the correctness of the code using mathematical
+induction.
+
+You will see a curious thing: many of the code snippets that require
+loops (for-loop or while-loop) can be rewritten without these loops
+using recursion! In fact some programming languages that support
+recursion do not have loops at all!
+
+
+\newpage\EMPHASIZE{What is recursion?}
+
+A \EMPHASIZE{recursive function} is easy to define:
+It's a function that calls itself.
+(There's another kind of recursion called recursive data
+structure.)
+
+Here's an example:
+
+\begin{consolethree}[escapeinside=||]
+int f(int x)
+{
+    std::cout << "entering f() with x = " << x
+              << std::endl;
+    if (x == 0)
+    {
+        return 0;
+    }
+    else
+    {
+        return f(x - 1);
+    }
+}
+
+int main()
+{
+    int x = f(3);
+    std::cout << "main() ... x = " << x << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+We say that \texttt{f()} is a \textbf{recursive function}.
+
+Let's trace the program slowly. The difficulty is that
+\texttt{f()} is being called several times.
+
+\texttt{main()} calls \texttt{f(3)}
+
+\texttt{f(3)} calls \texttt{f(3 - 1)}, i.e., \texttt{f(2)}
+
+\texttt{f(2)} calls \texttt{f(1)}
+
+\texttt{f(1)} calls \texttt{f(0)}
+
+Note that
+
+\texttt{f(0)} returns 0 to \texttt{f(1)}
+
+\texttt{f(1)} receives 0 and return it to \texttt{f(2)}
+
+\texttt{f(2)} receives 0 and return it to \texttt{f(3)}
+
+\texttt{f(3)} receives 0 and return it to \texttt{main()}
+
+Sometimes it's helpful to visual this stack of function
+calls:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(0, 0, 2, 1, label=r'\texttt{f(0)}', linewidth=0.05)
+p += Rect(0, 1.2, 2, 2.2, label=r'\texttt{f(1)}', linewidth=0.05)
+p += Rect(0, 2.4, 2, 3.4, label=r'\texttt{f(2)}', linewidth=0.05)
+p += Rect(0, 3.6, 2, 4.6, label=r'\texttt{f(3)}', linewidth=0.05)
+p += Rect(0, 4.8, 2, 5.8, label=r'\texttt{main()}', linewidth=0.05)
+
+p += Line(points=[(0, 5.3), (-0.5, 5.3), (-0.5, 4.1), (0, 4.1)], endstyle='>', linewidth=0.05)
+p += Line(points=[(0, 3.9), (-0.5, 3.9), (-0.5, 2.9), (0, 2.9)], endstyle='>', linewidth=0.05)
+p += Line(points=[(0, 2.7), (-0.5, 2.7), (-0.5, 1.7), (0, 1.7)], endstyle='>', linewidth=0.05)
+p += Line(points=[(0, 1.5), (-0.5, 1.5), (-0.5, 0.5), (0, 0.5)], endstyle='>', linewidth=0.05)
+# Labels for calls
+p += Rect(-1.5, 4.5, -0.5, 5.0, label=r'\small{calls}', linewidth=0)
+# Return arrows (right side)
+p += Line(points=[(2, 0.5), (2.5, 0.5), (2.5, 1.7), (2, 1.7)], endstyle='>', linewidth=0.05, linestyle='dashed')
+p += Line(points=[(2, 1.9), (2.5, 1.9), (2.5, 2.9), (2, 2.9)], endstyle='>', linewidth=0.05, linestyle='dashed')
+p += Line(points=[(2, 3.1), (2.5, 3.1), (2.5, 4.1), (2, 4.1)], endstyle='>', linewidth=0.05, linestyle='dashed')
+p += Line(points=[(2, 4.3), (2.5, 4.3), (2.5, 5.3), (2, 5.3)], endstyle='>', linewidth=0.05, linestyle='dashed')
+# Labels for returns
+p += Rect(2.5, 0.7, 4.0, 1.2, label=r'\small{returns 0}', linewidth=0)
+p += Rect(2.5, 1.9, 4.0, 2.4, label=r'\small{returns 0}', linewidth=0)
+p += Rect(2.5, 3.1, 4.0, 3.6, label=r'\small{returns 0}', linewidth=0)
+p += Rect(2.5, 4.3, 4.0, 4.8, label=r'\small{returns 0}', linewidth=0)
+print(p)
+\end{python}
+
+Our C++ function \texttt{f()}:
+
+\begin{consolethree}[escapeinside=||]
+int f(int x)
+{
+    if (x == 0)
+    {
+        return 0;
+    }
+    else
+    {
+        return f(x - 1);
+    }
+}
+\end{consolethree}
+
+is written mathematically like this:
+
+\[
+f(x) = \begin{cases}
+0 & \text{if } x = 0 \\
+f(x - 1) & \text{if } x > 0
+\end{cases}
+\]
+
+Now let's do a recursion that does something useful ...
+
+
+\newpage\EMPHASIZE{Function call graph}
+
+The diagram above that describes function call
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(0, 8, 3, 9, label=r'\texttt{f(0)}', linewidth=0.05)
+p += Rect(0, 6, 3, 7, label=r'\texttt{f(1)}', linewidth=0.05)
+p += Rect(0, 4, 3, 5, label=r'\texttt{f(2)}', linewidth=0.05)
+p += Rect(0, 2, 3, 3, label=r'\texttt{f(3)}', linewidth=0.05)
+p += Rect(0, 0, 3, 1, label=r'\texttt{main}', linewidth=0.05)
+#up
+zaphod = 1
+for i in range(4):
+    zaphod += 1
+    p += Line(points=[(0.75, zaphod - 1), (0.75, zaphod)], linewidth=0.075, endstyle='>')
+    zaphod += 1
+
+#down
+for i in range(4):
+    zaphod -= 1
+    p += Line(points=[(2.25, zaphod), (2.25, zaphod - 1)], linewidth=0.075, endstyle='>')
+    zaphod -= 1
+print(p)
+\end{python}
+
+is called a \EMPHASIZE{function call graph}. Usually a function call graph
+is used to describe the calling, so the return path is usually not
+shown. If I'm only interested in the recursive calls say of f(3), then I
+would not include the box for main(). So the function call graph for
+f(3) looks like this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(0, 8, 3, 9, label=r'\texttt{f(0)}', linewidth=0.05)
+p += Rect(0, 6, 3, 7, label=r'\texttt{f(1)}', linewidth=0.05)
+p += Rect(0, 4, 3, 5, label=r'\texttt{f(2)}', linewidth=0.05)
+p += Rect(0, 2, 3, 3, label=r'\texttt{f(3)}', linewidth=0.05)
+#up
+zaphod = 3
+for i in range(3):
+    zaphod += 1
+    p += Line(points=[(1.5, zaphod - 1), (1.5, zaphod)], linewidth=0.075, endstyle='>')
+    zaphod += 1
+
+print(p)
+\end{python}
+
+is important because, if there are no loops in the function, then the
+number of boxes in the function call graph more or less denotes the
+amount of work that has to be done to compute f(3). For instance,
+omitting the box for \texttt{main()}, f(3) involves 4 boxes.
+
+
+\newpage\EMPHASIZE{Sum from 1 to n}
+
+Suppose we write
+
+sum(n)
+
+to denote ``the sum of all integers from 0 to n'', i.e.,
+
+sum(n) = 0 + 1 + 2 + 3 + \ldots{} + n
+
+Of course we know how to sum from 1 to n without using recursion but
+using a loop:
+
+\begin{consolethree}[escapeinside=||]
+int sum(int n)
+{
+    int s = 0;
+    for (int i = 0; i < n; ++i)
+    {
+        s += i;
+    }
+    return s;
+}
+\end{consolethree}
+
+In fact the \ldots{} in sum(n) = 1 + 2 + 3 + \ldots{} + n more or less described a loop.
+
+Let me think of the sum(n) computation recursively \ldots{} let's try
+some examples to get a feel for the problem. Here's an
+example:
+
+sum(5) = 0 + 1 + 2 + 3 + 4 + 5
+
+Note that
+
+sum(4) = 0 + 1 + 2 + 3 + 4
+
+Therefore you have this:
+
+sum(5) = 0 + 1 + 2 + 3 + 4 + 5
+
+= (0 + 1 + 2 + 3 + 4) + 5
+
+= sum(4) + 5
+
+Clearly we also have
+
+sum(8) = 0 + 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8
+
+= (0 + 1 + 2 + 3 + 4 + 5 + 6 + 7) + 8
+
+= sum(7) + 8
+
+See you should quickly see that in general if n is a positive integer
+greater than 0, then
+
+sum(n) = sum(n - 1) + n
+
+You see that sum(n) is related to sum(n - 1). Also note that
+
+sum(0) = 0
+
+So if we define sum(n) to be ``the sum of all integers from 0 to n'',
+then we get
+
+\[
+\text{sum}(n) = \begin{cases}
+0 & \text{if } n = 0 \\
+\text{sum}(n - 1) + n & \text{if } n > 0
+\end{cases}
+\]
+
+The relationship (when n > 0)
+
+sum(n) = sum(n - 1) + n
+
+is called a \EMPHASIZE{recursion} because the sum function called
+\EMPHASIZE{itself}. The case when n = 0
+
+sum(0) = 0
+
+is called the \EMPHASIZE{base case} of the recursion.
+
+Recursion is an \EMPHASIZE{extremely} important phenomenon in math,
+computer science, \ldots, in nature. So listen up.
+
+First of all, if I ask you to give me sum(5), you would say, well it's
+just
+
+sum(5) = 1 + 2 + 3 + 4 + 5
+
+and then you evaluate the express to get 15. But you can also use
+
+\[
+\text{sum}(n) = \begin{cases}
+0 & \text{if } n = 0 \text{ (B)} \\
+\text{sum}(n - 1) + n & \text{if } n > 0 \text{ (R)}
+\end{cases}
+\]
+
+to get the same value. (Note that I've labeled the two cases.) Here's
+how you use (B) and (R) to compute sum(5):
+
+Since 5 > 0, from (R) we get
+
+sum(5) = sum(5 - 1) + 5
+
+So??? Well if we simplify that we get
+
+sum(5) = sum(4) + 5
+
+That doesn't give us a value of sum(5). But wait, sum(4)
+can be written in a different way: Because 4 > 0, by (R):
+
+sum(4) = sum(4 - 1) + 4
+
+which simplifies to
+
+sum(4) = sum(3) + 4
+
+So altogether we have this:
+
+sum(5) = sum(4) + 5
+
+sum(4) = sum(3) + 4
+
+That still does NOT tell us what the value of sum(5) is!!! But hang on,
+with the same reasoning (using (R)) we get three more facts:
+
+sum(3) = sum(2) + 3
+
+sum(2) = sum(1) + 2
+
+sum(1) = sum(0) + 1
+
+So altogether we have
+
+sum(5) = sum(4) + 5
+
+sum(4) = sum(3) + 4
+
+sum(3) = sum(2) + 3
+
+sum(2) = sum(1) + 2
+
+sum(1) = sum(0) + 1
+
+Now you might be tempted to write
+
+sum(0) = sum(-1) + 0
+
+That's wrong!!! Because the relationship (R)
+
+(R): sum(n) = sum(n - 1) + n
+
+applies only when n > 0. You cannot apply it to the case of
+n = 0. But wait \ldots{} for the case of n = 0 we have this:
+
+(B): sum(0) = 0
+
+Therefore altogether we have
+
+sum(5) = sum(4) + 5
+
+sum(4) = sum(3) + 4
+
+sum(3) = sum(2) + 3
+
+sum(2) = sum(1) + 2
+
+sum(1) = sum(0) + 1
+
+sum(0) = 0
+
+So what? Well, with these we can compute sum(5)!!! Let me show you how.
+First let me label the facts:
+
+(5): sum(5) = sum(4) + 5
+
+(4): sum(4) = sum(3) + 4
+
+(3): sum(3) = sum(2) + 3
+
+(2): sum(2) = sum(1) + 2
+
+(1): sum(1) = sum(0) + 1
+
+(0): sum(0) = 0
+
+From equation (0), we know that sum(0) = 0. Substituting this into
+equation (1) we get
+
+sum(1) = sum(0) + 1 = 0 + 1
+
+And if we substitute this into equation (2) we get
+
+sum(2) = sum(1) + 2 = 0 + 1+ 2
+
+Substituting this into equation (3) we get
+
+sum(3) = sum(2) + 3 = 0 + 1+ 2 + 3
+
+And when this is put into equation (4) we get
+
+sum(4) = sum(3) + 4 = 0 + 1+ 2 + 3 + 4
+
+And of course finally we get
+
+sum(5) = sum(4) + 5 = 0 + 1+ 2 + 3 + 4 + 5
+
+So whether you define sum(n) as
+
+sum(n) = 1 + 2 + \ldots{} + n
+
+(which looks more like a loop) or
+
+\[
+\text{sum}(n) = \begin{cases}
+0 & \text{if } n = 0 \\
+\text{sum}(n - 1) + n & \text{if } n > 0
+\end{cases}
+\]
+
+you get the same value for sum(n).
+
+\begin{ex}
+Using the above method for evaluating a recursive
+function, compute for sum(7). You should get 0 + 1 + 2 + 3 + 4 + 5 + 6 +
+7.
+\end{ex}
+
+The two ways of looking at sum(n), using a loop and using recursion,
+gives us the same result. The really important question to ask is this:
+
+Why should
+
+\[
+\text{sum}(n) = \begin{cases}
+0 & \text{if } n = 0 \\
+\text{sum}(n - 1) + n & \text{if } n > 0
+\end{cases}
+\]
+
+be a good alternative view of
+
+sum(n) = 0 + 1 + 2 + \ldots{} + n?
+
+The reason is because of this \ldots{} pay attention! \ldots{} many
+problems in nature present themselves naturally in a \EMPHASIZE{recursive
+way}. For more complex problems, the recursive way is the way that leads
+to a simpler solution. And simple mean less bugs.
+
+(For those of you who have taken Physics and Differential Equations, you
+know that many problems in Physics requires the description of a
+function or behavior of a physical phenomenon, but the function takes
+part in a relationship of a special form -- the function appears in a
+differential equation. For CS, many problems gives rise to functions
+which are recursive.)
+
+Of course we still need code \ldots{} but don't worry: We can easily
+translate the recursive sum(n)
+
+\[
+\text{sum}(n) = \begin{cases}
+0 & \text{if } n = 0 \\
+\text{sum}(n - 1) + n & \text{if } n > 0
+\end{cases}
+\]
+
+into a C++ function:
+
+\begin{consolethree}[escapeinside=||]
+int sum(int n)
+{
+    if (n == 0)
+    {
+        return 0;
+    }
+    else
+    {
+        return sum(n - 1) + n;
+    }
+}
+\end{consolethree}
+
+Note that the \EMPHASIZE{recursive version does not have loops}. Make sure
+you study and test it carefully.
+
+\begin{ex}
+The following version includes print statements so
+that you know what the function is doing:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int sum(int n)
+{
+    std::cout << "entering sum(" << n << ") ...\n";
+    if (n == 0)
+    {
+        std::cout << "exiting sum(" << n
+                  << ") returning 0 ...\n";
+        return 0;
+    }
+    else
+    {
+        int ret = sum(n - 1) + n;
+        std::cout << "exiting sum(" << n
+                  << ") returning " << ret
+                  << "...\n";
+        return ret;
+    }
+}
+
+int main()
+{
+    sum(5);
+    return 0;
+}
+\end{consolethree}
+
+Make sure you run the above. I've already mentioned this: putting print
+statements inside a function, recursive or not, helps in understanding
+the function and, if you have an error, helps in debugging the function.
+\end{ex}
+
+In this case, the sum-from-1-to-n is easy so recursion is not really
+necessary. The point of the section is to show you that
+it's possible to write a recursion function for
+sum-from-1-to-n. In the real world many problems are described more
+naturally in a recursive form and solving such problems using loops is
+extremely untidy and painful.
+
+\begin{ex}
+Draw the function call graph for sum(5). How many
+boxes do you see? How many boxes are there for the function call graph
+of sum(n)?
+\end{ex}
+
+\begin{ex}
+Let f(n) denote the sum of squares
+$0^2 + 1^2 + 2^2 + \ldots + n^2$.
+
+\begin{enumerate}
+\item[(a)] Write down f(4) and f(3). What is the relationship between f(4) and
+  f(3)?
+\item[(b)] Write down f(5) and f(4). What is the relationship between f(5) and
+  f(4)?
+\item[(c)] In general if n > 0 is a positive integer, what is the
+  (recursive) relationship between f(n) and f(n-1)?
+\item[(d)] What is f(0)?
+\end{enumerate}
+
+Write a C/C++ function for f(n). Write a \texttt{main()} to verify your
+f(n).
+\end{ex}
+
+\begin{ex}
+Let \texttt{h(n)} be 2 to the n-th power. Consider
+h(5):
+
+$h(5) = 2^5$
+
+Do you see h(4) in h(5)? Write a recursive function for \texttt{h(n)}.
+Test it (of course).
+\end{ex}
+
+\begin{ex}
+Continuing the above \ldots{} Let \texttt{h(a, n)} be a
+to the n-th power. Consider h(3, 5):
+
+$h(3, 5) = 3^5$
+
+Do you see h(3, 4) in h(3, 5)? Write a recursive function for \texttt{h(a,
+n)}. Test it (of course).
+\end{ex}
+
+\begin{ex}
+You are given the following mathematical description
+of a recursion:
+
+k(n) = 2 + 3 * k(n - 1) if n > 0
+
+k(0) = 1
+
+Compute by hand the value of k(1), k(2) and k(3). Write a C++ recursive
+function for k(n). Test your code. Make sure your computation by hand
+matches the output of your program.
+\end{ex}
+
+\begin{ex}
+You are given the following mathematical description
+of a recursion:
+
+j(n) = 1 + j(n - 1) * n if n > 0
+
+j(0) = 2
+
+Compute by hand the value of j(1), j(2) and j(3). Write a C++ recursive
+function for j(n). Test your code. Make sure your computation by hand
+matches the output of your program.
+\end{ex}
+
+
+\newpage\EMPHASIZE{Factorial}
+
+First let's just do math.
+
+Let f(n) denote the factorial function. In other words f(3) is 3x2x1;
+f(5) is 5x4x3x2x1. In math the factorial of 3 is written 3!; the
+factorial of 5 is written 5!. This is not new -- I have already talked
+about this long time ago.
+
+First of all there is a \EMPHASIZE{recursion} here. Look at f(n).
+
+f(n) = n x (n-1) x (n-2) x ... x 3 x 2 x 1
+
+Note that
+
+f(n - 1) = (n-1) x (n-2) x ... x 3 x 2 x 1
+
+Do you see f(n - 1) in f(n)? Putting the above together we have
+
+f(n) = n x (n-1) x (n-2) x ... x 3 x 2 x 1
+
+= n x [(n-1) x (n-2) x ... x 3 x 2 x 1]
+
+in other words:
+
+f(n) = n x f(n-1)
+
+Right? You can use this mathematical fact to compute f(3) by hand:
+
+f(3) = 3 x f(2)
+
+f(2) = 2 x f(1)
+
+WAIT!!! When do we stop?
+
+f(1) = 1 x f(0)
+
+f(0) = 0 x f(-1)
+
+f(-1) = -1 x f(-2)
+
+Not good ... this will go on forever. But hang on. Look at this:
+
+f(3) = 3 x f(2)
+
+f(2) = 2 x f(1)
+
+f(1) = 1 x f(0)
+
+This means
+
+f(3) = 3 x f(2) = 3 x 2 x f(1) = 3 x 2 x 1 x f(0)
+
+Now ... if we insist that f(0) is defined to be 1 we get
+
+f(3) = 3 x 2 x 1 x f(0) = 3 x 2 x 1 x 1
+
+So we have these properties for our factorial function:
+
+f(n) = n x f(n-1), if n > 0
+
+\EMPHASIZE{f(0) = 1}
+
+The fact
+
+\EMPHASIZE{f(0) = 1}
+
+is called the \EMPHASIZE{base case} of f(n) while
+
+f(n) = n x f(n-1), if n > 0
+
+is called the \EMPHASIZE{recursive case}.
+
+This is how you translate the above function:
+
+f(n) = n x f(n-1), if n > 0
+
+\EMPHASIZE{f(0) = 1}
+
+into C++ code:
+
+\begin{consolethree}[escapeinside=||]
+int f(int n)
+{
+    if (n == 0)
+        return 1;
+    else
+        return n * f(n - 1);
+}
+
+int main()
+{
+    for (int n = 0; n < 5; n++)
+    {
+        std::cout << n << "! = " << f(n)
+                  << std::endl;
+    }
+    return 0;
+}
+\end{consolethree}
+
+Of course there's another way (non-recursive way) of
+computing factorials \ldots{} using loops:
+
+\begin{consolethree}[escapeinside=||]
+int f(int n)
+{
+    int p = 1;
+    for (int i = 1; i <= n; i++)
+    {
+        p *= i;
+    }
+    return p;
+}
+\end{consolethree}
+
+Note that just like the sum(n) example the \EMPHASIZE{recursive version
+does not have loops}.
+
+To see the program trace its steps run this:
+
+\begin{consolethree}[escapeinside=||]
+int f(int n)
+{
+    std::cout << "enter f(" << n << ")" << std::endl;
+    if (n == 0)
+    {
+        std::cout << "base case ... returning 1"
+                  << std::endl;
+        return 1;
+    }
+    else
+    {
+        int x = n * f(n - 1);
+        std::cout << "recursive case ... returning "
+                  << x << std::endl;
+        return x;
+    }
+}
+
+int main()
+{
+    int x = f(5);
+    std::cout << "main() ... " << x << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+Here's a diagram that might help:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(0, 8, 3, 9, label=r'\texttt{f(0)}', linewidth=0.05)
+p += Rect(0, 6, 3, 7, label=r'\texttt{f(1)}', linewidth=0.05)
+p += Rect(0, 4, 3, 5, label=r'\texttt{f(2)}', linewidth=0.05)
+p += Rect(0, 2, 3, 3, label=r'\texttt{f(3)}', linewidth=0.05)
+p += Rect(0, 0, 3, 1, label=r'\texttt{f(4)}', linewidth=0.05)
+#up
+zaphod = -1
+for i in range(5):
+    zaphod += 1
+    p += Line(points=[(0.75, zaphod - 1), (0.75, zaphod)], linewidth=0.075, endstyle='>')
+    zaphod += 1
+
+namez = ['1', '1', '2', '6', '24']
+#down
+for i in range(5):
+    zaphod -= 1
+    p += Line(points=[(2.25, zaphod), (2.25, zaphod - 1)], linewidth=0.075, endstyle='>', label= r'\tab[5em]{' + namez[i] + '}')
+    zaphod -= 1
+
+p += Rect(5, -0.5, 14, 7.5, linewidth=0.1, innersep=0.2, s=r"""In \texttt{f(3)}, \begin{console}
+int f(int n)
+{
+    if (n == 0)
+       return 1;
+    else
+       return n * f(n - 1); 
+}
+\end{console}
+On receiving \texttt{f(2)}, i.e. 2, \texttt{f(3)} returns \texttt{n * f(n - 1)}, i.e. 3 * 2 i.e. 6.""", align='c')
+p += Line(points=[(2.5, 3), (5, 3)], linestyle='dashed', linewidth=0.1)
+print(p)
+\end{python}
+
+
+Notice that for the function call graph of f(4), there are 5 boxes. You
+should see quickly that the function call graph for f(n) has n + 1
+boxes.
+
+
+\newpage\EMPHASIZE{How to discover recursion: look for smaller subproblems inside a problem}
+
+This is really important \ldots{} !!!
+
+Let's step back and look at the recursive version of the
+computation of ``sum from 0 to n'' function and the ``factorial of n''.
+
+Here's the sum(n) (i.e., sum from 0 to n):
+
+$sum(0) = 0$
+
+$sum(n) = n + sum(n - 1)$ if $n > 0$
+
+and here's the factorial (which I'll
+just call f):
+
+$f(0) = 1$
+
+$f(n) = n * f(n - 1)$ if $n > 0$
+
+How does one recognize the recursive form of a function? The crucial
+thing is to see a smaller subproblem within a bigger problem. You should
+also look at specific concrete examples. This is what I mean \ldots{}
+
+Let's look at the sum(n) and say you
+don't know how to write down the recursive form yet. You
+try a concrete example, say the problem of computing sum(5). It looks
+like this:
+
+$sum(5) = 0 + 1 + 2 + 3 + 4 + 5$
+
+Next, you ask yourself if you can see another sum(n) within sum(5). You
+see immediately that sum(4) appears within sum(5):
+
+$sum(5) = 0 + 1 + 2 + 3 + 4 + 5$
+
+$= (0 + 1 + 2 + 3 + 4) + 5$
+
+$sum(4) = 0 + 1 + 2 + 3 + 4$
+
+i.e.,
+
+$sum(5) = sum(4) + 5$
+
+You then try a few more examples and you should see that in general
+
+$sum(n) = sum(n - 1) + n$
+
+Of course this is true for n > 0. You are pretty much done
+except for sum(0). You then ask yourself what is the meaning of sum(0).
+You see that it must be 0. The base case is not as abstract since
+it's just one case and is usually the easier to figure
+out.
+
+It's really the same for the factorial too. You look at
+a concrete example like f(5):
+
+$f(5) = 5 * 4 * 3 * 2 * 1$
+
+and you try to see another factorial on the right. You see that it must
+be:
+
+$f(5) = 5 * (4 * 3 * 2 * 1) = 5 * f(4)$
+
+in other words
+
+$f(n) = n * f(n - 1)$ \hspace{1cm} $(+)$
+
+If you don't see what f(0) is, you just try some
+examples using
+
+$f(n) = n * f(n - 1)$ \hspace{1cm} $(+)$
+
+Let's try f(5).
+
+$f(5) = 5 * f(4)$ using (+) with n = 5
+
+$= 5 * (4 * f(3))$ using (+) with n = 4
+
+$= 5 * (4 * (3 * f(2)))$ using (+) with n = 3
+
+$= 5 * (4 * (3 * (2 * f(1))))$ using (+) with n = 2
+
+$= 5 * (4 * (3 * (2 * (1 * f(0)))))$ using (+) with n = 1
+
+But you know concretely that
+
+$f(5) = 1 * 2 * 3 * 4 * 5$
+
+which means that
+
+$1 * 2 * 3 * 4 * 5 = 5 * (4 * (3 * (2 * (1 * f(0)))))$
+
+i.e., (removing the annoying parentheses):
+
+$1 * 2 * 3 * 4 * 5 = 5 * 4 * 3 * 2 * 1 * f(0)$
+
+which means, after canceling terms,
+
+$1 = f(0)$
+
+Remember this extremely important principle: To design a recursive
+formula, you must see a \EMPHASIZE{smaller subproblem(s) within a bigger
+problem}.
+
+For instance you must see sum(n - 1) within sum(n) and you must see f(n - 1) inside f(n).
+
+There are times when instead of ``n - 1'' in the smaller problem you
+might see the smaller subproblem of g(n - 2) within g(n). Or you might
+see h(n - 1) and h(n - 2) with h(n). Etc.
+
+
+\newpage\EMPHASIZE{Recursive function of two parameters}
+
+The \EMPHASIZE{number of ways to choose r objects from n} is a very common
+problem in math and computer science. It occurs so frequently that a
+special symbol has been invented for it:
+
+$\binom{n}{r}$
+
+(We read this as ``n choose r''). Let's do a simple
+example. Suppose we have 5 symbols A, B, C, D, E and we want to choose
+two symbols from this set of symbols. These are all the possible
+selections:
+
+\textbf{AB, AC, AD, AE, BC, BD, BE, CD, CE, DE}
+
+In other words ``5 choose 2'' is 10. Note that AB is the same as BA
+since BA is ``choosing B and A''. We are not interested in the order of
+choosing the symbols; choosing A then B is the same as choosing B then
+A.
+
+In fact there's a formula for ``n choose r'' in terms of
+factorials. It's given by this:
+
+\[
+\binom{n}{r} = \frac{n!}{r!(n-r)!}
+\]
+
+So for ``5 choose 2'' is
+
+\[
+\frac{5!}{2!(5-2)!} = \frac{5!}{2!3!} = \frac{5 \cdot 4 \cdot 3 \cdot 2 \cdot 1}{(2 \cdot 1)(3 \cdot 2 \cdot 1)} = 10
+\]
+
+and you can see easily that that is indeed 10. (I'm not
+going to explain why the above formula works. Take MATH225 if you want
+to find out more.)
+
+But there's another way to compute ``n choose r'' that
+avoids the factorial ...
+
+Let's write C(n,r) for ``n choose r''.
+Here's a relation:
+
+$C(n, r) = C(n - 1, r) + C(n - 1, r - 1)$
+
+If you use this repeatedly to compute C(5, 2) (``5 choose 2'') you get
+this:
+
+$C(5, 2) = C(4, 2) + C(4, 1)$
+
+$= (C(3, 2) + C(3, 1)) + (C(3, 1) + C(3, 0))$
+
+This formula is obviously helpful:
+
+$C(n, 0) = 1$
+
+Continuing the computation:
+
+$C(5, 2) = C(4, 2) + C(4, 1)$
+
+$= (C(3, 2) + C(3, 1)) + (C(3, 1) + 1)$
+
+$= ((C(2, 2) + C(2, 1)) + (C(2,1) + C(2,0))$
+
+$+ ((C(2, 1) + C(2, 0)) + 1)$
+
+At this point it's useful to know this:
+
+$C(n, n) = 1$
+
+Continuing the computation:
+
+$C(5, 2) = ((1 + C(2, 1)) + (C(2,1) + 1)$
+
+$+ ((C(2, 1) + 1) + 1)$
+
+$= ((1 + (C(1, 1) + C(1, 0)))) + ((C(1, 1) + C(1, 0)) + 1)$
+
+$+ (((C(1, 1) + C(1, 0)) + 1) + 1)$
+
+$= 10$
+
+In summary we have these relations:
+
+$C(n, r) = C(n - 1, r) + C(n - 1, r - 1)$ if $r > 0$ and $r < n$
+
+$C(n, 0) = 1$
+
+$C(n, n) = 1$
+
+Here's the code implementing the above mathematical
+facts about C(n,r):
+
+\begin{consolethree}[escapeinside=||]
+int c(int n, int r)
+{
+    if (n == r || r == 0)
+    {
+        return 1;
+    }
+    else
+    {
+        return c(n - 1, r) + c(n - 1, r - 1);
+    }
+}
+\end{consolethree}
+
+Note that the recursion is different from previous examples because c()
+calls itself \EMPHASIZE{twice:}
+
+\verb!return c(n - 1, r) + c(n - 1, r - 1);!
+
+For instance \texttt{c(5,2)} calls \texttt{c(4,2)} and \texttt{c(4,1)}, adds
+the return values, and return this sum. The mental picture is therefore
+slightly more complex. This is part of the diagram:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(0, 0, 3, 1.5, label=r'\texttt{c(4,2)}', linewidth=0.05)
+p += Rect(5.5, 0, 8.5, 1.5, label=r'\texttt{c(4,1)}', linewidth=0.05)
+p += Rect(2.75, -3, 5.75, -1.5, label=r'\texttt{c(5,2)}', linewidth=0.05)
+
+p += Line(points=[(2.5, 0), (3.75, -1.5)], endstyle='>', linewidth=0.075)
+p += Line(points=[(3.25, -1.5), (2, 0)], endstyle='>', linewidth=0.075)
+
+p += Line(points=[(6, 0), (5, -1.5)], endstyle='>', linewidth=0.075)
+p += Line(points=[(5.5, -1.5), (6.5, 0)], endstyle='>', linewidth=0.075)
+
+p += Line(points=[(4.25, -4.5), (4.25, -3)], endstyle='>', linewidth=0.075)
+print(p)
+\end{python}
+
+The whole picture looks like this. I will only draw a line for each
+function call and omit the line for return:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+bw, bh = 1.5, 0.8
+
+labels = [
+    ['c(5, 2)'],
+    ['c(4, 2)', 'c(4, 1)'],
+    ['c(3, 2)', 'c(3, 1)', 'c(3, 1)', 'c(3, 0)'],
+    ['c(2, 2)', 'c(2, 1)', 'c(2, 1)', 'c(2, 0)', 'c(2, 1)', 'c(2, 0)'],
+    ['c(1, 1)', 'c(1, 0)', 'c(1, 1)', 'c(1, 0)', 'c(1, 1)', 'c(1, 0)']
+]
+
+xpos = [
+    [0],
+    [-4, 4],
+    [-6, -2, 2, 6],
+    [-7, -5, -3, -1, 1, 3],
+    [-7, -5, -3.5, -1.5, 0.5, 2.5]
+]
+
+ypos = [0, 1.5, 3, 4.5, 6]
+
+pos = []
+for lvl in range(5):
+    lvl_pos = []
+    for i, (x, lbl) in enumerate(zip(xpos[lvl], labels[lvl])):
+        y = ypos[lvl]
+        p += Rect(x - bw/2, y, x + bw/2, y + bh, innersep=0.1, s=lbl, align='c', linewidth=0.05)
+        lvl_pos.append((x, y))
+    pos.append(lvl_pos)
+
+# Level 0 -> 1
+p += Line(points=[(pos[0][0][0], pos[0][0][1] + bh), (pos[1][0][0], pos[1][0][1])], linewidth=0.05)
+p += Line(points=[(pos[0][0][0], pos[0][0][1] + bh), (pos[1][1][0], pos[1][1][1])], linewidth=0.05)
+
+# Level 1 -> 2
+p += Line(points=[(pos[1][0][0], pos[1][0][1] + bh), (pos[2][0][0], pos[2][0][1])], linewidth=0.05)
+p += Line(points=[(pos[1][0][0], pos[1][0][1] + bh), (pos[2][1][0], pos[2][1][1])], linewidth=0.05)
+p += Line(points=[(pos[1][1][0], pos[1][1][1] + bh), (pos[2][2][0], pos[2][2][1])], linewidth=0.05)
+p += Line(points=[(pos[1][1][0], pos[1][1][1] + bh), (pos[2][3][0], pos[2][3][1])], linewidth=0.05)
+
+# Level 2 -> 3 
+p += Line(points=[(pos[2][0][0], pos[2][0][1] + bh), (pos[3][0][0], pos[3][0][1])], linewidth=0.05)
+p += Line(points=[(pos[2][0][0], pos[2][0][1] + bh), (pos[3][1][0], pos[3][1][1])], linewidth=0.05)
+p += Line(points=[(pos[2][1][0], pos[2][1][1] + bh), (pos[3][2][0], pos[3][2][1])], linewidth=0.05)
+p += Line(points=[(pos[2][1][0], pos[2][1][1] + bh), (pos[3][3][0], pos[3][3][1])], linewidth=0.05)
+p += Line(points=[(pos[2][2][0], pos[2][2][1] + bh), (pos[3][4][0], pos[3][4][1])], linewidth=0.05)
+p += Line(points=[(pos[2][2][0], pos[2][2][1] + bh), (pos[3][5][0], pos[3][5][1])], linewidth=0.05)
+
+# Level 3 -> 4 
+p += Line(points=[(pos[3][1][0], pos[3][1][1] + bh), (pos[4][0][0], pos[4][0][1])], linewidth=0.05)
+p += Line(points=[(pos[3][1][0], pos[3][1][1] + bh), (pos[4][1][0], pos[4][1][1])], linewidth=0.05)
+p += Line(points=[(pos[3][2][0], pos[3][2][1] + bh), (pos[4][2][0], pos[4][2][1])], linewidth=0.05)
+p += Line(points=[(pos[3][2][0], pos[3][2][1] + bh), (pos[4][3][0], pos[4][3][1])], linewidth=0.05)
+p += Line(points=[(pos[3][4][0], pos[3][4][1] + bh), (pos[4][4][0], pos[4][4][1])], linewidth=0.05)
+p += Line(points=[(pos[3][4][0], pos[3][4][1] + bh), (pos[4][5][0], pos[4][5][1])], linewidth=0.05)
+
+print(p)
+\end{python}
+
+Isn't this beautiful?
+
+Do you notice that this looks like a tree? This structure is in fact
+called a \EMPHASIZE{tree}. The box labeled c(5,2) is called the
+\EMPHASIZE{root} of the tree. The boxes are called \EMPHASIZE{nodes/vertices}
+of the tree. The boxes that corresponds to base cases are called
+\EMPHASIZE{leaf nodes/vertices}. You will learn more about this
+mathematical structure in your other Math/CS classes (for instance
+MATH325, CISS350, CISS358, etc.)
+
+\begin{ex}
+You should insert print statements in the above
+program to verify that you do get the above tree of function calls. Fill
+in the return values of a function call for each return arrow.
+\end{ex}
+
+\begin{ex}
+Given the following mathematically defined function
+
+\[
+f(i, j) = \begin{cases}
+5 & \text{if } i = 0 \text{ or } j = 0 \\
+j \cdot f(i - 1, j) + i \cdot f(i, j - 1) & \text{otherwise}
+\end{cases}
+\]
+
+Compute f(2, 3) and f(4, 2) by hand. Translate the above recursion into
+a C++ function and verify your computation with a program.
+\end{ex}
+
+\begin{ex}
+Given the code for function \texttt{f()}:
+
+\begin{consolethree}[escapeinside=||]
+int f(int x, int n)
+{
+    if (n == 0)
+    {
+        return 1;
+    }
+    else if (n == 1)
+    {
+        return x;
+    }
+    else
+    {
+        return f(x, n / 2) * f(x, n - n / 2);
+    }
+}
+\end{consolethree}
+
+compute \texttt{f(2, 4)} by hand. Now run the program and verify your
+computation.
+\end{ex}
+
+
+\newpage\EMPHASIZE{GCD}
+
+GCD stands for \EMPHASIZE{greatest common divisor}. For instance the GCD of
+10 and 35 is 5 because 5 is the largest divisor of both 10 and 35. The
+GCD of 100 and 30 is 10 since 10 is the largest divisor of both 100 and
+30.
+
+One way to compute the GCD of two numbers is to test all the numbers
+between 1 and the smaller of the two:
+
+\begin{consolethree}[escapeinside=||]
+int min(int x, int y)
+{
+    if (x < y)
+        return x;
+    else
+        return y;
+}
+
+int main()
+{
+    int x, y;
+    std::cin >> x >> y;
+    int gcd = 1;
+    for (int i = 2; i <= min(x, y); i++)
+    {
+        if (x % i == 0 && y % i == 0)
+        {
+            gcd = i;
+        }
+    }
+    std::cout << "gcd = " << gcd << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+Try it out.
+
+But there is a faster algorithm due to Euclid, a Greek mathematician.
+This is called \EMPHASIZE{Euclid's algorithm}.
+
+\begin{consolethree}
+gcd(m, n):
+    if n == 0:
+        return m
+    else:
+        return gcd(n, m % n)
+\end{consolethree}
+
+This is an extremely important algorithm and is used in CS, math,
+engineering, etc. in areas such as cryptography, data compression, etc.
+Here's the code:
+
+\begin{consolethree}[escapeinside=||]
+int gcd(int m, int n)
+{
+    if (n == 0)
+        return m;
+    else
+        return gcd(n, m % n);
+}
+\end{consolethree}
+
+\begin{ex}
+Compute \texttt{gcd(42, 66)} by hand. Draw the function
+call tree for \texttt{gcd(42, 66)}. Label the return arrows with the
+return values.
+\end{ex}
+
+\begin{ex}
+Now compute \texttt{gcd(66, 42)} by hand.
+\end{ex}
+
+\begin{ex}
+A brute force way to compute GCD is this:
+
+\begin{quote}
+Given positive integer m and n, run d from 1 to the smaller of m and n,
+check if d is a divisor of both m and n. Compute the largest of such d.
+\end{quote}
+
+Here's the pseudocode:
+
+\begin{consolethree}
+int max_d;
+for d = 1, 2, 3, ..., min(m,n):
+    if d divides both m and n:
+        if d < max_d:
+            max_d = d
+\end{consolethree}
+
+The max\_d is the GCD of m,n. (Why does this running max computation not
+require an initialization of max\_d?) Since d keeps increasing, the
+above is really the same as
+
+\begin{consolethree}
+int max_d;
+for d = 1, 2, 3, ..., min(m,n):
+    if d divides both m and n:
+        max_d = d
+\end{consolethree}
+
+I'll let you think about this \ldots{} this is a better pseudocode:
+
+\begin{consolethree}
+int max_d;
+for d = min(m,n), min(m,n) - 1, min(m,n) - 2, ..., 1:
+    if d divides both m and n:
+        max_d = d and break the loop
+\end{consolethree}
+
+Now you have two ways to compute GCD: by the earlier recursion or using
+this loop. Try to compute the GCD of several pairs of m,n and decide
+which algorithm is faster. (Hint: Euclid is smart.)
+\end{ex}
+
+
+\newpage\EMPHASIZE{Degree 2 recursion}
+
+The \EMPHASIZE{fibonacci numbers} are defined to be
+
+\textbf{1, 1, 2, 3, 5, 8, 13, 21, ...}
+
+i.e., the first two fibonacci numbers are 1 and a subsequent fibonacci
+number is defined to the the sum of the previous two. For instance 5 is
+the sum of 2 and 3. Therefore if fib() is the fibonacci function, we
+have this:
+
+$fib(n) = fib(n-1) + fib(n-2)$ if $n > 1$
+
+$fib(0) = 1$
+
+$fib(1) = 1$
+
+This is called a \EMPHASIZE{degree two} recursion because fib(n) is in
+terms of fib(n-1) and fib(n-2) and the largest difference between the
+parameters is 2 (i.e., the largest difference is between n and n - 2 which is 2).
+
+\begin{ex}
+What is the degree of this recursive definition:
+
+$a(n) = 3a(n-1) + 4a(n-2) + 5a(n-3)$ if $n > 2$
+
+$a(0) = 0$
+
+$a(1) = 1$
+
+$a(2) = 2$
+
+What will happen if I only give you two base cases such as
+
+$a(n) = 3a(n-1) + 4a(n-2) + 5a(n-3)$ if $n > 1$
+
+$a(0) = 0$
+
+$a(1) = 1$
+\end{ex}
+
+\begin{ex}
+What is the degree of this recursive definition:
+
+$b(n) = 5b(n-2) - 7b(n-4) + 12b(n-7)$
+
+How many base cases should there be?
+\end{ex}
+
+Let's work out fib(2) using the formula.
+
+$fib(2) = fib(1) + fib(0) = 1 + 1 = 2$
+
+What about f(4)?
+
+$fib(4) = fib(3) + fib(2)$
+
+$= (fib(2) + fib(1)) + (fib(1) + fib(0))$
+
+$= ((fib(1) + fib(0)) + 1) + (1 + 1)$
+
+$= ((1 + 1) + 1) + 2$
+
+$= (2 + 1) + 2$
+
+$= 3 + 2$
+
+$= 5$
+
+Note that previously we worked with degree one recursion. For instance
+look at this:
+
+$f(n) = n x f(n-1)$, if $n > 0$
+
+f(0) = 1
+
+The difference between n and n-1 is 1. The factorial is a recursive
+function of degree 1.
+
+Back to our recursion. Here's the code:
+
+\begin{consolethree}[escapeinside=||]
+int fib(int n)
+{
+    if (n == 0 || n == 1)
+        return 1;
+    else
+        return fib(n - 1) + fib(n - 2);
+}
+\end{consolethree}
+
+\begin{ex}
+Draw the function call graph for fib(4) -- include
+the return call arrows as well. Remember to label the return arrows with
+the return value. How many nodes/vertices are there? Can you figure out
+how roughly many nodes/vertices there are for fib(n) in general?
+\end{ex}
+
+\begin{ex}
+You are given the mathematical description of a
+degree 2 recursion:
+
+$a(n) = a(n-1) + 3 * a(n-2)$ if $n > 1$
+
+$a(0) = 1$
+
+$a(1) = 2$
+
+Compute a(2), a(3) by hand. Next, write a degree 2 C++ recursive
+function for a(). Test your code by printing a(0), a(1), a(2), and a(3).
+Make sure your computation by hand matches the output of your program.
+Draw the function call diagram for a(4).
+\end{ex}
+
+\begin{ex}
+In some books the fibonacci function is defined like
+this:
+
+$fib(n) = fib(n-1) + fib(n-2)$ if $n > 1$
+
+$fib(0) = 0$
+
+$fib(1) = 1$
+
+Note that fib(0) is 0 and not 1. Write down the value of fib(n) for n =
+0, 1, 2, 3, 4, 5, 6, 7. Implement this fib() function in C++ and print
+the values of fib(n) for n = 0, 1, 2, 3, 4, 5, 6, 7 and verify that your
+computations were done correctly. What is the relationship between this
+fibonacci function and ours earlier.
+\end{ex}
+
+\begin{ex}
+What's wrong with this recursion?
+
+\begin{consolethree}[escapeinside=||]
+int f(int x)
+{
+    if (x == 0)
+        return 3;
+    else
+        return x * f(x - 2);
+}
+\end{consolethree}
+
+If you don't see it, try to compute f(5) by hand. Next,
+insert some print statements into the function like this:
+
+\begin{consolethree}[escapeinside=||]
+int f(int x)
+{
+    std::cout << "f(" << x << ")" << std::endl;
+    if (x == 0)
+        return 3;
+    else
+        return x * f(x - 2);
+}
+\end{consolethree}
+
+and try to call f(5).
+\end{ex}
+
+
+\newpage\EMPHASIZE{Tower of Hanoi}
+
+Most of the previous examples are easily solved without recursion. For
+instance the computation of the sum from 1 to a number, n say, can be
+easily achieved using a for-loop.
+
+Now we come to a problem that is \EMPHASIZE{not} that easily solved
+without recursion. The following is a very famous problem called
+\ldots{} the \EMPHASIZE{Tower of Hanoi}.
+
+Suppose you have a set of disks, say we have 3, with different sizes.
+They each have a hole in the center. On the player platform there are
+three stakes or needles, A, B, and C. Initially the three disks are
+placed on needle A through their holes.
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Line(points=[(0, 0), (12, 0)], linewidth=0.05)
+
+p += Line(points=[(2, 0), (2, 3)], linewidth=0.15)
+p += Line(points=[(6, 0), (6, 3)], linewidth=0.15)
+p += Line(points=[(10, 0), (10, 3)], linewidth=0.15)
+
+p += Rect(2, -0.5, 2, -0.5, linewidth=0, label='A')
+p += Rect(6, -0.5, 6, -0.5, linewidth=0, label='B')
+p += Rect(10, -0.5, 10, -0.5, linewidth=0, label='C')
+
+p += Rect(0.8, 0, 3.2, 0.5, background='blue!20', linewidth=0.02, innersep=0.1)  
+p += Rect(1.1, 0.5, 2.9, 1.0, background='blue!20', linewidth=0.02, innersep=0.1)
+p += Rect(1.4, 1.0, 2.6, 1.5, background='blue!20', linewidth=0.02, innersep=0.1)
+
+print(p)
+\end{python}
+
+ Here's the goal: We want to move all the disks from
+ stake A to stake C. There are some rules:
+
+ \begin{itemize}
+ \item You can move one disk at a time.
+ \item You can only remove the topmost disk from a needle and place it on top
+   of the disk of another needle.
+ \item At all times, the disks on a needle must be arranged in descending
+   sizes from bottom to top.
+ \end{itemize}
+
+ You also want to be as efficient as possible, i.e., use the least number
+ of moves.
+
+ I'll do the simple \EMPHASIZE{case of 2 disks}.
+
+ A $\rightarrow$ B (this means take the topmost disk of A and put it in B)
+
+ A $\rightarrow$ C
+
+ B $\rightarrow$ C
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(2, -0.5, 2, -0.5, linewidth=0, label='A')
+p += Rect(6, -0.5, 6, -0.5, linewidth=0, label='B')
+p += Rect(10, -0.5, 10, -0.5, linewidth=0, label='C')
+p += Line(points=[(0, 0), (12, 0)], linewidth=0.05)
+
+p += Line(points=[(2, 0), (2, 3)], linewidth=0.15)
+p += Line(points=[(6, 0), (6, 3)], linewidth=0.15)
+p += Line(points=[(10, 0), (10, 3)], linewidth=0.15)
+
+p += Rect(0.8, 0, 3.2, 0.5, background='blue!20', linewidth=0.02, innersep=0.1)  
+p += Rect(1.1, 0.5, 2.9, 1.0, background='blue!20', linewidth=0.02, innersep=0.1)
+#p += Rect(1.4, 0.5, 2.6, 1.0, background='blue!20', linewidth=0.02, innersep=0.1)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Line(points=[(0, 0), (12, 0)], linewidth=0.05)
+
+p += Line(points=[(2, 0), (2, 3)], linewidth=0.15)
+p += Line(points=[(6, 0), (6, 3)], linewidth=0.15)
+p += Line(points=[(10, 0), (10, 3)], linewidth=0.15)
+
+p += Rect(2, -0.5, 2, -0.5, linewidth=0, label='A')
+p += Rect(6, -0.5, 6, -0.5, linewidth=0, label='B')
+p += Rect(10, -0.5, 10, -0.5, linewidth=0, label='C')
+
+p += Rect(0.8, 0, 3.2, 0.5, background='blue!20', linewidth=0.02, innersep=0.1)  
+p += Rect(5.1, 0, 6.9, 0.5, background='blue!20', linewidth=0.02, innersep=0.1)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Line(points=[(0, 0), (12, 0)], linewidth=0.05)
+
+p += Line(points=[(2, 0), (2, 3)], linewidth=0.15)
+p += Line(points=[(6, 0), (6, 3)], linewidth=0.15)
+p += Line(points=[(10, 0), (10, 3)], linewidth=0.15)
+
+p += Rect(2, -0.5, 2, -0.5, linewidth=0, label='A')
+p += Rect(6, -0.5, 6, -0.5, linewidth=0, label='B')
+p += Rect(10, -0.5, 10, -0.5, linewidth=0, label='C')
+
+p += Rect(8.8, 0, 11.2, 0.5, background='blue!20', linewidth=0.02, innersep=0.1)  
+p += Rect(5.1, 0, 6.9, 0.5, background='blue!20', linewidth=0.02, innersep=0.1)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Line(points=[(0, 0), (12, 0)], linewidth=0.05)
+
+p += Line(points=[(2, 0), (2, 3)], linewidth=0.15)
+p += Line(points=[(6, 0), (6, 3)], linewidth=0.15)
+p += Line(points=[(10, 0), (10, 3)], linewidth=0.15)
+
+p += Rect(2, -0.5, 2, -0.5, linewidth=0, label='A')
+p += Rect(6, -0.5, 6, -0.5, linewidth=0, label='B')
+p += Rect(10, -0.5, 10, -0.5, linewidth=0, label='C')
+
+p += Rect(8.8, 0, 11.2, 0.5, background='blue!20', linewidth=0.02, innersep=0.1)  
+p += Rect(9.1, 0.5, 10.9, 1, background='blue!20', linewidth=0.02, innersep=0.1)
+
+print(p)
+\end{python}
+
+ Do you get the point of the game now?
+
+ \begin{ex}
+ Write down a list of steps to move the 3 disks from A
+ to C. I'm giving you the first (Hint: There should be 7
+ steps).
+
+ 1. A $\rightarrow$ C
+
+ 2.
+
+ 3.
+
+ 4.
+
+ 5.
+
+ 6.
+
+ 7.
+ \end{ex}
+
+ \begin{ex}
+ Do the same for 4 disks. There should be 15 steps.
+ \end{ex}
+
+ Of course the problem becomes increasingly more and more complex (if you
+ don't see a common idea/pattern of the above solutions) when the number
+ of disks n grows. For instance what is the solution when n = 64?
+
+ Let's solve the general problem. Suppose we have n
+ disks. There are three needles. We can think of them as the ``from''
+ needle, the ``helper'' needle, and the ``to'' needle. We move all the
+ disks from the ``from'' to to ``to'' using the ``helper'' as a helper.
+ Think of the problem as one involving n-1 disks, and one disk:
+
+\begin{python}
+from latextool_basic import *
+from latextool_polygon import polygon
+p = Plot()
+
+p += Line(points=[(0, 0), (12, 0)], linewidth=0.05)
+
+p += Line(points=[(2, 0), (2, 3)], linewidth=0.15)
+p += Line(points=[(6, 0), (6, 3)], linewidth=0.15)
+p += Line(points=[(10, 0), (10, 3)], linewidth=0.15)
+
+p += Rect(2, -0.5, 2, -0.5, linewidth=0, label='A')
+p += Rect(6, -0.5, 6, -0.5, linewidth=0, label='B')
+p += Rect(10, -0.5, 10, -0.5, linewidth=0, label='C')
+
+p += Rect(0.8, 0, 3.2, 0.5, background='blue!20', linewidth=0.02, innersep=0.1)  
+p += polygon(points=[(1, 0.5), (2, 2), (3, 0.5)], background='blue!20', linewidth=0.02)
+print(p)
+\end{python}
+
+ The triangle denotes the n - 1 disks. You want to solve the Tower
+ of Hanoi problem for the n - 1 disks, but moving the n - 1 disks to
+ the middle needle, using the C as a helper.
+
+\begin{python}
+from latextool_basic import *
+from latextool_polygon import polygon
+p = Plot()
+
+p += Line(points=[(0, 0), (12, 0)], linewidth=0.05)
+
+p += Line(points=[(2, 0), (2, 3)], linewidth=0.15)
+p += Line(points=[(6, 0), (6, 3)], linewidth=0.15)
+p += Line(points=[(10, 0), (10, 3)], linewidth=0.15)
+
+p += Rect(2, -0.5, 2, -0.5, linewidth=0, label='A')
+p += Rect(6, -0.5, 6, -0.5, linewidth=0, label='B')
+p += Rect(10, -0.5, 10, -0.5, linewidth=0, label='C')
+
+p += Rect(0.8, 0, 3.2, 0.5, background='blue!20', linewidth=0.02, innersep=0.1)  
+p += polygon(points=[(5, 0), (6, 1.5), (7, 0)], background='blue!20', linewidth=0.02)
+print(p)
+\end{python}
+
+ Next I move the last disk, which is a Tower of Hanoi problem of size 1,
+ from A to C.
+
+\begin{python}
+from latextool_basic import *
+from latextool_polygon import polygon
+p = Plot()
+
+p += Line(points=[(0, 0), (12, 0)], linewidth=0.05)
+
+p += Line(points=[(2, 0), (2, 3)], linewidth=0.15)
+p += Line(points=[(6, 0), (6, 3)], linewidth=0.15)
+p += Line(points=[(10, 0), (10, 3)], linewidth=0.15)
+
+p += Rect(2, -0.5, 2, -0.5, linewidth=0, label='A')
+p += Rect(6, -0.5, 6, -0.5, linewidth=0, label='B')
+p += Rect(10, -0.5, 10, -0.5, linewidth=0, label='C')
+
+p += Rect(8.8, 0, 11.2, 0.5, background='blue!20', linewidth=0.02, innersep=0.1)  
+p += polygon(points=[(5, 0), (6, 1.5), (7, 0)], background='blue!20', linewidth=0.02)
+print(p)
+\end{python}
+
+ Now we solve the Tower of Hanoi problem of size n-1. Note that in this
+ case the ``from'' needle is B, the ``to'' needle is C, and the
+ ``helper'' needle is A.
+
+\begin{python}
+from latextool_basic import *
+from latextool_polygon import polygon
+p = Plot()
+
+p += Line(points=[(0, 0), (12, 0)], linewidth=0.05)
+
+p += Line(points=[(2, 0), (2, 3)], linewidth=0.15)
+p += Line(points=[(6, 0), (6, 3)], linewidth=0.15)
+p += Line(points=[(10, 0), (10, 3)], linewidth=0.15)
+
+p += Rect(2, -0.5, 2, -0.5, linewidth=0, label='A')
+p += Rect(6, -0.5, 6, -0.5, linewidth=0, label='B')
+p += Rect(10, -0.5, 10, -0.5, linewidth=0, label='C')
+
+p += Rect(8.8, 0, 11.2, 0.5, background='blue!20', linewidth=0.02, innersep=0.1)  
+p += polygon(points=[(9, 0.5), (10, 2), (11, 0.5)], background='blue!20', linewidth=0.02)
+print(p)
+\end{python}
+
+Let's write down the pseudocode. Suppose hanoi(n, from,
+helper, to) prints the moves. The case of n = 1 is easy:
+
+\begin{consolethree}
+hanoi(1, from, helper, to):
+    print from, "->", to
+\end{consolethree}
+
+and for n > 1:
+
+\begin{consolethree}
+hanoi(n, from, helper, to):
+    hanoi(n - 1, from, to, helper)
+    hanoi(1, from, helper, to)
+    hanoi(n - 1, helper, from, to)
+\end{consolethree}
+
+So the pseudocode is
+
+\begin{consolethree}
+hanoi(n, from, helper, to):
+    if n == 1:
+        print from, "--->", to
+    else:
+        hanoi(n - 1, from, to, helper)
+        hanoi(1, from, helper, to)
+        hanoi(n - 1, helper, from, to)
+\end{consolethree}
+
+Think about the pseudocode very carefully. Don't look at
+the code yet.
+
+\begin{ex}
+Execute the pseudocode for the function call hanoi(3, 'A', 'B', 'C')
+\end{ex}
+
+Here's the code (finally!):
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void hanoi(int n, char from, char helper, char to)
+{
+    if (n == 1)
+    {
+        std::cout << from << "--->" << to
+                  << std::endl;
+    }
+    else
+    {
+        hanoi(n - 1, from, to, helper);
+        hanoi(1, from, helper, to);
+        hanoi(n - 1, helper, from, to);
+    }
+}
+
+int main()
+{
+    int n = 0;
+    std::cout << "how many disks? ";
+    std::cin >> n;
+    hanoi(n, 'A', 'B', 'C');
+    return 0;
+}
+\end{consolethree}
+
+\begin{ex}
+Challenge: Solve this problem without recursion. (Yes it can be done.)
+\end{ex}
+
+The recursive idea behind the solution of the tower
+of Hanoi is made up of the following sequence of four pictures:
+
+\begin{python}
+from latextool_basic import *
+from latextool_polygon import polygon
+p = Plot()
+
+p += Line(points=[(0, 0), (12, 0)], linewidth=0.05)
+
+p += Line(points=[(2, 0), (2, 3)], linewidth=0.15)
+p += Line(points=[(6, 0), (6, 3)], linewidth=0.15)
+p += Line(points=[(10, 0), (10, 3)], linewidth=0.15)
+
+p += Rect(2, -0.5, 2, -0.5, linewidth=0, label='A')
+p += Rect(6, -0.5, 6, -0.5, linewidth=0, label='B')
+p += Rect(10, -0.5, 10, -0.5, linewidth=0, label='C')
+
+p += Rect(0.8, 0, 3.2, 0.5, background='blue!20', linewidth=0.02, innersep=0.1)  
+p += polygon(points=[(1, 0.5), (2, 2), (3, 0.5)], background='blue!20', linewidth=0.02)
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latextool_polygon import polygon
+p = Plot()
+
+p += Line(points=[(0, 0), (12, 0)], linewidth=0.05)
+
+p += Line(points=[(2, 0), (2, 3)], linewidth=0.15)
+p += Line(points=[(6, 0), (6, 3)], linewidth=0.15)
+p += Line(points=[(10, 0), (10, 3)], linewidth=0.15)
+
+p += Rect(2, -0.5, 2, -0.5, linewidth=0, label='A')
+p += Rect(6, -0.5, 6, -0.5, linewidth=0, label='B')
+p += Rect(10, -0.5, 10, -0.5, linewidth=0, label='C')
+
+p += Rect(0.8, 0, 3.2, 0.5, background='blue!20', linewidth=0.02, innersep=0.1)  
+p += polygon(points=[(5, 0), (6, 1.5), (7, 0)], background='blue!20', linewidth=0.02)
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latextool_polygon import polygon
+p = Plot()
+
+p += Line(points=[(0, 0), (12, 0)], linewidth=0.05)
+
+p += Line(points=[(2, 0), (2, 3)], linewidth=0.15)
+p += Line(points=[(6, 0), (6, 3)], linewidth=0.15)
+p += Line(points=[(10, 0), (10, 3)], linewidth=0.15)
+
+p += Rect(2, -0.5, 2, -0.5, linewidth=0, label='A')
+p += Rect(6, -0.5, 6, -0.5, linewidth=0, label='B')
+p += Rect(10, -0.5, 10, -0.5, linewidth=0, label='C')
+
+p += Rect(8.8, 0, 11.2, 0.5, background='blue!20', linewidth=0.02, innersep=0.1)  
+p += polygon(points=[(5, 0), (6, 1.5), (7, 0)], background='blue!20', linewidth=0.02)
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latextool_polygon import polygon
+p = Plot()
+
+p += Line(points=[(0, 0), (12, 0)], linewidth=0.05)
+
+p += Line(points=[(2, 0), (2, 3)], linewidth=0.15)
+p += Line(points=[(6, 0), (6, 3)], linewidth=0.15)
+p += Line(points=[(10, 0), (10, 3)], linewidth=0.15)
+
+p += Rect(2, -0.5, 2, -0.5, linewidth=0, label='A')
+p += Rect(6, -0.5, 6, -0.5, linewidth=0, label='B')
+p += Rect(10, -0.5, 10, -0.5, linewidth=0, label='C')
+
+p += Rect(8.8, 0, 11.2, 0.5, background='blue!20', linewidth=0.02, innersep=0.1)  
+p += polygon(points=[(9, 0.5), (10, 2), (11, 0.5)], background='blue!20', linewidth=0.02)
+print(p)
+\end{python}
+
+Note that the largest disk goes from the starting stake to the target
+stake. Suppose now I change the tower of Hanoi problem a little bit as
+follows:
+
+\begin{itemize}
+\item There are four stakes. The four stakes are called, A, B, C, D where A
+  is the starting stake and D is the target stake.
+\item No disk can go from the starting stake to the target stake. For
+  instance if there's only one disk (i.e., at A), then you cannot move
+  the disk from A to D -- you have to move the disk from A to B (or to
+  C) and then from B to D.
+\end{itemize}
+
+\begin{ex}
+Write a program to solve this modified tower of Hanoi problem. (There
+are many possible solution.)
+\end{ex}
+
+\begin{ex}
+Count the number of moves made for n = 1 disk, n = 2
+disks, n = 3 disks, n = 4 disks, etc. Is there a formula for the
+\EMPHASIZE{number of moves} for n disks? This can then be used as a measure
+of efficiency of the algorithm.
+\end{ex}
+
+\begin{ex}
+Now let me modify the tower of Hanoi problem: What if
+you cannot move a disk from A to C? In other words, you can move from A
+to B, B to A, B to C, C to B, C to A. But you cannot move a disk from A
+to C. Is it possible to solve this version of tower of Hanoi? How many
+moves does your algorithm make for n disks?
+\end{ex}
+
+\begin{ex}
+What about this version -- what if you have 4
+needles? You should be able to move a stack of n disks from A to C with
+fewer moves right?
+\end{ex}
+
+\begin{ex}
+How suppose there are 5 stakes A, B, C, D, E. There
+two stacks of disks, one stack is at A and one stack is at B. Each stack
+is made up of n disks of radius 1, 2, 3, \ldots, n. The goal is to move
+all the disks to E. (This means that when the procedure stops, all the
+disks are at E and the radii of the disks, from top to bottom, are 1, 1,
+2, 2, 3, 3, 4, 4, 5, 5, \ldots, n, n. Can you do this without stake D?
+\end{ex}
+
+Many computational problems can be solved a lot easier with recursion
+than without. Another reason for knowing recursion is that
+it's frequently the case that
+\EMPHASIZE{correctness} of a program can be
+\EMPHASIZE{mathematically proven} much easier if
+it's recursive. (For many critical software -- example:
+scientific software -- correctness is crucial.) Note that from the above
+examples, it should be clear that recursion can do the work of loops. In
+fact there are programming languages that do not have loops!
+
+
+\newpage\EMPHASIZE{Recursion and a tiling problem}
+
+Here's one such problem: How many ways are there to tile
+a 1-by-5 board
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+for i in range(5):
+    p += Rect(i, 0, i+1, 1, linewidth=0.03)
+print(p)
+\end{python}
+
+with 1-by-1 squares and 1-by-2 rectangles:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Rect(0, 0, 1, 1, linewidth=0.1)
+p += Rect(3, 0, 5, 1, linewidth=0.1)
+print(p)
+\end{python}
+
+Here's one way:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+for i in range(5):
+    p += Rect(i, 0, i+1, 1, linewidth=0.1)
+print(p)
+\end{python}
+
+and here's another:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Rect(0, 0, 5, 1, linewidth=0.1)
+sq = [0, 3, 4]
+for i in sq:
+    p += Rect(i, 0, i+1, 1, linewidth=0.1)
+print(p)
+\end{python}
+
+and another:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Rect(0, 0, 1, 1, linewidth=0.1)
+p += Rect(1, 0, 3, 1, linewidth=0.1)
+p += Rect(3, 0, 5, 1, linewidth=0.1)
+print(p)
+\end{python}
+
+Of course this is not difficult: Just do it yourself. How many can you find? However if I say since the number of ways to tile not a 1-by-5 board but a 1-by-100 \ldots{} then you'd find that a na\"ive and brute-force way of listing all the tilings is not the best way to solve this problem. Believe it or not \ldots{} this problem is recursive. Why? Look at the 1-by-5 board.
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Rect(0, 0, 1, 1, linewidth=0.1)
+for i in range(1, 5):
+    p += Rect(i, 0, i+1, 1, linewidth=0.03)
+print(p)
+\end{python}
+
+You have to start either with a 1-by-1 or a 1-by-2:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Rect(0, 0, 1, 1, linewidth=0.1)
+for i in range(1, 5):
+    p += Rect(i, 0, i+1, 1, linewidth=0.03)
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Rect(0, 0, 2, 1, linewidth=0.1)
+for i in range(2, 5):
+    p += Rect(i, 0, i+1, 1, linewidth=0.03)
+print(p)
+\end{python}
+
+Suppose the number of ways to tile a 1-by-n board is written T(n). In
+other words I'm interested in T(5).
+Where's the recursion? Look at the above:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Rect(0, 0, 1, 1, linewidth=0.1)
+for i in range(1, 5):
+    p += Rect(i, 0, i+1, 1, linewidth=0.03)
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Rect(0, 0, 2, 1, linewidth=0.1)
+for i in range(2, 5):
+    p += Rect(i, 0, i+1, 1, linewidth=0.03)
+print(p)
+\end{python}
+
+For the first case, after putting a 1-by-1 tile down,
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Rect(0, 0, 1, 1, linewidth=0.1)
+for i in range(1, 5):
+    p += Rect(i, 0, i+1, 1, linewidth=0.03)
+print(p)
+\end{python}
+
+I'm left with a 1-by-4. This means that there are T(4)
+ways to complete the first case!!!
+
+Furthermore, for the second case, after putting down a 1-by-2
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Rect(0, 0, 2, 1, linewidth=0.1)
+for i in range(2, 5):
+    p += Rect(i, 0, i+1, 1, linewidth=0.03)
+print(p)
+\end{python}
+
+I'm left with a 1-by-3 space to tile. And there are T(3)
+ways to complete the tiling.
+
+Hence altogether the number of ways to tile a 1-by-5 board, i.e. T(5),
+must be T(4) + T(3).
+
+Get it? Here's the recursion:
+
+$T(5) = T(4) + T(3)$
+
+Convince yourself that
+
+$T(n) = T(n - 1) + T(n - 2)$
+
+if $n > 2$. It's easy to see that
+
+$T(1) = 1$
+
+$T(2) = 2$
+
+(Make sure you see why!!!) Altogether we have
+
+$T(1) = 1$
+
+$T(2) = 2$
+
+$T(n) = T(n - 1) + T(n - 2)$, if $n > 2$
+
+Therefore to compute T(5) we have
+
+$T(5) = T(4) + T(3)$
+
+$T(4) = T(3) + T(2) = T(3) + 2$
+
+$T(3) = T(2) + T(1) = 2 + 1 = 3$
+
+Putting $T(3)$ into the second equation we get
+
+$T(4) = T(3) + 2 = 3 + 2 = 5$
+
+and putting $T(3) = 3$ and $T(4) = 5$ into the first equation we get
+
+$T(5) = 5 + 3 = 8$
+
+\begin{ex}
+Draw all the tilings of a 1-by-5 board. Do you have 8?
+\end{ex}
+
+\begin{ex}
+Draw all the tilings of a 1-by-6 board. How many are there? Now use
+
+$T(1) = 1$
+
+$T(2) = 2$
+
+$T(n) = T(n - 1) + T(n - 2)$, if $n > 2$
+
+to compute the number of tilings of the 1-by-6 board.
+\end{ex}
+
+If you write down $T(1)$, $T(2)$, $T(3)$, $T(4)$, \ldots{} you would see this sequence:
+
+\textbf{1, 2, 3, 5, 8, 13, 21, 34, 55, 89, \ldots{}}
+
+Of course note that after the first two terms, every term is the sum of
+the previous two. That's because of
+
+\textbf{$T(n) = T(n - 1) + T(n - 2)$, if $n > 2$}
+
+We can set $T(0) = 1$ (there is only one way to tile the 1-by-0 board: don't tile!) In that case the sequence of $T(0)$, $T(1)$, $T(2)$, $T(3)$, $T(4)$, \ldots{} is
+
+\textbf{1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, \ldots{}}
+
+This is the famous \EMPHASIZE{Fibonacci sequence} that you have seen
+earlier!!!
+
+$fib(0) = 1$
+
+$fib(1) = 1$
+
+$fib(n) = fib(n - 1) + fib(n - 2)$, if $n > 1$
+
+This sequence of numbers appears in many areas of math, physics, chemistry, finance, \ldots{} you name it.
+
+You see from this example that we try to solve a problem by restating it xin terms of small subproblems:
+
+\begin{center}
+\begin{tabular}{ll}
+\texttt{Problem} & \texttt{Subproblems} \\
+\hline
+tiling a 1-by-5 board & tiling a 1-by-4 board \\
+                      & tiling a 1-by-3 board \\
+\end{tabular}
+\end{center}
+
+Specifically:
+
+a \textbf{1-by-5 tiling} is either a \textbf{1-by-1 tile} followed by a \textbf{1-by-4 tiling} or a \textbf{1-by-2 tile} followed by a \textbf{1-by-3 tiling}
+
+\begin{ex}
+Let $T(n)$ be the number of tilings of a \textbf{2-by-n} board using \textbf{1-by-2} or \textbf{2-by-1} tiles. As an example, for the case of n = 5, how many ways are there to tile the following \textbf{2-by-5} board:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+lwid = 0.03
+for i in range(5):
+    p += Rect(i, 0, i+1, 1, linewidth=lwid)
+for i in range(5):
+    p += Rect(i, 1, i+1, 2, linewidth=lwid)
+print(p)
+\end{python}
+
+with the following types of tiles:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Rect(0, 0, 1, 2, linewidth=0.1)
+p += Rect(3, 1, 5, 2, linewidth=0.1)
+print(p)
+\end{python}
+
+Let $T(0) = 1$. Complete this:
+
+$T(0) = 1$
+
+$T(1) = ?$
+
+$T(n) = ?$
+\end{ex}
+
+You might think ``Aw.... this is just one of those academic math
+problems. I don't see how a puzzle like this can be used
+in the real world.'' The essence of the technique, i.e. recursion,
+appears all the time in the real world. Here's one: Find
+the shortest path on this ``simplified internet'' from machine A to B in
+this configuration
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+nodes = [
+    (0, 2),      # 0 - A (left)
+    (1.5, 3.2),  # 1
+    (1.5, 0.8),  # 2
+    (2.8, 2.2),  # 3
+    (2.5, 4),    # 4
+    (3.5, 0.5),  # 5
+    (4, 3),      # 6
+    (4.5, 1.5),  # 7
+    (5.5, 3.5),  # 8
+    (5.5, 2),    # 9
+    (5.2, 0.5),  # 10
+    (6.5, 2.5),  # 11 - B (right)
+]
+
+r = 0.2
+for (x, y) in nodes:
+    p += Circle(x=x, y=y, r=r, background='black', linewidth=0.01)
+
+edges = [
+    (0, 1), (0, 2), (0, 3),
+    (1, 3), (1, 4), (1, 6),
+    (2, 3), (2, 5),
+    (3, 6), (3, 7),
+    (4, 6), (4, 8),
+    (5, 7), (5, 10),
+    (6, 8), (6, 9),
+    (7, 9), (7, 10),
+    (8, 9), (8, 11),
+    (9, 11),
+    (10, 11),
+]
+
+for (i, j) in edges:
+    x0, y0 = nodes[i]
+    x1, y1 = nodes[j]
+    p += Line(points=[(x0, y0), (x1, y1)], linewidth=0.02)
+
+p += Rect(0, 1.3, 0, 1.3, linewidth=0, innersep=0.1, s='A', align='c')
+p += Rect(6.5, 1.8, 6.5, 1.8, linewidth=0, innersep=0.1, s='B', align='c')
+
+print(p)
+\end{python}
+
+where each dot is a machine and each line is a communication line
+between the two machines. This can be thought as a made up of finding
+shortest path from A1,A2,A3 to B in the following configurations or
+subproblems:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+nodes = [
+    (0, 2),      # 0 - A (left)
+    (1.5, 3.2),  # 1
+    (1.5, 0.8),  # 2
+    (2.8, 2.2),  # 3
+    (2.5, 4),    # 4
+    (3.5, 0.5),  # 5
+    (4, 3),      # 6
+    (4.5, 1.5),  # 7
+    (5.5, 3.5),  # 8
+    (5.5, 2),    # 9
+    (5.2, 0.5),  # 10
+    (6.5, 2.5),  # 11 - B (right)
+]
+
+r = 0.2
+for (x, y) in nodes:
+    p += Circle(x=x, y=y, r=r, background='black', linewidth=0.01)
+
+edges = [
+    (0, 1), (0, 2), (0, 3),
+    (1, 3), (1, 4), (1, 6),
+    (2, 3), (2, 5),
+    (3, 6), (3, 7),
+    (4, 6), (4, 8),
+    (5, 7), (5, 10),
+    (6, 8), (6, 9),
+    (7, 9), (7, 10),
+    (8, 9), (8, 11),
+    (9, 11),
+    (10, 11),
+]
+
+for (i, j) in edges:
+    x0, y0 = nodes[i]
+    x1, y1 = nodes[j]
+    p += Line(points=[(x0, y0), (x1, y1)], linewidth=0.02)
+
+p += Rect(0.8, 3.25, 0.8, 3.25, linewidth=0, innersep=0.1, s='A1', align='c')
+p += Rect(6.5, 1.8, 6.5, 1.8, linewidth=0, innersep=0.1, s='B', align='c')
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+nodes = [
+    (0, 2),      # 0 - A (left)
+    (1.5, 3.2),  # 1
+    (1.5, 0.8),  # 2
+    (2.8, 2.2),  # 3
+    (2.5, 4),    # 4
+    (3.5, 0.5),  # 5
+    (4, 3),      # 6
+    (4.5, 1.5),  # 7
+    (5.5, 3.5),  # 8
+    (5.5, 2),    # 9
+    (5.2, 0.5),  # 10
+    (6.5, 2.5),  # 11 - B (right)
+]
+
+r = 0.2
+for (x, y) in nodes:
+    p += Circle(x=x, y=y, r=r, background='black', linewidth=0.01)
+
+edges = [
+    (0, 1), (0, 2), (0, 3),
+    (1, 3), (1, 4), (1, 6),
+    (2, 3), (2, 5),
+    (3, 6), (3, 7),
+    (4, 6), (4, 8),
+    (5, 7), (5, 10),
+    (6, 8), (6, 9),
+    (7, 9), (7, 10),
+    (8, 9), (8, 11),
+    (9, 11),
+    (10, 11),
+]
+
+for (i, j) in edges:
+    x0, y0 = nodes[i]
+    x1, y1 = nodes[j]
+    p += Line(points=[(x0, y0), (x1, y1)], linewidth=0.02)
+
+p += Rect(0.8, 0.5, 0.8, 0.5, linewidth=0, innersep=0.1, s='A2', align='c')
+p += Rect(6.5, 1.8, 6.5, 1.8, linewidth=0, innersep=0.1, s='B', align='c')
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+nodes = [
+    (0, 2),      # 0 - A (left)
+    (1.5, 3.2),  # 1
+    (1.5, 0.8),  # 2
+    (2.8, 2.2),  # 3
+    (2.5, 4),    # 4
+    (3.5, 0.5),  # 5
+    (4, 3),      # 6
+    (4.5, 1.5),  # 7
+    (5.5, 3.5),  # 8
+    (5.5, 2),    # 9
+    (5.2, 0.5),  # 10
+    (6.5, 2.5),  # 11 - B (right)
+]
+
+r = 0.2
+for (x, y) in nodes:
+    p += Circle(x=x, y=y, r=r, background='black', linewidth=0.01)
+
+edges = [
+    (0, 1), (0, 2), (0, 3),
+    (1, 3), (1, 4), (1, 6),
+    (2, 3), (2, 5),
+    (3, 6), (3, 7),
+    (4, 6), (4, 8),
+    (5, 7), (5, 10),
+    (6, 8), (6, 9),
+    (7, 9), (7, 10),
+    (8, 9), (8, 11),
+    (9, 11),
+    (10, 11),
+]
+
+for (i, j) in edges:
+    x0, y0 = nodes[i]
+    x1, y1 = nodes[j]
+    p += Line(points=[(x0, y0), (x1, y1)], linewidth=0.02)
+
+p += Rect(2.3, 3.5, 2.3, 3.5, linewidth=0, innersep=0.1, s='A3', align='c')
+p += Rect(6.5, 1.8, 6.5, 1.8, linewidth=0, innersep=0.1, s='B', align='c')
+
+print(p)
+\end{python}
+
+
+Not only that, this is more or less also similar to finding a winning
+chess strategy where each ``machine'' (each black dot) is replaced by a
+particular ``chess board setup'' and the lines are replaced by an arrow
+that depicts a chess move that changes one chess board state to another.
+
+Also, tiling problems do appear in the real world. Tiling problems are
+related to ``space packing'' problems. For instance shipping companies
+are interested in optimizing the space in a cargo container. They are
+therefore interested in algorithms to solve problems like this: Given
+the (3-dimensional) measurement of cargo containers and a list of
+(3-dimensional) measurements of items to be placed in the container,
+find the best possible way to pack the items in the container. It also
+appears in diverse areas such as packing gates in a chips, protein
+folding, liquid crystal packing in an LCD screen, etc.
+
+I will stop here for our first introduction to recursion. There is not a
+complete set of notes on recursion. So this is not the last time you
+will be thinking recursively. But \ldots{} why did I bring up recursion
+at this point?
+
+The reason is because you will see later (when we do recursion again),
+that loops can be achieved through recursive programming, i.e. using
+recursive functions.
+
+\begin{ex}
+Suppose S(n) satisfies the following:
+
+S(0) = 1
+
+S(n) = 2 S(n - 1) + 1 if n > 0
+
+What is S(5)? Can you find a formula for S(n)?
+\end{ex}
+
+
+\newpage\EMPHASIZE{Recursive computation on arrays: Part 1}
+
+Here's another example. You already know that you can
+write a loop to compute the max value in an array. Let's
+look at this problem recursively. Suppose I write x is an array of
+value 2,3,5,6,4,1 and we want a function that looks like this:
+
+\verb!max(x)!
+
+If you split the array x into the first value of the array
+
+\verb!2!
+
+and the rest say we call it y of value 3,5,6,4,1, then we have this
+relation:
+
+\verb!max(x) = maximum of 2 and max(y)!
+
+You see that the max function occurs on both sides. This is a recursive
+relation. Furthermore, we need the function max to accept index values.
+Then
+
+\begin{consolethree}[escapeinside=||]
+// Returns max of x[start], x[1], x[2], ...,
+// x[end - 1]
+int max(int x[], int start, int end)
+{
+    if (start == end - 1)
+    {
+        return x[start];
+    }
+    else
+    {
+        if (x[start] < max(x, start + 1, end))
+        {
+            return max(x, start + 1, end);
+        }
+        else
+        {
+            return x[start];
+        }
+    }
+}
+\end{consolethree}
+
+Note that \texttt{max(x, start + 1, end)} is computed twice. To save
+computations, we can do this:
+
+\begin{consolethree}[escapeinside=||]
+int max(int x[], int start, int end)
+{
+    if (start == end - 1)
+    {
+        return x[start];
+    }
+    else
+    {
+        int y = max(x, start + 1, end);
+        if (x[start] < y)
+        {
+            return y;
+        }
+        else
+        {
+            return x[start];
+        }
+    }
+}
+\end{consolethree}
+
+Essentially you break the problem of finding the max of
+x[0],x[1],...,x[n-1] to
+
+\textbf{maximum between x[0] and max of x[1],x[2],...,x[n-1]}
+
+\begin{ex}
+Write a recursive version of a minimum function
+
+\verb!int min(int x[], int start, int end);!
+
+that returns the minimum of x[start], \ldots, x[end - 1].
+\end{ex}
+
+\begin{ex}
+Write a recursive version of a linear search function
+
+\verb!int linearsearch(int x[], int start, int end, int target);!
+
+that finds the first index where target is found in the array
+x[start], x[start + 1], \ldots, x[end - 1].
+\end{ex}
+
+\begin{ex}
+Write a recursive version of a count function
+
+\verb!int count(int x[], int start, int end, int target);!
+
+that returns the number of times target occurs in x[start], x[start + 1], x[start + 2], \ldots, x[end - 1].
+\end{ex}
+
+\begin{ex}
+Write a recursive version of a sum function
+
+\verb!int sum(int x[], int start, int end);!
+
+that returns x[start] + x[start + 1] + x[start + 2] +
+\ldots{} + x[end - 1].
+\end{ex}
+
+\begin{ex}
+A string is a palindrome if it's the same when you read it left-to-right and right-to-left. For instance here's one:
+
+\verb!madam!
+
+Here's another one: What does Adam say to Eve?
+
+\verb!Madam, I'm Adam.!
+
+If you remove spaces and punctuations and change everything to lowercase, you get
+
+\verb!madamimadam!
+
+Write a recursive function with the prototypes
+
+\verb!bool is_palindrome(char s[], start, end);!
+
+so that \verb!is_palindrome("madamimadam", 0, 11)! returns true.
+\end{ex}
+
+
+\newpage\EMPHASIZE{Recursive computation on arrays: Part 2}
+
+In the previous section, we break the problem of finding the max of x[0],x[1],...,x[n-1] to maximum between x[0] and max of x[1],x[2],...,x[n-1]
+
+But there's another way to do this \ldots{} Suppose I have an array x with the following values:
+
+\verb!{2,3,5,6,4,1}!
+
+I call \verb!max({2,3,5,6,4,1})!. Now, \verb!max({2,3,5,6,4,1})! computes in the following way. It breaks up \{2,3,5,6,4,1\} into \EMPHASIZE{two arrays of roughly the same length}:
+
+\verb!{2,3,5}! and \verb!{6,4,1}!
+
+and call max() on each of these pieces and wait for the result. When it receives the results, it will compare the two values and return the largest.
+
+For instance max(\{2,3,5,6,4,1\}) will wait for max(\{2,3,5\}). What will max(\{2,3,5\}) do? It will break up 2, 3, 5 into two pieces roughly of the same lengths to get
+
+\textbf{\{2\} and \{3,5\}}
+
+and then call max(\{2\}) and max(\{3,5\}) and wait for their results, compare them, and return the larger.
+
+Clearly the maximum of an array with one value (such as 2) must be the value itself (i.e., 2). What about max(\{3,5\})? max(\{3,5\}) breaks up \{3,5\} to get:
+
+\textbf{\{3\} and \{5\}}
+
+and calls max(\{3\}) and max(\{5\}). The max(\{3\}) will return 3 and
+max(\{5\}) will return 5. So 3 and 5 is returned back to max(\{3,5\}).
+max(\{3,5\}) will return the larger of 3 and 5, i.e., it will return 5.
+
+Now who will receive the return value of max(\{3,5\})? You see that it
+is max(\{2,3,5\}). Altogether, max(\{2,3,5\}) will return 2 from
+max(\{2\}) and 5 from max(\{3,5\}). Therefore max(\{2,3,5\}) will return
+the larger of 2 and 5, i.e., 5. Who does max(\{2,3,5\}) return to? The 5
+is returned back to max(\{2,3,5,6,4,1\}). Don't forget
+that max(\{2,3,5,6,4,1\}) calls max(\{2,3,5\}) and max(\{6,4,1\}). Only
+one value, i.e. 5, is returned.
+
+You can check for yourself, using the above scheme, that max(\{6,4,1\}) will be returning 6.
+
+Therefore max(\{2,3,5,6,4,1\}) will return the large of 5 and 6, i.e.,
+it will return 6.
+
+So the pseudocode looks like this:
+
+\begin{consolethree}[escapeinside=||]
+int max(int x[], int start_index, int end_index)
+{
+    if start_index == end_index
+    {
+        // BASE CASE
+        return x[start_index]
+    }
+    else
+    {
+        // RECURSIVE CASE
+        int mid = (start_index + end_index) / 2
+        int maxleft = max(x, start_index, mid)
+        int maxright = max(x, mid+1, end_index)
+        return the large of maxleft, maxright
+    }
+}
+\end{consolethree}
+
+Make sure you study this VERY VERY CAREFULLY!!! It's
+EXTREMELY IMPORTANT!!!
+
+As you know (and I've said this a gazillion times),
+tracing a progam/pseudocode helps in understanding the underlying logic
+behind the program/pseudocode. This is particularly important for
+recursive functions because recursive functions will be in some of your
+later classes. It's not just an interesting trick.
+Recursive functions are fundamental objects of study in both
+mathematical logic and CS. I expect you to study the following two
+traces VERY CAREFULLY.
+
+To make sure you REALLY understand the above pseudocode, here is a trace
+of the computation of max(\{4\}, 0, 0):
+
+\begin{consolethree}
+max({4}, 0, 0):
+    x = {4}
+    start_index = 0
+    end_index = 0
+    start_index == end_index is true:
+        // BASE CASE
+        return x[start_index], i.e., return x[0], i.e., 4
+\end{consolethree}
+
+We're done.
+
+Here's the trace of max(\{2,4\}, 0, 1):
+\begin{python}
+from latextool_basic import *
+p = Plot()
+b0 = r"""
+\begin{consolethree}[escapeinside=||]
+|{ \tiny max({2,4}, 0, 1):}|
+    |{ \tiny x = {2,4}}|
+    |{ \tiny start\_index = 0}|
+    |{ \tiny end\_index = 1}|
+    |{ \tiny start\_index == end\_index is false:}|
+        |{ \tiny // RECURSIVE CASE:}|
+        |{ \tiny mid = (start\_index + end\_index) = (1 + 0)/2 = 0}|
+        |{ \tiny maxleft = max(x, 0, 0) ... WAITING}|
+\end{consolethree}
+"""
+b1 = r"""
+\begin{consolethree}[escapeinside=||]
+|{ \tiny max({2,4}, 0, 0):}|
+    |{ \tiny x = {2,4}}|
+    |{ \tiny start\_index = 0}|
+    |{ \tiny end\_index = 0}|
+    |{ \tiny start\_index == end\_index is true:}|
+        |{ \tiny // BASE CASE:}|
+        |{ \tiny return x[start\_index], i.e., return x[0], i.e., return 2}|
+\end{consolethree}
+"""
+b2 = r"""
+\begin{consolethree}[escapeinside=||]
+|{ \tiny (CONTINUING max({2,4},0,1) ...}|
+|{ \tiny max({2,4}, 0, 1):}|
+    |{ \tiny x = {2,4}}|
+    |{ \tiny start\_index = 0}|
+    |{ \tiny end\_index = 1}|
+    |{ \tiny start\_index == end\_index is false:}|
+        |{ \tiny // RECURSIVE CASE:}|
+        |{ \tiny mid = (start\_index + end\_index) = (1 + 0)/2 = 0}|
+        |{ \tiny maxleft = max(x, 0, 0) = 2}|
+        |{ \tiny maxright = max(x, mid+1, end\_index) = max(x, 1, 1) ... WAITING}|
+\end{consolethree}
+"""
+b3 = r"""
+\begin{consolethree}[escapeinside=||]
+|{ \tiny max(x, 1, 1):}|
+    |{ \tiny x = {2,4}}|
+    |{ \tiny start\_index = 1}|
+    |{ \tiny end\_index = 1}|
+    |{ \tiny start\_index == end\_index is true:}|
+        |{ \tiny // BASE CASE:}|
+        |{ \tiny return x[start\_index], i.e., return x[1], i.e., return 4}|
+\end{consolethree}
+"""
+b4 = r"""
+\begin{consolethree}[escapeinside=||]
+|{ \tiny (CONTINUING max({2,4},0,1) ...}|
+|{ \tiny max({2,4}, 0, 1):}|
+    |{ \tiny x = {2,4}}|
+    |{ \tiny start\_index = 0}|
+    |{ \tiny end\_index = 1}|
+    |{ \tiny start\_index == end\_index is false:}|
+        |{ \tiny // RECURSIVE CASE:}|
+        |{ \tiny mid = (start\_index + end\_index) = (1 + 0)/2 = 0}|
+        |{ \tiny maxleft = max(x, 0, 0) = 2}|
+        |{ \tiny maxright = max(x, mid+1, end\_index) = max(x, 1, 1) = 4}|
+        |{ \tiny return larger of 2 and 4, i.e., return 4}|
+\end{consolethree}
+"""
+p += Rect(0, 8, 10, 12, linewidth=0, innersep=0.1, s=b0, align='c')
+p += Rect(2, 3.75, 10, 7.75, linewidth=0, innersep=0.1, s=b1, align='c')
+p += Line(points=[(1, 8.25), (1, 3.5)], linewidth=0.05, endstyle='>')
+
+p += Rect(0, -1, 10, 3, linewidth=0, innersep=0.1, s=b2, align='c')
+p += Rect(2, -5.5, 10, -1.5, linewidth=0, innersep=0.1, s=b3, align='c')
+p += Line(points=[(1, -1.25), (1, -5.75)], linewidth=0.05, endstyle='>')
+
+p += Rect(0, -10.5, 10, -6, linewidth=0, innersep=0.1, s=b4, align='c')
+print(p)
+\end{python}
+max(\{2,4\}, 0, 1) was the first function call. So the final end result
+is 4.
+
+\begin{ex}
+Perform a trace similar to the above for the
+computation of
+
+max(\{5,1\}, 0, 1).
+\end{ex}
+
+\begin{ex}
+Perform a trace similar to the above for the
+computation of
+
+max(\{2,5,3\}, 0, 2).
+\end{ex}
+
+\begin{ex}
+Perform a trace similar to the above for the
+computation of
+
+max(\{2,5,6,1\}, 0, 3).
+\end{ex}
+
+\begin{ex}
+Perform a trace similar to the above for the
+computation of
+
+max(\{2,5,3,6,1\}, 0, 4).
+\end{ex}
+
+\begin{ex}
+Implement the pseudocode in C++. Test the code.
+Insert print statements if necessary to understand the execution of
+several examples.
+\end{ex}
+
+In the previous section, we basically compute by breaking up an array
+into one value and the rest, something like this:
+
+\verb!max of {5,3,1,2,4,6} = larger of 5 and max of {3,1,2,4,6}!
+
+Yes, it is recursion since max is calling max. In \EMPHASIZE{this}
+section we break up the array this way:
+
+\verb!max of {5,3,1,2,4,6} = larger of max of {5,3,1} and max of {2,4,6}!
+
+See the difference?
+
+You can think the length of the array of a measure of the size of the
+problem to be solved. Obviously a large array will require more time. In
+the previous section a problem (array) of size 6 will give rise to a
+problem of size 1 and another size 5.
+
+\verb!max of {5,3,1,2,4,6}) = larger of 5 and max of {3,1,2,4,6}!
+
+
+size 6 \hspace{2cm} size 1 \hspace{2cm} size 5
+
+
+In \EMPHASIZE{this} section a problem of size 6 will give rise to a
+problem of size 3 and another of size 3.
+
+\verb!max of {5,3,1,2,4,6} = larger of max of {5,3,1} and max of {2,4,6}!
+
+
+size 6 \hspace{2cm} size 3 \hspace{2cm} size 3
+
+
+In general, an algorithm that solves a problem using recursion so that a
+problem of size n is solved by recursing on two smaller problems, each
+of about half the size of the original is said to be a
+\EMPHASIZE{divide-and-conquer} algorithm.
+
+If your algorithm divides the problem of size n into three problems
+where each has size roughly n/3, then it is also called a
+divide-and-conquer algorithm (except that it divides into 3 equal parts
+instead of 2.)
+
+\begin{ex}
+Develop a divide-and-conquer recursive algorithm to
+compute the minimum of an array.
+
+\verb!int min(int x[], int start, int end);!
+
+Test it by tracing it with several cases. Once you're
+confident that it works, implement it in C++.
+\end{ex}
+
+\begin{ex}
+Write a recursive function \texttt{print(int, int)}
+such that \texttt{println(1, 6)} prints 1 2 3 4 5 and a newline.
+\texttt{println(3, 8)} prints 3 4 5 6 7 and a newline.
+\end{ex}
+
+\begin{ex}
+Develop a divide-and-conquer recursive algorithm to
+compute the smallest index value where a target occurs in an array:
+
+\verb!int linearsearch(int x[], int start, int end, int target);!
+
+If the target is not found, -1 is returned. Test it by tracing it with
+several cases. Once you're confident that it works,
+implement it in C++.
+\end{ex}
+
+\begin{ex}
+Develop a divide-and-conquer recursive algorithm to
+compute the number of times a target value occurs an array.
+
+\verb!int count(int x[], int start, int end);!
+
+Test it by tracing it with several cases. Once you're
+confident that it works, implement it in C++.
+\end{ex}
+
+\begin{ex}
+Develop a divide-and-conquer recursive algorithm to
+compute the sum of the values an array:
+
+\verb!int sum(int x[], int start, int end);!
+
+Test it by tracing it with several cases. Once you're
+confident that it works, implement it in C++.
+\end{ex}
+
+Refer to the standard binary search in your previous set of notes. We
+will now write the recursive version of the program (in pseudocode):
+
+\begin{console}
+// searches for target in a[left], ..., a[right]
+binarysearch(a, left, right, target):
+    if left > right:
+        return -1
+    else:
+        mid = left + (right - left) / 2
+        if a[mid] == target:
+            return mid
+        else if a[mid] < target:
+            return binarysearch(a, mid + 1, right, target)
+        else
+            return binarysearch(a, left, mid - 1, target)
+\end{console}
+
+Note that the \EMPHASIZE{binary search is also a divide-and-conquer
+algorithm}.
+
+\begin{ex}
+Implement the binarysearch algorithm in C++. Test
+your function.
+\end{ex}
+
+For divide-and-conquer, when you apply that to an integer array where
+you have two index values \EMPHASIZE{left} and \EMPHASIZE{right}
+and you want to compute the index in the middle of left and right, it's
+easy. It's just
+
+\verb!int mid = left + (right - left) / 2;!
+
+Sometimes the subarray you are computing with is specified in terms of
+pointers, say \EMPHASIZE{start} and \EMPHASIZE{end} where
+\EMPHASIZE{start} is the address of the first value and
+\EMPHASIZE{end} is the address of the value \texttt{just outside} the
+subarray.
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+nums = [1, 3, 5, 2, 4]
+for i in range(5):
+    p += Rect(i, 0, i + 1, 1, innersep=0.1, s=str(nums[i]), align='c', linewidth=0.03)
+p += Rect(0.5, -1.5, 0.5, -1.5, innersep=0.1, s='start', align='c', linewidth=0)
+p += Rect(6, -1.5, 6, -1.5, innersep=0.1, s='end', align='c', linewidth=0)
+p += Line(points=[(0.5, -1.25), (0.5, -0.15)], linewidth=0.03, endstyle='>')
+p += Line(points=[(6, -1.25), (6, -0.15)], linewidth=0.03, endstyle='>')
+print(p)
+\end{python}
+
+In this case you can compute the address of the value in the middle
+using
+
+\verb!int * mid = start + (end - start) / 2;!
+
+Here's the max of array using divide-and-conquer where you specify the
+array using two pointers:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int max(int * start, int * end)
+{
+    if (start == end - 1)
+    {
+        return *start;
+    }
+    else
+    {
+        int * mid = start + (end - start) / 2;
+        int leftmax = max(start, mid);
+        int rightmax = max(mid, end);
+        return (leftmax >= rightmax ? leftmax : rightmax);
+    }
+}
+
+int main()
+{
+    int x[] = {1, 3, 5, 6, 4, 2};
+    std::cout << max(&x[0], &x[6]) << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+\begin{ex}
+Write (and test) a \texttt{min} function using
+divide-and-conquer:
+
+\verb!int min(int * start, int * end);!
+\end{ex}
+
+\begin{ex}
+Write (and test) a binary search function with the
+following prototype:
+
+\verb!int * binarysearch(int * start, int * end, int target);!
+\end{ex}
+
+\begin{ex}
+Write an exponentiation function \texttt{power(double,
+int)} such that \texttt{power(2.0, 6)} return 2.0 to the power of 6. You
+must use the divide-and-conquer strategy.
+\end{ex}
+
+
+\newpage\EMPHASIZE{Mutual Recursion}
+
+Sometimes recursion might involve more than one function.
+
+Let f(n), g(n) be functions satisfying
+
+$f(0) = 1$\\
+$f(n) = 2*g(n/2)$ if $n > 0$ and $n$ is even\\
+$f(n) = f(n/2)$ if $n > 0$ and $n$ is odd\\
+
+$g(0) = 2$\\
+$g(n) = f(n/2)$ if $n > 0$ and $n$ is even\\
+$g(n) = 3*g(n/2)$ if $n > 0$ and $n$ is odd\\
+
+(\EMPHASIZE{\/} refers to integer division.) Do you see f(n) using g(n) and g(n)
+using f(n)?
+
+\begin{ex}
+Compute f(10), g(10) by hand.
+\end{ex}
+
+Here's the code. Study it well. Note that the functions
+are mutually recursive so we must use function prototypes. Verify your
+computation with the program. Insert print statements to see the
+function being called.
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int f(int);
+int g(int);
+
+int f(int n)
+{
+    if (n == 0)
+    {
+        return 1;
+    }
+    else
+    {
+        if (n % 2 == 0) return 2 * g(n / 2);
+        else return f(n / 2);
+    }
+}
+
+int g(int n)
+{
+    if (n == 0)
+    {
+        return 2;
+    }
+    else
+    {
+        if (n % 2 == 0) return f(n / 2);
+        else return 3 * g(n / 2);
+    }
+}
+
+int main()
+{
+    std::cout << f(5) << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+\begin{ex}
+Write a pair of mutually recursive functions that
+prints the values of an array at the even index positions:
+
+\begin{consolethree}[escapeinside=||]
+void print(int x[], int & index, int size);
+void skip(int x[], int & index, int size);
+\end{consolethree}
+
+Here's how they work together:
+
+\begin{itemize}
+\item \texttt{print(x, i, n)} prints \texttt{x[i]} and calls \texttt{skip(x, i + 1, n)}
+\item \texttt{skip(x, i, n)} calls \texttt{print(x, i + 1, n)}
+\end{itemize}
+
+Of course \texttt{n} is the size of the array \texttt{x}.
+\end{ex}
+
+\begin{ex}
+Write a pair of function that checks if a string is
+an arithmetic expression of digits. An example would be the following
+string:
+\[
+``5+2-3*2+7/8''
+\]
+You should have two functions
+
+\begin{consolethree}[escapeinside=||]
+bool consume_digit_or_end(char x[], int & index);
+bool consume_operator(char x[], int & index);
+\end{consolethree}
+
+(The name of the functions says it all.) Finally create a function to
+wrap everything up:
+
+\begin{consolethree}[escapeinside=||]
+bool is_digit_expr(char x[])
+{
+    return consume_digit_or_end(x, 0);
+}
+\end{consolethree}
+
+(And thus we begin automata theory, language processing, and compilers
+\ldots)
+\end{ex}
