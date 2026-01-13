@@ -1,0 +1,1172 @@
+\newpage\EMPHASIZE{30. Structures}
+
+\textsc{Objectives}
+\begin{itemize}
+\item Define a \textit{struct}
+\item Declare \textit{struct} variable with or without initialization
+\item Use dot \textit{.} operator to access a \textit{struct} variable's member
+\item Declare and allocation/deallocate memory for a pointer-to-struct variable.
+\item Use \textit{->} dereferencing operator
+\item Declare array of \textit{struct} values
+\item Create nested \textit{struct}.
+\end{itemize}
+
+Up to this point we have been using types provided by C++: basic types,
+array types, etc.
+
+In this set of notes we will create our own types.
+
+
+\newpage\EMPHASIZE{struct}
+
+Try this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <iomanip>
+
+int main()
+{
+    struct Time
+    {
+        int hour;
+        int min;
+        int sec;
+    };
+
+    Time t0;
+    t0.hour = 5;
+    t0.min = 18;
+    t0.sec = 0;
+
+    std::cout << std::setw(2) << std::setfill('0')
+              << t0.hour << ':'
+              << std::setw(2) << std::setfill('0')
+              << t0.min << ':'
+              << std::setw(2) << std::setfill('0')
+              << t0.sec
+              << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+\textit{t0} is like a \textbf{variable containing other variables}:
+\textit{hour}, \textit{min}, and \textit{sec}. This is the picture of
+\textit{main()}'s memory after declaring and assigning
+values to \textit{t0:}
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+# main frame
+p += Rect(x0=0, y0=0, x1=5, y1=2, linewidth=0.05)
+p += Rect(x0=0.1, y0=1.6, x1=1, y1=2, label=r'{\tt main}', linewidth=0)
+
+# t0 label
+p += Rect(x0=0.5, y0=0.5, x1=1, y1=1.2, label=r'{\tt t0}', linewidth=0)
+
+# Three cells for hour, min, sec
+p += Rect(x0=1.2, y0=0.5, x1=2.2, y1=1.2, label=r'{\tt 5}', linewidth=0.05)
+p += Rect(x0=2.2, y0=0.5, x1=3.2, y1=1.2, label=r'{\tt 18}', linewidth=0.05)
+p += Rect(x0=3.2, y0=0.5, x1=4.2, y1=1.2, label=r'{\tt 0}', linewidth=0.05)
+
+print(p)
+\end{python}
+
+Here's the format for creating a struct type:
+
+\begin{verbatim}
+struct [struct name]
+{
+    [type 1] [member name 1];
+    [type 2] [member name 2];
+    ...
+};
+\end{verbatim}
+
+The most common gotcha is to forget the \textbf{semicolon} at the end.
+
+Of course \textit{[type 1]}, \textit{[type 2]}, ... must be types
+that are already defined.
+
+For our example above, the \textit{hour} in \textit{t0} is called a
+\textbf{member} (or \textbf{member variable}) of \textit{t0}.
+
+The member in a struct variable is accessed by the \textbf{dot
+operator}. The format is this:
+
+\verb![struct var name].[member name]!
+
+The ``\textit{hour} in \textit{t0}'' is \textbf{\textit{t0.hour}}.
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+# main frame
+p += Rect(x0=0, y0=0, x1=5, y1=2.5, linewidth=0.05)
+p += Rect(x0=0.1, y0=2.1, x1=1, y1=2.5, label=r'{\tt main}', linewidth=0)
+
+# t0 label
+p += Rect(x0=0.5, y0=0.8, x1=1, y1=1.5, label=r'{\tt t0}', linewidth=0)
+
+# Three cells for hour, min, sec
+p += Rect(x0=1.2, y0=0.8, x1=2.2, y1=1.5, label=r'{\tt 5}', linewidth=0.05)
+p += Rect(x0=2.2, y0=0.8, x1=3.2, y1=1.5, label=r'{\tt 18}', linewidth=0.05)
+p += Rect(x0=3.2, y0=0.8, x1=4.2, y1=1.5, label=r'{\tt 0}', linewidth=0.05)
+
+# Labels on the right
+p += Rect(x0=5.5, y0=2.0, x1=7.5, y1=2.6, label=r'{\tt t0.hour}', linewidth=0.05)
+p += Rect(x0=5.5, y0=1.2, x1=7.5, y1=1.8, label=r'{\tt t0.min}', linewidth=0.05)
+p += Rect(x0=5.5, y0=0.4, x1=7.5, y1=1.0, label=r'{\tt t0.sec}', linewidth=0.05)
+
+# Arrows from labels to cells
+p += Line(points=[(5.5, 2.3), (2.2, 1.5)], linewidth=0.05, linecolor='red', endstyle='>')
+p += Line(points=[(5.5, 1.5), (3.2, 1.5)], linewidth=0.05, linecolor='red', endstyle='>')
+p += Line(points=[(5.5, 0.7), (4.2, 1.15)], linewidth=0.05, linecolor='red', endstyle='>')
+
+print(p)
+\end{python}
+
+You \textbf{do} know how to work with \textit{[struct var
+name].[member name]} since \textit{[struct var name].[member name]}
+is just like a ``regular'' variable.
+
+\begin{ex}
+Create a variable \textit{t1} of type \textit{Time} and
+set it to the time one second after \textit{t0}. Print \textit{t1} in the
+same format as the print statement of \textit{t0}. Note that the values of
+\textit{sec} of \textit{t1} and \textit{sec} of \textit{t0} are different.
+\end{ex}
+
+Let's compare the struct variable and an array. Note
+that a struct variable is like an array in the sense that they both
+\textbf{contain values}.
+
+\begin{consolethree}[escapeinside=||]
+int x[3] = {1, 2, 3};
+
+struct Y
+{
+    int a;
+    int b;
+    int c;
+};
+
+Y y = {1, 2, 3};
+\end{consolethree}
+
+In the above \textit{x} is made up of three integers 1, 2, 3. The variable
+\textit{y} contains three variables \textit{a}, \textit{b}, and \textit{c} with
+values 1, 2, and 3 respectively. We refer to the values in \textit{x} by
+
+\verb!x[0]!, \verb!x[1]!, \verb!x[2]!
+
+while we refer to the values in \textit{y} by
+
+\verb!y.a!, \verb!y.b!, \verb!y.c!
+
+Make sure you \textbf{see the difference!!!} This is the picture of the
+program's memory during execution:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+# main frame
+p += Rect(x0=0, y0=0, x1=5, y1=3.5, linewidth=0.05)
+p += Rect(x0=0.1, y0=3.1, x1=1, y1=3.5, label=r'{\tt main}', linewidth=0)
+
+# x array (row 1)
+p += Rect(x0=0.5, y0=2.0, x1=1, y1=2.7, label=r'{\tt x}', linewidth=0)
+p += Rect(x0=1.2, y0=2.0, x1=2.2, y1=2.7, label=r'{\tt 1}', linewidth=0.05)
+p += Rect(x0=2.2, y0=2.0, x1=3.2, y1=2.7, label=r'{\tt 2}', linewidth=0.05)
+p += Rect(x0=3.2, y0=2.0, x1=4.2, y1=2.7, label=r'{\tt 3}', linewidth=0.05)
+
+# y struct (row 2)
+p += Rect(x0=0.5, y0=0.8, x1=1, y1=1.5, label=r'{\tt y}', linewidth=0)
+p += Rect(x0=1.2, y0=0.8, x1=2.2, y1=1.5, label=r'{\tt 1}', linewidth=0.05)
+p += Rect(x0=2.2, y0=0.8, x1=3.2, y1=1.5, label=r'{\tt 2}', linewidth=0.05)
+p += Rect(x0=3.2, y0=0.8, x1=4.2, y1=1.5, label=r'{\tt 3}', linewidth=0.05)
+
+print(p)
+\end{python}
+
+They both look the same but the names of the cells are different.
+Remember that.
+
+Note that while you can scan an array like this:
+
+\begin{consolethree}[escapeinside=||]
+for (int i = 0; i < 3; ++i)
+{
+    std::cout << x[i] << std::endl;
+}
+\end{consolethree}
+
+there's no analog for our \textit{struct} variable y:
+there is no way to scan the values in y using a \textit{for}-loop.
+That's not the purpose of \textit{struct} variables.
+
+The purpose of \textit{struct} is allow the software engineer to think at
+a \textbf{higher level of abstraction}. For instance in the case of our
+\textit{Time} struct, a function like
+
+\verb!void addOneSec(Time & t);!
+
+and a code like
+
+\begin{consolethree}[escapeinside=||]
+Time currentTime, endTime;
+...
+while (isLessThan(currentTime, endTime))
+{
+    // ... do something for a second
+    readCurrentTime(currentTime);
+}
+\end{consolethree}
+
+for instance will let us focus on the concept of time and not worry
+about the details of a time variable (hours, minutes, seconds.) While
+\textbf{functions} chunk up \textbf{code}, \textbf{struct variables}
+allows us to chunk up \textbf{data}.
+
+\begin{ex}
+There's a section on functions for
+struct variables. But I'm sure you can handle this
+exercise. Write the \textit{isLessThan()} function. We need to make sure
+that the \textit{Time} struct is outside the \textit{main()} and above this
+function:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <iomanip>
+
+struct Time
+{
+    int hour;
+    int min;
+    int sec;
+};
+
+bool isLessThan(Time t0, Time t1)
+{
+    // convert t0 and t1 into seconds since midnight
+    // and then compare.
+}
+
+int main()
+{
+    Time t0;
+    t0.hour = 5;
+    t0.min = 18;
+    t0.sec = 0;
+
+    Time t1;
+    t1.hour = 5;
+    t1.min = 18;
+    t1.sec = 1;
+
+    std::cout << isLessThan(t0, t1) << '\n';
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+Another difference between arrays and structs is this: You can have
+member variables of any type in a struct variable. For instance
+
+\begin{consolethree}[escapeinside=||]
+struct Student
+{
+    char lastname[50];
+    char firstname[50];
+    double gpa;
+};
+
+Student johnDoe = {"Doe", "John", 3.55};
+\end{consolethree}
+
+Here's the memory:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+# johnDoe label
+p += Rect(x0=0, y0=1, x1=1.5, y1=1.7, label=r'{\tt johnDoe}', linewidth=0)
+
+# Three cells for lastname, firstname, gpa
+p += Rect(x0=1.8, y0=1, x1=3.3, y1=1.7, label=r'{\tt "Doe"}', linewidth=0.05)
+p += Rect(x0=3.3, y0=1, x1=4.8, y1=1.7, label=r'{\tt "John"}', linewidth=0.05)
+p += Rect(x0=4.8, y0=1, x1=6.0, y1=1.7, label=r'{\tt 3.55}', linewidth=0.05)
+
+# Arrow pointing to first cell from above
+p += Line(points=[(2.55, 2.5), (2.55, 1.7)], linewidth=0.05, linecolor='red', endstyle='>')
+
+# Type annotation on right side (top)
+p += Rect(x0=6.5, y0=2.2, x1=11.5, y1=2.8, label=r'{\tt johnDoe.lastname} is a string', linewidth=0.05)
+p += Line(points=[(6.5, 2.5), (3.3, 1.7)], linewidth=0.05, linecolor='red', endstyle='>')
+
+# Type annotation on right side (bottom)
+p += Rect(x0=6.5, y0=0.8, x1=11.0, y1=1.4, label=r'{\tt johnDoe.gpa} is a double', linewidth=0.05)
+p += Line(points=[(6.5, 1.1), (6.0, 1.35)], linewidth=0.05, linecolor='red', endstyle='>')
+
+print(p)
+\end{python}
+
+On the other hand, the values in an array MUST all have the same type.
+In C/C++ there is no such concept as a single array made up of 3
+integers, 4 doubles, and 5 strings.
+
+\begin{ex}
+Using this code segment:
+
+\begin{consolethree}[escapeinside=||]
+struct Student
+{
+    char lastname[50];
+    char firstname[50];
+    double gpa;
+};
+
+Student johnDoe = {"Doe", "John", 3.55};
+\end{consolethree}
+
+print the first name, last name and GPA of \textit{johnDoe} variable.
+\end{ex}
+
+\begin{ex}
+The following is a \textit{struct} called
+\textit{Fraction} with two integer members: \textit{numerator} and
+\textit{denominator}. Correct any errors in the code. Of course a
+\textit{Fraction} variable models a (mathematical) fraction. Create a
+\textit{Fraction} variable modeling the fraction 2/3. Write a print
+function that prints a Fraction variable in the ``usual'' way, i.e.
+numerator, followed by '/', and then by the denominator.
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+struct Fraction
+{
+    int numerator;
+    int denominator;
+};
+
+void print(Fraction f)
+{
+}
+
+int main()
+{
+    Fraction x;
+    // assign values to the members of x so that
+    // it models the fraction 2/3
+    print(x);
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+struct Customer
+{
+    char fname[100];
+    char lname[100];
+    char email[100];
+};
+
+// Prints customer data in the format
+// Firstname: ***, Lastname: ***, Email: ***
+void print(Customer customer)
+{
+}
+
+int main()
+{
+    Customer johnDoe = {"John", "Doe", "johndoe@nowhere.com"};
+    print(johnDoe);
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Complete the following. You have to provide a
+comparison function and complete the bubblesort function.
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+struct GameObj
+{
+    char name[50];
+    int x;
+    int y;
+};
+
+bool isGreater(const GameObj & x, const GameObj & y)
+{
+    // Return true if x is > y where ">" means
+    // has a smaller x-coordinate in the sense that
+    // x is nearer to the left of the screen than y.
+}
+
+void bubblesort(GameObj x[], int n)
+{
+    // Sort by x-coordinate.
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Read about game sprites online. Suppose you have
+a game with up to 100 game objects on the screen. Each game object has a
+filename associated with it. Your game could have 10 types of game
+objects. Since the struct describes a game object on the screen, the
+struct should also contain the bitmap used for drawing.
+
+Design a struct for this situation. There are many ways to do this. You
+do not need to write any C++ code. Just describe your design in English.
+\end{ex}
+
+One last small point before we're done with this
+section: Note that above I declare the struct type in \textit{main()} and
+therefore the type is local to \textit{main()}. I don't want this
+(unless the struct is needed only in \textit{main()}). So from this point
+on, I declare the struct \textbf{outside} \textit{main()} (but before it)
+so that \textbf{all} functions can use it:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <iomanip>
+
+struct Time
+{
+    int hour;
+    int min;
+    int sec;
+};
+
+int main()
+{
+    Time t0;
+    t0.hour = 5;
+    t0.min = 18;
+    t0.sec = 0;
+
+    std::cout << std::setw(2) << std::setfill('0')
+              << t0.hour << ':'
+              << std::setw(2) << std::setfill('0')
+              << t0.min << ':'
+              << std::setw(2) << std::setfill('0')
+              << t0.sec
+              << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+By the way it's possible to define a \textit{struct} and
+also declare \textit{struct} variables at the same time:
+
+\begin{consolethree}[escapeinside=||]
+struct Time
+{
+    int hour;
+    int min;
+    int sec;
+} t0, t1, t2;
+\end{consolethree}
+
+The above defines the \textit{Time} struct and also declares three variables
+\textit{t0}, \textit{t1}, and \textit{t2} of \textit{Time} type.
+
+And it's even possible to define a \textit{struct} without
+naming the struct:
+
+\begin{consolethree}[escapeinside=||]
+struct
+{
+    int hour;
+    int min;
+    int sec;
+} t0;
+\end{consolethree}
+
+This defines a struct without a name and declares a variable \textit{t0}.
+The problem is that you cannot declare more variables of this type! The
+following therefore is \textit{not} the same as declaring three variables
+\textit{t0}, \textit{t1}, \textit{t2} of time \textit{Time}:
+
+\begin{consolethree}[escapeinside=||]
+struct
+{
+    int hour;
+    int min;
+    int sec;
+} t0;
+
+struct
+{
+    int hour;
+    int min;
+    int sec;
+} t1;
+
+struct
+{
+    int hour;
+    int min;
+    int sec;
+} t2;
+\end{consolethree}
+
+because each variable comes from a different type.
+
+This is \textbf{not common} since in most cases you want to writing
+functions for structs. Therefore I would not recommend using
+``anonymous'' structs.
+
+
+\newpage\EMPHASIZE{Initialization}
+
+As shown earlier, you can initialize a \textit{struct} variable using
+\verb!{...}!:
+
+\begin{consolethree}[escapeinside=||]
+struct Student
+{
+    char lastname[50];
+    char firstname[50];
+    double gpa;
+};
+
+Student johnDoe = {"Doe", "John", 3.55};
+\end{consolethree}
+
+In the above, the \textit{lastname} of \textit{johnDoe} is initialized
+with \verb!"Doe"!, the \textit{firstname} is initialized with
+\verb!"John"!, and \textit{gpa} is initialized with \textit{3.55}.
+
+Note that if you provide too few values in the initializer, the remaining
+values are initialized to a zero-ish (0 for numeric types, null character
+for character types):
+
+\begin{consolethree}[escapeinside=||]
+Student janeDoe = {"Doe"};
+// janeDoe.firstname is "", janeDoe.gpa is 0.0
+\end{consolethree}
+
+Notice that this looks very similar to initialization of an array. And
+just like arrays, you can have the following:
+
+\begin{consolethree}[escapeinside=||]
+struct Student
+{
+    char lastname[50];
+    char firstname[50];
+    double gpa;
+};
+
+Student johnDoe = {}; // All values are zero-ish
+\end{consolethree}
+
+
+\newpage\EMPHASIZE{Struct Assignment}
+
+To copy values from one struct variable to another you can of course do
+this:
+
+\begin{consolethree}[escapeinside=||]
+Time t0, t1;
+t0.hour = 5;
+t0.min = 18;
+t0.sec = 1;
+
+t1.hour = t0.hour;
+t1.min = t0.min;
+t1.sec = t0.sec;
+\end{consolethree}
+
+But C++ allows you to do a shortcut:
+
+\begin{consolethree}[escapeinside=||]
+Time t0, t1;
+t0.hour = 5;
+t0.min = 18;
+t0.sec = 1;
+
+t1 = t0;
+\end{consolethree}
+
+In other words the operator = (i.e. assignment operator) is defined
+for struct variables.
+
+\begin{ex}
+What happens if you do
+
+\begin{consolethree}[escapeinside=||]
+Time t0, t1;
+if (t0 == t1) ...
+\end{consolethree}
+
+?
+\end{ex}
+
+
+\newpage\EMPHASIZE{Array of Structs}
+
+Just like you can have arrays of integers or arrays of doubles, you can have
+arrays of struct variables. Here's an example:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+struct Student
+{
+    char lastname[50];
+    char firstname[50];
+    double gpa;
+};
+
+int main()
+{
+    Student s[3] = {{"Doe", "John", 3.55},
+                    {"Smith", "Jane", 3.75},
+                    {"Woo", "Bob", 3.25}};
+
+    for (int i = 0; i < 3; ++i)
+    {
+        std::cout << s[i].firstname << ' '
+                  << s[i].lastname << ": "
+                  << s[i].gpa << '\n';
+    }
+
+    return 0;
+}
+\end{consolethree}
+
+\begin{ex}
+Write a function to sort an array of \textit{Student} by GPA in descending
+order (highest GPA first).
+\end{ex}
+
+
+\newpage\EMPHASIZE{Pointers to structs}
+
+Since you can create pointers to any kind of variable, you can create
+a pointer to point to a struct value.
+
+Recall that to declare a pointer to point to a value of type X you do
+this:
+
+\verb!X * p;!
+
+So if \textit{Time} is a struct type, then to declare a pointer to a
+\textit{Time} value you do this:
+
+\verb!Time * p;!
+
+If you are pointing to a value that already exists you can access that
+value like this:
+
+\begin{consolethree}[escapeinside=||]
+Time t;
+t.hour = 5;
+t.min = 18;
+t.sec = 0;
+
+Time * p;
+p = &t;
+std::cout << (*p).hour << '\n';
+\end{consolethree}
+
+If not you have to give your pointer a value to point to. This is how
+you allocate memory for a single value:
+
+\begin{consolethree}[escapeinside=||]
+int * p = new int;
+*p = 42;
+std::cout << *p << '\n';
+delete p;
+\end{consolethree}
+
+and for an array
+
+\begin{consolethree}[escapeinside=||]
+int * p = new int[10];
+for (int i = 0; i < 10; ++i)
+{
+    p[i] = i * i;
+}
+for (int i = 0; i < 10; ++i)
+{
+    std::cout << p[i] << '\n';
+}
+delete[] p;
+\end{consolethree}
+
+Where does this memory (the int) come from? It's from a
+special memory area in RAM (random access memory) called the
+\textbf{heap}. This is also sometimes called the \textbf{freestore}.
+
+The \textbf{address} of the \textit{i-}th value that \textit{p} points to is
+
+\verb!p + i! or equivalently \verb!&p[i]!
+
+This is only a quick review. You should go over your previous notes on
+pointers.
+
+Of course you can apply the same techniques for struct variables:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+struct Time
+{
+    int hour;
+    int min;
+    int sec;
+};
+
+int main()
+{
+    Time * p = new Time;
+    (*p).hour = 5;
+    (*p).min = 18;
+    (*p).sec = 0;
+
+    std::cout << (*p).hour << ':'
+              << (*p).min << ':'
+              << (*p).sec << '\n';
+
+    delete p;
+    return 0;
+}
+\end{consolethree}
+
+And for an array of structs:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+struct Time
+{
+    int hour;
+    int min;
+    int sec;
+};
+
+int main()
+{
+    Time * p = new Time[3];
+
+    p[0].hour = 5;
+    p[0].min = 18;
+    p[0].sec = 0;
+
+    p[1].hour = 6;
+    p[1].min = 30;
+    p[1].sec = 45;
+
+    p[2].hour = 12;
+    p[2].min = 0;
+    p[2].sec = 0;
+
+    for (int i = 0; i < 3; ++i)
+    {
+        std::cout << p[i].hour << ':'
+                  << p[i].min << ':'
+                  << p[i].sec << '\n';
+    }
+
+    delete[] p;
+    return 0;
+}
+\end{consolethree}
+
+Read the code carefully. There is really no new concepts at all. While
+\verb!(*p).hour! makes sense, it looks ugly and it's frequently used. So
+there's a shortcut. Instead of \verb!(*p).hour!, you can write
+
+\verb!p->hour!
+
+The operator \texttt{->} is called the \textbf{de-referencing
+operator}. You de-reference \textit{p} (to get to what it's pointing to)
+and access the \textit{hour} member.
+
+Of course one quick question to ask is this. Suppose we omit the
+parentheses:
+
+\verb!*p.hour!
+
+The operator \textit{.} has a higher precedence than \textit{*}. So the
+above is the same as
+
+\verb!*(p.hour)!
+
+which is nonsense unless \textit{p.hour} is a pointer to something.
+
+\begin{ex}
+Fix the following so that it compiles and runs correctly:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+struct Fraction
+{
+    int num;
+    int denom;
+};
+
+int main()
+{
+    Fraction * p = new Fraction;
+    (*p).num = 1;
+    (*p).denom = 2;
+    std::cout << *p.num << '/' << *p.denom << std::endl;
+    delete p;
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Declare a pointer \textit{Fraction} and allocate an array of
+100 \textit{Fraction} values.
+\end{ex}
+
+
+\newpage\EMPHASIZE{Functions}
+
+You can of course pass struct variables as function parameters.
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+struct Fraction
+{
+    int num;
+    int denom;
+};
+
+void print(Fraction f)
+{
+    std::cout << f.num << '/' << f.denom;
+}
+
+int main()
+{
+    Fraction x;
+    x.num = 1;
+    x.denom = 2;
+    print(x);
+    return 0;
+}
+\end{consolethree}
+
+Note that in the above the variable \textit{f} in \textit{print()} gets a
+\textbf{copy} of \textit{x}. Just like any other type, struct values are
+passed by value (unless you say otherwise).
+
+Once you use a function for passing variables of a certain type you
+should start thinking about how to pass. If a function is meant to change
+the variable, passing by value is a problem:
+
+\begin{consolethree}[escapeinside=||]
+void doubleUp(Fraction f)
+{
+    f.num *= 2;
+}
+
+int main()
+{
+    Fraction x;
+    x.num = 1;
+    x.denom = 2;
+    doubleUp(x);
+    print(x);  // oops ... x is not changed!!!
+    return 0;
+}
+\end{consolethree}
+
+To really change the variable in the calling function you can do two
+things.
+
+Here's the version that uses references:
+
+\begin{consolethree}[escapeinside=||]
+void doubleUp(Fraction & f)
+{
+    f.num *= 2;
+}
+
+int main()
+{
+    Fraction x;
+    x.num = 1;
+    x.denom = 2;
+    doubleUp(x);
+    print(x);  // x is changed
+    return 0;
+}
+\end{consolethree}
+
+Here's the version that uses pointers:
+
+\begin{consolethree}[escapeinside=||]
+void doubleUp(Fraction * f)
+{
+    f->num *= 2;
+    // or (*f).num *= 2;
+}
+
+int main()
+{
+    Fraction x;
+    x.num = 1;
+    x.denom = 2;
+    doubleUp(&x);
+    print(x);  // x is changed
+    return 0;
+}
+\end{consolethree}
+
+
+\newpage\EMPHASIZE{Pass by Constant Reference}
+
+You know that since \textit{struct} variables are passed by value, they
+are copied. The copy is potentially slow. For instance:
+
+\begin{consolethree}[escapeinside=||]
+struct Student
+{
+    char lastname[1000];
+    char firstname[1000];
+    char email[1000];
+    double gpa;
+};
+
+void print(Student s)
+{
+    ...
+}
+\end{consolethree}
+
+This does work since the \textit{print()} function should not change the
+\textit{Student} variable but when you call \textit{print(s)}, the copying
+is slow.
+
+Therefore you can pass by reference to save time. Pass by reference will
+not make a copy. But the danger is that you might change the value
+in the function. You can add \textit{const} to prevent accidental
+changes:
+
+\begin{consolethree}[escapeinside=||]
+void print(const Student & s)
+{
+    std::cout << s.firstname << ' ' << s.lastname << '\n';
+}
+\end{consolethree}
+
+Now the danger is that you (or someone working with you on the same
+project) accidentally does this
+
+\begin{consolethree}[escapeinside=||]
+void print(const Student & s)
+{
+    s.gpa = 0.0;  // ERROR!
+    std::cout << s.firstname << ' ' << s.lastname << '\n';
+}
+\end{consolethree}
+
+If you have the \textit{const}, the compiler will catch the error. Without
+the \textit{const}, the above code will compile but change the student's
+GPA to 0.
+
+In summary:
+\begin{itemize}
+\item Pass by value: The function gets a copy. Changes do not affect caller.
+  Potentially slow for large structs.
+\item Pass by reference: No copy. Changes affect caller.
+\item Pass by const reference: No copy. Changes are prevented by compiler.
+\end{itemize}
+
+\begin{ex}
+Write a \textit{print()} function for this struct. Make sure you use
+pass by const reference.
+
+\begin{consolethree}[escapeinside=||]
+struct GameObj
+{
+    int x;
+    int y;
+    char name[100];
+};
+\end{consolethree}
+
+Does the function change the value of the parameter? What type of
+parameter passing should you use?
+\end{ex}
+
+
+\newpage\EMPHASIZE{Struct return values}
+
+You can also return struct values from functions:
+
+\begin{consolethree}[escapeinside=||]
+Fraction add(const Fraction & a, const Fraction & b)
+{
+    Fraction c;
+    c.num = a.num * b.denom + b.num * a.denom;
+    c.denom = a.denom * b.denom;
+    return c;
+}
+\end{consolethree}
+
+However all the values of the member variables inside a struct variable
+are copied to the calling function. Again, this can be slow.
+
+\begin{ex}
+Write a multiply function that returns the product of
+two \textit{Fraction} values.
+\end{ex}
+
+\begin{ex}
+Write a divide function that returns the quotient of
+two \textit{Fraction} values.
+\end{ex}
+
+\begin{ex}
+Write a subtract function that returns the difference of
+two \textit{Fraction} values.
+\end{ex}
+
+
+\newpage\EMPHASIZE{Header Files}
+
+When you have a struct and associated functions, it's common to put
+the struct declaration and function prototypes in a header file (.h file)
+and put the function definitions in a source file (.cpp file).
+
+For example:
+
+\textbf{fraction.h}
+\begin{consolethree}[escapeinside=||]
+#ifndef FRACTION_H
+#define FRACTION_H
+
+struct Fraction
+{
+    int num;
+    int denom;
+};
+
+void print(const Fraction & f);
+Fraction add(const Fraction & a, const Fraction & b);
+
+#endif
+\end{consolethree}
+
+\textbf{fraction.cpp}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "fraction.h"
+
+void print(const Fraction & f)
+{
+    std::cout << f.num << '/' << f.denom;
+}
+
+Fraction add(const Fraction & a, const Fraction & b)
+{
+    Fraction c;
+    c.num = a.num * b.denom + b.num * a.denom;
+    c.denom = a.denom * b.denom;
+    return c;
+}
+\end{consolethree}
+
+\textbf{main.cpp}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "fraction.h"
+
+int main()
+{
+    Fraction a = {1, 2};
+    Fraction b = {1, 3};
+    Fraction c = add(a, b);
+    print(c);
+    std::cout << '\n';
+    return 0;
+}
+\end{consolethree}
+
+
+\newpage\EMPHASIZE{Nested structs}
+
+You can have structs within structs:
+
+\begin{consolethree}[escapeinside=||]
+struct Date
+{
+    int month;
+    int day;
+    int year;
+};
+
+struct Student
+{
+    char lastname[50];
+    char firstname[50];
+    Date birthday;
+    double gpa;
+};
+\end{consolethree}
+
+To access the birthday month of a student:
+
+\begin{consolethree}[escapeinside=||]
+Student s;
+s.birthday.month = 12;
+s.birthday.day = 25;
+s.birthday.year = 2000;
+\end{consolethree}
+
+Note that if there are several \texttt{->} operators in a
+row, e.g.
+
+\verb!p->q->r!
+
+then you evaluate left to right, i.e., the above is \verb!(p->q)->r!.
+
+And remember that \texttt{.} goes before \texttt{->}. So
+
+\verb!x.p->q!
+
+is the same as
+
+\verb!(x.p)->q!
+
+\begin{ex}
+Create a \textit{Student} variable with the following data:
+\begin{itemize}
+\item Last name: ``Doe''
+\item First name: ``John''
+\item Birthday: January 15, 1995
+\item GPA: 3.5
+\end{itemize}
+\end{ex}
+
+\begin{ex}
+Write a function that prints a \textit{Student} variable
+showing all fields including the birthday.
+\end{ex}
+
+\end{document}

@@ -1,0 +1,1489 @@
+\newpage\EMPHASIZE{30. Structures}
+
+\textsc{Objectives}
+\begin{itemize}
+\item Define a \texttt{struct}
+\item Declare \texttt{struct} variable with or without initialization
+\item Use dot \texttt{.} operator to access a \texttt{struct} variable's member
+\item Declare and allocation/deallocate memory for a pointer-to-struct variable.
+\item Use \texttt{->} dereferencing operator
+\item Declare array of \texttt{struct} values
+\item Create nested \texttt{struct}.
+\end{itemize}
+
+Up to this point we have been using types provided by C++: basic types, array types, etc.
+
+In this set of notes we will create our own types.
+
+
+\newpage\EMPHASIZE{struct}
+
+Try this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <iomanip>
+
+int main()
+{
+    struct Time
+    {
+        int hour;
+        int min;
+        int sec;
+    };
+
+    Time t0;
+    t0.hour = 5;
+    t0.min = 18;
+    t0.sec = 0;
+
+    std::cout << std::setw(2) << std::setfill('0')
+              << t0.hour << ':'
+              << std::setw(2) << std::setfill('0')
+              << t0.min << ':'
+              << std::setw(2) << std::setfill('0')
+              << t0.sec
+              << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+\texttt{t0} is like a \EMPHASIZE{variable containing other variables}:
+\texttt{hour}, \texttt{min}, and \texttt{sec}. This is the picture of
+\texttt{main()}'s memory after declaring and assigning
+values to \texttt{t0:}
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(x0=0, y0=0, x1=5, y1=2, linewidth=0.05)
+p += Rect(x0=0.1, y0=2.5, x1=1, y1=3, label=r'{\tt main}', linewidth=0)
+
+p += Rect(x0=0.5, y0=0.5, x1=1, y1=1.2, label=r'{\tt t0}', linewidth=0)
+
+# Three cells for hour, min, sec
+p += Rect(x0=1.2, y0=0.5, x1=2.2, y1=1.2, label=r'{\tt 5}', linewidth=0.05)
+p += Rect(x0=2.2, y0=0.5, x1=3.2, y1=1.2, label=r'{\tt 18}', linewidth=0.05)
+p += Rect(x0=3.2, y0=0.5, x1=4.2, y1=1.2, label=r'{\tt 0}', linewidth=0.05)
+
+print(p)
+\end{python}
+
+Here's the format for creating a struct type:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+S=r"""
+\begin{consolethree}[escapeinside=||]
+|\EMPHASIZE{struct [struct name]}|
+|\EMPHASIZE{\{}|
+    |\EMPHASIZE{[type 1] [member name 1];}|
+    |\EMPHASIZE{[type 2] [member name 2];}|
+    |\EMPHASIZE{...}|
+|\EMPHASIZE{\};}|
+\end{consolethree}
+"""
+p += Rect(0, 0, 12, 5, innersep=0.1, s=S, align='c', linewidth=0)
+print(p)
+\end{python}
+
+The most common gotcha is to forget the \EMPHASIZE{semicolon} at the end.
+
+Of course \texttt{[type 1]}, \texttt{[type 2]}, ... must be types
+that are already defined.
+
+For our example above, the \texttt{hour} in \texttt{t0} is called a
+\EMPHASIZE{member} (or \EMPHASIZE{member variable}) of \texttt{t0}.
+
+The member in a struct variable is accessed by the \EMPHASIZE{dot
+operator}. The format is this:
+
+\verb![struct var name].[member name]!
+
+The ``\texttt{hour} in \texttt{t0}'' is \EMPHASIZE{\texttt{t0.hour}}.
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(x0=0, y0=0, x1=5, y1=2.5, linewidth=0.05)
+p += Rect(x0=0.1, y0=2.5, x1=1, y1=3, label=r'{\tt main}', linewidth=0)
+
+p += Rect(x0=0.5, y0=0.8, x1=1, y1=1.5, label=r'{\tt t0}', linewidth=0)
+
+p += Rect(x0=1.2, y0=0.8, x1=2.2, y1=1.5, label=r'{\tt 5}', linewidth=0.05)
+p += Rect(x0=2.2, y0=0.8, x1=3.2, y1=1.5, label=r'{\tt 18}', linewidth=0.05)
+p += Rect(x0=3.2, y0=0.8, x1=4.2, y1=1.5, label=r'{\tt 0}', linewidth=0.05)
+
+p += Rect(x0=5.5, y0=4.0, x1=7.5, y1=4.6, label=r'{\tt t0.hour}', linewidth=0.05, linecolor='red')
+p += Rect(x0=5.5, y0=3.2, x1=7.5, y1=3.8, label=r'{\tt t0.min}', linewidth=0.05, linecolor='red')
+p += Rect(x0=5.5, y0=2.4, x1=7.5, y1=3, label=r'{\tt t0.sec}', linewidth=0.05, linecolor='red')
+
+p += Line(points=[(5.5, 4.3), (1.6, 4.3), (1.6, 1.5)], linewidth=0.05, linecolor='red', endstyle='>')
+p += Line(points=[(5.5, 3.5), (2.6, 3.5), (2.6, 1.5)], linewidth=0.05, linecolor='red', endstyle='>')
+p += Line(points=[(5.5, 2.7), (3.6, 2.7), (3.6, 1.5)], linewidth=0.05, linecolor='red', endstyle='>')
+
+print(p)
+\end{python}
+
+You \EMPHASIZE{do} know how to work with \texttt{[struct var name].[member name]} since \texttt{[struct var name].[member name]} is just like a ``regular'' variable.
+
+\begin{ex}
+Create a variable \texttt{t1} of type \texttt{Time} and set it to the time one second after \texttt{t0}. Print \texttt{t1} in the same format as the print statement of \texttt{t0}. Note that the values of \texttt{sec} of \texttt{t1} and \texttt{sec} of \texttt{t0} are different.
+\end{ex}
+
+Let's compare the struct variable and an array. Note that a struct variable is like an array in the sense that they both \EMPHASIZE{contain values}.
+
+\begin{consolethree}[escapeinside=||]
+int x[3] = {1, 2, 3};
+
+struct Y
+{
+    int a;
+    int b;
+    int c;
+};
+
+Y y = {1, 2, 3};
+\end{consolethree}
+
+In the above \texttt{x} is made up of three integers 1, 2, 3. The variable
+\texttt{y} contains three variables \texttt{a}, \texttt{b}, and \texttt{c} with
+values 1, 2, and 3 respectively. We refer to the values in \texttt{x} by
+\begin{center}
+\texttt{x[0]}\\
+\texttt{x[1]}\\
+\texttt{x[2]}
+\end{centeR}
+while we refer to the values in \texttt{y} by
+
+\begin{center}
+\texttt{y.a}\\
+\texttt{y.b}\\
+\texttt{y.c}
+\end{centeR}
+
+Make sure you \EMPHASIZE{see the difference!!!} This is the picture of the
+program's memory during execution:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(x0=0, y0=0, x1=5, y1=3.5, linewidth=0.05)
+p += Rect(x0=0.1, y0=4.1, x1=1, y1=4.4, label=r'{\tt main}', linewidth=0)
+
+p += Rect(x0=0.5, y0=2.0, x1=1, y1=2.7, label=r'{\tt x}', linewidth=0)
+p += Rect(x0=1.2, y0=2.0, x1=2.2, y1=2.7, label=r'{\tt 1}', linewidth=0.05)
+p += Rect(x0=2.2, y0=2.0, x1=3.2, y1=2.7, label=r'{\tt 2}', linewidth=0.05)
+p += Rect(x0=3.2, y0=2.0, x1=4.2, y1=2.7, label=r'{\tt 3}', linewidth=0.05)
+
+p += Rect(x0=0.5, y0=0.8, x1=1, y1=1.5, label=r'{\tt y}', linewidth=0)
+p += Rect(x0=1.2, y0=0.8, x1=2.2, y1=1.5, label=r'{\tt 1}', linewidth=0.05)
+p += Rect(x0=2.2, y0=0.8, x1=3.2, y1=1.5, label=r'{\tt 2}', linewidth=0.05)
+p += Rect(x0=3.2, y0=0.8, x1=4.2, y1=1.5, label=r'{\tt 3}', linewidth=0.05)
+
+print(p)
+\end{python}
+
+They both look the same but the names of the cells are different.
+Remember that.
+
+Note that while you can scan an array like this:
+
+\begin{consolethree}[escapeinside=||]
+for (int i = 0; i < 3; ++i)
+{
+    std::cout << x[i] << std::endl;
+}
+\end{consolethree}
+
+there's no analog for our \texttt{struct} variable y:
+there is no way to scan the values in y using a \texttt{for}-loop.
+That's not the purpose of \texttt{struct} variables.
+
+The purpose of \texttt{struct} is allow the software engineer to think at
+a \EMPHASIZE{higher level of abstraction}. For instance in the case of our
+\texttt{Time} struct, a function like
+
+\verb!void addOneSec(Time & t);!
+
+and a code like
+
+\begin{consolethree}[escapeinside=||]
+Time currentTime, endTime;
+...
+while (isLessThan(currentTime, endTime))
+{
+    // ... do something for a second
+    readCurrentTime(currentTime);
+}
+\end{consolethree}
+
+for instance will let us focus on the concept of time and not worry
+about the details of a time variable (hours, minutes, seconds.) While
+\EMPHASIZE{functions} chunk up \EMPHASIZE{code}, \EMPHASIZE{struct variables}
+allows us to chunk up \EMPHASIZE{data}.
+
+\begin{ex}
+There's a section on functions for
+struct variables. But I'm sure you can handle this
+exercise. Write the \texttt{isLessThan()} function. We need to make sure
+that the \texttt{Time} struct is outside the \texttt{main()} and above this
+function:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <iomanip>
+
+struct Time
+{
+    int hour;
+    int min;
+    int sec;
+};
+
+bool isLessThan(Time t0, Time t1)
+{
+    // convert t0 and t1 into seconds since midnight
+    // and then compare.
+}
+
+int main()
+{
+    Time t0;
+    t0.hour = 5;
+    t0.min = 18;
+    t0.sec = 0;
+
+    Time t1;
+    t1.hour = 5;
+    t1.min = 18;
+    t1.sec = 1;
+
+    std::cout << isLessThan(t0, t1) << '\n';
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+Another difference between arrays and structs is this: You can have
+member variables of any type in a struct variable. For instance
+
+\begin{consolethree}[escapeinside=||]
+struct Student
+{
+    char lastname[50];
+    char firstname[50];
+    double gpa;
+};
+
+Student johnDoe = {"Doe", "John", 3.55};
+\end{consolethree}
+
+Here's the memory:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Rect(0, 0, 10, 2.5, innersep=0.1, s=r'{\tt    johnDoe}', align='c', linewidth=0.05)
+
+p += Rect(11, 2.8, 15.5, 3.8, innersep=0.1, s=r'{\tt johnDoe.lastname} is a string', align='c', linewidth=0.05, linecolor='red')
+p += Rect(11, 0.8, 14, 1.8, innersep=0.1, s=r'{\tt johnDoe.gpa} is a double', align='c', linewidth=0.05, linecolor='red')
+p += Line(points=[(11, 3.3), (3.5, 3.3), (3.5, 1.75)], linewidth=0.075, linecolor='red', endstyle='>')
+p += Line(points=[(11, 1.3), (8.5, 1.3)], linewidth=0.075, linecolor='red', endstyle='>')
+stuff = ['\"Doe\"', '\"John\"', '3.55']
+x = 2.5
+for i in stuff:
+    p += Rect(x, 0.75, x + 2, 1.75, linewidth=0.03, innersep=0.1, s=i, align='c')
+    x += 2
+print(p)
+\end{python}
+On the other hand, the values in an array MUST all have the same type.
+In C/C++ there is no such concept as a single array made up of 3
+integers, 4 doubles, and 5 strings.
+
+\begin{ex}
+Using this code segment:
+
+\begin{consolethree}[escapeinside=||]
+struct Student
+{
+    char lastname[50];
+    char firstname[50];
+    double gpa;
+};
+
+Student johnDoe = {"Doe", "John", 3.55};
+\end{consolethree}
+
+print the first name, last name and GPA of \texttt{johnDoe} variable.
+\end{ex}
+
+\begin{ex}
+The following is a \texttt{struct} called
+\texttt{Fraction} with two integer members: \texttt{numerator} and
+\texttt{denominator}. Correct any errors in the code. Of course a
+\texttt{Fraction} variable models a (mathematical) fraction. Create a
+\texttt{Fraction} variable modeling the fraction 2/3. Write a print
+function that prints a Fraction variable in the ``usual'' way, i.e.
+numerator, followed by '/', and then by the denominator.
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+struct Fraction
+{
+    int numerator;
+    int denominator;
+};
+
+void print(Fraction f)
+{
+}
+
+int main()
+{
+    Fraction x;
+    // assign values to the members of x so that
+    // it models the fraction 2/3
+    print(x);
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+f
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+struct Customer
+{
+    char fname[100];
+    char lname[100];
+    char email[100];
+};
+
+// Prints customer data in the format
+// Firstname: ***, Lastname: ***, Email: ***
+void print(Customer customer)
+{
+}
+
+int main()
+{
+    Customer johnDoe = {"John", "Doe", "johndoe@nowhere.com"};
+    print(johnDoe);
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Complete the following. You have to provide a
+comparison function and complete the bubblesort function.
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+struct GameObj
+{
+    char name[50];
+    int x;
+    int y;
+};
+
+bool isGreater(const GameObj & x, const GameObj & y)
+{
+    // Return true if x is > y where ">" means
+    // has a smaller x-coordinate in the sense that
+    // x is nearer to the left of the screen than y.
+}
+
+void bubblesort(GameObj x[], int n)
+{
+    // Sort by x-coordinate.
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Read about game sprites online. Suppose you have
+a game with up to 100 game objects on the screen. Each game object has a
+filename associated with it. Your game could have 10 types of game
+objects. Since the struct describes a game object on the screen, the
+struct should also contain the bitmap used for drawing.
+
+Design a struct for this situation. There are many ways to do this. You
+do not need to write any C++ code. Just describe your design in English.
+\end{ex}
+
+One last small point before we're done with this
+section: Note that above I declare the struct type in \texttt{main()} and
+therefore the type is local to \texttt{main()}. I don't want this
+(unless the struct is needed only in \texttt{main()}). So from this point
+on, I declare the struct \EMPHASIZE{outside} \texttt{main()} (but before it)
+so that \EMPHASIZE{all} functions can use it:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <iomanip>
+
+struct Time
+{
+    int hour;
+    int min;
+    int sec;
+};
+
+int main()
+{
+    Time t0;
+    t0.hour = 5;
+    t0.min = 18;
+    t0.sec = 0;
+
+    std::cout << std::setw(2) << std::setfill('0')
+              << t0.hour << ':'
+              << std::setw(2) << std::setfill('0')
+              << t0.min << ':'
+              << std::setw(2) << std::setfill('0')
+              << t0.sec
+              << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+By the way it's possible to define a \texttt{struct} and use it to declare \texttt{struct}
+variables in a single statement. Make sure you try this:
+
+\begin{consolethree}[escapeinside=||]
+struct Time
+{
+    int hour;
+    int min;
+    int sec;
+} t0, t1, t2;
+\end{consolethree}
+
+And it's even possible to define a \texttt{struct} without giving it a name. Run
+this:
+
+\begin{consolethree}[escapeinside=||]
+struct
+{
+    int hour;
+    int min;
+    int sec;
+} t0;
+\end{consolethree}
+
+This defines a struct without a name and declares a variable \texttt{t0}.
+The problem is that you cannot declare more variables of this type! The
+following therefore is \texttt{not} the same as declaring three variables
+\texttt{t0}, \texttt{t1}, \texttt{t2} of time \texttt{Time}:
+
+\begin{consolethree}[escapeinside=||]
+struct
+{
+    int hour;
+    int min;
+    int sec;
+} t0;
+
+struct
+{
+    int hour;
+    int min;
+    int sec;
+} t1;
+
+struct
+{
+    int hour;
+    int min;
+    int sec;
+} t2;
+\end{consolethree}
+
+because each variable comes from a different type.
+
+This is \EMPHASIZE{not common} since in most cases you want to writing
+functions to accept \texttt{struct} values and therefore the function would
+need to use the \texttt{struct}. For instance you might have something like
+this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+struct Robot
+{
+    char name[100];
+    double weight;
+    double height;
+    int x;
+    int y;
+}
+
+void print(Robot r)
+{
+    ...
+}
+
+int main()
+{
+    Robot arnold, t3;
+    ...
+    return 0;
+}
+\end{consolethree}
+
+
+\newpage\EMPHASIZE{Initialization}
+
+As shown earlier, you can initialize a \texttt{struct} variable using initializers:
+
+\begin{consolethree}[escapeinside=||]
+struct Student
+{
+    char lastname[50];
+    char firstname[50];
+    double gpa;
+};
+
+Student johnDoe = {"Doe", "John", 3.55};
+\end{consolethree}
+
+In the above, the \texttt{lastname} of \texttt{johnDoe} is initialized
+with \verb!"Doe"!, the \texttt{firstname} is initialized with
+\verb!"John"!, and \texttt{gpa} is initialized with \texttt{3.55}.
+
+Note that if you provide too few values in the initializer, the remaining
+values are initialized to a zero-ish (0 for numeric types, null character
+for character types):
+
+\begin{consolethree}[escapeinside=||]
+Student janeDoe = {"Doe"};
+// janeDoe.firstname is "", janeDoe.gpa is 0.0
+\end{consolethree}
+
+Notice that this looks very similar to initialization of an array. And just like
+arrays you can perform partial initialization:
+
+\begin{consolethree}[escapeinside=||]
+struct Student
+{
+    char lastname[50];
+    char firstname[50];
+    double gpa;
+};
+
+Student johnDoe = {}; // All values are zero-ish
+\end{consolethree}
+
+
+\newpage\EMPHASIZE{Operator =}
+
+To copy values from one struct variable to another you can of course do
+this:
+
+\begin{consolethree}[escapeinside=||]
+Time t0, t1;
+t0.hour = 5;
+t0.min = 18;
+t0.sec = 1;
+
+t1.hour = t0.hour;
+t1.min = t0.min;
+t1.sec = t0.sec;
+\end{consolethree}
+
+A better way is this:
+
+\begin{consolethree}[escapeinside=||]
+Time t0, t1;
+t0.hour = 5;
+t0.min = 18;
+t0.sec = 1;
+
+t1 = t0;
+\end{consolethree}
+
+In other words the operator = (i.e. assignment operator) is defined
+between struct variables of the same type. It copies all the values from
+the left to the right. It's not too surprising that the same holds for the
+initialization operator:
+
+\begin{consolethree}[escapeinside=||]
+struct Time
+{
+  int hour, min, sec;
+};
+Time t0 = {5, 18, 0};
+Time t1 = t0;
+\end{consolethree}
+
+
+\begin{ex}
+Is the operator == defined for struct variables of the same
+type? In other words does the following print 1?
+
+\begin{consolethree}[escapeinside=||]
+struct Time
+{
+    int hour, min, sec;
+};
+Time t0 = {5, 18, 0};
+Time t1 = t0;
+
+std::cout << (t1 == t0) << std::endl;
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Is the operator != defined for struct variables of the same
+type? Design an experiment to verify your guess.
+\end{ex}
+
+
+\newpage\EMPHASIZE{Array of Structs}
+
+Does this surprise you?
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+struct Student
+{
+    char lastname[50];
+    char firstname[50];
+    double gpa;
+};
+
+int main()
+{
+    Student s[3] = {{"Doe", "John", 3.55},
+                    {"Smith", "Jane", 3.75},
+                    {"Woo", "Bob", 3.25}};
+
+    for (int i = 0; i < 3; ++i)
+    {
+        std::cout << s[i].firstname << ' '
+                  << s[i].lastname << ": "
+                  << s[i].gpa << '\n';
+    }
+
+    return 0;
+}
+\end{consolethree}
+
+Enough said ...
+
+
+\newpage\EMPHASIZE{Pointers to structs}
+
+Since you can create pointers to any kind of variable, you can create
+pointers to structs too.(Review your notes/books on pointers if
+necessary.) Here's a quick review.
+
+Recall that to declare a pointer to point to a value of type X you do this:
+
+\verb!X * p;!
+
+For instance here's an int pointer:
+
+\verb!int * p;!
+
+If you are pointing to a value that already exists you can access that
+value using your pointer:
+
+\begin{consolethree}[escapeinside=||]
+Time t;
+t.hour = 5;
+t.min = 18;
+t.sec = 0;
+
+Time * p;
+p = &t;
+std::cout << (*p).hour << '\n';
+\end{consolethree}
+
+If not you have to give your pointer a value to point to. This is how you do
+it:
+
+\begin{consolethree}[escapeinside=||]
+int * p = new int;
+*p = 42;
+std::cout << *p << '\n';
+delete p;
+\end{consolethree}
+
+That's called \EMPHASIZE{allocating memory} for \texttt{p}. (You have already
+seen this concept.) You can do it in one step:
+
+\begin{consolethree}[escapeinside=||]
+int * p = new int;
+\end{consolethree}
+
+Where does this memory (the int) come from? It's from a pool of
+available memory that was created before your program runs; it's called
+the \EMPHASIZE{heap} or the \EMPHASIZE{free store}. Once you're done with using the value your
+pointer is pointing to you must release the memory back to the heap.
+This is called \EMPHASIZE{deallocating memory}. You do this:
+
+\begin{consolethree}[escapeinside=||]
+int * p = new int;
+... do something with p ...
+delete p;
+\end{consolethree}
+
+Note (yet again) that \texttt{delete p} releases the memory that \texttt{p} is pointing
+to; \texttt{p} itself is not somehow removed from the program until it goes out of
+scope. Therefore you can use it again:
+
+\begin{consolethree}[escapeinside=||]
+int * p = new int;
+... do something with p ...
+delete p;
+...
+p = new int;
+... do something else with p ...
+delete p;
+\end{consolethree}
+
+You can also get pointers to point to an array of values in the heap:
+
+\begin{consolethree}[escapeinside=||]
+int * p = new int[10];
+for (int i = 0; i < 10; ++i)
+{
+    p[i] = i * i;
+}
+for (int i = 0; i < 10; ++i)
+{
+    std::cout << p[i] << '\n';
+}
+delete[] p;
+\end{consolethree}
+
+Once \texttt{p} points to an array, you can use \texttt{p} like an array:
+
+\begin{consolethree}[escapeinside=||]
+int size = 42;
+p = new int[size];
+for (int i = 0; i < size; i++)
+{
+    |\EMPHASIZE{p[i]}| = i * i;
+}
+delete [] p; // <--- WARNING!!!
+\end{consolethree}
+
+The \EMPHASIZE{address} of the \texttt{i}-th value that \texttt{p} points to is \verb!p + i! and
+therefore the value of this value is \verb!*(p+i)!. So remember that the \texttt{i}-th
+value of the array that \texttt{p} points is is both \verb!p[i]! and \verb!*(p + i)!. They are
+the same. The preference is to use \verb!p[i]!.
+
+This is only a quick review. You should go over your previous notes on
+pointers. Now try this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+struct Time
+{
+    int hour;
+    int min;
+    int sec;
+};
+
+int main()
+{
+    Time * p = new Time;
+    (*p).hour = 5;
+    (*p).min = 18;
+    (*p).sec = 0;
+
+    std::cout << (*p).hour << ':'
+              << (*p).min << ':'
+              << (*p).sec << '\n';
+
+    delete p;
+    return 0;
+}
+\end{consolethree}
+
+And for an array of structs:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+struct Time
+{
+    int hour;
+    int min;
+    int sec;
+};
+
+int main()
+{
+    Time * p = new Time[3];
+
+    p[0].hour = 5;
+    p[0].min = 18;
+    p[0].sec = 0;
+
+    p[1].hour = 6;
+    p[1].min = 30;
+    p[1].sec = 45;
+
+    p[2].hour = 12;
+    p[2].min = 0;
+    p[2].sec = 0;
+
+    for (int i = 0; i < 3; ++i)
+    {
+        std::cout << p[i].hour << ':'
+                  << p[i].min << ':'
+                  << p[i].sec << '\n';
+    }
+
+    delete[] p;
+    return 0;
+}
+\end{consolethree}
+
+Read the code carefully. There is really no new concepts at all. While \texttt{p}
+is the pointer to a \texttt{Time} value, \verb!*p! is the actual \texttt{Time} value \texttt{p} is pointing
+to. Therefore
+
+\verb!(*p).hour!
+
+is the hour of the value \texttt{p} is pointing to. There is actually a shorthand
+notation for this. Note that \verb!(*p).hour! involves two operators: the \texttt{*} and
+the \texttt{.} operators. Let me emphasize that:
+
+\EMPHASIZE{\texttt{(*p).hour}}
+
+is the same as
+
+\EMPHASIZE{\texttt{p->hour}}
+
+The operator \texttt{->} is called the \EMPHASIZE{de-referencing operator}.
+Unfortunately \texttt{*} as in \verb!*p! is also called the de-referencing operator!!! You
+should use this instead of doing de-referencing-followed-by-the-dot-operator, i.e. write
+
+\EMPHASIZE{\texttt{p->hour}} \hspace{1cm} GOOD
+
+\EMPHASIZE{\texttt{(*p).hour}} \hspace{1cm} BAD
+
+Of course one quick question to ask is this. Suppose we omit the
+parentheses so that we have two operators, like this \verb!*x.y!. Which
+operator goes first? Is \verb!*x.y! really \verb!(*x).y! or is it \verb!*(x.y)!? The dot
+operator actually goes first. In other words \verb!*x.y! is really \verb!*(x.y)!.
+
+\begin{ex}
+Rewrite the above program with the \texttt{->} operator.
+\end{ex}
+
+Now try this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <iomanip>
+
+int main()
+{
+  struct Time
+  {
+    int hour;
+    int min;
+    int sec;
+  };
+
+  Time t0;
+  t0.hour = 5;
+  t0.min = 18;
+  t0.sec = 0;
+
+  std::cout
+    << std::setw(2) << std::setfill('0') << t0.hour
+    << ':'
+    << std::setw(2) << std::setfill('0') << t0.min
+    << ':'
+    << std::setw(2) << std::setfill('0') << t0.sec
+    << std::endl;
+
+  Time * p = new Time[100];
+
+  for (int i = 0; i < 100; i++)
+  {
+    p[i] = t0;
+    p[i].sec++;
+    std::cout
+      << std::setw(2) << std::setfill('0') << p[i].hour
+      << ':'
+      << std::setw(2) << std::setfill('0') << p[i].min
+      << ':'
+      << std::setw(2) << std::setfill('0') << p[i].sec
+      << std::endl;
+  }
+
+  delete [] p;
+
+  return 0;
+}
+\end{consolethree}
+
+Study the code carefully. Again there is really no new concept.
+
+\begin{ex}
+Refer to a previous exercise on the \texttt{Fraction} struct:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+struct Fraction
+{
+    int numerator;
+    int denominator;
+}
+
+void print(Fraction f)
+{
+}
+
+int main()
+{
+    Fraction x;
+    // assign values to the members of x so that
+    // it models the fraction 2/3
+
+    print(x);
+
+    return 0;
+}
+\end{consolethree}
+
+Modify this program and prompt the user for \texttt{size} (an integer). Declare a
+pointer \texttt{Fraction} and allocate an array of \texttt{Fraction}s to this pointer;
+the size of this array is given by \texttt{size}. In a for-loop, put random fractions
+into the array (there is one value you should avoid in the
+denominators ...) Print all the fractions. Deallocate memory used by the
+pointer.
+\end{ex}
+
+
+\newpage\EMPHASIZE{Functions}
+
+Look at this again:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+struct Fraction
+{
+    int num;
+    int denom;
+};
+
+void print(Fraction f)
+{
+    std::cout << f.num << '/' << f.denom;
+}
+
+int main()
+{
+    Fraction x;
+    x.num = 1;
+    x.denom = 2;
+    print(x);
+    return 0;
+}
+\end{consolethree}
+
+\begin{ex}
+Write a function to print the values of a \texttt{Time} variable:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <iomanip>
+
+|\EMPHASIZE{void print(Time t)}|
+|\EMPHASIZE{\{}|
+|\EMPHASIZE{\}}|
+
+int main()
+{
+  struct Time
+  {
+    int hour;
+    int min;
+    int sec;
+  };
+
+  Time t0;
+  t0.hour = 5;
+  t0.min = 18;
+  t0.sec = 0;
+
+  print(t0);
+
+  return 0;
+}
+\end{consolethree}
+
+(Where must the struct definition be?)
+\end{ex}
+
+Once you use a function for passing variables of a certain type you
+immediately ask if the parameters (the variables in the function) can
+modify the values in the calling function ... try this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <iomanip>
+
+// Time struct here
+
+void print(Time t)
+{
+}
+
+|\EMPHASIZE{void init(Time t)}|
+|\EMPHASIZE{\{}|
+|  \EMPHASIZE{t.hour = t.min = t.sec = 0;}|
+|\EMPHASIZE{\}}|
+
+int main()
+{
+
+  Time t0;
+  t0.hour = 5;
+  t0.min = 18;
+  t0.sec = 0;
+
+  print(t0);
+  |\EMPHASIZE{init(t0);}|
+  |\EMPHASIZE{print(t0);}|
+
+  return 0;
+}
+\end{consolethree}
+
+\EMPHASIZE{By default, structs are not passed by
+reference}. Recall that functions can modify an array which is
+passed in. Therefore arrays are passed by reference by default. This is
+another difference between an array and a struct variable.
+
+To really change the variable in the calling function you can do two things
+(see your earlier notes): using references or using pointers. Here's the
+version that uses references
+:
+
+\begin{consolethree}[escapeinside=||]
+|\EMPHASIZE{void init(Time \& t)}|
+|\EMPHASIZE{\{}|
+|  \EMPHASIZE{t.hour = t.min = t.sec = 0;}|
+|\EMPHASIZE{\}}|
+
+int main()
+{
+  Time t0;
+  t0.hour = 5;
+  t0.min = 18;
+  t0.sec = 0;
+
+  print(t0);
+  |\EMPHASIZE{init(t0);}|
+  |\EMPHASIZE{print(t0);}|
+
+  return 0;
+}
+\end{consolethree}
+
+And here's an initialization using pointers::
+
+\begin{consolethree}[escapeinside=||]
+...
+
+|\EMPHASIZE{void init2(Time * t)}|
+|\EMPHASIZE{\{}|
+|  \EMPHASIZE{t->hour = t->min = t->sec = 0;}|
+|\EMPHASIZE{\}}|
+
+int main()
+{
+  ...
+
+  print(t0);
+  |\EMPHASIZE{init2(\&t0);}|
+  print(t0);
+
+  return 0;
+}
+\end{consolethree}
+
+
+\newpage\EMPHASIZE{Pass by Constant Reference}
+
+You know that since \texttt{struct} variables are passed by value, they
+can't be changed by function call unless if passed by reference. Now look at
+your print function:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <iomanip>
+
+// Time structure here
+
+|\EMPHASIZE{void print(Time t)}|
+|\EMPHASIZE{\{}|
+|\EMPHASIZE{\}}|
+
+int main()
+{
+  ...
+  return 0;
+}
+\end{consolethree}
+
+This does work since the \texttt{print()} function should not change the value
+of the variable passed in anyway. However a \texttt{struct} variable by nature
+tends to contains lots of values. If you pass by value, the values will be
+copied to the receiving parameter. This takes time. Therefore you can
+pass by reference to save time. Pass by reference will not result in
+values being copied. Therefore we can do this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <iomanip>
+
+// Time structure here
+
+|\EMPHASIZE{void print(Time \& t)}|
+|\EMPHASIZE{\{}|
+|\EMPHASIZE{\}}|
+
+int main()
+{
+  ...
+  return 0;
+}
+\end{consolethree}
+
+Now the danger is that you (or someone working with you on the same
+project) might accidentally change the value of \texttt{t} in the \texttt{print()}
+function:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <iomanip>
+
+// Time structure here
+
+void print(Time & t)
+{
+    |\EMPHASIZE{t.hour = 0; // YIKES!!!}|
+}
+
+...
+\end{consolethree}
+
+So one way to prevent that and at the same time passing a \texttt{Time}
+variable by reference for speed is to make the parameter a
+\EMPHASIZE{constant reference}:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <iomanip>
+
+// Time structure here
+
+void print(|\EMPHASIZE{const}| Time |\EMPHASIZE{\&}| t)
+{
+}
+
+...
+\end{consolethree}
+
+In summary
+\begin{itemize}
+\item \EMPHASIZE{Struct parameters} should be \EMPHASIZE{pass by
+reference}
+\item If a function \EMPHASIZE{should not change} the values of a
+\EMPHASIZE{struct parameter}, then the parameter should be a
+\EMPHASIZE{constant reference}.
+\end{itemize}
+
+\begin{ex}
+Recall the following struct:
+
+\begin{consolethree}[escapeinside=||]
+struct Fraction
+{
+    int numerator;
+    int denominator;
+}
+\end{consolethree}
+
+Write a \texttt{print()} function for this struct. Make sure you use pass-by-constant-reference.
+\end{ex}
+
+\begin{ex}
+Write a function that checks if a \texttt{Time} struct parameter is
+valid. The boolean value \texttt{true} is returned if the value is correct, i.e. the
+hour is between 0 and 23 (inclusive), the minute is between 0 and 59
+(inclusive), and the second is between 0 and 23 (inclusive). The name of
+the function is \texttt{isValid}. [Question: Does the function change the value
+of the parameter? What type of parameter-passing should you use?]
+\end{ex}
+
+
+\newpage\EMPHASIZE{Struct return values}
+
+You already know that functions can only return one value at one time.
+So something like this is \EMPHASIZE{WRONG}:
+
+\begin{consolethree}[escapeinside=||]
+int, int squareAndCube(int x)
+{
+  return x*x, x*x*x; // trying to return a square
+                     // and a cube ...
+}
+\end{consolethree}
+
+In other words you cannot return two values at the same time.
+
+However all the values of the member variables inside a struct variable is
+considered a single value. So this is OK:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <iomanip>
+
+// Time struct
+
+// print function
+
+|\EMPHASIZE{Time}| addOneSec(const struct Time & t0)
+{
+  |\EMPHASIZE{struct Time t = t0;}|
+  t.sec++;
+  if (t.sec >= 60)
+  {
+    t.min += t.sec / 60;
+    t.sec %= 60;
+    if (t.min >= 60)
+    {
+      t.hour += t.min / 60;
+      t.min %= 60;
+      if (t.hour >= 24)
+      {
+        t.hour %= 24;
+      }
+    }
+  }
+  |\EMPHASIZE{return t;}|
+}
+
+int main()
+{
+  struct Time t0 = {5, 18, 0}; // 05:18:00 hours
+
+  ...
+
+  |\EMPHASIZE{t0 = addOneSec(t0);}|
+  |\EMPHASIZE{print(t0);}|
+
+  return 0;
+}
+\end{consolethree}
+
+\begin{ex}
+Write a multiply function that returns the product of
+two \texttt{Fraction} values.
+\end{ex}
+
+\begin{ex}
+Write a divide function that returns the quotient of
+two \texttt{Fraction} values.
+\end{ex}
+
+\begin{ex}
+Write a subtract function that returns the difference of
+two \texttt{Fraction} values.
+\end{ex}
+
+
+\newpage\EMPHASIZE{Header Files}
+
+A \texttt{struct} that is used by different programs can of course be kept in a
+header file. Function prototypes for functions related to the \texttt{struct} can
+be placed in the header file. And of course the implementation of the
+functions are in a cpp file.
+
+\begin{ex}
+Rewrite this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <iomanip>
+
+// Time struct
+
+// print function
+
+Time addOneSec(const struct Time & t0)
+{
+  struct Time t = t0;
+  t.sec++;
+  if (t.sec >= 60)
+  {
+    t.sec %= 60;
+    t.min += t.sec / 60;
+    if (t.min >= 60)
+    {
+      t.min %= 60;
+      t.hour += t.min / 60;
+      if (t.hour >= 24)
+      {
+        t.hour %= 24;
+      }
+    }
+  }
+  return t;
+}
+
+int main()
+{
+  struct Time t0 = {5, 18, 0}; // 05:18:00 hours
+
+  ...
+
+  t0 = addOneSec(t0);
+  print(t0);
+
+  return 0;
+}
+\end{consolethree}
+
+So that it looks like this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <iomanip>
+#include "Time.h"
+
+int main()
+{
+  struct Time t0 = {5, 18, 0}; // 05:18:00 hours
+
+  ...
+
+  |\EMPHASIZE{t0 = addOneSec(t0);}|
+  |\EMPHASIZE{print(t0);}|
+
+  return 0;
+}
+\end{consolethree}
+
+Of course you need a \texttt{Time.h} and a \texttt{Time.cpp}.
+\end{ex}
+
+
+\newpage\EMPHASIZE{Nested struct}
+
+A \texttt{struct} definition contains variable of any type. Since a \texttt{struct} itself
+is a type ... \EMPHASIZE{you can put a \texttt{struct} in a
+struct!!!!}
+
+Try this:
+
+\begin{consolethree}[escapeinside=||]
+struct StopWatch
+{
+    int ID;
+    Time time;
+};
+
+StopWatch s;
+s.ID = 0;
+s.time.hour = 5;
+s.time.min = 18;
+s.time.sec = 0;
+\end{consolethree}
+
+\EMPHASIZE{Nothing to it right?}
+
+\begin{ex}
+Write a \texttt{Date} struct containing month, day, year integers and
+a \texttt{Time} struct containing hour, minute, second integers. Finally create a
+\texttt{DateTime} struct that contains the date of \texttt{Date} type and time of the
+\texttt{Time} type. Write a \texttt{print()} function for \texttt{Date}, \texttt{Time}, and \texttt{DateTime}
+types. The \texttt{print()} function for \texttt{DateTime} should be the \texttt{print()}
+from \texttt{Date} and \texttt{Time}.
+\end{ex}
+
+\begin{ex}
+Given
+
+\begin{consolethree}[escapeinside=||]
+struct X
+{
+    int x;
+    int * y;
+    int z;
+};
+
+struct Y
+{
+    int * x;
+    X * y;
+    int * z;
+};
+
+struct Z
+{
+    X * x;
+    Y * y;
+    int * z;
+};
+\end{consolethree}
+
+and \texttt{x}, \texttt{y}, \texttt{z}, \texttt{w} are variables of type \texttt{X}, \texttt{Y}, \texttt{Z}, \texttt{Z*} respectively. Which of the
+following is valid:
+\begin{itemize}
+\item \verb!std::cout << x.x + 2;!
+\item \verb!x.y = new int;!
+\item \verb!x.z = new int[10];!
+\item \verb!delete [] y.z;!
+\item \verb!y.x = x.y;!
+\item \verb!std::cout << y->y.x;!
+\item \verb!std::cout << y.y->x;!
+\item \verb!std::cout << z.y->x;!
+\item \verb!std::cout << z->y->x;!
+\item \verb!std::cout << z.y->y->x;!
+\item \verb!std::cout << w->y->y.x;!
+\item \verb!std::cout << w->y->y->x;!
+\end{itemize}
+\end{ex}
+
+Note that if there are several \texttt{->} operators in a chain, then the evaluation
+goes left-to-right. In other words:
+
+\verb!a->b->c->d!
+
+is the same as
+
+\verb!((a->b)->c)->d!
+
+And remember that \texttt{.} goes before \texttt{->}. So
+
+\verb!a->b->c.d!
+
+is really the same as
+
+\verb!a->b->(c.d)!

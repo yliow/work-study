@@ -104,17 +104,17 @@ OK. Before you swear at C++, rewrite this program like this:
 \begin{consolethree}[escapeinside=||]
 #include <iostream>
 
-template < typename T >
-void println(T x)
+|\EMPHASIZE{template < typename T >}|
+void println(|\EMPHASIZE{T}| x)
 {
     std::cout << x << std::endl;
 }
 
 int main()
 {
-    println< int >(1);
-    println< double >(3.14);
-    println< char >('c');
+    println|\EMPHASIZE{< int >}|(1);
+    println|\EMPHASIZE{< double >}|(3.14);
+    println|\EMPHASIZE{< char >}|('c');
     return 0;
 }
 \end{consolethree}
@@ -132,29 +132,28 @@ void println(T x)
 }
 \end{consolethree}
 
-is called a \textbf{function template}. It's actually
+is called a \EMPHASIZE{function template}. It's actually
 not a function. It's like a rubber stamp for producing
-functions. You should think of the \textbf{T} as a \textbf{type
-variable} for the compiler. Here's how the compiler use
+functions. You should think of the \EMPHASIZE{T} as a \EMPHASIZE{type variable} for the compiler. Here's how the compiler use
 this \texttt{T}. When the compiler see this statement in your program:
 
 \begin{consolethree}[escapeinside=||]
 ...
-println< int >(1);
+println|\textbf{< int >}|(1);
 ...
 \end{consolethree}
 
 it (i.e., the compile) says: ``Aha! So you need
-\texttt{println\textbf{< int >}}.
+\texttt{println\EMPHASIZE{< int >}}.
 OK I'll take the rubber stamp \texttt{println} (i.e. the
-function template) and create one with \textbf{T} replaced by
-\textbf{int}.''
+function template) and create one with \EMPHASIZE{T} replaced by
+\EMPHASIZE{int}.''
 
 In other words C++ will insert this into the program:
 
 \begin{consolethree}[escapeinside=||]
 ...
-void println(int x)
+void println(|\EMPHASIZE{int}| x)
 {
     std::cout << x << std::endl;
 }
@@ -164,21 +163,21 @@ void println(int x)
 It might be better to think of the instantiated function as:
 
 \begin{consolethree}[escapeinside=||]
-template <>
-void println(int x)
+|\textbf{template <>}|
+void println(|\textbf{int}| x)
 {
     std::cout << x << std::endl;
 }
 \end{consolethree}
 
 This ``production of a C++ function'' by a function template is called a
-\textbf{function instantiation}. Note that if
+\EMPHASIZE{function instantiation}. Note that if
 \texttt{println< char * >()} was not called, the
-following function will \textbf{not} appear in your program:
+following function will \EMPHASIZE{not} appear in your program:
 
 \begin{consolethree}[escapeinside=||]
 ...
-template <>
+|\textbf{template <>}|
 void println(char * x)
 {
     std::cout << x << std::endl;
@@ -190,27 +189,16 @@ Note that the function template itself is actually not included in the
 binary executable code that is executed. It's only used
 as a rubber stamp by the compiler for creating actual functions.
 
-Writing function templates is sort of like writing \textbf{code that
-\textit{produces} code}. Specifically a function
-template can produce functions. This style of programming is called
-\textbf{generic programming}. Templates also lead to something called
-\textbf{metaprogramming}, but I won't get into that because that's
-beyond the scope of basic programming.
+Writing function templates is sort of like writing \EMPHASIZE{code that \underline{produces} code}. Specifically a function template can produce functions. This style of programming is called \EMPHASIZE{generic programming}. Templates also lead to something called \EMPHASIZE{metaprogramming}, but I won't get into that because that's beyond the scope of basic programming.
 
 Do you see the power of function templates?
 
-The variable type \texttt{T} (usually called a \textbf{type parameter})
-can appear anywhere in the function template, not just in the function
-header. Below is an example where the type parameter appears as a return
-type.
+The variable type \texttt{T} (usually called a \EMPHASIZE{type parameter}) can appear anywhere in the function template, not just in the function header. Below is an example where the type parameter appears as a return type.
 
-Another thing to remember is that you can use any identifier name for
-the type parameter. I used \texttt{T}. You can use \texttt{X} if you like.
-But the practice is to use a single uppercase letter.
+Another thing to remember is that you can use any identifier name for the type parameter. I used \texttt{T}. You can use \texttt{X} if you like. But the practice is to use a single uppercase letter.
 
 \begin{ex}
-In this example the same type parameter appears as a
-\textbf{return type}. You are given the following program:
+In this example the same type parameter appears as a \EMPHASIZE{return type}. You are given the following program:
 
 \begin{consolethree}[escapeinside=||]
 #include <iostream>
@@ -256,7 +244,7 @@ parameterized (made into a variable) is in bold and larger font.
 \begin{consolethree}[escapeinside=||]
 #include <iostream>
 
-int addOne(int x)
+|\EMPHASIZE{int}| addOne(|\EMPHASIZE{int}| x)
 {
     return x + 1;
 }
@@ -264,11 +252,13 @@ int addOne(int x)
 int main()
 {
     int a = 1;
-    std::cout << addOne< int >(a) << '\n';
-    std::cout << addOne< double >(3.3) << '\n';
-    std::cout << addOne< char >('c') << '\n';
-    int * p = new int;
-    std::cout << addOne< int * >(p) << '\n';
+    std::cout << addOne|\textbf{< int >}|(a) << '\n';
+    |\textbf{std::cout << addOne< double >(3.3) << '\textbackslash n';}|
+    |\textbf{std::cout << addOne< char >('c') << '\textbackslash n';}|
+
+    |\textbf{int * p = new int;}|
+    |\textbf{std::cout << addOne< int * >(p) << '\textbackslash n';}|
+
     return 0;
 }
 \end{consolethree}
@@ -279,6 +269,7 @@ operator, i.e. if \texttt{x} in either an \texttt{int}, or a \texttt{double},
 or a char, or an \texttt{int*}, the following makes sense in C++:
 
 \verb!x + 1;!
+
 \end{ex}
 
 \begin{ex}
@@ -313,9 +304,9 @@ font.
 \begin{consolethree}[escapeinside=||]
 #include <iostream>
 
-void swap(int & x, int & y)
+void swap(|\EMPHASIZE{int}| & x, |\EMPHASIZE{int}| & y)
 {
-    int temp;
+    |\EMPHASIZE{int}| temp;
     temp = x;
     x = y;
     y = temp;
@@ -413,30 +404,30 @@ bool arrayEqual2(double x[], double y[])
 
 Uh oh ... what about comparing array of booleans? Or characters? Etc.
 
-Now try \textbf{this}:
+Now try \textbf{\textit{this}}:
 
 \begin{consolethree}[escapeinside=||]
 #include <iostream>
 
-template < typename T >
-bool arrayEqual(T[], int, T[], int);
+|\EMPHASIZE{template < typename T >}|
+|\EMPHASIZE{bool arrayEqual(T[], int, T[], int);}|
 
 int main()
 {
     int x[] = {1, 2, 3};
     int y[] = {1, 2, 3};
-    std::cout << arrayEqual< int >(x, 3, y, 3)
+    std::cout << arrayEqual|\textbf{< int >}|(x, 3, y, 3)
               << std::endl;
 
     double a[] = {1.2, 3.4, 5.6};
     double b[] = {2.1, 4.3, 6.5};
-    std::cout << arrayEqual< double >(a, 3, b, 3)
+    std::cout << arrayEqual|\EMPHASIZE{< double >}|(a, 3, b, 3)
               << std::endl;
     return 0;
 }
 
-template < typename T >
-bool arrayEqual(T x[], int xSize, T y[], int ySize)
+|\EMPHASIZE{template < typename T >}|
+bool arrayEqual(|\textbf{T}| x[], int xSize, |\textbf{T}| y[], int ySize)
 {
     if (xSize == ySize)
     {
@@ -475,21 +466,20 @@ elements of type T. The elements of the two arrays appear in the code as
 bool arrayEqual(T x[], int xSize, T y[], int ySize)
 {
     ...
-    if (x[i] != y[i])
+    |\EMPHASIZE{if (x[i] != y[i])}|
     ...
 }
 \end{consolethree}
 
-As long as the \textbf{!=} makes sense for type
-\textbf{T}, C++ will be able to generate the actual function.
+As long as the \EMPHASIZE{!=} makes sense for type \EMPHASIZE{T}, C++ will be able to generate the actual function.
 
 For instance you can compare characters using !=. Therefore you can
 
 \begin{consolethree}[escapeinside=||]
 ...
-char s[] = {'a', 'b', 'c'};
-char t[] = {'a', 'b', 'c'};
-std::cout << arrayEqual< char >(x, 3, y, 3)
+|\EMPHASIZE{char}| s[] = {'a', 'b', 'c'};
+|\EMPHASIZE{char}| t[] = {'a', 'b', 'c'};
+std::cout << arrayEqual< |\EMPHASIZE{char}| >(x, 3, y, 3)
           << std::endl;
 ...
 \end{consolethree}
@@ -600,13 +590,12 @@ int main()
 (Of course for the last function there is a typecast from the two
 doubles 1.1 and 2.2 into integers).
 
-And here's an example where a template parameter is
-actually is an \textbf{int} value:
+And here's an example where a template parameter is actually is an \EMPHASIZE{int} value:
 
 \begin{consolethree}[escapeinside=||]
 #include <iostream>
 
-template < typename T, int S >
+template < typename T, |\EMPHASIZE{int}| S >
 T eggs(T x)
 {
     return x + S;
@@ -622,9 +611,7 @@ int main()
 }
 \end{consolethree}
 
-So now you know that a template parameter is declared with the word
-\textbf{``typename''} if it is a type and if it is an integer value you
-use the word \textbf{``int''}.
+So now you know that a template parameter is declared with the word \EMPHASIZE{``typename''} if it is a type and if it is an integer value you use the word \EMPHASIZE{``int''}.
 
 \begin{ex}
 Can you have a template parameter that is a char? A
@@ -714,32 +701,39 @@ The big question is ... what's the difference between the two? Why
 does C++ allow integer template parameters?
 
 Well for the first version, an example of a function call is this:
-
-\verb!max< int >(x, 10);!
-
+\begin{console}
+max< int >(x, 10);
+\end{console}
 For the second version , an example of a function call is this:
 
-\verb!max< int, 10 >(x);!
+\begin{console}
+max< int, 10 >(x);
+\end{console}
 
-In the second case, the \textbf{int 10} is not passed into the
-function.
+In the second case, the \EMPHASIZE{int 10} is not passed into the function.
 
-Review the \textbf{very important} pages in the first chapter on
+Review the \EMPHASIZE{very important} pages in the first chapter on
 functions where I did a trace. When you call a function, in your CPU,
 the program has to put the arguments for a function call into the
 function call stack. The first version has to put two values into the
 stack. The second version has to put one value into the stack:
 
-\verb!max< int >(x, 10);!
+\begin{consolethree}[escapeinside=||]
+max< int >(|\EMPHASIZE{x}, \EMPHASIZE{10}|);
+\end{consolethree}
 
-\verb!max< int, 10 >(x);!
+\begin{consolethree}[escapeinside=||]
+max< int, 10>(|\EMPHASIZE{x}|);
+\end{consolethree}
 
 See it? This is the benefit.
 
 However there's a disadvantage. Recall that if you make the following
 function call in your code:
 
-\verb!max< int, 10 >(x);!
+\begin{console}
+max< int, 10 >(x);
+\end{console}
 
 then your compiler will instantiate (i.e., create) the functions
 
@@ -753,7 +747,9 @@ int max< int, 10 >(int x[])
 
 If you also have
 
-\verb!max< double, 20 >(y);!
+\begin{console}
+max< double, 20 >(y);
+\end{console}
 
 then your compiler will also instantiate
 
@@ -801,8 +797,7 @@ that a function template parameter can accept a pointer type.
 Here's a very common gotcha. (I see this all the time.)
 
 When you organize your template functions, you should remember to
-include the \textbf{body of the function template in the header file}
-not a cpp file. That's because function templates are inline functions.
+include the \EMPHASIZE{body of the function template in the header file} not a cpp file. That's because function templates are inline functions.
 
 \begin{ex}
 Write a header file \texttt{array.h} so that the following
@@ -976,7 +971,7 @@ with code like this:
 
 And now you have a problem because the >> as in
 
-\verb!someFunction<someType<int>>(...);!
+\texttt{someFunction<someType<int\EMPHASIZE{>>}(...);}
 
 is the input operator!!! (Also known as the stream insertion operator.)
 To make matters worse, the error message you get in such cases tend to
@@ -989,12 +984,7 @@ when used in the context of templates.
 
 (ASIDE: The new C++0x standard, published since 2011, stipulates that a
 2011-compliant C++ compiler should parse nested templates correctly. So
-something like
-\texttt{someFunction<someType<int>>(...)}
-should be fine for such a compiler. But to be absolutely safe, I suggest
-you follow the practice as stated above and use a space to separate the
-two \textbf{>>}. That way your C++ code
-will compile on both new and old compilers.)
+something like \texttt{someFunction<someType<int\EMPHASIZE{>>}(...)} should be fine for such a compiler. But to be absolutely safe, I suggest you follow the practice as stated above and use a space to separate the two \EMPHASIZE{>>}. That way your C++ code will compile on both new and old compilers.)
 
 
 \newpage\EMPHASIZE{Non-deducible context and ambiguity}
@@ -1018,14 +1008,14 @@ int main()
 }
 \end{consolethree}
 
-In this case, T can be \textbf{int}, But note that it can also be
-\textbf{double} since
+In this case, T can be \EMPHASIZE{int}, But note that it can also be
+\EMPHASIZE{double} since
 
-C++ allows automatic typecasting from \textbf{int} to
-\textbf{double}.
+C++ allows automatic typecasting from \EMPHASIZE{int} to
+\EMPHASIZE{double}.
 
 In these cases, you have to explicit specify the substitution for
-\textbf{T}:
+\EMPHASIZE{T}:
 
 \begin{consolethree}[escapeinside=||]
 template < typename T >
@@ -1036,7 +1026,7 @@ T f(int x)
 
 int main()
 {
-    f< int >(42);
+    f|\EMPHASIZE{< int >}|(42);
     return 0;
 }
 \end{consolethree}
@@ -1088,8 +1078,7 @@ loop to the top of the loop. (This will be clarified in CISS360.) For
 the case of size = 1, using a for-loop will make the function call about
 5 times slower!
 
-C++ allows you to specify special cases for a function template. These
-are called \textbf{template specializations}.
+C++ allows you to specify special cases for a function template. These are called \EMPHASIZE{template specializations}.
 
 Run this:
 
@@ -1102,11 +1091,11 @@ T sum(T x[])
     ...
 }
 
-template <>
-int sum< int, 0 >(int x[])
-{
-    return x[0];
-}
+|\EMPHASIZE{template <>}|
+|\EMPHASIZE{int sum< int, 0 >(int x[])}|
+|\EMPHASIZE{\{}|
+    |\EMPHASIZE{return x[0];}|
+|\EMPHASIZE{\}}|
 
 int main()
 {
@@ -1114,40 +1103,35 @@ int main()
 }
 \end{consolethree}
 
-I've added a specialization of the \textbf{sum} function template
-for the case when \textbf{T = int} and \textbf{SIZE = 0}.
+I've added a specialization of the \EMPHASIZE{sum} function template for the case when \EMPHASIZE{T = int} and \EMPHASIZE{SIZE = 0}.
 
 \begin{ex}
 Add 3 more specializations to the above sum function template:
 
 \begin{itemize}
-\item \textbf{T = int} and \textbf{SIZE = 2}
-\item \textbf{T = double} and \textbf{SIZE = 1}
-\item \textbf{T = double} and \textbf{SIZE = 2}
+\item \EMPHASIZE{T = int} and \EMPHASIZE{SIZE = 2}
+\item \EMPHASIZE{T = double} and \EMPHASIZE{SIZE = 1}
+\item \EMPHASIZE{T = double} and \EMPHASIZE{SIZE = 2}
 \end{itemize}
 
-Insert print statements into the \textbf{sum} function template
+Insert print statements into the \EMPHASIZE{sum} function template
 and its specialization to verify that you are indeed calling the right
 function.
 \end{ex}
 
-The above specialization is called a \textbf{full specialization}. For
-templates, there's a concept of \textbf{partial specialization}. The
+The above specialization is called a \EMPHASIZE{full specialization}. For
+templates, there's a concept of \EMPHASIZE{partial specialization}. The
 syntax would be something like this:
 
 \begin{consolethree}[escapeinside=||]
-template < typename T >
-T sum< T, 0 >(int x[])
-{
-    return x[0];
-}
+\EMPHASIZE{template < typename T >}|
+\EMPHASIZE{T sum< T, 0 >(int x[])}|
+\EMPHASIZE{\{}|
+    \EMPHASIZE{return x[0];}|
+\EMPHASIZE{\}}|
 \end{consolethree}
 
-i.e., only \texttt{SIZE} has been specialized to \texttt{0}. However the
-above \textbf{does not compile} because \textbf{currently partial
-specialization is not supported for function templates}. (However it is
-supported for struct templates and class templates -- see later chapters
-for struct and classes.)
+i.e., only \texttt{SIZE} has been specialized to \texttt{0}. However the above \EMPHASIZE{does not compile} because \EMPHASIZE{currently partial specialization is not supported for function templates}. (However it is supported for struct templates and class templates -- see later chapters for struct and classes.)
 
 This is a bummer since if we do have partial specialization for function
 templates, we'll be writing less code.
@@ -1162,8 +1146,7 @@ int sum< int, 0 >(int x[])
 }
 \end{consolethree}
 
-Is not a template anymore. It's a regular function. Therefore for
-multi-file compilation,
+Is not a template anymore. It's a regular function. Therefore for multi-file compilation,
 
 \begin{itemize}
 \item You can put that in a cpp file and put the prototype in the header
@@ -1171,14 +1154,10 @@ multi-file compilation,
 \item You can inline the function and put the above in the header file.
 \end{itemize}
 
-The standard practice for creating specializations is to create them for
-frequently used cases where you want speed. For instance, you probably
-do NOT want to have specializations for int sum< int, 0
->, int sum< int, 1 >, int sum< int, 2
->, ..., int sum< int, 99 >!!!
+The standard practice for creating specializations is to create them for frequently used cases where you want speed. For instance, you probably do NOT want to have specializations for \verb!int sum< int, 0 >, int sum< int, 1 >, int sum< int, 2 >, ..., int sum< int, 99 >!!!!
 
 \begin{ex}
-Test putting your \textbf{sum} function
+Test putting your \EMPHASIZE{sum} function
 templates and its 4 specializations into a header file as inline
 function. Make sure you can compile your program.
 \end{ex}
@@ -1216,13 +1195,13 @@ specializations similar to the \texttt{sum} function template.
 You can model a 2D point as an array of two numbers:
 \{2, 3\}. In general you want to model points of dimension 1, 2, 3, 4,
 ... In physics, engineering, computer vision, etc, it's common to
-have points with coordinate which are \textbf{float}s or
-\textbf{double}s. Technically speaking I'm talking about
+have points with coordinate which are \EMPHASIZE{float}s or
+\EMPHASIZE{double}s. Technically speaking I'm talking about
 ``vectors'' and not ``points''. One common operation is to add vectors
 of the same dimension. For instance
-
+\begin{center}
 \{2, 3\} + \{1, 6\} = \{2+1, 3+6\}
-
+\end{center}
 Write a function template so that you can run the following:
 
 \begin{consolethree}[escapeinside=||]
@@ -1262,5 +1241,3 @@ array_println< char >(&z[0], &z[5]);
 // prints abcde and '\n'
 \end{consolethree}
 \end{ex}
-
-\end{document}

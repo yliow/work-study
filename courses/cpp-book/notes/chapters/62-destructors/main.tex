@@ -89,8 +89,8 @@ Now ...
 
 \newpage\EMPHASIZE{Automatic objects and automatic reclaim of memory}
 
-What happens when an \textbf{object} goes out of scope? Memory of all
-\textbf{automatic instance variables} of the object will be reclaimed
+What happens when an \EMPHASIZE{object} goes out of scope? Memory of all
+\EMPHASIZE{automatic instance variables} of the object will be reclaimed
 automatically:
 
 \begin{consolethree}[escapeinside=||]
@@ -166,8 +166,8 @@ if (x > 0)
 \newpage\EMPHASIZE{Destructors!!!}
 
 However, in general, some objects are more complicated and might need
-special \textbf{``cleaning up''}. This is because some objects
-\textbf{acquire resources (such as memory) which are not automatically
+special \EMPHASIZE{``cleaning up''}. This is because some objects
+\EMPHASIZE{acquire resources (such as memory) which are not automatically
 released}.
 
 Here's an example:
@@ -207,7 +207,7 @@ int main()
 What's the problem? Note that \texttt{thing.y\_} has
 requested for memory in the constructor. So I really need to execute
 
-\textbf{\texttt{delete thing.y\_;}}
+\EMPHASIZE{\texttt{delete thing.y\_;}}
 
 before \texttt{thing} goes out of scope!!! In other words I should do
 something like this:
@@ -239,10 +239,10 @@ class Thingy
 {
 public:
     ...
-    void cleanup()
-    {
-        delete y_;
-    }
+    |\EMPHASIZE{void cleanup()}
+    |\EMPHASIZE{\{}|
+        |\EMPHASIZE{delete y_;}|
+    |\EMPHASIZE{\}}|
     ...
 };
 
@@ -253,7 +253,8 @@ int main()
     {
         Thingy thing;
         // do something with thing
-        thing.cleanup();
+        
+        |\EMPHASIZE{thing.cleanup();}|
     }
     return 0;
 }
@@ -264,8 +265,8 @@ But what if I forget?
 WAIT ... don't even do that!!! The destructor comes
 to the rescue!!!
 
-A \textbf{destructor} is a member function that is
-\textbf{automatically called} when an object is about to be destroyed (i.e., about to
+A \EMPHASIZE{destructor} is a member function that is
+\EMPHASIZE{automatically called} when an object is about to be destroyed (i.e., about to
 go out of scope):
 
 \begin{consolethree}[escapeinside=||]
@@ -317,10 +318,10 @@ public:
     Thingy()             // memory allocation
         : y_(new char)   // during constructor call
     {}
-    ~Thingy()
-    {
-        delete y_;
-    }
+    |\EMPHASIZE{~Thingy()}|
+    |\EMPHASIZE{\{}|
+        |\EMPHASIZE{delete y_;}|
+    |\EMPHASIZE{\}}|
 private:
     int x_;     // x_ is automatic
     char * y_;  // y_ is automatic, but the *memory*
@@ -336,7 +337,9 @@ int main()
         Thingy thing; // memory for thing.x_,
                       // thing.y_, *(thing.y_)
                       // allocated.
+                      
         // do something with thing
+        
     } // At the end of the body of the if-statement,
       // memory for thing.x_, thing.y_ is reclaimed
       // automatically ...
@@ -377,11 +380,11 @@ public:
     Thingy()             // memory allocation
         : y_(new char)   // during constructor call
     {}
-    ~Thingy()
-    {
-        std::cout << "Thingy::~Thingy()\n";
-        delete y_;
-    }
+    |\EMPHASIZE{~Thingy()}|
+    |\EMPHASIZE{\{}|
+        |\EMPHASIZE{std::cout << "Thingy::~Thingy()\n";}|
+        |\EMPHASIZE{delete y_;}|
+    |\EMPHASIZE{\}}|
 private:
     int x_;     // x_ is automatic
     char * y_;  // y_ is automatic, but the *memory*
@@ -440,10 +443,10 @@ class Date
 {
 public:
     ...
-    ~Date()
-    {
-        std::cout << "Date::~Date ...\n";
-    }
+    |\EMPHASIZE{~Date()}|
+    |\EMPHASIZE{\{}|
+        |\EMPHASIZE{std::cout << "Date::~Date ...\n";}|
+    |\EMPHASIZE{\}}|
     ...
 }
 ...
@@ -475,11 +478,11 @@ does not have a destructor, how come the previous version can still
 compile and run??? Shouldn't your C++ compiler yell at
 you and tell you that \texttt{\~{}Date()} is not found???
 
-\textbf{No.}
+\EMPHASIZE{No.}
 
 Because ... if you don't specify a destructor for a
 class, the C++ compiler actually includes a do-nothing destructor in the
-class. This is the \textbf{default destructor}. The default destructor
+class. This is the \EMPHASIZE{default destructor}. The default destructor
 is a do-nothing method because it has an empty body:
 
 \begin{consolethree}[escapeinside=||]
@@ -548,8 +551,7 @@ int main()
 }
 \end{consolethree}
 
-So, remember this: \textbf{the order of destructor calls is always
-opposite to the order of constructor calls.}
+So, remember this: \EMPHASIZE{the order of destructor calls is always opposite to the order of constructor calls.}
 
 \begin{ex}
 Is it possible to call the destructor ``manually''?
@@ -640,7 +642,7 @@ when we execute \texttt{delete p}, then the object will call its
 destructor automatically. For the case of a pointer \texttt{p} pointing to
 an array of objects in the free store, when we execute \texttt{delete
 [] p}, each object in the array will call its destructor. Again: You
-do \textbf{not} call destructors explicitly. They are called
+do \EMPHASIZE{not} call destructors explicitly. They are called
 automatically. (In fact you cannot call destructors in your code.)
 
 \begin{consolethree}[escapeinside=||]
@@ -1002,7 +1004,7 @@ int main()
 \end{consolethree}
 
 In this case you can do the following: In the constructor, do NOT
-allocate memory but set the \textbf{relevant pointer} to NULL.
+allocate memory but set the \EMPHASIZE{relevant pointer} to NULL.
 
 Example:
 
