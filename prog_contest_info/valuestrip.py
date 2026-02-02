@@ -19,13 +19,13 @@ def print_all(small, medium, large):
 def find_skool(s, small, medium, large):
     search_term = s.lower()
     found = False
-
+    
     def search_list(category_name, school_list):
-        nonlocal found
-        for school in school_list:
-            if search_term in school.lower():
-                print(f"MATCH FOUND: {school} ({category_name})")
-                found = True
+      nonlocal found, search_term
+      for size, school in school_list:
+        if search_term in school.lower():
+          print(f"MATCH FOUND: {school}, SIZE = {size} ({category_name})")
+          found = True
 
     search_list("SMALL", small)
     search_list("MEDIUM", medium)
@@ -55,15 +55,21 @@ for i in lines:
     val = 0
   else:
     val = int(i[5])
-  
-  if val <= 500:
-    small.append(i[1])
-  elif 500 < val <= 1000:
-    medium.append(i[1])
-  else:
-    large.append(i[1])
-    
 
+  z = [val, i[1]]
+
+  if type(z[0]) != int:
+    x = z[0]
+    z[0] = z[1]
+    z[1] = x
+    
+  if val <= 500:
+    small.append(z)
+  elif 500 < val <= 1000:
+    medium.append(z)
+  else:
+    large.append(z)
+    
 while True:
   print("1. print all\n2. find size of school\n3. quit")
   option = int(input("enter option:"))
