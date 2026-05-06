@@ -879,7 +879,7 @@ First figure out the output (without a compiler) when x has a value of
 0.
 
 \begin{console}
-if (x  0)
+if (x < 0)
    if (x == -2) std::cout << "1" << std::endl;
 else
    std::cout << "2" << std::endl; 
@@ -893,7 +893,7 @@ This is called the \lq\lq dangling else'' problem.
 What actually happens is that an \texttt{else} always follows the closest
 \texttt{if}. This means that the above code is better indented this way:
 \begin{console}
-if (x  0)
+if (x < 0)
    if (x == -2) std::cout << "1" << std::endl;
    else
        std::cout << "2" << std::endl; 
@@ -906,7 +906,7 @@ human beings to follow the logic.
 Now if what I intended was actually something like the previous version,
 then I would have to do this:
 \begin{console}
-if (x  0)
+if (x < 0)
 {
    if (x == -2) std::cout << "1" << std::endl;
 }
@@ -922,7 +922,7 @@ use blocks even when the if-part or the else-part has only one line to
 execute. It prevents the misleading dangling else problem. So if I write
 this:
 \begin{console}
-if (x  0)
+if (x < 0)
 {
    if (x == -2)
    {
@@ -1361,7 +1361,7 @@ I also warn you again that type casting does not change the value of a
 variable:\\
 \begin{console}
 int x = 42;
-std::cout << (x \&\& 1) << std::endl;
+std::cout << (x && 1) << std::endl;
 std::cout << x << std::endl; 
 \end{console}
 
@@ -1449,11 +1449,11 @@ Run this with different values for variable x.
 Get the point of the \texttt{(?:)} operator yet? The format looks like
 this:
 \begin{center}
-\EMPHASIZE{(\texttt{[bool expr} ? \texttt{[expr1} : \texttt{[expr2})}
+\EMPHASIZE{(\texttt{[bool expr} ? \texttt{[expr1]} : \texttt{[expr2]})}
 \end{center}
-Basically, if the \texttt{[bool expr} (a boolean expression)
-evaluates to \texttt{true}, C++ will evaluate \texttt{[expr1} and give
-you its value; otherwise it gives you the value from \texttt{[expr2}.
+Basically, if the \texttt{[bool expr]} (a boolean expression)
+evaluates to \texttt{true}, C++ will evaluate \texttt{[expr1]} and give
+you its value; otherwise it gives you the value from \texttt{[expr2]}.
 
 Here's another example. First try to guess what the
 program does. Next run it to verify.
@@ -1486,7 +1486,7 @@ int die_roll = 1 + rand() % 6 ;
 std::cout << "value of die roll: " <<
           die_roll << '\n';
 std::cout << "You " 
-          << (die\_roll == 6 ? "win!" : "lose")
+          << (die_roll == 6 ? "win!" : "lose")
           << '\n'; 
 \end{console}
 Get it?
@@ -1555,7 +1555,7 @@ The if and if-else statement looks like these:
 \end{align*}
 
 where \texttt{[bool expr]} is a boolean expression and
-\texttt{[stmt, [stmt1]}, and \texttt{[stmt2]} are either
+\texttt{[stmt], [stmt1]}, and \texttt{[stmt2]} are either
 statements or blocks of statements.
 
 The else statement will always be associated with the closest if
@@ -1621,9 +1621,9 @@ Given for instance four variables \texttt{a}, \texttt{b}, \texttt{c}, and
 \texttt{b},\texttt{c} and \texttt{c},\texttt{d} to ensure that the largest value
 among \texttt{a}, \texttt{b}, \texttt{c}, \texttt{d} is in \texttt{d:}
 
-\tab[3em]{if (a > b) \{ swap values of a and b \}}\\
-\tab[3em]{if (b > c) \{ swap values of b and c \}}\\
-\tab[3em]{if (c > d) \{ swap values of c and d \}}\\
+\tab[3em]{if (a $>$ b) \{ swap values of a and b \}}\\
+\tab[3em]{if (b $>$ c) \{ swap values of b and c \}}\\
+\tab[3em]{if (c $>$ d) \{ swap values of c and d \}}\\
 
 This is called one pass of the sorting process. You can then apply the
 process to a, b, c for a second pass, and then to a, b for a third pass.
@@ -1644,11 +1644,11 @@ also automatic type type casting between bool and int or double:
 
 For instance the following is a valid C++ statement:
 \tab[3em]{if (1)}
-\tab[6em]{std::cout << "that's all folks";}
+\tab[6em]{std::cout $<<$ "that's all folks";}
 
 The ternary operator looks like this:
 \begin{center}
-(\texttt{[bool expr} ? \texttt{[expr1} : \texttt{[expr2})
+(\texttt{[bool expr]} ? \texttt{[expr1]} : \texttt{[expr2]})
 \end{center}
 This whole expression evaluates to \texttt{[expr1]} if \texttt{[bool
 expr]} is true; otherwise it evaluates to \texttt{[expr2]}.
@@ -1730,7 +1730,7 @@ if (max < [variable])
 \end{console}
 
 There's another \EMPHASIZE{TERRIBLE} way to do the above:
-\begin{console}
+\begin{consolethree}
 int w = 1, x = 3, y = 0, z = 5;
 if (w >= x && w >= y && w >= z)
     max = w;
@@ -1746,9 +1746,9 @@ else
             max = z;
       }
 }
-\end{console}
+\end{consolethree}
 
-Of course you can try to make it \lq\lq neater'':
+Of course you can try to make it ``neater'':
 \begin{console}
 int w = 1, x = 3, y = 0, z = 5;
 
@@ -1941,11 +1941,11 @@ correct answer was given. So instead of \lq\lq first answer is not correct'',
 we probably want \lq\lq \,\lq\lq answer is not correct'' that can be used or the second and third \lq\lq answer user for an answer''.
 
 \begin{align*}
-&\texttt{ask user for an answer}
-&\texttt{if answer is not correct}
-&\tab[3em]{\texttt{ask user for an answer}}
-&\texttt{if answer is not correct}
-&\tab[3em]{\texttt{ask user for an answer}}
+&\texttt{ask user for an answer}\\
+&\texttt{if answer is not correct}\\
+&\tab[3em]{\texttt{ask user for an answer}}\\
+&\texttt{if answer is not correct}\\
+&\tab[3em]{\texttt{ask user for an answer}}\\
 \end{align*}
 
 Let's make \lq\lq answer is not correct'' into a boolean variable:
@@ -2005,14 +2005,14 @@ stops. Therefore the sum is 6) and another
 
 \newpage\EMPHASIZE{Solutions}
 
-%\begin{ex}
+\begin{ex}
 Compute the sum of squares from 1 to 25, i.e., s =
 1*1 + 2*2 + 3*3 + 4*4 + 5*5 using the same idea as above.
 
 \protect\hypertarget{anchor}Solution.
 
 \begin{console}
-\#include <iostream>
+#include <iostream>
 
 int main()
 {
@@ -2039,364 +2039,294 @@ int main()
         return 0;
 } 
 \end{console}
+\end{ex}
 
-%% %\begin{ex}
-Get an integer n from the user and then compute the
-sum of the leftmost 4 digits of n. Do this with repetition code.
+\begin{ex}
+Get an integer n from the user and then compute the sum of the leftmost 4 digits of n. Do this with repetition code.
 
 \protect\hypertarget{anchor-1}Solution.
 
+\begin{consolethree}
+#include <iostream>
 
-%% \#include  iostream>
+int main()
+{
+    int n;
+    std::cin >> n;
+    int s = 0;
+    s = s + n % 10;
+    n = n / 10;
+    s = s + n % 10;
+    n = n / 10;
+    s = s + n % 10;
+    n = n / 10;
+    s = s + n % 10;
+    n = n / 10;
+    std::cout << s << ", " << n;
+    return 0;
+} 
 
-%% int main()
 
-%% \{
+\begin{ex} Get integer \texttt{x}, \texttt{y} from the user and print \texttt{x}, \texttt{y}, except that if \texttt{x }is negative you print \texttt{0} instead of \texttt{x} and if \texttt{y} is negative you print \texttt{0} instead of \texttt{y}. Here's a test case
 
-%% int n;
+\begin{console}
+2 3
 
-%% std::cin >> n;
+2 3 
+\end{console}
 
-%% int s = 0;
+Here's another test case
 
-%% s = s + n \% 10;
+\begin{console}
+-1 3
 
-%% n = n / 10;
+0 3 
+\end{console}
 
-%% s = s + n \% 10;
+and another test:
 
-%% n = n / 10;
+\begin{console}
+2 -2
 
-%% s = s + n \% 10;
+2 0 
+\end{console}
 
-%% n = n / 10;
+and finally
 
-%% s = s + n \% 10;
+\begin{console}
+-5 -2
 
-%% n = n / 10;
+0 0 
+\end{console
 
-%% std::cout  s 
-%%  n;
+You can write your program with boolean conditions where each boolean condition involves both \texttt{x} and \texttt{y}. 
+\end{ex}
 
-%% return 0;
+\protect\hypertarget{anchor-2}Solution.
 
-%% } 
+\begin{ex}
+But instead of that, write your program so that you have boolean expressions where each boolean expression involves only one variable.
+\begin{console}
+#include  <iostream>
 
+int main()
+{
+    int x, y;
+    std::cin >> x >> y;
+    if (x < 0)
+    {
+        x = 0;
+    }
 
-%% %\begin{ex} Get integer \texttt{x}, \texttt{y} from the user and
-%% print \texttt{x}, \texttt{y}, except that if \texttt{x }is negative you print
-%% \texttt{0} instead of \texttt{x} and if \texttt{y} is negative you print
-%% \texttt{0} instead of \texttt{y}. Here's a test case
+    std::cout << x;
 
+    if (y < 0)
+    {
+        y = 0;
+    }
+    
+    std::cout << y;
 
-%% 2 3
+    return 0;
+} 
+\end{console}
+\end{ex}
 
-%% 2 3 
+\begin{ex}   
+Get an integer n from the user and then compute the
+sum of the rightmost 4 digits of n. Once a digit 0 is added, you should
+stop the summation. Do this with repetition code. Here's a test case
 
+\begin{consolethree}[escapeinside=||]
+|\textbf{1534315}|
 
-%% Here's another test case
+13 
+\end{consolethree}
 
 
-%% -1 3
+Here's another:
 
-%% 0 3 
+\begin{consolethree}[escapeinside=||]
+|\textbf{1534015}|
 
+6 
+\end{consolethree}
 
-%% and another test:
 
+(after adding \texttt{5} and \texttt{1}, on seeing a \texttt{0}, the summation
+stops. Therefore the sum is 6) and another
 
-%% 2 -2
 
-%% 2 0 
+\begin{consolethree}[escapeinside=||]
+|\textbf{1534205}|
 
+5 
+\end{consolethree}
 
-%% and finally
+Here's the idea. First here's the code to sum the 4 rightmost digits:
 
+\begin{console}
+#include <iostream>
 
-%% -5 -2
+int main()
+{
+    int n;
+    std::cin >> n;
 
-%% 0 0 
+    int s = 0;
 
+    s = s + n % 10;
 
-%% You can write your program with boolean conditions where each boolean
-%% condition involves both \texttt{x} and \texttt{y}. But instead of that,
-%% write your program so that you have boolean expressions where each
-%% boolean expression involves only one variable.
+    n = n / 10;
 
-%% \protect\hypertarget{anchor-2}Solution.
+    s = s + n % 10;
 
+    n = n / 10;
 
-%% \#include  iostream>
+    s = s + n % 10;
 
-%% int main()
+    n = n / 10;
 
-%% \{
+    s = s + n % 10;
 
-%% int x, y;
+    n = n / 10;
 
-%% std::cin >> x >> y;
+    std::cout << s << n;
 
-%% if (x  0)
+    return 0;
+} 
 
-%% \{
 
-%% x = 0;
+Each block needs to know if a zero was encountered. So \ldots
 
-%% }
+\begin{console}
+#include <iostream>
 
-%% std::cout  x  
-%% ;
+int main()
+{
+    int n;
+    std::cin >> n;
 
-%% if (y  0)
+    int s = 0;
+    bool zero_not_found = true;
 
-%% \{
+    if (zero_not_found)
+    {
+        s = s + n % 10;
+        n = n / 10;
+    }
 
-%% y = 0;
+    if (zero_not_found)
+    {
+        s = s + n % 10;
+        n = n / 10;
+    }
 
-%% }
+    if (zero_not_found)
+    {
+        s = s + n % 10;
+        n = n / 10;
+    }
 
-%% std::cout  y  
-%% ;
+    if (zero_not_found)
+    {
+        s = s + n % 10;
+        n = n / 10;
+    }
 
-%% return 0;
+    std::cout << s << ", " <<n;
+    return 0;
+} 
 
-%% } 
 
+Get it? Think about what will happen if you don't use this communication device \verb!zero_not_found!. You will most likely have a deeply nested if-else structure in your code:
 
-%% %\begin{ex}   
-%% Get an integer n from the user and then compute the
-%% sum of the rightmost 4 digits of n. Once a digit 0 is added, you should
-%% stop the summation. Do this with repetition code. Here's a test case
-%% %\end{ex}
+\begin{console}
+if (n % 10 != 0) // 1st digit != 0
+{
+    s = s + n % 10;
+    n = n / 10;
+    if (n % 10 != 0) // 2nd digit != 0
+    {
+        s = s + n % 10;
+        n = n / 10;
+        if (n % 10 != 0) // 3rd digit != 0
+        {
+            s = s + n % 10;
+            n = n / 10;
+            if (n % 10 != 0) // 4th digit != 0
+            {
+                s = s + n % 10;
+                n = n / 10;
+            }
+        }
+    }
+}
+\end{console}
+\end{ex}
 
-%% \textbf{1534315}
+Later when I talk about loops and all the repeating blocks of code are placed in a loop structure, you'll see that your can control a loop to make it stop \lq\lq prematurely''.
 
-%% 13 
+\newpage\EMPHASIZE{Exercise}
 
+You have more than enough exercises in these notes already. Make sure
+you go over all of them on your own.
 
-%% Here's another:
+\newpage\EMPHASIZE{Some Mental Math (DIY)}
 
+This section has nothing to do with programming. It's just for fun.
 
-%% \textbf{1534015}
+Suppose I told you that it's possible to multiply 98 and 97 very quickly without paper and pencil or calculators or C++. Would you believe me? It does require some practice, but there is a way to multiply two values a little less than 100 very quickly.
 
-%% 6 
+Let me show you how with the 98 x 97 example. You subtract the numbers from 100. So 100 -- 98 = 2 and 100 -- 97 = 3. Write this down on a piece of paper:
 
+\begin{consolethree}
+98 97
 
-%% (after adding \texttt{5} and \texttt{1}, on seeing a \texttt{0}, the summation
-%% stops. Therefore the sum is 6) and another
+2 3
+\end{consolethree}
 
+Now look at 98 and 3. Compute 98 - 3. This is 95. You will need this number. Note that 97 - 2 is also 95. So there are two different ways of getting 95 with the two diagonals. Write this down:
 
-%% \textbf{1534205}
+\begin{consolethree}[escapeinside=||]
+98 97 |\textbf{95}|
 
-%% 5 
+2 3
+\end{consolethree}
 
+Now look at the 2 and 3. Multiply them together. You get 6. Write this
+down:
 
-%% Here's the idea. First here's the code to sum the 4 rightmost digits:
+\begin{consolethree}[escapeinside=||]
+98 97 95|\textbf{06}|
 
+2 3
+\end{consolethree}
 
-%% \#include  iostream>
+That's it. Here's another example: 96 x
+95. First you have:
 
-%% int main()
+\begin{consolethree}
+96 95
 
-%% \{
+4 5
+\end{consolethree}
 
-%% int n;
+Next you get
 
-%% std::cin >> n;
+\begin{consolethree}[escapeinside=||]
+96 95 |\textbf{91}|
 
-%% int s = 0;
+4 5
+\end{consolethree}
 
-%% s = s + n \% 10;
+and finally
 
-%% n = n / 10;
+\begin{consolethree}[escapeinside=||]
+96 95 91|\textbf{20}|
 
-%% s = s + n \% 10;
+4 5
+\end{consolethree}
 
-%% n = n / 10;
-
-%% s = s + n \% 10;
-
-%% n = n / 10;
-
-%% s = s + n \% 10;
-
-%% n = n / 10;
-
-%% std::cout  s 
-%%  n;
-
-%% return 0;
-
-%% } 
-
-
-%% Each block needs to know if a zero was encountered. So \ldots
-
-
-%% \#include  iostream>
-
-%% int main()
-
-%% \{
-
-%% int n;
-
-%% std::cin >> n;
-
-%% int s = 0;
-
-%% bool zero\_not\_found = true;
-
-%% if (zero\_not\_found)
-
-%% \{
-
-%% s = s + n \% 10;
-
-%% n = n / 10;
-
-%% }
-
-%% if (zero\_not\_found)
-
-%% \{
-
-%% s = s + n \% 10;
-
-%% n = n / 10;
-
-%% }
-
-%% if (zero\_not\_found)
-
-%% \{
-
-%% s = s + n \% 10;
-
-%% n = n / 10;
-
-%% }
-
-%% if (zero\_not\_found)
-
-%% \{
-
-%% s = s + n \% 10;
-
-%% n = n / 10;
-
-%% }
-
-%% std::cout  s                  
-%%  n;
-
-%% return 0;
-
-%% } 
-
-
-%% Get it? Think about what will happen if you don't use this communication
-%% device \texttt{zero\_not\_found}. You will most likely have a deeply
-%% nested if-else structure in your code:
-
-
-%% if (n \% 10 != 0) // 1st digit != 0
-
-%% \{
-
-%% s = s + n \% 10;
-
-%% n = n / 10;
-
-%% if (n \% 10 != 0) // 2nd digit != 0
-
-%% \{
-
-%% s = s + n \% 10;
-
-%% n = n / 10;
-
-%% if (n \% 10 != 0) // 3rd digit != 0
-
-%% \{
-
-%% s = s + n \% 10;
-
-%% n = n / 10;
-
-%% if (n \% 10 != 0) // 4th digit != 0
-
-%% \{
-
-%% s = s + n \% 10;
-
-%% n = n / 10;
-
-%% }
-
-%% Later when I talk about loops and all the repeating blocks of code are
-%% placed in a loop structure, you'll see that your can control a loop to
-%% make it stop \lq\lq prematurely''.
-
-%% Exercise
-
-%% You have more than enough exercises in these notes already. Make sure
-%% you go over all of them on your own.
-
-%% Some Mental Math (DIY)
-
-%% This section has nothing to do with programming. It's
-%% just for fun.
-
-%% Suppose I told you that it's possible to multiply 98 and
-%% 97 very quickly without paper and pencil or calculators or C++. Would
-%% you believe me? It does require some practice, but there is a way to
-%% multiply two values a little less than 100 very quickly.
-
-%% Let me show you how with the 98 x 97 example. You subtract the numbers
-%% from 100. So 100 -- 98 = 2 and 100 -- 97 = 3. Write this down on a piece
-%% of paper:
-
-%% 98 97
-
-%% 2 3
-
-%% Now look at 98 and 3. Compute 98 -- 3. This is 95. You will need this
-%% number. Note that 97 -- 2 is also 95. So there are two different ways of
-%% getting 95 with the two diagonals. Write this down:
-
-%% 98 97 \textbf{95}
-
-%% 2 3
-
-%% Now look at the 2 and 3. Multiply them together. You get 6. Write this
-%% down:
-
-%% 98 97 95\textbf{06}
-
-%% 2 3
-
-%% That's it. Here's another example: 96 x
-%% 95. First you have:
-
-%% 96 95
-
-%% 4 5
-
-%% \hfill\break
-%% Next you get
-
-%% 96 95 \textbf{91}
-
-%% 4 5
-
-%% and finally
-
-%% 96 95 91\textbf{20}
-
-%% 4 5
-
-%% The answer is 9120. With some practice you will be able to do the
-%% computation in your head. (Using algebra, you can actually prove that
-%% the method does work.) So now you can show it off to your math teacher.
+The answer is 9120. With some practice you will be able to do the computation in your head. (Using algebra, you can actually prove that the method does work.) So now you can show it off to your math teacher.
 
