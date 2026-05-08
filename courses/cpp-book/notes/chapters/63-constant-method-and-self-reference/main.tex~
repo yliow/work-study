@@ -1,0 +1,1819 @@
+\newpage\EMPHASIZE{63. Constant Method and Self Reference}
+
+\textsc{Objectives}
+\begin{itemize}
+\item Understand the \textit{this} pointer
+\item Understand the uses of the \textit{this} pointer
+\item Return a reference to an object
+\item Return a reference to an instance variable
+\item Understand the dangers of returning references to an instance variable
+\item Make parameters constant to protect from accidental modification
+\item Make \textit{*this} constant to protect from accidental modification
+\end{itemize}
+
+
+\newpage\EMPHASIZE{Recall}
+
+Suppose we have a class \textit{C} with a method \textit{m}. Suppose an
+object \textit{obj} of \textit{C} invokes \textit{m}. In the body of method
+\textit{m}, members and member functions without objects are those
+automatically associated with \textit{obj}
+
+\begin{consolethree}[escapeinside=||]
+// Int.h
+class Int
+{
+public:
+    Int(int x) : x_(x) {}
+    void print()
+    {
+        std::cout << x_ << "\n";
+    }
+private:
+    int x_;
+};
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// main.cpp
+#include "Int.h"
+
+int main()
+{
+    Int i(5);
+    i.print();
+    Int j(-3);
+    j.print();
+}
+\end{consolethree}
+
+Again, this applies to methods as well...
+
+Add methods \textit{m1}, \textit{m2} into the \textit{Int} class. For
+simplicity, I'm inlining the methods into the class header. But remember
+that you should inline minimally.
+
+\begin{consolethree}[escapeinside=||]
+// Int.h
+...
+class Int
+{
+public:
+    ...
+    void m1()
+    {
+        std::cout << "m1:" << x << "\n";
+        m2();
+    }
+    void m2()
+    {
+        std::cout << "m2:" << x << "\n";
+    }
+    ...
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// main.cpp
+#include "Int.h"
+
+int main()
+{
+    Int i(42);
+    i.m1();
+    std::cout << std::endl;
+    Int j(0);
+    j.m1();
+    return 0;
+}
+\end{consolethree}
+
+(Note: This is a review. I already talked about methods calling methods
+when we were looking at the \textit{Date} class.)
+
+
+\newpage\EMPHASIZE{Thinking of Objects}
+
+You should think of a class as a rubber stamp for creating objects.
+
+You should think of each object as a computational machine.
+
+You can (and should) think of the ``stuff'' on the green band (the
+\textit{m1}, \textit{m2}, \textit{print}) -- the \textit{public} things -- as
+things that outsiders can access while the stuff on the inside (the
+\textit{x\_}) -- the \textit{private} things -- are not available to
+outsiders. By outsiders, I mean functions not in the class and methods
+not in this class (i.e. methods of another class).
+
+
+\newpage\EMPHASIZE{What is the Invoking Object}
+
+What if a method must know the invoking object? Here's
+such an example:
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    ...
+    Int max(const Int & c)
+    {
+        if (c.x_ > x_)
+        {
+            return c;
+        }
+        else
+        {
+            return ???;
+        }
+    }
+private:
+    int x_;
+};
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    Int a(100), b(1);
+    Int c = a.max(b);
+    return 0;
+}
+\end{consolethree}
+
+For \textit{a.max(b)} we want to return \textit{a}. But what's the name of
+\textit{a} in the code of \textit{max()}??? In general, what's the name of
+the object making the call?
+
+There is a secret parameter in every method. You do not pass this
+parameter into the method. It's done for you automatically.
+
+What is this secret parameter??? ...
+
+
+\newpage\EMPHASIZE{The this Pointer}
+
+Try the program below.
+
+\begin{consolethree}[escapeinside=||]
+// Int.h
+#ifndef INT_H
+#define INT_H
+
+#include <iostream>
+
+class Int
+{
+public:
+    Int(int x) : x_(x) {}
+    void print()
+    {
+        std::cout << this << x_ << "\n";
+    }
+private:
+    int x_;
+};
+
+#endif
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// main.cpp
+#include <iostream>
+#include "Int.h"
+
+int main()
+{
+    Int i(42);
+    std::cout << &i << "\n";
+    i.print();
+    Int j(0);
+    std::cout << &j << "\n";
+    j.print();
+    return 0;
+}
+\end{consolethree}
+
+When an object \textit{obj} invokes a method \textit{m}, a special pointer
+\textit{this} is passed into \textit{m} automatically. The important thing
+to remember is that:
+
+\textit{this} points to \textit{obj}
+
+If an object \textit{obj} has member variable \textit{x\_} and \textit{this}
+is a pointer to \textit{obj}, then the following are the same:
+
+\textit{obj.x\_} \hspace{1cm} \textit{(*this).x\_} \hspace{1cm} \textit{this->x\_}
+
+This is the same notation used for pointers to \textit{struct} variables.
+You should \textbf{\textit{not}} use \textit{(*this).x\_}. Write
+\textit{this->x\_} instead.
+
+(There is an exception. Static methods do not have the \textit{this}
+secret parameter discussed here. We will talk about static methods
+later.)
+
+\textbf{WARNING:} \textit{*p.x} means \textit{*(p.x)} because \textit{.} has
+higher precedence than \textit{*}. Make sure you try changing the
+following
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    ...
+    void print()
+    {
+        std::cout << x_ << "\n";
+    }
+    ...
+private:
+    int x_;
+};
+\end{consolethree}
+
+to this:
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    ...
+    void print()
+    {
+        std::cout << this->x_ << "\n";
+    }
+    ...
+private:
+    int x_;
+};
+\end{consolethree}
+
+OK ... now to use \textit{this} ...
+
+
+\newpage\EMPHASIZE{When do you use this?}
+
+\textbf{Standard Practice:} Don't use \textit{this} in a method just to
+access members or member functions. In other words, in a method
+
+\begin{itemize}
+\item \textit{this->x} should be \textit{x}
+\item \textit{this->m()} should be \textit{m()}
+\end{itemize}
+
+For instance, this does work:
+
+\begin{consolethree}[escapeinside=||]
+...
+class Date
+{
+public:
+    ...
+    int get_year()
+    {
+        return this->yyyy_;
+    }
+    void set_year(int y)
+    {
+        this->yyyy_ = y;
+    }
+    ...
+    void add_m_y(int m, int d)
+    {
+        this->add_m(m);
+        this->add_d(d);
+    }
+private:
+    ...
+};
+\end{consolethree}
+
+but \textbf{DON'T DO THAT!!!} Do this:
+
+\begin{consolethree}[escapeinside=||]
+...
+class Date
+{
+public:
+    ...
+    int get_year()
+    {
+        return yyyy_;
+    }
+    void set_year(int y)
+    {
+        yyyy_ = y;
+    }
+    ...
+    void add_m_y(int m, int d)
+    {
+        add_m(m);
+        add_d(d);
+    }
+private:
+    ...
+};
+\end{consolethree}
+
+The pointer \textit{this} is used when it's used on its own either as
+\textit{this} or \textit{*this}. In particular \textit{*this} can be used for
+returning a copy of or a reference to the object making the method
+invocation and \textit{this} can be used for address comparison
+(you'll see this later when we need to compare address
+values when we overload the assignment operator \textit{operator=}.)
+
+(There are exceptions ... later. But the above two uses are good
+enough.)
+
+
+\newpage\EMPHASIZE{Returning a copy of *this}
+
+\begin{consolethree}[escapeinside=||]
+...
+class Int
+{
+    ...
+    Int max(const Int & c)
+    {
+        if (c.x_ > x_)
+            return c;
+        else
+            return *this;
+    }
+    ...
+private:
+    int x_;
+};
+...
+\end{consolethree}
+
+And now you can try this:
+
+\begin{consolethree}[escapeinside=||]
+#include "Int.h"
+
+int main()
+{
+    Int a(100), b(1);
+    Int c = a.max(b); // a.max(b) should return an
+                      // Int object with x_ value of
+                      // 100
+    c.print();
+    return 0;
+}
+\end{consolethree}
+
+Of course, this is better:
+
+\begin{consolethree}[escapeinside=||]
+...
+class Int
+{
+public:
+    ...
+    Int max(const Int & c)
+    {
+        return (c.x_ > x_ ? c : *this);
+    }
+    ...
+private:
+    int x_;
+};
+...
+\end{consolethree}
+
+Get it? In this case, we are returning a copy of the \textit{Int} object
+that \textit{this} points to, i.e., the object invoking the method.
+
+Notice however that you can also do this:
+
+\begin{consolethree}[escapeinside=||]
+...
+class Int
+{
+    ...
+    Int & max(const Int & c)
+    {
+        return (c.x_ > x_ ? c : *this);
+    }
+    ...
+private:
+    int x_;
+};
+...
+\end{consolethree}
+
+In this case, a \textbf{reference is returned}.
+
+Why is this important? Look at this code:
+
+\begin{consolethree}[escapeinside=||]
+#include "Int.h"
+
+int main()
+{
+    Int a(100), b(1);
+    Int c = a.max(b);
+    c.print();
+    return 0;
+}
+\end{consolethree}
+
+This means if the return of \textit{Int::max()} is an \textit{Int} and not
+an \textit{Int \&}
+
+\begin{consolethree}[escapeinside=||]
+...
+class Int
+{
+public:
+    ...
+    Int max(const Int & c)
+    {
+        ...
+    }
+    ...
+};
+...
+\end{consolethree}
+
+then an \textit{Int} value is returned (it has the same values as \textit{a}
+or \textit{b}). This \textit{Int} value is used for the invocation of the
+\textit{Int} copy constructor to initialize \textit{c}.
+
+Make sure you read the last two sentences again (and again and again).
+
+However if a reference is returned:
+
+\begin{consolethree}[escapeinside=||]
+...
+class Int
+{
+public:
+    ...
+    Int & max(const Int & c)
+    {
+        ...
+    }
+    ...
+};
+...
+\end{consolethree}
+
+then back in \textit{main()}, on returning from \textit{Int::max()}, a reference to a or to b is used by
+the copy constructor to initialize \textit{c}. There's no
+extra \textit{Int} object created by \textit{Int::max()} that is used to
+initialize \textit{c}.
+
+Let me repeat again: when you return \textit{Int} (not \textit{Int \&}), a
+copy of the object to be returned is made (by using the copy
+constructor).
+
+Whereas if you return \textit{Int \&}, no \textit{Int} object is created.
+The copy constructor used to create \textit{c} will simply reference
+\textit{a} or \textit{b}.
+
+
+\newpage\EMPHASIZE{Returning references}
+
+In the previous section, I have shown you an example of returning a
+reference.
+
+Certain methods and operators update the values of the variables or
+objects and return the values of the variables or objects. Run this:
+
+\begin{consolethree}[escapeinside=||]
+int x = 5;
+x++;
+std::cout << x << std::endl;
+int y = x++;
+std::cout << x << ',' << y << std::endl;
+y = (x += 5);
+std::cout << x << ',' << y << std::endl;
+(x += 5) += 5;
+std::cout << x << std::endl;
+\end{consolethree}
+
+Don't overdo this! Why? Because
+
+\begin{consolethree}[escapeinside=||]
+y = (x += 5);
+\end{consolethree}
+
+does too many things. A function/method/operator should do
+\textbf{\textit{one}} thing to avoid confusion. This is clearly easier to
+understand:
+
+\begin{consolethree}[escapeinside=||]
+x += 5;
+y = x;
+\end{consolethree}
+
+Note that the \textit{+=} when called twice:
+
+\begin{consolethree}[escapeinside=||]
+(x += 5) += 5;
+\end{consolethree}
+
+operates on the same \textit{x}. This means that \textit{+=}, besides
+incrementing \textit{x}, also returns a reference to x so that the second
+\textit{+=} operators on the same \textit{x}. If \textit{+=} returns a new
+\textit{int} value that has the same value as \textit{x} after incrementing,
+then the second \textit{+=} would have operated on this new \textit{int}
+value and not on \textit{x}. Therefore the right thing to do is to return
+a reference to \textit{x} and not a copy of \textit{x}.
+
+Of course returning a reference is faster than returning an object since
+objects tend to consume more memory. References are implemented using
+pointers and pointers take up very little memory.
+
+Refer to the \textit{Date} example. Suppose the \textit{add\_y} method is to
+add an integer value to the year value, \textit{and} return the value of
+the object.
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+...
+class Date
+{
+public:
+    ...
+    Date & add_y(int);
+    ...
+private:
+    int yyyy_, mm_, dd_;
+};
+...
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+...
+Date & Date::add_y(int inc)
+{
+    yyyy_ += inc;
+    return *this;
+}
+...
+\end{consolethree}
+
+With the above, I can now do this:
+
+\begin{consolethree}[escapeinside=||]
+Date today(1, 1, 1970);
+today.add_y(1).add_y(3);
+\end{consolethree}
+
+The first invocation of \textit{add\_y} will add 1 to the year of
+\textit{today} and then a reference to \textit{today} is returned. Therefore
+the second \textit{add\_y} is called by this reference, which means that
+the second \textit{add\_y} is called by \textit{today}.
+
+However if you do this:
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+...
+Date Date::add_y(int inc)
+{
+    y += inc;
+    return *this;
+}
+...
+\end{consolethree}
+
+i.e., return a \textit{Date} object instead of a reference, then
+\textit{Date}'s copy constructor is used to create a new
+\textit{Date} object from \textit{*this}. This object is returned to
+\textit{main()} and the \textit{add\_y} is called by this object so that
+\textit{today} does not have its year incremented by 3.
+
+We now look at returning references from a function call or method call.
+There's nothing new here about references.
+
+\textbf{WARNING:} Pay attention to the next programs!!!
+
+Run the following pair of programs. Explain their outputs.
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int & f(int & x)
+{
+    x++;
+    return x;
+}
+
+int main()
+{
+    int a = 42;
+    int & b = f(a);
+    std::cout << a << ' ' << b << '\n';
+    std::cout << &a << ' ' << &b << '\n';
+    b++;
+    std::cout << a << ' ' << b << '\n';
+    return 0;
+}
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int & f(int & x)
+{
+    x++;
+    return x;
+}
+
+int main()
+{
+    int a = 42;
+    int b = f(a);
+    std::cout << a << ' ' << b << '\n';
+    std::cout << a << ' ' << b << '\n';
+    b++;
+    std::cout << a << ' ' << b << '\n';
+    return 0;
+}
+\end{consolethree}
+
+The point:
+
+\begin{consolethree}[escapeinside=||]
+int a = 42;
+int & b = a;
+int & receiver1 = b;  // receiver1 references a
+int receiver2 = b;    // receiver2 gets the value of a
+receiver1 = 0;        // a is changed
+receiver2 = 0;        // receiver2 is changed, not a.
+\end{consolethree}
+
+What about this?
+
+\begin{consolethree}[escapeinside=||]
+int & f()
+{
+    int x = 42;
+    return x;
+}
+\end{consolethree}
+
+This returns a reference to a local variable but you cannot refer to
+this local variable once it goes out of scope since it will be destroyed
+at that point. (Note: this is OLD stuff. Yes I have already talked about
+it.)
+
+
+\newpage\EMPHASIZE{Yet more examples on returning *this as a reference (DIY)}
+
+\begin{consolethree}[escapeinside=||]
+class Point2d
+{
+public:
+    Point2d & set_x(int x) { x_ = x; return *this; }
+    Point2d & set_y(int y) { y_ = y; return *this; }
+    void print()
+    {
+        std::cout << x_ << ',' << y_ << '\n';
+    }
+private:
+    int x_, y_;
+};
+
+int main()
+{
+    Point2d p;
+    Point2d & q = p.set_x(1);
+    q.set_y(2);
+    p.print();
+    return 0;
+}
+\end{consolethree}
+
+Explain!
+
+\begin{consolethree}[escapeinside=||]
+class Point2d
+{
+public:
+    Point2d & set_x(int x)
+    {
+        x_ = x;
+        return *this;
+    }
+    Point2d & set_y(int y)
+    {
+        y_ = y;
+        return *this;
+    }
+    void print()
+    {
+        std::cout << x_ << ',' << y_ << '\n';
+    }
+private:
+    int x_, y_;
+};
+
+int main()
+{
+    Point2d p;
+    p.set_x(1).set_y(2);
+    p.print();
+    return 0;
+}
+\end{consolethree}
+
+This is similar to the previous program except that I got rid of
+\textit{q}. Explain!
+
+\begin{consolethree}[escapeinside=||]
+class Point2d
+{
+public:
+    Point2d set_x(int x)
+    {
+        x_ = x;
+        return *this;
+    }
+    Point2d set_y(int y)
+    {
+        y_ = y;
+        return *this;
+    }
+    void print()
+    {
+        std::cout << x_ << ',' << y_ << '\n';
+    }
+private:
+    int x_, y_;
+};
+
+int main()
+{
+    Point2d p;
+    p.set_x(1).set_y(2);
+    p.print();
+    return 0;
+}
+\end{consolethree}
+
+Explain!
+
+
+\newpage\EMPHASIZE{Returning reference to member variable}
+
+Of course you can also return a reference to a member (yes I know
+I've already talked about this before).
+
+\begin{consolethree}[escapeinside=||]
+class Point2d
+{
+public:
+    int & get_x()
+    {
+        return x_;
+    }
+    void print()
+    {
+        std::cout << x_ << ',' << y_ << '\n';
+    }
+private:
+    int x_, y_;
+};
+
+int main()
+{
+    Point2d p;
+    p.print();
+    int & a = p.get_x();
+    a = 0;
+    p.print();
+    return 0;
+}
+\end{consolethree}
+
+But remember about information hiding. Clients usually should not have
+direct access to instance variables. The class (and the objects) should
+provide services to clients through methods and hide internal
+implementation from outsiders. This makes the software more
+maintainable.
+
+And you definitely cannot do this in a method:
+
+\begin{consolethree}[escapeinside=||]
+class Point2d
+{
+public:
+    int & get_x()
+    {
+        int x = x_;
+        return x; // ERROR! Returning reference to
+                  // local variable!!! Arghh!!!
+    }
+private:
+    int x_, y_;
+};
+\end{consolethree}
+
+
+\newpage\EMPHASIZE{Temporary object values}
+
+Most of the time we have objects with names:
+
+\begin{consolethree}[escapeinside=||]
+Date date(1970, 1, 1);
+date.print();
+\end{consolethree}
+
+Of course you can create object values not bound to names:
+
+\begin{consolethree}[escapeinside=||]
+Date(1970, 1, 1).print();
+\end{consolethree}
+
+(I've already talked about this.)
+
+In the second case above, we have a temporary object, or an object value
+that does not belong to an object name.
+
+In the \textit{Int} class, if you have operator+ returns object values,
+you might see temporary objects:
+
+\begin{consolethree}[escapeinside=||]
+Int i(5), j(7), k (8);
+Int z = i + j + k; // i + j is temporary object
+                   // this temporary object is
+                   // added with k to produce
+                   // another temporary object
+\end{consolethree}
+
+Of course, just like a method, a function can return an object value
+
+\begin{consolethree}[escapeinside=||]
+Date rand_date()
+{
+    return Date(rand()%10 + 1,
+                rand()%10 + 1, rand());
+}
+\end{consolethree}
+
+Of course this is different from returning a reference:
+
+\begin{consolethree}[escapeinside=||]
+Date & Date::f()
+{
+    return (*this);
+}
+
+int main()
+{
+    Date date(1, 1, 1970);
+    date.f(); // A reference to date
+              // is returned
+}
+\end{consolethree}
+
+A temporary object can be destroyed immediately after the expression
+containing the temporary object is computed.
+
+There is an exception ... you can create an object name and bind it
+to a temporary object value. In this case the temporary object value is
+not destroyed immediately. For instance
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    Date date1 = rand_date();
+    ...
+}
+\end{consolethree}
+
+The value of \textit{date1} is actually the same as the value of the
+object returned by \textit{rand\_date()}, i.e., there is no copy
+constructor call. To verify this add some print statements:
+
+\begin{consolethree}[escapeinside=||]
+Date randdate()
+{
+    Date ret(rand() % 10 + 1,
+             rand() % 10 + 1, rand());
+    std::cout << &ret << '\n';
+    return ret;
+}
+
+int main()
+{
+    Date date1 = f();
+    std::cout << &date1 << '\n';
+}
+\end{consolethree}
+
+You can also insert print statements in the \textit{Date} destructor to
+verify that there is only one destructor call, not two, i.e., in the
+above, there is really only one \textit{Date} value.
+
+\begin{consolethree}[escapeinside=||]
+rand_date(); // Date value returned by
+             // rand_date() is not bound to a
+             // name. It's destroyed.
+             // Destructor is called.
+
+Date date1 = rand_date(); // Date value bound to
+                          // date1. Destructor not
+                          // called yet
+\end{consolethree}
+
+In the above example:
+
+\begin{consolethree}[escapeinside=||]
+Date date1 = rand_date();
+\end{consolethree}
+
+the destructor is called only when the name \textit{date1} goes out of
+scope.
+
+Here are the scenarios you should study and be familiar with:
+
+\begin{consolethree}[escapeinside=||]
+Date Date::f(...) { ...; return *this; }
+Date & Date::f(...) { ...; return *this; }
+Date Date::f(...) { ...; Date x; return x; }
+Date & Date::f(...) { ...; Date x; return x; } (error)
+Date Date::f(...) { ...; return Date(1,1,1970); }
+Date & Date::f(...) { ...; return Date(1,1,1970); } (error)
+(date1.f()).print()
+Date date2 = date1.f()
+Date & date2 = date1.f()
+\end{consolethree}
+
+
+\newpage\EMPHASIZE{Avoid similar names}
+
+\begin{consolethree}[escapeinside=||]
+int x_ = 0;
+
+int m2()
+{
+    return 5;
+}
+
+class C
+{
+public:
+    void m1()
+    {
+        x_ = m2();
+    }
+    void m2()
+    {
+        return 0;
+    }
+private:
+    int x_;
+};
+\end{consolethree}
+
+Avoid such ambiguities! What's this about ...
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    void m(int x_)
+    {
+        std::cout << x_;
+    }
+private:
+    int x_;
+};
+\end{consolethree}
+
+In general here's how C++ search for names in the above
+cases: first local variables are searched, then instance variables
+(member variables), and then globals.
+
+
+\newpage\EMPHASIZE{Notes}
+
+In some programming languages, instead of \textit{this} (in a method)
+which points to the object invoking the method, in other programming
+languages there's a \textit{self} or \textit{me} in a method
+this plays the same role as \textit{this} except that it is a reference to
+the object invoking the method.
+
+
+\newpage\EMPHASIZE{Forcing a reference parameter to be constant}
+
+Recall: When writing a function, it's a good idea to use \textit{const}
+for arguments that should not be changed. This is the case for both
+(regular) functions and methods of a class:
+
+\begin{consolethree}[escapeinside=||]
+// function
+void f(const C & c) { ... }
+
+// method in class C
+void C::g(const C & c) { ... }
+\end{consolethree}
+
+The following example shows 4 possible ways of pass-by-reference:
+
+\begin{itemize}
+\item Non-const to non-const \&
+\item Non-const to const \&
+\item Const to non-const \&
+\item Const to const \&
+\end{itemize}
+
+Which ones work and which do not? Here's an experiment
+that will help.
+
+\begin{consolethree}[escapeinside=||]
+void f(const int & i) {}
+void g(int & i) {}
+
+int main()
+{
+    int i = 0;
+    const int j = 0;
+    f(i); // nonconst passed to const reference
+    f(j); // const passed to const reference
+    g(i); // nonconst passed to nonconst reference
+    g(j); // const passed to nonconst reference
+    return 0;
+}
+\end{consolethree}
+
+First figure out on your own which is reasonable. Compile this and read
+the error message. Correct and check by compiling the program.
+
+Answer:
+
+\begin{itemize}
+\item Non-const to non-const \& OK
+\item Non-const to const \& OK
+\item Const to non-const \& BAD!!!
+\item Const to const \& OK
+\end{itemize}
+
+Why?
+
+\begin{consolethree}[escapeinside=||]
+void g(int & i) {} // i not constant
+                   // g() can change i
+
+int main()
+{
+    const int j = 0; // j cannot be changed
+    g(j); // oops ... now what?
+}
+\end{consolethree}
+
+The case of object parameters is the same.
+
+The following example shows 4 possible ways of pass-by-reference:
+
+\begin{itemize}
+\item Non-const to non-const \&
+\item Non-const to const \&
+\item Const to non-const \&
+\item Const to const \&
+\end{itemize}
+
+Which ones work and which do not?
+
+\begin{consolethree}[escapeinside=||]
+class C {};
+
+void f(const C & y) {}
+void g(C & y) {}
+
+int main()
+{
+    C a;
+    const C b = C();
+    f(a);
+    f(b);
+    g(a);
+    g(b);
+    return 0;
+}
+\end{consolethree}
+
+Answer:
+
+\begin{itemize}
+\item Non-const to non-const \& OK
+\item Non-const to const \& OK
+\item Const to non-const \& BAD!!!
+\item Const to const \& OK
+\end{itemize}
+
+Why?
+
+\begin{consolethree}[escapeinside=||]
+class C{};
+
+void h(C & x) {} // h can modify x
+
+int main()
+{
+    const C y = C(); // y cannot be modified
+    h(y); // oops ... now what???
+}
+\end{consolethree}
+
+In summary if \textit{T} is any type (\textit{int}, \textit{char}, ...,
+some \textit{class}, ...), and \textit{f()} has the following prototype:
+
+\textit{void f(\textbf{T \& x});}
+
+and y is a \textbf{\textit{constant}} \textit{T} object, then the following
+is incorrect:
+
+\begin{consolethree}[escapeinside=||]
+const T y;
+f(y);
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+class C {public: int x};
+
+void f0(const C & y) {}
+void f1(C & y) {}
+
+int main()
+{
+    C a;
+    f0(a); f1(a);
+    return 0;
+}
+\end{consolethree}
+
+Example:
+
+\begin{consolethree}[escapeinside=||]
+class IntPointer
+{
+public:
+    ...
+    IntPointer(const IntPointer & a)
+        : p_(new int)
+    { *p_ = *(a.p_); }
+    ...
+private:
+    int * p_;
+};
+\end{consolethree}
+
+Example:
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    Int(int x)
+        : x_(x)
+    {}
+    Int max(Int & a)
+    {
+        if (x_ < a.x_)
+            return a;
+        else
+            return (*this);
+    }
+private:
+    int x_;
+};
+\end{consolethree}
+
+So
+
+\begin{consolethree}[escapeinside=||]
+...
+class Int
+{
+public:
+    Int(int x)
+        : x_(x)
+    {}
+    Int max(const Int & a)
+    {
+        if (x_ < a.x_)
+            return a;
+        else
+            return (*this);
+    }
+public:
+    int x_;
+};
+...
+\end{consolethree}
+
+Example:
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    void f(int a)
+    {
+        x_ = a;
+    }
+    int g(int a)
+    {
+        return y_ + a;
+    }
+private:
+    int x_, y_;
+};
+
+void j(C & c)
+{
+    c.f(0);
+}
+
+void k(C & c)
+{
+    c.g(0);
+}
+
+int main()
+{
+    C c, d;
+    j(c);
+    k(c);
+    return 0;
+}
+\end{consolethree}
+
+\textbf{Example.} Invoking \textit{c.f()} will modify \textit{c}
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+    ...
+    void f(int a){ x_ = a; } // modifies x_
+    ...
+};
+\end{consolethree}
+
+This means that the following will \textbf{\textit{not}} work:
+
+\begin{consolethree}[escapeinside=||]
+void j(const C & c) { c.f(0); }
+\end{consolethree}
+
+Invoking \textit{c.g()} will not modify \textit{c}
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+    ...
+    int g(int a)
+    {
+        return y + a;
+    }
+    ...
+};
+\end{consolethree}
+
+This means that the following \textbf{\textit{will}} work:
+
+\begin{consolethree}[escapeinside=||]
+void j(const C & c) { c.g(0); }
+\end{consolethree}
+
+\begin{ex}
+Which parameters in \textit{j,k} can be made constant?
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    void f(int a)
+    {
+        x_ = a;
+    }
+    int g(int a)
+    {
+        return y_ + a;
+    }
+    void h(C & c)
+    {
+        f(c.x_);
+    }
+    void i(C & c)
+    {
+        c.x_ = g(5);
+    }
+private:
+    int x_, y_;
+};
+
+void j(C & c, C & d)
+{
+    c.h(d);
+}
+
+void k(C & c, C & d)
+{
+    c.i(d);
+}
+
+int main()
+{
+    C c, d;
+    j(c, d);
+    k(c, d);
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Which parameter should be made \textit{const}?
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    Int(int x0)
+        : x_(x0)
+    {}
+    void incrementBy(Int & a)
+    {
+        x_ += a.x_;
+    }
+    void increment(Int & a)
+    {
+        a.x_ += x_;
+    }
+    int get()
+    {
+        return x_;
+    }
+private:
+    int x_;
+};
+
+int main()
+{
+    Int a(1), b(5);
+    a.incrementBy(b);
+    a.increment(b);
+    std::cout << a.get() << ' ' << b.get() << '\n';
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+
+\newpage\EMPHASIZE{Forcing a return reference to be constant}
+
+Recall this example from above:
+
+\begin{consolethree}[escapeinside=||]
+class Point2d
+{
+public:
+    int & get_x()
+    {
+        return x_;
+    }
+    void print()
+    {
+        std::cout << x_ << ',' << y_ << '\n';
+    }
+private:
+    int x_, y_;
+};
+
+int main()
+{
+    Point2d p;
+    p.print();
+    int & a = p.get_x();
+    a = 0;
+    p.print();
+    return 0;
+}
+\end{consolethree}
+
+The \textit{p.get\_x()} method returns a reference to \textit{p.x\_}. This
+reference is then given to \textit{a}:
+
+\begin{consolethree}[escapeinside=||]
+int & a = p.get_x();
+\end{consolethree}
+
+This means that a is a reference to p.x\_. Therefore changing a will
+mean changing p.x\_.
+
+But remember what I said earlier about information hiding. Clients
+usually should not have direct access to instance variables. The class
+(and the objects) should provide services to clients through methods and
+hide internal implementation from outsiders. This makes the software
+more maintainable. So to prevent \textit{main()} from changing
+\textit{p.x\_} directly, you can do this:
+
+\begin{consolethree}[escapeinside=||]
+class Point2d
+{
+public:
+    const int & get_x()
+    {
+        return x_;
+    }
+    ...
+\end{consolethree}
+
+The reference returned will not be able to change the x\_ of the object.
+In fact, now the \textit{main()} above cannot be compiled. Why?
+
+\begin{consolethree}[escapeinside=||]
+class Point2d
+{
+public:
+    const int & get_x()
+    {
+        return x_;
+    }
+    ...
+};
+
+int main()
+{
+    Point2d p;
+    p.print();
+    int & a = p.get_x();
+    ...
+}
+\end{consolethree}
+
+Because the \textit{a} in \textit{main()} is a reference that can
+potentially attempt to the the value of \textit{p.x\_}. The issue is not
+whether \textit{a} will actually change or not. The only way for the above
+to compile is to make it impossible for a to change, i.e., you would
+have to do this:
+
+\begin{consolethree}[escapeinside=||]
+class Point2d
+{
+public:
+    const int & get_x()
+    {
+        return x_;
+    }
+    ...
+};
+
+int main()
+{
+    Point2d p;
+    p.print();
+    const int & a = p.get_x();
+    ...
+}
+\end{consolethree}
+
+
+\newpage\EMPHASIZE{How to make *this constant?}
+
+But what about \textit{this}? It's passed in automatically and is not
+shown in the parameter list! How do you ``\textit{const}'' \textit{this}?
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    Int(int x)
+        : x_(x)
+    {}
+    Int max(const Int & a)
+    {
+        if (x_ < a.x_)
+            return a;
+        else
+            return (*this);
+    }
+private:
+    int x_;
+};
+\end{consolethree}
+
+But ....
+
+Do this:
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    Int(int x)
+        : x_(x)
+    {}
+    Int max(const Int & a) const
+    {
+        if (x_ < a.x_)
+            return a;
+        else
+            return (*this);
+    }
+private:
+    int x_;
+};
+\end{consolethree}
+
+Example:
+
+\begin{consolethree}[escapeinside=||]
+class Date
+{
+public:
+    int get_d() const;
+private:
+    int yyyy_, mm_, dd_;
+};
+
+int Date::get_d() const
+{
+    return dd_;
+}
+\end{consolethree}
+
+\begin{ex}
+Correct the error(s)!
+
+\begin{consolethree}[escapeinside=||]
+class Date
+{
+public:
+    int get_d() const
+    {
+        return dd_;
+    }
+    void set_d(int dd) const
+    {
+        dd_ = dd;
+    }
+private:
+    int yyyy_, mm_, dd_;
+};
+\end{consolethree}
+\end{ex}
+
+WARNING:
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    void f() const
+    {}
+    void g() const;
+};
+
+void C::g() const
+{}
+\end{consolethree}
+
+Go ahead and experiment with this:
+
+\begin{consolethree}[escapeinside=||]
+class C{
+public:
+    void f() const
+    {}
+    void g() const;
+};
+
+void C::g() const
+{}
+
+int main()
+{}
+\end{consolethree}
+
+\begin{ex}
+Which methods should be constant?
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    Int(int x)
+        : x_(x)
+    {}
+    void incrementBy(Int & a)
+    {
+        x_ += a.x_;
+    }
+    void increment(Int & a)
+    {
+        a.x_ += x_;
+    }
+    int get()
+    {
+        return x_;
+    }
+private:
+    int x_;
+};
+
+int main()
+{
+    Int a(1), b(5);
+    a.incrementBy(b);
+    a.increment(b);
+    std::cout << a.get() << ' ' << b.get() << '\n';
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+Functions with \textit{const} at the end are called \textbf{constant
+member functions}. In other words, constant member functions
+are methods that will not modify the object invoking the method.
+
+\begin{ex}
+Which statement in \textit{main()} is incorrect? Next,
+Compile this and read the error message. Correct and check by compiling
+the program.
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    void m1()
+    {}
+    void m2() const
+    {}
+};
+
+int main()
+{
+    const C a;
+    C b;
+    a.m1();
+    a.m2();
+    b.m1();
+    b.m2();
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Which methods should be constant? Which parameters
+should be constant?
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    void m(C & a, C & b)
+    {
+        x_ = a.x_;
+        y_ = b.y_;
+    }
+    void m(C & a, C & b)
+    {
+        x_ = a.x_;
+        b.y_ = y_;
+    }
+    void m(C & a, C & b)
+    {
+        a.x_ = x_;
+        y_ = b.y_;
+    }
+    void m(C & a, C & b)
+    {
+        a.x_ = x_;
+        b.y_ = y_;
+    }
+private:
+    int x_, y_;
+};
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Go over \textit{all} the previous classes you have
+built (\textit{Date}, \textit{Vehicle}, \textit{WeatherCtrl}, \textit{Int},
+\textit{IntPointer}, \textit{IntArray}, \textit{IntDynArr}, etc.) Make all
+relevant parameters constant whenever possible. Make all methods
+constant whenever possible.
+\end{ex}
+
+\begin{ex}
+Does this compile?
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    void m()
+    {}
+    void m() const
+    {}
+};
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Look at the \textit{IntPointer} class very carefully.
+In particular look at the de-reference operator, \textit{operator*()}:
+
+\begin{consolethree}[escapeinside=||]
+class IntPointer
+{
+public:
+    ...
+    int & operator*()
+    {
+        return *p_;
+    }
+    ...
+};
+\end{consolethree}
+
+Should \textit{operator*()} be constant? The question to ask is this: is
+\textit{p} changed? The important point ... There is a difference
+between asking if \textit{p} should be constant and if \textit{*p} should be
+constant.
+\end{ex}
+
+\begin{ex}
+Continuing the above idea, look at \textit{IntArray}
+and \textit{IntDynArr}. There is a similar issue for
+\textit{operator[](int)}. Should it be a constant operator?
+\end{ex}
+
+
+\newpage\EMPHASIZE{Summary}
+
+\begin{itemize}
+\item When an object \textit{obj} invokes a method \textit{m}, a pointer called
+  \textit{this} is in the scope of \textit{m}. The \textit{this} pointer
+  points to \textit{obj}. In other words, in a method, the \textit{this}
+  pointer always point to the object invoking the method. (See section
+  on static methods for exception.)
+
+\item In the body of a method, if an object \textit{obj} has instance variable
+  \textit{x\_}, then the following are the same:
+
+\textit{x\_} is the same as \textit{this->x\_}
+
+\item In the body of a method, if an object \textit{obj} has another method
+  called \textit{m}, then the following are the same:
+
+\textit{m()} is the same as \textit{this->m()}
+
+\item A method can return a copy of the value of the object of class
+  \textit{C}:
+
+\begin{consolethree}[escapeinside=||]
+C C::m()
+{
+    ...
+    return *this;
+}
+\end{consolethree}
+
+\item or a reference to itself:
+
+\begin{consolethree}[escapeinside=||]
+C & C::m()
+{
+    ...
+    return *this;
+}
+\end{consolethree}
+
+\item If a method returns a reference to itself, then you can chain up
+  methods:
+
+\textit{obj.m().m1()}
+
+  where \textit{m1} is another method and \textit{m1} is also invoked by
+  \textit{obj}.
+
+\item WARNING: If \textit{m} does not return a reference of the invoking
+  object, then in the following:
+
+\textit{obj.m().m1()}
+
+  \textit{m1()} is not invoked by \textit{obj}, but rather by a copy of
+  \textit{obj}.
+
+\item A constant method is a method that cannot modify the object invoking
+  the method.
+
+\item A method is made constant by putting the word \textit{const} on the
+  right of the method header. This is done in the header file and if the
+  method is defined outside the class definition, then it must also be
+  done in the definition of the method.
+\end{itemize}
+
+\end{document}

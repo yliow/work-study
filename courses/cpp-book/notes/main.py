@@ -1,22 +1,26 @@
 from latextool_basic import *
+from latexcircuit import POINT
 p = Plot()
-#p += Grid(x0=0,y0=-4,x1=10,y1=4)
-D = '''
-Program execution in
-this block and looks for
-i. Program will keep
-looking in the next outer
-block until it's found or
-if not, we have an error
-'''
-code(p, D)
-p += Rect(7,-3,13,3,linewidth=0.15)
-p += Rect(7.5,-2.5,12.5,0.1,linewidth=0.15)
-p += Rect(8.5,0.5,11.5,2,linewidth=0.05)
-p += Rect(8.5,-2,11.5,-0.5,linewidth=0.05)
-#p += Rect(8.25,-1.45,8.25,-1.45,linewidth=0,label=r'i')
-p += Rect(8.25,1.3,8.25,1.3,linewidth=0,label=r'i')
-p += Circle(x=10,y=-1.2,r=0.5, linecolor='red',background='red')
-p += Line(points=[(10,-1.2),(10,0.3)],endstyle='>',linewidth=0.1,linecolor='red',linestyle='dashed')
+p += Grid(x0=-4, y0=-4, x1=4, y1=4)
+
+p += Rect(2, 2, 4, 3, linewidth=0.05, label='1.1')
+p += Rect(0, 2, 2, 3, linewidth=0.05, label='0.0')
+p += Line(points=[(6,2.5),(4,2.5)], linewidth=0.1, endstyle='>', label=r'1.123')
+p += Line(points=[(0,2.5),(-1,2.5)], linewidth=0.1, endstyle='>')
+p += Rect(2, 0, 4, 1, linewidth=0.05, label='1.123')
+p += Rect(0, 0, 2, 1, linewidth=0.05, label='1.1')
+p += Line(points=[(6,0.5),(4,0.5)], linewidth=0.1, endstyle='>', label=r'1.1345')
+p += Line(points=[(0,0.5),(-1,0.5)], linewidth=0.1, endstyle='>')
+p += Rect(2, -2, 4, -1, linewidth=0.05, label='1.1345')
+p += Rect(0, -2, 2, -1, linewidth=0.05, label='1.123')
+p += Line(points=[(6, -1.5),(4, -1.5)], linewidth=0.1, endstyle='>', label=r'1.1355')
+p += Line(points=[(0,-1.5),(-1,-1.5)], linewidth=0.1, endstyle='>')
+p += Line(points=[(7.5,4),(7.5,-3)], linewidth=0.1, linestyle='dashed', endstyle='>')
+X = POINT(8.7, 1, r=0, label=r'time')
+Y = POINT(-1, 0.5, r=0, label=r'0.0')
+Z = POINT(-1, -1.5, r=0, label=r'1.1')
+p += str(X)
+p += str(Y)
+p += str(Z)
 print(p)
 

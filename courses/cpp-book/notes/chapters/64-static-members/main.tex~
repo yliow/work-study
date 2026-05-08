@@ -1,0 +1,1318 @@
+\newpage\EMPHASIZE{64. Static Members}
+
+\textsc{Objectives}
+\begin{itemize}
+\item Understand static local variables
+\item Understand static members
+\item Write static members
+\item Access static members
+\item Write static methods
+\item Call static methods
+\item Understand when to use static members and methods
+\end{itemize}
+
+
+\newpage\EMPHASIZE{Static variables}
+
+First let me talk about static variables in general (which has nothing
+to do with classes.)
+
+Static variables are declared before the program executes, and they stay
+in memory until the program halts. Functions are static, because the
+memory allocated for them is declared before the start of the program,
+and is only reclaimed once the program ends. Global variables are also
+static for the same reason.
+
+Try the following program:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void f()
+{
+    static int x = 0;
+    int y = 0;
+    x++; y++;
+    std::cout << x << ' ' << y << std::endl;
+}
+
+int main()
+{
+    f(); f(); f(); f();
+    return 0;
+}
+\end{consolethree}
+
+What's happening??? Well ...
+
+\begin{consolethree}[escapeinside=||]
+void f()
+{
+    static int x = 0; // this is executed ONCE when
+                      // the program starts up
+                      // and x STAYS AROUND even when
+                      // you return from f(). x goes
+                      // away and only when the
+                      // program ends. So x is NOT
+                      // automatic.
+    ...
+}
+\end{consolethree}
+
+\begin{ex}
+Write a function \textit{mybankaccount()} such that the
+first time you call \textit{mybackaccount()}, it prints 0. If you call it
+the second time with 10, the function prints 10. If you call it the
+third time with 20, it prints 30. If you call it the fourth time with
+-5, it prints 25. In other words, it records the cumulative sum of the
+arguments sent into the function. Note that the first function call does
+not pass in a value while the remaining ones do. That tells you that
+\textit{mybankaccount()} has a parameter with a default value. For
+instance you can use -9999 as the default value to mean ``reset the
+cumulative sum to 0''.
+\end{ex}
+
+
+\newpage\EMPHASIZE{Static members variables (in a class)}
+
+Besides static variables in a code block, classes can have static
+members as well. Let me give the concepts first.
+
+(The code in this section is not runnable. You'll have
+to wait for the next section before I complete the code.)
+
+Think of \textbf{static member variables} as \textbf{variables belonging
+to a class} and not to each object. There is only one copy for each
+static member. All objects of a class \textbf{share} the same static
+member. If \textit{y} is a static member of a class and \textit{obj1} and
+\textit{obj2} are objects of that class, then \textit{obj1.y} is the
+\textbf{same} as \textit{obj2.y}.
+
+To make a member static put the keyword \textit{static} in front of the
+declaration of the member in the class declaration. Static members can
+be public or private.
+
+For the next example, I'm going to make all members
+public just to simplify the discussion. Don't run the
+code yet -- I'm going through the concept of static
+members and the code won't be runnable until the next
+section when I show you how to initialize static members.
+
+First let me show you how to create static member variables.
+Here's class C:
+
+\begin{consolethree}[escapeinside=||]
+// C.h
+#ifndef C_H
+#define C_H
+
+class C
+{
+public:
+    int x;               // regular class member variable
+    |{\bf static}| int y;       // static class member variable
+    |{\bf static}| int z;       // static class member variable
+};
+
+#endif
+\end{consolethree}
+
+Look at the ``\textit{static}'' words in the code. This class has two
+static members: \textit{y} and \textit{z}.
+
+Now if I do this in \textit{main()} (remember: don't run
+the code yet -- just focus on the idea):
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "C.h"
+
+int main()
+{
+    C c, d, e; // 3 objects from class C
+    ...
+\end{consolethree}
+
+then the objects currently in memory and the static members of class
+\textit{C} look like this (conceptually):
+
+Note the following:
+
+\begin{itemize}
+\item Each of the 3 objects have their own member variable x. So ...
+  \textit{c.x} is different from \textit{d.x} which is different from
+  \textit{e.x}. When c changes its x to \textit{1000}, \textit{d.x} is still
+  \textit{1} and \textit{e.x} is still \textit{2}.
+\item All 3 objects \textbf{share} \textit{y} and \textit{z} (the
+  \textbf{static} member variables). All 3 objects do have access to
+  \textit{y} and \textit{z}. So when \textit{c} changes \textit{y} to \textit{43}
+  and \textit{d} print \textit{y}, \textit{d} will be printing \textit{43}.
+\end{itemize}
+
+Get it? It's really not that complex: regular member
+variables are not shared among objects while static member variables are
+shared across all objects.
+
+Now although the objects \textit{c}, \textit{d}, \textit{e} have access to the
+static members \textit{y}, \textit{z}, you should view the static member
+variables as variables belonging to the class \textit{C}. So ...
+although you can write \textit{c.y} in your code (member \textit{y} is
+public -- look at definition of class \textit{C}):
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "C.h"
+
+int main()
+{
+    C c, d, e; // 3 objects from class C
+    std::cout << c.y << '\n';
+    ...
+\end{consolethree}
+
+it's more common to write \textit{C::y}.
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "C.h"
+
+int main()
+{
+    C c, d, e; // 3 objects from class C
+    std::cout << |{\bf C::y}| << '\n'; // better than c.y
+    ...
+\end{consolethree}
+
+If y is a private member:
+
+\begin{consolethree}[escapeinside=||]
+...
+class C
+{
+public:
+    int x;               // regular class member variable
+    static int z;        // static class member variable
+private:
+    static int y;        // static class member variable
+};
+...
+\end{consolethree}
+
+then this won't work:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "C.h"
+
+int main()
+{
+    C c, d, e; // 3 objects from class C
+    std::cout << C::y << '\n'; // BAD! BAD! BAD!
+    ...
+\end{consolethree}
+
+Now let me show you how to initialize the value of static member
+variables so that you can actually run the above code.
+
+
+\newpage\EMPHASIZE{Initialization of static member variables}
+
+Here's our class C again:
+
+\begin{consolethree}[escapeinside=||]
+// C.h
+...
+class C
+{
+public:
+    int x;
+    static int y;
+    static int z;
+};
+...
+\end{consolethree}
+
+The member variables y and z are static and have to be initialized even
+before any object is created.
+
+Recall an earlier example of static variable in functions:
+
+\begin{consolethree}[escapeinside=||]
+void f()
+{
+    static int x = 0; // this is executed ONCE when
+                      // the program starts up
+                      // and x STAYS AROUND even when
+                      // you return from f(). x goes
+                      // away and only when the
+                      // program ends. So x is NOT
+                      // automatic.
+    ...
+}
+\end{consolethree}
+
+Static variables have to be initialized when you run your program. In
+the case of classes, the static members are initialized even before you
+create any object of that class. So the initialization of \textit{y} and
+\textit{z} are not done through objects.
+
+The initialization is done through the class. There are two ways of
+doing it.
+
+\begin{consolethree}[escapeinside=||]
+// C.cpp
+#include "C.h"
+
+int C::y(42);      // First method of initialization
+int C::z = 99;     // Second method of initialization
+\end{consolethree}
+
+Don't forget the \textit{C::} in front of the \textit{y}!!!
+
+Note that the initialization code must be done in the implementation
+file, i.e., the cpp file, and not in the header file.
+(There's an exception -- see later section on constant
+static member variables.)
+
+\textbf{WARNING:} Do \textbf{not} include keyword static in cpp file.
+
+\begin{consolethree}[escapeinside=||]
+// C.cpp
+...
+static int C::y(42); // WRONG!!!!!!
+...
+\end{consolethree}
+
+Static should only appear during declaration in the header file.
+
+With the above you can now run this:
+
+\begin{consolethree}[escapeinside=||]
+// C.h
+#ifndef C_H
+#define C_H
+
+class C
+{
+public:
+    int x;
+    static int y;
+    static int z;
+};
+
+#endif
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// C.cpp
+#include "C.h"
+
+int C::y(42);
+int C::z = 99;
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "C.h"
+
+int main()
+{
+    C c, d, e;
+    std::cout << C::y << '\n';
+    std::cout << C::z << '\n';
+    // Change C::y through c ...
+    c.y = 24;
+    std::cout << C::y << '\n'; // and C::y is changed
+    // Change C::y ...
+    C::y = 42;
+    std::cout << d.y << '\n'; // and d.y is changed
+    // And in fact they are all the same ...
+    std::cout << &C::y << ' '
+              << &c.y << ' '
+              << &d.y << '\n';
+    return 0;
+}
+\end{consolethree}
+
+
+\newpage\EMPHASIZE{Static methods (i.e. static member functions)}
+
+Just like a regular member variable can be made static (so that it
+belongs to the class), a method can also made static.
+
+To make a method static put the keyword \textit{static} in front of the
+prototype of the method in the class declaration.
+
+A static method or static member function is like a method that belongs
+to the class and not to individual objects. In general, this is how you
+decide if a method should be static or not ...
+
+If a method of a class \textit{C} does not work with any regular member
+variable of \textit{C}, then the method should be made static.
+
+\begin{ex}
+Which method should be static?
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    C(char name[]) { strcpy(name_, name); }
+    void print0() const
+    {
+        std::cout << "hello 0\n";
+    }
+    void print1() const
+    {
+        std::cout << "hello " << name_ << std::endl;
+    }
+private:
+    char name_[100];
+};
+
+int main()
+{
+    C c("john");
+    c.print0();
+    c.print1();
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+Here's our class \textit{C} again:
+
+\begin{consolethree}[escapeinside=||]
+// C.h
+#ifndef C_H
+#define C_H
+
+class C
+{
+public:
+    int x;
+    static int y;
+    static int z;
+};
+
+#endif
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// C.cpp
+#include "C.h"
+
+int C::y(42);
+int C::z = 99;
+\end{consolethree}
+
+Note that in general, you want to hide all member variables, static or
+not. So I really should do this:
+
+\begin{consolethree}[escapeinside=||]
+// C.h
+#ifndef C_H
+#define C_H
+
+class C
+{
+public:
+private:
+    int x;
+    static int y;
+    static int z;
+};
+
+#endif
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// C.cpp
+#include "C.h"
+
+int C::y(42);
+int C::z = 99;
+\end{consolethree}
+
+What if I might want to print the value of \textit{C::y}? The following
+does not work any more since \textit{C::y} is now private:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "C.h"
+
+int main()
+{
+    std::cout << C::y << '\n'; // YIKES!!!
+    return 0;
+}
+\end{consolethree}
+
+What should we do?
+
+No problem... you just need a public method to return the value of
+\textit{C::y}:
+
+\begin{consolethree}[escapeinside=||]
+// C.h
+...
+class C
+{
+public:
+    int get_y() const;
+private:
+    ...
+};
+...
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// C.cpp
+#include "C.h"
+
+...
+
+int C::get_y() const
+{
+    return y;
+}
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "C.h"
+
+int main()
+{
+    //std::cout << C::y << '\n';
+    C c;
+    std::cout << c.get_y() << '\n';
+    return 0;
+}
+\end{consolethree}
+
+Note that in this case, we're accessing \textit{C::y}
+using \textit{c}, which is a \textit{C} object. It does work, but note the
+\textit{C::get\_y()} method works only with a static member variable. So
+it's better to make \textit{C::get\_y()} a static method
+like this:
+
+\begin{consolethree}[escapeinside=||]
+// C.h
+...
+class C
+{
+public:
+    |{\bf static}| int get_y(); // remove "const"
+private:
+    ...
+};
+...
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// C.cpp
+#include "C.h"
+
+...
+
+int C::get_y() // remove "const"
+{
+    return y;
+}
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "C.h"
+
+int main()
+{
+    std::cout << C::get_y() << '\n';
+    return 0;
+}
+\end{consolethree}
+
+Easy right?
+
+WARNING: Do not include the \textit{static} keyword in the definition of
+the method in the cpp file. (But if the definition of the static method
+is in the class within the header file, i.e. it is inlined, then you
+have to include the keyword \textit{static}.)
+
+IMPORTANT WARNING ... Because static methods belong to the class rather
+than the object and only work with static member variables, the body of
+the method must not refer to the \textit{this} pointer. There is no
+\textit{this} pointer in the body of a static method. Also, you cannot do
+this:
+
+\begin{consolethree}[escapeinside=||]
+// C.h
+...
+class C
+{
+public:
+    static int get_y() const; // Huh?!?
+private:
+    ...
+};
+...
+\end{consolethree}
+
+Because ``const'' refers to the fact the object making this method call
+cannot be changed by this method. But since the method should be called
+by the class, there's no object involved (even if you
+use a \textit{C} object to invoke \textit{get\_y()}).
+
+Although you can also call a static method through an object:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "C.h"
+
+int main()
+{
+    std::cout << C::get_y() << '\n'; // BETTER
+    C c;
+    std::cout << c.get_y() << '\n'; // WORKS ... BUT
+    return 0;
+}
+\end{consolethree}
+
+\begin{ex}
+Add a public static method C::set\_y() to set the
+value of C::y in the above class C. Test your code.
+\end{ex}
+
+\begin{ex}
+What's wrong here?
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    C(int a) : x_(a) {}
+    static void set() { x_ = a; }
+    static C & clear()
+    {
+        x_ = 0;
+        return (*this);
+    }
+private:
+    static int x_;
+};
+\end{consolethree}
+\end{ex}
+
+
+\newpage\EMPHASIZE{Application: Keeping a count of objects which are alive}
+
+Suppose you want to maintain a count of the number of objects which are
+``alive''. This is what I mean:
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    Car a; // at this point, there's 1 Car obj
+    Car b; // at this point, there are 2 Car objs
+    int x = 42;
+    if (x < 42)
+    {
+        ...
+    }
+    else
+    {
+        Car a; // at this point, there are 3 Car objs
+        Car z; // at this point, there are 4 Car objs
+    }
+    // at this point, there are 2 Car objs
+    Car c; // at this point, there are 3 Car objs
+    Car * p = new Car;
+    // at this point, there are 4 Car objs
+    Car d = c; // at this point, there are 5 Car objs
+    delete p; // at this point, there are 4 Car objs
+    return 0; // at this point, there are 0 Car objs
+}
+\end{consolethree}
+
+All you need to do is to declare a static member in Car to keep track of
+objects which are live:
+
+\begin{consolethree}[escapeinside=||]
+class Car
+{
+public:
+    static int numObjects;
+    ...
+private:
+    ...
+};
+
+int C::numObjects(0);
+\end{consolethree}
+
+Here's what you need to do:
+
+\begin{itemize}
+\item You want to increment each time an object is created, therefore
+  \textit{numObjects} should increment in each constructor, including the
+  copy constructor.
+\item You also want to decrement \textit{numObjects} each time an object is
+  destroyed so you want to decrement \textit{numObjects} in the
+  destructor.
+\end{itemize}
+
+\begin{ex}
+Modify the default destructor to decrement
+\textit{numObjects}. Also, modify the copy constructor so that you
+increment \textit{numObjects}. Complete the following:
+
+\begin{consolethree}[escapeinside=||]
+// Int.h
+#ifndef INT_H
+#define INT_H
+
+class Int
+{
+public:
+    Int(int a=0)
+        : x(a)
+    {
+        numObjects++;
+    }
+private:
+    static int numObjects;
+    ...
+};
+
+#endif
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+#include "Int.h"
+
+int Int::numObjects(0);
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "Int.h"
+
+int main()
+{
+    Int a;
+    std::cout << Int::get_numObjects() << '\n'; // 1
+    Int b;
+    std::cout << Int::get_numObjects() << '\n'; // 2
+    Int c = a;
+    std::cout << Int::get_numObjects() << '\n'; // 3
+    if (1)
+    {
+        Int d = a;
+        std::cout << Int::get_numObjects()
+                  << '\n'; // 4
+    }
+    std::cout << Int::get_numObjects() << '\n'; // 3
+
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+
+\newpage\EMPHASIZE{Application: Controlling default constructor using static object member}
+
+Now let me give you a slightly more complicated example where the static
+member is an object.
+
+If you look at our Date class again, you recall that we use 1970/1/1 as
+a default date in the default constructor:
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+#ifndef DATE_H
+#define DATE_H
+
+class Date
+{
+public:
+    Date(int=1970, int=1, int=1);
+    ...
+private:
+    int yyyy_, mm_, dd_;
+};
+
+#endif
+\end{consolethree}
+
+What if depending on the scenario of usage of the Date class, I
+sometimes want to change the behavior of the default constructor during
+runtime? In other words, occasionally, I might want to change the
+default constructor to initialize the Date object something other than
+1970/1/1. In other words I want this to happen in my main():
+
+\begin{consolethree}[escapeinside=||]
+#include "Date.h"
+
+int main()
+{
+    Date date1; // date1 models 1970/1/1
+    // do something here so that after this point
+    // default Date constructor works differently
+    Date date2; // date2 models 2000/12/25
+
+    return 0;
+}
+\end{consolethree}
+
+How would you do that??? For sure, your program (while
+it's running) cannot possible change the default values
+in the constructor!!!
+
+Well ... here's I would do it ...
+
+Instead of \textbf{hardcoding} 1970/1/1 as default values in the
+constructor:
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+#ifndef DATE_H
+#define DATE_H
+
+class Date
+{
+public:
+    Date(int=|{\bf 1970}|, int=|{\bf 1}|, int=|{\bf 1}|);
+    ...
+private:
+    int yyyy_, mm_, dd_;
+};
+
+#endif
+\end{consolethree}
+
+I store 1970/1/1 as three static integers in the Date class:
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+#ifndef DATE_H
+#define DATE_H
+
+class Date
+{
+public:
+    Date(int=1970, int=1, int=1);
+    ...
+private:
+    ...
+    |{\bf static int default\_yyyy\_;}|
+    |{\bf static int default\_mm\_;}|
+    |{\bf static int default\_dd\_;}|
+};
+
+#endif
+\end{consolethree}
+
+And initialize these static members in the cpp file:
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+...
+Date default_yyyy_(1970);
+Date default_mm_(1);
+Date default_dd_(1);
+...
+\end{consolethree}
+
+These three default integer static members can be used by the default
+constructor. For instance I can set the default values of the parameters
+in the constructor to 0 to mean ``use the static default yyyy, mm, dd'':
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+#ifndef DATE_H
+#define DATE_H
+
+class Date
+{
+public:
+    Date(int=|{\bf 0}|, int=|{\bf 0}|, int=|{\bf 0}|);
+    ...
+private:
+    ...
+    static int default_yyyy_;
+    static int default_mm_;
+    static int default_dd_;
+};
+
+#endif
+\end{consolethree}
+
+and in the \textit{Date} implementation file I do this:
+
+\begin{consolethree}[escapeinside=||]
+//Date.cpp
+#include "Date.h"
+
+Date::Date(int yyyy, int mm, int dd)
+{
+    yyyy_ = (yyyy == 0 ? default_yyyy_ : yyyy);
+    mm_ = (mm == 0 ? default_mm_ : mm);
+    dd_ = (dd == 0 ? default_dd_ : dd);
+}
+...
+\end{consolethree}
+
+Furthermore I can write static methods to modify these static values.
+
+Whoa ... wait ...
+
+The three static integers in fact form a date ... why not just
+bunch them up together into a default static \textit{Date} object like
+this:
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+#ifndef DATE_H
+#define DATE_H
+
+class Date
+{
+public:
+    Date(int=0, int=0, int=0);
+    ...
+private:
+    ...
+    |{\bf static Date default\_date\_;}|
+};
+
+#endif
+\end{consolethree}
+
+and initialize \textit{default\_date\_} in the cpp files like this:
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+...
+Date default_date_(1970, 1, 1);
+...
+\end{consolethree}
+
+The constructor can now use this static default date like this:
+
+\begin{consolethree}[escapeinside=||]
+//Date.cpp
+#include "Date.h"
+
+Date::Date(int yyyy, int mm, int dd)
+{
+    yyyy_ = (yyyy == 0 ? default_date.yyyy_ : yyyy);
+    mm_ = (mm == 0 ? default_date.mm_ : mm);
+    dd_ = (dd == 0 ? default_date.dd_ : dd);
+}
+...
+\end{consolethree}
+
+And we can change the default date like this:
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+#ifndef DATE_H
+#define DATE_H
+
+class Date
+{
+public:
+    Date(int=0, int=0, int=0);
+    ...
+private:
+    ...
+    |{\bf static void set\_default\_date(}|
+        |{\bf int, int, int);}|
+};
+
+#endif
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+//Date.cpp
+#include "Date.h"
+
+...
+
+|{\bf void}| Date::set_default_date(int a, int b, int c)
+{
+    default_date_ = Date(a, b, c); // changing default
+                                   // date
+}
+...
+\end{consolethree}
+
+\begin{ex}
+Modify the above \textit{Date} class so that the constructor
+uses the \textit{default\_date\_} during the constructor and it uses an
+initializer list.
+\end{ex}
+
+\begin{ex}
+Modify \textit{Date} class by adding an integer
+\textit{num\_dates\_} static member that keeps a count of the number of
+\textit{Date} objects which are still in scope. In other words the value
+of \textit{num\_dates\_} will tell us how many \textit{Date} objects are
+still in memory.
+\end{ex}
+
+\begin{ex}
+In the \textit{IntArray} class, keep track of the number of
+bytes used by all objects of this class.
+\end{ex}
+
+\begin{ex}
+In the \textit{IntDynArray} class, keep track of the number of
+bytes used by all objects of this class.
+\end{ex}
+
+\begin{ex}
+In the \textit{IntDynArray} class, keep track of the maximum of
+number of bytes used by all objects in the class.
+\end{ex}
+
+\begin{ex}
+In your \textit{Date} class, keep a static \textit{Date} object
+\textit{earliest\_date} so that the earliest \textit{Date} object
+instantiated will have the same values as \textit{earliest\_date}. If the
+constructor is called with values which model a \textit{Date} before
+\textit{earliest\_date}, then the value of \textit{earliest\_date} is used
+instead.
+\end{ex}
+
+\begin{ex}
+You have a class with 200 methods that you are using
+for a computer game. The class is working well but you want to improve
+on the performance to get a smoother animation. The game is very complex
+and it's practically impossible to optimize every single
+one of the 200 methods. But you still have 1 month before the game is to
+be shipped and you think you can optimize one function. You want to
+focus on the most frequently used method. You don't want
+to read the code and manually count the number of times a method is
+called. How would you figure out which method is used most?
+\end{ex}
+
+
+\newpage\EMPHASIZE{Application: Special global objects}
+
+In class \textit{vec2d}, suppose you \textbf{frequently} use a
+\textit{vec2d} object with x value of 0 and y value of 0. Because of its
+values, let's call this concept (or object) the origin.
+
+You can create \textit{origin} as a public static \textit{vec2d} object in
+\textit{vec2d} class. This allows you do this in \textit{main()}:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "vec2d.h"
+
+int main()
+{
+    std::cout << vec2d::origin << '\n';
+
+    return 0;
+}
+\end{consolethree}
+
+which has the same effect as
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "vec2d.h"
+
+int main()
+{
+    std::cout << vec2d(0, 0) << '\n';
+
+    return 0;
+}
+\end{consolethree}
+
+except that the first method is faster since the second method has to
+create \textit{vec2d(0,0)} during runtime and if you need
+\textit{vec2d(0,0)} again and again and again and again it might be slower
+(especially if the class in question has a lot more member variables and
+consumes a lot more memory.)
+
+\begin{ex}
+Create a public static \textit{vec2d} object member in
+your \textit{vec2d} class so that you can run this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "vec2d.h"
+
+int main()
+{
+    std::cout << vec2d::origin << '\n';
+
+    return 0;
+}
+\end{consolethree}
+
+Next, note that the member variables of \textit{vec2d::origin} do not
+change their values. Modify \textit{vec2d::origin} so that it is a
+\textbf{constant} public static member object of \textit{vec2d}.
+\end{ex}
+
+
+\newpage\EMPHASIZE{Application: Debug printing flag for a class}
+
+Sometimes when you first write a class, you might need to print low
+level information on the objects created from that class. You can switch
+between usual printing and low level debug printing for this class by
+keeping a boolean flag in the class.
+
+Here's out IntDynArr class for handling dynamic array of
+integer values:
+
+\begin{consolethree}[escapeinside=||]
+// IntDynArr.h
+#ifndef INTDYNARRAY_H
+#define INTDYNARRAY_H
+
+class IntDynArr
+{
+public:
+    ...
+    void print() const;
+private:
+    int * x_;
+    int size_;
+    int capacity_;
+};
+
+#endif
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// IntDynArr.cpp
+#include <iostream>
+
+void IntDynArray::print() const
+{
+    std::cout << '[';
+    for (int i = 0; i < size_ - 1; ++i)
+    {
+        std::cout << x_[i] << ", ";
+    }
+    if (size_ - 1 >= 0)
+    {
+        std::cout << x_[size_ - 1];
+    }
+    std::cout << ']';
+}
+\end{consolethree}
+
+If \textit{arr} is an object of the above class and the array
+\textit{arr.x\_} points to has values 2, 4, 6 (the size is 3), then
+\textit{arr.print()} will print
+
+\begin{console}[escapeinside=||]
+[2, 4, 6]
+\end{console}
+
+While you're writing (and debugging!) the class, you
+might want to print \textit{arr.size\_} and \textit{arr.capacity\_} You
+might want to do this:
+
+\begin{consolethree}[escapeinside=||]
+// IntDynArr.h
+#ifndef INTDYNARRAY_H
+#define INTDYNARRAY_H
+
+class IntDynArr
+{
+public:
+    ...
+    void print() const;
+    |{\bf static void set\_debug(bool);}|
+private:
+    |{\bf static bool debug;}|
+    int * x_;
+    int size_;
+    int capacity_;
+};
+
+#endif
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// IntDynArr.cpp
+#include <iostream>
+
+bool IntDynArry::debug(false);
+
+void IntDynArray::print() const
+{
+    std::cout << '[';
+    for (int i = 0; i < size_ - 1; ++i)
+    {
+        std::cout << x_[i] << ", ";
+    }
+    if (size_ - 1 >= 0)
+    {
+        std::cout << x_[size_ - 1];
+    }
+    std::cout << ']';
+    |{\bf if (debug)}|
+    {
+        std::cout << size_ << ' '
+                  << capacity_;
+    }
+}
+\end{consolethree}
+
+Or you can even print all the value \textit{arr.x\_[0]}, ...,
+\textit{arr.x\_[arr.capacity\_]} when \textit{IntDynArry::debug} is
+\textit{true}.
+
+Your \textit{main()} can then turn on/off debug printing:
+
+\begin{consolethree}[escapeinside=||]
+...
+
+int main()
+{
+    IntDynArray::set_debug(true); // turn on debug
+                                  // printing
+    IntDynArr arr;
+    arr.print();
+    IntDynArr::set_debug(false); // turn off debug
+                                 // printing
+    arr.print();
+    return 0;
+}
+\end{consolethree}
+
+
+\newpage\EMPHASIZE{Initialization of static constant integer members (DIY)}
+
+You can initialize static, \textbf{constant} integer members (int, char,
+etc) in class declaration with constant expression. In other words
+instead of this:
+
+\begin{consolethree}[escapeinside=||]
+// C.h
+class C
+{
+public:
+    static const int c;
+};
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// C.cpp
+const int C::c(1);
+\end{consolethree}
+
+You can do this:
+
+\begin{consolethree}[escapeinside=||]
+// C.h
+class C
+{
+public:
+    static const int c |{\bf = 1}|;
+};
+\end{consolethree}
+
+This ``inline initialization'' is valid only for integer constants
+(which includes character constants):
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    static const int c1 = 1;        // OK
+    static const int c2 = f(5.3);   // ERROR
+    static int c3 = 33;             // ERROR
+    const int c4 = 4444;            // ERROR
+    static const double c5 = 5.5;   // ERROR
+};
+\end{consolethree}
+
+(For \textit{c4}, a later C++ compiler which is C++11 compliant might
+allow you to initialize \textit{c4} inside the class definition.)
+
+Here's a valid use of static constant integer member:
+
+\begin{consolethree}[escapeinside=||]
+class GameEngine
+{
+public:
+    static const int version = 3;
+    ...
+};
+\end{consolethree}
+
+You can also use \textit{enum} to create static constant integer members:
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    enum {c1=1, c2=22, c3=333, c4=44, c5=5};
+};
+
+int main()
+{
+    std::cout << C::c1 << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+\begin{ex}
+Experiment with this class:
+
+\begin{consolethree}[escapeinside=||]
+class Employee {
+public:
+    enum Type {CEO, MGR, FULL_TIME, PART_TIME};
+    Employee(char[], Type);
+private:
+    char name_[1024];
+    Type type_;
+};
+
+int main()
+{
+    std::cout << Employee::CEO << std::endl;
+}
+\end{consolethree}
+\end{ex}
+
+
+\newpage\EMPHASIZE{Summary}
+
+Static members are members associated to the class rather than to
+objects.
+
+All the objects share the static members. Static methods do not have
+\textit{this} pointer. To make member or method static, include the
+keyword \textit{static} before the declaration of member or method in the
+class declaration.
+
+In the definition of static members and methods in the implementation
+file do not include \textit{static} keyword.
+
+If a static member \textit{x} is public in \textit{class C}, you can access
+it by \textit{C::x} or \textit{obj.x} if \textit{obj} is a \textit{C} object.
+
+If a static method \textit{m()} is public in a \textit{class C}, you call it
+by \textit{C::m()} or \textit{obj.m()} where \textit{obj} is a \textit{C}
+object.
+
+Some uses of static members include
+
+\begin{itemize}
+\item Object counter
+\item Default objects of a class to control default constructor
+\item Special global objects within a class
+\end{itemize}
