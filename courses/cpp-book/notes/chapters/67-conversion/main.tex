@@ -1,0 +1,390 @@
+\newpage\EMPHASIZE{67. Conversion}
+
+\textsc{Objectives}
+\begin{itemize}
+\item Use constructors for conversion
+\item Overload conversion operators
+\item Define constructors explicitly
+\end{itemize}
+
+
+\newpage\EMPHASIZE{Conversion using a constructor}
+
+C++ will generate an automatic conversion using a constructor call if
+necessary in order to find a best match for a method.
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    Int(int a)
+        : x_(a)
+    {}
+    void m(Int c) { std::cout << x_ << '\n'; }
+private:
+    int x_;
+};
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    Int c(0), d(1);
+    c.m(d);
+    |{\bf c.m(2);}|
+    return 0;
+}
+\end{consolethree}
+
+However, there is an exception: The constructor is \textbf{not} invoked
+for the left-hand side of \textit{.} And \textit{->}:
+\textit{3.m(1)} will not become \textit{C(3).m(1)}. You still might want to
+write your own \textit{m(int)} for efficiency.
+
+But there are problems with conversion using constructors:
+
+\begin{itemize}
+\item You cannot convert \textbf{to} built-in types (int, double, etc.)
+  because they are not objects
+\item You cannot convert from an object of class \textit{C} to an object of
+  class \textit{D} (without changing the declaration of \textit{D})
+\end{itemize}
+
+So ...
+
+
+\newpage\EMPHASIZE{Conversion operators}
+
+Suppose \textit{D} is a type (class or built-in type like int, double,
+...) and \textit{C} is a class. You can define a \textbf{conversion
+operator} from \textit{C} to \textit{D}. This should look like
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    ...
+    operator D();
+    ...
+};
+\end{consolethree}
+
+WARNING: Do not specify a return type. C++ knows that the return type
+will be \textit{D}. Also, conversion operators are usually \textit{const}.
+
+Let's make an addition to our \textit{Int} class
+
+\begin{consolethree}[escapeinside=||]
+class Int {
+public:
+    Int(int a)
+        : x_(a)
+    {}
+    |{\bf operator int() const \{ return x\_; \}}|
+private:
+    int x_;
+};
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    Int c(0);
+    std::cout << |{\bf (int) c}| << " " << |{\bf int(c)}|;
+    return 0;
+}
+\end{consolethree}
+
+\textit{(int) c} and \textit{int(c)} are the same as \textit{c.operator
+int()}.
+
+Here's another example:
+
+\begin{consolethree}[escapeinside=||]
+class D
+{
+public:
+    D(int a, int b)
+        : x_(a), y_(b)
+    {}
+    void print()
+    {
+        std::cout << "(" << x_ << "," << y_ << ")\n";
+    }
+private:
+    int x_, y_;
+};
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    Int(int a)
+        : x_(a)
+    {}
+    operator D() { return D(x_,x_); }
+private:
+    int x_;
+};
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    Int c(2);
+    ((D)c).print();
+    D(c).print();
+    return 0;
+}
+\end{consolethree}
+
+
+\newpage\EMPHASIZE{Automatic Conversion}
+
+C++ will automatically generate a call to conversion operators if
+necessary to find a best match for a method.
+
+\textbf{WARNING:} C++ will only generate one automatic conversion for
+each value.
+
+\textbf{WARNING:} Default conversions are used first (example
+\textit{double()}).
+
+C++ will use user-defined conversion only when necessary. No errors
+during compilation.
+
+\begin{consolethree}[escapeinside=||]
+class D
+{
+public:
+    D(int a, int b)
+        : x_(a), y_(b)
+    {}
+private:
+    int x_, y_;
+};
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    Int(int a)
+        : x_(a)
+    {}
+    operator D()
+    {
+        std::cout << "Int::D()\n";
+        return D(x_,x_);
+    }
+    void m(D d)
+    {
+        std::cout << "m(D)\n";
+    }
+private:
+    int x_;
+};
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    Int c0(2), c1(3);
+    c0.m(c1);
+    return 0;
+}
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+class E {};
+
+class D
+{
+public:
+    operator E()
+    {
+        ...
+    }
+};
+
+class C
+{
+public:
+    operator D()
+    {
+        ...
+    }
+};
+
+int main()
+{
+    E e1 = D(C());
+    E e2 = D();
+    |{\bf E e3 = C();}|
+    return 0;
+}
+\end{consolethree}
+
+\textbf{ERROR:} \textbf{Two} automatic conversions needed, \textit{C} to
+\textit{D} to \textit{E}. i.e. C++ will \textbf{not} convert
+
+\textit{E e3 = C()}
+
+to
+
+\textit{E e3 = E(D(C()))}
+
+Here's another example:
+
+\begin{consolethree}[escapeinside=||]
+class D {};
+
+class C
+{
+public:
+    operator D() { std::cout << "C::D()\n"; }
+};
+
+void f(D d) { std::cout << "f(D)\n"; }
+
+void f(double d) { std::cout << "f(double)\n"; }
+
+int main()
+{
+    f(1);
+    return 0;
+}
+\end{consolethree}
+
+Notice that the default conversion to a \textit{double()} was used instead
+of the \textit{C::D()} conversion.
+
+
+\newpage\EMPHASIZE{Advice}
+
+Do not have too many conversion operators. Doing so might lead to
+ambiguities. For instance, suppose you have conversion operators from
+\textit{C} to \textit{D} and vice versa; you also have \textit{operator+} in
+\textit{C} and \textit{D}. If you run the following code
+
+\begin{consolethree}[escapeinside=||]
+C c;
+D d;
+c + d;
+\end{consolethree}
+
+you'll see that your compiler does not know if it should do
+
+\textit{D(c) + d} using \textit{D::operator+}
+
+or
+
+\textit{c + C(d)} using \textit{C::operator+}
+
+Here's another tip: If you have two classes \textit{C} and
+\textit{D} where \textit{C} is ``included'' in D, then it's
+better to have automatic conversion from \textit{C} to \textit{D}. Consider
+the following example:
+
+Let's say you have an \textit{Int} class and a
+\textit{Fraction} class. You should have a \textit{operator Fraction()}
+declared in the \textit{Int} class. Note that you can achieve the same
+thing by having a constructor of the form:
+
+\textit{Fraction(const Int \&) const;}
+
+
+\newpage\EMPHASIZE{Explicit}
+
+You can prevent automatic type conversion via constructors.
+Here's an example:
+
+\textit{\textbf{explicit} Fraction(int);}
+
+In this case, C++ will \textbf{not} perform automatic type conversion
+from an \textit{int} to a \textit{Fraction}.
+
+Here's an example of what you've already seen before:
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    C(int i)
+    {}
+};
+
+void f(C c)
+{
+}
+
+int main()
+{
+    f(1);
+    return 0;
+}
+\end{consolethree}
+
+You should already know that this will not produce any errors;
+\textit{f(1)} automatically becomes \textit{f(C(1))}. However, if you run
+this
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    |{\bf explicit}| C(int i)
+    {}
+};
+
+void f(C c)
+{
+}
+
+int main()
+{
+    f(1);
+    return 0;
+}
+\end{consolethree}
+
+You'll get an error! The compiler does not know what to
+do because we did not define a way for an \textit{int} to be converted to
+a \textit{C} object.
+
+Note that
+
+\begin{itemize}
+\item Only constructors can be made explicit.
+\item You cannot make type conversion operators which are not a constructor
+  explicit.
+\end{itemize}
+
+Here's an example of the second restriction:
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+    explicit C(int); // OK
+    |{\bf explicit}| operator int() const; // |{\bf BAD!}|
+};
+\end{consolethree}
+
+\textbf{In the future}, C++ will allow all type conversion to be made
+\textit{explicit}. (NOTE: C++11 (i.e., C++ 2011) supports \textit{explicit}
+for type conversion.)
+
+Now, suppose the \textit{Fraction} class has the constructor
+\textit{Fraction(int)} and \textit{operator int()}. If we run
+
+\textit{Fraction r(1, 2);}
+
+\textit{std::cout << r + 1 << '\textbackslash n';}
+
+Which is used? \textit{int(r) + 1} or \textit{r + Fraction(1)}? \textbf{If} \textit{operator int()}
+is explicit. Then the above would execute
+
+\textit{r + Fraction(1)}
+
+\end{document}

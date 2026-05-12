@@ -1,0 +1,1323 @@
+\newpage\EMPHASIZE{65. Operator Overloading}
+
+\textsc{Objectives}
+\begin{itemize}
+\item Overloading Operators
+\end{itemize}
+
+
+\newpage\EMPHASIZE{Review}
+
+The name of some methods are awkward to use.
+
+For certain data (objects) we are more used to operators rather than
+method names.
+
+Consider the following:
+
+\begin{consolethree}[escapeinside=||]
+// Fraction.h
+class Fraction
+{
+public:
+    Fraction(int n=0, int d=1)
+        : n_(n), d_(d)
+    {}
+    Fraction plus(const Fraction &) const;
+    void print() const;
+private:
+    int n_, d_; // numerator,denominator
+};
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// Fraction.cpp
+#include "Fraction.h"
+
+Fraction Fraction::plus(const Fraction & a) const
+{
+    return Fraction(n_ * a.d_ + d_ * a.n_, d_ * a.d_);
+}
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+#include "Fraction.h"
+
+int main()
+{
+    Fraction a(1,3), b(1,4); // a=1/3 and b=1/4
+    Fraction c = a.plus(b); // basically, c = a + b
+    return 0;
+}
+\end{consolethree}
+
+So, if we want \textit{c = a + b * c -- d}, it would have to look like
+
+\textit{c = (a.plus(b.mult(c))).subtract(d)}
+
+YUCK!!!
+
+
+\newpage\EMPHASIZE{Operator as a Method}
+
+\begin{consolethree}[escapeinside=||]
+// Fraction.h
+class Fraction
+{
+public:
+    Fraction(int n=0, int d=1)
+        : n_(n), d_(d)
+    {}
+    Fraction operator+(const Fraction &) const;
+private:
+    int n_, d_; // numerator,denominator
+};
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// Fraction.cpp
+#include "Fraction.h"
+
+Fraction Fraction::operator+(const Fraction & b) const
+{
+    return Fraction(n_ * b.d_ + d_ * b.n_, d_ * b.d_);
+}
+\end{consolethree}
+
+Re-defining \textit{+}, so that we have \textit{+} for \textit{int},
+\textit{double}, and \textit{Fraction}.
+
+\begin{consolethree}[escapeinside=||]
+#include "Fraction.h"
+
+int main()
+{
+    Fraction a(1,3), b(1,4);
+    Fraction c = a + b;
+    Fraction d = a.operator+(b);
+    return 0;
+}
+\end{consolethree}
+
+Most programming languages allow you to define operators (with their own
+syntax). There are languages that do not have operator overloading.
+Example: Java.
+
+\begin{consolethree}[escapeinside=||]
+// Fraction.cpp
+#include "Fraction.h"
+
+Fraction Fraction::operator*(const Fraction & b) const
+{
+    return Fraction(n_ * b.n_, d_ * b.d_);
+}
+\end{consolethree}
+
+Test it:
+
+\begin{consolethree}[escapeinside=||]
+#include "Fraction.h"
+
+int main()
+{
+    Fraction a(1, 3), b(1, 4);
+    Fraction c = a * b;
+    return 0;
+}
+\end{consolethree}
+
+
+\newpage\EMPHASIZE{Operator in/outside the class}
+
+In general suppose \textit{a,b} are objects of class \textit{C}.
+
+C++ will interpret \textit{a + b} as either
+
+\textit{a + b} is the same as \textit{a.operator+(b)}
+
+or
+
+\textit{a + b} is the same as \textit{operator+(a, b)}
+
+For \textit{a.operator+(b)}, C++ will look for \textit{operator+} in the
+class \textit{C} (i.e., the class of \textit{a}) that accepts \textit{b}
+(object of class \textit{C})
+
+For \textit{operator+(a, b)}, C++ will look for an \textit{operator+} not in
+any class that accepts \textit{a,b} of class \textit{C}
+
+For instance, for \textit{Fraction} class
+
+\begin{consolethree}[escapeinside=||]
+class Fraction
+{
+public:
+    ...
+    Fraction operator+(const Fraction & b) const {...}
+};
+\end{consolethree}
+
+will let you execute \textit{a + b} where \textit{a,b} are \textit{Fraction}
+objects as \textit{a.operator+(b)}
+
+... or ...
+
+... if you prefer an operator \textbf{outside} the class:
+
+\begin{consolethree}[escapeinside=||]
+class Fraction
+{
+public:
+    ...
+};
+
+Fraction operator+(const Fraction & a, const Fraction & b)
+{
+    ...
+}
+\end{consolethree}
+
+will let you execute \textit{a + b}, where \textit{a,b} are \textit{Fraction}
+objects, as \textit{operator+(a, b)}.
+
+It is preferable to have an operator in a class if possible. You
+\textbf{cannot} have both:
+
+\begin{consolethree}[escapeinside=||]
+class Fraction
+{
+public:
+    Fraction operator+(const Fraction & b) const
+    {
+        ...
+    }
+};
+
+// |{\bf DANGER!}| can't have both above and the following together
+
+Fraction operator+(const Fraction & a, const Fraction & b)
+{
+    ...
+}
+\end{consolethree}
+
+Why? Because C++ does not know which \textit{operator+} to use if you give
+C++ both options. So you should only have either:
+
+\textit{Fraction Fraction::operator+(const Fraction \&) const}
+
+or
+
+\textit{Fraction operator+(const Fraction \&, const Fraction \&)}
+
+but not both.
+
+You can overload the following:
+
+\texttt{+ - * / \% \^{} \& |}
+
+\texttt{+= -= *= /= \%= \^{}= \&= |=}
+
+\texttt{! = < > << >> \~{} [ ]}
+
+\texttt{!= == <= >= <<= >>=}
+
+\texttt{\&\& || ++ -{}- ->* , -> ()}
+
+\texttt{new new[] delete delete[]}
+
+Warning: You cannot define your own functions for
+
+\textit{:: . .* ?: sizeof}
+
+
+\newpage\EMPHASIZE{Precedence rules}
+
+Usual precedence rules apply automatically. So if you have
+\textit{operator+} and \textit{operator*} for class C, then
+
+\textit{a = b + c * d;}
+
+is the same as
+
+\textit{a = b + (c * d);}
+
+i.e.,
+
+\textit{a = b.operator+(c.operator*(d));}
+
+\textbf{Reminder:} Review precedence rules from CISS240.
+
+
+\newpage\EMPHASIZE{Binary \& unary operators}
+
+Some operators are binary (example \textit{*}), some are unary (example
+\textit{!}), and some are both (example \textit{-})
+
+\textit{C a = b -- c;}
+
+\textit{C d = -b;}
+
+The function/method called is based on signature:
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+    ...
+    C operator-();
+    C operator-(C);
+    ...
+};
+\end{consolethree}
+
+In general for operator \textit{<op>}
+
+\textit{a <op> b} is the same as \textit{a.operator<op>(b)} or \textit{operator<op>(a,b)}
+
+\textit{<op> a} is the same as \textit{a.operator<op>()} or \textit{operator<op>(a)}
+
+\textit{a<op>} is the same as \textit{a.operator<op>(int)} or \textit{operator<op>(a,int)}
+
+Here's how C++ looks for operators to execute for
+\textit{+} (unary and binary), \textit{+=, ++} (pre and post)
+
+\textit{+a} is the same as \textit{a.operator+()} or \textit{operator+(a)}
+
+\textit{a += b} is the same as \textit{a.operator+=(b)} or \textit{operator+=(a,b)}
+
+\textit{a + b} is the same as \textit{a.operator+(b)} or \textit{operator+(a,b)}
+
+\textit{++a} is the same as \textit{a.operator++()} or \textit{operator++(a)}
+
+\textit{a++} is the same as \textit{a.operator++(0)} or \textit{operator++(a,0)}
+
+
+\newpage\EMPHASIZE{Pre and post operators}
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    Int(int x=0)
+        : x_(x)
+    {}
+    void operator++()
+    {
+        std::cout << "pre\n"; ++x_;
+    }
+    void operator++(int a)
+    {
+        std::cout << "post " << a << "\n"; x_++;
+    }
+    int get() { return x_; }
+private:
+    int x_;
+};
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    C x(4);
+    ++x;
+    std::cout << x.get() << "\n";
+    x++;
+    std::cout << x.get() << "\n";
+    return 0;
+}
+\end{consolethree}
+
+C++ translates \textit{++x} and \textit{x++} as:
+
+\textit{++x} is the same as \textit{x.operator++()}
+
+\textit{x++} is the same as \textit{x.operator++(0)}
+
+i.e., for post operators, C++ calls operator with a value of 0.
+
+\begin{ex}
+Overload the operators needed for the following code to run:
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    Int i(5), j(9), k(0);
+    j = i++; j = ++i;
+    i = j--; i = --j;
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+
+\newpage\EMPHASIZE{Restriction on arguments}
+
+Whether the operator is unary or binary is fixed. Just try to recall
+their meanings from CISS240. For example, \textit{\%} (remainder operator)
+is a \textbf{binary} operator: \textit{3 \% 5} is meaningful; \textit{5\%}
+has no meaning. So you cannot overload \textit{operator\%} by declaring
+and defining a unary \textit{\%}:
+
+\textit{C C::operator\%()}
+
+\textit{operator\%} \textbf{must} be
+
+\textit{C C::operator\%(C)}
+
+or
+
+\textit{C C::operator\%(const C \&)}
+
+etc.
+
+Other correct declarations:
+
+\textit{C* operator\&();}
+
+See operators \textit{[], (), ->}, etc. later.
+
+
+\newpage\EMPHASIZE{Hiding pre-defined operators}
+
+Here are the pre-defined class operators:
+
+\textit{= \& ,}
+
+If you do not want these pre-defined operators to be callable, just
+declare them as private. You need \textbf{not} define them:
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+private:
+    C & operator=(const C &);
+};
+\end{consolethree}
+
+
+\newpage\EMPHASIZE{Operators <op> and <op>=}
+
+Defining \textit{+} does not give you \textit{+=} automatically.
+
+Here's some advice: define + in terms of \textit{+=},
+\textit{-} in terms of \textit{-=}, etc. For instance:
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    ...
+    Int & operator+=(const Int & c)
+    {
+        x_ += c.x_;
+        return (*this);
+    }
+    Int operator+(Int c) const
+    {
+        return (Int(*this) += c);
+    }
+    ...
+private:
+    int x_;
+};
+\end{consolethree}
+
+A \textbf{nonmember function} is just a function not in a class (i.e.,
+not a method). If the function works with objects from a particular
+class, then the function is included with the class. You should
+
+\begin{enumerate}
+\item Put the function prototype in the header file (\textit{*.h})
+\item Define the function in the implementation file (\textit{*.cpp})
+\item Note that the function prototype is outside the class declaration
+\end{enumerate}
+
+Since the function prototype is out the class, it does \textbf{not} have
+access to the private members of the class. You can overwrite this for
+efficiency (later). Note that here \textit{+=} is more efficient than \textit{+}, same
+for integer \textit{+} and \textit{+=}. Also note that we want to do
+
+\textit{(a += b) += b;}
+
+\textit{c = (a += b); // i.e., a+=b; c=a;}
+
+That's why \textit{operator+=} returns a reference to
+\textit{*this}.
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    ...
+    |{\bf Int \&}| operator+=(const C & c)
+    {
+        x += c.x;
+        |{\bf return (*this);}|
+    }
+    ...
+};
+\end{consolethree}
+
+And \textit{operator+} can be written like this:
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    ...
+    Int operator+(const Int c) const
+    {
+        |{\bf return (Int(*this) += c);}|
+    }
+    ...
+};
+\end{consolethree}
+
+
+\newpage\EMPHASIZE{Commutation}
+
+At this point for \textit{Int} objects \textit{a} and \textit{b}, \textit{a + b}
+and \textit{b + a} make sense.
+
+\textit{a + b} is
+
+C++ will look for \textit{a.operator+(b)} or \textit{operator+(a,b)}. BUT
+... what if you want to do \textit{a + 1} or \textit{1 + a}? We'll talk
+about \textit{1 + a} first ...
+
+If \textit{a} is an \textit{Int} object,
+
+\textit{1 + a} is
+
+\textit{1} is not an object so \textit{1.operator+(a)} does not make sense.
+
+Therefore, \textbf{you will need to define this function outside the
+}\textit{\textbf{Int}}\textbf{ class:}
+
+\textit{Int operator+(int c, const Int \& a);}
+
+\begin{consolethree}[escapeinside=||]
+// Int.h
+class Int
+{
+public:
+    ...
+    Int & operator+=(const Int & c);
+    Int operator+(Int c) const
+    {
+        return (Int(*this) += c);
+    }
+    ...
+private:
+    int x_;
+};
+
+Int operator+(int, const Int &);
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// Int.cpp
+...
+
+Int operator+(int a, const int & b)
+{
+    return Int(a) + b;
+}
+...
+\end{consolethree}
+
+You have the same issue if you want to do this:
+
+\textit{Int a(6);}
+
+\textit{Int b = 5 * a;}
+
+is the same as
+
+\textit{Int b = operator*(5,a);}
+
+\textbf{You will need to define the function outside the
+}\textit{\textbf{Int}}\textbf{ class:}
+
+\textit{Int operator*(int c, const Int \& a);}
+
+Now back to the other case: \textit{a + 1}. If you have a class \textit{C},
+then
+
+\textit{C c = 1;}
+
+is the same as
+
+\textit{C c(1);}
+
+If \textit{C(1)} is a valid constructor call. In this case, the
+constructor was called \textbf{implicitly}. That means that for the
+\textit{Int} class,
+
+\textit{Int i(42), j(0);}
+
+\textit{j = i + 1; // becomes j = i + Int(1);}
+
+So you do \textbf{not} need \textit{operator+(const Int\&, int);}
+
+\begin{ex}
+How many constructor calls are there? Where?
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+class Int
+{
+public:
+    Int(int x)
+        : x_(x)
+    {
+        std::cout << "Int\n";
+    }
+    Int operator+(const Int & i)
+    {
+        return Int(x_ + i.x_);
+    }
+private:
+    int x_;
+};
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+#include "Int.h"
+
+int main()
+{
+    Int i(42), j(0);
+    j = i + 1;
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+
+\newpage\EMPHASIZE{operator[]}
+
+If \textit{c} is a \textit{C} object, C++ translates \textit{c[n]} like
+this:
+
+\textit{c[n]} is the same as \textit{c.operator[](n)}
+
+\textit{operator[]} must be a member function.
+
+\begin{consolethree}[escapeinside=||]
+class IntDynArr
+{
+public:
+    IntDynArr(int s)
+        : size_(s), p_(new int[s])
+    {}
+    ~IntDynArr() { delete [] p_; }
+    |{\bf int operator[](int n)}| { return p_[n]; }
+private:
+    int size_;
+    int * p_;
+};
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    IntDynArr c(100);
+    std::cout << c[5] << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+But what about this?
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    IntDynArr c(100);
+    c[5] = 23; // ERROR!
+    std::cout << c[5] << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+class IntDynArr
+{
+public:
+    IntDynArr(int s)
+        : size_(s), p_(new int[s])
+    {}
+    ~IntDynArr() { delete [] p_; }
+    ...
+    |{\bf int \& operator[](int n)}|
+    {
+        return p_[n];
+    }
+    ...
+private:
+    int size_;
+    int * p_;
+};
+\end{consolethree}
+
+Of course you can includes checks like \textit{size >= 0} for
+constructor, and argument of \textit{[]} is within bounds:
+
+\begin{consolethree}[escapeinside=||]
+...
+int & operator[](int n)
+{
+    if (n >= 0 && n < size)
+        return p_[n];
+}
+...
+\end{consolethree}
+
+But what if \textit{n < 0} or \textit{n >= size}?
+
+Later, we will handle such errors with \textbf{exceptions}.
+
+Now include
+
+\begin{consolethree}[escapeinside=||]
+...
+int & operator[](int n) const
+{
+    if (n >= 0 && n < size)
+        return p_[n];
+}
+...
+\end{consolethree}
+
+What is the point of this?
+
+
+\newpage\EMPHASIZE{operator()}
+
+Suppose you have class \textit{C} and \textit{c} is an object of class
+\textit{C}. C++ translates \textit{c(a)} like this:
+
+\textit{c(a)} is the same as \textit{c.operator()(a)}
+
+\textbf{The point:} makes object look like a function
+
+\begin{consolethree}[escapeinside=||]
+class Square
+{
+public:
+    int operator()(int x)
+    {
+        return x * x;
+    }
+};
+
+int main()
+{
+    Square square;
+    std::cout << square(5);
+    return 0;
+}
+\end{consolethree}
+
+Why not just use functions? Make object remember previous
+computation(s).
+
+\begin{consolethree}[escapeinside=||]
+class Square
+{
+public:
+    Square()
+        : last_square_(-1)
+    {}
+    int operator()(int x)
+    {
+        if (last_square_ != -1 && x == last_x_)
+        {
+            return last_square_;
+        }
+        else
+        {
+            last_x_ = x;
+            last_square_ = x * x;
+            return last_square_;
+        }
+    }
+private:
+    int last_x_, last_square_;
+};
+\end{consolethree}
+
+This is helpful if you frequently compute the last square and the
+computation of \textit{x * x} costs more than the computation of the
+boolean values in the code.
+
+You can also remember not just the history of one computation, but use
+an array.
+
+Some computations are so intensive that some form of ``history'' of
+computations is absolutely necessary.
+
+Here's the Fibonacci sequence:
+
+0, 1, 1, 2, 3, 5, 8, 13, 21, ...
+
+You start off with 0, 1. Subsequent terms are the sum of the previous
+two. Here's a simple Fibonacci function:
+
+\begin{consolethree}[escapeinside=||]
+int fib(int n)
+{
+    if (n == 0)
+        return 0;
+    else if (n == 1)
+        return 1;
+    else
+        return fib(n-1) + fib(n-2);
+}
+\end{consolethree}
+
+Try to execute \textit{fib} for high values of \textit{n}:
+
+\begin{consolethree}[escapeinside=||]
+for (int n = 0; n < 100; n++)
+{
+    Std::cout << n << ',' << fib(n) << '\n';
+}
+\end{consolethree}
+
+Why is it so slow? \textit{fib(90)} calls \textit{fib(89)} and
+\textit{fib(88)} and adds their return values. \textit{fib(89)} calls
+\textit{fib(88)} and \textit{fib(87)} and adds their return values. Etc.
+There are many re-computations!!!
+
+Let's remedy this by making a class:
+
+\begin{consolethree}[escapeinside=||]
+class Fibonacci
+{
+public:
+    Fibonacci()
+    {
+        lookup_[0] = 0;
+        lookup_[1] = 1;
+        for (int i = 2; i < 100; i++)
+        {
+            lookup_[i] = -1;
+        }
+    }
+private:
+    int lookup_[100];
+}
+\end{consolethree}
+
+In \textit{lookup\_}, if \textit{lookup\_[i]} is \textit{-1}, it means
+that the \textit{i}th value of Fibonacci has not been stored in
+\textit{lookup\_[i]} yet.
+
+Now add \textit{operator()}:
+
+\begin{consolethree}[escapeinside=||]
+int Fibonacci::operator(int n)
+{
+    if (n < 100) // within lookup_'s range
+    {
+        // not stored in lookup_ yet
+        if (lookup_[n] == -1)
+            lookup_[n] = (*this)(n - 1) + (*this)(n - 2);
+        return lookup_[n];
+    }
+    else // outside lookup_'s range
+    {
+        return (*this)(n - 1) + (*this)(n - 2);
+    }
+}
+\end{consolethree}
+
+Now test this version of the Fibonacci computation:
+
+\begin{consolethree}[escapeinside=||]
+Fibonacci fib;
+for (int n = 0; n < 100; n++)
+{
+    std::cout << n << ',' << fib(n) << '\n';
+}
+\end{consolethree}
+
+Another reason to use objects that look like function: the computation
+involves two (or more) values but one of them does not change. Store
+that unchanging value in the object.
+
+\begin{consolethree}[escapeinside=||]
+class AddBy
+{
+public:
+    AddBy(int x) : x_(x) {}
+    int operator()(int y) { return x_ + y; }
+private:
+    int x_;
+};
+\end{consolethree}
+
+Test it with:
+
+\begin{consolethree}[escapeinside=||]
+AddBy f(5);
+std::cout << f(3) << ',' << f(11) << '\n';
+AddBy g(10);
+std::cout << g(3) << ',' << g(11) << '\n';
+\end{consolethree}
+
+You can also provide methods to modify the \textit{x\_} in the class.
+
+
+\newpage\EMPHASIZE{operator=}
+
+The default \textit{=} operator will perform member-wise copy. For
+example: If you have the following class
+
+\begin{consolethree}[escapeinside=||]
+class vec2i
+{
+private:
+    int x_, y_;
+};
+\end{consolethree}
+
+and you have objects \textit{p, q} of \textit{vec2i}. Then \textit{p=q} will
+have the same effect as \textit{p.x\_ = q.x\_}, \textit{p.y\_ = q.y\_}.
+
+\textbf{WARNING:} You might actually not want \textit{operator=} to behave
+as above. Why? Can you think of some examples where the default
+\textit{operator=} is bad?
+
+You can overwrite the default \textit{=} by creating your own
+\textit{operator=}.
+
+You definitely want to do this if your object holds on to some form of
+system resource. Example: There is a pointer in your object.
+
+The default \textit{operator=} is called the \textbf{default copy
+operator} (not to be confused with the copy constructor which is a
+constructor that has an object as parameter). Note that you can do this:
+
+\textit{SomeClass a, b, c, d;}
+
+\textit{a = b = c = d;}
+
+This is because the second statement is
+
+\textit{a = (b = (c = d));}
+
+i.e.,
+
+\textit{a = (b = (c.operator=(d)));}
+
+This implies that \textit{c.operator=(d)} has a return value. This will be
+mentioned later.
+
+
+\newpage\EMPHASIZE{operator= Returning Value}
+
+What do we want to achieve with
+
+\textit{a = b = c = d;}
+
+We want to set \textit{c} to \textit{d}, then \textit{b} to \textit{c}.
+Therefore in
+
+\textit{a = (b = (c.operator=(d)));}
+
+we want (basically)
+
+\textit{c = d;}
+
+\textit{a = b = c;}
+
+Therefore for a class \textit{C} we want \textit{operator=} to look like
+this:
+
+\begin{consolethree}[escapeinside=||]
+C & C::operator=(const C & c)
+{
+    ... some code ...
+    return (*this);
+}
+\end{consolethree}
+
+What if we have the following instead? Why is this version a bad idea?
+
+\begin{consolethree}[escapeinside=||]
+C C::operator=(const C & c)
+{
+    ... some code ...
+    return (*this);
+}
+\end{consolethree}
+
+
+\newpage\EMPHASIZE{Assignment of same object}
+
+Depending on what you want to do, you usually do not want to change the
+object \textit{obj1} if you execute \textit{obj1 = obj2} if \textit{obj2} is
+actually the same as \textit{obj1}.
+
+\begin{consolethree}[escapeinside=||]
+C & C::operator=(const C & x)
+{
+    if (this == &x)
+        return (*this);
+    ... some code ...
+    return (*this);
+}
+\end{consolethree}
+
+
+\newpage\EMPHASIZE{Cascading operator=}
+
+Note that if you have
+
+\begin{consolethree}[escapeinside=||]
+class vec2iTemperature
+{
+private:
+    vec2i p_;
+    double temp_;
+};
+\end{consolethree}
+
+and objects \textit{t1, t2} of \textit{vec2iTemperature}, then \textit{t1 =
+t2} is the same as \textit{t1.p\_ = t2.p\_} and \textit{t1.temp\_ =
+t2.temp\_}. \textit{t1.p\_ = t2.p\_} will call the \textit{=} of
+\textit{vec2i}. The above puts object inside object. See later section on
+object composition.
+
+
+\newpage\EMPHASIZE{Initialization}
+
+\textbf{Reminder:} The following does not call \textit{operator=}
+
+\textit{Date d = today;}
+
+The above is actually an initialization and not an assignment.
+Initialization always involves the constructor. In the above case, the
+copy constructor is called. In other words, the above is the same as
+
+\textit{Date d(today);}
+
+
+\newpage\EMPHASIZE{Avoiding member-wise copy}
+
+If your object is going to use some resource that requires code to
+manually acquire and release, you \textbf{must} write your own
+
+\begin{itemize}
+\item constructor (to acquire resource)
+\item destructor (to release resource)
+\item copy constructor (to prevent memberwise copy)
+\item \textit{operator=} (to prevent memberwise copy)
+\end{itemize}
+
+Here's a standard example where the ``resource'' is
+memory ...
+
+\begin{consolethree}[escapeinside=||]
+class IntPointer
+{
+public:
+    IntPointer()
+        : p_(new int)
+    {}
+    IntPointer(const IntPointer & intptr)
+        : p_(new int)
+    {
+        *p_ = *(intptr.p_);
+    }
+    ~IntPointer() { delete p_; }
+    IntPointer & operator=(const IntPointer & intptr)
+    {
+        if (this == &intptr)
+        {
+            return (*this);
+        }
+        *p_ = *(intptr.p_);
+        return (*this);
+    }
+private:
+    int * p_;
+};
+\end{consolethree}
+
+You should document your \textit{IntPointer} to let the user know that
+\textit{IntPointer} objects do not share memory. Why? Because if you use
+the regular pointers:
+
+\textit{int * p = new int;}
+
+\textit{int * q;}
+
+\textit{q = p;}
+
+then \textit{p} and \textit{q} do point to the same integer value.
+
+\begin{ex}
+What about \textit{IntDynArr}? Write the copy
+constructor and \textit{operator=}.
+\end{ex}
+
+\begin{ex}
+What about \textit{IntArr}?
+\end{ex}
+
+
+\newpage\EMPHASIZE{operator>> and operator<<}
+
+You've been using \textit{<<} and
+\textit{>>} since day 1 of CISS240. From your
+previous notes you know that you can overload
+\textit{operator>>} and
+\textit{operator<<}. You also know from CISS240 that you
+can output
+
+\textit{int, char[], double}, etc., i.e., C++ has overloaded
+\textit{operator>>} in iostream.h. You also know
+that you can do
+
+\textit{std::cout << "A" << 3 << 5.5;}
+
+So the operators return an object.
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+#ifndef INT_H
+#define INT_H
+
+class Int
+{
+public:
+    Int(int x0 = 0) : x_(x0) {}
+    int get() const { return x_; }
+    ...
+    void operator<<(std::ostream &, const Int &);
+    ...
+private:
+    int x_;
+};
+
+#endif
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+#include "Int.h"
+
+void operator<<(std::ostream & cout, const Int & c)
+{
+    cout << c.get();
+}
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+#include "Int.h"
+
+int main()
+{
+    Int c(42);
+    std::cout << c;
+    return 0;
+}
+\end{consolethree}
+
+
+\newpage\EMPHASIZE{Cascading operator<<}
+
+If you want to do the following:
+
+\textit{Int c(42);}
+
+\textit{std::cout << c << "\textbackslash n";}
+
+you need to return an \textit{ostream} object from your
+\textit{operator<<} so that the above becomes
+
+\textit{Int c(42);}
+
+\textit{operator<<(operator<<(std::cout, c), "\textbackslash n");}
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+#ifndef INT_H
+#define INT_H
+
+class Int
+{
+public:
+    Int(int a)
+        : x(a)
+    {}
+    int get() const { return x; }
+private:
+    int x;
+};
+
+std::ostream & operator<<(std::ostream &, const Int &);
+
+#endif
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+#include "Int.h"
+
+std::ostream & operator<<(std::ostream & cout, const Int & c) {
+    cout << c.get();
+    return cout;
+}
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+#include "Int.h"
+
+int main()
+{
+    Int c(42), d(43);
+    std::cout << c << "," << d << "\n";
+    return 0;
+}
+\end{consolethree}
+
+
+\newpage\EMPHASIZE{Friends}
+
+You can let \textit{operator<<} have access to the
+private members of the object by making your
+\textit{operator<<} a \textbf{friend} in your class. We
+will re-visit friends later.
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+#ifndef INT_H
+#define INT_H
+
+class C
+{
+public:
+    Int(int x0 = 0)
+        : x_(x0)
+    {}
+    int get() const { return x_; }
+    |{\bf friend}| std::ostream & operator<<(std::ostream &, const Int &);
+private:
+    int x_;
+};
+
+#endif
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+#include "Int.h"
+
+std::ostream & operator<<(std::ostream & cout, const Int & c)
+{
+    cout << |{\bf c.x\_}|;
+    return cout;
+}
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+#include "Int.h"
+
+int main()
+{
+    Int c(42),d(43);
+    std::cout << c << "," << d << "\n";
+    return 0;
+}
+\end{consolethree}
+
+In general, if the header of a function \textit{f} is a friend in a class
+\textit{C}, then \textit{f} has access to things in private section of class
+\textit{C}:
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    |{\bf friend void f(C \& c);}|
+private:
+    int x_;
+    void m() { x++; }
+}
+
+void f(C & c)
+{
+    c.x_ = 0; // f can access c.x_ (private)
+    c.m(); // f can access c.m (private)
+}
+\end{consolethree}
+
+Do NOT declare too many friends in a class -- this breaks the principle
+of information hiding and makes the class harder to maintain in case you
+need private members variables or methods in the future.
+
+Of course friends can be completely avoided.
+
+
+\newpage\EMPHASIZE{operator>>}
+
+For input, just change \textit{ostream} to \textit{istream}. Everything else
+is pretty similar. You should be able to figure the differences out
+yourself. Here's an example to guide you.
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+#ifndef FRACTION_H
+#define FRACTION_H
+
+class Fraction
+{
+public:
+    Fraction(int a, int b)
+        : n_(a), d_(b)
+    {}
+    friend std::istream & operator>>(std::istream &, Fraction &);
+    friend std::ostream & operator<<(std::ostream &, const Fraction &);
+private:
+    int n_, d_;
+};
+
+#endif
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+#include "Fraction.h"
+
+std::ostream & operator<<(std::ostream & cout, const Fraction & r)
+{
+    cout << r.n_ << "/" << r.d_;
+    return cout;
+}
+
+std::istream & operator>>(std::istream & cin, Fraction & r)
+{
+    cin >> r.n_ >> r.d_;
+    return cin;
+}
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+#include "Fraction.h"
+
+int main()
+{
+    Fraction c(0,1), d(0,1);
+    std::cout << c << "," << d << "\n";
+    std::cin >> c >> d;
+    std::cout << c << "," << d << "\n";
+    return 0;
+}
+\end{consolethree}
+
+\end{document}
