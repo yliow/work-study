@@ -31,9 +31,7 @@ def extraction_to_file(ex_dest, note, ex_content, number):
   #directory for exercise and possible soln
   ex_console_name = ex_folder.replace(ex_dest, '')
 
-  #'solutions' works off the local dir so we change to that dir, we change back on return to read_file
-  # print("CHANGING TO: %s" % ex_dest)
-  
+  #'solutions' works off the local dir so we change to that dir, we change back on return to read_file  
   os.chdir(ex_dest)
 
   #assign file name and string for question.tex
@@ -75,15 +73,15 @@ def read_file(note, ex_dest, chap_dir):
         exercise_file_str = extraction_to_file(ex_dest, note.replace(chap_dir, ''), ex_accumulator, counter)
         
         #return to operating directory
-        # print(">>>>CHANGING FROM: %s" % chap_dir.replace('/chapters/', ''))
         os.chdir(chap_dir.replace('/chapters', ''))
+        
         #reset ex_accumulator
         ex_accumulator = []
         counter += 1
         
         if exercise_file_str != None:
           #process result
-          new_note.append("\\input{%s}" % exercise_file_str)
+          new_note.append("\\input{%s}" % exercise_file_str + '/question.tex')
         else:
           print("!!!!!! FAILED EXTRACTING EXERCISE IN CHAPTER %s, ABANDONING CHAPTER REWRITE !!!!!!!" % note)
           #needs to also clear the directory where it wrote all the exercises in this chapter (if there were any)
@@ -121,9 +119,12 @@ for chapter in notes_files:
     new_note, counter = read_file(note, ex_folder, chap_dir)
     new_note_location = chap_dir + chapter + '/new_main.tex'
     with open(new_note_location, 'w') as new_dest:
+      print("writing new_main.tex for chapter %s, extracted %s exercises to file\n" % (chapter, counter))
       for line in new_note:
-        print("writing new_main.tex for chapter %s, extracted %s exercises to file\n" % (chapter, counter))
         new_dest.write(line)
   except Exception as e:
-    print("!!!!!! ERROR PROCESSING CHAPTER: %s, MESSAGE: %s\n" % (chapter, e))
+    if (os.path.isdir(note)):
+      print("!!!!!! ERROR PROCESSING CHAPTER: %s, MESSAGE: %s\n" % (chapter, e))
+    else:
+      print("skipping file %s, not a directory\n" % note)
     

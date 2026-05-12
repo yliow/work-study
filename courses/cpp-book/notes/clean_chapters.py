@@ -2,6 +2,7 @@
 import os
 
 dir_ = os.getcwd() + '/chapters'
+chapters = os.listdir(dir_)
 
 for i in chapters:
   try:
