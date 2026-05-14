@@ -64,16 +64,18 @@ for chap in chap_list:
   note = chapters + chap + '/main.tex'
   exercises= []
 
+  ex_acc = []
+  note_acc = []
+  ex_dest = dir_ + '/temp/' + chap + '/exercises/'
   try:  
     #check if exercise dir exists
-    if not os.path.exists(dir_ + '/temp/' + chap + '/exercises'):
-      os.system("mkdir %s" % (dir_ + '/temp/' + chap + '/exercises'))
+    if not os.path.exists(ex_dest):
+      os.system("mkdir %s" % ex_dest)
       print("making exercise folder for chapter", chap)
-
+      
     with open(note, 'r') as n:
+      counter = 0
       flag = False
-      ex_acc = []
-      note_acc = []
       n = n.readlines()
       for line in n:
         if begin in line:
@@ -82,6 +84,11 @@ for chap in chap_list:
         elif end in line:
           flag = False
           ex_acc.append(line)
+          
+          #call exercise maker
+          exercise = extraction_to_file(ex_dest, note, ex_acc, counter)
+          ex_acc = []
+          counter += 1
         else:
           note_acc.append(line)
       
