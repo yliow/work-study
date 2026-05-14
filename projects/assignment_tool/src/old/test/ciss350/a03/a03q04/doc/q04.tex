@@ -1,0 +1,230 @@
+Write a recursive bubblesort function that implements
+bubblesort recursively.
+Specifically, \verb!bubblesort_rec(x, start, end)!
+performs bubblesort on
+\\
+\verb!x[start]!,
+\verb!x[start + 1]!,
+\verb!x[start + 2]!, ...,
+\verb!x[end - 1]!,
+
+You must use the following skeleton code which
+contains tracing of your function.
+
+You must use a recursive relation between
+\verb!bubblesort_rec(x, start, end)!
+and
+\\
+\verb!bubblesort_rec(x, start, end - 1)!.
+
+\begin{Verbatim}[frame=single, fontsize=\small]
+#include <iostream>
+#include <string>
+
+void print(int x[], int end)
+{
+    std::string delim = "";
+    std::cout << '{';
+    for (int i = 0; i < end; ++i)
+    {
+        std::cout << delim << x[i];
+        delim = ", ";
+    }
+    std::cout << '}';
+}
+
+
+void bubblesort_rec(int x[], int start, int end)
+{
+    if (start >= end - 1)
+    {
+        std::cout << "bubblesort_rec(";
+        print(x, end);
+        std::cout << ", " << start << ", " << end
+                  << ") base case ... return\n";
+        return;
+    }
+    else
+    {
+        std::cout << "bubblesort_rec(";
+        print(x, end);
+        std::cout << ", " << start << ", " << end
+                  << ") recursive case ...\n";
+
+
+
+
+        
+
+
+        std::cout << "bubblesort_rec(";
+        print(x, end);
+        std::cout << ", " << start << ", " << end
+                  << ") recursive case ... return\n";
+        return;
+    }
+}
+
+int main()
+{
+    int n;
+    std::cin >> n;
+    int * x = new int[n];
+    for (int i = 0; i < n; ++i)
+    {
+        std::cin >> x[i];
+    }
+    bubblesort_rec(x, 0, n);
+    print(x, n);
+    std::cout << '\n';
+    delete [] x;
+    return 0;
+}
+\end{Verbatim}
+
+\textsc{Test 1}
+\begin{Verbatim}[commandchars=\~\!\@, fontsize=\small, frame=single]
+~underline!5@
+~underline!5 1 4 2 3@
+bubblesort_rec({5, 1, 4, 2, 3}, 0, 5) recursive case ...
+bubblesort_rec({1, 4, 2, 3}, 0, 4) recursive case ...
+bubblesort_rec({1, 2, 3}, 0, 3) recursive case ...
+bubblesort_rec({1, 2}, 0, 2) recursive case ...
+bubblesort_rec({1}, 0, 1) base case ... return
+bubblesort_rec({1, 2}, 0, 2) recursive case ... return
+bubblesort_rec({1, 2, 3}, 0, 3) recursive case ... return
+bubblesort_rec({1, 2, 3, 4}, 0, 4) recursive case ... return
+bubblesort_rec({1, 2, 3, 4, 5}, 0, 5) recursive case ... return
+{1, 2, 3, 4, 5}
+\end{Verbatim}
+(Clearly the inputs are the size of the array and the array.)
+
+\textsc{Test 2}
+\begin{Verbatim}[commandchars=\\\{\}, fontsize=\small, frame=single]
+\underline{1}
+\underline{5}
+bubblesort_rec({5}, 0, 1) base case ... return
+{5}
+\end{Verbatim}
+
+Make sure you create your own test cases as well.
+
+Spoilers on next page.
+
+\newpage
+\textsc{Spoilers}
+
+The base case is when there are either no values or only one value
+to sort.
+There is one value to sort if \verb!start! is \verb!end - 1!.
+There are no values to sort if \verb!start! $>$ \verb!end - 1!.
+Suppose recursively, \verb!bubblesort_rec(x, start, end)! calls
+\\
+\verb!bubblesort_rec(x, start, end - 1)!.
+In that case, on return from
+\\
+\verb!bubblesort_rec(x, start, end - 1)!,
+the values
+\verb!x[start]!,
+\verb!x[start + 1]!,
+\verb!x[start + 2]!, ..., 
+\verb!x[end - 2]!
+are sorted.
+
+For instance support \verb!start! is 0 and \verb!end! is 5.
+\verb!bubblesort_rec(x, 0, 5)! is supposed to sort
+\verb!x[0]!,
+\verb!x[1]!,
+\verb!x[2]!, 
+\verb!x[3]!, 
+\verb!x[4]!.
+But since
+\verb!bubblesort_rec(x, 0, 5)!
+calls
+\\
+\verb!bubblesort_rec(x, 0, 4)!
+that means that
+\verb!bubblesort_rec(x, 0, 4)!
+will sort
+\verb!x[0]!,
+\verb!x[1]!,
+\verb!x[2]!,
+\verb!x[3]!.
+What must
+\verb!bubblesort_rec(x, 0, 5)! do to 
+\verb!x[0]!,
+\verb!x[1]!,
+\verb!x[2]!, ...
+\verb!x[4]!.
+before calling
+\verb!bubblesort_rec(x, 0, 4)!?
+
+\newpage
+\textsc{Divide-and-conquer}
+
+Make sure you review my notes on recursion (\#28).
+
+In all the previous recursions, there's a common theme:
+\begin{enumerate}[nosep]
+\item Power computation: If I write \texttt{pow(x, n)} for $x$
+to the power of $n$,
+then the recursion is
+\[
+\text{\texttt{pow(x, n)}: uses \texttt{pow(x, n - 1)} (and \texttt{x})}
+\]
+\item Linear search: Let me write \texttt{x[0..n-1]}
+to denote the array
+of values \texttt{x[0],...,x[n-1]}
+(and ignore implementation specifics
+whether using array, \verb!std::vector!, pointer to array, etc.
+If I write \verb!linearsearch(x[0..n-1], target)! for the
+linear search of \verb!target!
+in \verb!x[0..n-1]!, then the recursion is
+{\small
+\[
+\text{\texttt{linearsearch(x[0..n-1], target)}: uses
+\texttt{linearsearch(x[1..n-1], target)} (and \texttt{x[0]})}
+\]
+}
+\item Bubblesort:  
+If I write \verb!bubblesort(x[0..n-1])! for the bubblesort of
+\verb!x[0..n-1]!, then the recursion is
+\[
+\text{\texttt{bubblesort of x[0..n-1]}: uses
+\texttt{bubblesort(x[0..n-2])}
+}
+\]
+\end{enumerate}
+If $n$ denotes the size of a problem (in the case of the power computation
+it's the exponent and in the case of array type problems it's the size of the
+array), then in all the above the philosophy of recursion is this:
+If $P(n)$ is a problem, then to solve $P(n)$ by recursion you might want to try
+\[
+\text{to solve $P(n)$: solve $P(n-1)$ (as well as some other computations)}
+\]
+For instance
+\[
+\text{to compute $x^n$: compute $x^{n-1}$ (and multiply it with $x$)}
+\]
+(Such recursions are called linear recursions of degree 1.)
+
+A divide-and-conquer (DAC) recursion is \lq\lq usually" different.
+The philosophy of DAC is like this:
+\[
+\text{to solve $P(n)$: solve one or two $P(n/2)$ problems (and do some computations)}
+\]
+The $n/2$ is not exactly $n/2$, but an integer value roughly $n/2$.
+
+Note however that
+some people consider \textit{both} methods,
+\begin{tightlist}
+\li $P(n)$ in terms of $P(n-1)$ and
+\li $P(n)$ in terms of $P(n/2)$
+\end{tightlist}
+as DAC.
+In other words for some people, as long as a problem is solved
+in terms
+of \lq\lq smaller" problem(s), it's a DAC solution,
+whether it is smaller by 1 or smaller by a factor of $1/2$.
+
+\end{document}

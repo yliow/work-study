@@ -1,0 +1,373 @@
+[Review of classes of CISS245]
+
+This is a review of writing a class (without pointers).
+
+Write a \texttt{Fraction} class that should do the obvious.
+No skeleton code is given.
+The header file is named \texttt{Fraction.h}
+and the implementation file is named \texttt{Fraction.cpp}.
+You must design and implement the class yourself.
+You should of course test your code, i.e., you should have a
+\verb!main.cpp! that tests the features of your fraction library.
+Try not to refer to your previous work if you have already implemented
+such a class -- otherwise it defeats the purpose of review.
+You can however refer to my notes on object-oriented
+concepts/syntax of \cpp.
+Only refer to your previous code briefly for the \verb!Fraction! if you are
+totally lost.
+You should be able to complete this library in less than 1 hour.
+
+The following illustrates features of this class.
+
+The basic constructor should work as expected:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize, commandchars=\~\!\@]
+Fraction f(2, 3);
+Fraction g(42);                           
+Fraction h;                               // default constructor
+
+std::cout << f << '\n';                   // prints "2/3" (without the double quotes)
+std::cout << g << '\n';                   // prints "42"
+std::cout << h << '\n';                   // prints "0" 
+
+std::cout << Fraction(2, 4) << '\n';      // prints "1/2"
+std::cout << Fraction(-2, 4) << '\n';     // prints "-1/2"
+std::cout << Fraction(2, -4) << '\n';     // prints "-1/2"
+std::cout << Fraction(-2, -4) << '\n';    // prints "1/2"
+
+std::cout << Fraction(2, 2) << '\n';      // prints "1"
+std::cout << Fraction(2, -2) << '\n';     // prints "-1"
+std::cout << Fraction(-2, 2) << '\n';     // prints "-1"
+std::cout << Fraction(-2, -2) << '\n';    // prints "1"
+
+std::cout << Fraction(100, 20) << '\n';   // prints "5"
+std::cout << Fraction(100, -20) << '\n';  // prints "-5"
+std::cout << Fraction(-100, 20) << '\n';  // prints "-5"
+std::cout << Fraction(-100, -20) << '\n'; // prints "5"
+
+std::cout << Fraction(100) << '\n';       // prints "100"
+std::cout << Fraction(-100, 1) << '\n';   // prints "-100"
+std::cout << Fraction(100, -1) << '\n';   // prints "-100"
+std::cout << Fraction(-100, -1) << '\n';  // prints "100"
+
+std::cout << Fraction() << '\n';          // prints "0"
+std::cout << Fraction(0, 100) << '\n';    // prints "0"
+std::cout << Fraction(0, -100) << '\n';   // prints "0"
+
+
+// Testing division by zero exception catching
+try
+{
+    std::cout << Fraction(0, 0) << '\n';
+}
+catch (ZeroDivisionError & e)
+{
+    std::cout << "ZeroDivisionError exception caught\n";
+}
+
+try
+{
+    std::cout << Fraction(-10, 0) << '\n';
+}
+catch (ZeroDivisionError & e)
+{
+    std::cout << "ZeroDivisionError exception caught\n";
+}
+\end{Verbatim}
+Note that the numerator and denominator are reduced before they are
+saved in the \texttt{Fraction} object.
+
+Copy constructor and assignment operator should work as expected:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+Fraction f0(1, 2);
+Fraction f1(f0); // copy constructor
+f1 = f0;         // assignment operator
+\end{Verbatim}
+(Do you need to overwrite the default copy constructor
+and assignment operator for this class?)
+
+Various unary and binary operators should work as expected:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+Fraction f0(1, 2), f1(3, 4), f2;
+f2 = +f0;  
+f2 = -f0;
+f2 = (f0 += f1);
+f2 = (f0 -= f1);
+f2 = (f0 *= f1);
+f2 = (f0 /= f1);
+f2 = f0 + f1;  
+f2 = f0 - f1;  
+f2 = f0 * f1;  
+f2 = f0 / f1;
+\end{Verbatim}
+
+The \verb!Fraction! class works seamlessly with integers:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+Fraction f0(1, 2), f1(3, 4), f2;
+f2 = f0 + 42;
+f2 = f0 - 42;
+f2 = f0 * 42;
+f2 = f0 / 42;
+
+f2 = 42 + f0;
+f2 = 42 - f0;
+f2 = 42 * f0;
+f2 = 42 / f0;
+
+f2 = (f0 += 42);
+f2 = (f0 -= 42);
+f2 = (f0 *= 42);
+f2 = (f0 /= 42);
+
+int i = 42, j;
+j = (i += f0);
+j = (i -= f0);
+j = (i *= f0);
+j = (i /= f0);
+\end{Verbatim}
+
+Comparisons are possible:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+Fraction f0(-1, 2), f1(3, 4);
+std::cout << (f0 == f1) << '\n';
+std::cout << (f0 != f1) << '\n';
+std::cout << (f0 < f1) << '\n';
+std::cout << (f0 <= f1) << '\n';
+std::cout << (f0 > f1) << '\n';
+std::cout << (f0 >= f1) << '\n';
+\end{Verbatim}
+
+Finally it's possible to compute the absolute value
+and integer power of a \texttt{Fraction}:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+Fraction f0(-1, 2);
+std::cout << abs(f0) << '\n';
+std::cout << pow(f0, 5) << '\n';
+std::cout << pow(f0, -5) << '\n';
+\end{Verbatim}
+
+
+\newpage
+\textsc{Review of pointers}
+
+The following is a quick review of pointers.
+Refer to my pointer notes for details.
+
+\textsc{Declaration:}
+Suppose \verb!T! is a type 
+(example: \verb!int!, \verb!double!, \verb!char!, \verb!bool!, 
+some struct, some class),
+then you do the following to declare \verb!p! to be a pointer to a 
+\verb!T! value:
+\begin{console}[frame=single]
+T * p;
+\end{console}
+At this point, \verb!p! does not point to a valid 
+value (whether on the heap on in a scope/frame) yet.
+
+
+\textsc{Allocating/using/deallocating a single value:}
+To allocate a single \verb!T! value for \verb!p! to point to
+(or we can also say \lq\lq to allocate a value for \verb!p!"),
+we do
+\begin{console}[frame=single]
+p = new T;
+\end{console}
+After this you can use the value \verb!p! points to.
+You refer to this value as \verb!*p!.
+
+Note that the \textit{address} of this value is stored in \verb!p!.
+The \textit{value} that \verb!p! points to is \verb!*p!.
+Make sure you see the difference between \verb!p! and \verb!*p!.
+
+When you're done using this value, you can release this memory, 
+or we say deallocate the value that \verb!p! point to (or just say deallocate \verb!p!),
+by doing
+\begin{console}[frame=single,fontsize=\footnotesize]
+delete p;
+\end{console}
+Here's a simple example:
+\begin{console}[fontsize=\footnotesize]
+#include <iostream>
+
+int main()
+{
+    double * p = new double;
+    std::cout << "enter a double: ";
+    std::cin >> (*p);
+
+    std::cout << "you entered " << (*p) << std::endl;
+    delete p;
+
+    return 0;
+}
+\end{console}
+
+\textsc{Allocating/using/deallocating an array of values:}
+Now suppose instead of a single value of type
+\verb!T! you want to use an array of values
+of type \verb!T!, say \verb!n! such values.
+To allocate an array of \verb!n! 
+\verb!T!--values for \verb!p!, you do this:
+\begin{console}[frame=single,fontsize=\footnotesize]
+p = new T[n];
+\end{console}
+After this, \verb!p! points to the first of \verb!n!
+\verb!T!--values.
+The \verb!i!--th \textit{value} of the 
+array \verb!p! points to is just
+\verb!p[i]!.
+The \textit{address} of the
+\verb!i!--th value is \verb!p+i!.
+Therefore the \verb!i!--th value is also
+known as \verb!*(p+i)!, i.e.,
+\verb!p[i]!
+and
+\verb!*(p+i)!
+mean the same thing.
+
+After you're done with this array of \verb!T!
+values, you can deallocate the memory that \verb!p! points to
+(i.e. release the memory back to the heap)
+if you do
+\begin{console}[frame=single,fontsize=\footnotesize]
+delete [] p;
+\end{console}
+
+Here's a simple example:
+\begin{console}[frame=single,fontsize=\footnotesize]
+#include <iostream>
+
+int main()
+{
+    int n;
+    std::cout << "how many double do you need? ";
+    std::cin >> n;
+
+    double * p = new double[n];
+    for (int i = 0; i < n; i++)
+    {
+        std::cout << "enter double #" << i << ": ";
+        std::cin >> p[i];
+    }
+
+    std::cout << "here are all your doubles: ";
+    for (int i = 0; i < n; i++)
+    {
+        std::cout << p[i] << ' ';
+    }
+    std::cout << std::endl;
+
+    delete [] p;
+
+    return 0;
+}
+\end{console}
+The above iterates over the value that \verb!p! points
+to using index values.
+You can iterate using a pointer like this:
+\begin{console}[frame=single,fontsize=\footnotesize]
+#include <iostream>
+
+int main()
+{
+    int n;
+    std::cout << "how many double do you need? ";
+    std::cin >> n;
+
+    double * p = new double[n];
+    for (int i = 0; i < n; i++)
+    {
+        std::cout << "enter double #" << i << ": ";
+        std::cin >> p[i];
+    }
+
+    std::cout << "here are all your doubles: ";
+    for (double * q = p; q < p + n; ++q)
+    {
+        std::cout << (*q) << ' ';
+    }
+    std::cout << std::endl;
+
+    delete [] p;
+
+    return 0;
+}
+\end{console}
+In this case, the pointer \verb!q! (in the second \verb!for!--loop)
+iteratively points to the values
+of the array that \verb!p! points to.
+
+\textsc{Functions:}
+Of course pointers, like any variable, can be passed to functions.
+So of course you can rewrite:
+\begin{console}[frame=single,fontsize=\footnotesize]
+#include <iostream>
+
+int main()
+{
+    int n;
+    std::cout << "how many double do you need? ";
+    std::cin >> n;
+
+    double * p = new double[n];
+    for (int i = 0; i < n; i++)
+    {
+        std::cout << "enter double #" << i << ": ";
+        std::cin >> p[i];
+    }
+
+    std::cout << "here are all your doubles: ";
+    for (int i = 0; i < n; i++)
+    {
+        std::cout << p[i] << ' ';
+    }
+    std::cout << std::endl;
+
+    delete [] p;
+
+    return 0;
+}
+\end{console}
+as
+\begin{console}[frame=single,fontsize=\footnotesize]
+#include <iostream>
+
+void fill_doubles(double * p, int n)
+{
+    for (int i = 0; i < n; ++i)
+    {
+        std::cout << "enter double #" << i << ": ";
+        std::cin >> p[i];
+    }
+}
+
+void print_doubles(double * start, double * end)
+{
+    std::cout << "here are all your doubles: ";
+    for (double * q = start; q < end; ++q)
+    {
+        std::cout << (*q) << ' ';
+    }
+    std::cout << std::endl;
+}
+
+int main()
+{
+    int n;
+    std::cout << "how many double do you need? ";
+    std::cin >> n;
+
+    double * p = new double[n];
+
+    fill_doubles(p, n);
+    print_doubles(p, p + n);
+
+    delete [] p;
+
+    return 0;
+}
+\end{console}
+
+Recall that there's a memory debugging tool (google's asan -- address sanitizer)
+that can check your code for memory problems.
+See class website or my website.

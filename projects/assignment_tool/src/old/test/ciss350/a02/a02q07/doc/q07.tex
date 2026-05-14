@@ -1,0 +1,53 @@
+[Review of template class in CISS245 -- pointer class]
+
+This is a review of writing a template class with a pointer that points
+to a single value.
+
+Write a template pointer class, \verb!ptr!.
+(The previous problem is an array class with a pointer that points to an
+array of values. For this problem, the pointer points to a single value.)
+
+The header file is named \verb!ptr.h!.
+Each object of \verb!ptr! contains a pointer that when allocated points to
+\textit{one} value of type \verb!T! where \verb!T! is the template
+type parameter of the \verb!ptr! class.
+Call the pointer \verb!p_!.
+
+Here are some usage examples illustrating what your class can do:
+\begin{console}[fontsize=\footnotesize]
+void f()
+{
+    ptr< int > p;    // p.p_ points to an int value in the heap
+    ptr< double > q; // q.p_ points to a double value in the heap
+    ptr< char > r;   // r.p_ points to a char value in the heap
+  
+    *p = 42;
+    std::cout << (*p) << std::endl; // prints 42
+    *p = 43;
+    std::cout << (*p) << std::endl; // prints 43
+
+    ptr< int > s(42); // here's another constructor. s.p_ will point to
+                      // a 42 in the heap.
+    
+    // here ... where p,q,r,s go out of scope, their destructor will
+    // deallocate memory used by their pointers.
+}
+\end{console}
+Clearly you must overwrite the default destructor, copy constructor,
+and assignment operator of \verb!ptr!.
+\begin{console}[fontsize=\footnotesize]
+void g()
+{
+    ptr< int > p(42); 
+    ptr< int > q(p);  // q.p_ points to 42 in the heap which is different
+                      // from the 42 that p.p_ points to
+    ptr< int > r;
+    r = p;            // the integer that r.p_ points to is changed to 42
+}
+\end{console}
+
+Of course you have must ensure that there is no memory issues such as
+memory leaks and double free errors.
+You should definitely check your code with google asan.
+
+\end{document}

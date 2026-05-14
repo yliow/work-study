@@ -1,0 +1,202 @@
+A group of 10 rebels were trapped in a cave. Very soon an army of invading soldiers will be upon them. Instead
+of surrendering themselves, they decided to sit in a circle, and starting with someone and going around the
+circle, every other person will take his own life. Here's the initial setup.
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Circle(x=0,y=0,r=2,background='blue!10')
+deg = 90
+for i in range(10):
+    p += r'\draw (%s: 2.3) node {$%s$};' % (deg, i)
+    deg -= 360/10
+print p
+\end{python}
+  
+First the rebel at 0 will take his own life:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Circle(x=0,y=0,r=2,background='blue!10')
+deg = 90
+for i in range(10):
+    if i not in [0]:
+        p += r'\draw (%s: 2.3) node {$%s$};' % (deg, i)
+    else:
+        p += r'\draw (%s: 2.3) node {\textwhite{$%s$}};' % (deg, i)
+    deg -= 360/10
+print p
+\end{python}
+
+The next to take his life is the person at 2, i.e., going clockwise, it's
+the 
+second person alive after the person at 0 who just died:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Circle(x=0,y=0,r=2,background='blue!10')
+deg = 90
+for i in range(10):
+    if i not in [0,2]:
+        p += r'\draw (%s: 2.3) node {$%s$};' % (deg, i)
+    else:
+        p += r'\draw (%s: 2.3) node {\textwhite{$%s$}};' % (deg, i)
+    deg -= 360/10
+print p
+\end{python}
+
+This is followed by 4:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Circle(x=0,y=0,r=2,background='blue!10')
+deg = 90
+for i in range(10):
+    if i not in [0,2,4]:
+        p += r'\draw (%s: 2.3) node {$%s$};' % (deg, i)
+    else:
+        p += r'\draw (%s: 2.3) node {\textwhite{$%s$}};' % (deg, i)
+    deg -= 360/10
+print p
+\end{python}
+and then 6:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Circle(x=0,y=0,r=2,background='blue!10')
+deg = 90
+for i in range(10):
+    if i not in [0,2,4,6]:
+        p += r'\draw (%s: 2.3) node {$%s$};' % (deg, i)
+    else:
+        p += r'\draw (%s: 2.3) node {\textwhite{$%s$}};' % (deg, i)
+    deg -= 360/10
+print p
+\end{python}
+Next is 8:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Circle(x=0,y=0,r=2,background='blue!10')
+deg = 90
+for i in range(10):
+    if i not in [0,2,4,6,8]:
+        p += r'\draw (%s: 2.3) node {$%s$};' % (deg, i)
+    else:
+        p += r'\draw (%s: 2.3) node {\textwhite{$%s$}};' % (deg, i)
+    deg -= 360/10
+print p
+\end{python}
+Now note that the among the remaining rebels, 
+the second to the left of where 8 was is the rebel at position 1.
+Therefore the next to go is 1:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Circle(x=0,y=0,r=2,background='blue!10')
+deg = 90
+for i in range(10):
+    if i not in [0,2,4,6,8,1]:
+        p += r'\draw (%s: 2.3) node {$%s$};' % (deg, i)
+    else:
+        p += r'\draw (%s: 2.3) node {\textwhite{$%s$}};' % (deg, i)
+    deg -= 360/10
+print p
+\end{python}
+After 1, the next to be removed is 5:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Circle(x=0,y=0,r=2,background='blue!10')
+deg = 90
+for i in range(10):
+    if i not in [0,2,4,6,8,1,5]:
+        p += r'\draw (%s: 2.3) node {$%s$};' % (deg, i)
+    else:
+        p += r'\draw (%s: 2.3) node {\textwhite{$%s$}};' % (deg, i)
+    deg -= 360/10
+print p
+\end{python}
+then 9, followed by 7. Note that 3 is the last rebel.
+
+In general given $n$ rebels labeled $0$ to
+ $n-1$, with the same algorithm for removing the rebels, 
+who is the last surviving rebel?
+In the case of $n = 10$, the last surviving rebel is
+rebel number $3$.
+
+Write a function with prototype
+\[
+\texttt{int last\_alive(int n);}
+\]
+that returns the index of the last surviving rebel.
+For instance, \texttt{last\_alive(10)} returns \verb!3!.
+Your program must allow a maximum number of 1000 rebels.
+
+\textsc{Test 1}
+\begin{console}[commandchars=\\\{\}]
+\userinput{10}
+3
+\end{console}
+
+\textsc{Test 2}
+\begin{console}[commandchars=\\\{\}]
+\userinput{5}
+1
+\end{console}
+
+WARNING: INCOMING SPOILER ... Hint is on the next page.
+Use only if necessary.
+
+\newpage
+\textsc{Hint}
+
+For Test 1, think about using an array of 10 boolean values.
+Say the array is called \verb!alive!.
+Set all 10 values of \verb!alive! to \verb!true!.
+Go through the array just like going through the circle.
+Say you use an index variable \verb!i!.
+Once \verb!i! goes beyond \verb!9!, i.e.,
+when \verb!i! reaches 10, you want to set it to \verb!0!.
+In other words the values taken by \verb!i! is
+\verb!0!,
+\verb!1!,
+\verb!2!,
+\verb!3!,...
+\verb!7!,
+\verb!8!,
+\verb!9!,
+\verb!0!,
+\verb!1!,
+\verb!2!,
+\verb!3!,...
+\verb!7!,
+\verb!8!,
+\verb!9!,
+\verb!0!,
+\verb!1!,
+\verb!2!,
+etc.
+
+Starting with \verb!i = 0! \textred{\textso{and}} set \verb!alive[i]! to \verb!false!.
+You then advance \verb!i! to the next
+\verb!alive[i]! that is
+\verb!true!, and you keep going
+until you reach the \textit{second} \verb!alive[i]! value that is \verb!true!,
+you stop and set that \verb!alive[i]! to \verb!false!. Repeat.
+You stop when the \textit{second}
+\verb!alive[i]! that is \verb!true!
+is where you started.
+That tells you that there's only one alive.
+
+The above only works for an array of 10 boolean values.
+The problem states that it must work for different input.
+For instance the user can enter \verb!150!.
+The problem does say that you only need to consider a maximum input
+of \verb!1000!.
+So declare a boolean array of size \verb!1000!.
+If the user enters, say, \verb!15!, you just use \verb!x[0]!, ...,
+\verb!x[14]! and ignore the rest.
+If the user enters \verb!42!, then just use
+\verb!x[0]!, ...,
+\verb!x[41]!
+and ignore the rest.

@@ -1,0 +1,330 @@
+[Review of template class in CISS245 -- dynamic arrays]
+
+This is a review of writing a class template with a pointer
+and dynamic arrays in the heap.
+
+The goal is to write a class to make \cpp\ arrays a lot easier to use.
+
+Specifically, the \verb!vector! class is a class template
+that provides most of \cpp's array features.
+Study the skeleton code for \verb!vector! carefully.
+Specifically, note that each \verb!vector! object has three members:
+\verb!size_!, \verb!capacity_! and \verb!p_!.
+Obviously \verb!p_! points to an array allocated in the free store,
+\verb!capacity_! records the number of elements in the array, and
+\verb!size_! records the number of elements in the array that are \lq\lq in
+use".
+The file \verb!test.cpp! includes some usage examples.
+\verb!vector! is similar to our \verb!IntDynArray! from CISS245 except that
+\verb!IntDynArray! is not a class template.
+\verb!vector! is similiar to the \cpp\ STL \verb!std::vector! class
+template.
+
+Your goal is to complete the given
+skeleton file \verb!vector.h!.
+You are advised strongly to test your code.
+In particular, you should add more test cases to \verb!test.cpp!;
+what I've provided is absolutely not enough.
+If you work for a really good company, you will see
+that in some cases the test code can be longer than the code
+being tested.
+
+It should be clear what you need to complete just by looking at the
+skeleton code.
+All methods mentioned in the skeleton code must be completed.
+(For your own learning, you may add other methods if you like.)
+Let me just mention a few things.
+
+\verb!vector! objects can be constructed by specifying a size:
+\begin{console}[fontsize=\footnotesize]
+vector< int > x(5);    // x models an int array of size 5
+vector< double > y(4); // y models a double array of size 4
+vector< char > x(5);   // x models a char array of size 3
+\end{console}
+The memory used is of course from the free store (or memory heap).
+Specifically, pointer \verb!x.p_! will point to an array
+of 5 integer in the free store and 
+\verb!x.size_!
+\verb!x.capacity_!
+is set to 5.
+
+After the above you can read the values of \lq\lq array'' \verb!x!
+(or rather the values of the array that \verb!x.p_! points to):
+\begin{console}[fontsize=\footnotesize]
+std::cout << x[2] << '\n';
+\end{console}
+or you can write to the array:
+{\small
+\begin{console}
+x[2] = 42;
+\end{console}
+}
+This means that your class must have
+\verb!operator[]! for reading and writing.
+Since \verb!vector! objects model arrays in C/\cpp, this is not 
+surprising.
+However your \verb!operator[]! must provide protection
+against invalid index values.
+This means that if your \verb!vector! object has size 5,
+then calling \verb!operator[]! outside of the
+range of 0,1,2,3,4 will result in 
+\verb!IndexError! object being thrown as an exception object.
+The regular C/\cpp\ arrays do not have this protection
+and is a very common programming error resulting not just in 
+programs crashing but in fact can cause serious
+security issues.
+
+Of course there's the destructor, copy constructor, and assignment
+operator.
+Once you have memory allocation in your constructor(s), you must
+overwrite these, right?
+
+Another important constructor is
+\begin{console}[fontsize=\footnotesize]
+vector(T arr[], int size);
+\end{console}
+This allows you to construct a \verb!vector! object from a regular
+C/\cpp\ array. For instance the above
+constructor allows you to do the following
+\begin{console}[fontsize=\footnotesize]
+int x[] = {1,3,5,2,4,6};
+vector< int > y(x, 6);
+\end{console}
+Otherwise you would have to do this:
+\begin{console}[fontsize=\footnotesize]
+int x[] = {1,3,5,2,4,6};
+vector< int > y(6);
+for (int i = 0; i < 6; i++)
+{
+    x[i] = y[i]; 
+}
+\end{console}
+
+Code to print the vector is provided so that you can do this:
+\begin{console}[fontsize=\footnotesize]
+std::cout << x << '\n';
+\end{console}
+Study it carefully.
+By the way, printing like the above is probably
+among the earliest thing to write. 
+How in the world do you debug if you can't print?!?
+(Also, see the note below on debug printing.)
+
+The comparison operator, \verb!operator==!, returns \verb!true!
+exactly when the two relevant \verb!vector! objects
+model the same array, i.e., if you call
+\begin{console}[fontsize=\footnotesize]
+x == y
+\end{console}
+where \verb!x! and \verb!y! are, say \verb!vector< char >! objects,
+then you get \verb!true! 
+exactly when their sizes are the same and the values in the arrays
+that they point to have the same values.
+This operator must also be coded very early in order to 
+automate testing. 
+
+Of course the assignment operator, \verb!operator=()!, does the obvious.
+If you have
+\begin{console}[fontsize=\footnotesize]
+vector< double > x(5);
+vector< double > y(10);
+// code to put values into the arrays of x and y
+\end{console}
+then on calling the assignment operator:
+\begin{console}[fontsize=\footnotesize]
+x = y;
+\end{console}
+the arrays (in the free store) of both \verb!x! and \verb!y!
+have the same values; of course the size of \verb!x! and \verb!y!
+becomes the same.
+
+All the rest should be obvious from reading the skeleton code.
+
+The above is what you would expect to make \cpp's array more
+user-friendly.
+
+Now for the \verb!insert! method.
+This is not directly available in your usual C/\cpp\ arrays.
+
+Add a method \verb!insert(int index, const T & value)! so that 
+you can insert a 
+value into
+the array at the given index position. 
+This is the expected behavior (the following includes 3 test cases):
+\begin{console}[fontsize=\footnotesize]
+vector< int > a(3);
+a[0] = 5;
+a[1] = 10;
+a[2] = -6;
+std::cout << a << std::endl; // prints [5, 10, -6]
+
+a.insert(0, 42);
+std::cout << a << std::endl; // prints [42, 5, 10, -6]
+
+a.insert(2, 999);
+std::cout << a << std::endl; // prints [42, 5, 999, 10, -6]
+
+a.insert(5, -11111);
+std::cout << a << std::endl; // prints [42, 5, 999, 10, -6, -11111]
+\end{console}
+
+Note that if \verb!a! has size 5, you can only call \verb!insert!
+for \verb!index = 0, 1, 2, 3, 4, 5!.
+You cannot for instance insert at index value -1 and you cannot insert at
+index value 6.
+In general if the size of \verb!a! is \verb!s!, then you can 
+only insert at \verb!index = 0, 1, 2, ..., s!.
+If \verb!insert! is invoked at index outside this range your code
+should throw an \verb!IndexError! exception object.
+
+Here are test cases that test correct index positions:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+try
+{
+    vector< int > a(10);
+    a.insert(0, 42);
+    std::cout << "pass\n";
+}
+catch (IndexError & e)
+{
+    std::cout << "fail\n";
+}
+
+try
+{
+    vector< int > a(10);
+    a.insert(5, 42);
+    std::cout << "pass\n";
+}
+catch (IndexError & e)
+{
+    std::cout << "fail\n";
+}
+
+try
+{
+    vector< int > a(10);
+    a.insert(10, 42);
+    std::cout << "pass\n";
+}
+catch (IndexError & e)
+{
+    std::cout << "fail\n";
+}
+
+try
+{
+    vector< int > a(10);
+    a.insert(10, 42);
+    std::cout << "pass\n";
+}
+catch (IndexError & e)
+{
+    std::cout << "fail\n";
+}
+\end{Verbatim}
+
+Here are some test cases that test invalid index positions:
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
+try
+{
+    vector< int > a(10);
+    a.insert(-6, 42);
+    std::cout << "fail\n";
+}
+catch (IndexError & e)
+{
+    std::cout << "pass\n";
+}
+
+try
+{
+    vector< int > a(10);
+    a.insert(20, 42);
+    std::cout << "fail\n";
+}
+catch (IndexError & e)
+{
+    std::cout << "pass\n";
+}
+\end{Verbatim}
+
+Add a method to concatenate two \verb!vector! objects.
+This involves overloading the \verb!operator+=! and \verb!operator+!.
+For instance if \verb!a! and \verb!b! are \verb!vector< int >! objects,
+then \verb!a += b! will result in the values of \verb!b! being appended
+to \verb!a! (in the obvious way).
+Note that \verb!operator+=! should return a reference to the object
+invoking the operator.
+In other words, your class should allow you to do this:
+\begin{console}[fontsize=\footnotesize]
+(a += b) += b;
+\end{console}
+
+The \verb!push_back! method adds a value to the end of the
+array that your \verb!vector! models.
+\begin{console}[frame=single,fontsize=\footnotesize]
+int x[] = {1, 3, 5, 2, 4, 6};
+vector< int > y(x, 6); // y is {1, 3, 5, 2, 4, 6}
+y.push_back(42);       // y is {1, 3, 5, 2, 4, 6, 42}
+\end{console}
+Note that the \verb!y.size_! is changed from \verb!6! to \verb!7!.
+If the array that \verb!y.p_! cannot accomodate 7 values
+(i.e., if \verb!y.capacity_! is 6),
+then you need to reallocate a larger array for \verb!y.p_! to
+point to (just like the \verb!IntDynArray! example/assignment from CISS245).
+In this case, when you reallocate, the array must be twice of
+what you need.
+For instance in the above example, since \verb!y.p_! needs 7 values,
+the new array allocated must have 14 values.
+
+The skeleton code is of course not correct. You have to work on it.
+I do not need to tell you this but I'm going to anyway:
+Make sure that you use pass-by-reference for object parameters
+as much as possible.
+Also, parameters and methods should be constant whenever possible.
+
+(The \verb!IntDynArray! example/assignment from CISS245 and also
+the \cpp\ STL \verb!std::vector! has more methods
+than described above.
+You need not implement these extra methods.)
+
+Of course you have must ensure that there are no memory issues such as
+memory leaks and double free errors.
+You should definitely check your code with google asan.
+
+\newpage
+\textsc{Note on debug printing}
+
+Frequently, it is helpful to have the ability to print everything
+useful for debugging purposes.
+Our \verb!operator<<! is only helpful when \textit{using} this
+\verb!vector! class and debugging at a higher level assuming that
+the \verb!vector! class is already working perfectly.
+However for debugging \verb!vector!,
+besides printing the values in the 
+array, it might be helpful to print the \verb!size! and the pointer
+\verb!p! as well.
+I suggest you write a method
+\begin{console}[fontsize=\footnotesize]
+void debugprint() const;
+\end{console}
+to print everything associated to the object, i.e.,
+print the \verb!size! and \verb!p! besides the array values.
+This is very helpful especially in chasing pointers.
+In more complex classes with pointers, you absolutely have to print the 
+pointers for debugging.
+This method is not required for this assignment.
+
+
+\newpage
+Skeleton for \verb!vector.h!:
+{\footnotesize
+\includesourcenonumbers{vector.h}
+}
+
+\newpage
+Minimal \verb!test.cpp!:
+{\footnotesize
+\includesourcenonumbers{test.cpp}
+}
