@@ -1,0 +1,177 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Dynamic \& Static Binding}
+
+In the earlier sections, we saw that there are two ways to choose the \verb!f()! to execute, either \verb!P::f()! or \verb!C::f()!.
+
+\EMPHASIZE{Dynamic binding} refers to the choice of method (between the parent method and the child method with the same name) where the method is virtual. This is also called \EMPHASIZE{late binding.}
+
+\EMPHASIZE{Static binding} refers to the choice of method (between the parent method and the child method with the same name) where the method is not virtual. This is also known as \EMPHASIZE{early binding.}
+
+\tab[5em]{\verb!C c;!}\\
+\tab[5em]{\verb!P * p = c;!}\\
+
+Why is it called dynamic (or late) or static (or early)?
+
+Make sure you run the following really important example \ldots
+
+Suppose \verb!C0! and \verb!C1! are both subclass of \verb!P!. There are virtual functions \verb!f! defined in \verb!P!, \verb!C0!, \verb!C1!.
+
+\begin{console}
+#include < iostream>
+
+class P
+{
+public:
+     virtual void f() { std::cout << "P::f\ n"; }
+};
+
+class C: public P
+{
+public:
+     virtual void f() { std::cout << "C::f\ n"; }
+};
+
+class C1: public P
+{
+public:
+     virtual void f() { std::cout << "C1::f\ n"; }
+};
+
+int main()
+{   
+    P * p;
+    C c;
+    C1 c1;
+    int i;
+    std::cout << "Do you want C or C1? (0 or 1) ";
+    std::cin >> i;
+    if (i == 0)
+    {    
+         p = &c;
+    }
+    else
+    {
+         p = &c1;
+    }
+    p-> f();
+    
+    return 0;
+}
+\end{console}
+
+In the above, the decision of which \verb!f()! (\verb!C::f()! or \verb!C1::f()!) to use is \EMPHASIZE{not known during compilation} but is known \EMPHASIZE{only during runtime},. Therefore the binding is \EMPHASIZE{late} and is \EMPHASIZE{dynamic} (depending on runtime situation).
+
+On the other hand, if \verb!f()! is not virtual -- remove the virtual keyword -- and no matter what you enter, you always execute \verb!P::f()!. Therefore which \verb!f()! is used is known during compilation (it's \verb!P::f()!) -- it' s known even before you execute the program since it' s already known during compile time. Therefore the decision is \EMPHASIZE{early}. After the program is compiled, you \EMPHASIZE{cannot} change the \verb!f()! -- the choice of \verb!f()! is \EMPHASIZE{static} and \EMPHASIZE{not dynamic.}
+\newpage
+\tab[6em]{\large\verb!P * p;!}\\
+\tab[6em]{\large\verb!C c;!}\\
+\tab[6em]{\large\verb!p = &c;!}
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+p = Plot()
+
+#p += Grid(x0=-5, y0=-5, x1=5, y1=5)
+
+p += Rect(1, 2, 9, 5, s=r"If \texttt{f()} is not virtual, the decision of which \texttt{f()} to use is based on the pointer's type P.\\ \textbf{Static/early binding.}", linewidth=0.1, linecolor='red', innersep=0.3)
+
+p += Rect(1, -2, 9, 1, s=r"If \texttt{f()} not virtual, the decision of which \texttt{f()} to use is based on the object's class C.\\ \textbf{Dynamic/late binding.}", linewidth=0.1, linecolor='red', innersep=0.3)
+p += Rect(-3.5,2.5,-2.5,4.5,linewidth=0.05)
+p += Line(points=[(-2.5,3.5),(1,3.5)], linestyle='dashed',linecolor='red',linewidth=0.1)
+p += Line(points=[(-2.5,-0.5),(1,-0.5)], linestyle='dashed',linecolor='red',linewidth=0.1)
+p += Line(points=[(-3,3.5),(-3,0.5)], endstyle='>',linewidth=0.05)
+p += ellipse(center=(-3,-0.5), height=2,width=3,linewidth=0.05)
+X = POINT(x=-3.9, y=3.5, r=0, label='pointer to object')
+Y = POINT(x=-4.9, y=-0.5, r=0, label='object')
+p += str(X)
+p += str(Y)
+print(p)
+\end{python}
+WARNING: Static here refers to static \EMPHASIZE{binding}, i.e., which \verb!f()! is the p-> f() bound to. Do not be confused with static members!!!
+
+\textbf{Make sure you do the following exercises!}
+
+\begin{ex}What will happen if you have a stack of classes in an
+
+inheritance hierarchy like this:
+
+\begin{console}
+class P
+{
+public:
+     virtual void f() { std::cout << "P::f\ n"; }
+};
+
+class C: public P
+{
+public:
+     virtual void f() { std::cout << "C::f\ n"; }
+};
+
+class C1: public C
+{
+public:
+     virtual void f() { std::cout << "C1::f\ n"; }
+};
+\end{console}
+
+and you have
+
+\begin{console}
+C1 c1;
+P * p;
+p = &c1;
+p-> f();
+\end{console}
+
+What is the output? (Or is there a compilation or runtime error?)
+\end{ex}
+\begin{ex}What will happen if you have a stack of classes in an inheritance hierarchy like this:
+
+\begin{console}
+class P
+{
+public:
+     virtual void f() { std::cout << "P::f\ n"; }
+};
+
+class C: public P
+{
+public:
+     virtual void f() { std::cout << "C::f\ n"; }
+};
+
+class C1: public C
+{
+public:
+};
+\end{console}
+
+and you have
+
+\begin{console}
+C1 c1;
+P * p;
+p = &c1;
+p-> f();
+\end{console}
+
+What is the output? (Or is there a compilation or runtime error?)
+\end{ex}
+\begin{ex}Continuing with the above classes, can you run this
+program with input of 0? What is the output?
+
+\begin{console}
+P * p;
+C c0;
+C1 c1;
+int i;
+std::cout << "Do you want C0 or C1? (0 or 1) ";
+std::cin >> i;
+p = (i == 0 ? &c0 : &c1);
+p-> f();
+\end{console}
+\end{ex}
+

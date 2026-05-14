@@ -1,0 +1,118 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Pass by Constant Reference}
+
+You know that since \texttt{struct} variables are passed by value, they
+can't be changed by function call unless if passed by reference. Now look at
+your print function:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <iomanip>
+
+// Time structure here
+
+|\EMPHASIZE{void print(Time t)}|
+|\EMPHASIZE{\{}|
+|\EMPHASIZE{\}}|
+
+int main()
+{
+  ...
+  return 0;
+}
+\end{consolethree}
+
+This does work since the \texttt{print()} function should not change the value
+of the variable passed in anyway. However a \texttt{struct} variable by nature
+tends to contains lots of values. If you pass by value, the values will be
+copied to the receiving parameter. This takes time. Therefore you can
+pass by reference to save time. Pass by reference will not result in
+values being copied. Therefore we can do this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <iomanip>
+
+// Time structure here
+
+|\EMPHASIZE{void print(Time \& t)}|
+|\EMPHASIZE{\{}|
+|\EMPHASIZE{\}}|
+
+int main()
+{
+  ...
+  return 0;
+}
+\end{consolethree}
+
+Now the danger is that you (or someone working with you on the same
+project) might accidentally change the value of \texttt{t} in the \texttt{print()}
+function:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <iomanip>
+
+// Time structure here
+
+void print(Time & t)
+{
+    |\EMPHASIZE{t.hour = 0; // YIKES!!!}|
+}
+
+...
+\end{consolethree}
+
+So one way to prevent that and at the same time passing a \texttt{Time}
+variable by reference for speed is to make the parameter a
+\EMPHASIZE{constant reference}:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <iomanip>
+
+// Time structure here
+
+void print(|\EMPHASIZE{const}| Time |\EMPHASIZE{\&}| t)
+{
+}
+
+...
+\end{consolethree}
+
+In summary
+\begin{itemize}
+\item \EMPHASIZE{Struct parameters} should be \EMPHASIZE{pass by
+reference}
+\item If a function \EMPHASIZE{should not change} the values of a
+\EMPHASIZE{struct parameter}, then the parameter should be a
+\EMPHASIZE{constant reference}.
+\end{itemize}
+
+\begin{ex}
+Recall the following struct:
+
+\begin{consolethree}[escapeinside=||]
+struct Fraction
+{
+    int numerator;
+    int denominator;
+}
+\end{consolethree}
+
+Write a \texttt{print()} function for this struct. Make sure you use pass-by-constant-reference.
+\end{ex}
+
+\begin{ex}
+Write a function that checks if a \texttt{Time} struct parameter is
+valid. The boolean value \texttt{true} is returned if the value is correct, i.e. the
+hour is between 0 and 23 (inclusive), the minute is between 0 and 59
+(inclusive), and the second is between 0 and 23 (inclusive). The name of
+the function is \texttt{isValid}. [Question: Does the function change the value
+of the parameter? What type of parameter-passing should you use?]
+\end{ex}
+
+

@@ -1,0 +1,106 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Flushing the File and std::endl}
+
+The write operations you make to a file does not add contents to the file immediately. Your OS (operating system) actually provides the file operations and in many cases, the I/O (input/output) is buffered, meaning to say that the contents during I/O is temporarily kept in memory.
+
+Why?
+
+For performance reasons. Because the OS is in charge of deciding when's the best time to perform certain operations. In the case of a file, accessing a hard drive slows down the system. So the OS will keep the contents to be written in memory and wait till there's a certain amount to write to the hard drive before doing a real write to the hard drive. It's the same like you would keep a bunch of checks to cash in your wallet and visit your bank only once a week.
+
+This means that if you write 42 to a file, the actual file on your harddrive might not have a 42 in it immediately.
+
+You can however \EMPHASIZE{force} the contents to be written \EMPHASIZE{immediately} using the \EMPHASIZE{flush} method in the file object like this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <fstream>
+
+int main()
+{   
+    std::ofstream f("hw.txt", std::ios::app);
+
+    f << "hello world" << '\n';
+    |\EMPHASIZE{f.flush();}|
+
+    int x = 0;
+    double y = 3.14;
+    char z[] = "c++ rules";
+
+    f << x << ' ' << y << '\n';
+    |\EMPHASIZE{f.flush();}|
+
+    f << z << '\n';
+    |\EMPHASIZE{f.flush();}|
+
+    f.close();
+
+    return 0;
+
+}
+\end{consolethree}
+
+This is helpful if you want to synchronize (a little better) the actions in the program with your file on the harddrive. For instance if you're writing a game, you might want to have lots of print statements for debugging. If the print statements are delayed and there's a program error, the program might crash before the output is sent, therefore making your debugging difficult.
+
+You can also flush your \texttt{std::cout}:
+
+\begin{console}
+std::cout <<"hello world";
+std::cout.flush();
+\end{console}
+
+Note that you already know from day 1 of programming that another way to
+print a newline character to the console output is
+
+\begin{console}
+std::cout << "hello world" << std::endl;
+\end{console}
+
+Of course you can also do that for a file.
+
+\begin{console}
+f << "hello world" << std::endl; // f opened for
+                                 // writing 
+\end{console}
+
+Now it turns out that when you send \texttt{std::endl} to a file of \texttt{std::cout}, not only is a newline sent, in fact there's a flush. This means that
+
+\begin{console}
+f << "hello world" << '\n';
+f.flush() 
+\end{console}
+
+Is really the same as
+
+\begin{console}
+f <<"hello world" <<std::endl;
+\end{console}
+
+and
+
+\begin{console}
+std::cout << "hello world" << '\n';
+std::cout.flush();
+\end{console}
+
+is the same as
+
+\begin{console} 
+std::cout << "hello world" << std::endl;
+\end{console}
+
+The close operation also causes a flush to occur. Therefore you need not issue a flush when you're about to issue a close.
+
+By the way, when you use \texttt{std::cout} you are using an output file too (in most cases the file is tied to your console window). This output file is usually called "stdout". When you do
+
+\begin{center}
+\texttt{std::cout << std::endl;}
+\end{center}
+
+you are printing a newline \EMPHASIZE{and then flushing your stdout}. This ensures that whatever you have just printed is printed immediately without delay. If you're debugging a program and there are memory leaks, frequently the you want to print print statements to help with your debugging. The problem is that the program can crash before what you are printing appears. So in such cases, you want to flush your stdout as frequently as possible. So if you're trying to verify if the program crashed in function f(), you should do this:
+
+\tab[3em]{\verb!std::cout << "before calling f()" << std::endl;!}\\
+\tab[3em]{\verb!f(); // might be buggy!}\\
+\tab[3em]{\verb!std::cout << "after calling f()" << std::endl;!}\\
+

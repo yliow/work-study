@@ -1,0 +1,134 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Multiplication game: Part 4}
+
+Here's the pseudocode:
+\begin{align*}
+& \textbf{\texttt{Generate two random integers between 90 and 99}}\\
+& \tab[3em]{\texttt{and give the values to variables x and y}}\\
+& \textbf{\texttt{Store the product of x and y in variable answer}}\\
+& \textbf{\texttt{Print a prompt string to user to guess the}}\\
+& \textbf{\tab[3em]{\texttt{product of x and y}}}\\\\
+& \texttt{\textbf{Declare integer variable score and initialize it}}\\
+& \tab[3em]{\textbf{\texttt{to 0}}}\\
+& \textbf{\texttt{Declare integer variable guess}}\\
+& \texttt{\textbf{Prompt user for integer value for guess}}\\\\
+& \texttt{\textbf{If guess is answer}}\\
+& \tab[3em]{\texttt{\textbf{Print congratulatory message}}}\\
+& \tab[3em]{\texttt{\textbf{score = 2}}}\\
+& \texttt{\textbf{Otherwise if guess is less than the answer:}}\\
+& \tab[3em]{\texttt{\textbf{Tell user the guess is too low}}}\\
+& \tab[3em]{\texttt{\textbf{Print a prompt string to user to guess}}}\\
+& \tab[6em]{\texttt{\textbf{the product of x and y}}}\\
+& \tab[3em]{\texttt{\textbf{If guess is answer}}}\\
+& \tab[6em]{\texttt{\textbf{print congratulatory message}}}\\
+& \tab[6em]{\texttt{\textbf{score = 1}}}\\
+& \tab[3em]{\texttt{\textbf{Otherwise}}}\\
+& \tab[6em]{\texttt{\textbf{print answer}}}\\
+& \texttt{\textbf{Otherwise if guess is greater than the answer:}}\\
+& \tab[3em]{\texttt{\textbf{Tell user the guess is too low}}}\\
+& \tab[3em]{\texttt{\textbf{Print a prompt string to user to guess}}}\\
+& \tab[6em]{\texttt{\textbf{the product of x and y}}}\\
+& \tab[3em]{\texttt{\textbf{If guess is answer}}}\\
+& \tab[6em]{\texttt{\textbf{print congratulatory message}}}\\
+& \tab[6em]{\texttt{\textbf{score = 1}}}\\
+& \tab[3em]{\texttt{\textbf{Otherwise}}}\\
+& \tab[6em]{\texttt{\textbf{print answer}}}\\\\
+& \texttt{\textbf{Print user's score}}\\
+\end{align*}
+
+Sometimes, you have deeply nested code. What if the above, where you
+give the user at most 2 chances to answer a question, if changed to
+allowing the user to have \EMPHASIZE{3} chances or even \EMPHASIZE{4} chances?
+If you use the above method, you would have a very deeply nested code
+structure.
+
+Another way to allow the user 3 chances is to avoid deeply nested code
+as follows. First, since you do not want to nest the 3 cases, you want
+something like this:
+
+\begin{align*}
+&\texttt{ask user for an answer}\\
+&\texttt{ask user for an answer}\\
+&\texttt{ask user for an answer}\\
+\end{align*}
+
+But of course you want the second \lq\lq ask user for an answer'' to know if
+the first \lq\lq ask user for an answer'' gave rise to a correct answer or
+not.
+
+\begin{align*}
+&\texttt{ask user for an answer}\\
+&\texttt{if first answer is not correct:}\\
+&\tab[3em]{\texttt{ask user for an answer}}\\
+&\texttt{ask user for an answer}\\
+\end{align*}
+
+Likewise the third \lq\lq ask user for an answer'' also need to know if a
+correct answer was given. So instead of \lq\lq first answer is not correct'',
+we probably want \lq\lq \,\lq\lq answer is not correct'' that can be used or the second and third \lq\lq answer user for an answer''.
+
+\begin{align*}
+&\texttt{ask user for an answer}\\
+&\texttt{if answer is not correct}\\
+&\tab[3em]{\texttt{ask user for an answer}}\\
+&\texttt{if answer is not correct}\\
+&\tab[3em]{\texttt{ask user for an answer}}\\
+\end{align*}
+
+Let's make \lq\lq answer is not correct'' into a boolean variable:
+\begin{align*}
+&\texttt{bool answer\_is\_correct}\\\\
+&\texttt{ask user for an answer}\\
+&\texttt{if answer from user is correct,}\\
+&\tab[3em]{\texttt{answer\_is\_correct = true}}\\\\
+&\texttt{if !answer\_is\_correct:}\\
+&\tab[3em]{\texttt{ask user for an answer}}\\
+&\tab[3em]{\texttt{if answer from user is correct,}}\\
+&\tab[6em]{\texttt{answer\_is\_correct = true}}\\\\
+&\texttt{if !answer\_is\_correct:}\\
+&\tab[3em]{\texttt{ask user for an answer}}\\
+&\tab[3em]{\texttt{if answer from user is correct,}}\\
+&\tab[6em]{\texttt{answer\_is\_correct = true}}\\\\
+\end{align*}
+
+You want to think of \texttt{answer\_is\_correct} as a
+\EMPHASIZE{communication device} from the first \lq\lq answer user for an
+answer'' with the second and third, and also from the second to the
+third. For this example, the repeated blocks of code are \EMPHASIZE{not
+completely independent}. Other than the first block, subsequent blocks
+need to know if the user has given a correct answer.
+
+Get it?
+
+\begin{ex}
+Write the multiplication game that allows the user to
+have at most 3 tries.
+\end{ex}
+
+\begin{ex}
+Get an integer n from the user and then compute the
+sum of the rightmost 4 digits of n. Once a digit 0 is added, you should
+stop the summation. Do this with repetition code. Here's a test case
+\end{ex}
+\begin{console}[commandchars=\~\@\$]
+~textbf@1534315$
+13 
+\end{console}
+
+Here's another:
+\begin{console}[commandchars=\~\@\$]
+~textbf@1534015$
+6 
+\end{console}
+
+(after adding \texttt{5} and \texttt{1}, on seeing a \texttt{0}, the summation
+stops. Therefore the sum is 6) and another
+
+\begin{console}[commandchars=\~\@\$]
+~textbf@1534205$
+5 
+\end{console}
+
+

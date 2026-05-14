@@ -1,0 +1,90 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Conversion operators}
+
+Suppose \textit{D} is a type (class or built-in type like int, double,
+...) and \textit{C} is a class. You can define a \textbf{conversion
+operator} from \textit{C} to \textit{D}. This should look like
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    ...
+    operator D();
+    ...
+};
+\end{consolethree}
+
+WARNING: Do not specify a return type. C++ knows that the return type
+will be \textit{D}. Also, conversion operators are usually \textit{const}.
+
+Let's make an addition to our \textit{Int} class
+
+\begin{consolethree}[escapeinside=||]
+class Int {
+public:
+    Int(int a)
+        : x_(a)
+    {}
+    |{\bf operator int() const \{ return x\_; \}}|
+private:
+    int x_;
+};
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    Int c(0);
+    std::cout << |{\bf (int) c}| << " " << |{\bf int(c)}|;
+    return 0;
+}
+\end{consolethree}
+
+\textit{(int) c} and \textit{int(c)} are the same as \textit{c.operator
+int()}.
+
+Here's another example:
+
+\begin{consolethree}[escapeinside=||]
+class D
+{
+public:
+    D(int a, int b)
+        : x_(a), y_(b)
+    {}
+    void print()
+    {
+        std::cout << "(" << x_ << "," << y_ << ")\n";
+    }
+private:
+    int x_, y_;
+};
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    Int(int a)
+        : x_(a)
+    {}
+    operator D() { return D(x_,x_); }
+private:
+    int x_;
+};
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    Int c(2);
+    ((D)c).print();
+    D(c).print();
+    return 0;
+}
+\end{consolethree}
+
+

@@ -1,0 +1,177 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Constructor}
+
+Now add some print statements in the parent and child constructor:
+\begin{console}[commandchars=\~\@\$]
+#include <iostream>
+
+class P
+{
+public:
+        P() : x_(1) { ~textbf@std::cout << "P::P()\n"; $}
+        int get_x() const { return x_; }
+        void set_x(int x) { x_ = x; }
+private:
+        int x_;
+};
+
+class C: public P
+{
+public:
+        C() : x_(3), y_(2) { ~textbf@std::cout << "C::C()";$ }
+        int get_y() const { return y_; }       
+        void set_y(int y) { y_ = y; }
+private:
+        int x_;
+        int y_;
+};
+
+int main()
+{   
+    C c;
+    std::cout << "c.x_ =" << c.get_x() << ", "
+              << "c.y_ =" << c.get_y() << '\n';
+    std::cout << "c.x_ =" << c.P::get_x() << ", "
+              << "c.y_ =" << c.C::get_y() << '\n';
+return 0;
+
+}
+\end{console}
+
+Run it. You'll see that the parent constructor is indeed executed. This means that the child constructor actually called the parent's constructor.
+
+Note that the \EMPHASIZE{parent constructor} was \EMPHASIZE{called before} the \EMPHASIZE{child constructor.} Why is that? Because during child construction, you may use data already constructed in the parent. You cannot do the opposite.
+
+Now what if you want to choose how to initialize the parent part of the
+\verb!c! object? How do you explicitly call the parent's constructor?
+Let's add a new constructor in \verb!P!, one that accepts an integer
+value and get the \verb!C!'s constructor to call \verb!P::P(int):!
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+|\sidebox{parentctor}{\textbf{Call parent's constructor explicitly in the initializer list}}|
+class P
+{
+public:
+        P() : x_(1) { std::cout << "P::P()\n"; }
+        |\textbf{P(int x) : x\_(x) \{ std::cout << "P::P(int)"}||\verb!\n"; }!|
+        int get_x() const { return x_; }
+        void set_x(int x) { x_ = x; }
+private:
+        int x_;
+};
+
+class C: public P
+{
+public:
+        C() : |\tikzmarknode{end42}{\EMPHASIZE{P(42)}}|, x_(3), y_(2)
+                     { std::cout << "C::C()"; }
+        int get_y() const { return y_; }
+        void set_y(int y) { y_ = y; }
+private:
+        int x_;
+        int y_;
+};
+
+int main()
+{   
+    C c;
+    std::cout << "c.x_ =" << c.get_x() << ", "
+              << "c.y_ =" << c.get_y() << '\n';
+    std::cout << "c.x_ =" << c.P::get_x() << ", "
+              << "c.y_ =" << c.C::get_y() << '\n';
+    return 0;
+}
+\end{consolethree}
+\DrawArrow[red, thick]{parentctor.south west}{end42}
+
+\begin{ex} You are given this incomplete code. Add to the
+constructor of \verb!Car! and \verb!Motorcycle! so that a \verb!Car!
+object is initialized to have 4 wheels and a \verb!Motorcycle! object is
+initialized to have 2 wheels.
+
+\begin{console}
+class Vehicle
+{
+public:
+        Vehicle(int numWheels)
+           : numWheels_(numWheels)
+        {}
+        int numWheels() const { return numWheels_; }
+private:
+        int numWheels_;
+};
+
+class Car: public Vehicle
+{
+public:
+        Car(bool keyless_entry)
+           : keyless_entry_(keyless_entry)
+        {}
+private:
+        bool keyless_entry_;
+};
+
+class Motorcycle: public Vehicle
+{
+public:
+        Motorcycle()
+            :
+        {}
+};
+
+int main()
+{   
+    Car aCar;               // aCar has 4 wheels
+    Motorcycle aMotorcycle; // aMotorcycle has 2
+                            // wheels
+    std::cout << "aCar has "
+              << aCar.numWheels() << " wheels\n";
+    std::cout << "aMotorcycle has "
+              << aMotorcycle.numWheels()
+              << " wheels\n";
+    return 0;
+}
+\end{console}
+\sidenote{
+  \begin{tikzpicture}
+  \node[draw,text width=2cm,minimum height=2cm, line width=0.05cm, inner sep=0.3cm, anchor=center] (car) at (1,-2) 
+       {\tikzmark{c} \normalsize\texttt{Car}};
+  \node[draw,text width=2cm,minimum height=2cm, line width=0.05cm, inner sep=0.3cm, anchor=center] (mcycle) at (4,-2) 
+       {\tikzmark{m} \normalsize\texttt{Motor-\\ cycle}};
+  \node[draw,text width=2cm,minimum height=2cm,minimum width=2cm, line width=0.05cm, inner sep=0.3cm, anchor=base] (vehicle) at (2.5,1) 
+       {\tikzmark{v} \normalsize\texttt{Vehicle}};
+  \node[above=4mm of car.north] (Lstart){};
+  \node[above=4mm of mcycle.north] (Lend){};
+  \node[below=6mm of vehicle.south] (Lmid){};
+  \draw[ultra thick]        (car.north)   -- (Lstart) -- (Lend) -- (mcycle.north);
+  \draw[ultra thick, ->]        (Lmid)   -- (vehicle.south);
+\end{tikzpicture}
+}
+
+\end{ex}
+\begin{ex}
+This is an incomplete piece of code:
+\begin{console}
+class GameObject
+{
+private:
+        bool is_alive_;
+        int x_;
+        int y_;
+};
+
+class Laser: public GameObject
+{
+};
+
+class Alien: public GameObject
+{
+};
+\end{console}
+\end{ex}
+Add code so that during the initialization of a \verb!Laser! object, the
+\verb!is_alive_! is set to \verb!false! and during the initialization
+of an \verb!Alien! object, the \verb!is_alive_! is set to \verb!true!.
+

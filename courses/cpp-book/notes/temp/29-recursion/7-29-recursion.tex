@@ -1,0 +1,120 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{GCD}
+
+GCD stands for \EMPHASIZE{greatest common divisor}. For instance the GCD of
+10 and 35 is 5 because 5 is the largest divisor of both 10 and 35. The
+GCD of 100 and 30 is 10 since 10 is the largest divisor of both 100 and
+30.
+
+One way to compute the GCD of two numbers is to test all the numbers
+between 1 and the smaller of the two:
+
+\begin{consolethree}[escapeinside=||]
+int min(int x, int y)
+{
+    if (x < y)
+        return x;
+    else
+        return y;
+}
+
+int main()
+{
+    int x, y;
+    std::cin >> x >> y;
+    int gcd = 1;
+    for (int i = 2; i <= min(x, y); i++)
+    {
+        if (x % i == 0 && y % i == 0)
+        {
+            gcd = i;
+        }
+    }
+    std::cout << "gcd = " << gcd << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+Try it out.
+
+But there is a faster algorithm due to Euclid, a Greek mathematician.
+This is called \EMPHASIZE{Euclid's algorithm}.
+
+\begin{consolethree}
+gcd(m, n):
+    if n == 0:
+        return m
+    else:
+        return gcd(n, m % n)
+\end{consolethree}
+
+This is an extremely important algorithm and is used in CS, math,
+engineering, etc. in areas such as cryptography, data compression, etc.
+Here's the code:
+
+\begin{consolethree}[escapeinside=||]
+int gcd(int m, int n)
+{
+    if (n == 0)
+        return m;
+    else
+        return gcd(n, m % n);
+}
+\end{consolethree}
+
+\begin{ex}
+Compute \texttt{gcd(42, 66)} by hand. Draw the function
+call tree for \texttt{gcd(42, 66)}. Label the return arrows with the
+return values.
+\end{ex}
+
+\begin{ex}
+Now compute \texttt{gcd(66, 42)} by hand.
+\end{ex}
+
+\begin{ex}
+A brute force way to compute GCD is this:
+
+\begin{quote}
+Given positive integer m and n, run d from 1 to the smaller of m and n,
+check if d is a divisor of both m and n. Compute the largest of such d.
+\end{quote}
+
+Here's the pseudocode:
+
+\begin{consolethree}
+int max_d;
+for d = 1, 2, 3, ..., min(m,n):
+    if d divides both m and n:
+        if d < max_d:
+            max_d = d
+\end{consolethree}
+
+The max\_d is the GCD of m,n. (Why does this running max computation not
+require an initialization of max\_d?) Since d keeps increasing, the
+above is really the same as
+
+\begin{consolethree}
+int max_d;
+for d = 1, 2, 3, ..., min(m,n):
+    if d divides both m and n:
+        max_d = d
+\end{consolethree}
+
+I'll let you think about this \ldots{} this is a better pseudocode:
+
+\begin{consolethree}
+int max_d;
+for d = min(m,n), min(m,n) - 1, min(m,n) - 2, ..., 1:
+    if d divides both m and n:
+        max_d = d and break the loop
+\end{consolethree}
+
+Now you have two ways to compute GCD: by the earlier recursion or using
+this loop. Try to compute the GCD of several pairs of m,n and decide
+which algorithm is faster. (Hint: Euclid is smart.)
+\end{ex}
+
+

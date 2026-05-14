@@ -1,0 +1,106 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Inline functions}
+
+You have seen this before:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int max(int x, int y)
+{
+    if (x < y) return y;
+    else return x;
+}
+
+int main()
+{
+    int m = max(3, 5);
+    std::cout << m << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+(For very simple if-else statements, the above style is OK.)
+
+Now add one single keyword:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+inline int max(int x, int y)
+{
+    if (x < y) return y;
+    else return x;
+}
+
+int main()
+{
+    int m = max(3, 5);
+    std::cout << m << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+Note that it's common to see this coding style:
+
+\begin{consolethree}[escapeinside=||]
+inline
+int max(int x, int y)
+{
+    if (x < y) return y;
+    else return x;
+}
+\end{consolethree}
+
+I suggest you use this style.
+
+In terms of what a function can \textbf{do}, it doesn't make any difference if a function is inlined or not. The only difference is really in the speed of execution of the code.
+
+An \EMPHASIZE{inline function} is not exactly a function. When you compile a program with an inline function, what happens is that the compiler (more or less) copies the code to the place where you called the inline function. In other words, when you get C++ to compile the following program:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+inline
+int max(int x, int y)
+{
+    if (x < y) return y;
+    else return x;
+}
+
+int main()
+{
+    int m = max(3, 5);
+    std::cout << m << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+your compiler reads the program into its memory and changes it to this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int main()
+{
+    int m;
+    if (3 < 5) m = 5;
+    else m = 3;
+    std::cout << m << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+before generating the executable. There is really no \texttt{max()} function. In other words, an inline function is like a rubber stamp for a chunk of code.
+
+If your code calls the inline \texttt{max()} function 100 times, the body of \texttt{max()} is copied 100 times.
+
+Note that the copying of the body of the function to the places where the function is called is done when the compiler builds an executable file. Your actual cpp file is not changed; the above modification is done in the compiler's memory. You do not see the code duplicated in your source file.
+
+\begin{ex}
+Write an inline \texttt{min()} function. Test your function.
+\end{ex}
+
+

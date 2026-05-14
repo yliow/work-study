@@ -1,0 +1,111 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Enumerators and Integers}
+
+You might say ... ``Hang on there! What do you mean that the
+\textit{EmployeeCode} is a new type??? When I print an \textit{EmployeeCode}
+variable like this ...''
+
+\begin{consolethree}[escapeinside=||]
+enum EmployeeCode
+{
+    CEO, MANAGER, FULLTIME, PARTTIME
+};
+
+std::cout << CEO << std::endl;
+\end{consolethree}
+
+``I see that \textit{CEO} \textit{is} 0!!! So it \textit{is} an integer!!!
+Isn't it???''
+
+Yes and no.
+
+There's actually an automatic \textit{typecasting} between
+enumerators and integers. The statements:
+
+\begin{consolethree}[escapeinside=||]
+std::cout << CEO << std::endl;
+std::cout << MANAGER << std::endl;
+\end{consolethree}
+
+are really the same as
+
+\begin{consolethree}[escapeinside=||]
+std::cout << int(CEO) << std::endl;
+std::cout << int(MANAGER) << std::endl;
+\end{consolethree}
+
+This means that \textit{CEO}, because it's the
+\textbf{first} enumerator of an enumeration, is automatically
+typecast to the integer \textbf{0} if necessary, \textit{MANAGER}
+is automatically typecast to the integer 1 if necessary, etc.
+
+That example shows you that \textit{EmployeeCode} enumerator is
+automatically typecast to an \textit{int} when necessary. What about from
+an \textit{int} to \textit{EmployeeCode} enumerator? Try this:
+
+\begin{consolethree}[escapeinside=||]
+enum EmployeeCode
+{
+    CEO, MANAGER, FULLTIME, PARTTIME
+};
+
+EmployeeCode code = EmployeeCode(1);
+\end{consolethree}
+
+The last statement is the same as:
+
+\begin{consolethree}[escapeinside=||]
+EmployeeCode code = MANAGER;
+\end{consolethree}
+
+Now let's see if the typecast is also automatic. Try this:
+
+\begin{consolethree}[escapeinside=||]
+enum EmployeeCode
+{
+    CEO, MANAGER, FULLTIME, PARTTIME
+};
+
+EmployeeCode code = 1; // 1 becomes EmployeeCode(1)??
+\end{consolethree}
+
+The point: An integer is \textbf{not} automatically typecast to
+an enumerator.
+
+Since C/C++ will automatically typecast enumerators to integers if
+necessary, we can use it as though it's an integer. Here
+are some examples:
+
+Run this:
+
+\begin{consolethree}[escapeinside=||]
+enum operation {ADD, SUB, MUL, DIV};
+
+operation op = ADD;
+int x = 10, y = 20;
+
+switch (op)
+{
+    case ADD: std::cout << x + y; break;
+    case SUB: std::cout << x - y; break;
+    case MUL: std::cout << x * y; break;
+    case DIV: std::cout << x / y; break;
+}
+\end{consolethree}
+
+Try changing the \textit{op} to different values.
+
+\begin{ex}
+Is this a valid code segment? If so, what is the
+output? If it isn't explain why.
+
+\begin{consolethree}[escapeinside=||]
+enum operation {ADD, SUB, MUL, DIV};
+
+std::cout << ADD + SUB + MUL + DIV << std::endl;
+\end{consolethree}
+\end{ex}
+
+

@@ -1,17 +1,26 @@
 '''
-makes a chap.tex for the current chapter (name pending)
-splits chapters by their
+- makes a chap.tex for the current chapter (name pending)
+- splits chapters by their section <- will have to update this as time goes on from current naming scheme
+- writes found sections to "chap.tex" for its respective chapter
 '''
 import os
 
 #constants
-solution_header = r'''
-\begin{python0}
+solution_header = r'''\begin{python0}
 from solutions import *; clear()
 \end{python0}
 '''
-
-
+footer_chaptex = r'''\begin{python0}
+from solutions import *
+prepare_solutions()
+\end{python0}
+\input{solutions.tex}
+\begin{python0}
+from solutions import *
+clear()
+\end{python0}
+'''
+#directory access
 dir_ = os.getcwd()
 
 chapters = dir_ + '/chapters/'
@@ -20,20 +29,16 @@ chap_list = os.listdir(chapters)
 
 for chap in chap_list:
   note = chapters + chap + '/main.tex'
-
   sections = []
 
   #scan note to split into sections
   try:  
     with open(note, 'r') as f:
       file_ = f.readlines()
-      flag = False
       content = []
     
       for line in file_:
-    
         if r'\newpage\EMPHASIZE' in line:
-          print("NEWPAGE FOUND!!!")
           #check against empty content list to prevent blank first section 
           if len(content) and r'\newpage\EMPHASIZE' in line:
             sections.append(content)
@@ -44,12 +49,44 @@ for chap in chap_list:
         else:
           content.append(line)
           
+    print("CHAPTER %s SECTIONS LENGTH = " % chap, len(sections))
+    #change this into a directory format with section nums being under the chapter name in temp, then switch references of temp to "chapters" to retain consistency
     if not (os.path.exists(dir_ + '/temp')):
       os.system('mkdir temp')
-    
-    with open(dir_ + '/temp/' + chap + '.tex', 'w') as t:
-      for s in sections:
+
+    #section iterator
+    k = 0
+    #sections collector for insertion into chap.tex file
+    sections_list = []
+    #write sections to file in chapter folder
+    for s in sections:
+      #check if section folder already exists
+      if not os.path.exists(dir_ + '/temp/%s' % (chap + '/')):
+        os.system("mkdir %s" % (dir_ + '/temp/' + chap + '/'))  
+      
+      chap_section = str(k) + '-' + chap + '.tex'
+
+      #open section
+      with open(dir_ + '/temp/' + chap + '/' + chap_section, 'w') as t:
+
+        #write solution header
+        t.write(solution_header)
+        
+        #add to section list for writing to chap.tex later
+        sections_list.append(chap_section)
+
+        #write section
         for line in s:
           t.write(line)
+      k += 1
+      
+      #write sections to chap.tex file
+      with open(dir_ + '/temp/' + chap + '/chap.tex', 'w') as chaptex:
+        for entry in sections_list:
+          chaptex.write("\input{%s}\n" % entry)
+
+        #write footer for chap.tex
+        chaptex.write(footer_chaptex)
+        
   except Exception as e:        
     print("FAILURE PARSING NOTE %s, MESSAGE = %s" % (note, e))

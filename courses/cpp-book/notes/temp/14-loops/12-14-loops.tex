@@ -1,0 +1,183 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Numerical Approximation}
+
+Look at this sum:
+
+\tab[6em]{\texttt{\ \ \ \ \ \ 1\ \ \ \ \ \ \ 1\ \ \ \ \ \ \ 1\ \ \ \ \ \ \ 1\ \ \ \ \ \ \ 1}}\\
+\tab[6em]{\texttt{t = ----- + ----- + ----- + ----- + -----}}\\
+\tab[6em]{\texttt{\ \ \ \ 1 * 1\ \ \ 2 * 2\ \ \ 3 * 3\ \ \ 4 * 4\ \ \ 5 * 5}}\\
+
+This is a sum of 5 terms. It's easy to write a program
+to compute the sum -- you have seen similar examples before.
+
+\begin{ex} Write a program that computes t. Should you use a
+for-loop or a while-loop? The value you get should be approximately
+1.46361.
+\end{ex}
+%if you had a gun to my head and told me to figure out why this doesnt correctly tab before 1*1 but does afterwards or i die, i would pull the trigger for you
+\begin{ex} Now modify the above program to compute
+
+\texttt{\ \ \ \ \ \ 1\ \ \ \ \ \ \ 1\ \ \ \ \ \ \ 1\ \ \ \ \ \ \ 1\ \ \ \ \ \ \ 1\ \ \ \ \ \ \ \ 1}\\
+\texttt{t = ----- + ----- + ----- + ----- + ----- + -----}\\
+\texttt{\ \ \ \ 1 * 1\ \ \ 2 * 2\ \ \ 3 * 3\ \ \ 4 * 4\ \ \ 5 * 5\ \ \ 6 * 6}\\
+
+The value should be 1.49139. (If you get 1 then you know
+you're wrong.)
+\end{ex}
+
+\begin{ex} The first program of this section computes a sum of 5
+terms. The second computes a sum of six terms. Now do the obvious:
+Rewrite your program so that it prompts the user how many terms to use
+in the sum. Let's say the variable for the number of
+terms is n.
+\end{ex}
+\begin{ex} Modify your program to print the following values:
+\begin{console}
+  1
+-----
+1 * 1
+
+  1       1
+----- + -----
+1 * 1   2 * 2
+
+  1       1       1
+----- + ----- + -----
+1 * 1   2 * 2   3 * 3
+
+1         1       1       1
+----- + ----- + ----- + -----
+1 * 1   2 * 2   3 * 3   4 * 4
+
+  1       1       1       1       1
+----- + ----- + ----- + ----- + -----
+1 * 1   2 * 2   3 * 3   4 * 4   5 * 5
+
+up to
+
+  1       1       1              1
+----- + ----- + ----- + ... + -------
+1 * 1   2 * 2   3 * 3         10 * 10
+\end{console}
+You should get this:
+
+\begin{console}
+1
+1.25
+1.36111
+1.42361
+1.46361
+1.49139
+1.5118
+1.52742
+1.53977
+1.54977 
+\end{console}
+\end{ex}
+
+Now let the printout go up to a sum of 20 terms, then 30 terms, etc.
+Keep going until the first 5 decimal places stops changing.
+
+Basically, what you're doing in the previous exercises
+is to compute the approximations to
+\begin{console}
+      1       1       1       1       1
+s = ----- + ----- + ----- + ----- + ----- + ...
+    1 * 1   2 * 2   3 * 3   4 * 4   5 * 5
+\end{console}
+Note that this goes on forever. The reason why it stops changing after a
+while is that the term you're adding to the sum gets
+smaller and smaller ``very quickly'' :
+\tab[9em]{\texttt{
+\ \ 1
+-----
+i * i
+}}
+If you want to know more, you should take Calc 2. This is not a Calc
+class.
+
+(To the math folks: If you keep going forever you get
+
+\tab[9em]{$\frac{\pi^2}{6}$}
+
+correct?)
+
+Computations of approximations is important for many kinds of
+applications including scientific, mathematical, and business
+applications.
+
+Now suppose you work for NASA and you need to compute the above sum
+\begin{console}
+      1       1       1       1       1
+s = ----- + ----- + ----- + ----- + ----- + ...
+    1 * 1   2 * 2   3 * 3   4 * 4   5 * 5
+\end{console}
+(which goes on forever) up to 10 decimal places. You can do what we did
+early: Keep including more and more terms. You need to get C++ to reveal
+more decimal places (use \texttt{std::setprecision()}). That would be
+really time consuming.
+
+Another way is to let the for-loop run without an upper limit for i (how
+would you do that?) and when you see the first 10 decimal places not
+changing you can write it down (if you can see it scrolling by) and stop
+the program manually. But this might take a while and if you go out to
+lunch, the for-loop keeps running even after the first 10 decimal places
+stop changing. This is a waste of CPU time.
+
+We need to figure out how to stop the loop AUTOMATICALLY.
+
+By the way if you look at the term:\\
+\tab[3em]{\texttt{
+\ \ 1
+-----
+i * i
+}}
+
+obviously you want to avoid integer division. So in C++ you should do
+\begin{center}
+    \texttt{1.0 / (i * i)}
+\end{center}
+But besides fixing the division problem, you have another: recall that
+an int value in C++ does not go on forever. If you want to represent
+bigger numbers, you should do
+\begin{center}
+    \texttt{1.0 / (double(i) * i)}
+\end{center}
+i.e. even the denominator multiplication should be ``doubled'' -up.
+
+\begin{ex}
+Repeat the above example with this:
+\begin{console}
+      1       1       1       1       1
+s = ----- + ----- + ----- + ----- + ----- + ...
+    1*1*1   2*2*2   3*3*3   4*4*4   5*5*5
+\end{console}
+\end{ex}
+\begin{ex}
+Repeat the above example with this:
+\begin{console}
+      1       1       1 
+s = ----- + ----- + ----- + ...
+    1 * 1   3 * 3   5 * 5
+\end{console}
+\end{ex}
+\begin{ex}
+Repeat the above example with this:
+\begin{console}
+      1       1       1       1
+s = ----- - ----- + ----- - ----- ...
+    1 * 1   3 * 3   5 * 5   7 * 7
+\end{console}
+(WARNING: Note the alternating + and -- signs.)
+\end{ex}
+\begin{ex}
+Repeat the above example with this:
+\begin{console}
+    1    1      1        1          1
+s = - + --- + ----- + ------- + --------- + ...
+    1   1*2   1*2*3   1*2*3*4   1*2*3*4*5
+\end{console}
+\end{ex}
+

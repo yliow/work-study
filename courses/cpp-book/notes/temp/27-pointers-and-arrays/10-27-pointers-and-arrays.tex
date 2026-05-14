@@ -1,0 +1,277 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Functions with array parameters: where to start and where to end}
+
+Let's continue with the example from the previous section:
+
+\begin{consolethree}[escapeinside=||]
+int sum(int x[], int size)
+{
+    int s = 0;
+    for (int i = 0; i < size; ++i)
+    {
+        s += x[i];
+    }
+    return s;
+}
+int main()
+{
+    int a[] = {1,3,5,7,2,4,6,8};
+    std::cout << sum(a, 8) << '\n';
+    std::cout << sum(a, 4) << '\n';
+    std::cout << sum(a + 4, 3) << '\n';
+    return 0;
+}
+\end{consolethree}
+
+Again, in function sum, you want to think of x as a pointer to an array
+of values. When you call
+
+\verb!... sum(a + 4, 3) ...!
+
+You are basically telling the function to start at the value which is 4
+integers away from the address a (i.e., the 5\textsuperscript{th}
+integer in the array).
+
+I can rewrite the \texttt{sum} function like this so that it's really
+clear that the array parameter is really a pointer parameter:
+
+\begin{consolethree}[escapeinside=||]
+int sum(int * start_pointer, int size)
+{
+    int s = 0;
+    for (int i = 0; i < size; ++i)
+    {
+        s += start_pointer[i];
+    }
+    return s;
+}
+\end{consolethree}
+
+Since you're using a starting pointer address to specify where to find the first value, why not specify the pointer address of the last value? In that case your code becomes \EMPHASIZE{more uniform} like this:
+
+\begin{consolethree}[escapeinside=||]
+int sum(int * start_pointer, int * end_pointer)
+{
+    int s = 0;
+    for (int * p = start_pointer;
+         p <= end_pointer; ++p)
+    {
+        s += *p;
+    }
+    return s;
+}
+\end{consolethree}
+
+You do have to know for instance that ++p on a pointer will move the pointer p to the next integer (and I've already talked about it.)
+
+Now, it's actually more common to specifying the ending address value to be the value that is just \EMPHASIZE{one step outside} the array of values to be processed:
+
+\begin{consolethree}[escapeinside=||]
+int sum(int * start_pointer, int * end_pointer)
+{
+    int s = 0;
+    for (int * p = start_pointer;
+         p < end_pointer; ++p)
+    {
+        s += *p;
+    }
+    return s;
+}
+\end{consolethree}
+
+Simplifying the parameter names a little, I get \ldots{}
+
+\begin{consolethree}[escapeinside=||]
+int sum(int * start, int * end)
+{
+    int s = 0;
+    for (int * p = start; p < end; ++p)
+    {
+        s += *p;
+    }
+    return s;
+}
+\end{consolethree}
+
+(Instead of start and end, it's also common to name the pointers begin and end.)
+
+In this form, \texttt{main()} would have to look like this:
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    int a[] = {1, 3, 5, 7, 2, 4, 6, 8};
+    std::cout << sum(a, a + 8) << '\n';
+    std::cout << sum(a, a + 4) << '\n';
+    std::cout << sum(a + 4, a + 7) << '\n';
+    return 0;
+}
+\end{consolethree}
+
+Let me repeat: the general practice is that \texttt{end} points to one
+value beyond what you want to process. So the values processed are
+
+\texttt{*start}, \texttt{*(start + 1)}, \texttt{*(start + 2)}, \ldots,
+\texttt{*(end - 1)}
+
+Note that no values are process if start equals end.
+
+\begin{ex}
+Complete and test this function that does the
+obvious:
+
+\verb!void println(int * start, int * end);!
+
+(It's clear when you should stop.) Here's the format of the output:
+
+\verb!{5, 1, 2, 4}!
+
+A newline should be printed. When \texttt{start} and \texttt{end} have the
+same value, the output looks like this:
+
+\verb!{}!
+\end{ex}
+
+\begin{ex}
+Complete and test this function that does the
+obvious:
+
+\verb!int max(int * start, int * end);!
+
+(It's clear when you should stop.) You maybe assume at least one value
+is processed, i.e., assume \texttt{start} <= \texttt{end - 1}.
+\end{ex}
+
+\begin{ex}
+Complete and test this function:
+
+\verb!int * max(int * start, int * end);!
+
+that returns the address of the maximum value in \texttt{*start}, \ldots,
+\texttt{*(end - 1)} if \texttt{start <= end - 1}. Otherwise
+\texttt{NULL} is returned. You maybe assume at least one value is
+processed, i.e., assume \texttt{start} <= \texttt{end - 1}.
+\end{ex}
+
+\begin{ex}
+Complete and test this function:
+
+\verb!int * linearsearch(int * start, int * end, int target);!
+
+that returns the address of the first \texttt{target} (left-to-right) that
+occurs in the array of values \texttt{*start}, \ldots, \texttt{*(end - 1)}.
+If \texttt{target} does not occur in the array, \texttt{NULL} is returned.
+\end{ex}
+
+\begin{ex}
+Complete and test this very important function:
+
+\verb!void fill(int * start, int * end, int value);!
+
+that copies \texttt{value} to the values at \texttt{start}, \texttt{start +
+1}, etc.
+\end{ex}
+
+\begin{ex}
+Complete and test this very important function:
+
+\verb!void copy(int * start0, int * start1, int * end1);!
+
+that copies the value at \texttt{start1} to the value at location
+\texttt{start0}, etc. (It's clear when you should stop.)
+\end{ex}
+
+\begin{ex}
+Complete and test this very important function:
+
+\verb!void resize(int ** start, int * size, int newsize);!
+
+Initially, \texttt{*start} describes an array of \texttt{size} integers in
+the heap. When we return from the above function call, \texttt{*start}
+contains the address of an array of \texttt{newsize} integers in the heap
+and it contains (as many as possible) the values from the original
+array. For instance if you have
+
+\verb!int * p = NULL, size = 0;!
+
+after calling
+
+\verb!resize(&p, &size, 5);!
+
+\texttt{p} points to an array of 5 integers in the heap and \texttt{size} is
+changed to 5. Suppose we continue the above with
+
+\begin{consolethree}[escapeinside=||]
+p[0] = 2;
+p[1] = 3;
+p[2] = 5;
+\end{consolethree}
+
+Here's the memory model:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Rect(0, 0, 5, 2.5, linewidth=0.1)
+p += Rect(1.75, 0.25, 2.25, 0.75, linewidth=0.05)
+p += Rect(1.25, 0.35, 1.25, 0.35, linewidth=0, label=r'\texttt{x}')
+
+p += Rect(6, 0, 11, 2.5, linewidth=0.1)
+p += Rect(6.05, 2.5, 8, 3, linewidth=0, label='Free Store')
+startx = 6.25
+labelz = None
+for i in range(5):
+    match (i):
+          case 0:
+               labelz = str(2)
+          case 1:
+               labelz = str(3)
+          case 2:
+               labelz = str(5)
+          case _:
+               labelz= ''
+    p += Rect(startx, 1.5, startx + 0.5, 2, linewidth=0.05, label=labelz)
+    startx += 0.5
+p += Line(points=[(1.95, 0.5), (6.24, 1.75)], linewidth=0.075, endstyle='>')
+print(p)
+\end{python}
+Next if we call
+
+\verb!resize(&p, &size, 7);!
+
+\texttt{p} points to an array of 7 integers in the heap and \texttt{size} is
+changed to 7. Furthermore the first three values of the new array
+\texttt{p} points to are 2, 3, and 5. The memory model at this point looks
+like this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Rect(0, 0, 5, 2.5, linewidth=0.1)
+p += Rect(1.75, 0.25, 2.25, 0.75, linewidth=0.05)
+p += Rect(1.25, 0.35, 1.25, 0.35, linewidth=0, label=r'\texttt{x}')
+
+p += Rect(6.05, 2.5, 8, 3, linewidth=0, label='Free Store')
+p += Rect(6, 0, 11, 2.5, linewidth=0.1)
+startx = 6.85
+labelz = None
+for i in range(7):
+    match (i):
+          case 0:
+               labelz = str(2)
+          case 1:
+               labelz = str(3)
+          case 2:
+               labelz = str(5)
+          case _:
+               labelz= ''
+    p += Rect(startx, 0.25, startx + 0.5, 0.75, linewidth=0.05, label=labelz)
+    startx += 0.5
+p += Line(points=[(1.95, 0.5), (6.84, 0.5)], linewidth=0.075, endstyle='>')
+print(p)
+\end{python}
+
+(Note: \texttt{newsize} can be smaller than \texttt{size}.)
+\end{ex}
+

@@ -1,0 +1,213 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{How does C++ search for a variable?}
+
+In looking for a variable C++ will always start from the block where the execution occurs. If the variable cannot be found, C++ will look for that variable in the nearest outer enclosing block.
+
+Here's a simple example:
+\sidenote
+{
+\begin{tikzpicture}
+\node[draw, line width=1,text width=4cm, minimum height=5cm] (obbybox) at (0,4) {};
+\node[yshift=-1cm,draw,line width=0.2,text width=2.5cm, minimum height=1.25cm] (obbybox5) at (obbybox.north) {\large\texttt{\ \ \ \ \ \ \ \ \ \ \ \ \ \ 5}};
+\node[draw, line width=0.2,text width=2.5cm, minimum height=1.25cm] (obbybox6) at (obbybox.center) {\large\texttt{\ \ \ \ \ \ \ \ \ \ \ \ \ \ 6}};
+\node[yshift=-0.5cm, draw, line width=1, text width=3.5cm, minimum height=2.5cm] (obby2box6) at (obbybox6.center) {};
+\node[xshift=-2mm] (obbyj) at (obbybox5.west) {\large{i}};
+\node[xshift=-2mm] (obbyi) at (obbybox6.west) {\large{j}};
+
+\node[yshift=-1.5cm, align=center] (obbydesc) at (obbybox.south) {\normalsize{i is not found in this} \\ \normalsize{block. Look for i in the} \\ \normalsize{nearest enclosing}\\\normalsize{block. FOUND!}};
+\node[xshift=0.35cm] (obbyredarrend) at (obbybox5.east){};
+\node[xshift=0.35cm,yshift=-2cm] (obbyredarrstart) at (obbybox5.east){};
+\node[xshift=-1.3cm,yshift=-1.2cm] (obbyboxend1) at (obbybox.center){};
+\node[xshift=1.3cm,yshift=-1.2cm] (obbyboxend2) at (obbybox.center){};
+\draw[ultra thick, ->] (obbydesc) to (obbyboxend1);
+\draw[ultra thick, ->] (obbydesc) to (obbyboxend2);
+\draw[ultra thick, ->, color=red] (obbyredarrstart) to (obbyredarrend);
+\end{tikzpicture}
+}
+
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int main()
+{    
+     int i = 5;
+
+     if ( i > 0 )
+     {    
+          int j = 6;
+          |\begin{tikzpicture}\node[draw=red, thick, inner sep=2pt](nestconsolebox){std::cout << i;};\end{tikzpicture}|
+     }
+
+     return 0;
+}
+\end{consolethree}
+
+\DrawArrowVH{obbybox.center}{nestconsolebox}
+
+
+Of course C++ might need to search in several enclosing blocks before it's found.
+\sidenote
+{
+\begin{tikzpicture}
+\node[draw,line width=1,text width=4cm, minimum height=6cm] (sbox) at (0,-2){};
+\node[yshift=-0.5cm, draw, line width=1, text width=3.5cm, minimum height=4.5cm] (sbox1) at (sbox.center){};
+\node[yshift=-0.5cm,draw, line width=1, text width=3cm, minimum height=3cm] (sbox2) at (sbox1.center){};
+\node[draw, line width=1, text width=2.5cm, minimum height=2cm] (sbox3) at (sbox2.center){};
+\node[draw, line width=1, text width=2cm, minimum height=1.5cm] (sbox4) at (sbox3.center){};
+\node[xshift=0.5cm,yshift=-0.5cm] (sarrend) at (sbox.north){};
+\node[xshift=0.5cm,yshift=-1cm] (sarrstart) at (sbox.center){};
+\draw[line width=0.3, red, ultra thick, dashed, ->] (sarrstart) to (sarrend);
+\node[xshift=1cm,yshift=1.5cm,align=center] (stxt) at (sbox.north){\normalsize{C++ keeps searching}\\ \normalsize{for i from the current}\\ \normalsize{block of memory to the}\\ \normalsize{next enclosing block}\\ \normalsize{until its found.}};
+\node[xshift=-1.5cm,yshift=0.3cm,align=center] (stxti) at (sbox.north){\normalsize\textbf{i is here}};
+\node[xshift=-1.5cm,yshift=-1cm] (sarrendi) at (sbox.north){};
+\draw[line width=0.3, ultra thick, ->] (stxti.south) to (sarrendi);
+\node[xshift=-5mm] (scons) at (stxti){};
+\end{tikzpicture}
+}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int main()
+{    
+     int i = 5;
+     while (i > 0)
+     {    
+          int j = 6;
+
+          for (int k = 0; k < j; ++k)
+          {   
+               |\begin{tikzpicture}\node[draw=red, thick, inner sep=2pt](csearchnode){std::cout << i;};\end{tikzpicture}|
+          }
+          --i;
+     }
+}
+\end{consolethree}
+\DrawArrow[dashed,red,ultra thick, -]{csearchnode}{scons}
+\newpage
+\begin{ex} Now look at the example from the previous section. Why is C++ not confused?
+\sidenote
+{
+\begin{tikzpicture}
+\node[draw,text width=5cm, minimum height=4cm, line width=0.05cm] (conbox){};
+\node[yshift=-1cm,draw,text width=2cm, minimum height=1cm, line width=0.05cm] (conboxa) at (conbox.north){\normalsize\texttt{\ \ \ \ \ \ \ \ \ \ \ 5}};
+\node[yshift=1cm,draw,text width=2cm, minimum height=1cm, line width=0.05cm] (conboxa2) at (conbox.south){\normalsize\texttt{\ \ \ \ \ \ \ \ \ \ \ 6}};
+\node[draw,text width=2.5cm, minimum height=1.5cm, line width=0.05cm] (conboxa3) at (conboxa2.center){};
+\node[xshift=-5mm] (conboxx) at (conboxa.west) {\normalsize{a}};
+\node[xshift=-5mm] (conboxy) at (conboxa2.west) {\normalsize{a}};
+\end{tikzpicture}
+}
+\begin{consolethree}[escapeinside=||]
+int x = 0, y = 0;
+std::cin >> x >> y;
+
+if (x == 0)
+{    
+     int a = 5;
+     std::cout << a << std::endl;
+     if (y == 1)
+     {    
+          int a = 6;
+          |\begin{tikzpicture}\node[draw=red, thick, inner sep=2pt]{std::cout << a << std::endl;};\end{tikzpicture}|
+     }
+}
+\end{consolethree}
+\end{ex}
+In this case when the variable \texttt{a} in the inner if-statement is created, we say that the innermost \texttt{a} \EMPHASIZE{hides} the outer \texttt{a}.
+
+\begin{ex}
+What is the output? (Or is there an error?)
+
+\begin{console}
+int x = 0, y = 1;
+
+if (x == 0)
+{    
+     int a = 5;
+     if (y == 1)
+     {    
+          std::cout << a << std::endl;
+          int a = 6;
+          std::cout << a << std::endl;
+     }
+}
+\end{console}
+\end{ex}
+
+\begin{ex}
+What is the output? (Or is there an error?)
+
+\begin{console}
+int x = 0, y = 1;
+
+for (int x = 5; x < 10; x++)
+{    
+     std::cout << x << ' ' << y << std::endl;
+     int y = 5;
+     while (y > 0)
+     {   
+          int x = y + 1;
+          std::cout << x << ' ' << y << std::endl;
+          y++;
+     }  
+     std::cout << x << ' ' << y << std::endl;
+}
+\end{console}
+\end{ex}
+
+\begin{ex}
+What is the output? (Or is there an error?)
+
+\begin{console}
+int i = 5, j = 6;
+std::cout << i << ' ' << j << std::endl;
+for (int i = 0; i < 3; i++)
+{
+      std::cout << i << ' ' << j << std::endl;
+      if (i < j)
+      {      
+           std::cout << i << ' ' << j << std::endl;
+           int i = 24;
+           std::cout << i << ' ' << j << std::endl;
+      }
+      else
+      {
+           std::cout << i << ' ' << j << std::endl;
+           int j = 42; 
+           std::cout << i << ' ' << j << std::endl;
+      }
+      std::cout << i << ' ' << j << std::endl;
+}
+std::cout << i << ' ' << j << std::endl;
+\end{console}
+\end{ex}
+\begin{ex}
+What is the output? (Or is there an error?)
+
+\begin{console}
+int i = 5, j = 6;}
+std::cout << i << ' ' << j << std::endl;
+for (int i = 0; i < 3; i++)
+{   
+     int i = 8;
+     std::cout << i << ' ' << j << std::endl;
+     if (i < j)
+     {
+          std::cout << i << ' ' << j << std::endl;
+          int i = 24; 
+          std::cout << i << ' ' << j << std::endl;
+     }
+     else
+     {
+          std::cout << i << ' ' << j << std::endl;
+          int j = 42;
+          std::cout << i << ' ' << j << std::endl;
+     }
+     std::cout << i << ' ' << j << std::endl;
+     int i = 9; 
+}
+std::cout << i << ' ' << j << std::endl;
+\end{console}
+\end{ex}

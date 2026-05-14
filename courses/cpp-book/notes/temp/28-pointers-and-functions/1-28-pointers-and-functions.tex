@@ -1,0 +1,117 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Functions and Pointers}
+
+Try this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+double avg(int x, int y)
+{
+    return (x + y) / 2.0;
+}
+
+int main()
+{
+    std::cout << avg(1, 2) << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+No surprises. Of course
+
+\verb!avg(1, 2)!
+
+is a function call. No big deal. BUT ... now try this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+double avg(int x, int y)
+{
+    return (x + y) / 2.0;
+}
+
+int main()
+{
+    std::cout << avg(1, 2) << std::endl;
+    std::cout << (unsigned int) avg << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+What do you get? What do you think \textit{avg} means?
+
+\textit{avg} is actually the address of the function avg. You can think of
+it this way: Not only data (i.e. variable values) lives in your
+computer's memory, even code lives in your RAM. avg is
+the address of the first line of code of avg.
+
+You can save the function address in a variable. Such a variable is
+called \EMPHASIZE{function pointer}. Here's an example:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+double avg(int x, int y)
+{
+    return (x + y) / 2.0;
+}
+
+int main()
+{
+    std::cout << avg(1, 2) << std::endl;
+    std::cout << (unsigned int) avg << std::endl;
+    double (*g)(int, int);
+    g = &avg;
+    std::cout << (unsigned int) g << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+Note the declaration of \textit{g}.
+
+\begin{ex}
+Instead of this:
+
+\begin{consolethree}[escapeinside=||]
+...
+double (*g)(int, int);
+...
+\end{consolethree}
+
+can you do this:
+
+\begin{consolethree}[escapeinside=||]
+...
+double *g(int, int);
+...
+\end{consolethree}
+
+Why?
+\end{ex}
+
+\begin{ex}
+It turns out that instead of
+
+\begin{consolethree}[escapeinside=||]
+...
+g = &avg;
+...
+\end{consolethree}
+
+you can also write
+
+\begin{consolethree}[escapeinside=||]
+...
+g = avg;
+...
+\end{consolethree}
+
+In other words, for the case of functions, the address operator \& is
+optional. Try it.
+\end{ex}
+
+

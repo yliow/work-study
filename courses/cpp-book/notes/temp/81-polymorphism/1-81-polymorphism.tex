@@ -1,0 +1,129 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Constructor}
+
+\textbf{Polymorphism} = ``many forms''
+
+VERY IMPORTANT!!! LISTEN!!!
+
+Suppose class \texttt{C} is a subclass of \texttt{P}. You already know that
+the following is valid:
+\begin{center}
+\verb!C c;!\\
+\verb!P p;!\\
+\verb!p = c!;\\
+\end{center}
+However the following will not compile:
+\begin{center}
+\texttt{c = p;}
+\end{center}
+In particular the following is also valid:
+
+\tab[5em]{\verb!C c;!}\\
+\tab[5em]{\verb!P * p = &c; // p points to c!}\\
+
+And this is also valid:
+
+\tab[5em]{\texttt{C c; }}\\
+\tab[5em]{\verb!P & ref = c; // ref references c!}\\
+
+Suppose both \texttt{P} and \texttt{C} have methods \texttt{f()}. If I call
+
+\tab[5em]{\texttt{p-> f();}}\\
+
+which \texttt{f()} is invoked? (or \texttt{ref.f()} in the case where
+\texttt{ref} is a reference).
+
+All you need to do is to do this experiment:
+
+\begin{console}
+#include <iostream>
+
+class P
+{   
+public:
+     void f()
+     {    
+          std::cout << "P::f\ n";
+     }
+};
+
+class C: public P
+{
+public:
+     void f()
+     {    
+          std::cout << "C::f\ n";
+     }
+};
+
+int main()
+{   
+    C c;
+    P * p = &c;
+    p->f(); // parent's f
+    return 0;
+}
+\end{console}
+
+AHA! \ldots the parent's f() is called! This should be a surprise to you.
+
+After all we always think of
+
+\tab[5em]{\verb!p-> f();!}\\
+
+as
+
+\tab[5em]{\verb!(*p).f();!}\\
+
+and since \verb!(*p)! is the object \verb!c!, then should the above be
+
+\tab[5em]{\verb!c.f();!}\\
+
+and therefore should the code be calling the \verb!f()! in \verb!C!. But remember that from the previous set of notes on inheritance, when you perform
+
+\tab[5em]{\verb!p = c;!}\\
+
+what happens is that there's type conversion happening
+behind your back:
+
+\tab[5em]{\verb!p = P(c);!}\\
+
+so that the information in \verb!C! and not in \verb!P! is in fact lost.
+That's one way of
+
+remembering that the \verb!f()! called is \verb!P::f()!.
+
+Summary time \ldots so remember that our \verb!p!
+
+\tab[5em]{\verb!P * p = &c;!}\\
+
+is very special. In a sense it has \EMPHASIZE{two natures}:
+
+\begin{itemize}
+\item
+  From the type in the declaration \verb!P * p!, \verb!p! is related to type \verb!P!.
+\item
+  However from the value that \verb!p! points to, \verb!p = &c!, \verb!p! is related to value of type \verb!C!.
+\end{itemize}
+
+And for the choice of method \verb!f()!,
+
+\tab[5em]{\verb!p-> f();!}\\
+
+the method in the parent is chosen.
+
+\begin{ex} Suppose \verb!G! is the parent class of \verb!P! (using public inheritance) and \verb!P! is the parent class of \verb!C1! (using public inheritance). Suppose in \verb!G!, \verb!P!, and \verb!C! classes, there is a method
+
+\tab[5em]{\verb!void m() ...!}\\
+
+Suppose have this code fragment:
+\begin{console}
+G * p;
+C c;
+p = &c;
+p-> m();
+\end{console}
+Which \texttt{m()} was called?
+\end{ex}

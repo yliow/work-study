@@ -1,0 +1,202 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Generating Equally Spaced Points on a Line}
+
+In the next two sections, we will generate points in a range which are
+equally spaced. This is what I mean:
+
+Suppose I tell you that I want 5 equally spaced points on the interval [0, 4] that includes the end points 0 and 4. You would say:
+\begin{center}
+0, 1, 2, 3, 4
+\end{center}
+There are 5 values. They are equally spaced: consecutive values differ
+by 1. The first value 0 is the left endpoint of [0, 4] and the last
+value 4 is the right endpoint of [0, 4].
+
+What if I ask you for 3 equally spaced points on [0, 4] including
+both end points? Well this means that you want 3 values, say we call
+them
+\begin{center}
+x0, x1, x2
+\end{center}
+where x0 is 0 and x2 is 4. What about x1? x1 is right in the middle. So
+it must be
+\begin{center}
+x1 = (x2 -- x1) / 2 = 2
+\end{center}
+So the values are
+\begin{center}
+0, 2, 4
+\end{center}
+Great! Done!
+
+What if I ask you for 4 equally points in [0, 4]?
+Let's call then
+\begin{center}
+x0, x1, x2, x3
+\end{center}
+Of course
+\begin{center}
+x0 = 0
+x3 = 4
+\end{center}
+What about x1 and x2? Well since they are equally spaced,
+let's say the gap between x0 and x1 is d. Since the
+points are equally spaced, the gap is of course also the gap between
+x1,x2 and also x2,x3. There are altogether 3 gaps and they add up to 4.
+So
+\begin{center}
+d = 4/3
+\end{center}
+(as a real number, i.e., double. The above is math, not C++) In other
+words:
+\begin{center}
+d = 1.3333.... (up to 4 decimal places)
+\end{center}
+This mean that
+\begin{align*}
+\text{x0 = 0}\\
+\text{x1 = 0 + d = 1.3333....}\\
+\text{x2 = x1 + d = 2.6666...}\\
+\text{x3 = x2 + d = 4}\\
+\end{align*}
+What if I want \EMPHASIZE{7} points in the same interval? Say the points
+are
+\begin{center}
+x0, x1, x2, x3, x4, x5, x6
+\end{center}
+There are \EMPHASIZE{6} gaps. Call the gap d. The gaps add up to 4.
+Therefore
+\begin{center}
+6d = 4
+\end{center}
+i.e.,
+\begin{center}
+d = 4/6 = 0.6666...
+\end{center}
+and the values of the points are
+\begin{align*}
+\text{x0 = 0}\\
+\text{x1 = x0 + d}\\
+\text{x2 = x1 + d}\\
+\text{x3 = x2 + d}\\
+\text{x4 = x3 + d}\\
+\text{x5 = x4 + d}\\
+\text{x6 = x5 + d}\\
+\end{align*}
+
+Writing this as a C++ program I get
+\begin{console}
+double x = 0;
+double d = double(4) / 6
+for (int i = 0; i < 7; ++i)
+{   
+    std::cout << x << '\n';
+    x += d
+}
+\end{console}
+Run this and check that you do get 7 points which are equally spaced.
+
+\begin{ex}
+ Modify the following code to generate equally spaced
+points in [0, 4] if the number of points is n.
+\begin{console}
+int n;
+std::cin >> n;
+double x = 0;
+double d = double(4) / 6;
+for (int i = 0; i < 7; ++i)
+{   
+    std::cout << x << '\n';
+    x += d
+}
+\end{console}
+Test your program for different values of \texttt{n}.
+\end{ex}
+
+\begin{ex}
+If the interval is not [0, 4] but [0, b] and the number of points is n, then modify the following code as appropriate:
+\begin{console}
+int n = 0;
+double b = 0.0;
+std::cin >> b;
+std::cin >> n;
+
+double x = 0;
+double d = double(4) / 6;
+for (int i = 0; i < 7; ++i)
+{   
+    std::cout << x << '\n';
+    x += d
+}
+\end{console}
+Test your code thoroughly.
+\end{ex}
+
+\begin{ex}
+If the interval is [a, b] and the number of points is n, then modify the following code as appropriate:
+\begin{console}
+int n = 0;
+double a = 0.0, b = 0.0;
+std::cin >> a >> b;
+std::cin >> n;
+
+double x = 0;
+double d = double(4) / 6;
+for (int i = 0; i < 7; ++i)
+{   
+    std::cout << x << '\n';
+    x += d
+}
+\end{console}
+Test your code thoroughly. [Hint: Move the interval so that the left
+endpoint is 0. The interval becomes [0, b -- a]. Get the points
+using the previous exercise. Now move the points back to [a, b].
+\end{ex}
+WARNING \ldots INCOMING SPOILER!!!
+
+Here's the answer to the above. If you are generating n
+equally spaced points in the interval a, b] (and the left and right
+end points are included), the code is
+\begin{console}
+double x = a;
+double d = double(b - a) / (n - 1);
+for (int i = 0; i < n; ++i)
+{   
+    std::cout << x << '\n';
+    x += d
+}
+\end{console}
+
+Note that because of rounding errors (remember that doubles and floats
+are not exact!), the last point might not be exactly the value b. You
+can stop the for-loop earlier and manually use b for the last point:
+\begin{console}
+double x = a;
+double d = double(b - a) / (n - 1);
+for (int i = 0; i < n - 1; ++i)
+{   
+    std::cout << x << '\n';
+    x += d;
+}
+
+x = b;
+std::cout << x << '\n';
+\end{console}
+
+In the next couple of sections, we will be using these equally spaced
+points to do some computations. So in the general case, the code will
+look something like this:
+\begin{console}[commandchars=\~\@\$]
+double x = a;
+double d = double(b - a) / (n - 1);
+for (int i = 0; i < n - 1; ++i)
+{
+~textbf@{... do something with x ...}$
+x += d;
+}
+x = b;
+~textbf@... do something with x ...$
+\end{console}
+

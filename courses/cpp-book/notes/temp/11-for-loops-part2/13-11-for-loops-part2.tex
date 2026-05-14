@@ -1,0 +1,217 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Brute force search}
+
+Computer Science, like Mathematics, seeks to find solutions to problems.
+One way to look for solutions is through ``brute-force''search. This
+means going over all possible candidates and seeing which ones are the
+right solutions.
+
+Let's try one. Suppose you want to find \textbf{integer} solution(s) to this equation:
+\begin{center}
+x$^{3}$ = 729
+\end{center}
+If x is a negative integer, x$^{3}$ is negative. So we are definitely only interested in positive integers. Furthermore x must be less than 729 (well ... a lot less!). So we can try x = 0, 1, 2, ..., 729 and see which one satisfies the above equation.
+
+WHOA!!!
+
+That sure looks suspiciously like a for-loop to me ...
+
+\begin{ex}
+Write a for-loop with an index variable running from
+0 to 729 to find (and print ... of course!) solution(s) to the equation
+
+\begin{center}
+x$^{3}$ = 729
+\end{center}
+\end{ex}
+Well \ldots the above example is kind of silly since we could have
+computed the cube root of 729 and see if it's an integer
+value \ldots but what if you have \textit{\textbf{two}} variables in the
+equation? Suppose you want to solve for positive integers x and y
+satisfying
+
+\begin{center}
+x$^{2}$ + y$^{2}$= 13$^{2}$
+\end{center}
+
+Well first of all each x and y must be at most 13, right? So all you
+need to do is to check all possible 0, ..., 13 for x and 0, ..., 13 for
+y. In other words you need to check all the following cases:
+
+x = 0, y = 0\\
+x = 0, y = 1\\
+x = 0, y = 2\\
+...\\
+x = 0, y = 13\\
+x = 1, y = 0\\
+x = 1, y = 1\\
+x = 1, y = 2\\
+...\\
+x = 1, y = 13\\
+x = 2, y = 0\\
+x = 2, y = 1\\
+x = 2, y = 2\\
+...\\
+x = 2, y = 13\\
+...\\
+...\\
+...\\
+x = 13, y = 13\\
+
+That sure looks like a double-nested for-loop to me!
+Here's the program:
+\begin{console}
+for (int x = 0; x <= 13; ++x)
+{   
+    for (int y = 0; y <= 13; ++y)
+    {
+        if (x * x + y * y == 13 * 13)
+        {  
+           std::cout << x << ',' << y << '\n';
+        }
+    }
+}
+\end{console}
+Now note that you see some ``repetitions''. I'm saying
+that if x = a, y = b is a solution, then x = b, y = a is also a solution
+because in the equation above, you can switch x and y. What if you do
+not want to include such repetitions? One way would be to ensure x
+<= y. In other words you try to get your program to run through
+these values of x,y:
+
+x = 0, y = 0\\
+x = 0, y = 1\\
+x = 0, y = 2\\
+...\\
+x = 0, y = 13\\
+x = 1, y = 1 (note that y starts with 1 and not 0)\\
+x = 1, y = 2\\
+x = 1, y = 3\\
+...\\
+x = 1, y = 13\\
+x = 2, y = 2 (note that y starts with 2 and not 0)\\
+x = 2, y = 3\\
+x = 2, y = 4\\
+...\\
+x = 2, y = 13\\
+...\\
+...\\
+...\\
+x = 13, y = 13\\
+\begin{console}[commandchars=\~\@\$]
+for (int x = 0; x <= 13; ++x)
+{   
+    for (int y = ~textbf@x$; y <= 13; ++y)
+    {
+        if (x * x + y * y == 13 * 13)
+        {  
+           std::cout << x << ',' << y << '\n';
+        }
+    }
+}
+\end{console}
+Of course you realize that x$^2$ + y$^2$ = 13$^2$ gives the solution of the right-angle triangle with hypotenuse of length 13 and integer sides. Why not find all such triangles with hypotenuse from 1 to 100??? This means solving
+
+\begin{center}
+x$^2$ + y$^2$ = z$^2$
+\end{center}
+
+where 1 <= z <= 100.
+
+\begin{console}[commandchars=\~\@\$]
+~textbf@for (int z = 1; z <= 100; ++z)$
+~textbf@{$   
+    for (int x = 0; x <= z; ++x)
+    {   
+        for (int y = x; y <= z; ++y)
+        {   
+            if (x * x + y * y == z * z)
+            {  
+               std::cout << x << ','
+                         << y << ','
+                         << z << '\n';
+            }
+        }
+    }
+~textbf@}$
+\end{console}
+
+This prints the sides of all right angle triangles with integer sides
+where the hypotenuse is between 1 to 100.
+
+\begin{ex}
+Can you improve the performance of the above program?
+\end{ex}
+\begin{ex}
+Find all integer solutions to the equation
+\begin{center}
+x$^{4}$ + 2y$^{4}$ = 10001
+\end{center}
+\end{ex}
+\begin{ex}
+Here's something from wikipedia.org:
+\begin{console}[commandchars=\~\@\$]
+~textbf@1729$ is known as the ~textbf@Hardy-Ramanujan number$, after a
+famous anecdote of the British mathematician
+~href@http://en.wikipedia.org/wiki/G._H._Hardy$@G. H. Hardy$ regarding a
+hospital visit to the Indian mathematician
+~href@http://en.wikipedia.org/wiki/Srinivasa_Ramanujan$@Srinivasa
+Ramanujan$. In Hardy's words:
+
+~lq~lq I remember once going to see him when he was ill at
+~href@http://en.wikipedia.org/wiki/Putney$@Putney$. I had ridden in taxi cab number 1729
+and remarked that the number seemed to me rather a dull
+one, and that I hoped it was not an unfavorable ~href@http://en.wikipedia.org/wiki/Omen$@omen$.
+"No," he replied, "it is a very interesting number;
+~textbf@it is the smallest number expressible as the sum of two$
+~textbf@cubes in two different ways."$
+
+The quotation is sometimes expressed using the
+term "positive cubes", as the admission of negative
+perfect cubes (the cube of a ~href@http://en.wikipedia.org/wiki/Negative_and_non-negative_numbers$@negative$ ~href@http://en.wikipedia.org/wiki/Integer$@integer$) gives
+the smallest solution as ~href@http://en.wikipedia.org/wiki/91_%28number%29$@91$ (which is a factor of 1729):
+
+~tab[3em]@91 = 6^3 + (-5)^3 =$
+~tab[3em]@4^3 + 3^3$
+
+Of course, equating "smallest" with "most negative", as
+opposed to "closest to zero" gives rise to solutions
+like -91, -189, -1729, and further negative numbers.
+This ambiguity is eliminated by the term "positive cubes".
+
+Numbers such as
+
+~tab[3em]@1729 = 1^3 + 12^3 =$
+~tab[3em]@9^3 + 10^3$
+
+that are the smallest number that can be expressed as the
+sum of two cubes in ~texttt@n$ distinct ways have been dubbed
+~href@http://en.wikipedia.org/wiki/Taxicab_number$@taxicab numbers$. 1729 is the second taxicab number (the
+first is 2 = 1^3 + 1^3). The number was also found in one
+of Ramanujan's notebooks dated years before the incident.
+\end{console}
+Find all positive integer solutions to the equation
+\begin{center}
+x$^3$ + y$^3$ = 1729
+\end{center}
+(Hint: Write a double for-loop.)
+\end{ex}
+\begin{ex} The above exercise verified that there are exactly
+two integer solutions. It does not verify that 1729 is the
+``\textbf{smallest number expressible as the sum of two cubes in two
+different ways}''. To do that you need to solve this:
+\begin{center}
+x$^3$ + y$^3$ = z
+\end{center}
+Of course you should print out x, y, and z. Look at all the solutions
+and find the value of z with exactly two integer solutions. Is it 1729?
+(Or is Ramanujan totally wrong all these years ...)
+\end{ex}
+\begin{ex}
+Write a program that prints all positive fractions m/n from 0
+to 5 where m and n are positive and at most 10. The fractions need not
+be reduced or in any particular order or unique.
+\end{ex}
+

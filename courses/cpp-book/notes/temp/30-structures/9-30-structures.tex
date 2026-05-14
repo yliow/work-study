@@ -1,0 +1,79 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Header Files}
+
+A \texttt{struct} that is used by different programs can of course be kept in a
+header file. Function prototypes for functions related to the \texttt{struct} can
+be placed in the header file. And of course the implementation of the
+functions are in a cpp file.
+
+\begin{ex}
+Rewrite this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <iomanip>
+
+// Time struct
+
+// print function
+
+Time addOneSec(const struct Time & t0)
+{
+  struct Time t = t0;
+  t.sec++;
+  if (t.sec >= 60)
+  {
+    t.sec %= 60;
+    t.min += t.sec / 60;
+    if (t.min >= 60)
+    {
+      t.min %= 60;
+      t.hour += t.min / 60;
+      if (t.hour >= 24)
+      {
+        t.hour %= 24;
+      }
+    }
+  }
+  return t;
+}
+
+int main()
+{
+  struct Time t0 = {5, 18, 0}; // 05:18:00 hours
+
+  ...
+
+  t0 = addOneSec(t0);
+  print(t0);
+
+  return 0;
+}
+\end{consolethree}
+
+So that it looks like this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <iomanip>
+#include "Time.h"
+
+int main()
+{
+  struct Time t0 = {5, 18, 0}; // 05:18:00 hours
+
+  ...
+
+  |\EMPHASIZE{t0 = addOneSec(t0);}|
+  |\EMPHASIZE{print(t0);}|
+
+  return 0;
+}
+\end{consolethree}
+
+Of course you need a \texttt{Time.h} and a \texttt{Time.cpp}.
+\end{ex}
+
+

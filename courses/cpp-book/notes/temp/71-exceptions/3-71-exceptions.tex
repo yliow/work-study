@@ -1,0 +1,49 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Program 3. Rethrowing an exception}
+
+
+This is helpful when the error handling involves several functions
+within the function call stack.
+\begin{console}[commandchars=\~\@\$]
+#include <iostream>
+#include <exception>
+void f()
+{    
+     std::cout << "f ... 1\n";
+     throw exception();
+     std::cout << "f ... 2\n";
+}
+
+void g()
+{    
+     try
+     {    
+          std::cout << "g ... 1\n";
+          f();
+          std::cout << "g ... 2\n";
+     }
+     catch (exception & e)
+     {     
+          std::cout << "g ... caught\n";
+          ~EMPHASIZE@throw;$
+     }
+}
+int main()
+{   
+    try
+    {    
+         std::cout << "main ... 1\n";
+         g();
+         std::cout << "main ... 2\n";
+    }
+    catch (exception & e)
+    {
+         std::cout << "main ... caught \n";
+    }    
+    std::cout << "end\n";
+}
+return 0;
+\end{console}
+

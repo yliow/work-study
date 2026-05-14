@@ -1,0 +1,37 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Advice}
+
+Do not have too many conversion operators. Doing so might lead to
+ambiguities. For instance, suppose you have conversion operators from
+\textit{C} to \textit{D} and vice versa; you also have \textit{operator+} in
+\textit{C} and \textit{D}. If you run the following code
+
+\begin{consolethree}[escapeinside=||]
+C c;
+D d;
+c + d;
+\end{consolethree}
+
+you'll see that your compiler does not know if it should do
+
+\textit{D(c) + d} using \textit{D::operator+}
+
+or
+
+\textit{c + C(d)} using \textit{C::operator+}
+
+Here's another tip: If you have two classes \textit{C} and
+\textit{D} where \textit{C} is ``included'' in D, then it's
+better to have automatic conversion from \textit{C} to \textit{D}. Consider
+the following example:
+
+Let's say you have an \textit{Int} class and a
+\textit{Fraction} class. You should have a \textit{operator Fraction()}
+declared in the \textit{Int} class. Note that you can achieve the same
+thing by having a constructor of the form:
+
+\textit{Fraction(const Int \&) const;}
+
+

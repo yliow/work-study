@@ -1,0 +1,61 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Friend function}
+
+You can include the prototype of a function inside the class declaration
+to make it a \textbf{friend}.
+
+The friend function will then have direct access to private members of
+the class. This is done usually for \textbf{efficiency}.
+
+You can put the friend function in the private or the public section --
+no difference.
+
+Consider the following example:
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    C(int x):
+        x_(x)
+    {}
+    |{\bf friend}| void f(C c);
+private:
+    int x_;
+};
+
+void f(C c)
+{
+    std::cout << |{\bf c.x\_}| << '\n';
+}
+
+int main()
+{
+    C c(23);
+    f(c);
+    return 0;
+}
+\end{consolethree}
+
+\begin{ex}
+Look at your \textit{Date} class. Make
+\textit{operator<<(std::ostream \&, const Date \&)} a
+friend of \textit{Date} and rewrite it such that it accesses the private
+members of \textit{Date} directly.
+\end{ex}
+
+In general, friend functions break information hiding since the
+intention is for the friend function to directly access private member
+variables or directly call private member functions. Therefore you
+should limit the use of \textit{friend}.
+
+It's OK if the function is a function that is considered an integral
+part of the class you are writing. But you definitely do NOT want to
+make a function a friend if the function is not part of the class. For
+instance if one of your team mates (in a software project) says ``Hey,
+can you please make this function I'm writing a friend of your class?''
+you should probably say ``No!''
+
+

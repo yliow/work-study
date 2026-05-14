@@ -1,0 +1,153 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Constructor}
+
+Its always a good idea to initialize variables. So C++ encourages
+object initialization by giving a standardized way of initializing
+objects which is much better than the \texttt{init()} method in the
+\texttt{Date} class.
+
+This is called the \EMPHASIZE{class constructor}.
+
+Techno-jargon: When you create an object \texttt{obj} from a class
+\texttt{C}, besides saying you are declaring \texttt{obj} from \texttt{C}, you
+would also say that you are \EMPHASIZE{instantiating} \texttt{obj} from class
+\texttt{C}.
+
+The constructor is just a method (i.e. member function.) Therefore, if
+you can write methods, you can write a constructor. However, there are
+two rules that you must follow:
+
+\begin{enumerate}
+\item The constructor has the same name as the class
+\item The constructor does not have a return type (not even \texttt{void})
+\end{enumerate}
+
+Let's add a constructor to the \texttt{Date} class and remove the
+\texttt{init()} method.
+
+First we replace the \texttt{init()} prototype in the class definition in
+the header file with the following constructor prototype:
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+
+class Date
+{
+public:
+    |\textbf{Date(int, int, int);}|
+    ...
+private:
+    int yyyy_, mm_, dd_;
+};
+\end{consolethree}
+
+Next, we change the name of the \texttt{Date::init()} method to
+\texttt{Date::Date()} in the implementation file (I'm also adding a print
+statement just for testing):
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+
+...
+
+Date::Date(int yyyy, int mm, int dd)
+{
+    std::cout << "in Date::Date\n"; // for testing
+    yyyy_ = yyyy;
+    mm_ = mm;
+    dd_ = dd;
+}
+
+...
+\end{consolethree}
+
+Now run this and see what happens:
+
+\begin{consolethree}[escapeinside=||]
+// main.cpp
+
+...
+
+int main()
+{
+    |\textbf{Date today = Date(2014, 12, 25);}|
+    today.print();
+    |\textbf{Date yesterday(2014, 12, 24);}|
+    yesterday.print();
+
+    |\textbf{Date * p = new Date(1970, 1, 1);}|
+    p->print();
+    delete p;
+
+    return 0;
+}
+\end{consolethree}
+
+Note how I call the constructor ...
+
+There are two different ways of calling the constructor in C++:
+
+\begin{consolethree}[escapeinside=||]
+Date d(2014, 1, 1);
+\end{consolethree}
+
+and
+
+\begin{consolethree}[escapeinside=||]
+Date d = Date(2014, 1, 1);
+\end{consolethree}
+
+They do the same thing.
+
+And in the case of memory allocation of a Date object in the free store
+using new:
+
+\begin{consolethree}[escapeinside=||]
+Date * p = new Date(1970, 1, 1);
+\end{consolethree}
+
+There's a warning in using this version of calling the constructor:
+
+\begin{consolethree}[escapeinside=||]
+Date d(2014, 1, 1);
+\end{consolethree}
+
+It's better to use
+
+\begin{consolethree}[escapeinside=||]
+Date d = Date(2014, 1, 1);
+\end{consolethree}
+
+See the later section on Default Constructor.
+
+Of course you can also construct a \texttt{Date} \texttt{value} without
+giving it to a variable name:
+
+\begin{consolethree}[escapeinside=||]
+Date(2014, 12, 25).print();
+\end{consolethree}
+
+In this case, you create a \texttt{Date} object (without a name) and use
+it to invoke \texttt{print}.
+
+\begin{ex}
+Write a class \texttt{Being} with instance variables
+\texttt{num\_heads}, \texttt{num\_arms}, \texttt{num\_legs}. Write a
+constructor to initialize all members. Write a \texttt{print} method in
+the class to print the values of all instance variables. Write getter
+and setter methods to get and set all instance variables. Test your
+class.
+\end{ex}
+
+\begin{ex}
+Write a class \texttt{Vehicle} with instance variables
+\texttt{numWheels}, \texttt{numSeats}, \texttt{mileage (double)}, \texttt{year},
+\texttt{make} (C-string, max size of 50), and \texttt{model} (C-string, max
+size of 50). Write a \texttt{print} method in the class to print the
+values of all instance variables. Write a constructor to initialize all
+members. Test your class.
+\end{ex}
+
+

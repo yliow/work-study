@@ -1,0 +1,152 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Pointer Power \#3: Dynamic memory management}
+
+Now we are ready to talk about \EMPHASIZE{dynamic memory management.} For now I will focus on memory management for a single value of basic type. In the next set of notes, we'll talk about dynamic memory management for arrays.
+
+In our examples like
+
+\begin{consolethree}[escapeinside=||]
+int x = 1;
+
+int * p = &x;
+\end{consolethree}
+
+we always declare another variable for \texttt{p} to point to. You can also point \texttt{p} to an integer value which is \EMPHASIZE{not} associated to an integer variable.
+
+Try this:
+
+\begin{consolethree}[escapeinside=||]
+int * p;
+
+p = |\EMPHASIZE{new int}|;
+
+*p = 42;
+
+std::cout << *p << std::endl;
+\end{consolethree}
+or
+
+\begin{consolethree}[escapeinside=||]
+int * p = |\EMPHASIZE{new int}|;
+
+*p = 42
+
+std::cout << *p << std::endl;
+\end{consolethree}
+You should think of
+\begin{center}
+\texttt{p = new int;}
+\end{center}
+as creating an \texttt{int} value \EMPHASIZE{\textit{somewhere}} in the computer's memory and giving the memory address of this value to \texttt{p}. We say that we are \EMPHASIZE{allocating memory} for \texttt{p} (to point to). The integer value created is \underline{\textbf{not}} associated with an integer variable -- there's no integer variable name involved:
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import POINT
+p = Plot()
+
+borderbox = Rect(0, 0, 6, 3, linewidth=0.1)
+innerbox = Rect(1, 1, 4, 2, linewidth=0.05)
+p += borderbox
+p += innerbox
+
+ptrbox = Rect(9, 3.5, 12, 4.5, linewidth=0.05, label='42')
+p += ptrbox
+p += Line(points=[(3.75, 1.5), (9, 4)], linewidth=0.075, linestyle='dashed', endstyle='>')
+print(p)
+\end{python}
+
+Look at the picture: It's REALLY important to understand that
+
+\begin{itemize}
+
+\item
+  pointer \texttt{p} consumes memory and
+\item
+  the value \texttt{p} points to also consumes memory.
+\end{itemize}
+
+Make sure you see the difference between the two. Not distinguishing the two is the cause of many confusion later on when you learn more about memory management.
+
+\begin{ex}
+What is the output of this program if the user entered 5?
+
+\begin{consolethree}[escapeinside=||]
+int * x = new int;
+int * y = new int;
+*y = 1;
+
+std::cin >> *x;
+*x = *x + *y;
+
+std::cout << *x << ' ' << *y << '\n';
+\end{consolethree}
+In general you can \texttt{new} any type: you can \texttt{new} a \texttt{double}, a \texttt{char}, a \texttt{bool}, etc.
+\end{ex}
+
+Remember \texttt{NULL}? If you have declared a pointer \texttt{p}, but you have not allocated memory for \texttt{p}, then \texttt{*p} of course should not be used. And one way to remind yourself that \texttt{p} has not been allocated is to initialize it to \texttt{NULL:}
+
+\begin{consolethree}[escapeinside=||]
+int * p = NULL;
+                // etc.
+                // now you need an integer \ldots
+
+if (p == NULL)
+{
+    p = new int;
+}
+// Now use *p
+\end{consolethree}
+
+\begin{ex}
+What is the output of this program?
+
+\begin{consolethree}[escapeinside=||]
+int * x = new int;
+*x = 1;
+double * y = new double;
+
+*y = 5.1;
+
+for (int i = 0; i <= *y; i++)
+{
+    *x *= 2;
+}
+std::cout << *x << '\n';
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+What's the problem here?
+
+\begin{consolethree}[escapeinside=||]
+int * x = new double;
+*x = 42;
+std::cout << *x << '\n';
+\end{consolethree}
+\end{ex}
+
+For
+
+\begin{consolethree}[escapeinside=||]
+int * p = new int;
+*p = 42;
+\end{consolethree}
+\textit{\EMPHASIZE{where}} is this int value that \texttt{p} points to???
+\begin{python}
+from latextool_basic import *
+from latexcircuit import POINT
+p = Plot()
+
+borderbox = Rect(0, 0, 6, 3, linewidth=0.1)
+innerbox = Rect(1, 1, 4, 2, linewidth=0.05)
+p += borderbox
+p += innerbox
+
+ptrbox = Rect(9, 3.5, 12, 4.5, linewidth=0.05, label='42')
+p += ptrbox
+p += Line(points=[(3.75, 1.5), (9, 4)], linewidth=0.075, linestyle='dashed', endstyle='>')
+print(p)
+\end{python}
+

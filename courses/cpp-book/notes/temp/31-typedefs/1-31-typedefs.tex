@@ -1,0 +1,125 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{typedef}
+
+Just like we prefer to create constants instead of hardcoding constants:
+
+\verb!const int MAX_AGE = 100;!
+
+so we can also give type another (hopefully more readable) name. For
+instance instead of
+
+\begin{consolethree}[escapeinside=||]
+const int CEO = 0;
+const int MANAGER = 1;
+const int FULLTIME = 2;
+const int PARTTIME = 3;
+
+int employeeCode = FULLTIME;
+std::cin >> employeeCode;
+\end{consolethree}
+
+we can create a name for employee code type:
+
+\begin{consolethree}[escapeinside=||]
+typedef int EmployeeCode;
+
+const EmployeeCode CEO = 0;
+const EmployeeCode MANAGER = 1;
+const EmployeeCode FULLTIME = 2;
+const EmployeeCode PARTTIME = 3;
+
+EmployeeCode employeeCode = FULLTIME;
+std::cin >> employeeCode;
+\end{consolethree}
+
+The statement
+
+\verb!typedef int EmployeeCode;!
+
+basically tells C/C++ to replace \textit{EmployeeCode} with \textit{int}
+before compiling the program. The format for a typedef looks like this:
+
+\verb!typedef [type] [typedef name];!
+
+\begin{ex}
+Create a typedef for \textit{double} with the name
+\textit{GPA}. Declare a variable \textit{johnDoeGPA} of type \textit{GPA} and
+initialize it with the value of \textit{3.25}.
+\end{ex}
+
+It's important to remember that \textit{typedef}s are type
+aliases. Why is this important? This means that you \textbf{cannot} have
+the following overloaded functions like the following:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+typedef int EmployeeCode;
+
+const EmployeeCode CEO = 0;
+const EmployeeCode MANAGER = 1;
+const EmployeeCode FULLTIME = 2;
+const EmployeeCode PARTTIME = 3;
+
+void print(int i)
+{
+    std::cout << i;
+}
+
+void print(EmployeeCode code)
+{
+    std::cout << "Employee code: " << code;
+}
+
+int main()
+{
+    print(42);
+    print(CEO);
+    return 0;
+}
+\end{consolethree}
+
+Why? Because \textit{EmployeeCode} is just an alias for \textit{int}. In
+other words as far as the compiler is concerned the code is the same as:
+
+\begin{consolethree}[escapeinside=||]
+...
+
+void print(int i)
+{
+    std::cout << i;
+}
+
+void print(int code)
+{
+    std::cout << "Employee code: " << code;
+}
+
+...
+\end{consolethree}
+
+And of course you see the problem: There are two functions with the same
+signatures and that's not allowed.
+
+The following is an example on how to \textit{typedef} a reference type, a
+constant type, and a pointer type (no surprises):
+
+\begin{consolethree}[escapeinside=||]
+typedef int & intr;   // typedef for int &
+typedef const int cint; // typedef for const int
+typedef int * pint;   // typedef for int *
+
+int i = 42;
+intr x = i;
+cint j = 0;
+pint p = &i;
+\end{consolethree}
+
+\begin{ex}
+Make sure you create corresponding typedefs for
+doubles. Test the typedefs.
+\end{ex}
+
+

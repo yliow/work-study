@@ -1,0 +1,150 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Brute force search: polynomial factorization}
+
+Here's another brute force search program.
+Let's write a program to factorize a degree 2 polynomial
+into two polynomials with integer coefficients. For instance
+\begin{center}
+x$^2$ - 1 = (x + 1)(x - 1)
+\end{center}
+Therefore when the user enters 1 0 -1 for polynomial
+x$^2$ - 1, the program produces (x + 1)(x - 1).
+Here's an execution of the program:
+\begin{console}[commandchars=\~\@\$]
+~textbf@1 0 -1$
+1x^2 + 0x + -1 = (1x + 1)(1x + -1)
+\end{console}
+Assume that your program will only handle coefficients from -20 to 20.
+
+We know that
+\begin{center}
+(ax + b)(cx + d) = acx$^2$ + (ad + bc)x + bd
+\end{center}
+Suppose the user entered A, B, C for polynomial
+\begin{center}
+Ax$^2$ + Bx + C
+\end{center}
+then we basically want to find a, b, c, d such that
+\begin{center}
+(ax + b)(cx + d) = acx$^2$ + (ad + bc)x + bd = Ax$^2$ + Bx + C
+\end{center}
+which is the same as saying:
+%WHY IS ALIGN LIKE THIS. WHY DID THEY MAKE IT LIKE THIS. WHY CANT ANYTHING LATEX FUNCTION NORMALLY. WHY DOES EVERY TYPE OF ALIGN NOT ALIGN LEFT. WHAT IS EVEN GOING ON ANYMORE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+\begin{flalign*}
+&&\text{A = ac} &\\
+&&\text{B = ad + bc} &\\
+&&\text{C = bd} &\\
+\end{flalign*}
+For instance in the case of the polynomial x$^{2}$ - 1, we
+want to find a, b, c, d such that
+\begin{align*}
+\text{1 = a * c}\\
+\text{0 = a * d + b * c}\\
+\text{-1 = b * d}\\
+\end{align*}
+Here's the program:
+\begin{console}
+int A, B, C;
+std::cin >> A >> B >> C;
+
+int a, b, c, d;
+
+bool found = false;
+
+for (a = -20; a <= 20 && !found; ++a)
+{   
+    for (b = -20; b <= 20 && !found; ++b)
+    {   
+        for (c = -20; c <= 20 && !found; ++c)
+        {
+        for (d = -20; d <= 20 && !found; ++d)
+        {
+            if (a * c == A
+                 && B == a * d + b * c
+                 && b * d == C)
+            {  
+                    found = true;
+            }
+        }
+     }
+}
+if (found)
+{  
+   std::cout << a << ' '<< b
+             << ' ' << c << ' '<< d << '\n';
+}
+}
+\end{console}
+Of course you can change the range of values for a, b, c, d if you like.
+In fact, it's a good idea to create a constant, say N,
+for 20 in the above program so that a, b, c, d ranges from -N to N and
+you can change the value of N easily.
+
+Note that this is a \EMPHASIZE{brute force} search for a factorization of
+the given polynomial because it's \EMPHASIZE{not smart}.
+For instance, if the given polynomial is
+\begin{center}
+15x$^{2}$ + \ldots
+\end{center}
+then since you want
+\begin{center}
+15x$^{2}$ + \ldots = (ax + b)(cx + d) = acx$^2$ + (ad + bc)x + bd
+\end{center}
+then of course
+\begin{center}
+15 = ac
+\end{center}
+and the right thing to do is to factorize 15. You would get 15 = 1x15 =
+3x5 = 5x3 = 15x1 = -1x-15 = -3x-5 = -5x-3 and then a and c can only be
+\begin{align*}
+\text{a = 1, c = 15}\\
+\text{a = 3, c = 5}\\
+\text{a = 5, c = 3}\\
+\text{a = 15, c = 1}\\
+\text{a = -1, c = -15}\\
+\text{a = -3, c = -5}\\
+\text{a = -5, c = -3}\\
+\text{a = -15, c = -1}\\
+\end{align*}
+The above program however tries 41 possible values for a (i.e., from -20
+to 20) and also 41 possible values for c. This means that the program
+actually tries 41 x 41 possible cases for a and c. Including b and d,
+the program tries
+\begin{center}
+41 x 41 x 41 x 41 = 2825761
+\end{center}
+cases!!! This is no big deal for a modern-day computer of course. But if
+we want to allow more values for a, b, c, d, say from -100 to 100, then
+there are about
+\begin{center}
+201 x 201 x 201 x 201 = 1632240801
+\end{center}
+You can try this range of values for the above program.
+You'll see that the program will run very slowly. Brute
+force algorithms are not smart at all.
+
+\begin{ex} Write a program that prompts the user for n and if n
+is even, attempts to rewrite n as a sum of at most two primes. For
+instance if the user entered 2, the program prints:
+\begin{console}[commandchars=\~\@\$]
+~textbf@2$
+2
+\end{console}
+If the user entered 4 the program prints
+\begin{console}[commandchars=\~\@\$]
+~textbf@4$
+2 + 2 
+\end{console}
+If the user entered 12, the program prints
+\begin{console}[commandchars=\~\@\$]
+~textbf@12$
+5 + 7
+\end{console}
+\end{ex}
+Using your program, attempt to answer this question: Are there even
+integers which are not a sum of at most two primes? (For more
+information, google for ``Goldbach conjecture''. This is also a very
+famous conjecture in Math that is as yet unproven.)
+

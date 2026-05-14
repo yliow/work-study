@@ -1,0 +1,105 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{The \texttt{this} Pointer}
+
+Try the program below.
+
+\begin{consolethree}[escapeinside=||]
+// Int.h
+#ifndef INT_H
+#define INT_H
+
+#include <iostream>
+
+class Int
+{
+public:
+    Int(int x) : x_(x) {}
+    void print()
+    {
+        |\textbf{std::cout << \EMPHASIZE{this} << x\_ << "\textbackslash ";}|
+    }
+private:
+    int x_;
+};
+
+#endif
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// main.cpp
+#include <iostream>
+#include "Int.h"
+
+int main()
+{
+    Int i(42);
+    std::cout << &i << "\n";
+    i.print();
+    Int j(0);
+    std::cout << &j << "\n";
+    j.print();
+    return 0;
+}
+\end{consolethree}
+
+When an object \texttt{obj} invokes a method \texttt{m}, a special pointer
+\texttt{this} is passed into \texttt{m} automatically. The important thing
+to remember is that:
+
+\EMPHASIZE{\texttt{this} points to \texttt{obj}}
+
+If an object \texttt{obj} has member variable \texttt{x\_} and \texttt{this}
+is a pointer to \texttt{obj}, then the following are the same:
+
+\texttt{obj.x\_} \hspace{1cm} \texttt{(*this).x\_} \hspace{1cm} \texttt{this->x\_}
+
+This is the same notation used for pointers to \texttt{struct} variables.
+You should \EMPHASIZE{\texttt{not}} use \texttt{(*this).x\_}. Write
+\texttt{this->x\_} instead.
+
+(There is an exception. Static methods do not have the \texttt{this}
+secret parameter discussed here. We will talk about static methods
+later.)
+
+\EMPHASIZE{WARNING:} \texttt{*p.x} means \texttt{*(p.x)} because \texttt{.} has
+higher precedence than \texttt{*}. Make sure you try changing the
+following
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    ...
+    void print()
+    {
+        std::cout << |\tikzmarknode{same0}{\EMPHASIZE{x\_}}| << "\n";
+    }
+    ...
+private:
+    int x_;
+};
+\end{consolethree}
+\xsidebox[0cm]{0.5cm}{}{samebox}{\EMPHASIZE{Same!}}
+to this:
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    ...
+    void print()
+    {
+        std::cout << |\tikzmarknode{same1}{\EMPHASIZE{this-\textgreater x\_}}| << "\n";
+    }
+    ...
+private:
+    int x_;
+};
+\end{consolethree}
+\DrawArrow{samebox}{same0}
+\DrawArrow{samebox}{same1}
+OK ... now to use \texttt{this} ...
+
+

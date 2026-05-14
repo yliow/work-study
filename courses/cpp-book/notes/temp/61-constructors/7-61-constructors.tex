@@ -1,0 +1,156 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Review: Function Overloading}
+
+A function is \EMPHASIZE{overloaded} if its name is used more than once.
+
+The signature of the functions with the same name must be different.
+That's because in C++, a function is identified not by
+its name, but by it name and its signature, i.e., the name and the list
+of types of its parameters.
+
+\begin{ex}
+Does this compile? Next, check with your compiler.
+
+\begin{consolethree}[escapeinside=||]
+void f(int x){}          // f and signature int
+void f(int y, int y){}   // f and signature (int,int)
+void f(int x, double y){}// f and signature (int,double)
+
+int main()
+{
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Does this compile? Next, check with your compiler.
+
+\begin{consolethree}[escapeinside=||]
+void f(int x) {}
+int f(int x) {}
+void f(int x, double y) {}
+
+int main()
+{
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Does this compile? Next, check with your compiler.
+
+\begin{consolethree}[escapeinside=||]
+void f(int * x) {}
+int f(int x[]) {}
+
+int main()
+{
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+When a function is called in your code, C++ will use the function that
+matches both the function name and the type of the values passed in with
+the candidate's signature. If none is found, C++ will try to typecast
+the arguments. The one used is the one with the least number of
+typecasts. If there isn't one, you get an ambiguous invocation error.
+
+\begin{ex}
+Which function is called (or is there an error)?
+
+\begin{consolethree}[escapeinside=||]
+void f(int x) {}
+void f(double x) {}
+
+int main()
+{
+    f(1);
+}
+\end{consolethree}
+
+Check by running this version:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void f(int x) { std::cout << "f(int)\n"; }
+void f(double x) { std::cout << "f(double)\n"; }
+
+int main()
+{
+    f(1);
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Which function is called (or is there an error)?
+
+\begin{consolethree}[escapeinside=||]
+Void f(double x, int y) {}
+void f(int x, int y) {}
+void f(int x, double y) {}
+void f(double x, double y) {}
+
+int main()
+{
+    f(1, 1);
+
+    return 0;
+}
+\end{consolethree}
+
+Check with a program.
+\end{ex}
+
+If you compile the following with g++:
+
+\begin{consolethree}[escapeinside=||]
+void f(double x, int y) {}
+void f(int x, double y) {}
+int main() { f(1, 1); }
+\end{consolethree}
+
+it will complain with this message:
+
+\begin{consolethree}[escapeinside=||]
+a.cpp: In function int main():
+a.cpp:3:20: error: call of overloaded f(int, int) is
+    ambiguous
+a.cpp:1:6: note: candidates are: void f(double, int)
+a.cpp:2:6: note: void f(int, double)
+\end{consolethree}
+
+Basically, when looking for a function to execute
+
+\texttt{f(1, 1);}
+
+there is no exact match. So C++ attempts to typecast. If C++ typecasts
+the first value to 1.0:
+
+\verb!f(double(1), 1);!
+
+it will be able to match this:
+
+\verb!void f(double x, int y) {}!
+
+and if C++ typecasts the second value to get 1.0:
+
+\verb!f(1, double(1));!
+
+it will match this:
+
+\verb!void f(int x, double y) {}!
+
+So, in this case, since both functions match \texttt{f(1, 1)} with 1
+typecast, your C++ compiler does not know what to do and will complain.
+Of course if there's no exact match and
+there's only one option with one typecast, then C++ will
+happily choose that function that matches\texttt{f(1, 1)} with one typecast.
+
+

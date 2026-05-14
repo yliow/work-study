@@ -1,0 +1,407 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Sum from 1 to n}
+
+Suppose we write
+
+sum(n)
+
+to denote ``the sum of all integers from 0 to n'', i.e.,
+
+sum(n) = 0 + 1 + 2 + 3 + \ldots{} + n
+
+Of course we know how to sum from 1 to n without using recursion but
+using a loop:
+
+\begin{consolethree}[escapeinside=||]
+int sum(int n)
+{
+    int s = 0;
+    for (int i = 0; i < n; ++i)
+    {
+        s += i;
+    }
+    return s;
+}
+\end{consolethree}
+
+In fact the \ldots{} in sum(n) = 1 + 2 + 3 + \ldots{} + n more or less described a loop.
+
+Let me think of the sum(n) computation recursively \ldots{} let's try
+some examples to get a feel for the problem. Here's an
+example:
+
+sum(5) = 0 + 1 + 2 + 3 + 4 + 5
+
+Note that
+
+sum(4) = 0 + 1 + 2 + 3 + 4
+
+Therefore you have this:
+
+sum(5) = 0 + 1 + 2 + 3 + 4 + 5
+
+= (0 + 1 + 2 + 3 + 4) + 5
+
+= sum(4) + 5
+
+Clearly we also have
+
+sum(8) = 0 + 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8
+
+= (0 + 1 + 2 + 3 + 4 + 5 + 6 + 7) + 8
+
+= sum(7) + 8
+
+See you should quickly see that in general if n is a positive integer
+greater than 0, then
+
+sum(n) = sum(n - 1) + n
+
+You see that sum(n) is related to sum(n - 1). Also note that
+
+sum(0) = 0
+
+So if we define sum(n) to be ``the sum of all integers from 0 to n'',
+then we get
+
+\[
+\text{sum}(n) = \begin{cases}
+0 & \text{if } n = 0 \\
+\text{sum}(n - 1) + n & \text{if } n > 0
+\end{cases}
+\]
+
+The relationship (when n > 0)
+
+sum(n) = sum(n - 1) + n
+
+is called a \EMPHASIZE{recursion} because the sum function called
+\EMPHASIZE{itself}. The case when n = 0
+
+sum(0) = 0
+
+is called the \EMPHASIZE{base case} of the recursion.
+
+Recursion is an \EMPHASIZE{extremely} important phenomenon in math,
+computer science, \ldots, in nature. So listen up.
+
+First of all, if I ask you to give me sum(5), you would say, well it's
+just
+
+sum(5) = 1 + 2 + 3 + 4 + 5
+
+and then you evaluate the express to get 15. But you can also use
+
+\[
+\text{sum}(n) = \begin{cases}
+0 & \text{if } n = 0 \text{ (B)} \\
+\text{sum}(n - 1) + n & \text{if } n > 0 \text{ (R)}
+\end{cases}
+\]
+
+to get the same value. (Note that I've labeled the two cases.) Here's
+how you use (B) and (R) to compute sum(5):
+
+Since 5 > 0, from (R) we get
+
+sum(5) = sum(5 - 1) + 5
+
+So??? Well if we simplify that we get
+
+sum(5) = sum(4) + 5
+
+That doesn't give us a value of sum(5). But wait, sum(4)
+can be written in a different way: Because 4 > 0, by (R):
+
+sum(4) = sum(4 - 1) + 4
+
+which simplifies to
+
+sum(4) = sum(3) + 4
+
+So altogether we have this:
+
+sum(5) = sum(4) + 5
+
+sum(4) = sum(3) + 4
+
+That still does NOT tell us what the value of sum(5) is!!! But hang on,
+with the same reasoning (using (R)) we get three more facts:
+
+sum(3) = sum(2) + 3
+
+sum(2) = sum(1) + 2
+
+sum(1) = sum(0) + 1
+
+So altogether we have
+
+sum(5) = sum(4) + 5
+
+sum(4) = sum(3) + 4
+
+sum(3) = sum(2) + 3
+
+sum(2) = sum(1) + 2
+
+sum(1) = sum(0) + 1
+
+Now you might be tempted to write
+
+sum(0) = sum(-1) + 0
+
+That's wrong!!! Because the relationship (R)
+
+(R): sum(n) = sum(n - 1) + n
+
+applies only when n > 0. You cannot apply it to the case of
+n = 0. But wait \ldots{} for the case of n = 0 we have this:
+
+(B): sum(0) = 0
+
+Therefore altogether we have
+
+sum(5) = sum(4) + 5
+
+sum(4) = sum(3) + 4
+
+sum(3) = sum(2) + 3
+
+sum(2) = sum(1) + 2
+
+sum(1) = sum(0) + 1
+
+sum(0) = 0
+
+So what? Well, with these we can compute sum(5)!!! Let me show you how.
+First let me label the facts:
+
+(5): sum(5) = sum(4) + 5
+
+(4): sum(4) = sum(3) + 4
+
+(3): sum(3) = sum(2) + 3
+
+(2): sum(2) = sum(1) + 2
+
+(1): sum(1) = sum(0) + 1
+
+(0): sum(0) = 0
+
+From equation (0), we know that sum(0) = 0. Substituting this into
+equation (1) we get
+
+sum(1) = sum(0) + 1 = 0 + 1
+
+And if we substitute this into equation (2) we get
+
+sum(2) = sum(1) + 2 = 0 + 1+ 2
+
+Substituting this into equation (3) we get
+
+sum(3) = sum(2) + 3 = 0 + 1+ 2 + 3
+
+And when this is put into equation (4) we get
+
+sum(4) = sum(3) + 4 = 0 + 1+ 2 + 3 + 4
+
+And of course finally we get
+
+sum(5) = sum(4) + 5 = 0 + 1+ 2 + 3 + 4 + 5
+
+So whether you define sum(n) as
+
+sum(n) = 1 + 2 + \ldots{} + n
+
+(which looks more like a loop) or
+
+\[
+\text{sum}(n) = \begin{cases}
+0 & \text{if } n = 0 \\
+\text{sum}(n - 1) + n & \text{if } n > 0
+\end{cases}
+\]
+
+you get the same value for sum(n).
+
+\begin{ex}
+Using the above method for evaluating a recursive
+function, compute for sum(7). You should get 0 + 1 + 2 + 3 + 4 + 5 + 6 +
+7.
+\end{ex}
+
+The two ways of looking at sum(n), using a loop and using recursion,
+gives us the same result. The really important question to ask is this:
+
+Why should
+
+\[
+\text{sum}(n) = \begin{cases}
+0 & \text{if } n = 0 \\
+\text{sum}(n - 1) + n & \text{if } n > 0
+\end{cases}
+\]
+
+be a good alternative view of
+
+sum(n) = 0 + 1 + 2 + \ldots{} + n?
+
+The reason is because of this \ldots{} pay attention! \ldots{} many
+problems in nature present themselves naturally in a \EMPHASIZE{recursive
+way}. For more complex problems, the recursive way is the way that leads
+to a simpler solution. And simple mean less bugs.
+
+(For those of you who have taken Physics and Differential Equations, you
+know that many problems in Physics requires the description of a
+function or behavior of a physical phenomenon, but the function takes
+part in a relationship of a special form -- the function appears in a
+differential equation. For CS, many problems gives rise to functions
+which are recursive.)
+
+Of course we still need code \ldots{} but don't worry: We can easily
+translate the recursive sum(n)
+
+\[
+\text{sum}(n) = \begin{cases}
+0 & \text{if } n = 0 \\
+\text{sum}(n - 1) + n & \text{if } n > 0
+\end{cases}
+\]
+
+into a C++ function:
+
+\begin{consolethree}[escapeinside=||]
+int sum(int n)
+{
+    if (n == 0)
+    {
+        return 0;
+    }
+    else
+    {
+        return sum(n - 1) + n;
+    }
+}
+\end{consolethree}
+
+Note that the \EMPHASIZE{recursive version does not have loops}. Make sure
+you study and test it carefully.
+
+\begin{ex}
+The following version includes print statements so
+that you know what the function is doing:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int sum(int n)
+{
+    std::cout << "entering sum(" << n << ") ...\n";
+    if (n == 0)
+    {
+        std::cout << "exiting sum(" << n
+                  << ") returning 0 ...\n";
+        return 0;
+    }
+    else
+    {
+        int ret = sum(n - 1) + n;
+        std::cout << "exiting sum(" << n
+                  << ") returning " << ret
+                  << "...\n";
+        return ret;
+    }
+}
+
+int main()
+{
+    sum(5);
+    return 0;
+}
+\end{consolethree}
+
+Make sure you run the above. I've already mentioned this: putting print
+statements inside a function, recursive or not, helps in understanding
+the function and, if you have an error, helps in debugging the function.
+\end{ex}
+
+In this case, the sum-from-1-to-n is easy so recursion is not really
+necessary. The point of the section is to show you that
+it's possible to write a recursion function for
+sum-from-1-to-n. In the real world many problems are described more
+naturally in a recursive form and solving such problems using loops is
+extremely untidy and painful.
+
+\begin{ex}
+Draw the function call graph for sum(5). How many
+boxes do you see? How many boxes are there for the function call graph
+of sum(n)?
+\end{ex}
+
+\begin{ex}
+Let f(n) denote the sum of squares
+$0^2 + 1^2 + 2^2 + \ldots + n^2$.
+
+\begin{enumerate}
+\item[(a)] Write down f(4) and f(3). What is the relationship between f(4) and
+  f(3)?
+\item[(b)] Write down f(5) and f(4). What is the relationship between f(5) and
+  f(4)?
+\item[(c)] In general if n > 0 is a positive integer, what is the
+  (recursive) relationship between f(n) and f(n-1)?
+\item[(d)] What is f(0)?
+\end{enumerate}
+
+Write a C/C++ function for f(n). Write a \texttt{main()} to verify your
+f(n).
+\end{ex}
+
+\begin{ex}
+Let \texttt{h(n)} be 2 to the n-th power. Consider
+h(5):
+
+$h(5) = 2^5$
+
+Do you see h(4) in h(5)? Write a recursive function for \texttt{h(n)}.
+Test it (of course).
+\end{ex}
+
+\begin{ex}
+Continuing the above \ldots{} Let \texttt{h(a, n)} be a
+to the n-th power. Consider h(3, 5):
+
+$h(3, 5) = 3^5$
+
+Do you see h(3, 4) in h(3, 5)? Write a recursive function for \texttt{h(a,
+n)}. Test it (of course).
+\end{ex}
+
+\begin{ex}
+You are given the following mathematical description
+of a recursion:
+
+k(n) = 2 + 3 * k(n - 1) if n > 0
+
+k(0) = 1
+
+Compute by hand the value of k(1), k(2) and k(3). Write a C++ recursive
+function for k(n). Test your code. Make sure your computation by hand
+matches the output of your program.
+\end{ex}
+
+\begin{ex}
+You are given the following mathematical description
+of a recursion:
+
+j(n) = 1 + j(n - 1) * n if n > 0
+
+j(0) = 2
+
+Compute by hand the value of j(1), j(2) and j(3). Write a C++ recursive
+function for j(n). Test your code. Make sure your computation by hand
+matches the output of your program.
+\end{ex}
+
+

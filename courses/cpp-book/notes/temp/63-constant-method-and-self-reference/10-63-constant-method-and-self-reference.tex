@@ -1,0 +1,134 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Temporary object values}
+
+Most of the time we have objects with names:
+
+\begin{consolethree}[escapeinside=||]
+Date date(1970, 1, 1);
+date.print();
+\end{consolethree}
+
+Of course you can create object values not bound to names:
+
+\begin{consolethree}[escapeinside=||]
+Date(1970, 1, 1).print();
+\end{consolethree}
+
+(I've already talked about this.)
+
+In the second case above, we have a temporary object, or an object value
+that does not belong to an object name.
+
+In the \texttt{Int} class, if you have operator+ returns object values,
+you might see temporary objects:
+
+\begin{consolethree}[escapeinside=||]
+Int i(5), j(7), k (8);
+Int z = i + j + k; // i + j is temporary object
+                   // this temporary object is
+                   // added with k to produce
+                   // another temporary object
+\end{consolethree}
+
+Of course, just like a method, a function can return an object value
+
+\begin{consolethree}[escapeinside=||]
+Date rand_date()
+{
+    return Date(rand()%10 + 1,
+                rand()%10 + 1, rand());
+}
+\end{consolethree}
+
+Of course this is different from returning a reference:
+
+\begin{consolethree}[escapeinside=||]
+Date & Date::f()
+{
+    return (*this);
+}
+
+int main()
+{
+    Date date(1, 1, 1970);
+    date.f(); // A reference to date
+              // is returned
+}
+\end{consolethree}
+
+A temporary object can be destroyed immediately after the expression
+containing the temporary object is computed.
+
+There is an exception ... you can create an object name and bind it
+to a temporary object value. In this case the temporary object value is
+not destroyed immediately. For instance
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    Date date1 = rand_date();
+    ...
+}
+\end{consolethree}
+
+The value of \texttt{date1} is actually the same as the value of the
+object returned by \texttt{rand\_date()}, i.e., there is no copy
+constructor call. To verify this add some print statements:
+
+\begin{consolethree}[escapeinside=||]
+Date randdate()
+{
+    Date ret(rand() % 10 + 1,
+             rand() % 10 + 1, rand());
+    std::cout << &ret << '\n';
+    return ret;
+}
+
+int main()
+{
+    Date date1 = f();
+    std::cout << &date1 << '\n';
+}
+\end{consolethree}
+
+You can also insert print statements in the \texttt{Date} destructor to
+verify that there is only one destructor call, not two, i.e., in the
+above, there is really only one \texttt{Date} value.
+
+\begin{consolethree}[escapeinside=||]
+rand_date(); // Date value returned by
+             // rand_date() is not bound to a
+             // name. It's destroyed.
+             // Destructor is called.
+
+Date date1 = rand_date(); // Date value bound to
+                          // date1. Destructor not
+                          // called yet
+\end{consolethree}
+
+In the above example:
+
+\begin{consolethree}[escapeinside=||]
+Date date1 = rand_date();
+\end{consolethree}
+
+the destructor is called only when the name \texttt{date1} goes out of
+scope.
+
+Here are the scenarios you should study and be familiar with:
+
+\begin{consolethree}[escapeinside=||]
+Date Date::f(...) { ...; return *this; }
+Date & Date::f(...) { ...; return *this; }
+Date Date::f(...) { ...; Date x; return x; }
+Date & Date::f(...) { ...; Date x; return x; } (error)
+Date Date::f(...) { ...; return Date(1,1,1970); }
+Date & Date::f(...) { ...; return Date(1,1,1970); } (error)
+(date1.f()).print()
+Date date2 = date1.f()
+Date & date2 = date1.f()
+\end{consolethree}
+
+

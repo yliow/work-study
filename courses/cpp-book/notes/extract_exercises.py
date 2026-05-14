@@ -8,10 +8,8 @@ the file layout should be
 ../notes/
   |
   +-- chapters/ <- all our chapters are in here
-  |
-  +-- exercises/ <- all our exercises are in here, each under their own "chapname/chapname_ex_1/" folder
-  |
-  ...
+      |
+      +-- exercises/ <- all our exercises are in here, each under their own "chapname/chapname_ex_1/" folder
 
 '''
 
@@ -51,80 +49,41 @@ def extraction_to_file(ex_dest, note, ex_content, number):
     ex_file = None
   return ex_file
 
-#open and read file, then return a list of formatted exercises for that particular chapter
-def read_file(note, ex_dest, chap_dir):
-  #grabs lines that are part of an exercise block
-  ex_accumulator = []
-  new_note = []
-  counter = 0
-  flag = False
-  
-  with open(note, 'r') as f:
-    f = f.readlines()
-    for line in f:
-      if ("\\begin{ex}") in line:
-        flag = True
-      elif "\\end{ex}" in line:
-        flag = False        
+#constants
+begin = r'\begin{ex}'
+end = r'\end{ex}'
 
-        #get last line of ex
-        ex_accumulator.append(line)
-        #write to file, if its None then an error occurred writing so we abandon the chapter
-        exercise_file_str = extraction_to_file(ex_dest, note.replace(chap_dir, ''), ex_accumulator, counter)
-        
-        #return to operating directory
-        os.chdir(chap_dir.replace('/chapters', ''))
-        
-        #reset ex_accumulator
-        ex_accumulator = []
-        counter += 1
-        
-        if exercise_file_str != None:
-          #process result
-          new_note.append("\\input{%s}" % exercise_file_str + '/question.tex')
-        else:
-          print("!!!!!! FAILED EXTRACTING EXERCISE IN CHAPTER %s, ABANDONING CHAPTER REWRITE !!!!!!!" % note)
-          #needs to also clear the directory where it wrote all the exercises in this chapter (if there were any)
-          return None
-        
-        continue
-      
-      if flag:
-        ex_accumulator.append(line)
-        
-      #not in an exercise block, append line 
-      else:
-        new_note.append(line)
-  return new_note, counter
-
-#directory references
+#directory access
 dir_ = os.getcwd()
-chap_dir = dir_ + '/chapters/'
-ex_folder = dir_ + '/exercises/'
 
-#list of all notes under 'chapters'
-notes_files = os.listdir(chap_dir)
+chapters = dir_ + '/chapters/'
 
-if not os.path.exists(ex_folder):
-  print("CREATING EXERCISE FOLDER AT %s" % ex_folder)
-  os.system("mkdir %s" % ex_folder)
-  
-#check for exercise folders first
-for chapter in notes_files:
-  print("working on chapter: %s" % chapter)
-  try:
-    note = chap_dir + chapter + '/main.tex'
+chap_list = os.listdir(chapters)
 
-    # assign and write new note to file
-    new_note, counter = read_file(note, ex_folder, chap_dir)
-    new_note_location = chap_dir + chapter + '/new_main.tex'
-    with open(new_note_location, 'w') as new_dest:
-      print("writing new_main.tex for chapter %s, extracted %s exercises to file\n" % (chapter, counter))
-      for line in new_note:
-        new_dest.write(line)
+for chap in chap_list:
+  note = chapters + chap + '/main.tex'
+  exercises= []
+
+  try:  
+    #check if exercise dir exists
+    if not os.path.exists(dir_ + '/temp/' + chap + '/exercises'):
+      os.system("mkdir %s" % (dir_ + '/temp/' + chap + '/exercises'))
+      print("making exercise folder for chapter", chap)
+
+    with open(note, 'r') as n:
+      flag = False
+      ex_acc = []
+      note_acc = []
+      n = n.readlines()
+      for line in n:
+        if begin in line:
+          flag = True
+          ex_acc.append(line)
+        elif end in line:
+          flag = False
+          ex_acc.append(line)
+        else:
+          note_acc.append(line)
+      
   except Exception as e:
-    if (os.path.isdir(note)):
-      print("!!!!!! ERROR PROCESSING CHAPTER: %s, MESSAGE: %s\n" % (chapter, e))
-    else:
-      print("skipping file %s, not a directory\n" % note)
-    
+    print("ERROR: could not extract exercises from chapter %s, message: %s" % (chap, e))

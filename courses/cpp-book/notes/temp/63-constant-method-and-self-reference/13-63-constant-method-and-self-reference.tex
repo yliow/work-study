@@ -1,0 +1,372 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Forcing a reference parameter to be constant}
+
+Recall: When writing a function, it's a good idea to use \texttt{const}
+for arguments that should not be changed. This is the case for both
+(regular) functions and methods of a class:
+
+\begin{consolethree}[escapeinside=||]
+// function
+void f(|\EMPHASIZE{const}| C & c) { ... }
+
+// method in class C
+void C::g(|\EMPHASIZE{const}| C & c) { ... }
+\end{consolethree}
+
+The following example shows 4 possible ways of pass-by-reference:
+
+\begin{itemize}
+\item Non-const to non-const \&
+\item Non-const to const \&
+\item Const to non-const \&
+\item Const to const \&
+\end{itemize}
+
+Which ones work and which do not? Here's an experiment
+that will help.
+
+\begin{consolethree}[escapeinside=||]
+void f(const int & i) {}
+void g(int & i) {}
+
+int main()
+{
+    int i = 0;
+    const int j = 0;
+    f(i); // nonconst passed to const reference
+    f(j); // const passed to const reference
+    g(i); // nonconst passed to nonconst reference
+    g(j); // const passed to nonconst reference
+    return 0;
+}
+\end{consolethree}
+
+First figure out on your own which is reasonable. Compile this and read
+the error message. Correct and check by compiling the program.
+
+Answer:
+
+\begin{itemize}
+\item Non-const to non-const \&         OK
+\item Non-const to const \&             OK
+\item Const to non-const \&             BAD!!!
+\item Const to const \&                 OK
+\end{itemize}
+
+Why?
+
+\begin{consolethree}[escapeinside=||]
+void g(int & i) {} // i not constant
+                   // g() can change i
+
+int main()
+{
+    const int j = 0; // j cannot be changed
+    g(j); // oops ... now what?
+}
+\end{consolethree}
+
+The case of object parameters is the same.
+
+The following example shows 4 possible ways of pass-by-reference:
+
+\begin{itemize}
+\item Non-const to non-const \&
+\item Non-const to const \&
+\item Const to non-const \&
+\item Const to const \&
+\end{itemize}
+
+Which ones work and which do not?
+
+\begin{consolethree}[escapeinside=||]
+class C {};
+
+void f(const C & y) {}
+void g(C & y) {}
+
+int main()
+{
+    C a;
+    const C b = C();
+    f(a);
+    f(b);
+    g(a);
+    g(b);
+    return 0;
+}
+\end{consolethree}
+
+Answer:
+
+\begin{itemize}
+\item Non-const to non-const \&     OK
+\item Non-const to const \&         OK
+\item Const to non-const \&         BAD!!!
+\item Const to const \&             OK
+\end{itemize}
+
+Why?
+
+\begin{consolethree}[escapeinside=||]
+class C{};
+
+void h(C & x) {} // h can modify x
+
+int main()
+{
+    const C y = C(); // y cannot be modified
+    h(y); // oops ... now what???
+}
+\end{consolethree}
+
+In summary if \texttt{T} is any type (\texttt{int}, \texttt{char}, ...,
+some \texttt{class}, ...), and \texttt{f()} has the following prototype:
+
+\texttt{void f(\EMPHASIZE{T \& x});}
+
+and y is a \textbf{\textit{constant}} \texttt{T} object, then the following
+is incorrect:
+
+\begin{consolethree}[escapeinside=||]
+const T y;
+f(y);
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+class C {public: int x};
+void f0(const C & y) {}|\tikzmarknode{const0}{}|
+void f1(C & y) {}
+
+int main()|\xsidebox[0cm]{0cm}{}{constbox0}{Reminder:\\\texttt{f0()} cannot change \texttt{y} \\\texttt{f1()} can change \texttt{y}}|
+{
+    C a;
+    f0(a); f1(a);
+    return 0;
+}
+\end{consolethree}
+\DrawArrow{constbox0}{const0}
+Example:
+
+\begin{consolethree}[escapeinside=||]
+class IntPointer|\xsidebox[0cm]{0cm}{}{constbox1}{The member variable of \texttt{a} is not changed so we make \texttt{a} constant}|
+{
+public:
+    ...         |\tikzmarknode{const1}{}|
+    IntPointer(|\EMPHASIZE{const}| IntPointer & a)
+        : p_(new int)
+    { *p_ = *(a.p_); }
+    ...
+private:
+    int * p_;
+};
+\end{consolethree}
+\DrawArrow{constbox1}{const1}
+
+Example:
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    Int(int x)
+        : x_(x)
+    {}
+    Int max(Int & a)|\tikzmarknode{const2}{} \xsidebox[0cm]{0cm}{}{constbox2}{This method does not change \texttt{a}}|
+    {
+        if (x_ < a.x_)
+            return a;
+        else
+            return (*this);
+    }
+private:
+    int x_;
+};
+\end{consolethree}
+\DrawArrow{constbox2}{const2}
+So
+
+\begin{consolethree}[escapeinside=||]
+...
+class Int
+{
+public:
+    Int(int x)
+        : x_(x)
+    {}
+    Int max(|\EMPHASIZE{const}| Int & a)
+    {
+        if (x_ < a.x_)
+            return a;
+        else
+            return (*this);
+    }
+public:
+    int x_;
+};
+...
+\end{consolethree}
+
+Example:
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    void f(int a)
+    {
+        x_ = a;
+    }
+    int g(int a)
+    {
+        return y_ + a;
+    }
+private:
+    int x_, y_;
+};
+
+void j(C & c)|\tikzmarknode{funpar0}{}|
+{
+    c.f(0);|\xsidebox[0cm]{0cm}{}{funparbox0}{Which function param can be made const?}|
+}
+
+void k(C & c)|\tikzmarknode{funpar1}{}|
+{
+    c.g(0);
+}
+
+int main()
+{
+    C c, d;
+    j(c);
+    k(c);
+    return 0;
+}
+\end{consolethree}
+\DrawArrow{funparbox0}{funpar0}
+\DrawArrow{funparbox0}{funpar1}
+
+\textbf{Example.} Invoking \texttt{c.f()} will modify \texttt{c}
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+    ...
+    void f(int a){ x_ = a; } // modifies x_
+    ...
+};
+\end{consolethree}
+
+This means that the following will \EMPHASIZE{\textit{not}} work:
+
+\begin{consolethree}[escapeinside=||]
+void j(|\textbf{\underline{const}}| C & c) { c.f(0); }
+\end{consolethree}
+
+Invoking \texttt{c.g()} will not modify \texttt{c}
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+    ...
+    int g(int a)
+    {
+        return y + a;
+    }
+    ...
+};
+\end{consolethree}
+
+This means that the following \EMPHASIZE{\textit{will}} work:
+
+\begin{consolethree}[escapeinside=||]
+void j(|\textbf{\underline{const}}| C & c) { c.f(0); }
+\end{consolethree}
+
+\begin{ex}
+Which parameters in \texttt{j,k} can be made constant?
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    void f(int a)
+    {
+        x_ = a;
+    }
+    int g(int a)
+    {
+        return y_ + a;
+    }
+    void h(C & c)
+    {
+        f(c.x_);
+    }
+    void i(C & c)
+    {
+        c.x_ = g(5);
+    }
+private:
+    int x_, y_;
+};
+
+void j(C & c, C & d)
+{
+    c.h(d);
+}
+
+void k(C & c, C & d)
+{
+    c.i(d);
+}
+
+int main()
+{
+    C c, d;
+    j(c, d);
+    k(c, d);
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Which parameter should be made \texttt{const}?
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    Int(int x0)
+        : x_(x0)
+    {}
+    void incrementBy(Int & a)
+    {
+        x_ += a.x_;
+    }
+    void increment(Int & a)
+    {
+        a.x_ += x_;
+    }
+    int get()
+    {
+        return x_;
+    }
+private:
+    int x_;
+};
+
+int main()
+{
+    Int a(1), b(5);
+    a.incrementBy(b);
+    a.increment(b);
+    std::cout << a.get() << ' ' << b.get() << '\n';
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+

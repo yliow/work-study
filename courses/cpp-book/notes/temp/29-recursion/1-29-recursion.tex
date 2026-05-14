@@ -1,0 +1,118 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{What is recursion?}
+
+A \EMPHASIZE{recursive function} is easy to define:
+It's a function that calls itself.
+(There's another kind of recursion called recursive data
+structure.)
+
+Here's an example:
+
+\begin{consolethree}[escapeinside=||]
+int f(int x)
+{
+    std::cout << "entering f() with x = " << x
+              << std::endl;
+    if (x == 0)
+    {
+        return 0;
+    }
+    else
+    {
+        return f(x - 1);
+    }
+}
+
+int main()
+{
+    int x = f(3);
+    std::cout << "main() ... x = " << x << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+We say that \texttt{f()} is a \textbf{recursive function}.
+
+Let's trace the program slowly. The difficulty is that
+\texttt{f()} is being called several times.
+
+\texttt{main()} calls \texttt{f(3)}
+
+\texttt{f(3)} calls \texttt{f(3 - 1)}, i.e., \texttt{f(2)}
+
+\texttt{f(2)} calls \texttt{f(1)}
+
+\texttt{f(1)} calls \texttt{f(0)}
+
+Note that
+
+\texttt{f(0)} returns 0 to \texttt{f(1)}
+
+\texttt{f(1)} receives 0 and return it to \texttt{f(2)}
+
+\texttt{f(2)} receives 0 and return it to \texttt{f(3)}
+
+\texttt{f(3)} receives 0 and return it to \texttt{main()}
+
+Sometimes it's helpful to visual this stack of function
+calls:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(0, 0, 2, 1, label=r'\texttt{f(0)}', linewidth=0.05)
+p += Rect(0, 1.2, 2, 2.2, label=r'\texttt{f(1)}', linewidth=0.05)
+p += Rect(0, 2.4, 2, 3.4, label=r'\texttt{f(2)}', linewidth=0.05)
+p += Rect(0, 3.6, 2, 4.6, label=r'\texttt{f(3)}', linewidth=0.05)
+p += Rect(0, 4.8, 2, 5.8, label=r'\texttt{main()}', linewidth=0.05)
+
+p += Line(points=[(0, 5.3), (-0.5, 5.3), (-0.5, 4.1), (0, 4.1)], endstyle='>', linewidth=0.05)
+p += Line(points=[(0, 3.9), (-0.5, 3.9), (-0.5, 2.9), (0, 2.9)], endstyle='>', linewidth=0.05)
+p += Line(points=[(0, 2.7), (-0.5, 2.7), (-0.5, 1.7), (0, 1.7)], endstyle='>', linewidth=0.05)
+p += Line(points=[(0, 1.5), (-0.5, 1.5), (-0.5, 0.5), (0, 0.5)], endstyle='>', linewidth=0.05)
+# Labels for calls
+p += Rect(-1.5, 4.5, -0.5, 5.0, label=r'\small{calls}', linewidth=0)
+# Return arrows (right side)
+p += Line(points=[(2, 0.5), (2.5, 0.5), (2.5, 1.7), (2, 1.7)], endstyle='>', linewidth=0.05, linestyle='dashed')
+p += Line(points=[(2, 1.9), (2.5, 1.9), (2.5, 2.9), (2, 2.9)], endstyle='>', linewidth=0.05, linestyle='dashed')
+p += Line(points=[(2, 3.1), (2.5, 3.1), (2.5, 4.1), (2, 4.1)], endstyle='>', linewidth=0.05, linestyle='dashed')
+p += Line(points=[(2, 4.3), (2.5, 4.3), (2.5, 5.3), (2, 5.3)], endstyle='>', linewidth=0.05, linestyle='dashed')
+# Labels for returns
+p += Rect(2.5, 0.7, 4.0, 1.2, label=r'\small{returns 0}', linewidth=0)
+p += Rect(2.5, 1.9, 4.0, 2.4, label=r'\small{returns 0}', linewidth=0)
+p += Rect(2.5, 3.1, 4.0, 3.6, label=r'\small{returns 0}', linewidth=0)
+p += Rect(2.5, 4.3, 4.0, 4.8, label=r'\small{returns 0}', linewidth=0)
+print(p)
+\end{python}
+
+Our C++ function \texttt{f()}:
+
+\begin{consolethree}[escapeinside=||]
+int f(int x)
+{
+    if (x == 0)
+    {
+        return 0;
+    }
+    else
+    {
+        return f(x - 1);
+    }
+}
+\end{consolethree}
+
+is written mathematically like this:
+
+\[
+f(x) = \begin{cases}
+0 & \text{if } x = 0 \\
+f(x - 1) & \text{if } x > 0
+\end{cases}
+\]
+
+Now let's do a recursion that does something useful ...
+
+

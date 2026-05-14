@@ -1,0 +1,85 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Assignment operator}
+
+If \verb!c! is a \verb!C! object and \verb!p! is a \verb!P! object, and
+\verb!C! is derived from \verb!P!, can we do the following:
+\begin{center}
+\texttt{c = p; ???}\\
+\texttt{p = c; ???}
+\end{center}
+
+\begin{console}[commandchars=\!\@\$]
+#include <iostream>
+
+class P
+{
+public:
+        P() : x_(1) { std::cout << "P::P()\n"; }
+        P(int x) : x_(x) { std::cout << "P::P(int)\n"; }
+        ~P() { std::cout << "P::~P()\n"; }
+        int get_x() const { return x_; }
+        void set_x(int x) { x_ = x; }
+private:
+        int x_;
+};
+
+class C: public P
+{
+public:
+        C() : P(42), x_(3), y_(2)
+        { std::cout << "C::C()"; }
+        ~C() { std::cout << "C::~C()\n"; }
+        int get_y() const { return y_; }
+        void set_y(int y) { y_ = y; }
+private:
+        int x_;
+        int y_;
+};
+
+int main()
+{   
+    C c;
+    std::cout << "c.x_ =" << c.get_x() << ", "
+              << "c.y_ =" << c.get_y() << '\n';
+    std::cout << "c.x_ =" << c.P::get_x() << ", "
+              << "c.y_ =" << c.C::get_y() << '\n';
+    P p;
+
+    !textbf@// Which one works?$
+    !textbf@c = p;$
+    !textbf@p = c;$
+
+    return 0;
+} 
+\end{console}
+So if C is derived from \verb!P!, \verb!c! is a \verb!C! object and
+\verb!p! is a \verb!P! object, then \verb!p = c;! is valid. Why?
+
+Think about it. A \verb!C! object has more ``features'', so you can copy
+those features to a \verb!P! object.
+
+For instance suppose a child class object c has member variables c.w,
+c.x, c.y, c.x and a parent class object p has member variables p.w, p.x,
+then when you perform
+\begin{center}
+\texttt{p = c;}
+\end{center}
+this would happen:
+\begin{center}
+\texttt{p.w = c.w;}\\
+\texttt{p.x = c.x;}
+\end{center}
+But if you attempt to do
+\begin{center}
+\texttt{c = p;}
+\end{center}
+then it's not clear what should be done for the last two assignments:
+\begin{center}
+\texttt{c.w = p.w;}\\
+\texttt{c.x = p.x;}\\
+\texttt{c.y = ????}\\
+\texttt{c.z = ????}
+\end{center}
+

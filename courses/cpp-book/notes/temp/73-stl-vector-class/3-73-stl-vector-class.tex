@@ -1,0 +1,208 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Iterators}
+
+Recall that we have written an \texttt{IntPointer} class so that objects
+of this class behaves like integer pointers. Your \texttt{std::vector}
+class also comes with a pointer class that can be used to point to
+values in a \texttt{std::vector} object. These are called
+\textbf{iterator} classes.
+
+Besides accessing values in the vector using an index integer value, you
+can also use iterators. Iterators are object which pretend to be
+pointers. This is similar to the previous program but using iterators.
+Run it and study the code very carefully.
+\begin{console}
+#include <iostream>
+#include <vector>
+#include <string>
+
+std::ostream & operator<<(std::ostream & cout,
+             const std::vector< int > & v)
+{    
+     cout << '{';
+     std::string sep("");
+     for (std::vector< int >::const_iterator p =
+                                             v.begin();
+          p != v.end(); ++p)
+          { 
+              cout << sep << (*p);
+              if (sep == "") sep = ", ";
+          }
+          cout << '}';
+          return cout;
+}
+
+int main()
+{   
+    int s = 3;
+    std::vector< int > v(s);
+    
+    v[0] = 1; v[1] = 10; v[2] = 100;
+
+    std::cout << "v: " << v << "\n";
+
+    std::vector< int >::iterator p = v.begin();
+    *p = 42;
+    ++p;
+    *p = 43;
+    p = v.end();
+    --p;
+    *p = 99;
+    std::cout << "v: " << v << "\n";
+
+    p = v.begin();
+    p += 1;
+    v.erase(p);
+    std::cout << "v: " << v << "\n";
+    return 0;
+
+} 
+\end{console}
+
+\texttt{std::vector< int >::const\_iterator} objects
+are pointers that do not change the value they point to.
+\texttt{std::vector< int >::iterator} objects are
+pointers that can change the value they point to. When you do
+\begin{center}
+\texttt{std::vector< int >::iterator p = v.begin();}
+\end{center}
+the iterator p will point to the first value of v. In this case \texttt{p}
+can change the value that it points to. So you can change the first
+value of v to 42 if you do this:
+
+\tab[5em]{\verb!std::vector< int >::iterator p = v.begin();!}\\
+\tab[5em]{\verb!*p = 42;!}\\
+
+However if you do
+
+\tab[5em]{\verb!std::vector< int >::const_iterator p = v.begin();!}\\
+
+then \texttt{p} cannot change the value it points to. So for instance the
+compiler will yell at you if you write this:
+
+\tab[5em]{\verb!std::vector< int >::const_iterator p = v.begin();!}\\
+\tab[5em]{\verb!*p = 42;!}\\
+
+By the way the reason for the second ``::'' in
+
+\tab[5em]{\verb!std::vector< int >!\EMPHASIZE{::}\verb!iterator p;!}\\
+
+is because the iterator class is defined \EMPHASIZE{inside} the std::vector
+class:
+
+\begin{console}
+template < typename T >
+class vector
+{
+...
+    class iterator
+    {
+        ...
+    };  
+    class const_iterator
+    {
+        ...
+    };
+    ...
+};
+\end{console}
+
+Yes, that's right ... you can nest class definitions.
+
+Let's go on. If you do
+
+\tab[5em]{\verb!std::vector< int >::iterator p = v.end();!}\\
+
+then p will point to the \EMPHASIZE{very first value beyond} the last value
+of v. Therefore a for-loop that runs an iterator through the value of v
+would look like:
+
+\verb!for (std::vector< int >::iterator p = v.begin();!\\
+\verb!     p = v.end(); ++p)!\\
+\verb!{!\\
+\verb!     ...!\\
+\verb!}!\\
+
+In this case the iterator \texttt{p} can change the values of \texttt{v}. If
+you do not want to change the value of \texttt{v}, you can use a constant
+iterator:
+
+\verb!for (std::vector< int >::const_iterator p = v.begin();!\\
+\verb!     p = v.end(); ++p)!\\
+\verb!{!\\
+\verb!     ...!\\
+\verb!}!\\
+
+Like a regular pointer, you can do pointer arithmetic on your iterators.
+
+\tab[3em]{\verb!std::vector< int >::iterator p = v.begin();!}\\
+\tab[3em]{\verb!*p = 42; // Index 0 value of v is change to 42!}\\
+\tab[3em]{\verb!++p; // p now points to index 1 value of v!}\\
+\tab[3em]{\verb!p += 3 // p not points to index 4 value of v!}\\
+
+You can also do \verb!--p! and \verb!p -= 5!.
+
+While \verb!v.begin()! gives you the address of the index \verb!0! value of \verb!v!, \verb!v.end()! will give you the address of the last value of \verb!v!, i.e., the value at index \verb!v.size() - 1!.
+
+If p is an iterator,
+
+\tab[3em]{\verb!v.erase(p)!}\\
+
+will erase the value that \texttt{p} points to -- values in \texttt{v} after
+the value that is being erased will be move backward by one index step
+and the size of \texttt{v} is decremented by 1. You can also erase a whole
+section of your vector. For instance if \texttt{v} has 100 values, then
+
+\tab[3em]{\verb!v.erase(v.begin() + 3, v.begin() + 10);!}\\
+
+will erase the values from index 0 + 3 to 0 + 10; the size decrements by
+8. Make sure you create a test case for this and verify it for yourself.
+
+By the way, make sure you see
+
+\begin{itemize}
+\item
+  the difference between \texttt{v.front()} and \texttt{v.begin()} and
+\item
+  the difference between \texttt{v.back()} and \texttt{v.end()}.
+\end{itemize}
+
+If you don't see the difference, start from the beginning of this
+document and read it all over again.
+
+Iterators are \EMPHASIZE{extremely important} when working with containers classes of C++ because all container classes (like \verb!std::string! and \verb!std::vector!) have iterators. So iterators provide a \EMPHASIZE{common way} to access, modify, delete values in these containers.
+
+\begin{ex} Create a vector v of 10 doubles. Using iterators, do
+the following:
+
+\begin{itemize}
+\item
+  Set the first value to 3.1
+\item
+  Set the second value to 3.14
+\item
+  Set the third value to 3.141
+\item
+  Using a for-loop, set the rest to -1.0
+\item
+  Using a for-loop, print all the values of v.
+\item
+  Erase all the values which are -1.0.
+\item
+  Print the size of v -- you should get 3.
+\item
+  Using a for-loop, print all the values of v -- you should see only 3
+  values.
+\end{itemize}
+\end{ex}
+\begin{ex} the following function prototypes (which
+you learn from CISS240):
+
+\verb!int count(const std::vector< int > & v, int target);!\\
+\verb!int linearsearch(const std::vector< int > & v, int target);!\\
+\verb!void bubblesort(std::vector< int > & v);!\\
+\verb!int binarysearch(const std::vector< int > & v, int target);!\\
+
+\end{ex}

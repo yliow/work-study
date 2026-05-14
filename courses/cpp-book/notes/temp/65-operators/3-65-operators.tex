@@ -1,0 +1,107 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Operator in/outside the class}
+
+In general suppose \textit{a,b} are objects of class \textit{C}.
+
+C++ will interpret \textit{a + b} as either
+
+\textit{a + b} is the same as \textit{a.operator+(b)}
+
+or
+
+\textit{a + b} is the same as \textit{operator+(a, b)}
+
+For \textit{a.operator+(b)}, C++ will look for \textit{operator+} in the
+class \textit{C} (i.e., the class of \textit{a}) that accepts \textit{b}
+(object of class \textit{C})
+
+For \textit{operator+(a, b)}, C++ will look for an \textit{operator+} not in
+any class that accepts \textit{a,b} of class \textit{C}
+
+For instance, for \textit{Fraction} class
+
+\begin{consolethree}[escapeinside=||]
+class Fraction
+{
+public:
+    ...
+    Fraction operator+(const Fraction & b) const {...}
+};
+\end{consolethree}
+
+will let you execute \textit{a + b} where \textit{a,b} are \textit{Fraction}
+objects as \textit{a.operator+(b)}
+
+... or ...
+
+... if you prefer an operator \textbf{outside} the class:
+
+\begin{consolethree}[escapeinside=||]
+class Fraction
+{
+public:
+    ...
+};
+
+Fraction operator+(const Fraction & a, const Fraction & b)
+{
+    ...
+}
+\end{consolethree}
+
+will let you execute \textit{a + b}, where \textit{a,b} are \textit{Fraction}
+objects, as \textit{operator+(a, b)}.
+
+It is preferable to have an operator in a class if possible. You
+\textbf{cannot} have both:
+
+\begin{consolethree}[escapeinside=||]
+class Fraction
+{
+public:
+    Fraction operator+(const Fraction & b) const
+    {
+        ...
+    }
+};
+
+// |{\bf DANGER!}| can't have both above and the following together
+
+Fraction operator+(const Fraction & a, const Fraction & b)
+{
+    ...
+}
+\end{consolethree}
+
+Why? Because C++ does not know which \textit{operator+} to use if you give
+C++ both options. So you should only have either:
+
+\textit{Fraction Fraction::operator+(const Fraction \&) const}
+
+or
+
+\textit{Fraction operator+(const Fraction \&, const Fraction \&)}
+
+but not both.
+
+You can overload the following:
+
+\texttt{+ - * / \% \^{} \& |}
+
+\texttt{+= -= *= /= \%= \^{}= \&= |=}
+
+\texttt{! = < > << >> \~{} [ ]}
+
+\texttt{!= == <= >= <<= >>=}
+
+\texttt{\&\& || ++ -{}- ->* , -> ()}
+
+\texttt{new new[] delete delete[]}
+
+Warning: You cannot define your own functions for
+
+\textit{:: . .* ?: sizeof}
+
+

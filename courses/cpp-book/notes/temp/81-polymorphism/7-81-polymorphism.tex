@@ -1,0 +1,205 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Packaging auto destructor}
+
+Now look at this:
+
+\begin{console}
+#include <iostream>
+
+class P
+{
+public:
+     virtual ~ P() { std::cout << "P::~ P()\ n"; }
+     void m() { std::cout << "P::m()\ n"; }
+     
+private:
+};
+
+class C: public P
+{
+public:
+     C() : q(new int) {}
+     ~ C() { std::cout <<
+     "C::~ C()\ n"; delete q; }
+     void m() { std::cout << "C::m()\ n"; }
+     int * q;
+};
+
+int main()
+{   
+    P * p = new C;
+    p-> m();
+    delete p;
+    return 0;
+}
+\end{console}
+
+This allows us to work with objects through polymorphism. But this is achieved through pointers. Recall a benefit of classes -- you can auto execute the destructor when an object is going out of scope. In the above example, we have to remember to deallocate the memory used by the object that \texttt{p} points to:
+
+\tab[5em]{\verb!delete p;!}\\
+
+Using the idea in the chapter on destructor, we do this:
+
+\begin{console}
+#include <iostream>
+
+class P
+{
+public:
+     virtual ~ P() { std::cout << "P::~ P()\ n"; }
+     void m() { std::cout << "P::m()\ n"; }
+private:
+};
+
+class C: public P
+{
+public:
+     C() : q(new int) {}
+     ~ C() { std::cout << "C::~ C()\ n"; delete q; }
+     void m() { std::cout << "C::m()\ n"; }
+     int * q;
+};
+
+class autoP
+{
+public:
+     autoP()
+         : p_(new C)
+     {}
+     ~ autoP()
+     { delete p_; }
+     void m() { p_-> m(); }
+     
+private:
+     P * p_;
+};
+
+int main()
+{   
+    autoP p;
+    p.m();
+    return 0;
+}
+\end{console}
+
+Of course we need to figure out what to do with the copy constructor and \texttt{operator=}. If you don't plan to do that, you can put the prototypes in the \texttt{private} section.
+
+\begin{console}
+#include <iostream>
+
+class P
+{
+public:
+     P() : p(new int) {}
+     virtual ~ P() { std::cout << "P::~ P()\ n"; }
+     void m() { std::cout << "P::m()\ n"; }
+     
+private:
+     int * p;
+};
+
+class C: public P
+{
+public:
+     C() : q(new int) {}
+     ~ C() { std::cout << "C::~ C()\ n"; delete q; }
+     void m() { std::cout << "C::m()\ n"; }
+     int * q;
+};
+
+class autoP
+{
+public:
+     autoP()
+         : p_(new C)
+     {}
+     ~ autoP()
+     { delete p_; }
+     void m() { p_->m(); }
+     
+private:
+     autoP(const autoP & p);
+     const auto P & operator=(const autoP &);
+     P * p_;
+};
+
+int main()
+{   
+    autoP p;
+    p.m();
+    return 0;
+}
+\end{console}
+
+If you do want to allow copy constructor and \texttt{operator=}, you have to decide on what they should do, i.e., after
+
+\tab[5em]{\verb!autoP p0;!}\\
+\tab[5em]{\verb!autoP p1;!}\\
+\tab[5em]{\verb!p1 = p0;!}\\
+
+does \texttt{p1} points to the same object that \texttt{p0} points to or is the object that \texttt{p1} points to have the same values as the object that \texttt{p0} points to (i.e., it's a copy)?
+
+By the way, since the parent destructor is virtual, calling delete in autoP will execute the destructor in the child class. But what is the parent also has some memory allocation in its constructor like this:
+
+\begin{console}
+#include <iostream>
+
+class P
+{
+public:
+     P() : p(new int) {}
+     virtual ~ P() { std::cout << "P::~ P()\ n"; }
+     void m() { std::cout << "P::m()\ n"; }
+
+private:
+     int * p;
+};
+
+class C: public P
+{
+public:
+     C() : q(new int) {}
+     ~ C() { std::cout << "C::~ C()\ n"; delete q; }
+     void m() { std::cout << "C::m()\ n"; }
+     int * q;
+};
+... 
+\end{console}
+
+Then the child has to deallocate the memory allocation in the parent.
+Assuming the pointer in the parent is private, one might want to do
+this:
+
+\begin{console}
+#include <iostream>
+
+class P
+{
+public:
+     P() : p(new int) {}
+     virtual ~ P() { std::cout << "P::~ P()\ n"; }
+     void m() { std::cout << "P::m()\ n"; }
+     void deallocate() { delete p; }
+     
+private:
+     int * p;
+};
+
+class C: public P
+{
+public:
+     C() : q(new int) {}
+     ~ C()
+     {
+         std::cout << "C::~ C()\ n";
+         deallocate();
+         delete q;
+     }   
+     void m() { std::cout << "C::m()\ n"; }
+     int * q;
+};
+... 
+\end{console}
+

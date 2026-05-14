@@ -1,0 +1,290 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Function prototype}
+
+First, try this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void mamamia()
+{
+    std::cout << "ma ma mia\n";
+}
+
+int main()
+{
+    mamamia();
+    return 0;
+}
+\end{consolethree}
+
+Next, try this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int main()
+{
+    mamamia();
+    return 0;
+}
+
+void mamamia()
+{
+    std::cout << "ma ma mia\n";
+}
+\end{consolethree}
+
+Of course the program won't compile. The reason is because the function \texttt{mamamia()} is defined after the function call of \texttt{mamamia()} in \texttt{main()}. This is not new. I have already talked about it.
+
+This means that we need to arrange our function code so that the definition of a function is before the function is called. There's a way around this issue ...
+
+Try this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void mamamia();
+
+int main()
+{
+    mamamia();
+    return 0;
+}
+
+void mamamia()
+{
+    std::cout << "ma ma mia\n";
+}
+\end{consolethree}
+
+Voila! It works.
+
+The statement in the above code:
+
+\begin{consolethree}[escapeinside=||]
+...
+void mamamia();
+...
+\end{consolethree}
+
+is called a \EMPHASIZE{function prototype}.
+
+A \EMPHASIZE{function prototype} is just the header of a function (without the function body) which ends with a semicolon -- it's a complete statement. The function prototype announces the existence of a function somewhere in the code. That way, you can define the function anywhere in your source file. This will save you some time on re-organizing your code. That's it.
+
+Here's another example. This will not compile:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int main()
+{
+    int a = 0, b = 999;
+    swap(a, b);
+    std::cout << a << ' ' << b << '\n';
+    return 0;
+}
+
+void swap(int & x, int & y)
+{
+    int t = x;
+    x = y;
+    y = t;
+}
+\end{consolethree}
+
+I can add a function prototype for the \texttt{swap()} function:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void swap(int & x, int & y);
+
+int main()
+{
+    int a = 0, b = 999;
+    swap(a, b);
+    std::cout << a << ' ' << b << '\n';
+    return 0;
+}
+
+void swap(int & x, int & y)
+{
+    int t = x;
+    x = y;
+    y = t;
+}
+\end{consolethree}
+
+Now it compiles.
+
+Another thing to note is that in function prototypes, \EMPHASIZE{parameter names} are actually \EMPHASIZE{optional}. Try this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void swap(int &, int &);
+
+int main()
+{
+    int a = 0, b = 999;
+    swap(a, b);
+    std::cout << a << ' ' << b << '\n';
+    return 0;
+}
+
+void swap(int & x, int & y)
+{
+    int t = x;
+    x = y;
+    y = t;
+}
+\end{consolethree}
+
+Again it works.
+
+As I mentioned earlier, using function prototypes relieves you of the
+pain of having to spend time organizing your code so that functions
+definitions can be anywhere in your source file. There's actually more
+to it. There's a later set of notes on function prototype. But this is
+enough for now. We'll come back function prototypes again later.
+
+How do you write function prototypes for pass-by-reference parameters?
+Easy! It's the same as your other variables. For
+instance if you have this function:
+
+\begin{consolethree}[escapeinside=||]
+void f(int a, double & b, char & c, const bool & b)
+{
+    ... code ...
+}
+\end{consolethree}
+
+The function prototype is just
+
+\begin{consolethree}[escapeinside=||]
+void f(int, double &, char &, const bool &);
+\end{consolethree}
+
+That's all there is to it. So there's nothing new here.
+
+\begin{ex}
+Given this code
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int f(int & a, double & b)
+{
+    a++;
+    b += a;
+    return a * b;
+}
+
+int main()
+{
+    int x = 42;
+    double y = 1;
+    int z = f(x, y);
+    std::cout << x << ' ' << y << ' ' << z << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+Rewrite it into this form:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+// prototype of f() here
+
+int main()
+{
+    int x = 42;
+    double y = 1;
+    int z = f(x, y);
+    std::cout << x << ' ' << y << ' ' << z << std::endl;
+    return 0;
+}
+
+int f(int & a, double & b)
+{
+    a++;
+    b += a;
+    return a * b;
+}
+\end{consolethree}
+
+Run your program to make sure that you did it correctly.
+\end{ex}
+
+\begin{ex}
+Complete the following
+
+\begin{consolethree}[escapeinside=||]
+// function prototype for rotate_right
+
+int main()
+{
+    int x = 42;
+    int y = 1;
+    int z = -3;
+    rotate_right(x, y, z); // x,y,z becomes -3,42,1
+    std::cout << x << ' ' << y << ' ' << z << std::endl;
+    return 0;
+}
+
+// function definition for rotate_right
+\end{consolethree}
+
+Test your program.
+\end{ex}
+
+\begin{ex}
+Complete the following
+
+\begin{consolethree}[escapeinside=||]
+// function prototype for rotate_left
+
+int main()
+{
+    int x = 42;
+    int y = 1;
+    int z = -3;
+    rotate_left(x, y, z); // x,y,z become 1,-3,42
+    std::cout << x << ' ' << y << ' ' << z << '\n';
+    return 0;
+}
+
+// function definition for rotate_left
+\end{consolethree}
+
+Test your program.
+\end{ex}
+
+\begin{ex}
+Complete the following
+
+\begin{consolethree}[escapeinside=||]
+// function prototype for digits
+
+int main()
+{
+    int x = 152;
+    int digit2, digit1, digit0;
+    digits(x, digit2, digit1, digit0);
+    // digit2,digit1,digit0 become 1,5,2
+    std::cout << digit2 << ' ' << digit1 << ' '
+              << digit0 << '\n';
+    return 0;
+}
+
+// function definition for digits
+\end{consolethree}
+
+Test your program.
+\end{ex}
+
+

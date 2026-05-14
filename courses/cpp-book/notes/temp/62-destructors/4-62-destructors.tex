@@ -1,0 +1,167 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Default destructor}
+
+Since objects call their destructors just before they die (i.e. just
+before they go out of scope) and our previous version of \texttt{Date}
+does not have a destructor, how come the previous version can still
+compile and run??? Shouldn't your C++ compiler yell at
+you and tell you that \texttt{\~{}Date()} is not found???
+
+\EMPHASIZE{No.}
+
+Because ... if you don't specify a destructor for a
+class, the C++ compiler actually includes a do-nothing destructor in the
+class. This is the \EMPHASIZE{default destructor}. The default destructor
+is a do-nothing method because it has an empty body:
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    ...
+    ~C() {} // default destructor of C
+    ...
+};
+\end{consolethree}
+
+In the case of the earlier \texttt{Date} class, C++ included this
+destructor into the \texttt{Date} class when there was no destructor:
+
+\begin{consolethree}[escapeinside=||]
+class Date
+{
+public:
+    // constructors
+    ~Date() {}
+    // other methods
+};
+\end{consolethree}
+
+If you do write a destructor, then your C++ compiler will not insert a
+default destructor for you.
+
+Note that the default destructor supplied by C++ does not do anything.
+Since all instance variables are automatic in \texttt{Date}, a destructor
+is not necessary. It's still a good (and common)
+practice to include destructors
+even if it's not necessary. Being explicit is better
+than leaving things implicit.
+
+\begin{ex}
+What is the order in which objects call their
+destructor? (This is important!)
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    Date date1(1970, 1, 1);
+    Date date2(1985, 1, 1);
+    Date date3(2010, 10, 10);
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+Why is knowing the order important? Because in complex systems, there
+might be some dependencies between objects so that some object \texttt{x}
+can exist only if object \texttt{y} exists, i.e., \texttt{y} must be
+constructed before \texttt{x} and \texttt{x} must be destroyed before
+\texttt{y}.
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    Date date1(1970, 1, 1);
+    Date date2(1985, 1, 1);
+    Date date3(2010, 10, 10);
+    return 0; // date3 calls its destructor,
+              // *then* date2 calls its destructor,
+              // *then* date1 calls its destructor.
+}
+\end{consolethree}
+
+So, remember this: \EMPHASIZE{the order of destructor calls is always opposite to the order of constructor calls.}
+
+\begin{ex}
+Is it possible to call the destructor ``manually''?
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    Date date(1970, 1, 1);
+    date.~Date();
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+What is the output?
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+class A
+{
+public:
+    ~A() { std::cout << "A::~A\n"; }
+};
+
+class B
+{
+public:
+    ~B() { std::cout << "B::~B\n"; }
+};
+
+class C
+{
+public:
+    ~C() { std::cout << "C::~C\n"; }
+};
+
+int main()
+{
+    A a;
+    B b;
+    for (int i = 0; i < 5; i++)
+    {
+        C c;
+        if (i > 3)
+        {
+            A a;
+            if (i == 4) B b;
+        }
+    }
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Write a destructor for \texttt{WeatherCtrl} and test it
+by inserting a print statement in the destructor to check that it is called. Are all
+the instance variables automatic? So, is the default destructor good
+enough?
+\end{ex}
+
+\begin{ex}
+Write a destructor for \texttt{Vehicle} and test it by
+inserting a print statement in the destructor to check that it is called. Are all the
+instance variables automatic? So, is the default destructor good enough?
+\end{ex}
+
+\begin{ex}
+Write a destructor for \texttt{Being} and test it by
+inserting a print statement in the destructor to check that it is called. Is the default
+destructor good enough?
+\end{ex}
+
+\begin{ex}
+Write a destructor for \texttt{IntArray} and test it by
+inserting a print statement in the destructor to check that it is called. Is the default
+destructor good enough?
+\end{ex}
+
+

@@ -1,0 +1,484 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Dereferencing Pointers}
+
+Recall: If \texttt{p} is a pointer, then the value of \texttt{p} is the \EMPHASIZE{memory address} of the value \texttt{p} is pointing to.
+
+You can access the \EMPHASIZE{value} \texttt{p} is pointing to. That's call \EMPHASIZE{dereferencing} \texttt{p} and you do it using \EMPHASIZE{*p}. The \texttt{*} used in this way is called the \EMPHASIZE{dereferencing operator}. It's also called the indirection operator.
+
+Try this:
+
+\begin{consolethree}[escapeinside=||]
+int x = 42;
+int * p;
+p = \&x;
+
+std::cout << x << ' ' << *p << '\n';
+
+x = 0;
+std::cout << x << ' ' << *p << '\n';
+
+*p = 42;
+std::cout << x << ' ' << *p << '\n';
+\end{consolethree}
+Suppose \texttt{\&x} is 124500, then the memory model looks like this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(0, 1.5, 5, 5.5)
+
+xbawx = Rect(1, 2, 4, 3, label='124500')
+refbawx = Rect(8, 7, 12, 9, linecolor='red', linewidth=0.1, align='c', s='You can refer to this box using \\texttt{x} or \\texttt{*p}')
+p += xbawx
+p += refbawx
+p += Rect(0.5, 4.5, 0.5, 4.5, label='x')
+p += Rect(1, 4, 4, 5, label='42')
+p += Line(points = [(8, 8), (2.5, 5)], linewidth=0.1, linecolor='red', endstyle='>')
+pbawx = Rect(1.5, 5.25, 1.5, 5.25, label='124500')
+p += pbawx
+p += Rect(0.5, 2.5, 0.5, 2.5, label='p')
+
+p += Line(points=[(3.5, 2.5), (4.5, 2.5), (4.5, 4.5), (2.8, 4.5)], linewidth=0.15, endstyle='>')
+print(p)
+\end{python}
+
+
+\EMPHASIZE{MAKE SURE YOU SEE THE DIFFERENCE BETWEEN \texttt{p} and \texttt{*p}!!!:}
+
+\begin{itemize}
+\item
+  \EMPHASIZE{\texttt{p} is 124500}
+\item
+  \EMPHASIZE{\texttt{*p} is 42}
+\end{itemize}
+
+\EMPHASIZE{WARNING:}
+
+There are now \EMPHASIZE{3 different meanings for *}!!!
+
+\begin{consolethree}[escapeinside=||]
+int x = 2 * 3;           // * = multiplication
+int * p = &x;            // * = for pointer type
+std::cout << x
+          << ',' << *p   // * = for dereferencing
+          << '\n';
+\end{consolethree}
+It's really important to remember that if a pointer \texttt{p} points to a box, then the dereference of \texttt{p}, i.e. \texttt{*p}, refer to the contents or the ``inside'' of the box.
+
+In particular, if I give you this picture without showing you the name of the variable with a value of 23:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(0,0, 8, 5)
+p += Rect(2, 3, 5, 4, label='23')
+p += Rect(2, 1, 5, 2)
+p += Rect(1.5, 1.5, 1.5, 1.5, label='p')
+p += Line(points=[(2.5, 1.5), (6.5, 1.5), (6.5, 3.5), (5, 3.5)], linewidth=0.05, endstyle='>')
+
+print(p)
+\end{python}
+
+you tell me right away that \texttt{*p} is 23. You don't need to know the variable name of that box.
+
+Note that \texttt{*p} refers to the contents of the box \texttt{p} points to in two ways and can be used in two ways, for reading and for writing:
+
+\begin{itemize}
+\item
+  you can use \texttt{*p} to \EMPHASIZE{read} the value that \texttt{p} points
+  to
+\item
+  you can use \texttt{*p} to \EMPHASIZE{overwrite} the value \texttt{p} points
+  to
+\end{itemize}
+
+For instance:
+
+\begin{consolethree}[escapeinside=||]
+int x = 42;
+int * p = &x;
+int i;
+i = *p;         // read the value that p points to (and
+                // give it to i)
+*p = 100;       // write the value (i.e. 100) onto the
+                // value that p points to
+\end{consolethree}
+
+
+So \texttt{*p} can appear on either the right or the left of the
+assignment operator.
+
+\begin{ex}
+An \EMPHASIZE{lvalue} is something that can appear on the left of = (the assignment operator). An \EMPHASIZE{rvalue} is something that can appear on the the right of =. You have just seen that \texttt{*p} is is both an lvalue and an rvalue.
+\begin{itemize}
+
+\item
+  Is 42 an lvalue? An rvalue?
+\item
+  Suppose \texttt{x} is a variable. Is \texttt{x} an lvalue? An rvalue?
+\item
+  Suppose \texttt{c} is a constant. Is \texttt{c} an lvalue? An rvalue?
+\item
+  Suppose \texttt{f()} is a function with void return type. Is \texttt{f} an
+  lvalue? An rvalue?
+\item
+  Suppose \texttt{f()} is a function with \texttt{int} return type. Is
+  \texttt{f} an lvalue? An rvalue?
+\end{itemize}
+\end{ex}
+
+Let me repeat the above. Suppose the address value in \texttt{p} is 124500. Then if you see something like
+
+\begin{consolethree}[escapeinside=||]
+a = b + *p + c;
+\end{consolethree}
+
+you should think of it as
+
+\begin{consolethree}[escapeinside=||]
+a = b + (the value at address 124500) + c;
+\end{consolethree}
+
+And if you see
+
+\begin{consolethree}[escapeinside=||]
+*p = b + c;
+\end{consolethree}
+
+you should think of it as
+
+\begin{consolethree}[escapeinside=||]
+store value of (b + c) at address 124500
+\end{consolethree}
+
+In summary,
+\begin{python}
+from latextool_basic import table
+#print(table([(1, 2, 3), (2, 2, 5), (5, 2), (-1, 2, 6), (1, 2, 3), ]))
+print(table([("\\texttt{*p}", "Statement", "Same as"), ("lvalue", "\\texttt{*p = ...}", "store ... in memory at address \\texttt{p}"), ("rvalue", "\\texttt{... = ... *p}", "... = ... (value in memory at address \\texttt{p}) ...")]))
+\end{python}
+
+\begin{ex}
+Add one statement to the following:
+\begin{consolethree}[escapeinside=||]
+int x = 0;
+int * p = &x;
+
+// add one statement here to change the value of x
+// to 42. Do NOT use the variable name x in your
+// statement.
+
+std::cout << x << '\n';
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Add one statement to this code fragment so that the
+output is 3.1415:
+\begin{consolethree}[escapeinside=||]
+// p is a pointer variable that points to a double
+
+// add one statement below this line
+
+
+
+std::cout << *p << '\n';
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+What is the output of this program:
+\begin{consolethree}[escapeinside=||]
+int x = 2;
+int * p = &x;
+*p = *p + *p;
+std::cout << x << '\n';
+\end{consolethree}
+(Hint: Draw a picture)
+\end{ex}
+
+\begin{ex}
+What is the output of this program?
+
+\begin{consolethree}[escapeinside=||]
+int x = 2;
+int y = 42;
+int * p = &x;
+int * q = &y;
+std::cout << *p + *q << '\n';
+\end{consolethree}
+(Hint: Draw a picture)
+\end{ex}
+
+\begin{ex}
+What is the output of this program?
+\begin{consolethree}[escapeinside=||]
+int x = 2;
+int y = 42;
+int * p = &x;
+int * q = &y;
+*p = *p * 2 + *q;
+std::cout << x << ' ' << y << '\n';
+\end{consolethree}
+(Hint: Draw a ...)
+\end{ex}
+
+\begin{ex}
+What is the output of this program?
+\begin{consolethree}[escapeinside=||]
+int x = 2;
+int y = 42;
+int * p = &x;
+int * q = &y;
+*p = *p * *q;
+std::cout << x << ' ' << y << '\n';
+\end{consolethree}
+(Hint: Draw, draw, draw ...)
+\end{ex}
+
+\begin{ex}
+What is the output of this program?
+\begin{consolethree}[escapeinside=||]
+int x = 2;
+int y = 42;
+int * p = &x;
+int * q = &x;
+*p = *p * *q;
+*q = 42;
+std::cout << x << ' ' << y << '\n';
+std::cout << *p << ' ' << *q << '\n';
+\end{consolethree}
+(Hint: Draw...)
+\end{ex}
+
+\begin{ex}
+Do a simple addition program using the following skeleton.
+\begin{consolethree}[escapeinside=||]
+int x = 0, y = 0;
+int * p = &x;
+int * q = &y;
+// Statement to prompt the user for an integer and
+// put it into x. Do NOT use x in your statement.
+
+// Statement to prompt the user for an integer and
+// put it into y. Do NOT use y in your statement.
+
+std::cout << x + y << '\n';
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Declare a \texttt{double} variable called \texttt{d} and initialize it to 3.14. Declare a \texttt{double} pointer to point to \texttt{d}; call it \texttt{q}. Print \texttt{d} and \texttt{*q}. Add 1 to the value of \texttt{d} using \texttt{d}. Print \texttt{d} and \texttt{*q}. Add 1 to the value of \texttt{d} but using \texttt{q}. Print \texttt{d} and \texttt{q}.
+\end{ex}
+
+\begin{ex}
+What is the output of this code fragment:
+
+\begin{consolethree}[escapeinside=||]
+int x[] = {5, 4, 3, 2, 1};
+
+for (int i = 4; i >= 0; -\/-i)
+{   
+    int * p = &x[i];
+    std::cout << (*p) << std::endl;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Here's a program you are familiar with:
+
+\begin{consolethree}[escapeinside=||]
+int s = 0;
+
+for (int i = 0; i <= 100; i++)
+{   
+    s += i;
+    std::cout << i << ' ' << s << '\n';
+}
+
+std::cout << "1 + ... + 100 = " << s << '\n';
+\end{consolethree}
+I'm going to add a pointer:
+
+\begin{consolethree}[escapeinside=||]
+int s = 0;
+int * p = &s;
+for (int i = 0; i <= 100; i++)
+{   
+    s += i;
+    std::cout << i << ' ' << s << '\n';
+}
+
+std::cout << "1 + ... + 100 = " << s << '\n';
+\end{consolethree}
+
+Now modify the program so that it works the same as before but the variable name \texttt{s} is not used after the statement that declares \texttt{p}:
+\end{ex}
+
+\begin{consolethree}[escapeinside=||]
+int s = 0;
+int * p = &s;
+
+// Modify code below so that variable name s is not
+// used.
+
+for (int i = 0; i < 100; i++)
+
+{   
+    s += i;
+    std::cout << i << ' ' << s << '\n';
+}
+
+std::cout << "1 + ... + 100 = " << s << '\n';
+\end{consolethree}
+\begin{ex}
+If you see this picture
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(0,0, 8, 5)
+p += Rect(2, 3, 5, 4, label='\$')
+p += Rect(2, 1, 5, 2)
+p += Rect(1.5, 1.5, 1.5, 1.5, label='x')
+p += Line(points=[(2.5, 1.5), (6.5, 1.5), (6.5, 3.5), (5, 3.5)], linewidth=0.05, endstyle='>')
+
+print(p)
+\end{python}
+
+can you tell me what is the type of x?
+\end{ex}
+\begin{ex}
+If you see this
+\begin{consolethree}[escapeinside=||]
+double x = a[*b]; 
+\end{consolethree}
+
+can you tell me what is the type of \texttt{b}?
+\end{ex}
+
+\begin{ex}
+If you see this
+\begin{consolethree}[escapeinside=||]
+std::cout << x % (*y); 
+\end{consolethree}
+
+can you tell me what is the type of \texttt{y}?
+\end{ex}
+
+\begin{ex}
+Complete this:
+
+\begin{consolethree}[escapeinside=||]
+void nextprime(int * p)
+{
+
+}
+
+int main()
+{   
+    int x = 7;
+    nextprime(&x); // x becomes 11
+    std::cout << x << std::endl;
+    nextprime(&x); // x becomes 13
+    std::cout << x << std::endl;
+    nextprime(&x); // x becomes 17
+    std::cout << x << std::endl;
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Can you apply the pre- and post-increment operators to \texttt{*p} where \texttt{p} is a pointer to an \texttt{int}?
+
+\begin{consolethree}[escapeinside=||]
+++(*p);
+
+(*p)++;
+
+--(*p);
+
+(*p)--;
+\end{consolethree}
+\end{ex}
+
+Do you need the parentheses? Can you apply the augmented assignment operators to \texttt{*p?}
+
+Note that if you do not assign a memory address to your pointer, it would have an arbitrary address value, pointing to some arbitrary value.
+Reading that value might result result in printing something that looks like garbage. It might even cause your program to crash if you do not have access rights to that location!!!
+
+Another thing to note is that the dereferencing operator works with an address -- it does not have to be applied to a pointer. In other words if you're doing this:
+
+\begin{consolethree}[escapeinside=||]
+std::cout << *p << std::endl;
+\end{consolethree}
+
+and if you know that \texttt{p} has value 124500, then the above can also be
+
+\begin{consolethree}[escapeinside=||]
+std::cout << *124500 << std::endl;
+\end{consolethree}
+
+\begin{ex}
+First get a strong cup of coffee \ldots{} now \ldots{} What is the output? Or is there an error?
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int * f(int * x)
+{   
+    return x;
+}
+
+int f(int x)
+{   
+    return x;
+}
+
+int main()
+{   
+    int a = 21;
+    std::cout << *f(&a) + f(a) << std::endl;
+    return 0;
+}
+\end{consolethree}
+Verify! (Draw a picture if you need to.)
+\end{ex}
+
+\begin{ex}
+Sip your coffee \ldots{} another one \ldots{} What is the output? Or is there an error?
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int h(int * z)
+{   
+    return *z;
+}
+
+int * g(int * y)
+{   
+    return y;
+}
+
+int * f(int * x)
+{   
+    return (&x == NULL ? NULL : g(x));
+}
+
+int main()
+{   
+    int a = 21;
+    std::cout << *f(&a) + h(&a) << std::endl;
+    return 0;
+}
+\end{consolethree}
+Verify!
+\end{ex}
+

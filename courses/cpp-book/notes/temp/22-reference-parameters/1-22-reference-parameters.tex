@@ -1,0 +1,117 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Problems with Our Functions}
+
+What about writing a function to perform ``array assignment'', i.e., we want to do the following:
+
+\begin{consolethree}[escapeinside=||]
+int x[] = {1,2,3};
+int xSize = 3;
+int y[3];
+int ySize = 3;
+arrayAssign(y, 3, x, 3); // like y = x
+\end{consolethree}
+
+That's easy: Just write a for-loop in the function to pass the values from one to the other.
+
+This works for arrays of the same size. What if I use a ``length'' for an array?
+
+What I mean is that suppose I have an array of size 1000. I want to use the array like a container: I want to put values into the array and I want to pull values out of the array. The length of an array measures the number of things I put into the array that has not been taken out. For instance suppose I have the following:
+
+\begin{consolethree}[escapeinside=||]
+const int GOOGLE_STOCK_PRICE_SIZE = 1000;
+double googleStockPrice[GOOGLE_STOCK_PRICE_SIZE];
+\end{consolethree}
+
+which records the stock as the day progresses. \texttt{googleStockPrice[0]} is the stock price of Google at 9:00AM when the stock market opens, and \texttt{googleStockPrice[1]} is the stock price at 9:01AM, etc. At 9:05AM, I have stock prices of Google for 9:00AM, 9:01AM, 9:02AM, 9:03AM, 9:04AM, 9:05AM, i.e. there are 6 values. Of course the array has a size of 1000. But only \texttt{googleStockPrice[i]} for i = 0, 1, 2, 3, 4, 5 are valid at that point in time. I can keep track of how many values (from index 0) are valid using an integer variable, say \texttt{googleStockPriceLen} (Len for length).
+
+\begin{consolethree}[escapeinside=||]
+const int GOOGLE_STOCK_PRICE_SIZE = 1000;
+double googleStockPrice[GOOGLE_STOCK_PRICE_SIZE];
+int googleStockPriceLen = 0;
+\end{consolethree}
+
+So make sure you see the difference between the two different measures of an array: one measures the \EMPHASIZE{total number of values the array can hold}, and the other measures \EMPHASIZE{the number of values that have been placed into the array that has not been taken out}.
+
+Now suppose we want to write an array assignment function for such a general situation (remember: you want functions to be re-usable, therefore you want to make them general enough), then you want to be able to do this:
+
+\begin{consolethree}[escapeinside=||]
+const int XSIZE = 10;
+int x[XSIZE] = {42, 41, 40};
+int xlen = 3;
+const int YSIZE = 10;
+int y[YSIZE];
+int ylen = 0;
+arrayAssign(y, ylen, x, xlen); // sorta like y = x
+\end{consolethree}
+
+After the function call you want \texttt{y[0] = 42}, \texttt{y[1] =
+41}, \texttt{y[2] = 40} and \texttt{ylen = 3.}
+
+Now note this: A function can change the values of \texttt{y} which is an array. But the problem is that \texttt{ylen} is an integer variable and hence cannot be changed by a function when it is passed in as a pass-by-value parameter. Right? Here's an example:
+
+\begin{consolethree}[escapeinside=||]
+void swap(int a, int b)
+{
+    int t = a;
+    a = b;
+    b = t;
+}
+
+int main()
+{
+    int x = 0;
+    int y = 42;
+    swap(x, y); // x, y NOT CHANGED!!!!!!!!!!!!!!!!!!
+    std::cout << x << ' ' << y << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+One way to get around that is that you can return a value from a function and use that to change the value of \texttt{ylen} in the calling function. So the code using the array assignment function would look like this:
+
+\begin{consolethree}[escapeinside=||]
+const int XSIZE = 10;
+int x[XSIZE] = {42, 41, 40};
+int xlen = 3;
+const int YSIZE = 10;
+int y[YSIZE];
+int ylen = 0;
+ylen = arrayAssign(y, x, xlen); // sorta like y = x
+\end{consolethree}
+
+That will work. \EMPHASIZE{But} the prototype of this function would look very different from other useful array functions. This is how a header file for all the useful array functions if you have one:
+
+\begin{consolethree}[escapeinside=||]
+// array.h
+bool arrayEqual(int[], int, int[], int);
+bool arrayNotEqual(int[], int, int[], int);
+void bubbleSort(int[], int);
+int binarySearch(int[], int, int target);
+int arrayAssign(int[], int[], int);
+\end{consolethree}
+
+One quality of a well-designed program is one with \EMPHASIZE{least surprises}. In all parameters, you always see an array followed by a length ... EXCEPT for the case of \texttt{arrayAssign()}.
+
+There's another problem with using return values to change variables: If you want to change the value of two variables through one single function call you CAN'T. \EMPHASIZE{A function cannot return two values at the same time}. The following \EMPHASIZE{does NOT work}:
+
+\begin{consolethree}[escapeinside=||]
+int,int swap(int a, int b)
+{
+    int t = a;
+    a = b;
+    b = t;
+    return a, b // abominable
+}
+
+int main()
+{
+    int x = 0;
+    int y = 42;
+    x, y = swap(x, y); // :o
+    return 0;
+}
+\end{consolethree}
+
+

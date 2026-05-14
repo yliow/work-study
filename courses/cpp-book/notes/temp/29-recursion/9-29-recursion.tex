@@ -1,0 +1,480 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Tower of Hanoi}
+
+Most of the previous examples are easily solved without recursion. For
+instance the computation of the sum from 1 to a number, n say, can be
+easily achieved using a for-loop.
+
+Now we come to a problem that is \EMPHASIZE{not} that easily solved
+without recursion. The following is a very famous problem called
+\ldots{} the \EMPHASIZE{Tower of Hanoi}.
+
+Suppose you have a set of disks, say we have 3, with different sizes.
+They each have a hole in the center. On the player platform there are
+three stakes or needles, A, B, and C. Initially the three disks are
+placed on needle A through their holes.
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Line(points=[(0, 0), (12, 0)], linewidth=0.05)
+
+p += Line(points=[(2, 0), (2, 3)], linewidth=0.15)
+p += Line(points=[(6, 0), (6, 3)], linewidth=0.15)
+p += Line(points=[(10, 0), (10, 3)], linewidth=0.15)
+
+p += Rect(2, -0.5, 2, -0.5, linewidth=0, label='A')
+p += Rect(6, -0.5, 6, -0.5, linewidth=0, label='B')
+p += Rect(10, -0.5, 10, -0.5, linewidth=0, label='C')
+
+p += Rect(0.8, 0, 3.2, 0.5, background='blue!20', linewidth=0.02, innersep=0.1)  
+p += Rect(1.1, 0.5, 2.9, 1.0, background='blue!20', linewidth=0.02, innersep=0.1)
+p += Rect(1.4, 1.0, 2.6, 1.5, background='blue!20', linewidth=0.02, innersep=0.1)
+
+print(p)
+\end{python}
+
+ Here's the goal: We want to move all the disks from
+ stake A to stake C. There are some rules:
+
+ \begin{itemize}
+ \item You can move one disk at a time.
+ \item You can only remove the topmost disk from a needle and place it on top
+   of the disk of another needle.
+ \item At all times, the disks on a needle must be arranged in descending
+   sizes from bottom to top.
+ \end{itemize}
+
+ You also want to be as efficient as possible, i.e., use the least number
+ of moves.
+
+ I'll do the simple \EMPHASIZE{case of 2 disks}.
+
+ A $\rightarrow$ B (this means take the topmost disk of A and put it in B)
+
+ A $\rightarrow$ C
+
+ B $\rightarrow$ C
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(2, -0.5, 2, -0.5, linewidth=0, label='A')
+p += Rect(6, -0.5, 6, -0.5, linewidth=0, label='B')
+p += Rect(10, -0.5, 10, -0.5, linewidth=0, label='C')
+p += Line(points=[(0, 0), (12, 0)], linewidth=0.05)
+
+p += Line(points=[(2, 0), (2, 3)], linewidth=0.15)
+p += Line(points=[(6, 0), (6, 3)], linewidth=0.15)
+p += Line(points=[(10, 0), (10, 3)], linewidth=0.15)
+
+p += Rect(0.8, 0, 3.2, 0.5, background='blue!20', linewidth=0.02, innersep=0.1)  
+p += Rect(1.1, 0.5, 2.9, 1.0, background='blue!20', linewidth=0.02, innersep=0.1)
+#p += Rect(1.4, 0.5, 2.6, 1.0, background='blue!20', linewidth=0.02, innersep=0.1)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Line(points=[(0, 0), (12, 0)], linewidth=0.05)
+
+p += Line(points=[(2, 0), (2, 3)], linewidth=0.15)
+p += Line(points=[(6, 0), (6, 3)], linewidth=0.15)
+p += Line(points=[(10, 0), (10, 3)], linewidth=0.15)
+
+p += Rect(2, -0.5, 2, -0.5, linewidth=0, label='A')
+p += Rect(6, -0.5, 6, -0.5, linewidth=0, label='B')
+p += Rect(10, -0.5, 10, -0.5, linewidth=0, label='C')
+
+p += Rect(0.8, 0, 3.2, 0.5, background='blue!20', linewidth=0.02, innersep=0.1)  
+p += Rect(5.1, 0, 6.9, 0.5, background='blue!20', linewidth=0.02, innersep=0.1)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Line(points=[(0, 0), (12, 0)], linewidth=0.05)
+
+p += Line(points=[(2, 0), (2, 3)], linewidth=0.15)
+p += Line(points=[(6, 0), (6, 3)], linewidth=0.15)
+p += Line(points=[(10, 0), (10, 3)], linewidth=0.15)
+
+p += Rect(2, -0.5, 2, -0.5, linewidth=0, label='A')
+p += Rect(6, -0.5, 6, -0.5, linewidth=0, label='B')
+p += Rect(10, -0.5, 10, -0.5, linewidth=0, label='C')
+
+p += Rect(8.8, 0, 11.2, 0.5, background='blue!20', linewidth=0.02, innersep=0.1)  
+p += Rect(5.1, 0, 6.9, 0.5, background='blue!20', linewidth=0.02, innersep=0.1)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Line(points=[(0, 0), (12, 0)], linewidth=0.05)
+
+p += Line(points=[(2, 0), (2, 3)], linewidth=0.15)
+p += Line(points=[(6, 0), (6, 3)], linewidth=0.15)
+p += Line(points=[(10, 0), (10, 3)], linewidth=0.15)
+
+p += Rect(2, -0.5, 2, -0.5, linewidth=0, label='A')
+p += Rect(6, -0.5, 6, -0.5, linewidth=0, label='B')
+p += Rect(10, -0.5, 10, -0.5, linewidth=0, label='C')
+
+p += Rect(8.8, 0, 11.2, 0.5, background='blue!20', linewidth=0.02, innersep=0.1)  
+p += Rect(9.1, 0.5, 10.9, 1, background='blue!20', linewidth=0.02, innersep=0.1)
+
+print(p)
+\end{python}
+
+ Do you get the point of the game now?
+
+ \begin{ex}
+ Write down a list of steps to move the 3 disks from A
+ to C. I'm giving you the first (Hint: There should be 7
+ steps).
+
+ 1. A $\rightarrow$ C
+
+ 2.
+
+ 3.
+
+ 4.
+
+ 5.
+
+ 6.
+
+ 7.
+ \end{ex}
+
+ \begin{ex}
+ Do the same for 4 disks. There should be 15 steps.
+ \end{ex}
+
+ Of course the problem becomes increasingly more and more complex (if you
+ don't see a common idea/pattern of the above solutions) when the number
+ of disks n grows. For instance what is the solution when n = 64?
+
+ Let's solve the general problem. Suppose we have n
+ disks. There are three needles. We can think of them as the ``from''
+ needle, the ``helper'' needle, and the ``to'' needle. We move all the
+ disks from the ``from'' to to ``to'' using the ``helper'' as a helper.
+ Think of the problem as one involving n-1 disks, and one disk:
+
+\begin{python}
+from latextool_basic import *
+from latextool_polygon import polygon
+p = Plot()
+
+p += Line(points=[(0, 0), (12, 0)], linewidth=0.05)
+
+p += Line(points=[(2, 0), (2, 3)], linewidth=0.15)
+p += Line(points=[(6, 0), (6, 3)], linewidth=0.15)
+p += Line(points=[(10, 0), (10, 3)], linewidth=0.15)
+
+p += Rect(2, -0.5, 2, -0.5, linewidth=0, label='A')
+p += Rect(6, -0.5, 6, -0.5, linewidth=0, label='B')
+p += Rect(10, -0.5, 10, -0.5, linewidth=0, label='C')
+
+p += Rect(0.8, 0, 3.2, 0.5, background='blue!20', linewidth=0.02, innersep=0.1)  
+p += polygon(points=[(1, 0.5), (2, 2), (3, 0.5)], background='blue!20', linewidth=0.02)
+print(p)
+\end{python}
+
+ The triangle denotes the n - 1 disks. You want to solve the Tower
+ of Hanoi problem for the n - 1 disks, but moving the n - 1 disks to
+ the middle needle, using the C as a helper.
+
+\begin{python}
+from latextool_basic import *
+from latextool_polygon import polygon
+p = Plot()
+
+p += Line(points=[(0, 0), (12, 0)], linewidth=0.05)
+
+p += Line(points=[(2, 0), (2, 3)], linewidth=0.15)
+p += Line(points=[(6, 0), (6, 3)], linewidth=0.15)
+p += Line(points=[(10, 0), (10, 3)], linewidth=0.15)
+
+p += Rect(2, -0.5, 2, -0.5, linewidth=0, label='A')
+p += Rect(6, -0.5, 6, -0.5, linewidth=0, label='B')
+p += Rect(10, -0.5, 10, -0.5, linewidth=0, label='C')
+
+p += Rect(0.8, 0, 3.2, 0.5, background='blue!20', linewidth=0.02, innersep=0.1)  
+p += polygon(points=[(5, 0), (6, 1.5), (7, 0)], background='blue!20', linewidth=0.02)
+print(p)
+\end{python}
+
+ Next I move the last disk, which is a Tower of Hanoi problem of size 1,
+ from A to C.
+
+\begin{python}
+from latextool_basic import *
+from latextool_polygon import polygon
+p = Plot()
+
+p += Line(points=[(0, 0), (12, 0)], linewidth=0.05)
+
+p += Line(points=[(2, 0), (2, 3)], linewidth=0.15)
+p += Line(points=[(6, 0), (6, 3)], linewidth=0.15)
+p += Line(points=[(10, 0), (10, 3)], linewidth=0.15)
+
+p += Rect(2, -0.5, 2, -0.5, linewidth=0, label='A')
+p += Rect(6, -0.5, 6, -0.5, linewidth=0, label='B')
+p += Rect(10, -0.5, 10, -0.5, linewidth=0, label='C')
+
+p += Rect(8.8, 0, 11.2, 0.5, background='blue!20', linewidth=0.02, innersep=0.1)  
+p += polygon(points=[(5, 0), (6, 1.5), (7, 0)], background='blue!20', linewidth=0.02)
+print(p)
+\end{python}
+
+ Now we solve the Tower of Hanoi problem of size n-1. Note that in this
+ case the ``from'' needle is B, the ``to'' needle is C, and the
+ ``helper'' needle is A.
+
+\begin{python}
+from latextool_basic import *
+from latextool_polygon import polygon
+p = Plot()
+
+p += Line(points=[(0, 0), (12, 0)], linewidth=0.05)
+
+p += Line(points=[(2, 0), (2, 3)], linewidth=0.15)
+p += Line(points=[(6, 0), (6, 3)], linewidth=0.15)
+p += Line(points=[(10, 0), (10, 3)], linewidth=0.15)
+
+p += Rect(2, -0.5, 2, -0.5, linewidth=0, label='A')
+p += Rect(6, -0.5, 6, -0.5, linewidth=0, label='B')
+p += Rect(10, -0.5, 10, -0.5, linewidth=0, label='C')
+
+p += Rect(8.8, 0, 11.2, 0.5, background='blue!20', linewidth=0.02, innersep=0.1)  
+p += polygon(points=[(9, 0.5), (10, 2), (11, 0.5)], background='blue!20', linewidth=0.02)
+print(p)
+\end{python}
+
+Let's write down the pseudocode. Suppose hanoi(n, from,
+helper, to) prints the moves. The case of n = 1 is easy:
+
+\begin{consolethree}
+hanoi(1, from, helper, to):
+    print from, "->", to
+\end{consolethree}
+
+and for n > 1:
+
+\begin{consolethree}
+hanoi(n, from, helper, to):
+    hanoi(n - 1, from, to, helper)
+    hanoi(1, from, helper, to)
+    hanoi(n - 1, helper, from, to)
+\end{consolethree}
+
+So the pseudocode is
+
+\begin{consolethree}
+hanoi(n, from, helper, to):
+    if n == 1:
+        print from, "--->", to
+    else:
+        hanoi(n - 1, from, to, helper)
+        hanoi(1, from, helper, to)
+        hanoi(n - 1, helper, from, to)
+\end{consolethree}
+
+Think about the pseudocode very carefully. Don't look at
+the code yet.
+
+\begin{ex}
+Execute the pseudocode for the function call hanoi(3, 'A', 'B', 'C')
+\end{ex}
+
+Here's the code (finally!):
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void hanoi(int n, char from, char helper, char to)
+{
+    if (n == 1)
+    {
+        std::cout << from << "--->" << to
+                  << std::endl;
+    }
+    else
+    {
+        hanoi(n - 1, from, to, helper);
+        hanoi(1, from, helper, to);
+        hanoi(n - 1, helper, from, to);
+    }
+}
+
+int main()
+{
+    int n = 0;
+    std::cout << "how many disks? ";
+    std::cin >> n;
+    hanoi(n, 'A', 'B', 'C');
+    return 0;
+}
+\end{consolethree}
+
+\begin{ex}
+Challenge: Solve this problem without recursion. (Yes it can be done.)
+\end{ex}
+
+The recursive idea behind the solution of the tower
+of Hanoi is made up of the following sequence of four pictures:
+
+\begin{python}
+from latextool_basic import *
+from latextool_polygon import polygon
+p = Plot()
+
+p += Line(points=[(0, 0), (12, 0)], linewidth=0.05)
+
+p += Line(points=[(2, 0), (2, 3)], linewidth=0.15)
+p += Line(points=[(6, 0), (6, 3)], linewidth=0.15)
+p += Line(points=[(10, 0), (10, 3)], linewidth=0.15)
+
+p += Rect(2, -0.5, 2, -0.5, linewidth=0, label='A')
+p += Rect(6, -0.5, 6, -0.5, linewidth=0, label='B')
+p += Rect(10, -0.5, 10, -0.5, linewidth=0, label='C')
+
+p += Rect(0.8, 0, 3.2, 0.5, background='blue!20', linewidth=0.02, innersep=0.1)  
+p += polygon(points=[(1, 0.5), (2, 2), (3, 0.5)], background='blue!20', linewidth=0.02)
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latextool_polygon import polygon
+p = Plot()
+
+p += Line(points=[(0, 0), (12, 0)], linewidth=0.05)
+
+p += Line(points=[(2, 0), (2, 3)], linewidth=0.15)
+p += Line(points=[(6, 0), (6, 3)], linewidth=0.15)
+p += Line(points=[(10, 0), (10, 3)], linewidth=0.15)
+
+p += Rect(2, -0.5, 2, -0.5, linewidth=0, label='A')
+p += Rect(6, -0.5, 6, -0.5, linewidth=0, label='B')
+p += Rect(10, -0.5, 10, -0.5, linewidth=0, label='C')
+
+p += Rect(0.8, 0, 3.2, 0.5, background='blue!20', linewidth=0.02, innersep=0.1)  
+p += polygon(points=[(5, 0), (6, 1.5), (7, 0)], background='blue!20', linewidth=0.02)
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latextool_polygon import polygon
+p = Plot()
+
+p += Line(points=[(0, 0), (12, 0)], linewidth=0.05)
+
+p += Line(points=[(2, 0), (2, 3)], linewidth=0.15)
+p += Line(points=[(6, 0), (6, 3)], linewidth=0.15)
+p += Line(points=[(10, 0), (10, 3)], linewidth=0.15)
+
+p += Rect(2, -0.5, 2, -0.5, linewidth=0, label='A')
+p += Rect(6, -0.5, 6, -0.5, linewidth=0, label='B')
+p += Rect(10, -0.5, 10, -0.5, linewidth=0, label='C')
+
+p += Rect(8.8, 0, 11.2, 0.5, background='blue!20', linewidth=0.02, innersep=0.1)  
+p += polygon(points=[(5, 0), (6, 1.5), (7, 0)], background='blue!20', linewidth=0.02)
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latextool_polygon import polygon
+p = Plot()
+
+p += Line(points=[(0, 0), (12, 0)], linewidth=0.05)
+
+p += Line(points=[(2, 0), (2, 3)], linewidth=0.15)
+p += Line(points=[(6, 0), (6, 3)], linewidth=0.15)
+p += Line(points=[(10, 0), (10, 3)], linewidth=0.15)
+
+p += Rect(2, -0.5, 2, -0.5, linewidth=0, label='A')
+p += Rect(6, -0.5, 6, -0.5, linewidth=0, label='B')
+p += Rect(10, -0.5, 10, -0.5, linewidth=0, label='C')
+
+p += Rect(8.8, 0, 11.2, 0.5, background='blue!20', linewidth=0.02, innersep=0.1)  
+p += polygon(points=[(9, 0.5), (10, 2), (11, 0.5)], background='blue!20', linewidth=0.02)
+print(p)
+\end{python}
+
+Note that the largest disk goes from the starting stake to the target
+stake. Suppose now I change the tower of Hanoi problem a little bit as
+follows:
+
+\begin{itemize}
+\item There are four stakes. The four stakes are called, A, B, C, D where A
+  is the starting stake and D is the target stake.
+\item No disk can go from the starting stake to the target stake. For
+  instance if there's only one disk (i.e., at A), then you cannot move
+  the disk from A to D -- you have to move the disk from A to B (or to
+  C) and then from B to D.
+\end{itemize}
+
+\begin{ex}
+Write a program to solve this modified tower of Hanoi problem. (There
+are many possible solution.)
+\end{ex}
+
+\begin{ex}
+Count the number of moves made for n = 1 disk, n = 2
+disks, n = 3 disks, n = 4 disks, etc. Is there a formula for the
+\EMPHASIZE{number of moves} for n disks? This can then be used as a measure
+of efficiency of the algorithm.
+\end{ex}
+
+\begin{ex}
+Now let me modify the tower of Hanoi problem: What if
+you cannot move a disk from A to C? In other words, you can move from A
+to B, B to A, B to C, C to B, C to A. But you cannot move a disk from A
+to C. Is it possible to solve this version of tower of Hanoi? How many
+moves does your algorithm make for n disks?
+\end{ex}
+
+\begin{ex}
+What about this version -- what if you have 4
+needles? You should be able to move a stack of n disks from A to C with
+fewer moves right?
+\end{ex}
+
+\begin{ex}
+How suppose there are 5 stakes A, B, C, D, E. There
+two stacks of disks, one stack is at A and one stack is at B. Each stack
+is made up of n disks of radius 1, 2, 3, \ldots, n. The goal is to move
+all the disks to E. (This means that when the procedure stops, all the
+disks are at E and the radii of the disks, from top to bottom, are 1, 1,
+2, 2, 3, 3, 4, 4, 5, 5, \ldots, n, n. Can you do this without stake D?
+\end{ex}
+
+Many computational problems can be solved a lot easier with recursion
+than without. Another reason for knowing recursion is that
+it's frequently the case that
+\EMPHASIZE{correctness} of a program can be
+\EMPHASIZE{mathematically proven} much easier if
+it's recursive. (For many critical software -- example:
+scientific software -- correctness is crucial.) Note that from the above
+examples, it should be clear that recursion can do the work of loops. In
+fact there are programming languages that do not have loops!
+
+

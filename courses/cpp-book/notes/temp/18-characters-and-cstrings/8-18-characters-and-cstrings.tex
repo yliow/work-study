@@ -1,0 +1,73 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{The \texttt{strnlen(), strncmp(), strncat()} functions}
+
+All the string functions we talked about run into problems if the character arrays passed into these function do not contain \texttt{'\textbackslash 0'} resulting in buffer overflow.
+
+In fact this is one scenario of the so-called \EMPHASIZE{buffer overflow attack}, a technique used in many virus software (malware).
+
+Accompanying these functions are similar functions that allow you to specify a stopping point. For instance in the case of \verb!strlen()! (the string length function) there is a function called \verb!strnlen()!
+
+Besides passing in a string, you also pass in a maximum possible length
+for the string.
+
+\begin{consolethree}[escapeinside=||]
+char s[100] = ""; // s[0] = '\0';
+std::cin >> s;
+std::cout << strnlen(s, 99) << std::endl;
+\end{consolethree}
+
+Note that I pass in 99 and not 100. If s has a \EMPHASIZE{size of 100} the \EMPHASIZE{maximum possible length is 99} since in this case the \EMPHASIZE{last character is used by '\textbackslash 0'}. Therefore \texttt{s} (of size 100) has a maximum length of 99.
+
+\begin{ex}
+What is the output of this code?
+\end{ex}
+
+The accompanying safer functions for strcmp() and strcat() are strncmp() and strncat(). So we have the following \textbf{\underline{pairs}} of functions:
+
+\begin{tabular}{ll}
+strlen() & strnlen() \\
+strcmp() & strncmp() \\
+strcat() & strncat() \\
+\end{tabular}
+
+Try this program:
+
+\begin{consolethree}[escapeinside=||]
+char s[100] = "aaa";
+char t[100] = "bbb";
+char u[100];
+
+// string copy function
+// In this case at most 100 chars are copied
+// from s to u
+strncpy(u, s, 100);
+std::cout << u << std::endl;
+
+// string concatenation function
+// In this case at most 100 chars are
+// concatenated from t to u
+strncat(u, t, 100);
+std::cout << u << std::endl;
+
+// string comparison function
+// In this case at most 100 characters are
+// compared.
+int i = strncmp(u, s, 100);
+std::cout << i << std::endl;
+\end{consolethree}
+
+The only problem in the above example is the call to strncat() function. You see if \texttt{u} already has a string of length 10, then only 90 characters are left for concatenation. If \texttt{t} has length greater than that, the program might crash. Therefore it's safe to write this:
+
+\begin{consolethree}[escapeinside=||]
+// string concatenation function
+// In this case at most 100 chars are
+// concatenated from t to u
+strncat(u, t, 100 - strnlen(u, 100));
+std::cout << u << std::endl;
+\end{consolethree}
+
+But in this case some character might not be copied from \texttt{t} to \texttt{u}. Depending on what your program is supposed to do, you might want to print an error message and halt the program.
+
+

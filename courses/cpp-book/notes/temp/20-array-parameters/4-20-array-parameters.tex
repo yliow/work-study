@@ -1,0 +1,148 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Computing array sizes: \texttt{sizeof()}}
+
+This is a quick review.
+
+The amount of memory (in terms of bytes -- i.e. 8 bits) used by a value,
+a variable, or a type can be found by calling the \texttt{sizeof()}
+function.
+
+Try this:
+
+\begin{consolethree}[escapeinside=||]
+std::cout << sizeof(int) << std::endl;
+std::cout << sizeof(42) << std::endl;
+int x;
+std::cout << sizeof(x) << std::endl;
+int y[5];
+std::cout << sizeof(y) << std::endl;
+\end{consolethree}
+
+As you can see, to determine the amount of memory used to hold an int
+value is 4 bytes. And you get this number (I.e. 4) by using any of the
+following:
+
+sizeof(int) sizeof(1) sizeof(x)
+
+where \texttt{x} is an \texttt{int} variable. In the above
+
+\texttt{ sizeof(y})
+
+gives you the number of bytes used for an array of 5 integers.
+
+Here' s a useful application of the \texttt{sizeof()}
+function. Suppose you have an array of integers and you want to compute
+\textbf{the size of the array}. You can do this:
+
+\begin{consolethree}[escapeinside=||]
+int y[5];
+std::cout << sizeof(y) / sizeof(int) << std::endl;
+\end{consolethree}
+
+With this, the following program:
+
+\begin{consolethree}[escapeinside=||]
+\#include \textless iostream>
+
+void print(int x[], int x_size)
+{
+    for (int i = 0; i < x_size; ++i)
+    {
+        std::cout << x[i] << ' ';
+    }
+}
+
+int main()
+{
+    int a[] = {1, 2, 3};
+    print(a, 3);
+    return 0;
+}
+\end{consolethree}
+
+can be rewritten as
+
+\begin{consolethree}[escapeinside=||]
+...
+int main()
+{
+    int a[] = {1, 2, 3};
+    int a_size = sizeof(a) / sizeof(int);
+    print(a, a_size);
+    return 0;
+}
+\end{consolethree}
+
+Why is this is a good thing? Because now if you change your program so that it works with an array of 5 values:
+
+\begin{consolethree}[escapeinside=||]
+...
+int main()
+{
+    int a[] = {1, 2, 3|\textbf{, 6, 2}|};
+    ...
+}
+...
+\end{consolethree}
+
+you don' t have to worry about changing
+
+\begin{consolethree}[escapeinside=||]
+...
+print(a, |\textbf{3}|);
+...
+\end{consolethree}
+
+to
+
+\begin{consolethree}[escapeinside=||]
+...
+print(a, |\textbf{5}|);
+...
+\end{consolethree}
+
+Since with
+
+\begin{consolethree}[escapeinside=||]
+...
+int a_size = sizeof(a) / sizeof(int);
+print(a, a_size);
+...
+\end{consolethree}
+
+The program works for array \texttt{\textbf{a}} of any size.
+
+By the way, remember that it' s OK to process only part of the array:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void print(int x[], int x_size)
+{
+    for (int i = 0; i < x_size; ++i)
+    {
+        std::cout << x[i] << ' ';
+    }
+}
+
+int main()
+{
+    int a[] = {1, 2, 3};
+    print(a, 2);
+    return 0;
+}
+\end{consolethree}
+
+Of course you already know (see earlier notes on arrays) that you should never go outside the array so something like this is BAD ... (this has nothing to do with functions of course) ...
+
+\begin{consolethree}[escapeinside=||]
+...
+int a[] = {1, 2, 3};
+print(a, |\EMPHASIZE{5}|);
+...
+\end{consolethree}
+
+Make sure you try it.
+

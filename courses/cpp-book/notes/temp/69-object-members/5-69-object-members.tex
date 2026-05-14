@@ -1,0 +1,54 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Member destructor}
+
+Let's look at what happens with member destructors.
+Consider this example:
+
+\begin{console}
+class C
+{
+public:
+        C(int a): x_(a)
+        {
+             std::cout << "C()\ n";
+        }
+        ~ C()
+        {
+             std::cout << "~ C()\ n";
+        }
+private:
+        int x_;
+};
+
+class D
+{
+public:
+        D(int a)
+            : c_(a)
+        {}
+        
+        ~ D()
+        {
+            std::cout << "~ D()\ n";
+        }
+        
+private:
+        C c_;
+};
+
+int main()
+{   
+    C c = C(0);
+    D d = D(1);
+    return 0;
+
+}
+\end{console}
+
+When object \texttt{d} does out of scope, destructor of \texttt{D}, i.e.
+\texttt{D::~ D()}, is called. In
+\texttt{D::~ D()}, member \texttt{c} calls its destructor
+\texttt{C::~ C()}.
+

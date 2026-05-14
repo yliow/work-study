@@ -1,0 +1,292 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Pointer Power \#1: Assessing value anywhere}
+
+Here comes the first application of pointers \ldots{} a really important one \ldots{} we can use pointers to access a variable's memory anywhere we like. (This is not new since references are exactly for that purpose. You want to review references now.)
+
+First of all recall the following:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void swap(int x, int y)
+{
+    int t = x;
+    x = y;
+    y = t;
+}
+
+int main()
+{   
+    int x = 0, y = 1;
+    std::cout << x << ' ' << y << '\n';
+    swap(x, y);
+    std::cout << x << ' ' << y << '\n';
+    return 0;
+}
+\end{consolethree}
+Of course the function uses pass-by-value. The \texttt{x} and \texttt{y} in \texttt{swap()} has nothing to do with the \texttt{x} and \texttt{y} in \texttt{main()} and therefore \texttt{swap()} cannot possibly change the values of variables in \texttt{main()}.
+
+Now look at this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void swap(int & x, int & y)
+{    
+     int t = x;
+     x = y;
+     y = t;
+}
+
+int main()
+{   
+    int x = 0, y = 1;
+    std::cout << x << ' ' << y << '\n';
+    swap(x, y);
+    std::cout << x << ' ' << y << '\n';
+    return 0;
+}
+\end{consolethree}
+This second \texttt{swap()} function uses pass-by-reference and it does swap the values of two variables in \texttt{main()}.
+
+With your understanding of pointers, run and explain this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void swap(int * x, int * y)
+{    
+     int t = *x;
+     *x = *y;
+     *y = t;
+}
+
+int main()
+{   
+    int x = 0, y = 1;
+    std::cout << x << ' ' << y << '\n';
+    swap(&x, &y);
+    std::cout << x << ' ' << y << '\n';
+    return 0;
+}
+\end{consolethree}
+Therefore pointers can be used as parameters to modify values of variables in the calling function, i.e., they can be used to achieve the same results as references. Actually references are secretly pointers!
+
+Understand this very important idea: pointers allow you to access any value you like from anywhere in your code as long as know where to find the value (and you have access rights to that value):
+
+\begin{consolethree}[escapeinside=||]
+
+#include <iostream>
+
+void j(int * x)
+{    
+     *x = 42; // TADA!
+}
+
+void i(int * x)
+{
+    j(x);
+}
+
+void h(int * x)
+{
+    i(x);
+}
+
+void f(int * x)
+{
+    h(x);
+}
+
+int main ()
+{
+    int x = 0;
+    f(&x);
+    std::cout << x << std::endl;
+    return 0;
+}
+\end{consolethree}
+Here's another example. This version of reciprocating \texttt{x} does not
+work:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void reciprocal(double x)
+{
+    x = 1.0 / x;
+}
+
+int main()
+{
+    double x = 2.0;
+    reciprocal(x);
+    std::cout << x << '\n';     // x is still 2.0
+    return 0;
+}
+\end{consolethree}
+This one does work, using reference:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void reciprocal(double & x)
+{
+    x = 1.0 / x;
+}
+
+int main()
+{
+    double x = 2.0;
+    reciprocal(x);
+    std::cout << x << '\n';     // x is 0.5
+    return 0;
+}
+\end{consolethree}
+And this one does work, using pointers:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void reciprocal(double * x)
+{
+    *x = 1.0 / *x;
+}
+
+int main()
+{
+    double x = 2.0;
+    reciprocal(&x);
+    std::cout << x << '\n';     // x is 0.5
+    return 0;
+}
+\end{consolethree}
+Now's your turn \ldots{}
+
+\begin{ex}
+
+Here's an increment function that does not work:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void inc(int x)
+{
+    x++;
+}
+
+int main()
+{
+    int a = 42;
+    inc(a);
+    std::cout << a << std::endl;    // a is still 42
+    return 0;
+}
+\end{consolethree}
+And here's one that works, using reference variables:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void inc(int & x)
+{
+    x++;
+}
+
+int main()
+{
+    int a = 42;
+    inc(a);
+    std::cout << a << std::endl;    // a is 43
+    return 0;
+}
+\end{consolethree}
+Complete the following program so that the new increment works, except
+that the parameter is a pointer and not a reference:
+\end{ex}
+
+\begin{consolethree}[escapeinside=||]
+void inc(int * x)
+{
+}
+
+int main()
+{
+    int a = 42;
+    inc(&a);
+    std::cout << a << std::endl;    // you should get 43
+    return 0;
+}
+\end{consolethree}
+
+\begin{ex}
+Complete the \verb!array_append()! function (which adds a value to the array \verb!x! and increments the value of the length variable of the array. The expected output is \verb!2 3 5 7!.
+d
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void array_println(int x[], int xlen)
+{
+    for (int i = 0; i < xlen; ++i)
+    {
+        std::cout << x[i] << ' ';
+    }
+    std::cout << std::endl;
+}
+
+void array_append(int x[], int * xlen, int value)
+{
+}
+
+int main()
+{
+    int x[10] = {2, 3, 5};
+    int xlen = 3;
+    array_append(x, &xlen, 7);
+    array_println(x, xlen);
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Here's a function that acts like an integer input function:
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void scanf(int * x)
+{
+}
+
+int main()
+{
+    int a = 0;
+    scanf(&a);
+    std::cout << a << std::endl;
+    return 0;
+}
+\end{consolethree}
+Complete this so that when you run it and enter 42, there's an output of 42.
+\end{ex}
+\begin{ex}
+This is similar to the above:
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void scanf(double * x)
+{
+}
+
+int main()
+{
+    double a = 0;
+    scanf(&a);
+    std::cout << a << std::endl;
+    return 0;
+}
+\end{consolethree}
+Test it!!!
+\end{ex}
+

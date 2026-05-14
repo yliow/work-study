@@ -1,0 +1,49 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{operator=}
+
+The default \textit{=} operator will perform member-wise copy. For
+example: If you have the following class
+
+\begin{consolethree}[escapeinside=||]
+class vec2i
+{
+private:
+    int x_, y_;
+};
+\end{consolethree}
+
+and you have objects \textit{p, q} of \textit{vec2i}. Then \textit{p=q} will
+have the same effect as \textit{p.x\_ = q.x\_}, \textit{p.y\_ = q.y\_}.
+
+\textbf{WARNING:} You might actually not want \textit{operator=} to behave
+as above. Why? Can you think of some examples where the default
+\textit{operator=} is bad?
+
+You can overwrite the default \textit{=} by creating your own
+\textit{operator=}.
+
+You definitely want to do this if your object holds on to some form of
+system resource. Example: There is a pointer in your object.
+
+The default \textit{operator=} is called the \textbf{default copy
+operator} (not to be confused with the copy constructor which is a
+constructor that has an object as parameter). Note that you can do this:
+
+\textit{SomeClass a, b, c, d;}
+
+\textit{a = b = c = d;}
+
+This is because the second statement is
+
+\textit{a = (b = (c = d));}
+
+i.e.,
+
+\textit{a = (b = (c.operator=(d)));}
+
+This implies that \textit{c.operator=(d)} has a return value. This will be
+mentioned later.
+
+

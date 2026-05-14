@@ -1,0 +1,73 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{The \texttt{strlen()} function}
+
+C-strings are so useful that several functions are provided with your compiler so that you can work effectively with them. Depending on your compiler, you might need to do this when you want to use these C-string functions:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <cstring>
+... YOUR PROGRAM ...
+\end{consolethree}
+
+If your compiler is really old then you might need to do this instead:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "string.h"
+... YOUR PROGRAM ...
+\end{consolethree}
+
+Here's the first function ...
+
+The function strlen() returns the \EMPHASIZE{length} of the string parameter. This is called the \EMPHASIZE{string length function}. Try this:
+
+\begin{consolethree}[escapeinside=||]
+std::cout << strlen("abc") << std::endl;
+std::cout << strlen("a\0c") << std::endl;
+std::cout << strlen("") << std::endl;
+char s[] = "abc";
+std::cout << strlen(s) << std::endl;
+char t[] = "ab\0c";
+std::cout << strlen(t) << std::endl;
+char u[100] = "";
+std::cout << strlen(u) << std::endl;
+\end{consolethree}
+
+By the way, what if your compiler does not have the \verb!strlen()! function? Well the code to perform the same thing as the \verb!strlen()! function is very simple. You just loop through the character array until you see \texttt{'\textbackslash 0'}. You have a counter that counts the number of characters scanned until \texttt{'\textbackslash 0'}, not including the \texttt{'\textbackslash 0'} character. Here you go:
+
+\begin{consolethree}[escapeinside=||]
+char x[100] = "abc";
+int len = 0;
+while (x[len] != '\0')
+{
+    len++;
+}
+std::cout << len << '\n';
+\end{consolethree}
+
+Run the program. Change it to this and run it again:
+
+\begin{consolethree}[escapeinside=||]
+char x[100] = "hello world";
+int len = 0;
+while (x[len] != '\0')
+{
+    len++;
+}
+std::cout << len << '\n';
+\end{consolethree}
+
+There's actually a ``problem'' with the \texttt{strlen()} function. You see ... if a person accidentally calls the \texttt{strlen()} function with a character array that does \EMPHASIZE{\textit{not}} contain a \texttt{'\textbackslash 0'}, the function can actually go beyond the array bound. This might crash the program.
+
+Here's an example:
+
+\begin{consolethree}[escapeinside=||]
+char x[] = {'a', 'b', 'c'};
+std::cout << strlen(x) << std::endl;
+\end{consolethree}
+
+This is what we call a \EMPHASIZE{buffer overflow}: Your string length function will access a value in the array \texttt{x} that is actually outside \texttt{x}. We'll come back to this issue later.
+
+

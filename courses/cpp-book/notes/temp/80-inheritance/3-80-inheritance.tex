@@ -1,0 +1,471 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Inheritance is not copy-and-paste of code!}
+
+It's really important to understand that inheritance is not a copy-and-paste of code from the parent class to the child class. Inheritance is not like your \lq\lq \verb!#include!'' business.
+
+Here's how you should visualize objects created from a class that's a child class. Look at our Basic Example code again. We have a \verb!c! object declared with class \verb!C! which inherits class \verb!P!. The object \verb!c! has member \verb!y_!, \verb!get_y!, and \verb!set_y! since the type of \verb!c! is class \verb!C!. From the experiments in the previous section, we see that \verb!c! also has \verb!gx_!, \verb!get_x!, and \verb!set_x! from its parent \verb!P!.
+
+Here's a picture to keep in mind. First here's a diagram of our classes:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+pbox = Rect(0, 0, 2, 2, label='P', linewidth=0.1)
+cbox = Rect(0,-4,2,-2, label='C', linewidth=0.1)
+c2p = Line(points=[cbox.top(), pbox.bottom()], linewidth=0.1, endstyle='>')
+p += pbox
+p += cbox
+p += c2p
+print(p)
+\end{python}
+Each box represents the class. The arrow describes the inheritance
+relationship between the two classes. (This is the so-called class
+diagram from UML. I'm simplifying it a little -- see previous notes for
+details on what to draw inside the boxes.) We created an object \verb!c!
+from class \verb!C!. So informally I'll draw it this way:
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+p = Plot()
+#p += Grid(x0=-5,y0=-5,x1=10,y1=5)
+pbox = Rect(0, 0, 2, 2, label='P', linewidth=0.1)
+cbox = Rect(0,-4,2,-2, label='C', linewidth=0.1)
+c2p = Line(points=[cbox.top(), pbox.bottom()], linewidth=0.1, endstyle='>')
+p += pbox
+p += cbox
+p += c2p
+mthdel = ellipse(center=(7,-2), width=6, height=3, linewidth=0.1)
+c2mthd = Line(points=[cbox.right(), (7,-2)], linewidth=0.1)
+p += c2mthd
+p += mthdel
+mthd0 = POINT(x=6, y=-1.7, r=0, label=r'\verb!y_!')
+mthd1 = POINT(x=9, y=-1.5, r=0, label=r'\verb!set_y!')
+mthd2 = POINT(x=8, y=-3, r=0, label=r'\verb!get_y!')
+p += str(mthd0)
+p += str(mthd1)
+p += str(mthd2)
+print(p)
+\end{python}
+We also know that through inheritance, \verb!c! also has \verb!x_!,
+\verb!get_x!, and \verb!set_x!. So where's \verb!c.x_!,
+\verb!c.get_x!, and \verb!c.set_x!?
+
+Now if you think of \verb!c.x_!, \verb!c.get_x!, and \verb!c.set_x!
+in the same bag of things like this:
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+p = Plot()
+#p += Grid(x0=-5,y0=-5,x1=10,y1=5)
+pbox = Rect(0, 0, 2, 2, label='P', linewidth=0.1)
+cbox = Rect(0,-4,2,-2, label='C', linewidth=0.1)
+c2p = Line(points=[cbox.top(), pbox.bottom()], linewidth=0.1, endstyle='>')
+p += pbox
+p += cbox
+p += c2p
+mthdel = ellipse(center=(7,-2), width=6, height=3, linewidth=0.1)
+c2mthd = Line(points=[cbox.right(), (7,-2)], linewidth=0.1)
+p += c2mthd
+p += mthdel
+mthd0 = POINT(x=6, y=-1.7, r=0, label=r'\verb!y_!')
+mthd1 = POINT(x=9, y=-1.5, r=0, label=r'\verb!set_y!')
+mthd2 = POINT(x=8, y=-3, r=0, label=r'\verb!get_y!')
+mthd3 = POINT(x=6, y=-2.5, r=0, label=r'\verb!x_!')
+mthd4 = POINT(x=8.5, y=-2.5, r=0, label=r'\verb!set_x!')
+mthd5 = POINT(x=7, y=-1, r=0, label=r'\verb!get_x!')
+
+p += str(mthd0)
+p += str(mthd1)
+p += str(mthd2)
+p += str(mthd3)
+p += str(mthd4)
+p += str(mthd5)
+print(p)
+\end{python}
+then you would be surprised by the following experiment: Add an integer
+member variable to class \verb!C!:
+
+\begin{console}[commandchars=\~\@\$]
+#include <iostream>
+
+class P
+{
+public:
+        P() : x_(1) {}
+        int get_x() const { return x_; }
+        void set_x(int x) { x_ = x; }
+private:
+        int x_;
+};
+
+class C : public P
+{
+public:
+        C() : y_(2) {}
+        int get_y() const { return y_; }
+        void set_y(int y) { y_ = y; }
+private:
+        ~EMPHASIZE@~redtext@int x_;$$
+        int y_;
+};
+
+int main()
+{   
+    C c;
+    std::cout << "c.x_ =" << c.get_x() << ", "
+              << "c.y_ =" << c.get_y() << '\n';
+    return 0;
+}
+\end{console}
+
+The program does compile. But this means that \verb!c_! now has two
+\verb!x_!'s!!!
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+p = Plot()
+#p += Grid(x0=-5,y0=-5,x1=10,y1=5)
+pbox = Rect(0, 0, 2, 2, label='P', linewidth=0.1)
+cbox = Rect(0,-4,2,-2, label='C', linewidth=0.1)
+c2p = Line(points=[cbox.top(), pbox.bottom()], linewidth=0.1, endstyle='>')
+p += pbox
+p += cbox
+p += c2p
+mthdel = ellipse(center=(7,-2), width=6, height=3, linewidth=0.1)
+c2mthd = Line(points=[cbox.right(), (7,-2)], linewidth=0.1)
+p += c2mthd
+p += mthdel
+mthd0 = POINT(x=6, y=-1.7, r=0, label=r'\verb!y_!')
+mthd1 = POINT(x=9, y=-1.5, r=0, label=r'\verb!set_y!')
+mthd2 = POINT(x=8, y=-3, r=0, label=r'\verb!get_y!')
+mthd3 = POINT(x=6, y=-2.5, r=0, label=r'\verb!x_!')
+mthd4 = POINT(x=8.5, y=-2.5, r=0, label=r'\verb!set_x!')
+mthd5 = POINT(x=7, y=-1, r=0, label=r'\verb!get_x!')
+mthd6 = POINT(x=7, y=-2.2, r=0, label=r'\verb!x_!')
+
+p += str(mthd0)
+p += str(mthd1)
+p += str(mthd2)
+p += str(mthd3)
+p += str(mthd4)
+p += str(mthd5)
+p += str(mthd6)
+yikesbox = Rect(4, 1, 6, 3, linewidth=0.1, linecolor='red', , label=r'Yikes')
+p += yikesbox
+yikesL0 = Line(points=[yikesbox.bottomright(), (mthd6.x() - 0.5, mthd6.y() + 0.3)], linewidth=0.05, linecolor='red', endstyle='>')
+yikesL1 = Line(points=[yikesbox.bottomleft(), (mthd3.x() - 0.5, mthd3.y() + 0.3)], linewidth=0.05, linecolor='red', endstyle='>')
+
+p += yikesL0
+p += yikesL1
+
+print(p)
+\end{python}
+When you call upon \verb!c.x_! which one is it??? Why does the compiler
+allow this?
+
+\begin{ex} Can you think of an experiment that can tell you
+which \verb!x_! is used if you access \verb!c.x_! in \verb!main()!?
+\end{ex}
+You really want to think of the members (member variables as well as
+methods) as being organized into two different scopes:
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+p = Plot()
+#p += Grid(x0=-5,y0=-5,x1=10,y1=5)
+pbox = Rect(0, 0, 2, 2, label='P', linewidth=0.1)
+cbox = Rect(0,-4,2,-2, label='C', linewidth=0.1)
+
+c2p = Line(points=[cbox.top(), pbox.bottom()], linewidth=0.1, endstyle='>')
+
+p += pbox
+p += cbox
+p += c2p
+
+mthdel0 = ellipse(center=(7,-4), width=6, height=3, linewidth=0.1)
+mthdel1 = ellipse(center=(7,2), width=6, height=3, linewidth=0.1)
+
+c2mthd = Line(points=[cbox.right(), (7,-4)], linewidth=0.1)
+p2mthd = Line(points=[pbox.right(), (7, 2)], linewidth=0.1)
+mthd2mthd = Line(points=[(7,-4), (7, 2)], linewidth=0.1)
+
+p += c2mthd
+p += p2mthd
+p += mthd2mthd
+p += mthdel0
+p += mthdel1
+
+mthd0 = POINT(x=6, y=-3.7, r=0, label=r'\verb!y_!')
+mthd1 = POINT(x=9, y=-3.5, r=0, label=r'\verb!set_y!')
+mthd2 = POINT(x=8, y=-5, r=0, label=r'\verb!get_y!')
+mthd3 = POINT(x=6, y=2.5, r=0, label=r'\verb!x_!')
+mthd4 = POINT(x=6, y=-2.1, r=0, label=r'\large\verb!c!')
+mthd5 = POINT(x=8.5, y=2.8, r=0, label=r'\verb!set_x!')
+mthd6 = POINT(x=7, y=-3, r=0, label=r'\verb!x_!')
+mthd7 = POINT(x=7.3, y=1.5, r=0, label=r'\verb!get_x!')
+
+p += str(mthd0)
+p += str(mthd1)
+p += str(mthd2)
+p += str(mthd3)
+p += str(mthd4)
+p += str(mthd5)
+p += str(mthd6)
+p += str(mthd7)
+
+print(p)
+\end{python}
+The members of \verb!c! that are due to inheritance is at the top while
+the members declared in class \verb!C! are at the bottom. In particular
+the \verb!x_! declared in class \verb!C! is at the bottom.
+
+The name \verb!c.x_! refers to the \verb!x_! at the bottom, i.e., the
+\verb!x_! due to the class \verb!C!. Of course now you have a problem:
+what if in \verb!main()!, you want to access the \verb!x_! at the
+top???
+
+In fact to be very precise, each member of \verb!c! belongs to one of
+the two bags (bottom and top) and you can think of the two bags as
+scopes. You can in fact specify the scopes when you access a member of
+\verb!c!. First of all the scopes have names: they are \verb!C! and
+\verb!P!, i.e., the names of the classes:
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+p = Plot()
+#p += Grid(x0=-5,y0=-5,x1=10,y1=5)
+pbox = Rect(0, 0, 2, 2, label='P', linewidth=0.1)
+cbox = Rect(0,-4,2,-2, label='C', linewidth=0.1)
+
+c2p = Line(points=[cbox.top(), pbox.bottom()], linewidth=0.1, endstyle='>')
+
+p += pbox
+p += cbox
+p += c2p
+
+mthdel0 = ellipse(center=(7,-4), width=6, height=3, linewidth=0.1)
+mthdel1 = ellipse(center=(7,2), width=6, height=3, linewidth=0.1)
+
+c2mthd = Line(points=[cbox.right(), (7,-4)], linewidth=0.1)
+p2mthd = Line(points=[pbox.right(), (7, 2)], linewidth=0.1)
+mthd2mthd = Line(points=[(7,-4), (7, 2)], linewidth=0.1)
+
+p += c2mthd
+p += p2mthd
+p += mthd2mthd
+p += mthdel0
+p += mthdel1
+
+mthd0 = POINT(x=6, y=-3.7, r=0, label=r'\verb!y_!')
+mthd1 = POINT(x=9, y=-3.5, r=0, label=r'\verb!set_y!')
+mthd2 = POINT(x=8, y=-5, r=0, label=r'\verb!get_y!')
+mthd3 = POINT(x=6, y=2.5, r=0, label=r'\verb!x_!')
+mthd4 = POINT(x=6, y=-2.1, r=0, label=r'\large\verb!c!')
+mthd5 = POINT(x=8.5, y=2.8, r=0, label=r'\verb!set_x!')
+mthd6 = POINT(x=7, y=-3, r=0, label=r'\verb!x_!')
+mthd7 = POINT(x=7.3, y=1.5, r=0, label=r'\verb!get_x!')
+mthd8 = POINT(x=6, y=0.2, r=0, label=r'\large\verb!P!')
+mthd9 = POINT(x=6, y=-2.1, r=0, label=r'\large\verb!C!')
+mthd10 = POINT(x=6.2, y=-1.6, r=0, label=r'\large\verb!c!')
+
+p += str(mthd0)
+p += str(mthd1)
+p += str(mthd2)
+p += str(mthd3)
+p += str(mthd4)
+p += str(mthd5)
+p += str(mthd6)
+p += str(mthd7)
+p += str(mthd8)
+p += str(mthd9)
+p += str(mthd10)
+
+print(p)
+\end{python}
+You can actually address a particular member by prepending it with
+\verb!C::! or \verb!P::! if you want to be specific. Try the following:
+\begin{console}[commandchars=\~\@\$]
+#include < iostream>
+
+class P
+{
+public:
+        P() : x_(1) {}
+        int get_x() const { return x_; }
+        void set_x(int x) { x_ = x; }
+private:
+        int x_;
+};
+
+class C : public P
+{
+public:
+        C() : y_(2) {}
+        int get_y() const { return y_; }
+        void set_y(int y) { y_ = y; }
+private:
+        int x_;
+        int y_;
+};
+
+int main()
+{   
+    C c;        
+    std::cout << "c.x_ =" << c.get_x() << ", "
+              << "c.y_ =" << c.get_y() << '\n';
+    std::cout << "c.x_ =" << c.~EMPHASIZE@~redtext@P::$$get_x() << ", "
+              << "c.y_ =" << c.~EMPHASIZE@~redtext@C::$$get_y() << '\n';
+return 0;
+
+}
+\end{console}
+
+We also have two \verb!x_!'s in \verb!c!. Let's temporarily make them
+public and then access them:
+\begin{console}[commandchars=\~\@\$]
+#include < iostream>
+class P
+{
+public:
+        P() : x_(1) {}
+        int get_x() const { return x_; }
+        void set_x(int x) { x_ = x; }
+~EMPHASIZE@~redtext@public:$$
+        int x_;
+};
+
+class C : public P
+{
+public:
+        C() : y_(2) {}
+        int get_y() const { return y_; }
+        void set_y(int y) { y_ = y; }
+~EMPHASIZE@~redtext@public:$$
+        int x_;
+        int y_;
+};
+
+int main()
+{   
+    C c;
+    std::cout << "c.x_ =" << c.get_x() << ", "
+              << "c.y_ =" << c.get_y() << '\n';
+    std::cout << "c.x_ =" << c.P::get_x() << ", "
+              << "c.y_ =" << c.C::get_y() << '\n';
+    std::cout << "c.x_ (in C) =" << c.~EMPHASIZE@~redtext@P::x_$$ << ", "
+              << "c.x_ (in P) =" << c.~EMPHASIZE@~redtext@C::x_$$ << '\n';
+
+return 0;
+
+}
+\end{console}
+
+NOTE: Since \verb!c.C::x_! is not initialized, your C++ compiler will
+give you a warning. In that case, just do this (duh):
+\begin{console}
+...
+
+class C : public P
+{
+public:
+        C() : ~EMPHASIZE@~redtext@x_(3),$$ y_(2) {}
+        ...
+~EMPHASIZE@~redtext@public:$$
+        int x_;
+        int y_;
+};
+
+... 
+\end{console}
+
+Note that in \verb!main()!, \verb!c.x_! by default refers to the \verb!x_! in \verb!C! and not the \verb!x_! of \verb!P!. Sometimes we say that the \verb!x_! in \verb!C! \EMPHASIZE{hides} the \verb!x_! in \verb!P!.
+
+After the above experiments, change the \lq\lq \verb!public:!'' back to \lq\lq \verb!private:!'' and make the appropriate changes.
+
+In general, here's how your C++ compiler hunts down a name (member variable or method) or an object. Say your code has \verb!c.x_!.
+
+\begin{itemize}
+\item
+  The compiler starts with the class used to declare the object. If
+  there's an \verb!x_! in that class, that's the one used.
+\item
+  If the class used to declare \verb!c! does not have \verb!x_!, your
+  compiler will look at the parent class. If the parent has an
+  \verb!x_!, then that's the one used.
+\item
+  If the parent class does not have \verb!x_!, and if the parent class
+  inheritance from another class (that would be a grandparent class of
+  the class of \verb!c!), then the compiler will look for \verb!x_! in
+  the grandparent class of \verb!C!.
+\item
+  Etc.
+\item
+  If it's not found going up the public inheritance hierarchy, then your
+  C++ compiler will yell at you.
+\end{itemize}
+
+If a class scope was specified, say you call upon \verb!c.P::x_!, then
+the search for \verb!x_! starts at class \verb!P! proceeds upward
+through the inheritance hierarchy until it's found.
+
+Note that the search for a name goes \EMPHASIZE{up} the inheritance
+hierarchy. Add the following to our Basic Example:
+\begin{console}[commandchars=\~\@\$]
+...
+class P
+{
+public:
+        ...
+        ~EMPHASIZE@~redtext@void b() { std::cout <<$$ 
+                   ~EMPHASIZE@~redtext@"P::b()\n"; }$$
+        ...
+};
+
+class C : public P
+{
+public:
+        ...
+        ~EMPHASIZE@~redtext@void a() { std::cout <<$$ 
+                   ~EMPHASIZE@~redtext@"C::a()\n";$$
+                   ~EMPHASIZE@~redtext@b();  }$$
+        ...
+};
+
+int main()
+{   
+    ...
+    ~EMPHASIZE@~redtext@c.a();$$
+    return 0;
+}
+\end{console}
+
+\begin{ex} What is the output? Or is there an error? The
+following is obtained by adding code to our Basic Example:
+\begin{console}[commandchars=\~\@\$]
+...
+
+class P
+{
+public:
+        ...
+        ~textbf@void c() { std::cout << "P::c()\n"; d(); }$
+        ...
+};
+
+class C : public P
+{
+public:
+        ...
+        ~textbf@void d() { std::cout << "C::c()\n"; }$
+        ...
+};
+
+int main()
+{   
+    ...
+    ~textbf@c.c();$
+    return 0;
+}
+\end{console}
+\end{ex}

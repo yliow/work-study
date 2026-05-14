@@ -1,0 +1,186 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Public, protected, and private}
+
+So far you have seen public inheritance:
+\begin{console}[commandchars=\~\@\$]
+class P
+{ ... };
+class C: ~textbf@public$ P
+{ ... }; 
+\end{console}
+
+There are two other types of inheritance: \EMPHASIZE{protected and private inheritance}. Suppose you have a class \verb!P!. Now define the following child classes:
+\begin{console}
+class CPublic: public P {};
+class CProtected: protected P {};
+class CPrivate: private P {}; 
+\end{console}
+
+\begin{itemize}
+\item
+  The private members of \verb!P! stay private in \verb!CPublic!,
+  \verb!CProtected!, \verb!CPrivate!.
+\item
+  \verb!CPublic!: public of \verb!P! are public, protected of \verb!P!
+  are protected
+\item
+  \verb!CProtected!: public and protected of \verb!P! are protected
+\item
+  \verb!CPrivate!: public, protected, and private of \verb!P! are
+  private.
+\end{itemize}
+\begin{console}[commandchars=\~\@\$]
+class P
+{
+~EMPHASIZE@public: int x;$
+protected: int y_;
+private: int z_;
+};
+
+class C: ~EMPHASIZE@public P$
+{
+public:
+void f() { y_++; } // OK
+};
+
+int main()
+{   
+    C c;
+    ~EMPHASIZE@c.x_++;$ // OK
+    return 0;
+}
+\end{console}
+\begin{console}[commandchars=\~\@\$]
+class P
+{
+~EMPHASIZE@public: int x_;$
+protected: int y_;
+private: int z_;
+};
+
+class C: ~EMPHASIZE@protected P$
+{
+public:
+        void f() { y_++; } // OK
+};
+
+int main()
+{   
+    C c;
+    ~EMPHASIZE@c.x_++;$ // WRONG!!! Public x in P becomes
+            // protected in C so that only subclass
+            // can access x
+    return 0;
+
+}
+\end{console}
+\begin{console}[commandchars=\~\@\$]
+class P
+{
+~EMPHASIZE@public: int x_;$
+protected: int y_;
+private: int z_;
+};
+
+class C: ~EMPHASIZE@protected P$
+
+{
+
+public:
+
+void f() { y_++; } // OK
+
+};
+
+class C0: public C
+
+{
+
+public:
+
+void f() { ~EMPHASIZE@x_++;$ } // OK. Public x becomes
+                   // protected in C which
+                   // is accessible in CO
+};
+
+int main()
+{   
+    return 0;
+}
+\end{console}
+
+In summary, suppose \verb!C! is a protected subclass of \verb!P!, and \verb!x_! is a public member of \verb!P!.
+
+\begin{itemize}
+\item
+  \verb!x_! is accessible in \verb!C!. (Any method in \verb!C! can
+  access member \verb!x_!)
+\item
+  \verb!x_! becomes protected in \verb!C!. Functions outside of
+  \verb!C! cannot access \verb!obj.x_! if \verb!obj! is an object of
+  \verb!C!.
+\end{itemize}
+
+Note that \verb!p! is an object of \verb!P!, the \verb!p.x_! is still public.
+\begin{console}[commandchars=\~\@\$]
+class P
+{
+~EMPHASIZE@public: int x_;$
+protected: int y_;
+private: int z_;
+};
+
+class C: ~EMPHASIZE@private P$ // public x_ in P becomes
+                   // private in C.
+{
+public:
+        void f() { y_++; } // OK
+};
+
+class C0: public C
+{
+public:
+        void f() { ~EMPHASIZE@x_++;$ } // WRONG!!! x_ is now private
+};
+
+int main()
+{   
+    return 0;
+}
+\end{console}
+
+You can have as many layers of inheritance as you like:
+\begin{console}
+class GameObject { ... };
+
+class Weapon: public GameObject { ... };
+class Laser: public Weapon { ... };
+class Rocket: public Weapon { ... };
+
+class Spaceship: public GameObject { ... };
+class AlienSoldierShip: public Spaceship { ... };
+class AlienCommanderShip: public Spaceship { ... };
+\end{console}
+
+Obviously create a new class only when there are member variables and/or
+methods which cannot be combined.
+
+For instance if the following
+\begin{console}
+Class AlienWorth10Points {...};
+class AlienWorth20Points {...};
+\end{console}
+
+have exactly the same member variables and methods except that when
+objects of these types are destroyed in a gameplay, the points earned
+are different, then you should have combined the two as...
+\begin{console}
+class Alien
+{
+...
+    int points;
+}; 
+\end{console}
+

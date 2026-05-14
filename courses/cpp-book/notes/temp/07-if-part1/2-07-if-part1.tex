@@ -1,0 +1,109 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Mental picture: flow of execution for \texttt{if}}
+
+The \verb!if! statement is difficult for some beginning programmers
+because it alters the flow of execution of a program.
+
+Before this set of notes, C++ executes one statement at a time from top
+to bottom; it executes every statement.
+
+The \verb!if! statement is different because it has a statement
+\EMPHASIZE{inside} the \verb!if! statement.
+%ISSUE this text alignment in T1 needs to be corrected, i also need to figure out how to mess with font types/sizing
+\begin{python}
+from latextool_basic import *
+p = Plot()
+M = r'''
+int x = 0;
+std::cin >> x;
+                                                                          
+if (x > 0)
+    std::cout << "spam!" << std::endl;
+
+std::cout << "eggs" << std::endl;
+'''.strip()
+
+B0 = Rect(0, -4.5, 13, -2.5, linestyle= 'ultra thick', linecolor= 'red')
+T0 = Rect(6, -1, 10.5, 0.3,  linecolor= 'red', label = 'This is an if-statement', linewidth='0.2')
+L0 = Line(x0=8, y0=-1, x1=6, y1=-2.5, endstyle='>', linewidth='0.15', linecolor='red', bend_right = 30)
+
+B1 = Rect(1.3, -3.9, 12.5, -3.3, linestyle= 'ultra thick', linecolor= 'red')
+T1 = Rect(12, -1, 19, 0.5, linewidth='0.2', linecolor= 'red', s = 'This is a statement inside the if-statement', font = r'\large', innersep = 0.02)
+L1 = Line(x0=14.5, y0=-1, x1=12.5, y1=-3.6, endstyle='>', linewidth='0.15', linecolor='red', bend_left = 40)
+
+p += B0
+p += T0
+p += L0
+p += B1
+p += T1
+p += L1
+code(p, M, x=0, y=0, height=0.8, width=0.33, border_linewidth=0.01, innersep=0.8)
+print(p)
+\end{python}
+
+
+The statement in the \verb!if! statement is executed only when the
+\verb!x > 0! is true. If the condition is not true, the
+statement in the \verb!if! statement is not executed.
+
+In the following diagram, you can follow the arrows to get a sense of
+the flow of execution:
+%ISSUE fix the coordinate plots for the true/false flowchart labels
+\begin{python}
+from latextool_basic import *
+p = Plot()
+M = r'''
+int x = 0;
+
+std::cin >> x;
+                                                                          
+if (x > 0)
+
+   std::cout << "spam!" << std::endl;   
+
+std::cout << "eggs" << std::endl;
+'''.strip()
+
+points = [(-1.5, 0.72), (-1.5, -0.72), (13.7, -0.72), (13.7, -2.1), (-1.5, -2.1), (-1.5, -3.72), (13.7, -3.72), (13.7, -5.1), (-1.5, -5.1), (-1.5, -6.3), (-0.8, -6.3), (13, -9.7), (13.7, -9.7), (13.7, -11.72), (-1.5, -11.72), (-1.5, -12.72), (-0.8, -12.72)]
+
+p += Line(points = [(-1.5, 0.72), (-1.5, -0.72)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-1.5, -0.72), (-0.8, -0.72)], linewidth = 0.1, endstyle='>', linecolor='red')
+p += Line(points = [(13, -0.72), (13.7, -0.72)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(13.7, -0.72), (13.7, -2.1)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(13.7, -2.1), (-1.5, -2.1)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-1.5, -2.1), (-1.5, -3.72)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-1.5, -3.72), (-0.8, -3.72)], linewidth = 0.1, endstyle='>', linecolor='red')
+p += Line(points = [(13, -3.72), (13.7, -3.72)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(13.7, -3.72), (13.7, -5.1)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(13.7, -5.1), (-1.5, -5.1)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-1.5, -5.1), (-1.5, -6.3)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-1.5, -6.3),(-0.8, -6.3)], linewidth = 0.1, endstyle='>', linecolor='red')
+p += Line(points = [(13, -9), (13.7, -9)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(13.7, -9), (13.7, -11.72)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(13.7, -11.72), (-1.5, -11.72)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-1.5, -11.72), (-1.5, -12.72)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-1.5, -12.72), (-0.8, -12.72)], linewidth = 0.1, endstyle='>', linecolor='red')
+
+p += Line(points = [(2.5, -7.22), (2.5, -8.22)], linewidth=0.1, linecolor='red')
+p += Line(points = [(-0.1, -8.22), (13, -8.22)], endstyle='>', linewidth=0.1, linecolor='red')
+p += Line(points = [(-0.1, -8.22), (-0.1, -9.6)], linewidth=0.1, linecolor='red')
+p += Line(points = [(-0.1, -9.6), (0.45, -9.6)], endstyle='>', linewidth=0.1, linecolor='red')
+p += Line(points = [(12.2, -9.6), (13, -9.6)], endstyle='>', linewidth=0.1, linecolor='red')
+
+p += Rect(-0.8, -1.2, 13, -0.22, linecolor='red', linewidth=0.1, name='b1')
+p += Rect(-0.8, -4.2, 13, -3.22, linecolor='red', linewidth=0.1, name='b2')
+p += Rect(-0.8, -11.2, 13, -5.8, linecolor='red', linewidth=0.1, name='b3')
+p += Rect(0.8, -7.22, 3.5, -6.22, linecolor='red', linewidth=0.1, name='b4')
+p += Rect(0.45, -10.2, 12.2, -9.22, linecolor='red', linewidth=0.1, name='b5')
+p += Rect(-0.8, -13.2, 13, -12.22, linecolor='red', linewidth=0.1, name='b6')
+code(p, M, x=0, y=0, height=1.5, width=0.33, border_linewidth=0.01, innersep=0.8)
+
+print(p)
+\end{python}
+
+Of course the program is still executing one statement at a time from
+the top to the bottom if you view the if statement as a statement (i.e.
+forget about the internals of the if statement).
+

@@ -1,0 +1,181 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{The [ ] operator}
+
+Here's an example from the previous section.
+
+\begin{consolethree}[escapeinside=||]
+int a[3] = {4, 2, 42};
+std::cout << a[0] << std::endl;
+
+int x = a[1];
+
+std::cout << x << std::endl;  
+\end{consolethree}
+
+Actually you can specify an index value using any \EMPHASIZE{integer expression}. Try this:
+
+\begin{consolethree}[escapeinside=||]
+int a[3] = {4, 2, 42};
+
+int i = 0
+std::cout << a[i] << std::endl;
+
+int x = a[i + 1];
+std::cout << x << std::endl;  
+\end{consolethree}
+
+In fact this is the reason why we have arrays ... Try this:
+
+\begin{consolethree}[escapeinside=||]
+int a[3] = {4, 2, 42};
+
+for (int i = 0; i < 3; ++i)
+{
+    std::cout << a[i] << std::endl;
+}
+\end{consolethree}
+
+The following code declares an array and populates it with integers entered by the user:
+
+\begin{consolethree}[escapeinside=||]
+int y[5] = {0};
+
+for (int i = 0; i < 5; ++i)
+{
+    std::cin >> y[i];
+} 
+\end{consolethree}
+
+Compare this to this code:
+
+\begin{consolethree}[escapeinside=||]
+int y0 = 0, y1 = 0, y2 = 0, y3 = 0, y4 = 0;
+
+std::cin >> y0 >> y1 >> y2 >> y3 >> y4; 
+\end{consolethree}
+
+They more or less achieve the same thing, right? Now suppose instead of 5 variables, there are 1000 variables. The first version becomes:
+
+\begin{consolethree}[escapeinside=||]
+int y[1000] = {0};
+
+for (int i = 0; i < 1000; ++i)
+{
+    std::cin >> y[i];
+}
+\end{consolethree}
+
+Now let's see how much time you'd need to modify the \texttt{std::cin} statement if you have not heard of arrays:
+
+\begin{consolethree}[escapeinside=||]
+int y0 = 0, y1 = 0, y2 = 0, y3 = 0, y4 = 0, ...;
+
+std::cin >> y0 >> y1 >> y2 >> y3 >> y4 >> y5 >> ...; 
+\end{consolethree}
+
+YIKES!!!
+
+Get the point of arrays now?
+
+In other words previously our for-loop allows us to iteratively execute
+a block of statements. With the array, the for-loop allows us to execute
+a block of statements on one variable from a huge list of variables one
+at a time (if you think of an element of an array as a variable).
+Previously our for-loop executes a bunch of statements on a single
+variable (or maybe two or three). But here we apply the same computation
+across a bunch of variables. POWERFUL IDEA!
+
+In the next few sections, I'll show you how to apply
+this principle in different scenarios.
+
+One final thing before I show you different uses of the array.
+It's always a good idea not to hardcode constants,
+remember? The size of an array is not an exception. Therefore
+
+\begin{consolethree}[escapeinside=||]
+int y[1000] = {0};
+for (int i = 0; i < 1000; ++i)
+{
+    std::cin >> y[i];
+} 
+\end{consolethree}
+
+should be
+
+\begin{consolethree}[escapeinside=||]const int SIZE = 1000;
+int y[SIZE] = {0};
+
+for (int i = 0; i < SIZE; ++i)
+{
+    std::cin >> y[i];
+}
+\end{consolethree}
+
+For our example in this set of notes I will not use constants for array
+sizes since the code is very short. But when the program is longer (such
+as your assignments) you should use constants.
+
+There's another way to avoid hardcoding the size of an
+array. The function \texttt{sizeof()} will tell you the mount of memory
+used by the computer to store the value of a variable. Try this:
+
+\begin{consolethree}[escapeinside=||]int x = 0;
+double y = 0.0;
+
+char z = 'a';
+
+int a[5] = {0};
+
+std::cout << sizeof(x) << '\n'
+          << sizeof(y) << '\n'
+          << sizeof(z) << '\n'
+          << sizeof(a) << '\n';
+
+std::cout << sizeof(int) << '\n'
+          << sizeof(double) << '\n'
+          << sizeof(char) << '\n'; 
+\end{consolethree}
+
+So here's how you can determine the number of elements
+in an array. Try this:
+
+\begin{consolethree}[escapeinside=||]
+int a[5] = {0};
+double b[10] = {0};
+char c[100];
+
+std::cout << sizeof(a) / sizeof(int) << '\n';
+std::cout << sizeof(b) / sizeof(double) << '\n';
+std::cout << sizeof(c) / sizeof(char) << '\n'; 
+\end{consolethree}
+
+Get it?
+
+One final thing. You should NEVER use an index value outside the bound
+of your array. In other words if the size of your array a is 5, you MUST
+not access \texttt{a[5]} or \texttt{a[1000]}; you should only access
+\texttt{a[0]}, \texttt{a[1]}, \texttt{a[2]}, \texttt{a[3]}, and
+\texttt{a[4].}
+
+As mentioned earlier in the section on gotchas, you cannot assign
+arrays:
+\begin{consolethree}
+int a[3] = {1, 2, 3};
+int b[3];
+b = a;               // BAD BAD BAD!!!
+\end{consolethree}
+This is what you have to do:
+\begin{consolethree}
+int a[3] = {1, 2, 3};
+int b[3];
+for (int i = 0; i < 3; ++i)
+{
+    b[i] = a[i];
+}
+\end{consolethree}
+\begin{ex}
+Declare an array of 10 integers; call this array \texttt{dice}. Using a for-loop, put random integers 1 to 6 into the array. Using another for-loop, print all the values in the array.
+\end{ex}
+

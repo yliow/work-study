@@ -1,0 +1,54 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Review: Inline Functions}
+
+Review the notes on inline functions. The following is only a quick
+recap.
+
+Recall that an inline function is like a rubber stamp for a function:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+inline int max(int x, int y)
+{
+    return (x < y ? y : x);
+}
+
+int main()
+{
+    std::cout << max(2, 3) << '\n';
+
+    return 0;
+}
+\end{consolethree}
+
+This means that there is really no \texttt{max()} function. Rather, at the
+place where the inline function is called, C++ substitutes the code for
+\texttt{max()} so that the program compiled is:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int main()
+{
+    std::cout << (2 < 3 ? 3 : 2) << '\n';
+
+    return 0;
+}
+\end{consolethree}
+
+Inline functions can speed up program execution since the act of making
+a function call takes time.
+
+The compiler can choose to ignore making a function an inline function
+so that it becomes a real function. This can happen if the function is
+too long.
+
+For multi-file compilation, the \texttt{whole} inline function must be in
+the header file. You cannot have an inline prototype in the header file
+and the definition of the body of the function in the implementation
+file.
+
+

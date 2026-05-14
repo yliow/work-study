@@ -1,0 +1,117 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Return value or pass-by-reference???}
+
+Now we have a dilemma ...
+
+The following is a simple \texttt{square()} function:
+
+\begin{consolethree}[escapeinside=||]
+double square(double x)
+{
+    return x * x;
+}
+
+int main()
+{
+    std::cout << square(3.14) << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+But you know that you can also do this:
+
+\begin{consolethree}[escapeinside=||]
+void square(double x, double & theSquare)
+{
+    theSquare = x * x;
+}
+
+int main()
+{
+    double theSquare = 0.0;
+    square(3.14, theSquare);
+    std::cout << theSquare << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+Make sure you run it.
+
+Which should you use??? (Don't you hate making decisions ...)
+
+In general, if your function is like a mathematical function that computes a value, then you should use a return value. (Principle of least surprise.)
+
+For instance look at the above example. Notice how clumsy is the usage of the \texttt{square()} function.
+
+If you have a function that computes two values, then you might want to have to have two pass-by-reference variables. Of course you can have two different functions. Here's an example:
+
+Here's functions:
+
+\begin{consolethree}[escapeinside=||]
+double max(int x[], int len)
+{
+    double m = x[0];
+    for (int i = 1; i < len; i++)
+    {
+        if (m < x[i]) m = x[i];
+    }
+    return m;
+}
+
+double min(int x[], int len)
+{
+    double m = x[0];
+    for (int i = 1; i < len; i++)
+    {
+        if (m > x[i]) m = x[i];
+    }
+    return m;
+}
+\end{consolethree}
+
+You can combine them into one:
+
+\begin{consolethree}[escapeinside=||]
+void max_min(int x[], int len,
+             int & max, int & min)
+{
+    double max = x[0];
+    double min = x[0];
+    for (int i = 1; i < len; i++)
+    {
+        if (max < x[i]) max = x[i];
+        if (min > x[i]) min = x[i];
+    }
+}
+\end{consolethree}
+
+If your program(s) always have to compute both the maximum and minimum, then the second version might be more useful. In fact it's faster than calling both \texttt{max()} and \texttt{min()} which requires \EMPHASIZE{two} function calls and also \EMPHASIZE{two} scans of the array.
+
+However this means that one fine day, if you really need to compute only the minimum of an array, you have to call this function and you have to create a dummy variable for the max which is not going to be used:
+
+\begin{consolethree}[escapeinside=||]
+double x, y;
+max_min(a, 10, x, y); // a is some array of length 10
+... only x is used ...
+\end{consolethree}
+
+Or you have to write a \texttt{min()} function.
+
+A basic principle of good software design is to design each function to perform one task and not two.
+
+Now if you look at our \texttt{swap()} function
+
+\begin{consolethree}[escapeinside=||]
+void swap(int & a, int & b)
+{
+    int t = a;
+    a = b;
+    b = t;
+}
+\end{consolethree}
+
+It does not perform a numerical computation; there is really no return value. It performs a transformation on variables. That's why the design of this function is reasonable.
+
+

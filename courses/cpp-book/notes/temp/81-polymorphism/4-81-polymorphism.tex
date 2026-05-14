@@ -1,0 +1,87 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{No virtual ... or what if there are no virtual methods}
+
+What if C++ does not have dynamic binding? You're forced to write ugly code, placing some method selection computation within your code. This is sometimes known as the \EMPHASIZE{``type field''} method.
+
+Here's the code from before where we avoid using the virtual keyword:
+
+\begin{console}
+#include <iostream>
+
+class P
+{
+public:
+     void f() { std::cout << "P::f()\ n"; }
+};
+
+class C: public P
+{
+public:
+     void f() { std::cout << "C::f()\ n"; }
+};
+
+int main()
+{   
+    C c;
+    P * p = &c;
+    p-> f();
+    return 0;
+}
+\end{console}
+
+How can we ``reach'' \texttt{C::f()}??
+
+We add a field to keep track of the class an object comes from and instead of calling we create a function that accepts and determine (based on the type field) which to execute.
+
+\begin{console}
+#include <iostream>
+
+const int PTYPE = 0;
+const int CTYPE = 1;
+
+class P
+{
+public:
+     P() : type_(PTYPE) {}
+     void f() { std::cout << "P::f()\ n"; }
+     void set_type(int t0) { type_ = t0; }
+     int get_type() { return type_; }
+     
+private:
+     int type_;
+
+};
+
+class C : public P
+{
+public:
+     C() { set_type(CTYPE); }
+     void f() { std::cout << "C::f()\ n"; }
+
+};
+
+void f(const P * p)
+{    
+     switch (p-> get_type())
+     {    
+          case PTYPE:
+               p-> f();
+               break;
+          case CTYPE:
+               const C * q = (const C *)(p);
+               q-> f();
+               break;
+     }
+}
+
+int main()
+{   
+    C c;
+    P * p = &c;
+    f(p);
+    return 0;
+}
+\end{console}
+

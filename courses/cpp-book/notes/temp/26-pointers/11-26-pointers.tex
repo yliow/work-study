@@ -1,0 +1,338 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Constantness for pointers}
+
+Recall that for a regular variable like this:
+
+\begin{consolethree}[escapeinside=||]
+int x = 42;
+\end{consolethree}
+
+to make \texttt{x} constant so that its value cannot change, you do this:
+
+\begin{consolethree}[escapeinside=||]
+const int x = 42;
+\end{consolethree}
+
+Making a variable constant is a protection mechanism to prevent change in the case when a variable should not be changed. (Make sure you review the notes on constants.)
+
+The above is old stuff. Now for something new \ldots{}
+
+Because a pointer is associated with two values, an address and a value the pointer points to, you can ``const'' two values associated with a pointer. First let me describe the ideas, then I'll talk about the syntax.
+
+Look at the following picture of a pointer \texttt{p} pointing to 42 (at address 5002048):
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import POINT
+p = Plot()
+
+borderbox = Rect(0, 0, 6, 3, linewidth=0.1)
+innerbox = Rect(1, 1, 4, 2, linewidth=0.05, label='5002048')
+ppoint = Rect(0.5, 1.5, 0.5, 1.5, label='p', linecolor='white')
+p += borderbox
+p += innerbox
+p += ppoint
+
+ptrbox = Rect(9, 3.5, 12, 4.5, linewidth=0.05, label='42')
+ptrlbl = Rect(9, 5, 9, 5, label='5002048', linecolor='white')
+p += ptrbox
+p += ptrlbl
+
+p += Line(points=[(3.75, 1.5), (9, 4)], linewidth=0.075, linestyle='dashed', endstyle='>')
+print(p)
+\end{python}
+
+If \texttt{p} is a \EMPHASIZE{constant pointer}, then the pointer value of \texttt{p} is a constant and therefore cannot change.
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import POINT
+p = Plot()
+
+borderbox = Rect(0, 0, 6, 3, linewidth=0.1)
+innerbox = Rect(1, 1, 4, 2, linewidth=0.05, label='5002048')
+ppoint = Rect(0.5, 1.5, 0.5, 1.5, label='p', linecolor='white')
+p += borderbox
+p += innerbox
+p += ppoint
+
+ptrbox = Rect(9, 3.5, 12, 4.5, linewidth=0.05, label='42')
+ptrlbl = Rect(10, 5, 10, 5, label='5002048', linecolor='white')
+p += ptrbox
+p += ptrlbl
+
+redbox = Rect(13, 2, 18, 4, linewidth=0.1, linecolor='red', innersep=0.25, s = 'Cannot be changed!!!! \\texttt{p = ...} is wrong!!!!', align='c')
+p += redbox
+p += Line(points=[(13, 2.5), (4, 1.5)], linewidth = 0.1, linecolor='red', endstyle='>')
+p += Line(points=[(3.75, 1.5), (9, 4)], linewidth=0.075, linestyle='dashed', endstyle='>')
+print(p)
+\end{python}
+
+However if \texttt{p} is a \EMPHASIZE{pointer to constant}, then the value that \texttt{p} points to cannot be changed through using \texttt{*p}:
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import POINT
+p = Plot()
+
+borderbox = Rect(0, 0, 6, 3, linewidth=0.1)
+innerbox = Rect(1, 1, 4, 2, linewidth=0.05, label='5002048')
+ppoint = Rect(0.5, 1.5, 0.5, 1.5, label='p', linecolor='white')
+p += borderbox
+p += innerbox
+p += ppoint
+
+ptrbox = Rect(9, 3.5, 12, 4.5, linewidth=0.05, label='42')
+ptrlbl = Rect(10, 5, 10, 5, label='5002048', linecolor='white')
+p += ptrbox
+p += ptrlbl
+
+redbox = Rect(13, 2, 18, 4, linewidth=0.1, linecolor='red', innersep=0.25, s = 'Cannot be changed!!!! \\texttt{p = ...} is wrong!!!!', align='c')
+p += redbox
+p += Line(points=[(13, 2.5), (10.5, 3.5)], linewidth = 0.1, linecolor='red', endstyle='>')
+p += Line(points=[(3.75, 1.5), (9, 4)], linewidth=0.075, linestyle='dashed', endstyle='>')
+print(p)
+\end{python}
+
+Easy right?
+
+Now let's talk about the syntax \ldots{}
+
+In the case of a pointer, say:
+
+\begin{consolethree}[escapeinside=||]
+int x = 42;
+int * p = &x;
+\end{consolethree}
+
+If you do not want the memory address value in \texttt{p} to be changed, you want \texttt{p} to be a \EMPHASIZE{constant pointer}, you do this:
+
+\begin{consolethree}[escapeinside=||]
+int x = 42;
+
+int * |\EMPHASIZE{const}| p = &x;
+\end{consolethree}
+Note where \texttt{const} is placed: to the right of \texttt{*}.
+
+\begin{ex}
+To make sure you remember the above, first run this
+
+\begin{consolethree}[escapeinside=||]
+int x = 0, y = 1;
+int * p = &x;
+std::cout << *p << '\n';
+p = &y;
+std::cout << *p << '\n'; 
+\end{consolethree}
+Everything works just fine. Now make \texttt{p} a constant pointer like this:
+
+\begin{consolethree}[escapeinside=||]
+int x = 0, y = 1;
+int * |\EMPHASIZE{const}| p = &x;
+std::cout << *p << '\n';
+p = &y; // compiler complaints!!!
+std::cout << *p << '\n'; 
+\end{consolethree}
+Get it?
+\end{ex}
+What about the case where \texttt{p} points to a constant value? First run this
+
+\begin{consolethree}[escapeinside=||]
+int x = 0;
+|\EMPHASIZE{const}| int * p = &x;
+std::cout << *p << '\n';
+\end{consolethree}
+No problems. Now try this:
+
+\begin{consolethree}[escapeinside=||]
+int x = 0;
+|\textbf{const}| int * p = &x;
+std::cout << *p << '\n';
+*p = 42; // compiler complaints!!!
+\end{consolethree}
+That's it!
+
+There is however one very important thing you must remember. Run this:
+
+\begin{consolethree}[escapeinside=||]
+int x = 0, y = 1;
+|\textbf{const}| int * p = &x;
+std::cout << x << ' ' << *p << '\n';
+x = 42;                  // OK ... x is a variable
+std::cout << x << ' ' << *p << '\n';
+\end{consolethree}
+
+Note: \EMPHASIZE{If \texttt{p} points to a \texttt{const int}, it doesn't mean that the \texttt{int} value can't change -- it's just that you cannot change it using \texttt{*p}.} In the above, we change the value using \texttt{x} Get it?
+
+Here is a table the summarizes all the cases:
+
+%% \tab[14em]{Can change \texttt{p}?} \tab[2em]{Can change \texttt{*p}?}
+
+%% \tab[14em]{Is \texttt{p =} \ldots{} OK?} \tab[2em]{Is \texttt{*p =} \ldots{} OK?}
+
+%% \tab[3em]{\ \ \ \texttt{int *}} \tab[3em]{\texttt{p}} \tab[3em]{YES} \tab[3em]{YES}
+
+%% \texttt{const int *}\tab[3em]{\texttt{p}} \tab[3em]{YES} \tab[3em]{NO}
+
+%% \tab[3em]{\ \ \texttt{int * const p} \tab[3em]{NO} \tab[3em]{YES}
+
+%% \texttt{const int * const p} \tab[3em]{NO} \tab[3em]{NO}
+
+\begin{tabular}{l l l l}
+    & & \texttt{Can change p?} & \texttt{Can change *p?} \\
+    & & Is \texttt{p} = ... OK? & Is \texttt{*p} = ... OK? \\
+    \texttt{int *} & \texttt{p} & YES & YES \\
+    \texttt{const int *} & \texttt{p} & YES & NO \\
+    \texttt{int * const} & \texttt{p} & NO & YES \\
+    \texttt{const int * const} & \texttt{p} & NO & NO \\
+\end{tabular}
+
+Here's an important \EMPHASIZE{memory aid} (this might not be in your textbook): You \EMPHASIZE{read} the pointer type \EMPHASIZE{backwards}. For instance, if you see this declaration:
+
+\tab[3em]{\texttt{const int * const p}}
+
+you read it in this direction:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Rect(0, 0, 3, 1, linecolor='white', label='\\texttt{const int * const p}')
+p += Line(points=[(4, 0), (-1, 0)], linewidth=0.1, endstyle='>')
+print(p)
+\end{python}    
+so that you say ``\texttt{p} is a constant pointer to an integer constant''. Here are all the 4 possible constantness cases for a pointer declaration:
+
+You say:
+
+%% \tab[3em]{\texttt{int *}} \tab[3em]{\texttt{p}} \tab[3em]{``p is a pointer to int''}
+
+%% \texttt{const int *}\tab[3em]{\texttt{p}} \tab[3em]{``p is a pointer to int const''}
+
+%% \tab[3em]{\texttt{int * const p} \tab[3em]{``p is a const pointer to int''}
+
+%% \tab[3em]{const int * const p} \tab[3em]{``p is a const pointer to int const''}
+\begin{tabular}{l l l l}
+    \texttt{int *} & \texttt{p} &  ``p is a pointer to int'' \\
+    \texttt{const int *} & \texttt{p} &  ``p is a pointer to int const''\\
+    \texttt{int * const} & \texttt{p} &  ``p is a const pointer to int'' \\
+    \texttt{const int * const} & \texttt{p} &  ``p is a const pointer to int const''\\
+\end{tabular}
+
+
+Two important things to note ...
+
+\EMPHASIZE{A constant pointer must be initialized.} (This is just like a regular constant integer variable -- all constants must be initialized.)
+
+This means:
+
+\begin{consolethree}[escapeinside=||]
+int * const p;          // WRONG!!!
+p = &x;                 // TOO LATE!!!
+
+const int * const q;    // WRONG AGAIN!!
+q = &y;                 // TOO LATE BOZO!!!
+\end{consolethree}
+\EMPHASIZE{A non-constant pointer cannot point to a constant.} For instance
+
+\begin{consolethree}[escapeinside=||]
+const int x = 42;
+int * p0 = &x;       // WRONG!!!
+int * const p1 = &x; // WRONG!!! 
+\end{consolethree}
+
+Why? Because in this case, \texttt{p} is supposed to point to an \texttt{int} (not \texttt{const int}) Therefore \texttt{p} can change the value that it points to using \texttt{*p}. But that value is a \texttt{const}! That's a contradiction!
+
+\begin{ex}
+Is this OK?
+
+\begin{consolethree}[escapeinside=||]
+const int x = 42;
+const int * p = &x;
+int * const q = p;
+\end{consolethree}
+Here are some exercises to tease your brain.
+\end{ex}
+
+\begin{ex}
+Does the following code fragment compile?
+
+\begin{consolethree}[escapeinside=||]
+int x = 42, y = 24;
+int * p = &x;
+p = &y;     // OK?
+*p = 42;    // OK?
+\end{consolethree}
+Verify on your own.
+\end{ex}
+
+\begin{ex}
+Does the following code fragment compile?
+
+\begin{consolethree}[escapeinside=||]
+double x = 3.14, y = 2.71;
+double * const p = &x;
+p = &y; // OK?
+*p = 0; // OK?
+\end{consolethree}
+Verify on your own.
+\end{ex}
+
+\begin{ex}
+Does the following code fragment compile?
+
+\begin{consolethree}[escapeinside=||]
+char x = 'a', y = 'b';
+const char * p = &x;
+p = &y;      // OK?
+*p = 0;      // OK?
+\end{consolethree}
+Verify on your own.
+\end{ex}
+
+\begin{ex}
+Does the following code fragment compile?
+
+\begin{consolethree}[escapeinside=||]
+bool x = true, y = false;
+const bool * const p = &x;
+
+p = &y;      // OK?
+*p = 0;      // OK?
+\end{consolethree}
+Verify on your own.
+\end{ex}
+
+\begin{ex}
+Which of the following pointer declarations with initialization works?
+
+\begin{consolethree}[escapeinside=||]
+const char x = '#';
+      char * p0 = &x;
+      char * const p1 = &x;
+const char * p2 = &x;
+const char * const p3 = &x;
+\end{consolethree}
+\end{ex}
+\begin{ex}
+Does this compile? If it does, what's the output?
+
+\begin{consolethree}[escapeinside=||]
+double a = 3.14;
+const double * p = &a;
+*p = a + *p;
+
+std::cout << a << ' ' << *p << '\n';
+\end{consolethree}
+\end{ex}
+\begin{ex}
+Does this compile? If it does, what's the output?
+
+\begin{consolethree}[escapeinside=||]
+double a = 3.14;
+const double * p = &a;
+a = a + *p;
+
+std::cout << a << ' ' << *p << '\n';
+\end{consolethree}
+\end{ex}

@@ -1,0 +1,331 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Static arrays}
+
+One of the problems with arrays is that they have fixed size.
+
+\verb!int x[SIZE]!
+
+The \texttt{SIZE} must be constant.
+
+(WARNING: Some C++ compilers allow you to declare arrays with variable sizes. However this is not standard. Therefore do NOT use variable size for arrays. You do want your C++ code to be as portable as possible, right?)
+
+The nice thing about an array is that it is a local variable, where the memory of the values in the array is allocated within the scope of its declaration and when the array goes out of the scope, the memory is reclaimed. For instance:
+
+\begin{consolethree}[escapeinside=||]
+if (a < 0)
+{
+    int x[SIZE];
+    // ... do something useful with x ...
+
+} // x goes out of scope, and array of values
+  // used by x is reclaim by the program.
+\end{consolethree}
+
+In other words, \texttt{x} an automatic variable.
+
+Such arrays are called \EMPHASIZE{static arrays}.
+
+The next 4 experiments are extremely important in your understanding of the array, in the context of addresses. Make sure you run them all!
+
+First experiment:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+int main()
+{
+    int x[5];
+    std::cout << x << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+You will see an address!!! That tells you that the array \texttt{x} is somehow an address!!!
+
+Second experiment:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+int main()
+{
+    int x[5];
+    std::cout << x << std::endl;
+    std::cout << &x[0] << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+This tells you that if you think of \texttt{x} as a pointer, then \texttt{\EMPHASIZE{x}}\EMPHASIZE{is the address of the first value} of your array of value.
+
+So what's happening?!?
+
+Whenever you use \texttt{x} as though it's a value, the compiler will actually replace \texttt{x} with \texttt{\&x[0]}, i.e., the address of the first value of of the array:
+\begin{center}
+\texttt{\EMPHASIZE{x}}\EMPHASIZE{ is the same as }\texttt{\EMPHASIZE{\&x[0]}}
+\end{center}
+You also know that you can perform pointer arithmetic. Since \texttt{x} (besides being an array/collection of values) can be thought as a pointer, you can think about the pointers:
+\begin{center}
+\texttt{x}, \texttt{x + 1}, \texttt{x + 2}, \texttt{x + 3}, \texttt{x + 4}
+\end{center}
+which are the same as
+\begin{center}
+\texttt{\&x[0]}, \texttt{\&x[1]}, \texttt{\&x[2]}, \texttt{\&x[3]}, \texttt{\&x[4]}
+\end{center}
+We'll verify this fact using the next experiment \ldots{}
+
+Third experiment:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+int main()
+{
+    int x[5];
+    for (int i = 0; i < 5; ++i)
+    {
+        std::cout << x + i << ' ';
+    }
+    std::cout << std::endl;
+    for (int i = 0; i < 5; ++i)
+    {
+        std::cout << &x[i] << ' ';
+    }
+    std::cout << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+The above is about the addresses of the values in an array. What about
+the values of the array? You know that you can access the values in the
+array using
+\begin{center}
+\texttt{x[0]}, \texttt{x[1]}, \texttt{x[2]}, \texttt{x[3]}, \texttt{x[4]}
+\end{center}
+But since \texttt{x}, \texttt{x + 1}, \texttt{x + 2}, \texttt{x + 3}, \texttt{x + 4} points to the above values, we conclude that you can also access the values of the array using:
+
+\begin{center}
+\texttt{*x}, \texttt{*(x + 1)}, \texttt{*(x + 2)}, \texttt{*(x + 3)}, \texttt{*(x + 4)}
+\end{center}
+
+Let's check that \ldots{}
+
+Fourth experiment ...
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+int main()
+{
+    int x[5] = {2, 3, 5, 7, 11};
+    for (int i = 0; i < 5; ++i)
+    {
+        std::cout << *(x + i) << ' ';
+    }
+    std::cout << std::endl;
+    for (int i = 0; i < 5; ++i)
+    {
+        std::cout << x[i] << ' ';
+    }
+    std::cout << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+You now arrive at the conclusion that
+\begin{center}
+\texttt{x[i]} is like \texttt{*(x + i)}
+\end{center}
+
+In fact given \EMPHASIZE{any} pointer \texttt{p} (not just an array) and integer \texttt{i}, in C/C++,
+
+\texttt{\EMPHASIZE{p[i] }}\EMPHASIZE{is the same as }\texttt{\EMPHASIZE{*(p + i)}}
+
+Remember that!!!
+
+So let me summarize. When you declare this array variable:
+
+\verb!int x[5];!
+
+\begin{itemize}
+\item You can think of \texttt{x} as a pointer that points to the first value
+  in the array of 5 integers, i.e. \texttt{x} has the address of
+  \texttt{x[0]}. In fact in your code, \texttt{x}, is actually
+  translated into \texttt{\&x[0]}.
+\item The values \texttt{x[0]}, \texttt{x[1]}, \texttt{x[2]},
+  \texttt{x[3]}, \texttt{x[4]} are laid out in memory in increasing
+  address values with no gaps.
+\item The following addresses are the same:
+  \begin{itemize}
+  \item \texttt{x + i}          is the same as      \texttt{\&x[i]}
+  \end{itemize}
+\item The following values are the same:
+  \begin{itemize}
+  \item \texttt{*(x + i)}       is the same as      \texttt{x[i]}
+  \end{itemize}
+\end{itemize}
+
+\begin{ex}
+You are given that the address of the first value of the following array
+
+\verb!int x[100];!
+
+is 72008004. Assuming that each \texttt{int} value takes up 4 bytes of memory, what is the address of the value \texttt{x[3]}? What is the memory address of \texttt{x[56]}?
+\end{ex}
+
+\begin{ex}
+You have the following declarations:
+
+\begin{consolethree}[escapeinside=||]
+int x = 0;
+double y = 2.14;
+int a[100];
+double b[100];
+\end{consolethree}
+
+Assuming that an \texttt{int} takes up 4 bytes and a \texttt{double} takes up 8 byte, the address of \texttt{x} is 120004000, what is the address of \texttt{a[3]} and \texttt{b[20]}? (Assume that there is no gaps in the memory layout of variables and address value grows.)
+\end{ex}
+
+\begin{ex}
+What is the output of this code fragment:
+
+\begin{consolethree}[escapeinside=||]
+int a[5] = {2, 3, 5, 7, 11};
+int * b = a;
+std::cout << *(b + 2) << '\n';
+\end{consolethree}
+
+Verify!
+\end{ex}
+
+\begin{ex}
+What is the output of this code fragment:
+
+\begin{consolethree}[escapeinside=||]
+int a[5] = {2, 3, 5, 7, 11};
+int * b = (a + 2);
+std::cout << *(b + 1) << '\n';
+\end{consolethree}
+
+Verify!
+\end{ex}
+
+\begin{ex}
+What is the output of this code fragment:
+
+\begin{consolethree}[escapeinside=||]
+int a[5] = {2, 3, 5, 7, 11};
+int * b = (a + 3);
+std::cout << *(b - 2) + b[1] << '\n';
+\end{consolethree}
+
+Verify!
+\end{ex}
+
+\begin{ex}
+What is the output of this code fragment:
+
+\begin{consolethree}[escapeinside=||]
+int a[5] = {2, 3, 5, 7, 11};
+int * b = (a + 3);
+std::cout << *(b + 1) + b[-2] << '\n';
+\end{consolethree}
+
+Verify!
+\end{ex}
+
+\begin{ex}
+What is the output of this code fragment:
+
+\begin{consolethree}[escapeinside=||]
+int a[5] = {2, 3, 5, 7, 11};
+int b = 0;
+for (int i = 0; i < 5; ++i)
+{
+    b += *(a + i);
+}
+std::cout << b << '\n';
+\end{consolethree}
+
+Verify!
+\end{ex}
+
+\begin{ex}
+What is the output of this code fragment:
+
+\begin{consolethree}[escapeinside=||]
+int a[5] = {2, 3, 5, 7, 11};
+int b = a + 3;
+std::cout << *(b - 1) << '\n';
+\end{consolethree}
+
+Verify!
+\end{ex}
+
+\begin{ex}
+What is the output of this code fragment:
+
+\begin{consolethree}[escapeinside=||]
+int a[5] = {2, 3, 5, 7, 11};
+int * b = a + 4;
+std::cout << *(b - 3) + *b << '\n';
+\end{consolethree}
+
+Verify!
+\end{ex}
+
+\begin{ex}
+What is the output of this code fragment:
+
+\begin{consolethree}[escapeinside=||]
+int a[5] = {2, 3, 5, 7, 11};
+int * b = a;
+int * c = a + 1;
+int s = 0;
+for (int i = 0; i < 3; ++i)
+{
+    s += *c - *b;
+    ++b;
+    ++c;
+}
+std::cout << s << '\n';
+\end{consolethree}
+
+Verify!
+\end{ex}
+
+\begin{ex}
+Rewrite the following so that the array bracket
+operator \texttt{[]} is not used.
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <ctime>
+#include <cstdlib>
+int main()
+{
+    srand((unsigned int) time(NULL));
+    const int SIZE = 100;
+    const double MAX = double(RAND_MAX);
+    double x[SIZE];
+    for (int i = 0; i < SIZE; i++)
+    {
+        |\textbf{\underline{x[i]}}| = rand() / MAX * 2 - 1;
+    }
+    double min = |\textbf{\underline{x[0]}}|;
+    int index = 0;
+    for (int i = 1; i < SIZE; i++)
+    {
+        if (|\textbf{\underline{x[i]}}| < m)
+        {
+            min = |\textbf{\underline{x[i]}}|;
+            index = i;
+        }
+    }
+    std::cout << "min:" << min
+              << " at index:" << index
+              << '\n';
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+

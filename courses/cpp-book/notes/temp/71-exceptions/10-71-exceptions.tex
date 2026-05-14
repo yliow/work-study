@@ -1,0 +1,118 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Bad Usage of Exceptions}
+
+From previous examples you see that exceptions can be used to alter flow
+of execution in situations where some type of error has occurs. Of
+course you can use this to alter the flow of execution in any situation,
+but that would be a WRONG usage of exceptions. Here's
+one such bad use of exceptions:
+
+\begin{console}
+#include <iostream>
+
+class A {};
+class B {};
+class C {};
+class D {};
+class F {};
+
+int main()
+{   
+    while (1)
+    {     
+          try
+          {
+               double score;
+               std::cin >> score;
+               if (score >= 90)
+               {
+                    throw A();
+               }
+               else if (score >= 80)
+               {
+                    throw B();
+               }
+               else if (score >= 70)
+               {
+                    throw C();
+               }
+               else if (score >= 60)
+               {
+                    throw D();
+               }
+               else
+               {
+                    throw F();
+               }
+          }
+          catch (A e)
+          {
+               std::cout << "You got A!!!\n";
+          }
+          catch (B e)
+          {
+               std::cout << "You got B!!!\n";
+          }
+          catch (C e)
+          {
+               std::cout << "You got C!!!\n";
+          }
+          catch (D e)
+          {         
+               std::cout << ""You got D!!!\n";
+          }
+          catch (F e)
+          {
+               std::cout << ""You got
+               F!!!\n";
+          }
+    }
+    return 0;
+}
+\end{console}
+
+Study the above carefully. Of course you know that the following is
+better:
+
+\begin{console}
+#include <iostream>
+
+int main()
+{   
+    while (1)
+    {
+        double score;
+        std::cin >> score;
+        if (score >= 90)
+        {   
+           std::cout << "You got A!!!\n";
+        }
+        else if (score >= 80)
+        {
+           std::cout << "You got B!!!\n";
+        }
+        else if (score >= 70)
+        {
+           std::cout << "You got C!!!\n";
+        }
+        else if (score >= 60)
+        {
+           std::cout << "You got D!!!\n";
+        }
+        else
+        {
+           std::cout << "You got F!!!\n";
+        }
+    }
+    return 0;
+}
+\end{console}
+
+The type of error you want to handle with exceptions are usually those
+that are pretty severe, in the sense that the program usually has to
+shutdown completely and possibly it would have to do some form of
+resource clean up (example: release memory usage, release some exclusive
+hold of hardware resource, etc.)
+

@@ -1,0 +1,65 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Openness of namespace}
+
+Namespaces are \EMPHASIZE{open}: you can open it after it's closed.
+\begin{console}
+namespace yliow
+{    
+     class C
+     {};
+}
+
+namespace yliow // open again!!!
+{    
+     class D
+     {};
+}
+int main()
+{   
+     yliow::C obj1;
+     yliow::D obj2;
+     return 0;
+}
+ 
+\end{console}
+
+The most common usage of namespace is probably to hold classes and function prototypes:
+
+\begin{console}
+// GameLib.h
+namespace GameLib
+{    
+     class vec2d { ... };
+     class graphics { ... };
+     class sound { ... }; 
+     class physics { ... };
+}
+               
+\end{console}
+
+If you' re writing games and scientific simulations. You
+can split the above.
+
+\begin{console}
+// Physics.h
+namespace GameLib
+{    
+     class vec2d { ... };
+     class physics { ... };
+} 
+\end{console}
+
+\begin{console}
+// GameLib.h
+#include "Physics.h"
+namespace GameLib
+{    
+     class graphics { ... };
+     class sound { ... };
+} 
+\end{console}
+
+In this way, when you're writing a text-based sci simulations, you don't need to compile with the graphics and sound class.
+
