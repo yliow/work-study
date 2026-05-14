@@ -11,7 +11,7 @@ LATEXRM = rm -rf \
         main.aux main.ilg main.log main.idx main.ind main.out \
         main.py.err main.py.out \
         comment.cut comment.err comment.out \
-        latex.py main.pytxcode pythontex-files-main
+        latex.py main.pytxcode pythontex-files-main missfont.log main.py
 
 main:
 	$(PDF)

@@ -1,0 +1,49 @@
+%-*-latex-*-
+\sectionthree{Python example}
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+
+If you need to execute python code in a
+python environment (example: for drawing) in \LaTeX\: 
+\begin{console}
+some latex
+\begin{python}
+x = 1
+print(x + 41)
+\end{python}
+some more latex
+\end{console}
+you move the python code to a file say \verb!stdout000.py!:
+\begin{console}
+# file: stdout000.py
+x = 1
+print(x + 41)
+\end{console}
+Remove the python environment from the \LaTeX\ file and replace it with
+this:
+\begin{console}
+some latex
+\input{stdout000.tex}
+some more latex
+\end{console}
+In the makefile run \verb!stdout*.py! and send output to \verb!stdout*.tex!:
+\begin{console}
+...
+main: stdout000.tex\
+      stdout001.tex\
+      stdout002.tex
+	$(PDF)
+c:
+	$(LATEXRM)
+v:
+	$(OPEN) main.pdf
+
+stdout000.tex: stdout000.py
+	python stdout000.py > stdout000.tex
+stdout001.tex: stdout001.py
+	python stdout001.py > stdout001.tex
+stdout002.tex: stdout002.py
+	python stdout002.py > stdout002.tex
+...
+\end{console}
