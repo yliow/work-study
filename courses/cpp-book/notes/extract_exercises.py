@@ -26,10 +26,7 @@ def extraction_to_file(ex_dest, note, ex_content, number):
   #formatting for file/console printout, should just be 'num-chapter' 
   note = note.replace('/main.tex', '')
   
-  #directory for exercise and possible soln
-  ex_console_name = ex_folder.replace(ex_dest, '')
-
-  #'solutions' works off the local dir so we change to that dir, we change back on return to read_file  
+  #'solutions' works off the local dir so we change to that dir, we change back on return
   os.chdir(ex_dest)
 
   #assign file name and string for question.tex
@@ -45,7 +42,7 @@ def extraction_to_file(ex_dest, note, ex_content, number):
       for entry in ex_content:
         x.write(entry)
   except Exception as e:
-    print("!!!!!!! ERROR WRITING EXERCISE %s TO FILE %s" % (question, e))
+    print("!!!!!!! ERROR WRITING EXERCISE %s TO FILE, MESSAGE = %s" % (question, e))
     ex_file = None
   return ex_file
 
@@ -60,6 +57,12 @@ chapters = dir_ + '/chapters/'
 
 chap_list = os.listdir(chapters)
 
+write_dir = dir_ + '/temp/'
+
+if not os.path.exists(write_dir):
+  print("making temp dir\n")
+  os.system("mkdir %s" % write_dir)
+  
 for chap in chap_list:
   note = chapters + chap + '/main.tex'
   exercises= []
@@ -67,7 +70,13 @@ for chap in chap_list:
   ex_acc = []
   note_acc = []
   ex_dest = dir_ + '/temp/' + chap + '/exercises/'
-  try:  
+  
+  try:
+    #check if note dir exists
+    if not os.path.exists(dir_ + '/temp/' + chap + '/'):
+      print("making chapter %s dir..." % chap)
+      os.system("mkdir %s" % (dir_ + '/temp/' + chap + '/'))
+      
     #check if exercise dir exists
     if not os.path.exists(ex_dest):
       os.system("mkdir %s" % ex_dest)
@@ -77,20 +86,41 @@ for chap in chap_list:
       counter = 0
       flag = False
       n = n.readlines()
+      
       for line in n:
+
         if begin in line:
           flag = True
           ex_acc.append(line)
+          
         elif end in line:
           flag = False
           ex_acc.append(line)
           
           #call exercise maker
-          exercise = extraction_to_file(ex_dest, note, ex_acc, counter)
+          exercise = extraction_to_file(ex_dest, note.replace(chapters, ''), ex_acc, counter)
           ex_acc = []
           counter += 1
+          
+          if exercise != None:
+            note_acc.append(r"\input{%s/%s/exercises/%s/question.tex}" % ('temp', chap, exercise) )
+          else:
+            raise Exception("MALFORMED EXERCISE, COULD NOT CREATE")
+          
+        elif flag:
+          ex_acc.append(line)
+          
         else:
           note_acc.append(line)
       
+    old_main = chapters + chap + '/old_main.tex'
+    os.system("mv %s %s" % (note, old_main))
+      
+    #write new file
+    with open(note, 'w') as f:
+      for line in note_acc:
+        f.write(line)
+        
+  #remove chapter on failure? dont want to include half-baked chaps
   except Exception as e:
     print("ERROR: could not extract exercises from chapter %s, message: %s" % (chap, e))

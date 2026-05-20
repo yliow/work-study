@@ -1,0 +1,133 @@
+\tinysidebar{\debug{exercises/{test/question.tex}}}
+\begin{ex}   
+Get an integer n from the user and then compute the
+sum of the rightmost 4 digits of n. Once a digit 0 is added, you should
+stop the summation. Do this with repetition code. Here's a test case
+
+\begin{consolethree}[escapeinside=||]
+|\textbf{1534315}|
+
+13 
+\end{consolethree}
+
+
+Here's another:
+
+\begin{consolethree}[escapeinside=||]
+|\textbf{1534015}|
+
+6 
+\end{consolethree}
+
+
+(after adding \texttt{5} and \texttt{1}, on seeing a \texttt{0}, the summation
+stops. Therefore the sum is 6) and another
+
+
+\begin{consolethree}[escapeinside=||]
+|\textbf{1534205}|
+
+5 
+\end{consolethree}
+
+Here's the idea. First here's the code to sum the 4 rightmost digits:
+
+\begin{console}
+#include <iostream>
+
+int main()
+{
+    int n;
+    std::cin >> n;
+
+    int s = 0;
+
+    s = s + n % 10;
+
+    n = n / 10;
+
+    s = s + n % 10;
+
+    n = n / 10;
+
+    s = s + n % 10;
+
+    n = n / 10;
+
+    s = s + n % 10;
+
+    n = n / 10;
+
+    std::cout << s << n;
+
+    return 0;
+} 
+
+
+Each block needs to know if a zero was encountered. So \ldots
+
+\begin{console}
+#include <iostream>
+
+int main()
+{
+    int n;
+    std::cin >> n;
+
+    int s = 0;
+    bool zero_not_found = true;
+
+    if (zero_not_found)
+    {
+        s = s + n % 10;
+        n = n / 10;
+    }
+
+    if (zero_not_found)
+    {
+        s = s + n % 10;
+        n = n / 10;
+    }
+
+    if (zero_not_found)
+    {
+        s = s + n % 10;
+        n = n / 10;
+    }
+
+    if (zero_not_found)
+    {
+        s = s + n % 10;
+        n = n / 10;
+    }
+
+    std::cout << s << ", " <<n;
+    return 0;
+} 
+
+
+Get it? Think about what will happen if you don't use this communication device \verb!zero_not_found!. You will most likely have a deeply nested if-else structure in your code:
+
+\begin{console}
+if (n % 10 != 0) // 1st digit != 0
+{
+    s = s + n % 10;
+    n = n / 10;
+    if (n % 10 != 0) // 2nd digit != 0
+    {
+        s = s + n % 10;
+        n = n / 10;
+        if (n % 10 != 0) // 3rd digit != 0
+        {
+            s = s + n % 10;
+            n = n / 10;
+            if (n % 10 != 0) // 4th digit != 0
+            {
+                s = s + n % 10;
+                n = n / 10;
+            }
+        }
+    }
+}
+\end{console}
+\end{ex}
