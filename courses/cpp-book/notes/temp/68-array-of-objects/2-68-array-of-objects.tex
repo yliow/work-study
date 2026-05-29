@@ -82,34 +82,7 @@ Remember that! If you want to declare an array of objects without an
 initializer list, you \EMPHASIZE{MUST} have the default constructor used to
 construct the objects in the array.
 
-\begin{ex}
-Fix the following class so that an array of
-\texttt{WeatherControl} objects can be created with all instance variables
-initialized to 10.
-\begin{console}
-// WeatherCtrl.h
-#ifndef WEATHERCTRL_H
-#define WEATHERCTRL_H
-
-class WeatherCtrl
-{
-public:
-        WeatherCtrl(double temp, double pressure)
-        : temp_(temp), pressure_(pressure)
-        {}
-        double get_temp() const { return temp_; }
-        double get_pressure() const { return pressure_; }
-        void set_temp(double);
-        void set_pressure(double);
-private:
-        double temp_;
-        double pressure_;
-};
-
-#endif
-\end{console}
-\end{ex}
-Suppose we have the following class:
+\input{temp/68-array-of-objects/exercises/0-68-array-of-objects/question.tex}Suppose we have the following class:
 
 \begin{console}
 class Int
@@ -293,33 +266,7 @@ constructor is fixed.
 See notes on Static for details. Such values are more associated with
 the class than with individual objects.
 
-\begin{ex}
-Write a program that does this:
-
-\begin{itemize}
-\item
-  Prompt the user for s.
-\item
-  Create a dynamic array of size s of Int objects initializing them so
-  that you get a Fibonacci sequence.
-\item
-  For instance if you enter 7 the integers modeled in the array are:
-\end{itemize}
-\begin{center}
-1, 1, 2, 3, 5, 8, 13
-\end{center}
-You can also have 2-dim array of objects.
-
-Example:
-\begin{console}
-Int a[5][6]; // default constructor called on each
-             // a[i][j]
-for (int i = 0; i < 5; i++)
-    for (int j = 0; j < 6; j++)
-        a[i][j].set(42);
-\end{console}
-\end{ex}
-In this example, the array has fixed sizes, and you loose control over
+\input{temp/68-array-of-objects/exercises/1-68-array-of-objects/question.tex}In this example, the array has fixed sizes, and you loose control over
 the constructor call.
 
 Use an array of object pointers to control constructor call
@@ -374,53 +321,8 @@ for (int i = 0; i < rows; i++)
     delete [] a[i];
 delete [] a;
 \end{console}
-\begin{ex}
-Write a program that does this:
-\begin{itemize}
-\item
-  prompts the user for the row and column size of a 2-dim array of
-  integer values. (Just the regular int).
-\item
-  Fill the 2-dim array with random integers.
-\item
-  Print the values in the array in a 2-dim grid.
-\item
-  Compute the row, column, and overall average of all the values (up to
-  1 decimal place).
-\item
-  Deallocate Memory used.
-\item
-  Here is what a 3 by 3 case looks like
-\end{itemize}
-
-\begin{console}
-0    3   3 |2.0
-2    9   0 |3.6
-8    2   6 |5.3
------------+
-
-3.3 4.6 3.0 3.6
-\end{console}
-\end{ex}
-
-\begin{ex}Run this program. Explain why it does not work.
-\begin{console}
-int floors = 3, rooms_per_floor = 10;
-WeatherControl ** wc = new WeatherControl*[floors];
-for (int floor = 0; floor < floors; ++floor)
-{   
-    wc[floor] = new WeatherControl[rooms_per_floor];
-}
-delete [] wc;
-for (int floor = 0; floor < floors; ++floor)
-{   
-    delete [] wc[floor];
-}
-\end{console}
-From previous example, each \texttt{a[i][j]} is an \texttt{Int}
-object. You lose control over calling constructor.
-\end{ex}
-Now we want the row and column sizes to be dynamic \EMPHASIZE{and} the values in the array to be pointers so that we can call the constructor for each pointer \ldots
+\input{temp/68-array-of-objects/exercises/2-68-array-of-objects/question.tex}
+\input{temp/68-array-of-objects/exercises/3-68-array-of-objects/question.tex}Now we want the row and column sizes to be dynamic \EMPHASIZE{and} the values in the array to be pointers so that we can call the constructor for each pointer \ldots
 
 \begin{consolethree}[escapeinside=||]%[commandchars=\~\@\$]
 int rows = 5, columns = 6;
@@ -497,86 +399,5 @@ p += textbox
 
 print(p)
 \end{python}
-\begin{ex}
-
-\begin{itemize}
-\item
-  Create a 2-dim (dynamic) array of \texttt{Int} object pointers. The size
-  of the first and second dim is randomly chosen from integer
-  1,2,...,10.
-\item
-  Initialize the pointers by allocating memory for \texttt{Int} objects
-  and initializing the \texttt{Int} objects with integers randomly chosen
-  from 1,2,...,10
-\item
-  Print all the integer values ``in'' this array in a 2-dim grid.
-\end{itemize}
-
-All the arrays up to this point have been rectangular, i.e., the arrays
-as a container values look like this.
-\begin{python}
-from latextool_basic import table
-print(table([('', '', ''), ('', '', ''), ('', '','')]))
-\end{python}
-Create an array that is triangular, i.e. for row 0
-
-there are 3 columns, for row 1 there are 2 columns, etc. (They are
-called jagged arrays.)
-\begin{python}
-from latextool_basic import table
-print(table([('','',''), ('',''), ('')]))
-\end{python}
-For the static size 3-dim array of \texttt{Int} objects:
-\begin{center}
-\texttt{Int a[3][6][4]}
-\end{center}
-For the static size 3-dim array of \texttt{Int} pointers:
-\begin{center}
-\texttt{Int * a[3][6][4]}
-\end{center}
-For the dynamic size 3-dim array of \texttt{Int} objects:
-\begin{center}
-\texttt{Int *** a}
-\end{center}
-For the dynamic size 3-dim array of \texttt{Int} pointers:
-\begin{center}
-\texttt{Int **** a}
-\end{center}
-Phew!!!!
-\end{ex}
-
-\begin{ex} In a function \texttt{f(a, b, c)} create a dynamic
-array of \texttt{Int} pointers with sizes \texttt{a, b, c}. Initialize all
-the pointers by allocating the memory and initializing the objects the
-pointer points to with a random integer. Make sure you de-allocate
-memory used.
-
-In your \texttt{main()}, write a \texttt{for} loop that calls \texttt{f(10,
-10, 10)} and print a message for each iteration of the loop. If the
-printing of the messages slows down, it tells you that you probably have
-a memory leak.
-\end{ex}
-\begin{ex}Write a class that models a dynamic 2-dim array of
-integers. The following usage will tell you how it works:
-\begin{console}
-IntDynArr a(5,6); // 5-by-6 int array
-a(1, 2) = 42;     // set ``a[1][2]'' to 42
-std::cout << a(1, 2) << std::endl;
-\end{console}
-Hint: \texttt{a(1, 2)} is \texttt{a.operator()(1, 2)}. You need to define
-\texttt{int \& operator(int, int)}.
-\end{ex}
-\begin{ex} Rewrite your class so you can execute this:
-\begin{console}
-IntDynArr a(5, 6);
-a[1][2] = 42;
-\end{console}
-Hint: Note that
-\begin{console}
-a[1][2]
-\end{console}          
-Is not \texttt{a.operator[][](1,2)} because there is no
-\texttt{[][]} operator!!! Instead \texttt{a[1][2]} is
-\texttt{a.operator[](1).operator[](2)}
-\end{ex}
-
+\input{temp/68-array-of-objects/exercises/4-68-array-of-objects/question.tex}
+\input{temp/68-array-of-objects/exercises/5-68-array-of-objects/question.tex}\input{temp/68-array-of-objects/exercises/6-68-array-of-objects/question.tex}\input{temp/68-array-of-objects/exercises/7-68-array-of-objects/question.tex}
