@@ -1,0 +1,1857 @@
+    \newpage\EMPHASIZE{60. Classes}
+
+\textsc{Objectives}
+\begin{itemize}
+\item Understand the relationship between \texttt{struct} and \texttt{class}
+\item Create classes
+\item Write methods that accept parameters of basic type
+\item Write methods that accept object parameters
+\item Write methods that accept object reference parameters
+\item Write functions that accept object parameters
+\item Write functions that return objects
+\item Declare arrays of objects using the default constructor
+\item Declare and use pointers to objects
+\end{itemize}
+
+
+\newpage\EMPHASIZE{Object-oriented Thingies}
+
+So far you have been using C++ in a particular way. The programming
+style (or paradigm) you have been using is called \EMPHASIZE{structured
+programming}.
+
+You can recognize structured programming when you see blocks of code
+including but not limited to the following:
+
+\begin{itemize}
+\item branching such as if and if-else
+\item loops such as for-loop, while-loop
+\item functions
+\end{itemize}
+
+But this is not the only paradigm. The next paradigm we will focus on is
+called \EMPHASIZE{Object-Oriented Programming, OOP}.
+
+(There are many other styles/paradigms of programming. For instance, you
+will learn functional programming in CISS445. Then
+there's aspect-oriented programming ...)
+
+Both structured programming and OOP came out around 60s. Structured
+programming was popularized in the 80s through the introduction of the
+Pascal language by N. Wirth. (I learned that when I was in college.)
+Although OOP also came out around that time, it took off only around the
+90s. So in terms of widespread use, OOP is actually pretty ``new'' or
+``recent''. (But in the computer science world, anything older than 5
+years is considered ``old'' ...)
+
+While structured programming and OOP refer to using certain language
+features to \EMPHASIZE{write} programs, structured analysis and
+object-oriented analysis refers to high level \EMPHASIZE{analysis} of a
+program (usually using diagrams) with a view toward implementing the
+ideas using a structured or an object-oriented language respectively.
+
+Some research shows that once a program goes beyond 100,000 lines,
+structured programming methodology breaks down because of the complexity
+of the project. (That's not to say that it cannot be
+done and that's also not saying that OO is the only way
+to handle large projects.)
+
+Instead of going through all the philosophical reasons why OO is
+superior to old-style programming (such as structured programming), as
+many books do, we'll go through examples. It's pointless
+to discuss philosophy first because if you have not seen OO language
+features, it would be hard to judge. So ...
+
+
+\newpage\EMPHASIZE{Date class version 1}
+
+We want to implement a \texttt{Date} type.
+
+First I use \texttt{struct} to package up year, month, day and have some
+useful functions:
+
+\begin{itemize}
+\item \texttt{init} to set the month, day, year value of a \texttt{Date}
+  variable
+\item \texttt{add\_y} to add a year increment value to \texttt{Date} variable
+\item \texttt{add\_m} to add a month increment value to \texttt{Date} variable
+\item \texttt{add\_d} to add a day increment value to \texttt{Date} variable
+\end{itemize}
+
+Here we go (and this is nothing new) ...
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+#ifndef DATE_H
+#define DATE_H
+
+struct Date
+{
+    int yyyy_, mm_, dd_;
+};
+
+void init(Date &, int, int, int);
+void print(const Date &);
+void add_y(Date &, int);
+void add_m(Date &, int);
+void add_d(Date &, int);
+
+#endif
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+#include "Date.h"
+
+void init(Date & date, int yyyy, int mm, int dd)
+{
+    date.yyyy_ = yyyy;
+    date.mm_ = mm;
+    date.dd_ = dd;
+}
+
+void print(const Date & date)
+{
+    std::cout << date.yyyy_ << '/'
+              << date.mm_ << '/'
+              << date.dd_ << '\n';
+}
+
+void add_y(Date & date, int inc)
+{
+    date.yyyy_ += inc ;
+}
+
+// etc.
+\end{consolethree}
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+#p += Grid(0, 0, 10, 10)
+strink = r"""
+\begin{consolethree}[escapeinside=||]
+// main.cpp
+#include "Date.h"
+
+int main()
+{
+    Date today, yesterday;
+
+    init(today, 2014, 12, 25);
+    print(today);
+    
+    init(yesterday, 2014, 12, 24);
+    print(yesterday);
+
+    return 0;
+}
+\end{consolethree}
+"""
+p += Rect(0, 0, 8, 5, s=strink, linewidth=0)
+td = [r'\textbf{today}', r'\textbf{yyyy\_}', r'\textbf{mm\_}', r'\textbf{dd\_}']
+p += Rect(7, 4, 9, 5, innersep=0.25, s=td[0], align='c', linewidth=0)
+x = 9
+for i in range (1, 4):
+      p += Rect(x, 4, x + 2, 5, innersep=0.25, s=td[i], align='c', linewidth=0.05, linecolor='red')
+      x += 2
+
+p += Rect(9, -1, 13.5, 2, innersep=0.25, s=r'At this point in \texttt{main()\'}s memory, \texttt{today} looks like this... ', align='c', linewidth=0.05)
+p += Line(points=[(12, 2), (12, 4)], linewidth=0.05, linecolor='red', endstyle='>')
+p += Line(points=[(9, 1), (6.75, 1.75)], linewidth=0.05, linecolor='red', endstyle='>')
+print(p)
+\end{python}
+
+Now in your \texttt{main.cpp}, go ahead and call \texttt{add\_d(yesterday,
+1)} and then \texttt{print(yesterday)}.
+
+Note that the above \texttt{main()} that uses the \texttt{Date} type
+(\texttt{Date.h} and \texttt{Date.cpp}) does not need to know about the
+details (i.e., the members) of a \texttt{Date} variable: you do not need
+to know that a \texttt{Date} variable such as \texttt{today} contains
+\texttt{yyyy\_}, \texttt{mm\_}, \texttt{dd\_}.
+
+This is the beginning of the concepts of \EMPHASIZE{information hiding} and
+\EMPHASIZE{encapsulation}.
+
+Specifically, in the above, we collect up the concepts of a year, a
+month and a day and create the concept of a date. That's
+\EMPHASIZE{encapsulation}.
+
+Encapsulation allows you to \EMPHASIZE{think at a higher level} of
+abstraction. It's easier to focus on higher level
+concepts once lower level details are encapsulated.
+
+Note that in version 1 the functions are not tied to \texttt{Date} struct.
+
+We want to think of the functions as ``belonging'' to the \texttt{Date}
+struct.
+
+You can actually put the functions into the \texttt{struct} definition to
+get \EMPHASIZE{member functions} .
+
+So we get a \texttt{struct} with \EMPHASIZE{member variables} and
+\EMPHASIZE{member functions} in one package.
+
+After moving the functions into the \texttt{struct}, you need to make some
+modifications.
+
+\begin{ex}
+Complete the \texttt{add\_m} and \texttt{add\_d}
+functions.
+\end{ex}
+
+
+\newpage\EMPHASIZE{Date class version 2}
+
+Make the following changes:
+
+\EMPHASIZE{In }\texttt{\EMPHASIZE{Date.h}}\EMPHASIZE{:} move the function
+prototypes into the \texttt{struct} and remove all first parameters which
+are \texttt{Date} reference parameters.
+
+\EMPHASIZE{In }\texttt{\EMPHASIZE{Date.cpp}}\EMPHASIZE{:} remove all first
+parameters which are \texttt{Date} reference parameters and remove
+``\texttt{date.}'' in the body of all functions.
+
+\EMPHASIZE{In }\texttt{\EMPHASIZE{main.cpp}}\EMPHASIZE{:} move all \texttt{Date}
+variables which are first arguments outside the function call. Add a dot
+after these \texttt{Date} variables.
+Here are the files with the changes
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+#ifndef DATE_H
+#define DATE_H
+struct Date
+{
+    int yyyy_, mm_, dd_;
+    void init(|\sout{Date \&,}| int, int, int);
+    void print(|\sout{const Date \&}|);
+    void add_y(|\sout{Date \&, int}|);
+    void add_m(|\sout{Date \&, int}|);
+    void add_d(|\sout{Date \&, int}|);
+};
+#endif
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+#include "Date.h"
+void |\EMPHASIZE{Date::}|init(|\sout{Date \& date,}| int yyyy, int mm, int dd)
+{
+    |\sout{date.}|yyyy_ = yyyy;
+    |\sout{date.}|mm_= mm;
+    |\sout{date.}|dd_= dd;
+}
+
+void |\EMPHASIZE{Date::}|print(|\sout{const Date \& date}|)
+{
+    std::cout << |\sout{date.}|yyyy_ << '/'
+              << |\sout{date.}|mm_ << '/'
+              << |\sout{date.}|dd_<< '\n';
+}
+
+void |\EMPHASIZE{Date::}|add_y(|\sout{Date \& date,}| int inc)
+{
+    |\sout{date.}|yyyy_+= inc ;
+}
+
+// etc.
+\end{consolethree}
+\begin{consolethree}[escapeinside=||]
+// main.cpp
+#include "Date.h"
+int main()
+{
+    Date today, yesterday;
+
+    |\EMPHASIZE{today.}|init(|\sout{today,}| 2014, 12, 25);
+    |\EMPHASIZE{today.}|print(|\sout{today}|);
+
+    |\EMPHASIZE{yesterday.}|init(|\sout{yesterday,}| 2014, 12, 24);
+    |\EMPHASIZE{yesterday.}|print(|\sout{yesterday}|);
+
+    return 0;
+}
+\end{consolethree}
+Here's what you get:
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+#ifndef DATE_H
+#define DATE_H
+
+struct Date
+{
+    int yyyy_, mm_, dd_;
+
+    void init(int, int, int);
+    void print();
+    void add_y(int);
+    void add_m(int);
+    void add_d(int);
+};
+
+#endif
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+#include "Date.h"
+
+void Date::init(int yyyy, int mm, int dd)
+{
+    yyyy_ = yyyy;
+    mm_ = mm;
+    dd_ = dd;
+}
+
+void Date::print()
+{
+    std::cout << yyyy_ << '/'
+              << mm_ << '/'
+              << dd_ << '\n';
+}
+
+void Date::add_y(int inc)
+{
+    yyyy_ += inc ;
+}
+
+// etc.
+\end{consolethree}
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+#p += Grid(0, 0, 10, 10)
+strink = r"""
+\begin{consolethree}[escapeinside=||]
+// main.cpp
+#include "Date.h"
+
+int main()
+{
+    Date today, yesterday;
+
+    |\textbf{today.init(2014, 12, 25);}|
+    today.print();
+    
+    yesterday.init(2014, 12, 24);
+    yesterday.print();
+
+    return 0;
+}
+\end{consolethree}
+"""
+p += Rect(0, 0, 8, 5, s=strink, linewidth=0)
+td = [r'\textbf{today}', r'\textbf{yyyy\_}', r'\textbf{mm\_}', r'\textbf{dd\_}', r'\textbf{init}', r'\textbf{print}', r'\textbf{add\_y}', r'\textbf{add\_d}', r'\textbf{add\_m}']
+p += Rect(7, 5, 9, 6, innersep=0.25, s=td[0], align='c', linewidth=0)
+x = 9
+for i in range (1, 4):
+      p += Rect(x, 6, x + 2, 7, innersep=0.25, s=td[i], align='c', linewidth=0.05, linecolor='red')
+      x += 2
+x = 9
+for i in range (4, 7):
+      p += Rect(x, 5, x + 2, 6, innersep=0.25, s=td[i], align='c', linewidth=0.05, linecolor='red')
+      x += 2
+
+p += Rect(9, 4, 12, 5, innersep=0.25, s=td[8], align='c', linewidth=0.05, linecolor='red')
+p += Rect(12, 4, 15, 5, innersep=0.25, s=td[7], align='c', linewidth=0.05, linecolor='red')
+
+p += Rect(9, -1, 13.5, 2, innersep=0.25, s=r'At this point in \texttt{main()\'}s memory, \texttt{today} looks like this... ', align='c', linewidth=0.05)
+p += Line(points=[(12, 2), (12, 4)], linewidth=0.05, linecolor='red', endstyle='>')
+p += Line(points=[(9, 1), (6.75, 1.75)], linewidth=0.05, linecolor='red', endstyle='>')
+print(p)
+\end{python}
+
+As stated earlier, we put the function prototypes into the \texttt{struct} definition.
+
+Note that in \texttt{Date.cpp}, we need to put \EMPHASIZE{Date::} in
+front of the implementation of the member functions. This is because the
+\texttt{Date} \texttt{struct} creates a scope. Therefore outside the
+\texttt{struct}, you need to say ``the \texttt{init} function \EMPHASIZE{of
+}\texttt{\EMPHASIZE{Date}}''. If you just call it \texttt{init,} C++ will think
+of some \texttt{init} function outside the \texttt{Date} \texttt{struct}. This means that
+C++ actually allows you to do this:
+\begin{consolethree}
+// Date.h
+
+...
+
+struct Date
+{
+    ...
+    void init(int, int, int);
+    ...
+};
+
+void init(int, int, int);
+
+#endif
+\end{consolethree}
+In the code, you can see the concept of ``variable calls a function''.
+For instance, you see \texttt{today.init(2014, 12, 25)}.
+
+In the implementation of \texttt{Date::init}, you see \texttt{yyyy\_},
+\texttt{mm\_}, and \texttt{dd\_}. Which \texttt{yyyy\_} are we talking about?
+There's the \texttt{yyyy\_} of \texttt{today} and the
+\texttt{yyyy\_} of \texttt{yesterday}!!! Well, in the body of
+\texttt{Date::init},
+\begin{center}
+\texttt{yyyy\_} refers to \texttt{yyyy\_} of the variable calling \texttt{init()}
+
+\texttt{mm\_} refers to \texttt{mm\_} of the variable calling \texttt{init()}
+
+\texttt{dd\_} refers to \texttt{dd\_} of the variable calling \texttt{init()}
+\end{center}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+#p += Grid(0, 0, 10, 10)
+str0 = r"""
+\begin{consolethree}[escapeinside=||]
+...
+
+int main()
+{
+    ...
+
+    |\EMPHASIZE{today.init(2014, 12, 25);}|
+
+    ...
+\end{consolethree}
+"""
+str1 = r"""
+\begin{consolethree}[escapeinside=||]
+void Date::init(int yyyy, int mm, int dd)
+{
+    |\EMPHASIZE{yyyy\_}| = y0;
+    mm_ = m0;
+    dd_ = y0;
+}
+\end{consolethree}
+"""
+str2 = r"""
+\begin{consolethree}[escapeinside=||]
+...
+
+int main()
+{
+    ...
+
+    |\EMPHASIZE{yesterday.init(2014, 12, 25);}|
+
+    ...
+\end{consolethree}
+"""
+p += Rect(-2, 0, 10, 3, linewidth=0, s=str2)
+
+p += Rect(7, 5.75, 16.5, 6.5, linewidth=0, s=str1)
+
+p += Rect(-2, 9, 10, 12, linewidth=0, s=str0)
+
+p += Rect(10.5, 9, 16.5, 10.25, linewidth=0, s=r'While \\executing \textbf{\texttt{today.init(2014, 12, 25)}}, the \textbf{\texttt{yyyy\_}} refers to the \textbf{\texttt{yyyy\_}} of \textbf{\texttt{today}} ...')
+p += Rect(10.5, 0, 16.5, 3.25, linewidth=0, s=r'While \\executing \textbf{\texttt{yesterday.init(2014, 12, 24)}}, the \textbf{\texttt{yyyy\_}} refers to the \textbf{\texttt{yyyy\_}} of \textbf{\texttt{yesterday}} ...')
+p += Line(points=[(10.25, 9), (8.15, 9.15)], linewidth=0.075, linecolor='red', endstyle='>')
+p += Line(points=[(12, 8), (12, 6.55)], linewidth=0.075, linecolor='red', endstyle='>')
+p += Line(points=[(10.25, 2), (9, 0.65)], linewidth=0.075, linecolor='red', endstyle='>')
+p += Line(points=[(13.5, 2.3), (13.5, 3.65)], linewidth=0.075, linecolor='red', endstyle='>')
+print(p)
+\end{python}
+
+
+Note that
+\begin{itemize}
+\item functions are part of \texttt{Date}
+\item \texttt{Date} variables can invoke \texttt{Date} member functions
+\item Member functions ``know'' which variables invoked them and which
+  \texttt{yyyy\_}, \texttt{mm\_}, \texttt{dd\_} they should work with.
+\item For instance, \texttt{today.mm\_} : Refers to the member variable
+  \texttt{mm\_} in \texttt{today}
+\item For instance, \texttt{today.print()} : Calls/invokes the \texttt{print()}
+  member function of \texttt{today} and while executing the function,
+  \texttt{yyyy\_} refers to the \texttt{yyyy\_} of \texttt{today.}
+\end{itemize}
+
+Make sure you see the differences between version 1 and 2!!!
+
+\begin{ex}
+Write a \texttt{struct} \texttt{Robot} with the following
+members:
+
+\begin{itemize}
+\item \texttt{int x}: the x-coordinate of the position
+\item \texttt{int y}: the y-coordinate of the position
+\item \texttt{void init(int a, int b)}: sets the \texttt{x}, \texttt{y} values to
+  \texttt{a}, \texttt{b} respectively
+\item \texttt{void print()}: prints the \texttt{x}, \texttt{y} values
+\item \texttt{void moveLeft(int steps)}: sets \texttt{x} to \texttt{x - steps}
+\item \texttt{void moveRight(int steps)}: sets \texttt{x} to \texttt{x + steps}
+\item \texttt{void moveUp(int steps)}: sets \texttt{y} to \texttt{y + steps}
+\item \texttt{void moveDown(int steps)}: sets \texttt{y} to \texttt{y - steps}
+\end{itemize}
+
+Write a program to test your \texttt{Robot} structure:
+\begin{itemize}
+\item Declare and initialize \texttt{c3p0} of \texttt{Robot} type to \texttt{\{5, 5\}}
+\item Call \texttt{c3p0.print()}
+\item Call \texttt{c3p0.moveLeft(2)}
+\item Call \texttt{c3p0.print()}
+\item Call \texttt{c3p0.moveRight(3)}
+\item Call \texttt{c3p0.print()}
+\item Call \texttt{c3p0.moveUp(-4)}
+\item Call \texttt{c3p0.print()}
+\item Call \texttt{c3p0.moveDown(5)}
+\item Call \texttt{c3p0.print()}
+\end{itemize}
+\end{ex}
+
+In the above exercise, you will have statements such as
+
+\texttt{c3p0.moveRight(3);}
+
+You can and \EMPHASIZE{should} think of the \texttt{Robot} variable
+\texttt{c3p0} as having the \EMPHASIZE{ability} to \texttt{moveRight} by 3 on
+its own. In other words, you want to think of the \texttt{Robot} as having
+some \EMPHASIZE{autonomous ability} to perform the \texttt{moveRight}
+operation. That is one very important philosophy behind packaging
+functions into a \texttt{struct} so that they become members (i.e. member
+functions) as the \texttt{struct} variable. In
+fact, historically, the earliest example of a programming language that
+allows this is from the MIT AI lab in the late 50s.
+
+This is very different from say if you do
+
+\texttt{Robot\_moveRight(c3p0, 3);}
+
+Written this way, it reads more like \EMPHASIZE{your} program is
+\EMPHASIZE{controlling} the \texttt{Robot c3p0} and making him/her/it move.
+
+For complex software engineering, we want to analyze and develop
+software not by focusing on data and functions separately, but rather by
+focusing on data \EMPHASIZE{with} their functions. This is achieved in version 2
+above. For instance, look at
+
+\tab[3em]{\texttt{today.init(12, 25, 2003);}}
+
+You think of the \texttt{init()} function as being part of \texttt{today}, just like you
+have \texttt{today.mm\_}, \texttt{today.dd\_}, \texttt{today.yyyy\_} etc.
+
+In fact, to emphasize again that \texttt{today} has the autonomous ability
+to execute \texttt{init()}, I will frequently say:
+
+\EMPHASIZE{today invokes init()}
+
+and not ``your program invokes the \texttt{init()} of \texttt{today}''.
+
+\begin{ex}
+Add the following member function in the header file
+of your \texttt{Date}:
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+struct Date
+{
+    int yyyy_, mm_, dd_;
+    ...
+    void add_m_d(int, int);
+};
+\end{consolethree}
+
+And of course in your \texttt{Date.cpp}, you have:
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+#include "Date.h"
+...
+void Date::add_m_d(int inc_mm, int inc_dd)
+{
+    mm_ += inc_mm;
+    dd_ += inc_dd;
+}
+\end{consolethree}
+
+Now ... and here's the point of this exercise
+... instead of writing code to directly modify the member
+variables, use member functions instead because you already have member
+functions to increment the \texttt{mm\_} and the \texttt{dd\_} member
+variables. In other words, \texttt{Date} variables can call their member
+functions and in a member function, you can call another member
+function.
+\end{ex}
+
+\begin{ex}
+Check your \texttt{add\_y}, \texttt{add\_m},
+\texttt{add\_d} functions and verify that the \texttt{Date} variable is
+correct after the increments. For instance if the month is greater than
+12, what must you do? Also, assuming a \texttt{Date} is correct, after
+calling add\_d, what must you do if the dd\_ is greater than 40? Did you
+check the number of days for February for leap years and non-leap years?
+\end{ex}
+
+\begin{ex}
+Now implement the following function that allows you
+to increment the \texttt{yyyy\_}, \texttt{mm\_}, \texttt{dd\_} members by 3
+integer values passed into the following function:
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+struct Date
+{
+    int yyyy_, mm_, dd_;
+    ...
+    void add_y_m_d(int, int, int);
+};
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+The above passes in 3 integer values to be used for
+incrementing the \texttt{yyyy\_}, \texttt{mm\_}, \texttt{dd\_} member values
+of the \texttt{struct} variable invoking the function. Well ... a
+\texttt{Date} variable already contains 3 values, the \texttt{yyyy\_},
+\texttt{mm\_}, and \texttt{dd\_}. So why not pass in a \texttt{Date} value
+instead? Now implement the following function that allows you to
+increment the \texttt{yyyy\_}, \texttt{mm\_}, \texttt{dd\_} members by a
+\texttt{Date} value passed into the following function:
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+struct Date
+{
+    int yyyy_, mm_, dd_;
+    ...
+    void add_date(const Date & d);
+};
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Create a function in \texttt{Robot} called
+\texttt{moveLeftUp()} that calls \texttt{moveLeft()} and \texttt{moveUp()}.
+Test!!!
+\end{ex}
+
+
+\newpage\EMPHASIZE{Structured vs OO}
+
+We don't have classes and objects yet (what are they
+anyway?) But even with what we have done so far, we can ask ...
+
+Why? Why are we writing code this way.
+
+The main reason is to control complexity ...
+
+Structured programming focuses on functions. You start with a goal/task
+(big function) and subdivide task into simpler subtask (simpler
+functions). Data is passed between functions. Structured programming and structured
+analysis tend to separate the computational task and the data involved.
+
+OOP and OO analysis tend to focus on both data and functions together at
+the same time. At a higher level of design and engineering, we think of
+OO analysis and design as finding objects and their responsibilities
+(functions), i.e., what the objects do. So in the discipline of OO
+analysis and design, we tend to think of and find high level concepts
+and analyze what the variable (i.e., the objects) associated with that
+high level concept should be be capable of doing.
+
+Let me give you an example.
+Suppose I work for a bank and I need to print a daily report of all the
+transactions (deposit to an account, withdrawal from an account, closing
+of an account, opening of an account, changing the address of the
+customer, etc.)
+
+Structured thinking means this: I want to print a report. To do that, I need
+to read the database for all transaction. For each transaction, there's an
+transaction ID, the customer ID, a transaction type, etc. Now for each
+customer ID, I will read the customer file, look for the matching customer
+ID, read his firstname and lastname, etc. Next, for this transaction, I have
+to look up the meaning of the transaction from the transaction type (for
+instance say 1 means open account, 2 means close account, 3 means
+deposit, etc.) I get the description of the transaction ID from some file, so
+if the transaction is 1, the description for this entry is “Open Account”,
+“Close Account”, etc. This style of thinking is called structured analysis
+and design. And the type of code you write to reflect this way of thinking
+tends to have a certain look – structured programming code.
+
+The object-oriented way is different. You want to think of a report as
+being made up of transaction objects. Each transaction object of course
+has some type and some description (“Open Account”, “Close Account”,
+etc.), but the main program will not get the transaction description.
+Rather for each transaction, you will probably call
+
+\begin{center}
+\texttt{transaction.getDescription()}
+\end{center}
+
+in other words, each transaction object has the ability to provide useful
+computations. You think of “telling the transaction to do its work on its 
+own” and you wait for the description to be returned (probably a string).
+Also, each transaction knows (on its own) that it's a transaction for a
+particular customer. So to know more about the customer, you would ask
+transaction to tell you who is the customer:
+\begin{center}
+\texttt{Customer customer = transaction.getCustomer();}
+\end{center}
+
+And with this customer object now available, you ask the customer to
+give you his/her first and last name (probably string) say for printing:
+
+\tab[3em]{\texttt{std::cout << customer.getLastName() << “, “}}
+\tab[5em]{\texttt{<< customer.getFirstName()}}
+\tab[5em]{\texttt{<< ...}}
+
+So as you can see, the style of thinking (the OO analysis and design) will
+give rise to very different code:
+
+\tab[3em]{for each transaction in today's collection of transactions:}\\
+ \tab[5em]{I ask the transaction for the transaction description and print it.}\\
+ \tab[5em]{I then ask the transaction for the time when it was created and}\\
+ \tab[5em]{print the date and time.}\\
+ \tab[5em]{I then ask the transaction for firstname and lastname of the}\\
+ \tab[5em]{customer responsible for this transaction this will result in the}\\
+ \tab[5em]{transaction asking the cusomter involved for his/her firstname}\\
+ \tab[5em]{and lastname. The customer gives his/her firstname and}\\
+ \tab[5em]{lastname to the transaction and the transaction passes the}\\
+ \tab[5em]{firstname and lastname back to me.}\\
+
+Note that when I ask a transaction for the firstname and lastname of the
+customer, the transaction talks to the customer (object) and asks the
+customer to provide his/her first and last name. When an object needs to
+perform some computation it will either do it himself/herself or will talk to
+some other object to do the work.
+
+You don't need to know the full picture of structured thinking and OO
+thinking. The above is to give you a quick overview of the different
+philosophy between the two.
+
+The goal in this course is to teach you the basics of OO syntax and the
+language features. You will NOT be able to engineer beautiful and well
+constructed OO systems immediately. In fact it takes a very long time to
+be an expert in either the structured or the object-oriented style of
+analyzing and designing systems. Right now, my goal is to give you the
+basic syntax and language features of an OO language. It will take many
+years before you will become a true OO guru because the road is
+challenging, tough, and is just extreme fun. (Which, frankly speaking, is a
+good thing -- if OO is something you can learn in 1-2 years, you wouldn't
+expect it to be fun or worth much, would you?)
+
+
+\newpage\EMPHASIZE{Information Hiding and Encapsulation}
+
+We also want to control another type of complexity.
+
+There are many ways to implement a \texttt{struct} and the member functions. Outsiders using the \texttt{struct} should not have access to its member variables.
+
+In fact outsiders should \EMPHASIZE{not} even know how things are implemented in the \texttt{struct}. For instance, in the \texttt{Date} \texttt{struct}, you implemented the member variables with three integer variables names \texttt{yyyy\_}, \texttt{mm\_}, \texttt{dd\_}.
+
+\EMPHASIZE{Information hiding} refers to hiding implementation details from users of your struct library which can very well change in the future.
+
+Look at the struct definition:
+
+\begin{consolethree}
+// Date.h
+
+...
+
+struct Date
+{
+    int yyyy_, mm_, dd_;
+    void init(int, int, int);
+    void print();
+    void add_y(int);
+    void add_m(int);
+    void add_d(int);
+};
+
+...
+\end{consolethree}
+With complete documentation of the member functions, we can use the Date type without actually knowing the implementation of the data member variables or the member functions.
+
+If someone wants to use your Date library in a different way, he/she just
+has to submit a feature request to you. For instance suppose he/she
+wants to have a print member function that prints with a '-' separating the
+year, month, and day instead of a '/'. You can just add a new print
+member function:
+\begin{consolethree}
+// Date.h
+
+...
+
+struct Date
+{
+    int yyyy_, mm_, dd_;
+    void init(int, int, int);
+    void print();
+    void print_with_dash();
+
+    ...
+};
+
+...
+\end{consolethree}
+Now why should users of your library not know about the existence of \texttt{yyyy\_},\texttt{mm\_}, \texttt{dd\_}??? Is that just paranoia?
+
+The problem with letting outsiders know about the internal
+implementation of the \texttt{Date} struct (i.e., information about the
+member variables) is that someone with itchy fingers will write
+something like this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "Date.h"
+
+int main()
+{
+    ...
+    
+    Date today;
+
+    ...
+
+    std::cout << today.yyyy_ << '-'
+              << today.mm_ << '-'
+              << today.dd_ << '\n';
+    ...
+
+    return 0;
+}
+\end{consolethree}
+
+Now you might say ... ``So what? It does work, correct?''
+
+Well ... here's the problem. Say you have exposed
+the internal implementation of your struct. And you let others in your
+company use the member variables. After some time, the code in your
+company will have lots of access to the internals of the \texttt{Date}
+struct.
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "Date.h"
+
+int main()
+{
+    ...
+
+    Date today;
+
+    ...
+
+    std::cout << today.|\EMPHASIZE{yyyy\_}| << '-'
+              << today.|\EMPHASIZE{mm\_}| << '-'
+              << today.|\EMPHASIZE{dd\_}| << '\n';
+
+    ...
+    
+    if (today.|\EMPHASIZE{yyyy\_}| > 2020)
+    {
+        ...
+    }
+
+    for (int i = 1; i < yesterday.|\EMPHASIZE{dd\_}; ++i)
+    {
+        ...
+    }
+
+    return 0;
+}
+\end{consolethree}
+
+One fine day, you realize that it's a waste to use 3
+integers to implement the internals of your \texttt{Date} struct. You can
+clearly fit the \texttt{yyyy\_}, \texttt{mm\_}, \texttt{dd\_} into a single
+integer!!! In other words it would have been better if you did this:
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+...
+struct Date
+{
+    int yyyymmdd_;
+
+    void init(int, int, int);
+    ...
+};
+...
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+...
+void Date::init(int yyyy, int mm, int dd)
+{
+    yyyymmdd_ = yyyy * 10000 + mm * 100 + dd;
+}
+...
+\end{consolethree}
+
+For instance, whereas the members variables of the old \texttt{today}
+looks like this:
+\begin{center}
+\texttt{today.yyyy\_ = 2014}\\
+
+\texttt{today.mm\_ = 12}\\
+
+\texttt{today.dd\_ = 25}\\
+\end{center}
+the new \texttt{today} would look like this:
+
+\texttt{today.yyyymmdd\_ = 20141225}
+
+Wow … not bad! If your main program (say something that prints a
+financial report) uses 100 Date variables, you're saving a lot of memory.
+But ... there's a problem ... remember this program:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "Date.h"
+
+int main()
+{
+    ...
+
+    Date today;
+
+    ...
+
+    std::cout << today.|\EMPHASIZE{yyyy\_}| << '-'
+              << today.|\EMPHASIZE{mm\_}| << '-'
+              << today.|\EMPHASIZE{dd\_}| << '\n';
+
+    ...
+    
+    if (today.|\EMPHASIZE{yyyy\_}| > 2020)
+    {
+        ...
+    }
+
+    for (int i = 1; i < yesterday.|\EMPHASIZE{dd\_}; ++i)
+    {
+        ...
+    }
+
+    return 0;
+}
+\end{consolethree}
+It uses yyyy\_, mm\_, and dd\_. After changing your Date to the new one that uses yyyymmdd\_ as member variable, the above program will not compile. If there are 5 appearances of the old-style member variables, that's OK. But if your company has 10 people writing code that uses the internals of the old \texttt{struct} for the past 6 months and 100000 lines of code is written, there will be a LOT of work changing everyone's code!!!
+
+It's a lot better if they had asked you for the
+following features:
+\begin{center}
+\texttt{print\_with\_dash()} prints Date with '-' instead of '/'\\
+
+\texttt{get\_year()} computes and returns the value of the year\\
+
+\texttt{get\_day()} computes and return the value of the day\\
+\end{center}
+
+and written their code like this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "Date.h"
+
+int main()
+{
+    ...
+
+    Date today;
+
+    ...
+
+    today.|\EMPHASIZE{print\_with\_dash();}|
+
+    ...
+
+    if (today.|\EMPHASIZE{get\_year()}| > 2020)
+    {
+        ...
+    }
+
+    for (int i = 1; i < yesterday.|\EMPHASIZE{get\_day()}|; ++i)
+    {
+        ...
+    }
+
+    return 0;
+}
+\end{consolethree}
+The point: if you provide features through functions and tell others not
+to use the internal member variables, then when you need to change your
+code, you need only need to change the members functions in your
+\texttt{Date} library. Period.
+
+\begin{ex}
+Add a \texttt{get\_year()}, \texttt{get\_month()},
+\texttt{get\_day()} in your \texttt{Date} library. Test it with this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "Date.h"
+
+int main()
+{
+    Date today;
+    today.init(2014, 12, 25);
+    std::cout << today.get_year() << '\n';
+    std::cout << today.get_month() << '\n';
+    std::cout << today.get_day() << '\n';
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Add a \texttt{set\_year(int)}, \texttt{set\_month(int)},
+\texttt{set\_day(int)} in your \texttt{Date} library. Test it with this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "Date.h"
+
+int main()
+{
+    Date today;
+    today.init(2014, 12, 25);
+    today.set_year(1770);
+    std::cout << today.get_year() << '\n'; // 1770
+    ...
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+Member functions to get and set basic values in the struct variable
+(regardless of how you implement the internals) are called
+\EMPHASIZE{getters} and \EMPHASIZE{setters}. Getters are member functions that
+get basic lower level concepts. Setters are members functions that set
+some internal variables to some other values.
+
+The struct allows us to put member variables underneath another variable
+besides putting functions inside struct variables. So
+it's hiding things in a header file. But ...
+
+The struct does \EMPHASIZE{not} enforce \EMPHASIZE{strict information hiding}.
+
+Sure, you can tell others not to use \texttt{yyyy\_}, \texttt{mm\_},
+\texttt{dd\_}. But they can be stubborn and insist on using them.
+
+So ...
+
+
+\newpage\EMPHASIZE{Date class version 3 (the real deal)}
+
+Now do this:
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+#ifndef DATE_H
+#define DATE_H
+
+|\EMPHASIZE{class}| Date
+{
+public:
+    void init(int, int, int);
+    void print();
+    void add_y(int);
+    void add_m(int);
+    void add_d(int);
+    // etc.
+
+|\EMPHASIZE{private:}|
+    int yyyy_, mm_, dd_;
+};
+
+#endif
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+#include <iostream>
+#include "Date.h"
+
+void Date::init(int yyyy, int mm, int dd)
+{
+    yyyy_ = yyyy;
+    mm_ = mm;
+    dd_ = dd;
+}
+
+void Date::print()
+{
+    std::cout << yyyy_ << '/'
+              << mm_ << '/'
+              << dd_ << '\n';
+}
+
+void Date::add_y(int inc)
+{
+    yyyy_ += inc ;
+}
+
+// etc.
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// main.cpp
+#include <iostream>
+#include "Date.h"
+
+int main()
+{
+    Date today, yesterday;
+    
+    today.init(2014, 12, 25);
+    today.print();
+    
+    yesterday.init(2014, 12, 24);
+    yesterday.print();
+    
+    return 0;
+}
+\end{consolethree}
+
+Note that there's no change in \texttt{main.cpp}.
+
+The \texttt{struct} is now called a \EMPHASIZE{class}.
+
+Note the \texttt{public} and \texttt{private} sections in the \texttt{Date}
+class. Try the following code:
+
+\begin{consolethree}[escapeinside=||]
+// main.cpp
+#include "Date.h"
+
+int main()
+{
+    Date today, yesterday;
+    
+    today.init(2014, 12, 25);
+    |\EMPHASIZE{today.dd_ = 1;}|
+    ...
+    return 0;
+}
+\end{consolethree}
+
+Read the error message from your C++ compiler. Get it?
+
+Basically: Anything under \texttt{public} is accessible outside the
+\texttt{Date} class. Anything under \texttt{private} is not. (We'll see
+exceptions later). Inside the \texttt{Date} class, everything is freely
+available. For instance, since \texttt{Date::init()} is part of the
+\texttt{Date} class, of course the function body of \texttt{Date::init()}
+can access \texttt{yyyy\_}. But \texttt{main()} is \EMPHASIZE{outside} the
+\texttt{Date} class. So \texttt{main()} \EMPHASIZE{cannot} touch
+\texttt{today.yyyy\_} directly.
+
+The practice of putting \texttt{yyyy\_}, \texttt{mm\_}, \texttt{dd\_} under
+the private section to disallow access from outside the class is called
+data or information hiding. This is a form of encapsulation.
+
+You can also put member functions into the private section as well. And
+you can have as many private and public sections as you wish.
+
+\begin{ex}
+Create a dummy private member function:
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+#ifndef DATE_H
+#define DATE_H
+
+class Date
+{
+public:
+    void init(int, int, int);
+    void print();
+    void add_y(int);
+    void add_m(int);
+    void add_d(int);
+    // etc.
+
+private:
+    int yyyy_, mm_, dd_;
+    void f();
+};
+
+#endif
+\end{consolethree}
+
+(You can make it do whatever you want.) Now call \texttt{today.f()} in your \texttt{main()}.
+\end{ex}
+
+Now for some very important techno jargon ...
+
+The above \texttt{Date} is a \EMPHASIZE{class}. You can think of a class as a rubber stamp for creating a certain kind of values. A value created from a class includes values such as member variables. But it also contains member functions. Such a value is called an \EMPHASIZE{object}.
+
+Sometimes we will call the name of the object as object as well. For instance when I do this:
+
+\texttt{Date today;}
+
+You can think of \texttt{today} as the name of a chunk of memory in your computer's RAM. I will usually call \texttt{today} an object. However (depending on who you talk to), sometimes, \texttt{today} is called an \EMPHASIZE{instance} of the \texttt{Date} class. Make sure you think about the difference between the name \texttt{today} and the chunk of memory in your RAM that \texttt{today} refers to. I will however use object and instance interchangeably.
+
+In C++, the variables inside the class are called \EMPHASIZE{member variables}. For instance \texttt{yyyy\_} is a member variable of \texttt{today}. I will also say that \texttt{yyyy\_} is a member variable of \texttt{Date}. Outside of C++, when you talk about object-oriented programming in general, the general term is \EMPHASIZE{instance variable}. So when you talk to someone using an object-oriented language such as Python or Java, do not use the term member variable -- use instance variable. That's the safest thing to do. In other words, instance variable is a general OOP concept while member variable is a C++ term.
+
+In C++, objects also have functions -- we call them \EMPHASIZE{member functions}. In general OOP, you would call them \EMPHASIZE{methods}.
+
+So, in general, an object contains instance variables and methods. Get it?
+
+The point of a class is to (1) bundle data and methods together into
+objects and also to (2) provide some access control mechanism so that
+outsiders of the class cannot access certain parts of the class (or
+certain parts of the objects). The act of doing (1) and (2) is called
+\EMPHASIZE{encapsulation}.
+
+The above is a class. It's split into the header file and the cpp file. The
+header file specifies the interface of the class, i.e., the function
+prototypes in the public section(s) tell the outside world what an object
+can do and what they need to do anything. The cpp file implements the
+behavior promised in the header file. As long as the resulting object
+fulfills the promises made by the interface in the header file, nobody
+using your code cares how you implement the interface.
+
+\EMPHASIZE{Information hiding} refers to hiding the internal representation
+of the objects from outsiders of the class.
+
+Source code that uses a class is called a \EMPHASIZE{client} of the
+class. For instance, our \texttt{main.cpp} is a client of the
+\texttt{Date} class.
+
+By default, every member of a \texttt{class} in C++ is \texttt{private}.
+
+In C++, a \texttt{struct} is just a \texttt{class} where every member
+(member variable or member function) is \texttt{public}, i.e.,
+
+\begin{consolethree}[escapeinside=||]
+|\EMPHASIZE{struct X}|
+{
+    ...
+};
+\end{consolethree}
+
+is just
+
+\begin{consolethree}[escapeinside=||]
+|\EMPHASIZE{class X}|
+{
+public:
+    ...
+};
+\end{consolethree}
+
+
+\newpage\EMPHASIZE{Scope}
+
+It's important to note that the \texttt{Date::init} refer
+to the \texttt{init} function inside the \texttt{Date} class, i.e.,
+\texttt{init} is inside the scope called \texttt{Date}.
+That's right: classes create scopes just like the block
+of your for-loop forms a scope. The only difference is that in the case
+of the class, the scope has a name: its name is the name of the class.
+
+It's perfectly OK to have another \texttt{init} function
+OUTSIDE the class like this:
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+...
+class Date
+{
+public:
+    void init(int, int, int);
+    ...
+private:
+    int yyyy_, mm_, dd_;
+};
+
+void init(int, int, int);
+
+#endif
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+
+...
+
+void Date::init(int yyyy, int mm, int dd)
+{
+    yyyy_ = yyyy;
+    mm_ = mm;
+    dd_ = dd;
+}
+
+void init(int x, int y, int z)
+{
+    std::cout << "init outside Date\n";
+}
+
+...
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// main.cpp
+
+#include <iostream>
+#include "Date.h"
+
+int main()
+{
+    Date today, yesterday;
+
+    today.init(2014, 12, 25);
+    init(0, 0, 0);
+
+    ...
+}
+\end{consolethree}
+
+In C++, functions outside a class are sometimes called \EMPHASIZE{nonmember functions}.
+
+\begin{ex}
+Does this compile?
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+...
+class Date
+{
+public:
+    ...
+    void f();
+    void g();
+    ...
+};
+
+#endif
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+...
+void Date::f()
+{
+    g();
+}
+
+void Date::g()
+{
+}
+...
+\end{consolethree}
+\end{ex}
+
+
+\newpage\EMPHASIZE{Class and Type}
+
+In C++, a class is a type (in the sense of C++!!!). This means that, two
+classes are different types even if their internals are the same:
+
+\begin{consolethree}[escapeinside=||]
+class X
+{
+    int i;
+};
+
+class Y
+{
+    int i;
+};
+\end{consolethree}
+
+
+This means that the following will actually compile:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+class X
+{
+};
+
+class Y
+{
+};
+
+void f(const X & obj)
+{
+    std::cout << "f(X)" << std::endl;
+}
+
+void f(const Y & obj)
+{
+    std::cout << "f(Y)" << std::endl;
+}
+
+int main()
+{
+    X a;
+    f(a);
+    Y b;
+    f(b);
+}
+\end{consolethree}
+
+Why? Because in C++, a function is distinguished by the name of the
+function and its prototype, i.e., C++ supports function overloading.
+
+
+\newpage\EMPHASIZE{Passing and returning objects}
+
+It's OK to have object parameters and
+it's also OK to return objects.
+
+\begin{ex}
+Now include an \texttt{equals} method that accepts a
+\texttt{Date} object and then returns \texttt{true} if the \texttt{Date}
+object has the same values as the object invoking the method.
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+...
+class Date
+{
+public:
+    ...
+    bool equals(const Date &);
+    ...
+private:
+    int yyyy_, mm_, dd_;
+};
+
+#endif
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+...
+bool Date::equals(const Date & date)
+{
+}
+...
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// main.cpp
+#include <iostream>
+#include "Date.h"
+
+int main()
+{
+    Date today, yesterday;
+    today.init(2014, 12, 25);
+    today2.init(2014, 12, 25);
+    std::cout << today.equals(today2) << '\n';
+    ...
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Now include an \texttt{add} method that accepts a \texttt{Date}
+object and then returns a \texttt{Date} object with values obtained by
+adding the values of the object invoking the call with the object passed
+in.
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+...
+class Date
+{
+public:
+    ...
+    Date add(const Date &);
+    ...
+private:
+    int yyyy_, mm_, dd_;
+};
+
+#endif
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+...
+Date Date::add(const Date & date)
+{
+}
+...
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// main.cpp
+#include <iostream>
+#include "Date.h"
+
+int main()
+{
+    Date today, yesterday;
+    today.init(2014, 12, 25);
+    Date one;
+    one.init(1, 1, 1);
+    Date x = today.add(one);
+    std::cout << x << '\n';
+    ...
+}
+\end{consolethree}
+
+Make sure that the date returned is valid!!!
+\end{ex}
+
+\begin{ex}
+Write a method \texttt{neq} (i.e., not equals) for
+\texttt{Date} that does the obvious thing.
+\end{ex}
+
+\begin{ex}
+Write a method \texttt{lt} (i.e., less than) for
+\texttt{Date} that does the obvious thing. Then write \texttt{le} (i.e.,
+less than or equals), then \texttt{gt} (greater than), and then \texttt{ge}
+(greater than or equals).
+\end{ex}
+
+Note that for the above methods, you should write them in such a way
+that they emulate expressions that you're used to using. For example, \texttt{x
+<= 2} would do something like this: \texttt{x.le(2)}. So the object passed into
+the \texttt{le()} (or other) function should be the value on the right of the
+expression, and the object calling the method is on the left. This will be
+discussed more later.
+
+With the above you can now do this:
+
+\begin{consolethree}[escapeinside=||]
+Date start;
+start.init(1, 1, 1970);
+Date end;
+end.init(1, 1, 2015);
+Date oneday;
+oneday.init(0, 0, 1);
+
+for (Date d = start; d <= end; d = d.add(oneday))
+{
+    d.print();
+}
+\end{consolethree}
+
+
+\newpage\EMPHASIZE{Default operator=}
+
+The assignment operator = copies values of members from one object to
+another. So, if \texttt{date1} and \texttt{date2} are \texttt{Date} object,
+then
+
+\texttt{date1 = date2;}
+
+will have the same effect as
+\begin{center}
+\texttt{date1.mm\_ = date2.mm\_;}\\
+
+\texttt{date1.dd\_ = date2.dd\_;}\\
+
+\texttt{date1.yyyy\_ = date2.yyyy\_;}\\
+\end{center}
+
+This is just like assignment between \texttt{struct} variables. So no big
+surprises here.
+
+You can re-define \texttt{operator=}. There are cases where you should.
+We'll see this later.
+
+
+\newpage\EMPHASIZE{Array of Objects}
+
+\begin{ex}
+Be brave ... Can you create an array of objects?
+Declare an array of \texttt{Date} objects. Set them to whatever dates you
+choose and print all of them.
+\end{ex}
+
+
+\newpage\EMPHASIZE{Pointers to Objects}
+
+Make sure you review pointers ... again!!!
+
+You can of course create pointers to objects:
+
+\begin{consolethree}[escapeinside=||]
+Date * p = new Date();
+p->add_y(1); // i.e. (*p).add_y(1)
+...
+delete p;
+\end{consolethree}
+
+Note the \verb!->! operator. This is just like for the case
+of \texttt{struct}. In other words, if \texttt{p} is a pointer and \texttt{m}
+is a member, then \texttt{(*p).m} is the same as \verb!p->m!.
+Likewise to call the \texttt{init()} of the \texttt{Date} \texttt{p} is
+pointing to, you do:
+
+\verb!p->init(1, 1, 2003).!
+
+\begin{ex}
+Create a \texttt{Date} pointer \texttt{tomorrow}.
+Allocate memory for \texttt{tomorrow}. Set the \texttt{Date} object that
+\texttt{tomorrow} points to so that the \texttt{Date} object is 2014/12/26.
+Print the object that points to.
+\end{ex}
+
+\begin{ex}
+Convert the \texttt{Robot} \texttt{struct} from earlier
+to a \texttt{class}. Create a pointer \texttt{c3p0} to a \texttt{Robot}
+object. Print its location, move right by 3 units then print its
+location again. Deallocate memory for \texttt{c3p0}.
+\end{ex}
+
+\begin{ex}
+Write a \texttt{Time} class. The member variables (instance variables)
+are \texttt{hour}, \texttt{min}, \texttt{sec} (\texttt{int} of course!) using
+the 24-hour format, i.e. hour is 0..23, min is 0..59, sec is 0..59.
+The member functions (methods) are
+
+\begin{itemize}
+\item void init(int, int, int)
+\item void print()
+\item int get\_hour()
+\item int get\_min()
+\item int get\_sec()
+\item void set\_hour(int)
+\item void set\_min(int)
+\item void set\_sec(int)
+\item void add\_hour(int)
+\item void add\_min(int)
+\item void add\_sec(int)
+\end{itemize}
+
+The \texttt{add\_hour}, \texttt{add\_min}, \texttt{add\_sec} must ensure
+that the resulting \texttt{Time} is valid. Of course you should test
+your \texttt{Time} class!
+\end{ex}
+
+\begin{ex}
+Create a pointer \texttt{p} to a \texttt{Time} object, allocate memory for
+\texttt{p}, and call all the available methods through \texttt{p}.
+Deallocate memory at the end.
+\end{ex}
+
+\begin{ex}
+Create an array of 1000 pointers to \texttt{Time} objects, allocate
+memory for all of them, set the first to time 00:00:00, the second to
+00:00:01, etc. and print their values. Deallocate memory for every
+pointer.
+\end{ex}
+
+\begin{ex}
+Declare a \texttt{Time} pointer \texttt{q} and allocate 1000 \texttt{Time}
+objects for \texttt{q} and do as above. Deallocate memory for \texttt{q}.
+\end{ex}
+
+\begin{ex}
+Does this program compile? (Private section before public)
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+class X
+{
+private:
+    int x;
+public:
+    void n();
+};
+
+void X::n()
+{
+}
+
+int main()
+{
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Does this compile? (Everything private)
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+class X
+{
+private:
+    int x;
+    void n();
+};
+
+void X::n()
+{
+}
+
+int main()
+{
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Does this compile? (Everything public)
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+class X
+{
+public:
+    int x;
+    void n();
+};
+
+void X::n()
+{
+}
+
+int main()
+{
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Does this compile? (Missing prototype)
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+class X
+{
+private:
+    int x;
+};
+
+void X::n()
+{
+}
+
+int main()
+{
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Does this program compile? (Several public)
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+class X
+{
+public:
+    int x;
+private:
+    int y;
+public:
+    int z;
+};
+
+int main()
+{
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+
+\newpage\EMPHASIZE{UML}
+
+\EMPHASIZE{UML (Unified modeling language)} is a standard language for
+modeling objects. It is an industrial standard for communication and it
+is used for designing systems.
+
+\EMPHASIZE{UP (Unified Process)} is a very popular process in software
+development. UP is tightly related to \EMPHASIZE{RUP (Rational Unified
+Process)} where UML comes from, and RUP is used by $>$50\% of
+the Fortune 500 companies.
+
+The following is a simplified version of the \EMPHASIZE{class diagram} for Date.
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+#p += Grid(0, 0, 10, 10)
+stri = r"""
+\begin{consolethree}[escapeinside=||]
+                Date
+
+
+  dd_: int
+  mm_: int
+  yyyy_: int
+
+
+  init(int, int, int): void
+  get_d(): int
+  
+\end{consolethree}
+"""
+p += Rect(0, 0, 8, 5, linewidth=0, s=stri)
+p += Rect(0.05, 3.75, 8.06, 5.05, linewidth=0.05)
+p += Rect(0.05, 2, 8.06, 3.75, linewidth=0.05)
+p += Rect(0.05, 0.55, 8.06, 2, linewidth=0.05)
+
+p += Line (points=[(10, 4.8), (4.75, 4.8)], linewidth=0.05, linecolor='red', endstyle='>')
+
+p += Rect(10.25, 4.75, 14.25, 5, linewidth=0, s=r'\textbf{class name}')
+
+p += Line (points=[(11, 3), (2.5, 3.5)], linewidth=0.05, linecolor='red', endstyle='>')
+p += Line (points=[(11, 3), (2.35, 3)], linewidth=0.05, linecolor='red', endstyle='>')
+p += Line (points=[(11, 3), (2.85, 2.55)], linewidth=0.05, linecolor='red', endstyle='>')
+p += Rect(11.25, 2.75, 12.25, 3.25, linewidth=0, s=r'\textbf{attributes}')
+
+p += Line (points=[(10, 1.25), (6, 1.35)], linewidth=0.05, linecolor='red', endstyle='>')
+p += Line (points=[(10, 1.25), (3.25, 0.95)], linewidth=0.05, linecolor='red', endstyle='>')
+p += Rect(10.25, 1.25, 12.25, 1.5, linewidth=0, s=r'\textbf{methods}')
+
+print(p)
+\end{python}
+Here's a slightly more decorated version:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+stri = r"""
+\begin{consolethree}[escapeinside=||]
+                Date
+
+
+ - dd_: int
+ - mm_: int
+ - yyyy_: int
+
+
+ - init(int, int, int): void
+ - get_d(): int
+  
+\end{consolethree}
+"""
+p += Rect(0, 0, 8, 5, linewidth=0, s=stri)
+p += Rect(0.05, 3.75, 8.06, 5.05, linewidth=0.05)
+p += Rect(0.05, 2, 8.06, 3.75, linewidth=0.05)
+p += Rect(0.05, 0.55, 8.06, 2, linewidth=0.05)
+
+p += Circle(0.5, 3.5, r=0.2, linecolor='red', linewidth=0.05)
+p += Circle(0.5, 1.35, r=0.2, linecolor='red', linewidth=0.05)
+
+p += Circle(-4.1,3.5,r=0.1, s='private', linewidth=0)
+p += Circle(-4.1,1.35,r=0.1, s='public', linewidth=0)
+
+p += Line(points=[(-2.85, 3.5), (0.25, 3.5)], linewidth=0.05, linecolor='red', endstyle='>')
+p += Line(points=[(-2.85, 1.35), (0.25, 1.35)], linewidth=0.05, linecolor='red', endstyle='>')
+print(p)
+\end{python}

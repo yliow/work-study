@@ -1,0 +1,463 @@
+\newpage\EMPHASIZE{32. Enumerations}
+
+\textsc{Objectives}
+\begin{itemize}
+\item Create enums
+\item Use enums
+\item Understand the relationship between enums and constants
+\end{itemize}
+
+Up to this point we have been using types provided by C++. Using these
+types we have also been using arrays and pointer types. Now we will
+create our own types using \textit{enum}. The \textit{enum} basically
+creates a type made up of integer constants.
+
+
+\newpage\EMPHASIZE{Enum}
+
+There's another way to rewrite a previous example:
+
+\begin{consolethree}[escapeinside=||]
+typedef int EmployeeCode;
+
+const EmployeeCode CEO = 0;
+const EmployeeCode MANAGER = 1;
+const EmployeeCode FULLTIME = 2;
+const EmployeeCode PARTTIME = 3;
+
+EmployeeCode code = CEO;
+\end{consolethree}
+
+Here's how you do it:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int main()
+{
+    enum EmployeeCode
+    {
+        CEO, MANAGER, FULLTIME, PARTTIME
+    };
+    EmployeeCode code = CEO;
+    std::cout << CEO << std::endl;
+    std::cout << code << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+Here comes some \textit{enum} jargon ...
+
+\begin{consolethree}[escapeinside=||]
+enum EmployeeCode
+{
+    CEO, MANAGER, FULLTIME, PARTTIME
+};
+\end{consolethree}
+
+The format of creating an enumeration is
+
+\begin{consolethree}[escapeinside=||]
+enum [enumeration name]
+{
+    [enumerator-1], ...,
+    [enumerator-n]
+};
+\end{consolethree}
+
+\begin{ex}
+Declare a \textit{Grade} enumeration containing
+enumerators \textit{A}, \textit{B}, \textit{C}, \textit{D}, and \textit{F}.
+Declare variable \textit{johnDoeGrade} of type \textit{Grade} and initialize
+it with \textit{A}. Print \textit{johnDoeGrade} and then print \textit{A}.
+\end{ex}
+
+
+\newpage\EMPHASIZE{Enum as a type}
+
+So what's the difference between
+
+\begin{consolethree}[escapeinside=||]
+typedef int EmployeeCode;
+
+const EmployeeCode CEO = 0;
+const EmployeeCode MANAGER = 1;
+const EmployeeCode FULLTIME = 2;
+const EmployeeCode PARTTIME = 3;
+\end{consolethree}
+
+and
+
+\begin{consolethree}[escapeinside=||]
+enum EmployeeCode
+{
+    CEO, MANAGER, FULLTIME, PARTTIME
+};
+\end{consolethree}
+
+(besides the fact that the second produces a shorter code)???
+
+The enumeration \textit{EmployeeCode} is actually \textbf{a new
+type}. This means that you can actually have this:
+
+\begin{ex}
+Try compiling this program:
+
+\begin{consolethree}[escapeinside=||]
+enum EmployeeCode
+{
+    CEO, MANAGER, FULLTIME, PARTTIME
+};
+
+void f(EmployeeCode c)
+{}
+
+void f(int i)
+{}
+
+int main()
+{
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+
+\newpage\EMPHASIZE{Enumerators and Integers}
+
+You might say ... ``Hang on there! What do you mean that the
+\textit{EmployeeCode} is a new type??? When I print an \textit{EmployeeCode}
+variable like this ...''
+
+\begin{consolethree}[escapeinside=||]
+enum EmployeeCode
+{
+    CEO, MANAGER, FULLTIME, PARTTIME
+};
+
+std::cout << CEO << std::endl;
+\end{consolethree}
+
+``I see that \textit{CEO} \textit{is} 0!!! So it \textit{is} an integer!!!
+Isn't it???''
+
+Yes and no.
+
+There's actually an automatic \textit{typecasting} between
+enumerators and integers. The statements:
+
+\begin{consolethree}[escapeinside=||]
+std::cout << CEO << std::endl;
+std::cout << MANAGER << std::endl;
+\end{consolethree}
+
+are really the same as
+
+\begin{consolethree}[escapeinside=||]
+std::cout << int(CEO) << std::endl;
+std::cout << int(MANAGER) << std::endl;
+\end{consolethree}
+
+This means that \textit{CEO}, because it's the
+\textbf{first} enumerator of an enumeration, is automatically
+typecast to the integer \textbf{0} if necessary, \textit{MANAGER}
+is automatically typecast to the integer 1 if necessary, etc.
+
+That example shows you that \textit{EmployeeCode} enumerator is
+automatically typecast to an \textit{int} when necessary. What about from
+an \textit{int} to \textit{EmployeeCode} enumerator? Try this:
+
+\begin{consolethree}[escapeinside=||]
+enum EmployeeCode
+{
+    CEO, MANAGER, FULLTIME, PARTTIME
+};
+
+EmployeeCode code = EmployeeCode(1);
+\end{consolethree}
+
+The last statement is the same as:
+
+\begin{consolethree}[escapeinside=||]
+EmployeeCode code = MANAGER;
+\end{consolethree}
+
+Now let's see if the typecast is also automatic. Try this:
+
+\begin{consolethree}[escapeinside=||]
+enum EmployeeCode
+{
+    CEO, MANAGER, FULLTIME, PARTTIME
+};
+
+EmployeeCode code = 1; // 1 becomes EmployeeCode(1)??
+\end{consolethree}
+
+The point: An integer is \textbf{not} automatically typecast to
+an enumerator.
+
+Since C/C++ will automatically typecast enumerators to integers if
+necessary, we can use it as though it's an integer. Here
+are some examples:
+
+Run this:
+
+\begin{consolethree}[escapeinside=||]
+enum operation {ADD, SUB, MUL, DIV};
+
+operation op = ADD;
+int x = 10, y = 20;
+
+switch (op)
+{
+    case ADD: std::cout << x + y; break;
+    case SUB: std::cout << x - y; break;
+    case MUL: std::cout << x * y; break;
+    case DIV: std::cout << x / y; break;
+}
+\end{consolethree}
+
+Try changing the \textit{op} to different values.
+
+\begin{ex}
+Is this a valid code segment? If so, what is the
+output? If it isn't explain why.
+
+\begin{consolethree}[escapeinside=||]
+enum operation {ADD, SUB, MUL, DIV};
+
+std::cout << ADD + SUB + MUL + DIV << std::endl;
+\end{consolethree}
+\end{ex}
+
+
+\newpage\EMPHASIZE{The integer value of an enumerator}
+
+You can actually change the integer value associated with an enumerator.
+Try this:
+
+\begin{consolethree}[escapeinside=||]
+enum CutOff
+{
+    A = 90, B = 80, C = 70, D = 60, F = 0
+};
+
+std::cout << B << std::endl;
+CutOff x = B;
+std::cout << x << std::endl;
+\end{consolethree}
+
+Now try this:
+
+\begin{consolethree}[escapeinside=||]
+enum X
+{
+    a = 5, b, c, d = 42, e, f
+};
+
+std::cout << a << ' ' << b << ' ' << c << ' '
+          << d << ' ' << e << ' ' << f << std::endl;
+\end{consolethree}
+
+And ... you \textbf{have} to try this because
+it's a common gotcha:
+
+\begin{consolethree}[escapeinside=||]
+enum X {a = 1.1};
+\end{consolethree}
+
+The point is that enumerators can only be initialized with integer
+values.
+
+\begin{ex}
+Either write down the output of the following code segment or
+find the error:
+
+\begin{consolethree}[escapeinside=||]
+enum X
+{
+    a, b, c, d = 42, e, f
+};
+
+X foo = b;
+X bar = f;
+std::cout << b << f << std::endl;
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Either write down the output of the following code segment or
+find the error:
+
+\begin{consolethree}[escapeinside=||]
+enum Y
+{
+    a = 1, b, c, d = 4.5, e = 5.6, f = 6.7
+};
+
+X foo = b;
+std::cout << b << std::endl;
+\end{consolethree}
+\end{ex}
+
+
+\newpage\EMPHASIZE{Enum Without Enumeration Name}
+
+Notice that
+
+\begin{consolethree}[escapeinside=||]
+enum EmployeeCode
+{
+    CEO, MANAGER, FULLTIME, PARTTIME
+};
+\end{consolethree}
+
+actually does \textbf{two} things:
+
+\begin{itemize}
+\item It creates four constants (enumerators)
+\item It gives a type (enumeration) for the four constants.
+\end{itemize}
+
+You can actually use the \textit{enum} to create constants without
+creating an enumeration. Try this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int main()
+{
+    enum {A, B, C, D, E};
+    std::cout << A << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+\begin{ex}
+Rewrite the following using enumerators:
+
+\begin{consolethree}[escapeinside=||]
+const int FEE = 1;
+const int FIE = 0;
+const int FOE = 2;
+const int FUM = 3;
+\end{consolethree}
+
+Omit the enumeration name and integer values.
+\end{ex}
+
+
+\newpage\EMPHASIZE{Symbolic constants}
+
+Sometimes we don't really care about the integer value
+of enumerators. We really want the names of the enumerators to make it
+easier to read our programs. Look at this example:
+
+\begin{consolethree}[escapeinside=||]
+enum GameState
+{
+    INIT, MENU, STARTING, RUN, RESTART, EXIT
+};
+
+GameState gameState = INIT;
+
+int main()
+{
+    int energy = 1000;
+
+    while (gameState != EXIT)
+    {
+        ...
+        if (energy == 0)
+            gameState = EXIT
+        ...
+
+        switch (gameState)
+        {
+            case INIT: ...
+            case MENU: ...
+            case STARTING: ...
+            case RUN: ...
+            case RESTART: ...
+            case EXIT: ...
+        }
+    }
+
+    return 0;
+}
+\end{consolethree}
+
+Notice that it doesn't matter if the integer value of
+\textit{INIT} is 0 or 1 or 2 or what-have-you.
+
+Using this technique of programming where the code to execute is based
+on the value of a variable, you create something called a finite state
+machine.
+
+\begin{ex}
+Given
+
+\begin{consolethree}[escapeinside=||]
+enum EnumA {x, y, z};
+enum EnumB {a, b, c};
+\end{consolethree}
+
+does this work?
+
+\begin{consolethree}[escapeinside=||]
+EnumA i = a;
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Given
+
+\begin{consolethree}[escapeinside=||]
+enum EnumA {x, y, z};
+enum EnumB (a, b, c};
+\end{consolethree}
+
+does this work?
+
+\begin{consolethree}[escapeinside=||]
+EnumA a0 = x;
+EnumB a1 = a;
+std::cout << (a0 == a1) << std::endl;
+\end{consolethree}
+\end{ex}
+
+
+\newpage\EMPHASIZE{Multi-file Compilation}
+
+Enumerations can be placed in a header file if other files (source or
+header) use it.
+
+
+\newpage\EMPHASIZE{Summary}
+
+You can create symbolic constants using enum.
+
+You can give the set of constants a name. This creates a type.
+
+You can then create a variable of an enum type.
+
+\begin{consolethree}[escapeinside=||]
+enum PlaneState { STATIONARY, FLYING, MAINTENANCE };
+PlaneState boeing747a = STATIONARY;
+PlaneState boeing747b = FLYING;
+\end{consolethree}
+
+By default enumerators are given integer values: 0, 1, 2, ...
+
+You can give the enumerators values:
+
+\begin{consolethree}[escapeinside=||]
+enum PlaneState
+{
+    STATIONARY=5, FLYING, MAINTENANCE=10
+}; // int(FLYING) is 6
+\end{consolethree}
+
+The name of the enumeration is optional.
+
+\end{document}

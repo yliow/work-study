@@ -103,7 +103,7 @@ for chap in chap_list:
           counter += 1
           
           if exercise != None:
-            note_acc.append(r"\input{%s/%s/exercises/%s/question.tex}" % ('temp', chap, exercise) )
+            note_acc.append(r"\input{../exercises/%s/question.tex}" % exercise )
           else:
             raise Exception("MALFORMED EXERCISE, COULD NOT CREATE")
           

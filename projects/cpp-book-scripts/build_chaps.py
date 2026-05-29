@@ -15,7 +15,6 @@ latextool = 'latextool_basic.py'
 make = 'makefile'
 compilation_files = [thismac, thispre, thispost, thispack, thistitle, latexcirc, latextool, make]
 
-
 #dirs
 dir_ = os.getcwd()
 chapdir = dir_ + '/temp/'
@@ -31,3 +30,9 @@ for chaps in f:
   #copy necessary files to book directory
   for file_ in compilation_files:
     os.system('cp %s %s' % (dir_ + '/' + file_, bookdir))
+  
+  #create a proper "main.tex" for the chapter
+  with open(bookdir + 'main.tex', 'w') as mtex:
+    mtex.write(r'\input{thispreamble.tex}')
+    mtex.write(r'\input{../chap.tex}')    
+    mtex.write(r'\input{thispostamble.tex}')

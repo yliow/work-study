@@ -79,13 +79,14 @@ for chap in chap_list:
         #write section
         for line in s:
           t.write(line)
+          
       k += 1
       
       #write sections to chap.tex file
-      with open(dir_ + '/temp/' + chap + '/main.tex', 'w') as chaptex:
+      with open(dir_ + '/temp/' + chap + '/chap.tex', 'w') as chaptex:
         for entry in sections_list:
-          chaptex.write("\input{%s}\n" % ('temp/' + chap + '/' + entry) )
-
+          chaptex.write("\input{%s}\n" % ('../' + entry)) #'temp/' + chap + '/' + 
+          
         #write footer for chap.tex
         chaptex.write(footer_chaptex)
         

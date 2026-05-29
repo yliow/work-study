@@ -1,0 +1,1267 @@
+\newpage\EMPHASIZE{21. Function Prototypes}
+
+\textsc{Objectives}
+\begin{itemize}
+\item Write function prototypes
+\item Write header files and build a multifile project
+\end{itemize}
+
+\newpage\EMPHASIZE{Function Prototypes}
+
+\begin{ex}
+What's wrong with the program. You have 2 seconds.
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int main()
+{
+    f(1);
+    return 0;
+}
+
+void f(int x)
+{
+    std::cout << x << std::endl;
+}
+\end{consolethree}
+Correct it. Verify with C++.
+\end{ex}
+
+Now try this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+|\tikzmarknode{proto}{void f(int);} \xsidebox[0cm]{0cm}{}{protobox}{Function prototype for \texttt{f()}}|
+
+int main()
+{
+    f(1);
+    return 0;
+}
+
+void f(int x)
+{
+    std::cout << x << std::endl;
+    return;
+}
+\end{consolethree}
+\DrawArrow{protobox}{proto}
+A \EMPHASIZE{function prototype} basically tells C++ that the function does exist. The information contained in a function prototype includes:
+
+\begin{itemize}
+\item \EMPHASIZE{name} of the function
+\item the \EMPHASIZE{return type} and
+\item the \EMPHASIZE{types of the parameters}.
+\end{itemize}
+
+The function prototype is the minimal amount of information needed to get your C++ compiler to work with your C++ file.
+
+Why?
+
+Well C++ needs to compile \texttt{main()} to work which means from the side of \texttt{main()}, the \texttt{main()} function needs to know what to push onto the stack to communication with \texttt{f()} and also what value (if any) is expected from the return of calling \texttt{f()}. As far as \texttt{main()} is concerned, all \texttt{main()} needs is the ``communication infrastructure'' of \texttt{f()}. \texttt{main()} doesn't need to know how \texttt{f()} carries out its duty. We'll come back to this again later.
+
+The format of a function prototype is exactly the same as the header of a function except for the following:
+
+\begin{itemize}
+\item a function prototype must end with a semicolon
+\item the parameter names can be left out. (You can retain them if you wish).
+\end{itemize}
+
+Here's another example. First the program without prototype:
+
+\begin{consolethree}[escapeinside=||]
+int sum(int start, int end, int step)
+{
+    int sum = 0;
+    if (step > 0)
+    {
+        for (int i = start; i <= end; i += step)
+        {
+            sum += i;
+        }
+    }
+    else if (step < 0)
+    {
+        for (int i = start; i >= end; i += step)
+        {
+            sum += i;
+        }
+    }
+    return sum;
+}
+
+int main()
+{
+    std::cout << sum(1, 10, 1) << std::endl;
+    std::cout << sum(2, 10, 4) << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+And now the program with prototype:
+
+\begin{consolethree}[escapeinside=||]
+|\textbf{int sum(int, int, int);}|
+
+int main()
+{
+    std::cout << sum(1, 10, 1) << std::endl;
+    return 0;
+}
+
+int sum(int start, int end, int step)
+{
+    int sum = 0;
+    if (step > 0)
+    {
+        for (int i = start; i <= end; i += step)
+        {
+            sum += i;
+        }
+    }
+    else if (step < 0)
+    {
+        for (int i = start; i >= end; i += step)
+        {
+            sum += i;
+        }
+    }
+    return sum;
+}
+\end{consolethree}
+
+\begin{ex}
+Write a function prototype for the given function. Run the
+program to make sure it works.
+
+\begin{consolethree}[escapeinside=||]
+// put prototype of isNiceNumber() here
+
+int main()
+{
+    std::cout << isNiceNumber(1) << std::endl;
+    std::cout << isNiceNumber(42) << std::end;
+}
+
+bool isNiceNumber(int x)
+{
+    return (x == 42);
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Write a function prototype for the given function. Run the
+program to make sure it works.
+\begin{consolethree}[escapeinside=||]
+// put prototype for predictGoogleStockPrice here
+
+int main()
+{
+    std::cout << predictGoogleStockPrice(1, 1, 2008)
+              << '\n'
+              << "don't count on it ..."
+              << std::endl;
+    return 0;
+}
+
+int predictGoogleStockPrice(int mth, int day, int yr)
+{
+    if (yr >= 2004)
+    {
+        return 450 * (yr - 2004)
+               + (mth % 2) * (day - 2);
+    }
+    else
+    {
+        return 0;
+    }
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Write a function that accepts an array x of integers and an
+integer i, computes and returns the sum of values in an array from index
+position 0 to index position i.
+\begin{consolethree}[escapeinside=||]
+// put prototype here
+
+int main()
+{
+    int x[10] = {0, 2, 4, 6, 8, 1, 3, 5, 7, 9};
+    for (int i = 0; i < 10; i++)
+    {
+        std::cout << sum(x, i);
+    }
+    return 0;
+}
+
+// put function definition (actual function) here
+\end{consolethree}
+\end{ex}
+
+Now you might ask: ``Why bother? Why not just put the function
+\texttt{f()} before \texttt{main()}?''
+
+There are two reasons.
+
+First read this program and figure out what the program is trying to do:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void f(int x)
+{
+    std::cout << "in f() ..." << std::endl;
+    if (x > 0) g(x - 1);
+    return;
+}
+
+void g(int x)
+{
+    std::cout << "in g() ..." << std::endl;
+    if (x > 0) f(x - 1);
+    return;
+}
+
+int main()
+{
+    f(5);
+    return 0;
+}
+\end{consolethree}
+
+Next tell me why it won't work. You have 5 seconds ...
+
+And finally, tell me why moving functions around won't help!!! The point is
+that \texttt{f()} and \texttt{g()} calls each other!!!
+
+Now try this ...
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void g(int);
+
+void f(int x)
+{
+    std::cout << "in f() ... x = " << x << std::endl;
+    if (x > 0) g(x - 1);
+    return;
+}
+
+void g(int x)
+{
+    std::cout << "in g() ... x = " << x << std::endl;
+    if (x > 0) f(x - 1);
+    return;
+}
+
+int main()
+{
+    f(5);
+    return 0;
+}
+\end{consolethree}
+
+Do you see now that for this scenario, you \textbf{must} have a function
+prototype to make this program work?
+
+For the above situation, we say that \texttt{f()} and \texttt{g()} are \EMPHASIZE{mutually recursive}. A function say \texttt{h()} can also call itself; we say that \texttt{h()} is \textbf{recursive}. I don't want to spend any more time on recursion since there will be a set of notes for that later. The point here is to show you that there are cases where you have to untangle function dependencies using function prototypes.
+
+Before I go on to the second reason, you should know that the standard ``layout'' of a C/C++ program looks like this:
+
+\begin{consolethree}[escapeinside=||]
+... documentation (comments) ...
+
+... #includes ...
+
+... global constants ...
+
+... function prototypes ...
+
+int main()
+{
+    ...
+}
+
+... function definitions ...
+\end{consolethree}
+
+(There are other parts but we haven't talked about them yet.)
+
+So our above program can be professionally (ahem ...) written like this:
+
+\begin{consolethree}[escapeinside=||]
+// This program demonstrates the use of prototypes
+// with two mutually recursive functions.
+
+#include <iostream>
+
+void g(int);
+void f(int);
+
+int main()
+{
+    f(5);
+    return 0;
+}
+
+void f(int x)
+{
+    std::cout << "in f() ... x = " << x << std::endl;
+    if (x > 0) g(x - 1);
+    return;
+}
+
+void g(int x)
+{
+    std::cout << "in g() ... x = " << x << std::endl;
+    if (x > 0) f(x - 1);
+    return;
+}
+\end{consolethree}
+
+(Actually moving the function bodies below \texttt{main()} is not that crucial).
+
+Once again in C/C++, a function, say \texttt{func1()}, can call another,
+say \texttt{func2()}, if \texttt{func1()} knows the ``communication
+structure'' of \texttt{func2()}. \texttt{func1()} does not need the
+definition or body of \texttt{func2()}. And the communication structure is
+made up of the types of the parameters of \texttt{func2()} and the return
+type of \texttt{func2()}. That's why I drew this picture
+for you earlier showing the types of data passed in and the type of
+value returned.
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+func2 = Rect(x0=3, y0=0, x1=6, y1=3, label=r'{\tt func2()}', linewidth=0.05)
+p += func2
+
+p += Rect(x0=0, y0=2.2, x1=2.2, y1=2.8, label=r'{\small param-1 type}', linewidth=0.05)
+p += Rect(x0=0.5, y0=1.3, x1=1.5, y1=1.7, label=r'{\small ...}', linewidth=0)
+p += Rect(x0=0, y0=0.2, x1=2.2, y1=0.8, label=r'{\small param-n type}', linewidth=0.05)
+
+p += Line(points=[(2.2, 2.5), (3, 2.5)], linewidth=0.05, endstyle='>')
+p += Line(points=[(2.2, 0.5), (3, 0.5)], linewidth=0.05, endstyle='>')
+
+p += Rect(x0=7, y0=1.2, x1=9, y1=1.8, label=r'{\small return type}', linewidth=0)
+p += Line(points=[(6, 1.5), (7, 1.5)], linewidth=0.05, endstyle='>')
+
+print(p)
+\end{python}
+
+The function prototype of \texttt{func2()} is sometimes called the
+\textbf{interface} of \texttt{func2()}. Why? Because that is how
+\texttt{func2()} interfaces with the outside world.
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+# func1 box
+p += Rect(x0=0, y0=0, x1=2.5, y1=2, label=r'{\tt func1()}', linewidth=0.05)
+
+# Interface bar (tall thin rectangle)
+p += Rect(x0=4, y0=-0.5, x1=4.5, y1=2.5, label='', linewidth=0.05)
+
+# func2 box
+p += Rect(x0=6, y0=0, x1=8.5, y1=2, label=r'{\tt func2()}', linewidth=0.05)
+
+# Arrows between func1 and interface
+p += Line(points=[(2.5, 1.3), (4, 1.3)], linewidth=0.05, endstyle='>')
+p += Line(points=[(4, 0.7), (2.5, 0.7)], linewidth=0.05, endstyle='>')
+
+# Arrows between interface and func2
+p += Line(points=[(4.5, 1.3), (6, 1.3)], linewidth=0.05, endstyle='>')
+p += Line(points=[(6, 0.7), (4.5, 0.7)], linewidth=0.05, endstyle='>')
+
+# Label
+p += Rect(x0=3.2, y0=-1.5, x1=5.3, y1=-0.8, label=r'{\small interface of}', linewidth=0)
+p += Rect(x0=3.2, y0=-2.1, x1=5.3, y1=-1.5, label=r'{\small \texttt{func2()}}', linewidth=0)
+
+print(p)
+\end{python}
+
+\begin{ex}
+Rewrite the following program using function prototypes and
+moving the function bodies below \texttt{main()} and making all constants
+global to remove duplicate constants declarations.
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void printRules()
+{
+    const int MIN_HEADS = 2;
+    const int MAX_HEADS = 10;
+    std::cout << "To join MENSA you need at least "
+              << MIN_HEADS << " and at most "
+              << MAX_HEADS << std::endl;
+    return;
+}
+
+int getHeads()
+{
+    int heads;
+    std::cout << "How many heads to you have? ";
+    std::cin >> heads;
+    return heads;
+}
+
+bool passMinTest(int heads)
+{
+    const int MIN_HEADS = 2;
+    if (heads < MIN_HEADS)
+    {
+        std::cout << "Too few! Try again!"
+                  << std::endl;
+        return false;
+    }
+    else
+        return true;
+}
+
+bool passMaxTest(int heads)
+{
+    const int MAX_HEADS = 10;
+    if (heads > MAX_HEADS)
+    {
+        std::cout << "Don't show off! Try again!"
+                  << std::endl;
+        return false;
+    }
+    else
+        return true;
+}
+
+bool passTest(int x)
+{
+    return passMinTest(x) && passMaxTest(x);
+}
+
+int main()
+{
+    int heads = 0;
+    printRules();
+    heads = getHeads();
+    while (!passTest(heads))
+    {
+        heads = getHeads();
+    }
+    std::cout << "OK. You can join MENSA."
+              << std::endl;
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+Now for the second reason ...
+
+\newpage\EMPHASIZE{Header Files and Multi-file Compilation}
+
+Remember the first week of class when I told you not to worry about
+
+\verb!#include <iostream>!
+
+and I told you we will come to it? Now's the time. In
+this section I'll explain the purpose of this \#include
+business. I'll also explain, at a very high level, the
+compilation and linking process that your compiler performs on your
+program in order to produce a machine executable code. Your C++ files
+are human readable; the machine (your PC/laptop/cellphone/etc) can only
+understand machine code.
+
+And there's no better way to understand this \#include
+business than to do an example.
+
+First here's a program:
+
+\begin{consolethree}[escapeinside=||]
+// Name: testmax.cpp
+
+#include <iostream>
+
+int max(int, int);
+
+int main()
+{
+    std::cout << max(3, 5) << std::endl;
+    return 0;
+}
+
+int max(int x, int y)
+{
+    if (x >= y)
+        return x;
+    else
+        return y;
+}
+\end{consolethree}
+
+Make sure it works.
+
+Now create a new cpp file called \texttt{mymath.cpp} that contains the
+\texttt{max()} function. (Follow the instructions given in class -- the
+process depends very much on the software you use to write programs).
+
+\begin{consolethree}[escapeinside=||]
+// Name: mymath.cpp
+
+int max(int x, int y)
+{
+    if (x >= y)
+        return x;
+    else
+        return y;
+}
+\end{consolethree}
+
+Now remove the \texttt{max()} function in \texttt{testmax.cpp} -- do not
+remove the function prototype. Altogether, now you have two cpp files:
+
+\begin{consolethree}[escapeinside=||]
+// Name: testmax.cpp
+
+#include <iostream>
+
+int max(int, int);
+
+int main()
+{
+    std::cout << max(3, 5) << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+and
+
+\begin{consolethree}[escapeinside=||]
+// Name: mymath.cpp
+
+int max(int, int);
+
+int max(int x, int y)
+{
+    if (x >= y)
+        return x;
+    else
+        return y;
+}
+\end{consolethree}
+
+Run your program and you'll find that it works.
+
+When I say ``compile and run your program'', the compiler software you
+use actually performs (at least) two things to build a machine
+executable code. Each cpp file (and you have two in this case) produces an \EMPHASIZE{object code}. In our example \texttt{testmax.cpp} and \texttt{mymath.cpp} produce \texttt{testmax.obj} and \texttt{mymath.obj}. This step is called \EMPHASIZE{compilation}.
+
+The next step involves combining both object code into a single machine
+executable code, \texttt{testmax.exe}.
+
+You see the function prototype in \texttt{testmax.cpp}:
+
+\begin{consolethree}[escapeinside=||]
+// Name: testmax.cpp
+
+#include <iostream>
+
+|\textbf{int max(int, int);}|
+
+int main()
+...
+\end{consolethree}
+
+tells \texttt{main()} how to communicate with \texttt{max()} - what types
+and values should be sent to \texttt{max()} and what type and value (if
+any) is to be received. This is all built into \texttt{testmax.obj}.
+However \texttt{testmax.obj} does not contain the logic to actually
+execute \texttt{max()} since the logic is in \texttt{mymath.obj}.
+
+The next thing the compiler software does is called \EMPHASIZE{object code linking}. It takes \texttt{testmax.obj} and \texttt{mymath.obj} and produces \texttt{testmax.exe}. Here's a picture to help you:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(x0=-0.25, y0=4, x1=2.75, y1=5, label=r'{\tt testmax.cpp}', linewidth=0.05)
+p += Rect(x0=3.75, y0=4, x1=6.75, y1=5, label=r'{\tt mymath.cpp}', linewidth=0.05)
+
+p += Line(points=[(0, 3.5), (8, 3.5)], linewidth=0.02, linestyle='dashed', startstyle='', endstyle='')
+p += Rect(x0=8.5, y0=3.2, x1=10, y1=3.8, label=r'{\small compile}', linewidth=0)
+
+p += Line(points=[(1.25, 4), (1.25, 3)], linewidth=0.05, endstyle='>')
+p += Line(points=[(5.25, 4), (5.25, 3)], linewidth=0.05, endstyle='>')
+
+p += Rect(x0=-0.25, y0=2, x1=2.75, y1=3, label=r'{\tt testmax.obj}', linewidth=0.05)
+p += Rect(x0=3.75, y0=2, x1=6.75, y1=3, label=r'{\tt mymath.obj}', linewidth=0.05)
+
+p += Line(points=[(0, 1.5), (8, 1.5)], linewidth=0.02, linestyle='dashed', startstyle='', endstyle='')
+p += Rect(x0=8.5, y0=1.2, x1=9.5, y1=1.8, label=r'{\small link}', linewidth=0)
+
+p += Line(points=[(1.25, 2), (1.25, 1)], linewidth=0.05, endstyle='>')
+p += Line(points=[(5.25, 2), (3.5, 1)], linewidth=0.05, endstyle='>')
+
+p += Rect(x0=-0.25, y0=0, x1=2.75, y1=1, label=r'{\tt testmax.exe}', linewidth=0.05)
+
+print(p)
+\end{python}
+
+When the computer runs the program, the file that is executed is
+actually \texttt{testmax.exe}.
+
+Now I want to explain another step in the whole compilation process. And
+this will explain the \#include business.
+
+Now create a \EMPHASIZE{header file} \texttt{mymath.h} (follow the
+instructions given in class -- the process depends very much on the
+software you use to write programs). It includes some boilerplate code
+and the function prototype from \texttt{testmax.cpp}:
+
+\begin{consolethree}[escapeinside=||]
+// Name: mymath.h
+#ifndef MYMATH_H
+#define MYMATH_H
+
+int max(int, int);
+
+#endif
+\end{consolethree}
+
+(remember to add a blank line at the end -- it's important!) and your cpp
+file containing \texttt{main()} should now look like this:
+
+\begin{consolethree}[escapeinside=||]
+// Name: testmax.cpp
+
+#include <iostream>
+#include "mymath.h"
+
+int main()
+{
+    std::cout << max(3, 5) << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+Do the same for \texttt{mymath.cpp}:
+
+\begin{consolethree}[escapeinside=||]
+// Name: mymath.cpp
+
+#include "mymath.h"
+
+int max(int x, int y)
+{
+    if (x >= y)
+        return x;
+    else
+        return y;
+}
+\end{consolethree}
+
+Altogether you have now three files:
+
+\begin{consolethree}[escapeinside=||]
+// Name: mymath.h
+#ifndef MYMATH_H
+#define MYMATH_H
+
+int max(int, int);
+
+#endif
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// Name: testmax.cpp
+
+#include <iostream>
+#include "mymath.h"
+
+int main()
+{
+    std::cout << max(3, 5) << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// Name: mymath.cpp
+
+#include "mymath.h"
+
+int max(int x, int y)
+{
+    if (x >= y)
+        return x;
+    else
+        return y;
+}
+\end{consolethree}
+
+Run your program and make sure it works.
+
+What's the point of \texttt{\#include "mymath.h"}?
+
+When you compile your program, the compiler software copies all the
+contents of the file \texttt{mymath.h} (excluding the boilerplate code) to
+the places where you have \texttt{\#include "mymath.h"}.
+I'm not going to explain the boilerplate code in bold:
+
+\begin{consolethree}[escapeinside=||]
+// Name: mymath.h
+|\textbf{\#ifndef MYMATH\_H}|
+|\textbf{\#define MYMATH\_H}|
+
+int max(int, int);
+
+|\textbf{\#endif}|
+\end{consolethree}
+
+All you need to know is that if you header file is named \texttt{xyz.h},
+then the boilerplate code should look like this:
+
+\begin{consolethree}[escapeinside=||]
+// Name: xyz.h
+|\textbf{\#ifndef XYZ\_H}|
+|\textbf{\#define XYZ\_H}|
+
+...
+
+|\textbf{\#endif}|
+\end{consolethree}
+
+This step is called \EMPHASIZE{preprocessing}. For our example, after
+preprocessing the \texttt{testmax.cpp} file
+
+\begin{consolethree}[escapeinside=||]
+// Name: testmax.cpp
+
+#include <iostream>
+#include "mymath.h"
+
+int main()
+{
+    std::cout << max(3, 5) << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+it becomes the following in the memory of the compiler software (the
+actual testmax.cpp file is \textbf{\texttt{not}} changed).
+
+\begin{consolethree}[escapeinside=||]
+// testmax.cpp
+
+#include <iostream>
+
+int max(int, int);
+
+int main()
+{
+    std::cout << max(3, 5) << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+Anyway ... the compilation process is now actually made up of three steps:
+
+\xsidebox[0cm]{0cm}{}{aaaaaaaaaaaa}{The inclusion of \texttt{mymath.h} in \texttt{testmax.cpp} and \texttt{mymath.cpp} is only done in the compiler's memory. The actual files (\texttt{testmax.cpp} and \texttt{mymath.cpp}) were not changed}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(x0=-0.25, y0=7, x1=2.75, y1=8, label=r'{\tt testmax.cpp}', linewidth=0.05)
+p += Rect(x0=3.25, y0=7, x1=5.75, y1=8, label=r'{\tt mymath.h}', linewidth=0.05)
+p += Rect(x0=6.25, y0=7, x1=9.25, y1=8, label=r'{\tt mymath.cpp}', linewidth=0.05)
+
+p += Line(points=[(3.25, 7.5), (1.75, 6)], linewidth=0.05, endstyle='>')
+p += Line(points=[(5.75, 7.5), (7.25, 6)], linewidth=0.05, endstyle='>')
+
+p += Line(points=[(-0.5, 6.5), (9.5, 6.5)], linewidth=0.02, linestyle='dashed', startstyle='', endstyle='')
+p += Rect(x0=10, y0=6.2, x1=10, y1=6.8, label=r'{\tiny preprocessing}', linewidth=0)
+
+p += Line(points=[(1.25, 7), (1.25, 6)], linewidth=0.05, endstyle='>')
+p += Line(points=[(7.75, 7), (7.75, 6)], linewidth=0.05, endstyle='>')
+
+p += Rect(x0=-0.25, y0=5, x1=2.75, y1=6, label=r'{\tt testmax.cpp}', linewidth=0.05)
+p += Rect(x0=6.25, y0=5, x1=9.25, y1=6, label=r'{\tt mymath.cpp}', linewidth=0.05)
+
+p += Line(points=[(-0.5, 4.5), (9.5, 4.5)], linewidth=0.02, linestyle='dashed', startstyle='', endstyle='')
+p += Rect(x0=10, y0=4.2, x1=10, y1=4.8, label=r'{\tiny compile}', linewidth=0)
+
+p += Line(points=[(1.25, 5), (1.25, 4)], linewidth=0.05, endstyle='>')
+p += Line(points=[(7.75, 5), (7.75, 4)], linewidth=0.05, endstyle='>')
+
+p += Rect(x0=-0.25, y0=3, x1=2.75, y1=4, label=r'{\tt testmax.obj}', linewidth=0.05)
+p += Rect(x0=6.25, y0=3, x1=9.25, y1=4, label=r'{\tt mymath.obj}', linewidth=0.05)
+
+p += Line(points=[(-0.5, 2.5), (9.5, 2.5)], linewidth=0.02, linestyle='dashed', startstyle='', endstyle='')
+p += Rect(x0=10, y0=2.2, x1=10, y1=2.8, label=r'{\tiny link}', linewidth=0)
+
+p += Line(points=[(1.25, 3), (1.25, 2)], linewidth=0.05, endstyle='>')
+p += Line(points=[(7.75, 3), (4, 2)], linewidth=0.05, endstyle='>')
+
+p += Rect(x0=-0.25, y0=1, x1=2.75, y1=2, label=r'{\tt testmax.exe}', linewidth=0.05)
+
+p += Line(points=[(12.55, 5.5), (9.5, 5.5)], linewidth=0.05, linecolor='red', endstyle='>')
+
+print(p)
+\end{python}
+To learn more about issues like machine code (in the file \texttt{testmax.exe}) you need to take CISS360 (Assembly Language andComputer Systems.)
+
+\begin{ex}
+Add a \texttt{min()} function to \texttt{mymath.cpp}, add
+a function prototype for \texttt{min()} in \texttt{mymath.h}. Finally modify
+your \texttt{main()} as follows:
+\begin{consolethree}[escapeinside=||]
+// testmax.cpp
+
+#include <iostream>
+#include "mymath.h"
+
+int main()
+{
+    std::cout << max(3, 5) << std::endl;
+    std::cout << min(3, 5) << std::endl;
+    return 0;
+}
+\end{consolethree}
+Run the program.
+\end{ex}
+
+So what have we done?
+
+In our previous example I told you that a function prototype for
+function \texttt{func2()} is like its interface with the outside world. If
+\texttt{func1()} calls \texttt{func2()} we have this picture:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(x0=0, y0=0, x1=2.5, y1=2, label=r'{\tt func1()}', linewidth=0.05)
+
+p += Rect(x0=4, y0=-0.5, x1=4.5, y1=2.5, label='', linewidth=0.05)
+
+p += Rect(x0=6, y0=0, x1=8.5, y1=2, label=r'{\tt func2()}', linewidth=0.05)
+
+p += Line(points=[(2.5, 1.3), (4, 1.3)], linewidth=0.05, startstyle='>', endstyle='>')
+p += Line(points=[(4.5, 1.3), (6, 1.3)], linewidth=0.05, startstyle='>', endstyle='>')
+
+p += Rect(x0=3.2, y0=-1.5, x1=5.3, y1=-0.8, label=r'{\small interface of}', linewidth=0)
+p += Rect(x0=3.2, y0=-2.1, x1=5.3, y1=-1.5, label=r'{\small \texttt{func2()}}', linewidth=0)
+
+print(p)
+\end{python}
+
+For our current example, we placed our functions into a separate cpp
+file called \texttt{mymath.cpp} and put all the function prototypes of
+functions in \texttt{mymath.cpp} into \texttt{mymath.h}. We can then call
+the functions in \texttt{mymath.cpp} from our main source file (say
+it's called testmax.cpp)
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(x0=-0.25, y0=0, x1=2.75, y1=2, label=r'{\tt testmax.cpp}', linewidth=0.05)
+
+p += Rect(x0=4, y0=-0.5, x1=4.5, y1=2.5, label='', linewidth=0.05)
+
+p += Rect(x0=5.5, y0=0, x1=9, y1=2, label=r'{\tt mymath.cpp}', linewidth=0.05)
+
+p += Line(points=[(2.75, 1.3), (4, 1.3)], linewidth=0.05, endstyle='>', startstyle='>')
+p += Line(points=[(4.5, 1.3), (5.5, 1.3)], linewidth=0.05, startstyle='>', endstyle='>')
+
+p += Rect(x0=3.5, y0=-1.2, x1=5, y1=-0.6, label=r'{\tt mymath.h}', linewidth=0)
+
+print(p)
+\end{python}
+
+Of course any function in \texttt{testmax.cpp} (not just \texttt{main()}) can call the functions in \texttt{mymath.cpp}.
+
+We have basically broken up our original program into two cpp file. The header file \texttt{mymath.h} provides an interface for \texttt{mymath.cpp}.
+
+Why is that good?
+
+Because if one day you need the \texttt{max()} and \texttt{min()} functions in another project, say the main source file is called \texttt{main2.cpp} then you can copy \texttt{mymath.cpp} and \texttt{mymath.h} to the project space of \texttt{main2.cpp} and you have the functions in \texttt{mymath.cpp} available to \texttt{main2.cpp}.
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(x0=0, y0=0, x1=2.5, y1=2, label=r'{\tt main2.cpp}', linewidth=0.05)
+
+p += Rect(x0=4, y0=-0.5, x1=4.5, y1=2.5, label='', linewidth=0.05)
+
+p += Rect(x0=6, y0=0, x1=8.5, y1=2, label=r'{\tt mymath.cpp}', linewidth=0.05)
+
+p += Line(points=[(2.5, 1.3), (4, 1.3)], linewidth=0.05, startstyle='>', endstyle='>')
+p += Line(points=[(4.5, 1.3), (6, 1.3)], linewidth=0.05, startstyle='>', endstyle='>')
+
+# Label
+p += Rect(x0=3.5, y0=-1.2, x1=5, y1=-0.6, label=r'{\tt mymath.h}', linewidth=0)
+
+print(p)
+\end{python}
+
+\begin{ex}
+Create a brand new project, copy \texttt{mymath.cpp}
+and \texttt{mymath.h} to the new project folder. Add these files to your
+project. Create a \texttt{main()} that calls \texttt{min()} and
+\texttt{max()}.
+\end{ex}
+
+OK. Let's step back and take a look at what
+we've done. Previously we ``re-use'' the code for
+\texttt{max()} and \texttt{min()} by creating a function from chunks of
+code. This reduces code duplication.
+
+But this is code reduction for \EMPHASIZE{one single cpp file}.
+
+To make the functions \EMPHASIZE{more re-usable}, we took those out and put
+them into a new cpp file. We need a header file too.
+
+This allows us to re-use code easily for two totally separate programs.
+
+(Actually you don't even need to copy \texttt{mymath.cpp}
+and \texttt{mymath.h} to the new project. You can have one single copy of
+\texttt{mymath.h} and \texttt{mymath.cpp} but I don't want
+to go into that for CISS240.)
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(x0=0, y0=3, x1=2.5, y1=5, label=r'{\tt main1.cpp}', linewidth=0.05)
+
+p += Rect(x0=0, y0=0, x1=2.5, y1=2, label=r'{\tt main2.cpp}', linewidth=0.05)
+
+p += Rect(x0=4, y0=-0.5, x1=4.5, y1=5.5, label='', linewidth=0.05)
+
+p += Rect(x0=6, y0=1.5, x1=8.5, y1=3.5, label=r'{\tt mymath.cpp}', linewidth=0.05)
+
+p += Line(points=[(2.5, 4.3), (4, 4.3)], linewidth=0.05, startstyle='>', endstyle='>')
+
+p += Line(points=[(2.5, 1.3), (4, 1.3)], linewidth=0.05, startstyle='>', endstyle='>')
+
+p += Line(points=[(4.5, 2.8), (6, 2.8)], linewidth=0.05, startstyle='>', endstyle='>')
+
+p += Rect(x0=3.5, y0=-1.5, x1=5, y1=-0.8, label=r'{\tt mymath.h}', linewidth=0)
+
+print(p)
+\end{python}
+
+OK but what about
+
+\verb!#include <iostream>!
+
+For header files for C++ standard cpp files you should write
+
+\verb!#include <iostream>!
+
+which is actually the same as
+
+\verb!#include "iostream.h"!
+
+So in other words
+
+\verb!#include <...>! // for C++ standard header files
+
+\verb!#include "..."! // for your header files
+
+And remember that when you use \verb!<...>! you do not
+have the .h part of the header filename.
+
+You might say, ``Well why doesn't the compiler just
+search for the function I'm calling? Just scan the hard
+disk for all cpp and header files and look for the function.''
+
+True.
+
+But compilers don't work that way because it could
+potentially take half an hour before the compiler reports an error that
+the function can't be found on your hard drive!!! Your
+hard drive is pretty huge, you know. For a really huge hard drive it
+might take even more time.
+
+\begin{ex}
+Here's a previous program. Move all
+the function bodies to \texttt{heads.cpp} and create a header file (pun?)
+\texttt{heads.h}. Run your program and make sure it works. The global
+constants should be in the header file.
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void printRules()
+{
+    const int MIN_HEADS = 2;
+    const int MAX_HEADS = 10;
+    std::cout << "To join MENSA you must have at "
+              << "least " << MIN_HEADS
+              << " and at most "
+              << MAX_HEADS << std::endl;
+    return;
+}
+
+int getHeads()
+{
+    int heads;
+    std::cout << "How many heads to you have? ";
+    std::cin >> heads;
+    return heads;
+}
+
+bool passMinTest(int heads)
+{
+    const int MIN_HEADS = 2;
+    if (heads < MIN_HEADS)
+    {
+        std::cout << "Too few! Try again!"
+                  << std::endl;
+        return false;
+    }
+    else
+        return true;
+}
+
+bool passMaxTest(int heads)
+{
+    const int MAX_HEADS = 10;
+    if (heads > MAX_HEADS)
+    {
+        std::cout << "Don't show off! Try again!"
+                  << std::endl;
+        return false;
+    }
+    else
+        return true;
+}
+
+bool passTest(int x)
+{
+    return passMinTest(x) && passMaxTest(x);
+}
+
+int main()
+{
+    int heads = 0;
+    printRules();
+    heads = getHeads();
+    while (!passTest(heads))
+    {
+        heads = getHeads();
+    }
+    std::cout << "OK. You can join MENSA."
+              << std::endl;
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\newpage\EMPHASIZE{``Why do I sometimes see Parameter Names for Function Prototypes?''}
+
+I already told you that function prototypes only need the name of the
+functions and the various types: the parameter types and return types.
+
+However sometimes you see parameter names. For instance instead of this
+prototype:
+
+\begin{consolethree}[escapeinside=||]
+int getSalary(int, int);
+\end{consolethree}
+
+you might have this:
+
+\begin{consolethree}[escapeinside=||]
+int getSalary(int employeeId, int overtime);
+\end{consolethree}
+
+The reason for giving parametric names in function prototypes even
+though they are ignored by C++ is that they make the function prototype
+\EMPHASIZE{easier to read and use}. This is especially the case where the
+prototype has many parameters of the same type. For instance this
+
+\begin{consolethree}[escapeinside=||]
+int getSalary(int employeeId, int overtime);
+\end{consolethree}
+
+is more useful than this:
+
+\begin{consolethree}[escapeinside=||]
+int getSalary(int, int);
+\end{consolethree}
+
+Giving parameter names also allows the programmer to document the
+function:
+
+\begin{consolethree}[escapeinside=||]
+//---------------------------------------------------
+// The getSalary() function accepts employeeId and
+// overtime (in number of minutes) and returns the
+// salary (in cents). Note that a valid employeeId
+// ranges from 10000 to 99999.
+// If the employeeId is not valid or if the overtime
+// is negative the return value is -1.
+//---------------------------------------------------
+int getSalary(int employeeId, int overtime);
+\end{consolethree}
+
+\newpage\EMPHASIZE{Exercise: integer array library}
+
+Write an integer array library that has files \texttt{IntArray.h} and
+\texttt{IntArray.cpp} that has the following features.
+
+\texttt{array\_init(x, x\_len, val, n)}
+
+copy integer val into x from index 0 to index n -- 1 and set x\_len to
+n.
+
+\texttt{array\_assign(x, x\_len, y, y\_start, y\_end)}
+
+copy y from index y\_start to y\_end -- 1 to x starting at index 0.
+x\_len is set accordingly.
+
+\texttt{array\_concat(x, x\_len, y, y\_start, y\_end)}
+
+concatenate the subarray of y from index y\_start to y\_end -- 1 to x
+beginning at index x\_len. x\_len is changed accordingly.
+
+\texttt{array\_isequal(x, x\_start, x\_end, y, y\_start, y\_end)}
+
+return true if and only if x from index x\_start to x\_end -- 1 is the
+same as y from index y\_start to y\_end -- 1.
+
+\texttt{array\_replace(x, x\_start, x\_end, source, target)}
+
+replace all occurrences of integer source in x from index start to end
+-- 1 with integer target.
+
+\texttt{array\_count(x, x\_start, x\_end, target)}
+
+returns the number of times integer target occurs in x from index
+x\_start to x\_end -- 1.
+
+\texttt{array\_max(x, x\_start, x\_end)}
+
+return maximum value of x from index x\_start to x\_end -- 1.
+
+\texttt{array\_min(x, x\_start, x\_end)}
+
+return minimum value of x from index x\_start to x\_end -- 1.
+
+\texttt{array\_max\_index(x, x\_start, x\_end)}
+
+return index of maximum value of x from index x\_start to x\_end -- 1.
+
+\texttt{array\_min\_index(x, x\_start, x\_end)}
+
+return index of minimum value of x from index x\_start to x\_end -- 1.
+
+\texttt{array\_isascending(x, x\_start, x\_end)}
+
+return true if and only if x from index x\_start to x\_end -- 1 is
+sorted in ascending order.
+
+\texttt{array\_bubblesort(x, x\_start, x\_end)}
+
+perform bubblesort on x from index x\_start to x\_end -- 1.
+
+\texttt{array\_linearsearch(x, x\_start, x\_end, target)}
+
+perform linear search on x from index x\_start to x\_end -- 1 searching
+for integer target and return its index in x.
+
+\texttt{array\_binarysearch(x, x\_start, x\_end, target)}
+
+perform binarysearch on x from index x\_start to x\_end -- 1 searching
+for integer target and return its index in x.
+
+\newpage\EMPHASIZE{Exercise: C-string library}
+
+Look at the chapter 18 Characters and C-strings. There are a bunch of
+useful C-string functions in the C-string library. Implement your own
+C-string library in files \texttt{mystring.h} and \texttt{mystring.cpp}.
+
+\texttt{strlen(s)}
+
+returns the string length of C-string s
+
+\texttt{strcpy(s, t)}
+
+copy string t to s
+
+\texttt{strclear(s)}
+
+after calling this function s becomes "". This is the same as strcpy(s,
+"").
+
+\texttt{strcat(s, t)}
+
+concatenate t to s
+
+\texttt{strcmp(s, t)}
+
+returns 0 if C-strings s and t are the same strings
+
+\texttt{strreplace(s, source, target)}
+
+replace all occurrences of character source by character target. For
+instance if s is "hello world", after calling strreplace(s,
+'l', 'm'),
+s becomes "hemmo wormd".
+
+\texttt{strleftstrip(s)}
+
+remove all whitespace characters (' ',
+'\textbackslash n',
+'\textbackslash t') on the left of s. For
+instance if s is " abc ", after calling strleftstrip(s), s becomes "abc
+".
+
+\texttt{strrightstrip(s)}
+
+remove all whitespace characters (' ',
+'\textbackslash n',
+'\textbackslash t') on the right of s. For
+instance if s is " abc ", after calling strrightstrip(s), s becomes "
+abc".
+
+There are actually a lot more C-string functions that comes with your
+C/C++ compiler.
+
+\newpage\EMPHASIZE{Summary}
+
+A function prototype is a statement that looks like the header of a
+function. For instance the prototype of the function
+
+\begin{consolethree}[escapeinside=||]
+double f(int x, int y, char z)
+{
+    if (z == 'a')
+    {
+        return x + y;
+    }
+    else
+    {
+        return x * y;
+    }
+}
+\end{consolethree}
+
+is just
+
+\begin{consolethree}[escapeinside=||]
+double f(int, int, char);
+\end{consolethree}
+
+Once a prototype of a function f is given, the program can call the
+function; the body of f need not be defined before f is called.
+
+Prototypes of functions can be kept in a file and then ``\#include'' in
+a cpp file. The definition of the functions can be kept in a different
+cpp file.
