@@ -1,0 +1,1997 @@
+\newpage\EMPHASIZE{61. Constructors}
+
+\textsc{Objectives}
+\begin{itemize}
+\item Understand what a constructor is
+\item Write constructors
+\item Write constructors using the initializer list
+\item Write inline methods
+\item Write overloaded constructors
+\item Understand how the default constructor works
+\item Write constructors with default values
+\item Write and use copy constructors
+\end{itemize}
+
+
+\newpage\EMPHASIZE{Constructor}
+
+Its always a good idea to initialize variables. So C++ encourages
+object initialization by giving a standardized way of initializing
+objects which is much better than the \texttt{init()} method in the
+\texttt{Date} class.
+
+This is called the \EMPHASIZE{class constructor}.
+
+Techno-jargon: When you create an object \texttt{obj} from a class
+\texttt{C}, besides saying you are declaring \texttt{obj} from \texttt{C}, you
+would also say that you are \EMPHASIZE{instantiating} \texttt{obj} from class
+\texttt{C}.
+
+The constructor is just a method (i.e. member function.) Therefore, if
+you can write methods, you can write a constructor. However, there are
+two rules that you must follow:
+
+\begin{enumerate}
+\item The constructor has the same name as the class
+\item The constructor does not have a return type (not even \texttt{void})
+\end{enumerate}
+
+Let's add a constructor to the \texttt{Date} class and remove the
+\texttt{init()} method.
+
+First we replace the \texttt{init()} prototype in the class definition in
+the header file with the following constructor prototype:
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+
+class Date
+{
+public:
+    |\textbf{Date(int, int, int);}|
+    ...
+private:
+    int yyyy_, mm_, dd_;
+};
+\end{consolethree}
+
+Next, we change the name of the \texttt{Date::init()} method to
+\texttt{Date::Date()} in the implementation file (I'm also adding a print
+statement just for testing):
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+
+...
+
+Date::Date(int yyyy, int mm, int dd)
+{
+    std::cout << "in Date::Date\n"; // for testing
+    yyyy_ = yyyy;
+    mm_ = mm;
+    dd_ = dd;
+}
+
+...
+\end{consolethree}
+
+Now run this and see what happens:
+
+\begin{consolethree}[escapeinside=||]
+// main.cpp
+
+...
+
+int main()
+{
+    |\textbf{Date today = Date(2014, 12, 25);}|
+    today.print();
+    |\textbf{Date yesterday(2014, 12, 24);}|
+    yesterday.print();
+
+    |\textbf{Date * p = new Date(1970, 1, 1);}|
+    p->print();
+    delete p;
+
+    return 0;
+}
+\end{consolethree}
+
+Note how I call the constructor ...
+
+There are two different ways of calling the constructor in C++:
+
+\begin{consolethree}[escapeinside=||]
+Date d(2014, 1, 1);
+\end{consolethree}
+
+and
+
+\begin{consolethree}[escapeinside=||]
+Date d = Date(2014, 1, 1);
+\end{consolethree}
+
+They do the same thing.
+
+And in the case of memory allocation of a Date object in the free store
+using new:
+
+\begin{consolethree}[escapeinside=||]
+Date * p = new Date(1970, 1, 1);
+\end{consolethree}
+
+There's a warning in using this version of calling the constructor:
+
+\begin{consolethree}[escapeinside=||]
+Date d(2014, 1, 1);
+\end{consolethree}
+
+It's better to use
+
+\begin{consolethree}[escapeinside=||]
+Date d = Date(2014, 1, 1);
+\end{consolethree}
+
+See the later section on Default Constructor.
+
+Of course you can also construct a \texttt{Date} \texttt{value} without
+giving it to a variable name:
+
+\begin{consolethree}[escapeinside=||]
+Date(2014, 12, 25).print();
+\end{consolethree}
+
+In this case, you create a \texttt{Date} object (without a name) and use
+it to invoke \texttt{print}.
+
+\begin{ex}
+Write a class \texttt{Being} with instance variables
+\texttt{num\_heads}, \texttt{num\_arms}, \texttt{num\_legs}. Write a
+constructor to initialize all members. Write a \texttt{print} method in
+the class to print the values of all instance variables. Write getter
+and setter methods to get and set all instance variables. Test your
+class.
+\end{ex}
+
+\begin{ex}
+Write a class \texttt{Vehicle} with instance variables
+\texttt{numWheels}, \texttt{numSeats}, \texttt{mileage (double)}, \texttt{year},
+\texttt{make} (C-string, max size of 50), and \texttt{model} (C-string, max
+size of 50). Write a \texttt{print} method in the class to print the
+values of all instance variables. Write a constructor to initialize all
+members. Test your class.
+\end{ex}
+
+
+\newpage\EMPHASIZE{Initializer List}
+
+Recall that in C++, arrays and \texttt{struct} variables can be
+initialized using an initializer list:
+
+\begin{consolethree}[escapeinside=||]
+struct Z
+{
+    int x;
+    double y;
+};
+
+Z z = {42, 3.14159}; // struct initialization
+int x[] = {2, 3, 5, 9, 11}; // array initialization
+\end{consolethree}
+
+Similarly, the member variables (instance variables) of an object can be
+initialized by an \EMPHASIZE{initializer list} in the constructor.
+
+Example:
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+
+...
+
+Date::Date(int yyyy, int mm, int dd)
+        : |\textbf{yyyy\_(yyyy), mm\_(mm), dd\_(dd)}|
+{}
+
+...
+\end{consolethree}
+
+In the above "\texttt{yyyy\_(yyyy)}" means "\texttt{yyyy\_} is initialized
+with \texttt{yyyy}".
+
+Constructor initializers are important and unfortunately not always
+emphasized in books! (\EMPHASIZE{Some books don't even mention them!!!})
+
+In a constructor, whenever possible, you should use initialization and
+not assignment like this:
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+
+...
+
+Date::Date(int yyyy, int dd, int mm)
+    : mm_(mm), dd_(dd) // Initialization ... GOOD!
+{
+    yyyy_ = yyyy;          // Assignment ... BAD!
+}
+
+...
+\end{consolethree}
+
+\EMPHASIZE{Warning:} If you do this:
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+...
+Date::Date(int yyyy, int mm, int dd)
+{
+    yyyy_ = yyyy;
+    mm_ = mm;
+    dd_ = dd;
+}
+...
+\end{consolethree}
+
+you should know by now that you're using assignment and not
+initialization.
+
+This means that \texttt{yyyy\_} was
+
+\begin{enumerate}
+\item initialized to random garbage and \texttt{then}
+\item assigned the value of \texttt{yyyy}.
+\end{enumerate}
+
+Therefore, because of the above (\texttt{and} also other reasons) using
+initializers will always be faster. Do not let me ever catch you doing
+an assignment in constructors when it should be an initialization using
+an initializer list.
+
+In fact there are cases where you \EMPHASIZE{have} to use initializers:
+
+\begin{consolethree}[escapeinside=||]
+// C.h
+class C
+{
+public:
+    C(int &);
+private:
+    int & x_;
+    const double y_;
+};
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// C.cpp
+C::C(int & x)
+    : x_(x), y_(3.14159)
+{}
+\end{consolethree}
+
+Why? Because references and constants \EMPHASIZE{must be initialized}.
+
+The following is a quick review of the relevant facts. Check notes on
+constants and references for details.
+
+\begin{consolethree}[escapeinside=||]
+const int x; // WRONG: constants MUST be initialized!
+x = 42;      // TOO LATE!!!
+
+int j = 42;
+int & k;     // WRONG: References must be initialized!
+k = j;       // TOO LATE!!!
+\end{consolethree}
+
+It should have been this:
+
+\begin{consolethree}[escapeinside=||]
+const int x = 42; // THAT'S BETTER!!!
+
+int j = 42;
+int & k = j;      // YES!!!
+\end{consolethree}
+
+By the way, you can use any valid expression to initialize the object's
+members and the body of the method can still have statements:
+
+\begin{consolethree}[escapeinside=||]
+// C.h
+
+class C
+{
+public:
+    C(int, int);
+private:
+    int x_, y_, z_;
+};
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// C.cpp
+
+C::C(int a, int b)
+    : x_(a + b), y_(a * b - 1), z_((x_ + y_) * a * b)
+{
+    x_ = 42;
+}
+\end{consolethree}
+
+\begin{ex}
+Rewrite the constructor of the \texttt{Being} class so
+that the constructor uses an initializer list.
+\end{ex}
+
+\begin{ex}
+Rewrite the constructor of the \texttt{Vehicle} class
+so that the constructor uses an initializer list. (Note that for the
+string members, you have to copy the characters of the strings in the
+body of the constructor. So the body is not empty.)
+\end{ex}
+
+
+\newpage\EMPHASIZE{Gotchas}
+
+Here are two very common gotchas for you ...
+
+\EMPHASIZE{First:} The initializer syntax can only be used in constructors:
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+...
+void Date::set_d(int dd)
+    : dd_(dd)             // BAD BAD BAD WRONG WRONG WRONG
+{}
+\end{consolethree}
+
+\EMPHASIZE{Second:} Order of initialization is the order of member
+declaration:
+
+\begin{consolethree}[escapeinside=||]
+// C.h
+class C
+{
+public:
+    C(int, int);
+private:
+    int avg_, x_, y_;
+    // avg_ = average of x_, y_
+};
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// C.cpp
+
+C::C(int a, int b)
+    : x_(a), y_(b), avg_((x + y) / 2)
+// avg_ is initialized with x_, y_ before they are
+// initialized!!! YIKES!!!
+{}
+\end{consolethree}
+
+To fix this problem, either
+
+(1) use \texttt{a} and \texttt{b} in the initialization of \texttt{avg\_:}
+
+\begin{consolethree}[escapeinside=||]
+// C.cpp
+C::C(int a, int b)
+    : x_(a), y_(b), avg_((a + b) / 2)
+    // avg_ doesn't rely on x_ and y_, so it's safe
+{}
+\end{consolethree}
+
+or
+
+(2) declare \texttt{avg\_} after \texttt{x\_} and \texttt{y\_} in the class
+definition (after all, the \texttt{avg\_} average should clearly be set
+after \texttt{x\_} and \texttt{y\_}, right?!?!)
+
+\begin{consolethree}[escapeinside=||]
+// C.h
+class C
+{
+public:
+    C(int, int);
+private:
+    int x_, y_, avg_;
+    // avg_ = average of x_, y_
+};
+\end{consolethree}
+
+
+\newpage\EMPHASIZE{Review: Inline Functions}
+
+Review the notes on inline functions. The following is only a quick
+recap.
+
+Recall that an inline function is like a rubber stamp for a function:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+inline int max(int x, int y)
+{
+    return (x < y ? y : x);
+}
+
+int main()
+{
+    std::cout << max(2, 3) << '\n';
+
+    return 0;
+}
+\end{consolethree}
+
+This means that there is really no \texttt{max()} function. Rather, at the
+place where the inline function is called, C++ substitutes the code for
+\texttt{max()} so that the program compiled is:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int main()
+{
+    std::cout << (2 < 3 ? 3 : 2) << '\n';
+
+    return 0;
+}
+\end{consolethree}
+
+Inline functions can speed up program execution since the act of making
+a function call takes time.
+
+The compiler can choose to ignore making a function an inline function
+so that it becomes a real function. This can happen if the function is
+too long.
+
+For multi-file compilation, the \texttt{whole} inline function must be in
+the header file. You cannot have an inline prototype in the header file
+and the definition of the body of the function in the implementation
+file.
+
+
+\newpage\EMPHASIZE{Inline Methods}
+
+The information in this section applies to inlining of methods and not
+just constructors.
+
+Class methods (i.e., member functions) can also be inlined.
+
+To inline a class method, you can either:
+
+\begin{enumerate}
+\item Put the whole method inside the class definition.
+\item Put the method definition in the header file prepended with
+  \texttt{inline}.
+\end{enumerate}
+
+\textbf{First way:}
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+
+class Date
+{
+public:
+    |\textbf{Date(int yyyy, int mm, int dd)}|
+        |\textbf{: yyyy\_(yyyy), mm\_(mm), dd\_(dd)}|
+    |\textbf{\{\}}|
+
+    ...
+};
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+
+// Date::Date(int, int, int) moved to Date.h
+
+...
+\end{consolethree}
+
+\textbf{Second way:}
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+
+class Date
+{
+public:
+    |\textbf{Date(int yyyy, int mm, int dd);}|
+    ...
+};
+
+|\textbf{inline Date::Date(int yyyy, int mm, int dd)}|
+    |\textbf{: yyyy\_(yyyy), mm\_(mm), dd\_(dd)}|
+|\textbf{\{\}}|
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+
+// Date::Date(int, int, int) moved to Date.h
+
+...
+\end{consolethree}
+
+\begin{ex}
+All the methods in our \texttt{Date} class are pretty
+short. Inline them.
+\end{ex}
+
+\begin{ex}
+Inline all the short methods in the \texttt{Being}
+class.
+\end{ex}
+
+\begin{ex}
+Inline all the short methods in the \texttt{Vehicle}
+class.
+\end{ex}
+
+
+\newpage\EMPHASIZE{Review: Function Signature}
+
+Review notes on function loading. This is a quick recap.
+
+The \EMPHASIZE{signature} of a function is the list of types of the
+parameters of the function.
+
+WARNING: Note that the return type is \EMPHASIZE{\texttt{not}} part of the
+function signature.
+
+Here's an example: the signature of
+
+\begin{consolethree}[escapeinside=||]
+int f(int x, char y) {}
+\end{consolethree}
+
+is \texttt{(int, char)}
+
+Here are some warnings:
+
+\begin{itemize}
+\item The type of "\texttt{const X}" is \texttt{X.}
+\item The type of "\texttt{const X *}" is \texttt{const X *.}
+\item The type of "\texttt{X[]}" is \texttt{X*}.
+\end{itemize}
+
+Here's a trick to get your C++ compiler to tell you the signature of a
+function. Deliberately include an error in the function.
+
+\begin{consolethree}[escapeinside=||]
+// main.cpp
+
+void f(int x, const int y, const int * const z)
+{
+    abc;
+}
+
+int main()
+{
+    f();
+
+    return 0;
+}
+\end{consolethree}
+
+When you compile, the compiler will have to tell you there's an error in
+the above function, listing the prototype. For g++, you will get:
+
+\begin{consolethree}[escapeinside=||]
+main.cpp: In function void f(int, int, const int*):
+main.cpp:3:5: error: abc was not declared in this
+scope
+\end{consolethree}
+
+You can see from the above error message that for the second parameter,
+although it's \texttt{const int}, the type as part of the
+signature is \texttt{int}.
+
+\begin{ex}
+Pair up functions below with the same signatures.
+Find a way to check your answer with your compiler.
+
+\begin{consolethree}[escapeinside=||]
+void f(int x, const int & y) {}
+void f(int x, const int * y) {}
+void f(int x, const int y) {}
+void f(char x, const int y) {}
+void f(const int y, char x) {}
+void f(int * x) {}
+void f(int x[]) {}
+void f(int x[10]) {}
+void f(int x[10][10]) {}
+void f(int x[10][]) {}
+\end{consolethree}
+\end{ex}
+
+
+\newpage\EMPHASIZE{Review: Function Overloading}
+
+A function is \EMPHASIZE{overloaded} if its name is used more than once.
+
+The signature of the functions with the same name must be different.
+That's because in C++, a function is identified not by
+its name, but by it name and its signature, i.e., the name and the list
+of types of its parameters.
+
+\begin{ex}
+Does this compile? Next, check with your compiler.
+
+\begin{consolethree}[escapeinside=||]
+void f(int x){}          // f and signature int
+void f(int y, int y){}   // f and signature (int,int)
+void f(int x, double y){}// f and signature (int,double)
+
+int main()
+{
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Does this compile? Next, check with your compiler.
+
+\begin{consolethree}[escapeinside=||]
+void f(int x) {}
+int f(int x) {}
+void f(int x, double y) {}
+
+int main()
+{
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Does this compile? Next, check with your compiler.
+
+\begin{consolethree}[escapeinside=||]
+void f(int * x) {}
+int f(int x[]) {}
+
+int main()
+{
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+When a function is called in your code, C++ will use the function that
+matches both the function name and the type of the values passed in with
+the candidate's signature. If none is found, C++ will try to typecast
+the arguments. The one used is the one with the least number of
+typecasts. If there isn't one, you get an ambiguous invocation error.
+
+\begin{ex}
+Which function is called (or is there an error)?
+
+\begin{consolethree}[escapeinside=||]
+void f(int x) {}
+void f(double x) {}
+
+int main()
+{
+    f(1);
+}
+\end{consolethree}
+
+Check by running this version:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void f(int x) { std::cout << "f(int)\n"; }
+void f(double x) { std::cout << "f(double)\n"; }
+
+int main()
+{
+    f(1);
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Which function is called (or is there an error)?
+
+\begin{consolethree}[escapeinside=||]
+Void f(double x, int y) {}
+void f(int x, int y) {}
+void f(int x, double y) {}
+void f(double x, double y) {}
+
+int main()
+{
+    f(1, 1);
+
+    return 0;
+}
+\end{consolethree}
+
+Check with a program.
+\end{ex}
+
+If you compile the following with g++:
+
+\begin{consolethree}[escapeinside=||]
+void f(double x, int y) {}
+void f(int x, double y) {}
+int main() { f(1, 1); }
+\end{consolethree}
+
+it will complain with this message:
+
+\begin{consolethree}[escapeinside=||]
+a.cpp: In function int main():
+a.cpp:3:20: error: call of overloaded f(int, int) is
+    ambiguous
+a.cpp:1:6: note: candidates are: void f(double, int)
+a.cpp:2:6: note: void f(int, double)
+\end{consolethree}
+
+Basically, when looking for a function to execute
+
+\texttt{f(1, 1);}
+
+there is no exact match. So C++ attempts to typecast. If C++ typecasts
+the first value to 1.0:
+
+\verb!f(double(1), 1);!
+
+it will be able to match this:
+
+\verb!void f(double x, int y) {}!
+
+and if C++ typecasts the second value to get 1.0:
+
+\verb!f(1, double(1));!
+
+it will match this:
+
+\verb!void f(int x, double y) {}!
+
+So, in this case, since both functions match \texttt{f(1, 1)} with 1
+typecast, your C++ compiler does not know what to do and will complain.
+Of course if there's no exact match and
+there's only one option with one typecast, then C++ will
+happily choose that function that matches\texttt{f(1, 1)} with one typecast.
+
+
+\newpage\EMPHASIZE{Method overloading}
+
+Methods in a class can also be overloaded as long as the signatures are
+different.
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    void f(int);
+    void f(int, int);
+    void f(int, double);
+};
+\end{consolethree}
+
+In this case, all the following have different signatures.
+
+\tab[3em]{\texttt{C::f(int)}}\\
+
+\tab[3em]{\texttt{C::f(int, int)}}\\
+
+\tab[3em]{\texttt{C::f(int, double)}}\\
+
+Note that since every method is within a class scope, you can have
+methods with the same name and same signatures but in different classes.
+So the following is OK:
+
+\tab[3em]{\texttt{C::f(int x) \{\}}}\\
+
+\tab[3em]{\texttt{D::f(int x) \{\}}}\\
+
+since if an object \texttt{obj} is of class \texttt{C}, then
+\texttt{obj.f(42)} will result in \texttt{C::f} being executed. There's no
+ambiguity.
+
+We will be overloading the \texttt{Date} constructor: We will later write
+a ``default'' constructor and a ``copy constructor''.
+
+I'll write another constructor so that I can do something like this:
+
+\begin{consolethree}[escapeinside=||]
+Date date1("December 25, 1985");
+\end{consolethree}
+
+The prototype is of course like this:
+
+\begin{consolethree}[escapeinside=||]
+Date(char s[]);
+\end{consolethree}
+
+The pseudocode should be like this:
+
+\begin{consolethree}[escapeinside=||]
+read enough character from s to compute the value for mm_
+read past a space
+read till a comma is reached, computing the value for dd_
+read past a space
+read remaining characters to compute the value for yyyy_
+\end{consolethree}
+
+And we get:
+
+\begin{consolethree}[escapeinside=||]
+Date(char s[])
+{
+    int i = 0;
+    if (s[0] == 'J' && s[1] == 'a') mm_ = 1;
+    else if (s[0] == 'F' && s[1] == 'e') mm_ = 2;
+    ...
+    i = 2;
+    while (s[i] != ' ') i++;
+    i++;
+    dd_ = 0;
+    while ((0 <= s[i] - '0') && (s[i] - '0' <= 9))
+    {
+        dd_ *= 10; dd_ += (s[i] - '0'); i++;
+    }
+    while ((s[i] < '0') || (s[i] > '9')) i++;
+    yyyy_ = 0;
+    while ((0 <= s[i] - '0') && (s[i] - '0' <= 9))
+    {
+        yyyy_ *= 10;
+        yyyy_ += (s[i] - '0');
+        i++;
+    }
+}
+\end{consolethree}
+
+
+\newpage\EMPHASIZE{Default constructor}
+
+The \EMPHASIZE{default constructor} of a class is the constructor that does
+not have any parameters.
+
+Why use a default constructor? Because they make it easy to construct
+the most common objects.
+
+Let's add one more constructor (i.e. we are overloading the constructor)
+to our Date class.
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+...
+
+class Date
+{
+public:
+    Date(int, int, int);
+    |\EMPHASIZE{Date();}|
+    ...
+};
+
+...
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+...
+
+Date::Date()
+    : yyyy_(1970), mm_(1), dd_(1)
+{}
+
+...
+\end{consolethree}
+
+How do you call the default constructor? Easy.
+
+If \texttt{C} is a class, the following are two different ways to call the
+default constructor:
+
+\begin{consolethree}[escapeinside=||]
+C obj1;
+C obj2 = C();
+\end{consolethree}
+
+Try this with our \texttt{Date} class:
+
+\begin{consolethree}[escapeinside=||]
+Date date1;            // date1 calls Date::Date()
+date1.print();
+Date date2 = Date();   // date2 calls Date::Date()
+date2.print();
+Date * date3 = new Date(); // Date::Date() called
+date3->print();
+\end{consolethree}
+
+To verify that we did go into the default constructor, run the program
+again with a print statement in the default constructor.
+
+Here's an important \EMPHASIZE{WARNING} ... From this
+syntax of calling constructors:
+
+\begin{consolethree}[escapeinside=||]
+Date today(2014, 12, 25);
+\end{consolethree}
+
+you might be tempted to do this:
+
+\begin{consolethree}[escapeinside=||]
+Date date1();  // trying to call Date::Date() ...
+               // WRONG!!!
+\end{consolethree}
+
+This is a subtle problem as the compiler will not complain and in fact
+you can even run the program.
+
+The problem begins when you use \texttt{date1}:
+
+\begin{consolethree}[escapeinside=||]
+Date date1();  // Date::Date() ... WRONG!
+date1.print(); // Compiler now complains ... :(
+\end{consolethree}
+
+Why is that?!? Because when you write this:
+
+\begin{consolethree}[escapeinside=||]
+Date date1();
+\end{consolethree}
+
+Your compiler thinks that you're writing down a function
+prototype!!! In other words, your compilers thinks that \texttt{date1} is
+a function with no parameters and returns a \texttt{Date} value.
+
+Summary:
+
+\begin{consolethree}[escapeinside=||]
+Date date1;              // Date::Date() OK
+Date date2 = Date(); // Date::Date() OK
+Date date3();            // Date::Date() ... WRONG!!!
+\end{consolethree}
+
+
+\newpage\EMPHASIZE{The FREE default constructor}
+
+For any class, C, if you do not specify any constructor, C++ will
+automatically add the default constructor that does not do anything into
+the class:
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    C() {}
+};
+\end{consolethree}
+
+In fact, that's the reason why our first Date class
+works. Recall that for that version (without explicitly defining
+constructors), I was able to do this:
+
+\begin{consolethree}[escapeinside=||]
+...
+
+int main()
+{
+    Date today;
+    today.init(2014, 12, 25);
+    ...
+    return 0;
+}
+\end{consolethree}
+
+Of course now you know that in fact:
+
+\begin{consolethree}[escapeinside=||]
+...
+
+int main()
+{
+    Date today; // default constructor Date::Date() was
+                // called to initialize the members of
+                // today. In particular today.yyyy_,
+                // today.mm_ and today.dd_ was initialized
+                // to random values.
+    today.init(2014, 12, 25);
+    ...
+    return 0;
+}
+\end{consolethree}
+
+This means that when using the default constructor, the object
+being initialized will have random initial values.
+
+If you write one or more constructors in this class, C++ will
+\EMPHASIZE{not} add this do-nothing default constructor into this class.
+This is very important because later you will see that there are times
+when you need to have a default constructor, whether it is supplied by
+your C++ compiler (automatically) or by you (manually).
+
+\begin{ex}
+Create a default constructor for the \texttt{Being}
+class with the following default values: 2 for number of heads, 3 for
+number of arms, and 2 for number of legs. Test your code.
+\end{ex}
+
+\begin{ex}
+Create a default constructor for the \texttt{Vehicle}
+class with the following default values: 4 for number of wheels, 4 for
+number of seats, 45.24 for mileage, 2011 for year, ``Nissan'' for make,
+and ``Sentra'' for model. Test your code.
+\end{ex}
+
+
+\newpage\EMPHASIZE{Review: Default values for functions}
+
+Review the notes on default values for functions. This is only a quick
+recap.
+
+Recall: Parameters of a function can have default values.
+
+If a default value is assigned to a parameter, then all parameters to
+the right must also have default values:
+
+\begin{consolethree}[escapeinside=||]
+void f(int x, int y = 0, int z = 0); // OK
+void f(int x, int y = 0, int z);     // BAD!!!
+\end{consolethree}
+
+You can then invoke the function without specifying values for
+default-valued parameters. If you do not specify a value for such a
+parameter, the default value is used:
+
+\begin{consolethree}[escapeinside=||]
+void f(int x, int y = 0, int z = 0) { ... }
+
+int main()
+{
+    f(42, 24); // i.e., in f, x = 42, y = 24, z = 0
+}
+\end{consolethree}
+
+For multi-file compilation, default values are in the header file, not
+in the cpp file:
+
+\begin{consolethree}[escapeinside=||]
+// xyz.h
+
+#ifndef XYZ_H
+#define XYZ_H
+
+int f(int=0, int=42);
+
+#endif
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// xyz.cpp
+
+#include "xyz.h"
+
+int f(int x, int y)
+{
+    return x + y;
+}
+int main()
+{
+    return 0;
+}
+\end{consolethree}
+
+\begin{ex}
+Does this program compile?
+
+\begin{consolethree}[escapeinside=||]
+void f(int x = 1) {}
+void f() {}
+
+int main()
+{
+    f();
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Which function is called (or is there an error)?
+
+\begin{consolethree}[escapeinside=||]
+void f(int x, int y = 1) {}
+void f(int x) {}
+
+int main()
+{
+    f(1);
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+
+\newpage\EMPHASIZE{Default value for methods}
+
+The above information on default values for functions also applies to
+methods of classes.
+
+Modify our \texttt{Date} class:
+
+\begin{consolethree}[escapeinside=||]
+class Date
+{
+public:
+    Date(int = 1970, int = 1, int = 1);
+    // remove default constructor ... why?
+    void set_d(int = 1);
+    void set_m(int = 1);
+    void set_y(int = 1970);
+    ...
+};
+\end{consolethree}
+
+Now modify the implementation file \texttt{Date.cpp}. Add test cases to
+\texttt{main()}.
+
+\begin{ex}
+For the \texttt{Being} class, rewrite the constructor
+so that it has default values using the values from the default
+constructor. Modify the setter methods to use the corresponding default
+values.
+\end{ex}
+
+\begin{ex}
+For the \texttt{Vehicle} class, rewrite the constructor
+so that it has default values using the values from the default
+constructor. Modify the setter methods to use the corresponding default
+values.
+\end{ex}
+
+
+\newpage\EMPHASIZE{Copy constructor}
+
+Suppose you already have a \texttt{Date} object \texttt{date1}. You want to
+create another \texttt{Date} object, \texttt{date2}, so that \texttt{date2}
+has the same values as \texttt{date1}.
+
+\texttt{date2} is not a reference to date1 like this:
+
+\begin{consolethree}[escapeinside=||]
+Date & date2 = date1;
+\end{consolethree}
+
+Rather, you want \texttt{date2} to be an actual Date object with
+its own member variables.
+
+You can do this
+
+\begin{consolethree}[escapeinside=||]
+Date date2(date1.get_y(), date1.get_m(), date1.get_d());
+\end{consolethree}
+
+using the constructor that accepts three integers. But ...
+
+What a pain!
+
+This is cleaner:
+
+\begin{consolethree}[escapeinside=||]
+Date date1;
+Date date2;
+date2 = date1;
+\end{consolethree}
+
+But this means that \texttt{date1} was first initialized to something that
+I do not want, and \texttt{then} I assign the values of \texttt{date1} to
+\texttt{date2}. That's not efficient.
+
+We can achieve a cleaner initialization if we define a constructor that
+accepts a \texttt{Date} object. In other words I would like to do this:
+
+\begin{consolethree}[escapeinside=||]
+Date date2(date1);
+\end{consolethree}
+
+The prototype looks like this:
+
+\begin{consolethree}[escapeinside=||]
+Date(const Date &);
+\end{consolethree}
+
+Note that I'm passing by reference to make the parameter passing
+efficient and since I don't intend to modify the parameter, I make it a
+constant. I'm therefore passing by constant reference.
+
+The implementation looks like this:
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+Date::Date(const Date & date)
+    : yyyy_(date.yyyy_), mm_(date.mm_), dd_(date.dd_)
+{}
+\end{consolethree}
+
+You can think of \texttt{date2} as a clone of \texttt{date1}. You can (and
+should) think of the copy constructor as a cloning operation.
+
+For any class \texttt{C}, the \EMPHASIZE{copy constructor} of that class is a
+constructor with the following prototype:
+
+\texttt{C(const C \&);}
+
+Think of the copy constructor as a \EMPHASIZE{cloning operation} and the
+intent is to copy values from one object to another.
+
+\begin{ex}
+Inline our \texttt{Date} copy constructor.
+\end{ex}
+
+
+\newpage\EMPHASIZE{Calling the copy constructor}
+
+There are actually two different syntax for invoking the copy
+constructor of a class \texttt{C}:
+
+\begin{consolethree}[escapeinside=||]
+// obj1 is an object of class C
+
+C obj2(obj1); // clone obj2 as obj1
+C obj3 = obj1; // clone obj3 as obj1
+\end{consolethree}
+
+WARNING: The second syntax is calling the copy constructor, not the
+assignment operator.
+
+\EMPHASIZE{Example.} Insert a print statement in the copy constructor of
+\texttt{Date}:
+
+\begin{consolethree}[escapeinside=||]
+Date(const Date & date)
+    : yyyy_(date.yyyy_), mm_(date.mm_), dd_(date.dd_)
+{
+    std::cout << "Date::Date(const Date &)\n";
+}
+\end{consolethree}
+
+and then execute this in \texttt{main()}:
+
+\begin{consolethree}[escapeinside=||]
+Date date1(2050, 1, 1);
+
+Date date2(date1);  // clone date2 from date1
+Date date3 = date1; // clone date3 from date1
+\end{consolethree}
+
+
+\newpage\EMPHASIZE{Default copy constructor}
+
+If a copy constructor is not specified, your C++ compiler will supply a
+default copy constructor that initializes all instance variables of the
+object invoking the constructor with the corresponding members of the
+object that is passed in.
+
+\begin{consolethree}[escapeinside=||]
+// C has instance variables a_, b_, c_, d_
+C::C(const C & obj)
+    : a_(obj.a_), b_(obj.b_), c_(obj.c_), d_(obj.d_)
+{}
+\end{consolethree}
+
+So technically we don't need the copy constructor for our \texttt{Date}
+class. However, you will see very soon, that there are cases (many
+cases!!!) where you want your own copy constructor to do something else.
+So here's the warning just so you catch it ...
+
+\EMPHASIZE{WARNING:} There are cases where the default member-by-member
+copy is \EMPHASIZE{\texttt{not}} what you want. (See later examples.)
+
+If you define a copy constructor, of course the compiler will not supply
+one. You can't possibly have two copy constructors. (Why?)
+
+Comment out our copy constructor in \texttt{Date} and then execute in
+\texttt{main()}:
+
+\begin{consolethree}[escapeinside=||]
+Date date1(2050, 1, 1);
+Date date2(date1);  // clone date2 from date1
+Date date3 = date1; // clone date3 from date1
+\end{consolethree}
+
+You will find that the compiler will not complain and the program does
+run. Why? Because your C++ compiler supplies the default copy
+constructor.
+
+\begin{ex}
+Write a copy constructor for the \texttt{Being} class.
+\end{ex}
+
+\begin{ex}
+Write a copy constructor for the \texttt{Vehicle}
+class.
+\end{ex}
+
+\begin{ex}
+Here's the header file for weather control devices:
+
+\begin{consolethree}[escapeinside=||]
+// WeatherCtrl.h
+class WeatherCtrl
+{
+public:
+    WeatherCtrl(double, double);
+    double get_temp();
+    double get_pressure();
+    void set_temp(double);
+    void set_pressure(double);
+private:
+    double temp_;
+    double pressure_;
+};
+\end{consolethree}
+
+Write a cpp file containing the method implementation (i.e., definition)
+for all the prototypes that appear in the header file.
+
+Next go over the following \texttt{main.cpp} that uses the weather control
+class:
+
+\begin{consolethree}[escapeinside=||]
+// main.cpp
+int main()
+{
+// Declare and initialize wc as a WeatherCtrl object with
+// initial temperature reading of 50.5 and pressure reading
+// of 30.5
+
+// Print the temp and pressure value of wc using std::cout
+
+// Set the temp and pressure value of wc to 60 and 40
+
+// print the temp and pressure value of wc using std::cout
+
+// Uncomment the next statement and compile. What's wrong?
+// WeatherCtrl wc2;
+
+// Comment out the above wrong statement and
+// move on ...
+
+// Modify the constructor so that it's inlined in
+// the header and defaults the temp and pressure
+// value to 50 and 60. Use an initializer list.
+
+// Uncomment the next line, compile and run.
+// WeatherCtrl wc2;
+
+// Print the temp and pressure value of wc2.
+
+// Declare wc3 as a pointer to WeatherCtrl and
+// initialize it to point to a WeatherCtrl object in the
+// heap with 110 and 70 for temp and pressure
+// values.
+// Print the temp and pressure of the object wc3 is
+// pointing to.
+
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+If \texttt{C} is a class and \texttt{obj1} is an object
+of class \texttt{C} and you want to clone \texttt{obj1} to another object,
+say \texttt{obj2}. The following works but it's a bad idea. Why?
+
+\begin{consolethree}[escapeinside=||]
+C obj2 = C(obj1);
+\end{consolethree}
+
+If you don't believe me you can try
+
+\begin{consolethree}[escapeinside=||]
+Date date1(1970, 1, 1);
+Date date2 = Date(date1);
+date2.print();
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+The following \texttt{Int} class essentially models an
+integer. Complete it.
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    Int(int x)
+        :              // initialize x_ with x
+    {}
+
+    Int(           ) // copy constructor
+        :
+    {}
+
+    int get()
+    {
+        return x_;
+    }
+
+private:
+    int x_;
+};
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "Int.h"
+
+int main()
+{
+    Int i(5);
+
+    // Construct object j of type Int
+    // using i. Use the copy constructor
+
+    std::cout << j.get() << '\n';
+
+    return 0;
+}
+\end{consolethree}
+
+Now write a set method to set the value of x in the object. Test it with
+this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "Int.h"
+
+int main()
+{
+    Int i(5);
+    // Construct object j of type Int
+    // using i. Use the copy constructor.
+    std::cout << j.get() << '\n';
+
+    i.set(42);
+    std::cout << i.get() << '\n'; // should be 42
+
+    return 0;
+}
+\end{consolethree}
+
+Finally, add an increment method so that this works:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "Int.h"
+
+int main()
+{
+    Int i(5);
+    // Construct object j of type Int
+    // using i. Use the copy constructor.
+    std::cout << j.get() << '\n';
+
+    i.set(42);
+    std::cout << i.get() << '\n'; // should be 42
+
+    i.increment(j); // i.x is incremented by j.x
+    std::cout << i.get() << '\n'; // should be 47
+
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+
+\newpage\EMPHASIZE{Example and exercise: \texttt{IntPointer}}
+
+The next few exercises are extremely important!!! Some will in fact
+appear in assignments!!!
+
+One of the problems regarding pointers (pointing to either a single
+value or an array of values) is that there's a danger of forgetting to
+deallocate memory:
+
+\begin{consolethree}[escapeinside=||]
+void f()
+{
+    int * p = new int;
+    int * q = new int[10];
+    // do something with *p
+    // do something with q[0],...,q[9]
+    return; // oops ... forgot delete p and
+            // delete [] q;
+}
+
+int main()
+{
+    f();
+    // oops ... memory leak ... lost 11 integers!!!
+    return 0;
+}
+\end{consolethree}
+
+You will see later (see notes on Destructors) that classes will help
+solve this very dangerous problem. For this section,
+let's talk about a pointer to a single value and write a
+class for that.
+
+The following class models an integer pointer. This is an important
+example. But it's incomplete. (Clearly once
+you're done with this, you can also talk about a class
+to model the pointer to a double, to a char, etc.)
+
+\begin{consolethree}[escapeinside=||]
+class IntPointer
+{
+public:
+    IntPointer(int x)
+        : p_(new int) // allocate memory for p_
+    {
+        *p_ = x;      // store an int at memory that p_
+                      // points to
+    }
+    IntPointer(const IntPointer & intptr)
+        : p_(new int)
+    {
+        *p_ = *(intptr.p_);
+    }
+    int dereference()
+    {
+        return *p_;
+    }
+    void allocate()
+    {
+        if (p_ == NULL)
+        {
+            p_ = new int;
+        }
+    }
+    void deallocate()
+    {
+        delete p_;
+    }
+private:
+    int * p_;
+};
+\end{consolethree}
+
+\begin{ex}
+Here's a program that uses the above class. Trace the
+program by hand. Draw a picture of the memory during execution. What is
+the output?
+
+\begin{consolethree}[escapeinside=||]
+// What must you #include?
+
+void f()
+{
+    IntPointer p(42);
+    IntPointer q(p);
+    std::cout << q.dereference() << '\n';
+    // memory leak here
+}
+
+int main()
+{
+    f();
+
+    return 0;
+}
+\end{consolethree}
+
+Check your trace by completing the above code and running it. Can you
+explain why there's a memory leak?
+\end{ex}
+
+\begin{ex}
+To make the above object more like a pointer, modify
+the \texttt{dereference} method:
+
+\begin{consolethree}[escapeinside=||]
+int operator*() //change dereference to this
+{
+    return *p_;
+}
+\end{consolethree}
+
+and in \texttt{f} change the call to \texttt{dereference()} to \texttt{*}:
+
+\begin{consolethree}[escapeinside=||]
+void f()
+{
+    IntPointer q(42);
+    std::cout << *q << '\n'; //*q = q.operator*()
+}
+\end{consolethree}
+
+Run the program again.
+\end{ex}
+
+\begin{ex}
+However this does not work:
+
+\begin{consolethree}[escapeinside=||]
+void f()
+{
+    ...
+    std::cout << *q << '\n';
+    *q = 1024;                  // YIKES
+    std::cout << *q << '\n';
+    ...
+}
+\end{consolethree}
+
+Compile and read the error message - remember it! It seems that getting
+\texttt{*q} works but modifying \texttt{*q} does not work.
+\end{ex}
+
+\begin{ex}
+To correct it, change \texttt{operator*} to this:
+
+\begin{consolethree}[escapeinside=||]
+int & operator*()
+{
+    return *p_;
+}
+\end{consolethree}
+
+Compile and run. Remember this fix!
+\end{ex}
+
+\begin{ex}
+Now add a line of code to deallocate memory so that
+there's no memory leak. It's still a problem that we have to deallocate
+memory before object \texttt{q} dies (i.e., goes out of scope). We might
+forget!!! Later you will see that you can tell the object to
+automatically invoke a very special method just before the object dies.
+\end{ex}
+
+\begin{ex}
+Note that I have overwritten the default copy
+constructor:
+
+\begin{consolethree}[escapeinside=||]
+class IntPointer
+{
+public:
+    ...
+    IntPointer(const IntPointer & intptr)
+        : p_(new int)
+    {
+        *p_ = *(intptr.p_);
+    }
+    ...
+};
+\end{consolethree}
+
+Draw a memory model of what happens when you use this copy constructor,
+for instance, like this:
+
+\begin{consolethree}[escapeinside=||]
+...
+int main()
+{
+    IntPointer p(42);
+    IntPointer q = p; // calls copy constructor
+    return 0;
+}
+\end{consolethree}
+
+Check the definition of the default copy constructor. It copies values
+memberwise., i.e., the default copy constructor works like this:
+
+\begin{consolethree}[escapeinside=||]
+class IntPointer
+{
+public:
+    ...
+    IntPointer(const IntPointer & intptr)
+        : p_(intptr.p_)
+    {}
+    ...
+};
+\end{consolethree}
+
+What is the difference between this copy constructor (the default
+provided by the compiler if you do not have one) and the one that I
+wrote? (Hint: Draw a picture).
+
+Now, what if I deallocate while using the default copy constructor?
+
+\begin{consolethree}[escapeinside=||]
+class IntPointer
+{
+public:
+    ...
+    IntPointer(const IntPointer & intptr)
+        : p_(intptr.p_)
+    {}
+    ...
+};
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+...
+int main()
+{
+    IntPointer p(42);
+    IntPointer q = p;
+    q.deallocate();
+    p.deallocate();
+    return 0;
+}
+\end{consolethree}
+
+Why?
+\end{ex}
+
+
+\newpage\EMPHASIZE{Example and exercise: \texttt{IntArray}}
+
+\begin{ex}
+We frequently use a fixed size array with a length
+variable:
+
+\begin{consolethree}[escapeinside=||]
+int x[1000];
+int length = 0;
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+We should package up an int array with a length
+variable either using \texttt{struct} or \texttt{class}. Of course
+\texttt{class} has class! Here's the \texttt{IntArray} class:
+
+\begin{consolethree}[escapeinside=||]
+class IntArray
+{
+public:
+    IntArray();                   // Initialize length
+                                  // to 0.
+    IntArray(const IntArray &);   // Copy length and
+                                  // also the values!!
+    int get_length();
+    void set_length(int);
+    void print();
+private:
+    int x_[1000];
+    int length_;
+};
+\end{consolethree}
+
+and here's \texttt{main} to test the class:
+
+\begin{consolethree}[escapeinside=||]
+// What's missing here?
+
+int main()
+{
+    IntArray a;
+    a.print();          // prints blank line;
+                        // a.length_ is 0
+    a.set_length(5);
+    a.print();          // prints 5 random values;
+                        // a.length_ is 5
+    return 0;
+}
+\end{consolethree}
+
+Complete the class by implementing all the listed methods. Test your
+code by running it.
+\end{ex}
+
+\begin{ex}
+There's still no way to set the values in the array.
+Add the following to the class:
+
+\begin{consolethree}[escapeinside=||]
+class IntArray
+{
+public:
+    ...
+
+    int operator[](int i); //returns the value of x_[i]
+};
+\end{consolethree}
+
+Define the method (or rather, the operator) and then do this in
+\texttt{main()}:
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    ...
+    std::cout << a[0] << '\n'; //a[0] is a.operator[](0)
+
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Now do this:
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    ...
+    std::cout << a[0] << '\n'; //a[0] is a.operator[](0)
+    a[0] = 42;
+
+    return 0;
+}
+\end{consolethree}
+
+and ... you get a problem! It seems that getting \texttt{a[0]} works
+but modifying \texttt{a[0]} does not work. Fix it. (See
+\texttt{IntPointer}.)
+\end{ex}
+
+\begin{ex}
+Once the \texttt{operator[]} is fixed you can do
+this:
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    IntArray a;
+    a.print(); // prints blank line; a.length_ is 0
+    a.set_length(5);
+    for (int i = 0; i < a.get_length(); i++)
+    {
+        a[i] = i * i;
+    }
+    a.print(); // prints 5 values; a.length_ is 5
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Add a sum method that returns the sum of the values
+of \texttt{a.x\_[0], a.x\_[1], ..., a.x\_[a.length\_ - 1]}.
+Test your code with this:
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    IntArray a;
+     a.print(); // prints blank line; a.length_ is 0
+     a.set_length(5);
+     for (int i = 0; i < a.get_length(); i++)
+     {
+          a[i] = i * i;
+     }
+     a.print(); // prints 5 values; a.length_ is 5
+     std::cout << a.sum() << '\n';
+     return 0;
+}
+\end{consolethree}
+\end{ex}
+
+Clearly you can also implement an array of doubles, of bools, of ...
+
+
+\newpage\EMPHASIZE{Example and exercise: \texttt{IntDynArray}}
+
+The \texttt{IntArray} is great for packaging up all that you need to work
+with the concept of an array with changing length. Of course the actual
+maximum size of the array is fixed. (In the above case, it's fixed at
+1000.) This is a waste if for instance you need only 10. And if you need
+to store more than 1000 values in an IntArray object, then
+you're out of luck.
+
+Therefore it's better to \EMPHASIZE{dynamically} request for what you need
+based on what happens when the program runs. Pointers to the
+rescue!!! Why? Because for array in the local scope the size must be
+constant:
+
+\begin{consolethree}[escapeinside=||]
+int x[1000];                //OK
+consts int SIZE = 20000;
+int y[SIZE];                // OK
+int n = 0;
+std::cin >> n;
+int z[n];                   // NO, NO, NO!!!
+\end{consolethree}
+
+However arrays allocated in the free store can have variable sizes:
+
+\begin{consolethree}[escapeinside=||]
+int * x = new int[1000]; //OK
+// now use x[0], x[1], ..., x[999]
+const int SIZE = 20000;
+int * y = new int[SIZE]; // OK
+// now use y[0], y[1], ..., y[19999]
+int n = 0;
+std::cin >> n;
+int * z = new int[n];       // OK
+// now use z[0], z[1], ..., z[n - 1]
+delete [] z;
+delete [] y;
+delete [] x;
+\end{consolethree}
+
+Pause ... and study your notes on pointers again ...
+
+\begin{ex}
+Write the following dynamic integer array class. What
+I'm calling length in \texttt{IntArray}, I'm calling \texttt{size} here. The
+size of the array requested on the memory heap is \texttt{capacity}. Many
+of the methods requires minimum change from the version in
+\texttt{IntArray}.
+
+\begin{consolethree}[escapeinside=||]
+class IntDynArray
+{
+public:
+    IntDynArray(int capacity); // Allocate capacity
+                               // number of integers
+                               // for pointer x_. Set
+                               // size_ to 0 and
+                               // capacity_ to
+                               // capacity.
+    IntDynArray(const IntDynArray &);
+    int get_size();
+    void set_size(int);
+    void get_capacity();
+    void print();
+private:
+    int * x_;
+    int size_;
+    int capacity_;
+};
+\end{consolethree}
+
+Test your code with this:
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    IntDynArray a(10); request 10 integers
+    a.print(); // prints blank line; a.length is 0
+    a.set_size(5);
+    for (int i = 0; i < a.get_size(); i++)
+    {
+        a[i] = i * i;
+    }
+    a.print(); // prints 5 values
+    std::cout << a.sum() << '\n';
+    return 0;
+}
+\end{consolethree}
+
+Add a method to deallocate all memory allocated:
+
+\begin{consolethree}[escapeinside=||]
+class IntDynArray
+{
+public:
+    void deallocate();
+};
+\end{consolethree}
+
+and in \texttt{main} do this:
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    ...
+    a.deallocate();
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+Again, later you will see that you can define a method that will be
+called automatically whenever the object is about to die. All you need
+to do is to deallocate memory in this special method and we don't have
+to remember to deallocate anymore.
+
+Clearly you can also implement a dynamical array of doubles, of chars,
+of ...

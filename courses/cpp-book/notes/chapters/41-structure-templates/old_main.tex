@@ -1,0 +1,174 @@
+\newpage\EMPHASIZE{41. Structure Templates}
+
+\textsc{Objectives}
+\begin{itemize}
+\item Write structure templates
+\item Instantiate structure templates by creating structure variables
+\end{itemize}
+
+
+\newpage\EMPHASIZE{Structure template}
+
+Once you understand the concept of a function template,
+it's not too surprising when you see a structure
+template:
+
+\begin{consolethree}[escapeinside=||]
+template < typename T >
+struct vec2
+{
+    T x, y;
+};
+
+int main()
+{
+    vec2< int > p = {1, 2};
+    std::cout << p.x << ',' << p.y << std::endl;
+
+    vec2< double > q = {1.1, 2.2};
+    std::cout << q.x << ',' << q.y << std::endl;
+
+    return 0;
+}
+\end{consolethree}
+
+Neat right? And of course we can use them both at the same time when you
+have template functions supporting structure templates. In this case you
+will see a templatized structure parameter.
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+template < typename T >
+struct vec2
+{
+    T x, y;
+};
+
+template < typename T >
+void println(const vec2< T > & p)
+{
+    std::cout << p.x << ',' << p.y << std::endl;
+}
+
+int main()
+{
+    vec2< int > p = {1, 2};
+    println< int >(p);
+
+    vec2< double > q = {1.1, 2.2};
+    println< double >(q);
+
+    return 0;
+}
+\end{consolethree}
+
+\begin{ex}
+Add this function template to your program above.
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+template < typename T >
+struct vec2
+{
+    T x, y;
+};
+
+template < typename T >
+void println(const vec2< T > & p)
+{
+    std::cout << p.x << ',' << p.y << std::endl;
+}
+
+template < typename T >
+vec2< T > add(const vec2< T > & p,
+              const vec2< T > & q)
+{
+    vec2< T > r;
+    r.x = p.x + q.x;
+    r.y = p.y + q.y;
+    return r;
+}
+
+int main()
+{
+    vec2< int > p = {1, 2};
+    println< int >(p);
+
+    vec2< double > q = {1.1, 2.2};
+    println< double >(q);
+
+    return 0;
+}
+\end{consolethree}
+
+Read the code carefully. What does it do? Test this function.
+\end{ex}
+
+\begin{ex}
+Here's a structure template:
+
+\begin{consolethree}[escapeinside=||]
+template < typename T >
+struct Array
+{
+    T x[1000];
+    int length;
+};
+\end{consolethree}
+
+Write a function \texttt{init()} so that \texttt{init(a)} will set
+\texttt{a.length} to 0. Write another function \texttt{append()} so that
+\texttt{append(a, x)} will ``add x to a''. Write a function
+\texttt{println()} so that \texttt{println(a)} will print the values in
+\texttt{a} i.e., \texttt{a.x[0]}, \texttt{a.x[1]}, ...,
+\texttt{a.x[a.length - 1]}.
+\end{ex}
+
+Template parameters need not be types. They can be integers too. Try
+this ...
+
+\begin{ex}
+Here's a structure template:
+
+\begin{consolethree}[escapeinside=||]
+template < typename T, int N >
+struct Array
+{
+    T x[N];
+    int length;
+};
+\end{consolethree}
+
+Here's a struct variable created using the above:
+
+\begin{consolethree}[escapeinside=||]
+Array< int, 1000 > a; // a.x is size 1000 int array
+\end{consolethree}
+
+Write a function \texttt{init()} so that \texttt{init(a)} will set
+\texttt{a.length} to 0. Write another function \texttt{append()} so that
+\texttt{append(a, x)} will ``add x to a''. Write a function
+\texttt{println()} so that \texttt{println(a)} will print the values in
+\texttt{a} i.e., \texttt{a.x[0]}, \texttt{a.x[1]}, ...,
+\texttt{a.x[a.length - 1]}.
+\end{ex}
+
+
+\newpage\EMPHASIZE{Header Files}
+
+Here is the most important rule for writing function templates: the
+whole function must be in the header file.
+
+This is very different from your regular functions where you put the
+prototype in the header file and the actual definition of the function
+in a cpp file.
+
+(Note that struct templates, like structs, should also be in the header
+file.)
+
+Make sure you remember that or you will get an error when you compile
+your program.
+
+\end{document}

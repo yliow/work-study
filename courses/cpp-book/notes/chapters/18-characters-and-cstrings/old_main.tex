@@ -1,0 +1,1083 @@
+\newpage\EMPHASIZE{18. Characters and C-strings}
+
+\textsc{Objectives}
+\begin{itemize}
+\item Declare character variables with or without initialization
+\item Output and input character values
+\item Use operators for character type
+\item Understand the relationship between characters and ASCII decimal values
+\item Declare C-string variables with or without initialization
+\item Use C-string functions
+\end{itemize}
+
+
+\newpage\EMPHASIZE{Containers}
+
+We're already talked about arrays (arrays of ints, arrays of doubles, etc.) Usually we use all the slots in the arrays. However an array can be used to model \EMPHASIZE{containers}. What do I mean by that? For instance suppose you want to write a program to contain student IDs of current students who are at least 7 feet tall. (Not a big list I suppose \ldots) In fall 2009 the list might contain:
+
+\begin{center}
+3145673, 4135778, 2356317
+\end{center}
+
+in spring 2009 it might be
+
+\begin{center}
+3145673, 4135778, 2356317, 5678246
+\end{center}
+
+and in fall 2010 it might be
+
+\begin{center}
+2356317, 5678246
+\end{center}
+
+As you can see the number of things in the list changes.
+
+An array can be used to model a container. It can be done in two ways (at least!) You can keep an extra variable to indicate the number of things modeled by the array. For instance try this program that prompts the user for ids to be added to the id array and terminates when the user enters -1.
+
+\begin{consolethree}[escapeinside=||]
+int length = 0;
+int id[10];
+
+while (1)
+{
+    if (length == 10)
+    {
+        std::cout << "oops ... I'm full!\n";
+        break;
+    }
+    int x;
+    std::cin >> x;
+    if (x == -1) break;
+    id[length] = x;
+    length++;
+    for (int i = 0; i < length; i++)
+    {
+        std::cout << id[i] << ' ';
+    }
+    std::cout << '\n';
+}
+\end{consolethree}
+
+In this case \texttt{\EMPHASIZE{length}} is used to indicate that the actual student ids are
+
+\begin{center}
+\textit{id[0], id[1], \ldots, id[length-1]}
+\end{center}
+
+and the rest
+
+\begin{center}
+\textit{id[length], id[length+1], \ldots, id[999]}
+\end{center}
+
+are unused.
+
+A second way to model a container is to use a special \EMPHASIZE{sentinel} value to denote \EMPHASIZE{``end-of-data''}. Try this program that does the same thing as above except that I'm using -9999 to mark the end-of-data.
+
+\begin{consolethree}[escapeinside=||]
+int id[10] = {-9999};
+
+while (1)
+{
+    // find length
+    int length = 0;
+    for (int i = 0; i < 10; i++)
+    {
+        if (id[i] == -9999)
+        {
+            length = i;
+            break;
+        }
+    }
+    if (length == 9)
+    {
+        std::cout << "oops ... I'm full!\n";
+        break;
+    }
+    int x;
+    std::cin >> x;
+    if (x == -1) break;
+    id[length] = x;
+    id[length + 1] = -9999;
+    // print values in container
+    int i = 0;
+    while (id[i] != -9999)
+    {
+        std::cout << id[i] << ' ';
+        i++;
+    }
+    std::cout << '\n';
+}
+\end{consolethree}
+
+Note that the array begins with
+
+\begin{center}
+-9999, \ldots{}
+\end{center}
+
+(the \ldots{} after the -9999) If I entered 42, the array becomes
+
+\begin{center}
+42, -9999, \ldots{}
+\end{center}
+
+And if I entered 135 as the next number, the array becomes
+
+\begin{center}
+42, 135, -9999, \ldots{}
+\end{center}
+
+Note that when using a sentinel to implement a container
+
+\begin{itemize}
+\item
+When adding the end of the container you always need to search for the sentinel value (more or less to compute the length of the container)
+\item
+The number of values you can put into the container is always \EMPHASIZE{one less than the actual size} of the container. Why? Because the sentinel value takes up on of the spots in the array!
+\end{itemize}
+
+We'll be talking about C-strings in this set of notes. You'll see that the C-string uses the second method to describe characters in a string.
+
+
+\newpage\EMPHASIZE{Characters}
+
+Recall that this is a character:
+
+\begin{center}
+\verb!'A'!
+\end{center}
+
+That's nothing new. To declare a character variable you do this:
+
+\begin{center}
+\texttt{char c;}
+\end{center}
+
+You can of course initialize it too:
+
+\begin{center}
+\textit{char c = 'A';}
+\end{center}
+
+And of course you already know that you can output and input characters:
+
+\begin{consolethree}[escapeinside=||]
+std::cout << 'A' << std::endl;
+char c = 'A';
+std::cout << c << std::endl;
+std::cin >> c;
+std::cout << c << std::endl;
+\end{consolethree}
+
+Another thing you already know is that you can compare characters:
+
+\begin{consolethree}[escapeinside=||]
+char c = 'A';
+std::cout << "gimme an A: ";
+std::cin >> c;
+if (c == 'A')
+{
+    std::cout << "thanks!";
+}
+else
+{
+    std::cout << "r u the troublemaker-type?";
+}
+\end{consolethree}
+
+
+\newpage\EMPHASIZE{ASCII: Characters and integers}
+
+One important thing you should know is that the character type is actually an integer type. You can typecast between the two. Try this:
+
+\begin{consolethree}[escapeinside=||]
+std::cout << (int) 'A' << std::endl;
+std::cout << int('A') << std::endl;
+char c = 'A';
+std::cout << (int) c << std::endl;
+std::cout << int(c) << std::endl;
+\end{consolethree}
+
+As you can see the integer value corresponding to character
+'A' is 65. Now try this:
+
+\begin{consolethree}[escapeinside=||]
+std::cout << (char) 65 << std::endl;
+std::cout << char(65) << std::endl;
+\end{consolethree}
+
+The translation between characters and integer value is provided by the
+so-called ASCII table. You can google the web to read more about the
+ASCII standard and its history. You can also go straight to
+wikipedia.com and search for ``ascii''. Here's one such
+table. Look for 'A' and you see that
+the integer value corresponding to 'A'
+is 65 (look under the ``Dec'' column -- ``Dec'' means the integer value
+is in base 10 \textbf{\textit{dec}}imal notation.)
+
+% NOTE: ASCII table image - students can reference one online at wikipedia.com/wiki/ASCII
+% \includegraphics[width=6.9846in,height=4.8701in]{Pictures/10000000000002CB000001E83D872810C8DA2306.png}
+
+\begin{ex}
+What is the ASCII value of 'Z'? (You can of course use the web ... but it's easier just to write a program).
+\end{ex}
+
+Now with the ASCII value of 'Z', fill in the blank and run this program ... WAIT!!! ... can you figure out what it does BEFORE running the program?
+
+\begin{consolethree}[escapeinside=||]
+for (int i = 65; i <= _____; ++i)
+{
+    std::cout << (char) i << std::endl;
+}
+\end{consolethree}
+
+In fact since characters can be automatically typecasted to integers you can do this too:
+
+\begin{consolethree}[escapeinside=||]
+for (int i = 'A'; i <= 'Z'; ++i)
+{
+    std::cout << (char) i << std::endl;
+}
+\end{consolethree}
+
+\begin{ex}
+What is the ASCII value of 'Z' and '5'? (Use the above ASCII table.) Is the following true or false?
+
+\begin{center}
+\verb!'Z' < '5'!
+\end{center}
+
+Now verify your guess by running this:
+\begin{consolethree}[escapeinside=||]
+std::cout << ('Z' < '5') << std::endl;
+\end{consolethree}
+\end{ex}
+
+\EMPHASIZE{\textit{YET}} another way to do this is to realize that there are arithmetic operators on the character type. First try this:
+
+\begin{consolethree}[escapeinside=||]
+std::cout << 'A' + 1 << std::endl;
+\end{consolethree}
+
+This tells you that \verb!'A'! is automatically typecasted to its ASCII value. Now you can do this:
+
+\begin{consolethree}[escapeinside=||]
+std::cout << (char)('A' + 1) << std::endl;
+\end{consolethree}
+
+\EMPHASIZE{\textit{Finally}} ... run this:
+
+\begin{consolethree}[escapeinside=||]
+for (char c = 'A'; c <= 'Z'; ++c)
+{
+    std::cout << c << std::endl;
+}
+\end{consolethree}
+
+This tells us that besides == and !=, the character type has the boolean operators $<, <=, >, >=$. Basically these comparison operators compare the ASCII value of the character. And of course you have arithmetic operators since the character type is an integer type.
+
+So you see ... characters are actually numbers ... at least in the computer.
+
+
+\newpage\EMPHASIZE{Digit Character to Integer Value}
+
+Here's a neat trick.
+
+Suppose you want to ``translate'' the character \texttt{'0'} to integer \texttt{0}, character \texttt{'1'} to integer \texttt{1}, ..., character \texttt{'9'} to \texttt{9}. One way is to do this: Suppose \texttt{c} is a character with character \texttt{'0'} or \texttt{'1'} or \ldots{} or \texttt{'9'}, and you want \texttt{i} which is an \texttt{int} to be \texttt{0} if \texttt{c} is \texttt{'0'}, \texttt{1} if \texttt{c} is \texttt{'1'}, etc. You can do this:
+
+\begin{consolethree}[escapeinside=||]
+char c = ' ';
+std::cin >> c;
+int i = 0;
+switch (c)
+{
+    case '0': i = 0; break;
+    case '1': i = 1; break;
+    case '2': i = 2; break;
+    case '3': i = 3; break;
+    case '4': i = 4; break;
+    case '5': i = 5; break;
+    case '6': i = 6; break;
+    case '7': i = 7; break;
+    case '8': i = 8; break;
+    case '9': i = 9; break;
+}
+std::cout << i << std::endl;
+\end{consolethree}
+
+Or you can also use a stack of if-else. Make sure you run this program.
+
+That's great. It works. But it shows you're a newbie!!! Here's the smart way to do it. Notice that the ASCII table for \texttt{'0', '1', ..., '9'} is this:
+
+\begin{tabular}{lll}
+character & ASCII integer value & value that you want \\
+\hline
+'0' & 48 & 0 \\
+'1' & 49 & 1 \\
+'2' & 50 & 2 \\
+'3' & 51 & 3 \\
+'4' & 52 & 4 \\
+'5' & 53 & 5 \\
+'6' & 54 & 6 \\
+'7' & 55 & 7 \\
+'8' & 56 & 8 \\
+'9' & 57 & 9 \\
+\end{tabular}
+
+Do you see a pattern? (SPOILERS AHEAD)
+
+The point is that the character \texttt{'0', ..., '9'} appear in order in the ASCII table. Look at the table again:
+
+\begin{tabular}{lll}
+character & ASCII integer value & translated value \\
+\hline
+'0' & 48 & 0 = 48 - 48 \\
+'1' & 49 & 1 = 49 - 48 \\
+'2' & 50 & 2 = 50 - 48 \\
+'3' & 51 & 3 = 51 - 48 \\
+'4' & 52 & 4 = 52 - 48 \\
+'5' & 53 & 5 = 53 - 48 \\
+'6' & 54 & 6 = 54 - 48 \\
+'7' & 55 & 7 = 55 - 48 \\
+'8' & 56 & 8 = 56 - 48 \\
+'9' & 57 & 9 = 57 - 48 \\
+\end{tabular}
+
+which is the same as
+
+\begin{tabular}{lll}
+character & ASCII integer value & translated value \\
+\hline
+'0' & 48 & 0 = int('0' - '0') \\
+'1' & 49 & 1 = int('1' - '0') \\
+'2' & 50 & 2 = int('2' - '0') \\
+'3' & 51 & 3 = int('3' - '0') \\
+'4' & 52 & 4 = int('4' - '0') \\
+'5' & 53 & 5 = int('5' - '0') \\
+'6' & 54 & 6 = int('6' - '0') \\
+'7' & 55 & 7 = int('7' - '0') \\
+'8' & 56 & 8 = int('8' - '0') \\
+'9' & 57 & 9 = int('9' - '0') \\
+\end{tabular}
+
+In all cases, if c is a character '0',...,'9' the integer value you want is ...
+
+\begin{center}
+\verb!c - '0'!
+\end{center}
+
+\EMPHASIZE{That's all!!!} In other words, this program:
+
+\begin{consolethree}[escapeinside=||]
+char c = ' ';
+std::cin >> c;
+int i = 0;
+switch (c)
+{
+    case '0': i = 0; break;
+    case '1': i = 1; break;
+    case '2': i = 2; break;
+    case '3': i = 3; break;
+    case '4': i = 4; break;
+    case '5': i = 5; break;
+    case '6': i = 6; break;
+    case '7': i = 7; break;
+    case '8': i = 8; break;
+    case '9': i = 9; break;
+}
+std::cout << i << std::endl;
+\end{consolethree}
+
+can be \EMPHASIZE{rewritten} as:
+
+\begin{consolethree}[escapeinside=||]
+char c = ' ';
+std::cin >> c;
+int i = c - '0';
+std::cout << i << std::endl;
+\end{consolethree}
+
+I don't know about you. But I prefer the second version!!! Make sure you run this program.
+
+\begin{ex}
+Write a program that prompts the user for a, b, c, \ldots, z (i.e. lowercase letters) and prints 0, 1, 2, \ldots, 25 respectively.
+\end{ex}
+
+\begin{ex}
+Write a program that prompts the user for a, b, c, \ldots, z, A, B, C, \ldots, Z (i.e. lower and uppercase letters) and prints 0 for a or A, 1 for b or B, 2 for c or C, \ldots, 25 for z or Z respectively.
+\end{ex}
+
+
+\newpage\EMPHASIZE{C-strings}
+
+A \EMPHASIZE{C-string} is nothing more than an array of characters. The only thing different between a C-string and an array of integers (say) is that the \textbf{special escape character '\ 0'} (the 0 is the \textbf{number} 0, not the letter O) is used to mark the \textbf{end-of-string}. This is a special character just like \verb!'\n'! or \verb!'\t'! because \texttt{'\textbackslash 0'}, \verb!'\n'!, \verb!'\t'! are not ``visible'' characters.
+
+Try to print \texttt{'\textbackslash 0'} and you won't see a thing:
+
+\begin{consolethree}[escapeinside=||]
+std::cout << '\0' << std::endl;
+\end{consolethree}
+
+(There are in fact lots of invisible characters.)
+
+The point of the end-of-string marker \texttt{'\textbackslash 0'}, is to end some string processing. This is what I mean. Try this:
+
+\begin{consolethree}[escapeinside=||]
+char spam[] = {'a', 'b', 'c', '\0', 'd', 'e'};
+std::cout << spam << std::endl;
+\end{consolethree}
+
+In this case the ``processing'' is the print statement:
+
+\begin{consolethree}[escapeinside=||]
+std::cout << spam << std::endl;
+\end{consolethree}
+
+The \texttt{'\textbackslash 0'} basically tells the print statement that printing should stop after printing the third character \texttt{'c'}. The output looks like this:
+
+\begin{center}
+\texttt{abc}
+\end{center}
+
+Note another thing ... \EMPHASIZE{You can actually print a character array!!!} Remember that you cannot do that for an array of integers, doubles, or booleans. You have to write a for-loop in those case. As a reminder try this:
+
+\begin{consolethree}[escapeinside=||]
+int x[] = {1, 2, 3, 4, 5};
+std::cout << x << std::endl;
+\end{consolethree}
+
+Let's go back to the above example:
+
+\begin{consolethree}[escapeinside=||]
+char spam[] = {'a', 'b', 'c', '\0', 'd', 'e'};
+std::cout << spam << std::endl;
+\end{consolethree}
+
+Note that it does NOT mean that the size of the array is 3; it is true that three characters are printed. There are actually 6 characters in the array:
+
+\begin{center}
+\texttt{'a', 'b', 'c', \texttt{'\textbackslash 0'}, 'd', 'e'}
+\end{center}
+
+So you need to distinguish the difference between the \EMPHASIZE{\texttt{size}} of the string \texttt{spam} and its \EMPHASIZE{\texttt{length}} which is defined to be the number of characters up to, but not including, the first \texttt{'\textbackslash 0'}.
+
+Informally when we think of
+
+\begin{consolethree}[escapeinside=||]
+char spam[] = {'a', 'b', 'c', '\0', 'd', 'e'};
+\end{consolethree}
+
+\EMPHASIZE{as a string}, we say that it is made up of 'a', 'b', 'c'. But \EMPHASIZE{as a character array} is made up of six characters. Make sure you remember that.
+
+You can think of the character \texttt{'\textbackslash 0'} in the array
+
+\begin{consolethree}[escapeinside=||]
+char spam[] = {'a', 'b', 'c', '\0', 'd', 'e'};
+\end{consolethree}
+
+as a sentinel value to mark the end of data for the string represented as an array. The character '\ 0' is also called the \EMPHASIZE{null character}. This is the reason why C-strings are also called \EMPHASIZE{null-terminated strings}.
+
+\begin{ex}
+What are the lengths and sizes of the following variables?
+\begin{consolethree}[escapeinside=||]
+char ham[] = {'3', '.', '\0', '1', '4'};
+char eggs[] = {'\0', 'b', '\0', 'a'};
+\end{consolethree}
+
+You can verify your answers by counting the number of characters printed:
+\begin{consolethree}[escapeinside=||]
+std::cout << ham << std::endl;
+std::cout << eggs << std::endl;
+\end{consolethree}
+\end{ex}
+
+There is a shorthand for \{'a', 'b', 'c', '\ 0'\}. Try this:
+
+\begin{consolethree}[escapeinside=||]
+char spam[] = "abc"
+std::cout << spam << std::endl;
+\end{consolethree}
+
+Note in this case that spam has size 4 (there are 4 characters in the array) and length 3 (there are 3 characters before the first \texttt{'\textbackslash 0'}); "abc" is
+
+\begin{center}
+'a', 'b', 'c', \texttt{'\textbackslash 0'}.
+\end{center}
+
+\begin{ex}
+What is the length and size of the following variable?
+\begin{consolethree}[escapeinside=||]
+char spam[100] = "ab\0cd";
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+What is the length and size of the following variable?
+\begin{consolethree}[escapeinside=||]
+char spam[] = "ab\0cd";
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+What are the length and size of the following variable?
+\begin{consolethree}[escapeinside=||]
+char spam[100] = "";
+\end{consolethree}
+\end{ex}
+
+Of course you can do this:
+
+\begin{consolethree}[escapeinside=||]
+std::cout << "abc\0de" << std::endl;
+\end{consolethree}
+
+You have already seen this ...
+
+\begin{consolethree}[escapeinside=||]
+std::cout << "hello world" << std::endl;
+\end{consolethree}
+
+during the first week of class. Now you know that \texttt{"hello world"} is an array of characters. It's just the character array made up of the following characters:
+
+\begin{center}
+\texttt{'h','e','l','l','o',' ','w','o','r','l','d','\textbackslash 0'}
+\end{center}
+
+(Don't forget the \texttt{'\textbackslash 0'}!!!!)
+
+\begin{ex}
+Can you do the following?
+\begin{consolethree}[escapeinside=||]
+std::cout << {'a', 'b', 'c'} << std::endl;
+\end{consolethree}
+\end{ex}
+
+If you have a long string you can break it up like this:
+
+\begin{consolethree}[escapeinside=||]
+char foo[] = "abc"
+             "def";
+std::cout << foo << std::endl;
+\end{consolethree}
+
+Basically C++ will join it up for you so that the above code is the same as this:
+
+\begin{consolethree}[escapeinside=||]
+char foo[] = "abcdef";
+std::cout << foo << std::endl;
+\end{consolethree}
+
+\begin{ex}
+Can you do this:
+\begin{consolethree}[escapeinside=||]
+std::cout << "abc" "def" << std::endl;
+\end{consolethree}
+
+Can you do the same for integers?
+\begin{consolethree}[escapeinside=||]
+std::cout << 123 456 << std::endl;
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+You now know that although you cannot print an array of integers with \texttt{std::cout} (you need to write a for-loop), you can print an array of characters (it will only print up to
+\texttt{'\ 0'}). What about input? Try this:
+\begin{consolethree}[escapeinside=||]
+char s[100];
+std::cin >> s; // type in abcde
+std::cout << s << std::endl;
+\end{consolethree}
+
+Not too shocking right?
+\end{ex}
+
+\begin{ex}
+Run the above program again and enter this as input:
+
+\begin{center}
+\texttt{hello world}
+\end{center}
+
+What do you see?
+\end{ex}
+
+The problem with \texttt{std::cin} is that is that \texttt{std::cin} cuts up inputs at spaces, tabs, or newline (i.e. whitespaces). So for the above exercise, C++ will only give the string \texttt{"hello"} to variable s. If you do want spaces to go into your string variable, then you need to do something else for input. Check out a later section on the \texttt{getline()} function.
+
+
+\newpage\EMPHASIZE{The \texttt{strlen()} function}
+
+C-strings are so useful that several functions are provided with your compiler so that you can work effectively with them. Depending on your compiler, you might need to do this when you want to use these C-string functions:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <cstring>
+... YOUR PROGRAM ...
+\end{consolethree}
+
+If your compiler is really old then you might need to do this instead:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "string.h"
+... YOUR PROGRAM ...
+\end{consolethree}
+
+Here's the first function ...
+
+The function strlen() returns the \EMPHASIZE{length} of the string parameter. This is called the \EMPHASIZE{string length function}. Try this:
+
+\begin{consolethree}[escapeinside=||]
+std::cout << strlen("abc") << std::endl;
+std::cout << strlen("a\0c") << std::endl;
+std::cout << strlen("") << std::endl;
+char s[] = "abc";
+std::cout << strlen(s) << std::endl;
+char t[] = "ab\0c";
+std::cout << strlen(t) << std::endl;
+char u[100] = "";
+std::cout << strlen(u) << std::endl;
+\end{consolethree}
+
+By the way, what if your compiler does not have the \verb!strlen()! function? Well the code to perform the same thing as the \verb!strlen()! function is very simple. You just loop through the character array until you see \texttt{'\textbackslash 0'}. You have a counter that counts the number of characters scanned until \texttt{'\textbackslash 0'}, not including the \texttt{'\textbackslash 0'} character. Here you go:
+
+\begin{consolethree}[escapeinside=||]
+char x[100] = "abc";
+int len = 0;
+while (x[len] != '\0')
+{
+    len++;
+}
+std::cout << len << '\n';
+\end{consolethree}
+
+Run the program. Change it to this and run it again:
+
+\begin{consolethree}[escapeinside=||]
+char x[100] = "hello world";
+int len = 0;
+while (x[len] != '\0')
+{
+    len++;
+}
+std::cout << len << '\n';
+\end{consolethree}
+
+There's actually a ``problem'' with the \texttt{strlen()} function. You see ... if a person accidentally calls the \texttt{strlen()} function with a character array that does \EMPHASIZE{\textit{not}} contain a \texttt{'\textbackslash 0'}, the function can actually go beyond the array bound. This might crash the program.
+
+Here's an example:
+
+\begin{consolethree}[escapeinside=||]
+char x[] = {'a', 'b', 'c'};
+std::cout << strlen(x) << std::endl;
+\end{consolethree}
+
+This is what we call a \EMPHASIZE{buffer overflow}: Your string length function will access a value in the array \texttt{x} that is actually outside \texttt{x}. We'll come back to this issue later.
+
+
+\newpage\EMPHASIZE{Other C-string functions}
+
+In fact there are MANY standard string functions that come with all C compilers. Here are some of the most basic ones. Experiment with this code and figure out what the string functions do:
+
+\begin{consolethree}[escapeinside=||]
+char s[100] = "aaa";
+char t[100] = "bbb";
+char u[100];
+
+// string copy function
+// overwrite the string in u with the string in
+// s
+strcpy(u, s);
+std::cout << u << std::endl;
+
+// string concatenation function
+// put the string in t to the end of the string
+// in u
+strcat(u, t);
+std::cout << u << std::endl;
+
+// WARNING: You cannot do strcat(u, u), i.e., the
+// two arguments of the function must be different.
+
+// string comparison function
+// 0 is returned when the strings are
+// the same. Otherwise a nonzero value is
+// returned.
+int i = strcmp(u, s);
+std::cout << i << std::endl;
+\end{consolethree}
+
+You might wonder what nonzero value is returned by \texttt{strcmp()} when the strings are different.
+
+\begin{consolethree}[escapeinside=||]
+std::cout << strcmp("a", "b") << std::endl;
+std::cout << strcmp("a", "c") << std::endl;
+std::cout << strcmp("a", "d") << std::endl;
+std::cout << strcmp("a", "z") << std::endl;
+std::cout << strcmp("a", "!") << std::endl;
+std::cout << strcmp("a", "ba") << std::endl;
+std::cout << strcmp("b", "a") << std::endl;
+std::cout << strcmp("c", "a") << std::endl;
+std::cout << strcmp("d", "a") << std::endl;
+std::cout << strcmp("ba", "a") << std::endl;
+\end{consolethree}
+
+See it yet? (Hint: Check an ASCII table.)
+
+There are other C-string functions but you will need to know a little more in order to understand how to use them.
+
+
+\newpage\EMPHASIZE{The \texttt{strnlen(), strncmp(), strncat()} functions}
+
+All the string functions we talked about run into problems if the character arrays passed into these function do not contain \texttt{'\textbackslash 0'} resulting in buffer overflow.
+
+In fact this is one scenario of the so-called \EMPHASIZE{buffer overflow attack}, a technique used in many virus software (malware).
+
+Accompanying these functions are similar functions that allow you to specify a stopping point. For instance in the case of \verb!strlen()! (the string length function) there is a function called \verb!strnlen()!
+
+Besides passing in a string, you also pass in a maximum possible length
+for the string.
+
+\begin{consolethree}[escapeinside=||]
+char s[100] = ""; // s[0] = '\0';
+std::cin >> s;
+std::cout << strnlen(s, 99) << std::endl;
+\end{consolethree}
+
+Note that I pass in 99 and not 100. If s has a \EMPHASIZE{size of 100} the \EMPHASIZE{maximum possible length is 99} since in this case the \EMPHASIZE{last character is used by '\textbackslash 0'}. Therefore \texttt{s} (of size 100) has a maximum length of 99.
+
+\begin{ex}
+What is the output of this code?
+\end{ex}
+
+The accompanying safer functions for strcmp() and strcat() are strncmp() and strncat(). So we have the following \textbf{\underline{pairs}} of functions:
+
+\begin{tabular}{ll}
+strlen() & strnlen() \\
+strcmp() & strncmp() \\
+strcat() & strncat() \\
+\end{tabular}
+
+Try this program:
+
+\begin{consolethree}[escapeinside=||]
+char s[100] = "aaa";
+char t[100] = "bbb";
+char u[100];
+
+// string copy function
+// In this case at most 100 chars are copied
+// from s to u
+strncpy(u, s, 100);
+std::cout << u << std::endl;
+
+// string concatenation function
+// In this case at most 100 chars are
+// concatenated from t to u
+strncat(u, t, 100);
+std::cout << u << std::endl;
+
+// string comparison function
+// In this case at most 100 characters are
+// compared.
+int i = strncmp(u, s, 100);
+std::cout << i << std::endl;
+\end{consolethree}
+
+The only problem in the above example is the call to strncat() function. You see if \texttt{u} already has a string of length 10, then only 90 characters are left for concatenation. If \texttt{t} has length greater than that, the program might crash. Therefore it's safe to write this:
+
+\begin{consolethree}[escapeinside=||]
+// string concatenation function
+// In this case at most 100 chars are
+// concatenated from t to u
+strncat(u, t, 100 - strnlen(u, 100));
+std::cout << u << std::endl;
+\end{consolethree}
+
+But in this case some character might not be copied from \texttt{t} to \texttt{u}. Depending on what your program is supposed to do, you might want to print an error message and halt the program.
+
+
+\newpage\EMPHASIZE{The \texttt{std::cin.getline()} function}
+
+Recall that there is a problem with input of strings ...
+
+\texttt{std::cin} cuts up inputs at spaces, tabs, or newline (i.e. whitespaces). So if you run this code:
+
+\begin{consolethree}[escapeinside=||]
+char s[100];
+std::cin >> s;
+std::cout << s << std::endl;
+\end{consolethree}
+
+with this input
+
+\begin{consolethree}[escapeinside=||]
+|\textbf{to be or not to be}|
+\end{consolethree}
+
+you will find that the output is
+
+\begin{console}
+to
+\end{console}
+
+In other words C++ chops up the input at spaces, tabs and newlines. So \texttt{s} is only assigned the string \texttt{"to"}.
+
+Now \ldots{} what ever happened to the rest of the input:
+
+\begin{console}
+be or not to be
+\end{console}
+
+?!? Try this:
+
+\begin{consolethree}[escapeinside=||]
+char s[100];
+char t[100];
+char u[100];
+std::cin >> s >> t >> u;
+std::cout << s << '\n' << t << '\n' << u << '\n';
+\end{consolethree}
+
+with input
+
+\begin{consolethree}[escapeinside=||]
+i'm zaphod beeblebrox
+\end{consolethree}
+
+Get it?
+
+\begin{ex}
+What if you entered 5 spaces at the \textbf{\texttt{beginning}} of the input like this
+
+\begin{center}
+\verb!     i'm zaphod beeblebrox!
+\end{center}
+
+What is the value of \texttt{s} in this case?
+
+\end{ex}
+
+So how do you handle the problem of spaces and tabs? What if you really want spaces and tabs to go into a string? Then you have to use another function. Try running this:
+
+\begin{consolethree}[escapeinside=||]
+char s[100];
+std::cin.getline(s, 100);
+std::cout << s << std::endl;
+\end{consolethree}
+
+with this input:
+
+\begin{consolethree}[escapeinside=||]
+|\textbf{to be or not to be}|
+\end{consolethree}
+
+Note that the \texttt{std::cin.getline()} function also allows you to specify the size of \texttt{s}. In the above example, C++ will only read in at most 99 characters, reserving the last for \texttt{'\textbackslash 0'}. This prevents buffer overflow.
+
+The \texttt{std::cin.getline()} function will assign all the characters up to but not including \texttt{'\textbackslash n'} (when you press the enter key you are including a \texttt{'\textbackslash n'} in your input. In other words \verb!getline()! cuts up input at the \verb!'\n'! character.
+
+The \texttt{std::cin.getline()} function can actually do a lot more. You can get it to cut up input at any character you specify. For instance
+
+\begin{center}
+\verb!std::cin.getline(s, 100, '\t');!
+\end{center}
+
+will cut up input at \verb!'\t'! (tab) characters. (The \verb!'\t'! in this case is sometimes called the stop character.)
+
+Try this
+
+\begin{consolethree}[escapeinside=||]
+char s[10];
+char t[10];
+char u[10];
+std::cin.getline(s, 10, ',');
+std::cin.getline(t, 10, ',');
+std::cin.getline(u, 10, ',');
+std::cout << '[' << s << "]\n"
+          << '[' << t << "]\n"
+          << '[' << u << "]\n" ;
+\end{consolethree}
+
+with input
+
+\begin{console}
+aaa, bbb ,c c c,
+\end{console}
+
+\begin{ex}
+What happens when you run the above program with this
+input
+
+\begin{console}
+0123456789,b,c,
+\end{console}
+\end{ex}
+
+
+\newpage\EMPHASIZE{\texttt{std::cin} and \texttt{std::cin.getline()}}
+
+The \EMPHASIZE{extremely important thing} to remember is that \texttt{std::cin} does not work well with \texttt{std::cin.getline()}.
+
+\begin{ex}
+Try to mix \texttt{std::cin} and \texttt{std::cin.getline()} like this:
+\begin{consolethree}[escapeinside=||]
+char s[100];
+int i;
+std::cin >> i;
+std::cout << i << std::endl;
+std::cin.getline(s, 100);
+std::cout << s << std::endl;
+\end{consolethree}
+
+Run the program and see what happens.
+\end{ex}
+
+\newpage\EMPHASIZE{Type conversion: C-strings to numerics}
+
+We've been using the \texttt{std::cin} for inputs and it works for input of integer values, double values, C-string values, etc. We saw above that the problem is that \texttt{std::cin} cuts up input at whitespaces. The \texttt{std::cin.getline()} does work by really taking in everything as input. But the problem is that it works for strings.
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <cstdlib>
+
+int main()
+{
+    char s[100] = "123";
+    char t[100] = "12.3";
+    int i = strtol(s, NULL, 10);
+    double d = strtod(t, NULL);
+    std::cout << i << '\n' << d << '\n';
+}
+\end{consolethree}
+
+The functions above are
+
+\begin{tabular}{ll}
+\texttt{strtol()} & string-to-long-integer \\
+\texttt{strtod()} & string-to-double \\
+\end{tabular}
+
+The \texttt{strtol()} converts the string to a \EMPHASIZE{\texttt{long int}} whose largest possible value might be larger than your usual \EMPHASIZE{\texttt{int}}.
+
+I'll explain the \texttt{NULL} business later. Right now I just want to get the usage of the functions to you now so that you can use it.
+
+
+\newpage\EMPHASIZE{Type conversion: numerics to C-strings}
+
+Of course you also need to know how to convert an int or a double to a C-string. There are several ways to do this.
+
+Here's the first method in C-style (i.e. using a C function)
+
+\begin{consolethree}[escapeinside=||]
+|\textbf{\#include <cstdio> // or \#include <stdio.h>}|
+
+...
+
+char c[100];
+int i = 42;
+double d = 3.14;
+
+|\textbf{sprintf(c, "\%d", i);}|
+std::cout << c << '\n';
+
+|\textbf{sprintf(c, "\%f", d);}|
+std::cout << c << '\n';
+\end{consolethree}
+
+The second method uses C++ features:
+
+\begin{consolethree}[escapeinside=||]
+|\textbf{\#include <sstream>}|
+
+...
+
+char c[100];
+int i = 123;
+double d = 3.14;
+
+|\textbf{std::stringstream out;}|
+
+|\textbf{out << i;}|
+|\textbf{strcpy(c, out.str().c\_str());}|
+std::cout << c << '\n';
+
+|\textbf{out << d;}|
+|\textbf{strcpy(c, out.str().c\_str());}|
+std::cout << c << '\n';
+\end{consolethree}
+
+\newpage\EMPHASIZE{Exercises}
+
+\begin{ex}
+Write a program that prompts the user for a string and prints the character that occurs most frequently in the string.
+\end{ex}
+
+\begin{ex}
+Write a program that prompts the user for a string and checks if the string is a palindrome. The check should ignore non-letters and the case of letters. For instance ``madam, I'm Adam'' is a palindrome.
+\end{ex}
+
+\begin{ex}
+Write a program that prompts the user for a string, that allows user to perform a substitution of characters. For instance, if the user enters ``hello world'' and then request to have l replaced by r.
+
+\begin{consolethree}[escapeinside=||]
+input: hello world
+source: l
+target: r
+
+hello world
+l->r
+--rr- ---r-
+
+source: d
+target: e
+hello world
+l->r, d->e
+--rr- ---re
+
+source: l
+target: o
+l->o, d->e
+hello world
+--oo- ---oe
+
+source: w
+target: o
+*** invalid target: o is already a target
+target: i
+l->o, d->e, w->i
+hello world
+--oo- i---oe
+
+source: +
+\end{consolethree}
+
+The program quits when the user enters + for source. This simple program can be used to help you solve a type of encrypted text called substitution cipher.
+\end{ex}
+
+\begin{ex}
+Write a program that prompts the user for two strings and checks if the second string occurs as a substring of the first. If so the index where the second occurs in the first is printed. Otherwise -1 is printed.
+\end{ex}
+
+\begin{ex}
+Write a program that accepts a string from the user and a window column size and prints the string in the console window with the given size. For instance if the user entered ``it was a dark and stormy night \ldots'' and a size of 10, then the output is
+
+\begin{consolethree}[escapeinside=||]
+it was a
+dark and
+stormy
+night ...
+\end{consolethree}
+
+Note that at most 10 characters from the string is printed per row. If the user entered 15 for the size then the output is
+
+\begin{consolethree}[escapeinside=||]
+it was a dark
+and stormy
+night ...
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Write a program accepts a string that is an integer expression, interprets the expression, perform the appropriate operations and prints the results. For instance is the user enters the string ``1 + 2'', the program prints 3. If the user enters ``1 - 2 + 3 * 4'' the program prints 11. The program should handle +, -, *, /, \% and integer values.
+\end{ex}

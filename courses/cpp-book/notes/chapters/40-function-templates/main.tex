@@ -197,152 +197,9 @@ The variable type \texttt{T} (usually called a \EMPHASIZE{type parameter}) can a
 
 Another thing to remember is that you can use any identifier name for the type parameter. I used \texttt{T}. You can use \texttt{X} if you like. But the practice is to use a single uppercase letter.
 
-\begin{ex}
-In this example the same type parameter appears as a \EMPHASIZE{return type}. You are given the following program:
-
-\begin{consolethree}[escapeinside=||]
-#include <iostream>
-
-int addOne(int x)
-{
-    return x + 1;
-}
-
-int main()
-{
-    int a = 1;
-    std::cout << addOne(a) << '\n';
-    return 0;
-}
-\end{consolethree}
-
-Run it. Easy program right? Now run this:
-
-\begin{consolethree}[escapeinside=||]
-#include <iostream>
-
-int addOne(int x)
-{
-    return x + 1;
-}
-
-int main()
-{
-    int a = 1;
-    std::cout << addOne(a) << '\n';
-    std::cout << addOne(3.3) << '\n';
-    return 0;
-}
-\end{consolethree}
-
-The 3.3 is passed to the x of \texttt{addOne()} which will typecast the
-value to an integer, i.e. 3. Now rewrite the program so that the
-\texttt{addOne()} function becomes a function template; some test code is
-included to test your function template. The types that needs to be
-parameterized (made into a variable) is in bold and larger font.
-
-\begin{consolethree}[escapeinside=||]
-#include <iostream>
-
-|\EMPHASIZE{int}| addOne(|\EMPHASIZE{int}| x)
-{
-    return x + 1;
-}
-
-int main()
-{
-    int a = 1;
-    std::cout << addOne|\textbf{< int >}|(a) << '\n';
-    |\textbf{std::cout << addOne< double >(3.3) << '\textbackslash n';}|
-    |\textbf{std::cout << addOne< char >('c') << '\textbackslash n';}|
-
-    |\textbf{int * p = new int;}|
-    |\textbf{std::cout << addOne< int * >(p) << '\textbackslash n';}|
-
-    return 0;
-}
-\end{consolethree}
-
-(Note that I'm using the \texttt{addOne()} function with
-\texttt{double}, \texttt{char}, \texttt{int*} values which have the +
-operator, i.e. if \texttt{x} in either an \texttt{int}, or a \texttt{double},
-or a char, or an \texttt{int*}, the following makes sense in C++:
-
-\verb!x + 1;!
-
-\end{ex}
-
-\begin{ex}
-In this exercise you write a function template with
-one type parameter that appears in the function body.
-Here's one familiar \texttt{swap()} function.
-
-\begin{consolethree}[escapeinside=||]
-#include <iostream>
-
-void swap(int & x, int & y)
-{
-    int t;
-    t = x;
-    x = y;
-    y = t;
-}
-
-int main()
-{
-    int x = 1, y = 42;
-    swap(x, y);
-    std::cout << x << ' ' << y << std::endl;
-    return 0;
-}
-\end{consolethree}
-
-Rewrite it into a function template and test it with the extra code.
-HINT: The types that should be parameterized are in bold and larger
-font.
-
-\begin{consolethree}[escapeinside=||]
-#include <iostream>
-
-void swap(|\EMPHASIZE{int}| & x, |\EMPHASIZE{int}| & y)
-{
-    |\EMPHASIZE{int}| temp;
-    temp = x;
-    x = y;
-    y = temp;
-}
-
-int main()
-{
-    int x = 1, y = 42;
-    swap< int >(x, y);
-    std::cout << x << ' ' << y << std::endl;
-
-    double a = 1.2, b = 3.4;
-    swap< double >(a, b);
-    std::cout << a << ' ' << b << std::endl;
-    return 0;
-}
-\end{consolethree}
-\end{ex}
-
-\begin{ex}
-Complete the following:
-
-\begin{consolethree}[escapeinside=||]
-#include <iostream>
-
-int main()
-{
-    std::cout << max< int >(1, 3) << '\n';
-    std::cout << max< double >(3.1, 1.1) << '\n';
-    std::cout << min< int >(1, 3) << '\n';
-    std::cout << min< double >(3.1, 1.1) << '\n';
-    return 0;
-}
-\end{consolethree}
-\end{ex}
-
+\input{../exercises/0-40-function-templates/question.tex}
+\input{../exercises/1-40-function-templates/question.tex}
+\input{../exercises/2-40-function-templates/question.tex}
 
 \newpage\EMPHASIZE{Another Example}
 
@@ -484,83 +341,8 @@ std::cout << arrayEqual< |\EMPHASIZE{char}| >(x, 3, y, 3)
 ...
 \end{consolethree}
 
-\begin{ex}
-Why does this program not work? Which statement
-causes the problem?
-
-\begin{consolethree}[escapeinside=||]
-#include <iostream>
-
-template < typename T >
-void printProduct(T x, T y)
-{
-    std::cout << (x * y) << std::endl;
-}
-
-int main()
-{
-    int a = 2;
-    int b = 3;
-    printProduct< int >(a, b);
-
-    double c = 1.2;
-    double d = 3.4;
-    printProduct< double >(c, d);
-
-    int * e = new int;
-    int * f = new int;
-    printProduct< int * >(e, f);
-}
-\end{consolethree}
-
-(Run this with your compiler and read the error message.)
-\end{ex}
-
-\begin{ex}
-Convert the following program to one containing a
-function template:
-
-\begin{consolethree}[escapeinside=||]
-#include <iostream>
-
-int max (int x[], int size)
-{
-    int m = x[0];
-    for (int i = 1; i < size; i++)
-    {
-        if (m < x[i]) m = x[i];
-    }
-    return m;
-}
-
-int main()
-{
-    int x[10] = {3, 1, 5, 6, 2, 8, 9, 3, -2, 3};
-    std::cout << max(x, 10) << std::endl;
-    return 0;
-}
-\end{consolethree}
-
-And test it with this:
-
-\begin{consolethree}[escapeinside=||]
-#include <iostream>
-
-int main() {
-    int x[10] = {3, 1, 5, 6, 2, 8, 9, 3, -2, 3};
-    std::cout << max< int >(x, 10) << std::endl;
-
-    int z[8] = {3, 1, 5, 6, 2, 8, 9, 3};
-    std::cout << max< int >(z, 8) << std::endl;
-
-    double y[8] = {3.1, 1.8, 5.2, 6.7,
-                   8.4, 9.1, 3.6, -2.7};
-    std::cout << max< double >(y, 8) << std::endl;
-    return 0;
-}
-\end{consolethree}
-\end{ex}
-
+\input{../exercises/3-40-function-templates/question.tex}
+\input{../exercises/4-40-function-templates/question.tex}
 
 \newpage\EMPHASIZE{Template parameters}
 
@@ -613,70 +395,8 @@ int main()
 
 So now you know that a template parameter is declared with the word \EMPHASIZE{``typename''} if it is a type and if it is an integer value you use the word \EMPHASIZE{``int''}.
 
-\begin{ex}
-Can you have a template parameter that is a char? A
-double?
-\end{ex}
-
-\begin{ex}
-Remember this example:
-
-\begin{consolethree}[escapeinside=||]
-#include <iostream>
-
-template < typename T >
-T max(T x[], int size)
-{
-    T m = x[0];
-    for (int i = 1; i < size; i++)
-    {
-        if (m < x[i]) m = x[i];
-    }
-    return m;
-}
-
-int main()
-{
-    int x[10] = {3, 1, 5, 6, 2, 8, 9, 3, -2, 3};
-    std::cout << max< int >(x, 10) << std::endl;
-
-    double y[8] = {3.1, 1.8, 5.2, 6.7,
-                   8.4, 9.1, 3.6, -2.7};
-    std::cout << max< double >(y, 10) << std::endl;
-    return 0;
-}
-\end{consolethree}
-
-Modify the template function so that the size of the array is passed in
-as a template parameter instead of a function parameter. In other words
-your \texttt{main()} should look like this:
-
-\begin{consolethree}[escapeinside=||]
-#include <iostream>
-
-...
-
-int main()
-{
-    int x[10] = {3, 1, 5, 6, 2, 8, 9, 3, -2, 3};
-    std::cout << max< int, 10 >(x) << std::endl;
-
-    int z[8] = {3, 1, 5, 6, 2, 8, 9, 3};
-    std::cout << max< int, 8 >(x) << std::endl;
-
-    double y[8] = {3.1, 1.8, 5.2, 6.7,
-                   8.4, 9.1, 3.6, -2.7};
-    std::cout << max< double, 8 >(y) << std::endl;
-    return 0;
-}
-\end{consolethree}
-
-What is the difference between the old template function and the new in
-terms of the code they produced? Specifically how many actual functions
-were created by C++ for the above \texttt{main()} by the original function
-template and by the new template function?
-\end{ex}
-
+\input{../exercises/5-40-function-templates/question.tex}
+\input{../exercises/6-40-function-templates/question.tex}
 So now you know you can have either this
 
 \begin{consolethree}[escapeinside=||]
@@ -764,33 +484,9 @@ int max< double, 10 >(int x[])
 This means that the second version will generate a large executable
 binary code.
 
-\begin{ex}
-Can integer template parameter accept values from a
-variable? Say something like this:
-
-\begin{consolethree}[escapeinside=||]
-int x[] = {2, 3, 5, 7, 11};
-int i = 5;
-max< int, i >(x);
-\end{consolethree}
-\end{ex}
-
-\begin{ex}
-Write a function template that computes the maximum
-of the values from one pointer address up to but not including the
-second pointer address.
-
-\begin{consolethree}[escapeinside=||]
-int x[] = {2, 3, 5, 7, 11};
-std::cout << max< int >(&x[0], &x[5]);
-\end{consolethree}
-\end{ex}
-
-\begin{ex}
-IMPORTANT!!! Create a simple experiment to verify
-that a function template parameter can accept a pointer type.
-\end{ex}
-
+\input{../exercises/7-40-function-templates/question.tex}
+\input{../exercises/8-40-function-templates/question.tex}
+\input{../exercises/9-40-function-templates/question.tex}
 
 \newpage\EMPHASIZE{Header Files}
 
@@ -799,41 +495,7 @@ Here's a very common gotcha. (I see this all the time.)
 When you organize your template functions, you should remember to
 include the \EMPHASIZE{body of the function template in the header file} not a cpp file. That's because function templates are inline functions.
 
-\begin{ex}
-Write a header file \texttt{array.h} so that the following
-works:
-
-\begin{consolethree}[escapeinside=||]
-#include "array.h"
-
-int main()
-{
-    int x[] = {5, 3, 1, 2, 4};
-    int xSize = sizeof(x) / sizeof(int);
-    int y[] = {5, 3, 1, 2, 4};
-    int ySize = sizeof(x) / sizeof(int);
-
-    println< int >(x, xSize);
-    println< int >(y, ySize);
-    bubbleSort< int >(x, xSize);
-    println< int >(x, xSize);
-    println< int >(y, ySize);
-
-    double a[] = {5.5, 3.3, 1.1, 2.2, 4.4};
-    int aSize = sizeof(a) / sizeof(double);
-    double b[] = {5.5, 3.3, 1.1, 2.2, 4.4};
-    int bSize = sizeof(b) / sizeof(double);
-
-    println< double >(a, aSize);
-    println< double >(b, bSize);
-    bubbleSort< double >(a, aSize);
-    println< double >(a, aSize);
-    println< double >(b, bSize);
-    return 0;
-}
-\end{consolethree}
-\end{ex}
-
+\input{../exercises/10-40-function-templates/question.tex}
 
 \newpage\EMPHASIZE{Automatic resolution}
 
@@ -894,43 +556,7 @@ void println(int x)
 
 and deduce that the T is int.
 
-\begin{ex}
-I have two function templates, f and g, that accepts
-a pointer and prints the value stores in the pointer and prints the
-value that the pointer is pointing to.
-
-\begin{consolethree}[escapeinside=||]
-int * p = new int;
-f(p);
-g(p);
-\end{consolethree}
-
-Because of automatic resolution, I don't have to specify the type when I
-call these two functions. The two functions print:
-
-\begin{consolethree}[escapeinside=||]
-0x10d92c0 0
-0x10d92c0 0
-\end{consolethree}
-
-Of course f and g has to also work for
-
-\begin{consolethree}[escapeinside=||]
-double * q = new double;
-f(q);
-g(q);
-\end{consolethree}
-
-Although these two functions have the same output, they are actually
-different.
-
-\begin{itemize}
-\item How would you implement f and g so that they are different?
-\item In what scenario would you use one way of implementation and not the
-  other?
-\end{itemize}
-\end{ex}
-
+\input{../exercises/11-40-function-templates/question.tex}
 
 \newpage\EMPHASIZE{Gotcha}
 
@@ -1105,20 +731,7 @@ int main()
 
 I've added a specialization of the \EMPHASIZE{sum} function template for the case when \EMPHASIZE{T = int} and \EMPHASIZE{SIZE = 0}.
 
-\begin{ex}
-Add 3 more specializations to the above sum function template:
-
-\begin{itemize}
-\item \EMPHASIZE{T = int} and \EMPHASIZE{SIZE = 2}
-\item \EMPHASIZE{T = double} and \EMPHASIZE{SIZE = 1}
-\item \EMPHASIZE{T = double} and \EMPHASIZE{SIZE = 2}
-\end{itemize}
-
-Insert print statements into the \EMPHASIZE{sum} function template
-and its specialization to verify that you are indeed calling the right
-function.
-\end{ex}
-
+\input{../exercises/12-40-function-templates/question.tex}
 The above specialization is called a \EMPHASIZE{full specialization}. For
 templates, there's a concept of \EMPHASIZE{partial specialization}. The
 syntax would be something like this:
@@ -1156,88 +769,10 @@ Is not a template anymore. It's a regular function. Therefore for multi-file com
 
 The standard practice for creating specializations is to create them for frequently used cases where you want speed. For instance, you probably do NOT want to have specializations for \verb!int sum< int, 0 >, int sum< int, 1 >, int sum< int, 2 >, ..., int sum< int, 99 >!!!!
 
-\begin{ex}
-Test putting your \EMPHASIZE{sum} function
-templates and its 4 specializations into a header file as inline
-function. Make sure you can compile your program.
-\end{ex}
-
-\begin{ex}
-Next, try putting the prototypes of the 4
-specializations into a heaer file and implementations (i.e. bodies) of
-the 4 specializations in the cpp file. Make sure your program compiles.
-\end{ex}
-
-\begin{ex}
-Write a \texttt{max} function template with specializations
-similar to the \texttt{sum} function template.
-
-\begin{consolethree}[escapeinside=||]
-template < typename T, int SIZE >
-int max(T x[])
-{
-    ...
-}
-\end{consolethree}
-\end{ex}
-
-\begin{ex}
-Write a \texttt{bubblesort} function template with
-specializations similar to the \texttt{sum} function template.
-\end{ex}
-
-\begin{ex}
-Write a \texttt{binarysearch} function template with
-specializations similar to the \texttt{sum} function template.
-\end{ex}
-
-\begin{ex}
-You can model a 2D point as an array of two numbers:
-\{2, 3\}. In general you want to model points of dimension 1, 2, 3, 4,
-... In physics, engineering, computer vision, etc, it's common to
-have points with coordinate which are \EMPHASIZE{float}s or
-\EMPHASIZE{double}s. Technically speaking I'm talking about
-``vectors'' and not ``points''. One common operation is to add vectors
-of the same dimension. For instance
-\begin{center}
-\{2, 3\} + \{1, 6\} = \{2+1, 3+6\}
-\end{center}
-Write a function template so that you can run the following:
-
-\begin{consolethree}[escapeinside=||]
-double p0[2] = {2, 3};
-double q0[2] = {1, 6};
-double sum0[2];
-vec_add< double, 2 >(sum0, p0, q0);
-vec_println(sum0); // prints <3, 9> and newline
-
-float p1[2] = {2.1, 3.2};
-float q1[2] = {1.3, 6.4};
-float sum1[2];
-vec_add< float, 2 >(sum1, p1, q1);
-vec_println(sum1); // prints <3.4, 9.6> and newline
-\end{consolethree}
-
-Your \texttt{vec\_add} and \texttt{vec\_println} should work for any
-dimension. After you are done, write some specializations. The most
-common case is when the dimension is 1, 2, 3, 4.
-\end{ex}
-
-\begin{ex}
-Write a template function with specialization(s) to
-print an array.
-
-\begin{consolethree}[escapeinside=||]
-int x[] = {2, 3, 5};
-array_println< int >(&x[0], &x[3]);
-// prints {2, 3, 5} and '\n'
-
-double y[] = {2.1, 3.1, 5.1};
-array_println< double >(&y[0], &y[3]);
-// prints {2.1, 3.1, 5.1} and '\n'
-
-char z[] = "abcde";
-array_println< char >(&z[0], &z[5]);
-// prints abcde and '\n'
-\end{consolethree}
-\end{ex}
+\input{../exercises/13-40-function-templates/question.tex}
+\input{../exercises/14-40-function-templates/question.tex}
+\input{../exercises/15-40-function-templates/question.tex}
+\input{../exercises/16-40-function-templates/question.tex}
+\input{../exercises/17-40-function-templates/question.tex}
+\input{../exercises/18-40-function-templates/question.tex}
+\input{../exercises/19-40-function-templates/question.tex}

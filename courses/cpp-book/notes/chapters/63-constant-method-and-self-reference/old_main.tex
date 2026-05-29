@@ -1,0 +1,1911 @@
+\newpage\EMPHASIZE{63. Constant Method and Self Reference}
+
+\textsc{Objectives}
+\begin{itemize}
+\item Understand the \texttt{this} pointer
+\item Understand the uses of the \texttt{this} pointer
+\item Return a reference to an object
+\item Return a reference to an instance variable
+\item Understand the dangers of returning references to an instance variable
+\item Make parameters constant to protect from accidental modification
+\item Make \texttt{*this} constant to protect from accidental modification
+\end{itemize}
+
+
+\newpage\EMPHASIZE{Recall}
+
+Suppose we have a class \texttt{C} with a method \texttt{m}. Suppose an
+object \texttt{obj} of \texttt{C} invokes \texttt{m}. In the body of method
+\texttt{m}, members and member functions without objects are those
+automatically associated with \texttt{obj}
+
+\begin{consolethree}[escapeinside=||]
+// Int.h
+class Int |\xsidebox[0cm]{0cm}{}{recallbox0}{\textbf{When i invokes} \texttt{print()}, \textbf{the \texttt{x\_} refers to} \texttt{i.x\_}.}|
+{
+public:
+    Int(int x) : x_(x) {}
+    void print()
+    {
+        std::cout << |\tikzmarknode{recall0}{x\_}| << "\n";
+    }
+private:
+    int x_;
+};
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// main.cpp
+#include "Int.h"
+
+int main()|\xsidebox[0cm]{0cm}{}{recallbox1}{\textbf{Now} \texttt{x\_} \textbf{refers to} \texttt{j.x\_}}|
+{
+    Int i(5);
+
+    |\textbox{\tikzmarknode{recall1}{i.print()}}|;
+
+    Int j(-3);
+
+    |\textbox{\tikzmarknode{recall2}{j.print();}}|
+}
+\end{consolethree}
+
+\DrawArrow{recallbox0}{recall0}
+\DrawArrow{recallbox0}{recall1}
+\DrawArrow{recallbox1}{recall0}
+\DrawArrow{recallbox1}{recall2}
+Again, this applies to methods as well...
+
+Add methods \texttt{m1}, \texttt{m2} into the \texttt{Int} class. For
+simplicity, I'm inlining the methods into the class header. But remember
+that you should inline minimally.
+
+\begin{consolethree}[escapeinside=||]
+// Int.h
+...
+class Int
+{
+public:
+    ...
+    void m1()
+    {
+        std::cout << "m1:" << x << "\n";
+        
+        |\textbox{m2();}|
+    }
+    void m2()
+    {
+        std::cout << "m2:" << x << "\n";
+    }
+    ...
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// main.cpp
+#include "Int.h"
+
+int main()
+{
+    Int i(42);
+    i.m1();
+    std::cout << std::endl;
+    Int j(0);
+    j.m1();
+    return 0;
+}
+\end{consolethree}
+
+(Note: This is a review. I already talked about methods calling methods
+when we were looking at the \texttt{Date} class.)
+
+
+\newpage\EMPHASIZE{Thinking of Objects}
+
+You should think of a class as a rubber stamp for creating objects.
+
+You should think of each object as a computational machine.
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Circle(3, 2, r=2.5, background='red')
+p += Circle(3, 2, r=1.15, background='white', label='x\_')
+p += Rect(3.25, 1.85, 3.9, 2.15, innersep=0.1, s='42', align='c', linewidth=0.05)
+
+p += Rect(3.25, 3.25, 4, 4, innersep=0.1, s='m1', align='c', linewidth=0.075, linecolor='blue')
+p += Rect(0.75, 1.8, 1.65, 2.3, innersep=0.1, s='m2', align='c', linewidth=0.075, linecolor='blue')
+p += Rect(3.25, -0.05, 4.4, 0.65, innersep=0.1, s='print', align='c', linewidth=0.075, linecolor='blue')
+
+st = r"""
+\begin{consolethree}
+Int
+
+- x_  :  int
+
++ print: void
++ m1: void
++ m2: void
+\end{consolethree}
+"""
+p += Rect(-5, 0, -1, 4, s = st, linewidth=0)
+p += Line(points=[(-4.95, 2.5), (-0.95, 2.5)], linewidth=0.01)
+p += Line(points=[(-4.95, 3.35), (-0.95, 3.35)], linewidth=0.01)
+print(p)
+\end{python}
+You can (and should) think of the ``stuff'' on the green band (the
+\texttt{m1}, \texttt{m2}, \texttt{print}) -- the \texttt{public} things -- as
+things that outsiders can access while the stuff on the inside (the
+\texttt{x\_}) -- the \texttt{private} things -- are not available to
+outsiders. By outsiders, I mean functions not in the class and methods
+not in this class (i.e. methods of another class).
+
+
+\newpage\EMPHASIZE{What is the Invoking Object}
+
+What if a method must know the invoking object? Here's
+such an example:
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    ...
+    |\textbf{Int max(const Int \& c)}|
+    {
+        if (c.x_ > x_)
+        {
+            return c;
+        }
+        else
+        {
+            return ???;
+        }
+    }
+private:
+    int x_;
+};
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    Int a(100), b(1);
+    Int c = a.max(b);
+    return 0;
+}
+\end{consolethree}
+
+For \texttt{a.max(b)} we want to return \texttt{a}. But what's the name of
+\texttt{a} in the code of \texttt{max()}??? In general, what's the name of
+the object making the call?
+
+There is a secret parameter in every method. You do not pass this
+parameter into the method. It's done for you automatically.
+
+What is this secret parameter??? ...
+
+
+\newpage\EMPHASIZE{The \texttt{this} Pointer}
+
+Try the program below.
+
+\begin{consolethree}[escapeinside=||]
+// Int.h
+#ifndef INT_H
+#define INT_H
+
+#include <iostream>
+
+class Int
+{
+public:
+    Int(int x) : x_(x) {}
+    void print()
+    {
+        |\textbf{std::cout << \EMPHASIZE{this} << x\_ << "\textbackslash ";}|
+    }
+private:
+    int x_;
+};
+
+#endif
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// main.cpp
+#include <iostream>
+#include "Int.h"
+
+int main()
+{
+    Int i(42);
+    std::cout << &i << "\n";
+    i.print();
+    Int j(0);
+    std::cout << &j << "\n";
+    j.print();
+    return 0;
+}
+\end{consolethree}
+
+When an object \texttt{obj} invokes a method \texttt{m}, a special pointer
+\texttt{this} is passed into \texttt{m} automatically. The important thing
+to remember is that:
+
+\EMPHASIZE{\texttt{this} points to \texttt{obj}}
+
+If an object \texttt{obj} has member variable \texttt{x\_} and \texttt{this}
+is a pointer to \texttt{obj}, then the following are the same:
+
+\texttt{obj.x\_} \hspace{1cm} \texttt{(*this).x\_} \hspace{1cm} \texttt{this->x\_}
+
+This is the same notation used for pointers to \texttt{struct} variables.
+You should \EMPHASIZE{\texttt{not}} use \texttt{(*this).x\_}. Write
+\texttt{this->x\_} instead.
+
+(There is an exception. Static methods do not have the \texttt{this}
+secret parameter discussed here. We will talk about static methods
+later.)
+
+\EMPHASIZE{WARNING:} \texttt{*p.x} means \texttt{*(p.x)} because \texttt{.} has
+higher precedence than \texttt{*}. Make sure you try changing the
+following
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    ...
+    void print()
+    {
+        std::cout << |\tikzmarknode{same0}{\EMPHASIZE{x\_}}| << "\n";
+    }
+    ...
+private:
+    int x_;
+};
+\end{consolethree}
+\xsidebox[0cm]{0.5cm}{}{samebox}{\EMPHASIZE{Same!}}
+to this:
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    ...
+    void print()
+    {
+        std::cout << |\tikzmarknode{same1}{\EMPHASIZE{this-\textgreater x\_}}| << "\n";
+    }
+    ...
+private:
+    int x_;
+};
+\end{consolethree}
+\DrawArrow{samebox}{same0}
+\DrawArrow{samebox}{same1}
+OK ... now to use \texttt{this} ...
+
+
+\newpage\EMPHASIZE{When do you use this?}
+
+\EMPHASIZE{Standard Practice:} Don't use \texttt{this} in a method just to access members or member functions. In other words, in a method
+
+\begin{itemize}
+\item \texttt{this->x} should be \texttt{x}
+\item \texttt{this->m()} should be \texttt{m()}
+\end{itemize}
+
+For instance, this does work:
+
+\begin{consolethree}[escapeinside=||]
+...
+class Date
+{
+public:
+    ...
+    int get_year()
+    {
+        return |\EMPHASIZE{this->yyyy\_;}|
+    }
+    void set_year(int y)
+    {
+        |\EMPHASIZE{this->yyyy\_}| = y;
+    }
+    ...
+    void add_m_y(int m, int d)
+    {
+        |\EMPHASIZE{this->add\_m(m);}|
+        |\EMPHASIZE{this->add\_d(d);}|
+    }
+private:
+    ...
+};
+\end{consolethree}
+
+but \EMPHASIZE{DON'T DO THAT!!!} Do this:
+
+\begin{consolethree}[escapeinside=||]
+...
+class Date
+{
+public:
+    ...
+    int get_year()
+    {
+        return |\EMPHASIZE{yyyy\_;}|
+    }
+    void set_year(int y)
+    {
+        |\EMPHASIZE{yyyy\_}| = y;
+    }
+    ...
+    void add_m_y(int m, int d)
+    {
+        |\EMPHASIZE{add\_m(m);}|
+        |\EMPHASIZE{add\_d(d);}|
+    }
+private:
+    ...
+};
+\end{consolethree}
+
+The pointer \texttt{this} is used when it's used on its own either as
+\texttt{this} or \texttt{*this}. In particular \texttt{*this} can be used for
+returning a copy of or a reference to the object making the method
+invocation and \texttt{this} can be used for address comparison
+(you'll see this later when we need to compare address
+values when we overload the assignment operator \texttt{operator=}.)
+
+(There are exceptions ... later. But the above two uses are good
+enough.)
+
+
+\newpage\EMPHASIZE{Returning a copy of *this}
+
+\begin{consolethree}[escapeinside=||]
+...
+class Int
+{
+    ...
+    Int max(const Int & c)
+    {
+        if (c.x_ > x_)
+            return c;
+        else
+            return |\EMPHASIZE{*this;}|
+    }
+    ...
+private:
+    int x_;
+};
+...
+\end{consolethree}
+
+And now you can try this:
+
+\begin{consolethree}[escapeinside=||]
+#include "Int.h"
+
+int main()
+{
+    Int a(100), b(1);
+    Int c = a.max(b); // a.max(b) should return an
+                      // Int object with x_ value of
+                      // 100
+    c.print();
+    return 0;
+}
+\end{consolethree}
+
+Of course, this is better:
+
+\begin{consolethree}[escapeinside=||]
+...
+class Int
+{
+public:
+    ...
+    Int max(const Int & c)
+    {
+        return (c.x_ > x_ ? c : *this);
+    }
+    ...
+private:
+    int x_;
+};
+...
+\end{consolethree}
+
+Get it? In this case, we are returning a copy of the \texttt{Int} object
+that \texttt{this} points to, i.e., the object invoking the method.
+
+Notice however that you can also do this:
+
+\begin{consolethree}[escapeinside=||]
+...
+class Int
+{
+    ...
+    Int & max(const Int |\EMPHASIZE{\&}| c)
+    {
+        return (c.x_ > x_ ? c : *this);
+    }
+    ...
+private:
+    int x_;
+};
+...
+\end{consolethree}
+
+In this case, a \EMPHASIZE{reference is returned}.
+
+Why is this important? Look at this code:
+
+\begin{consolethree}[escapeinside=||]
+#include "Int.h"
+
+int main()
+{
+    Int a(100), b(1);
+    Int c = a.max(b);
+    c.print();
+    return 0;
+}
+\end{consolethree}
+
+This means if the return of \texttt{Int::max()} is an \texttt{Int} and not
+an \texttt{Int \&}
+
+\begin{consolethree}[escapeinside=||]
+...
+class Int
+{
+public:
+    ...
+    |\EMPHASIZE{Int}| max(const Int & c)
+    {
+        ...
+    }
+    ...
+};
+...
+\end{consolethree}
+
+then an \texttt{Int} value is returned (it has the same values as \texttt{a}
+or \texttt{b}). This \texttt{Int} value is used for the invocation of the
+\texttt{Int} copy constructor to initialize \texttt{c}.
+
+Make sure you read the last two sentences again (and again and again).
+
+However if a reference is returned:
+
+\begin{consolethree}[escapeinside=||]
+...
+class Int
+{
+public:
+    ...
+    |\EMPHASIZE{Int \&}| max(const Int & c)
+    {
+        ...
+    }
+    ...
+};
+...
+\end{consolethree}
+
+then back in \texttt{main()},
+\begin{consolethree}
+#include "Int.h"
+
+int main()
+{
+    Int a(100), b(1);
+    Int c = a.max(b);
+    c.print();
+    
+    return 0;
+}
+\end{consolethree}
+
+on returning from \texttt{Int::max()}, a reference to a or to b is used by
+the copy constructor to initialize \texttt{c}. There's no
+extra \texttt{Int} object created by \texttt{Int::max()} that is used to
+initialize \texttt{c}.
+
+Let me repeat again: when you return \texttt{Int} (not \texttt{Int \&}), a
+copy of the object to be returned is made (by using the copy
+cconstructor).
+\begin{consolethree}[escapeinside=||]
+...
+class Int
+{
+public:
+    ...
+    |\EMPHASIZE{Int}| max(const Int & c)
+    {|\xsidebox[0cm]{0cm}{}{ctorbx}{Copy constructor is called using \texttt{c} or \texttt{*this}!!! Because return type is \texttt{Int} (and not \texttt{Int \&}) Remember that!!!}|
+        return (c.x > x ? c : *this);
+    }
+    ...
+private:
+\end{consolethree}
+Whereas if you return \texttt{Int \&}, no \texttt{Int} object is created.
+The copy constructor used to create \texttt{c} will simply reference
+\texttt{a} or \texttt{b}.
+
+
+\newpage\EMPHASIZE{Returning references}
+
+In the previous section, I have shown you an example of returning a
+reference.
+
+Certain methods and operators update the values of the variables or
+objects and return the values of the variables or objects. Run this:
+
+\begin{consolethree}[escapeinside=||]
+int x = 5;
+x++;
+std::cout << x << std::endl;
+int y = x++;
+std::cout << x << ',' << y << std::endl;
+y = (x += 5);
+std::cout << x << ',' << y << std::endl;
+(x += 5) += 5;
+std::cout << x << std::endl;
+\end{consolethree}
+
+Don't overdo this! Why? Because
+
+\begin{consolethree}[escapeinside=||]
+y = (x += 5);
+\end{consolethree}
+
+does too many things. A function/method/operator should do
+\EMPHASIZE{\texttt{one}} thing to avoid confusion. This is clearly easier to
+understand:
+
+\begin{consolethree}[escapeinside=||]
+x += 5;
+y = x;
+\end{consolethree}
+
+Note that the \texttt{+=} when called twice:
+
+\begin{consolethree}[escapeinside=||]
+(x += 5) += 5;
+\end{consolethree}
+
+operates on the same \texttt{x}. This means that \texttt{+=}, besides
+incrementing \texttt{x}, also returns a reference to x so that the second
+\texttt{+=} operators on the same \texttt{x}. If \texttt{+=} returns a new
+\texttt{int} value that has the same value as \texttt{x} after incrementing,
+then the second \texttt{+=} would have operated on this new \texttt{int}
+value and not on \texttt{x}. Therefore the right thing to do is to return
+a reference to \texttt{x} and not a copy of \texttt{x}.
+
+Of course returning a reference is faster than returning an object since
+objects tend to consume more memory. References are implemented using
+pointers and pointers take up very little memory.
+
+Refer to the \texttt{Date} example. Suppose the \texttt{add\_y} method is to
+add an integer value to the year value, \texttt{and} return the value of
+the object.
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+...
+class Date
+{
+public:
+    ...
+    |\EMPHASIZE{Date \&}| add_y(int);
+    ...
+private:
+    int yyyy_, mm_, dd_;
+};
+...
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+...
+|\EMPHASIZE{Date \&}| Date::add_y(int inc)
+{
+    yyyy_ += inc;
+    |\EMPHASIZE{return *this;}|
+}
+...
+\end{consolethree}
+
+With the above, I can now do this:
+
+\begin{consolethree}[escapeinside=||]
+Date today(1, 1, 1970);
+today.add_y(1).add_y(3);
+\end{consolethree}
+
+The first invocation of \texttt{add\_y} will add 1 to the year of
+\texttt{today} and then a reference to \texttt{today} is returned. Therefore
+the second \texttt{add\_y} is called by this reference, which means that
+the second \texttt{add\_y} is called by \texttt{today}.
+
+However if you do this:
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+...
+|\EMPHASIZE{Date}| Date::add_y(int inc)
+{
+    y += inc;
+    |\EMPHASIZE{return *this;}|
+}
+...
+\end{consolethree}
+
+i.e., return a \texttt{Date} object instead of a reference, then
+\texttt{Date}'s copy constructor is used to create a new
+\texttt{Date} object from \texttt{*this}. This object is returned to
+\texttt{main()} and the \texttt{add\_y} is called by this object so that
+\texttt{today} does not have its year incremented by 3.
+
+We now look at returning references from a function call or method call.
+There's nothing new here about references.
+
+\EMPHASIZE{WARNING:} Pay attention to the next programs!!!
+
+Run the following pair of programs. Explain their outputs.
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int & f(int & x)
+{
+    x++;
+    return x;
+}
+
+int main()
+{
+    int a = 42;
+    int & b = f(a);
+    std::cout << a << ' ' << b << '\n';
+    std::cout << &a << ' ' << &b << '\n';
+    b++;
+    std::cout << a << ' ' << b << '\n';
+    return 0;
+}
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int & f(int & x)
+{
+    x++;
+    return x;
+}
+
+int main()
+{
+    int a = 42;
+    int b = f(a);
+    std::cout << a << ' ' << b << '\n';
+    std::cout << a << ' ' << b << '\n';
+    b++;
+    std::cout << a << ' ' << b << '\n';
+    return 0;
+}
+\end{consolethree}
+
+The point:
+
+\begin{consolethree}[escapeinside=||]
+int a = 42;
+int & b = a;
+int & receiver1 = b;  // receiver1 references a
+int receiver2 = b;    // receiver2 gets the value of a
+receiver1 = 0;        // a is changed
+receiver2 = 0;        // receiver2 is changed, not a.
+\end{consolethree}
+
+What about this?
+
+\begin{consolethree}[escapeinside=||]
+int & f()
+{
+    int x = 42;
+    return x;
+}
+\end{consolethree}
+
+This returns a reference to a local variable but you cannot refer to
+this local variable once it goes out of scope since it will be destroyed
+at that point. (Note: this is OLD stuff. Yes I have already talked about
+it.)
+
+
+\newpage\EMPHASIZE{Yet more examples on returning *this as a reference (DIY)}
+
+\begin{consolethree}[escapeinside=||]
+class Point2d
+{
+public:
+    Point2d & set_x(int x) { x_ = x; return *this; }
+    Point2d & set_y(int y) { y_ = y; return *this; }
+    void print()
+    {
+        std::cout << x_ << ',' << y_ << '\n';
+    }
+private:
+    int x_, y_;
+};
+
+int main()
+{
+    Point2d p;
+    Point2d & q = p.set_x(1);
+    q.set_y(2);
+    p.print();
+    return 0;
+}
+\end{consolethree}
+
+Explain!
+
+\begin{consolethree}[escapeinside=||]
+class Point2d
+{
+public:
+    Point2d |\EMPHASIZE{\&}| set_x(int x)
+    {
+        x_ = x;
+        return |\EMPHASIZE{*this;}|
+    }
+    Point2d |\EMPHASIZE{\&}| set_y(int y)
+    {
+        y_ = y;
+        return |\EMPHASIZE{*this;}|
+    }
+    void print()
+    {
+        std::cout << x_ << ',' << y_ << '\n';
+    }
+private:
+    int x_, y_;
+};
+
+int main()
+{
+    Point2d p;
+    p.set_x(1).set_y(2);
+    p.print();
+    return 0;
+}
+\end{consolethree}
+
+This is similar to the previous program except that I got rid of \texttt{q}. Explain!
+
+\begin{consolethree}[escapeinside=||]
+class Point2d |\xsidebox[0cm]{0cm}{}{rettype}{Return type is Point2d and not Point2d\&}|
+{
+public:
+    |\tikzmarknode{pt0}{\EMPHASIZE{Point2d}}| set_x(int x)
+    {
+        x_ = x;
+        return *this;
+    }
+    |\EMPHASIZE{Point2d}| set_y(int y)
+    {
+        y_ = y;
+        return *this;
+    }
+    void print()
+    {
+        std::cout << x_ << ',' << y_ << '\n';
+    }
+private:
+    int x_, y_;
+};
+
+int main()
+{
+    Point2d p;
+    p.set_x(1).set_y(2);
+    p.print();
+    return 0;
+}
+\end{consolethree}
+\DrawArrow{rettype}{pt0}
+Explain!
+
+
+\newpage\EMPHASIZE{Returning reference to member variable}
+
+Of course you can also return a reference to a member (yes I know
+I've already talked about this before).
+
+\begin{consolethree}[escapeinside=||]
+class Point2d
+{
+public:
+    int & get_x()
+    {
+        return x_;
+    }
+    void print()
+    {
+        std::cout << x_ << ',' << y_ << '\n';
+    }
+private:
+    int x_, y_;
+};
+
+int main()
+{
+    Point2d p;
+    p.print();
+    int & a = p.get_x();
+    a = 0;
+    p.print();
+    return 0;
+}
+\end{consolethree}
+
+But remember about information hiding. Clients usually should not have
+direct access to instance variables. The class (and the objects) should
+provide services to clients through methods and hide internal
+implementation from outsiders. This makes the software more
+maintainable.
+
+And you definitely cannot do this in a method:
+
+\begin{consolethree}[escapeinside=||]
+class Point2d
+{
+public:
+    int & get_x()
+    {
+        int x = x_;
+        return x; // ERROR! Returning reference to
+                  // local variable!!! Arghh!!!
+    }
+private:
+    int x_, y_;
+};
+\end{consolethree}
+
+
+\newpage\EMPHASIZE{Temporary object values}
+
+Most of the time we have objects with names:
+
+\begin{consolethree}[escapeinside=||]
+Date date(1970, 1, 1);
+date.print();
+\end{consolethree}
+
+Of course you can create object values not bound to names:
+
+\begin{consolethree}[escapeinside=||]
+Date(1970, 1, 1).print();
+\end{consolethree}
+
+(I've already talked about this.)
+
+In the second case above, we have a temporary object, or an object value
+that does not belong to an object name.
+
+In the \texttt{Int} class, if you have operator+ returns object values,
+you might see temporary objects:
+
+\begin{consolethree}[escapeinside=||]
+Int i(5), j(7), k (8);
+Int z = i + j + k; // i + j is temporary object
+                   // this temporary object is
+                   // added with k to produce
+                   // another temporary object
+\end{consolethree}
+
+Of course, just like a method, a function can return an object value
+
+\begin{consolethree}[escapeinside=||]
+Date rand_date()
+{
+    return Date(rand()%10 + 1,
+                rand()%10 + 1, rand());
+}
+\end{consolethree}
+
+Of course this is different from returning a reference:
+
+\begin{consolethree}[escapeinside=||]
+Date & Date::f()
+{
+    return (*this);
+}
+
+int main()
+{
+    Date date(1, 1, 1970);
+    date.f(); // A reference to date
+              // is returned
+}
+\end{consolethree}
+
+A temporary object can be destroyed immediately after the expression
+containing the temporary object is computed.
+
+There is an exception ... you can create an object name and bind it
+to a temporary object value. In this case the temporary object value is
+not destroyed immediately. For instance
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    Date date1 = rand_date();
+    ...
+}
+\end{consolethree}
+
+The value of \texttt{date1} is actually the same as the value of the
+object returned by \texttt{rand\_date()}, i.e., there is no copy
+constructor call. To verify this add some print statements:
+
+\begin{consolethree}[escapeinside=||]
+Date randdate()
+{
+    Date ret(rand() % 10 + 1,
+             rand() % 10 + 1, rand());
+    std::cout << &ret << '\n';
+    return ret;
+}
+
+int main()
+{
+    Date date1 = f();
+    std::cout << &date1 << '\n';
+}
+\end{consolethree}
+
+You can also insert print statements in the \texttt{Date} destructor to
+verify that there is only one destructor call, not two, i.e., in the
+above, there is really only one \texttt{Date} value.
+
+\begin{consolethree}[escapeinside=||]
+rand_date(); // Date value returned by
+             // rand_date() is not bound to a
+             // name. It's destroyed.
+             // Destructor is called.
+
+Date date1 = rand_date(); // Date value bound to
+                          // date1. Destructor not
+                          // called yet
+\end{consolethree}
+
+In the above example:
+
+\begin{consolethree}[escapeinside=||]
+Date date1 = rand_date();
+\end{consolethree}
+
+the destructor is called only when the name \texttt{date1} goes out of
+scope.
+
+Here are the scenarios you should study and be familiar with:
+
+\begin{consolethree}[escapeinside=||]
+Date Date::f(...) { ...; return *this; }
+Date & Date::f(...) { ...; return *this; }
+Date Date::f(...) { ...; Date x; return x; }
+Date & Date::f(...) { ...; Date x; return x; } (error)
+Date Date::f(...) { ...; return Date(1,1,1970); }
+Date & Date::f(...) { ...; return Date(1,1,1970); } (error)
+(date1.f()).print()
+Date date2 = date1.f()
+Date & date2 = date1.f()
+\end{consolethree}
+
+
+\newpage\EMPHASIZE{Avoid similar names}
+
+\begin{consolethree}[escapeinside=||]
+int x_ = 0;|\tikzmarknode{x0}{} \xsidebox[-1cm]{0cm}{}{arghbox}{Arrghh! Global names and members have the same name!!!}|
+|\xsidebox[-8cm]{0cm}{}{mbawx0}{which x\_?}|
+int m2()|\tikzmarknode{x1}{}|
+{
+    return 5;
+}
+
+class C
+{
+public:
+    void m1()
+    {       |\tikzmarknode{x2}{} \xsidebox[0cm]{0cm}{}{mbawx1}{which m2?}|
+        x_ = m2();|\tikzmarknode{x3}{}|
+    }
+    void m2()
+    {
+        return 0;
+    }
+private:
+    int x_;
+};
+\end{consolethree}
+\DrawArrow{mbawx0}{x0}
+\DrawArrow{mbawx0}{x2}
+\DrawArrow{mbawx1}{x1}
+\DrawArrow{mbawx1}{x3}
+
+Avoid such ambiguities! What's this about ...
+
+\begin{consolethree}[escapeinside=||]
+class C|\xsidebox[0cm]{0cm}{}{yikesbox0}{Yikes!!! Instance variable and parameter have the same name!!!}|
+{
+public:
+    void m(int x_)|\tikzmarknode{yikes0}{}|
+    {|\xsidebox[-6cm]{0cm}{}{yikesbox1}{which x\_?}|
+        std::cout << x_;
+    }
+private:
+    int x_;|\tikzmarknode{yikes1}{}|
+};
+\end{consolethree}
+\DrawArrow{yikesbox1}{yikes0}
+\DrawArrow{yikesbox1}{yikes1}
+In general here's how C++ search for names in the above
+cases: first local variables are searched, then instance variables
+(member variables), and then globals.
+
+
+\newpage\EMPHASIZE{Notes}
+
+In some programming languages, instead of \texttt{this} (in a method)
+which points to the object invoking the method, in other programming
+languages there's a \texttt{self} or \texttt{me} in a method
+this plays the same role as \texttt{this} except that it is a reference to
+the object invoking the method.
+
+
+\newpage\EMPHASIZE{Forcing a reference parameter to be constant}
+
+Recall: When writing a function, it's a good idea to use \texttt{const}
+for arguments that should not be changed. This is the case for both
+(regular) functions and methods of a class:
+
+\begin{consolethree}[escapeinside=||]
+// function
+void f(|\EMPHASIZE{const}| C & c) { ... }
+
+// method in class C
+void C::g(|\EMPHASIZE{const}| C & c) { ... }
+\end{consolethree}
+
+The following example shows 4 possible ways of pass-by-reference:
+
+\begin{itemize}
+\item Non-const to non-const \&
+\item Non-const to const \&
+\item Const to non-const \&
+\item Const to const \&
+\end{itemize}
+
+Which ones work and which do not? Here's an experiment
+that will help.
+
+\begin{consolethree}[escapeinside=||]
+void f(const int & i) {}
+void g(int & i) {}
+
+int main()
+{
+    int i = 0;
+    const int j = 0;
+    f(i); // nonconst passed to const reference
+    f(j); // const passed to const reference
+    g(i); // nonconst passed to nonconst reference
+    g(j); // const passed to nonconst reference
+    return 0;
+}
+\end{consolethree}
+
+First figure out on your own which is reasonable. Compile this and read
+the error message. Correct and check by compiling the program.
+
+Answer:
+
+\begin{itemize}
+\item Non-const to non-const \&         OK
+\item Non-const to const \&             OK
+\item Const to non-const \&             BAD!!!
+\item Const to const \&                 OK
+\end{itemize}
+
+Why?
+
+\begin{consolethree}[escapeinside=||]
+void g(int & i) {} // i not constant
+                   // g() can change i
+
+int main()
+{
+    const int j = 0; // j cannot be changed
+    g(j); // oops ... now what?
+}
+\end{consolethree}
+
+The case of object parameters is the same.
+
+The following example shows 4 possible ways of pass-by-reference:
+
+\begin{itemize}
+\item Non-const to non-const \&
+\item Non-const to const \&
+\item Const to non-const \&
+\item Const to const \&
+\end{itemize}
+
+Which ones work and which do not?
+
+\begin{consolethree}[escapeinside=||]
+class C {};
+
+void f(const C & y) {}
+void g(C & y) {}
+
+int main()
+{
+    C a;
+    const C b = C();
+    f(a);
+    f(b);
+    g(a);
+    g(b);
+    return 0;
+}
+\end{consolethree}
+
+Answer:
+
+\begin{itemize}
+\item Non-const to non-const \&     OK
+\item Non-const to const \&         OK
+\item Const to non-const \&         BAD!!!
+\item Const to const \&             OK
+\end{itemize}
+
+Why?
+
+\begin{consolethree}[escapeinside=||]
+class C{};
+
+void h(C & x) {} // h can modify x
+
+int main()
+{
+    const C y = C(); // y cannot be modified
+    h(y); // oops ... now what???
+}
+\end{consolethree}
+
+In summary if \texttt{T} is any type (\texttt{int}, \texttt{char}, ...,
+some \texttt{class}, ...), and \texttt{f()} has the following prototype:
+
+\texttt{void f(\EMPHASIZE{T \& x});}
+
+and y is a \textbf{\textit{constant}} \texttt{T} object, then the following
+is incorrect:
+
+\begin{consolethree}[escapeinside=||]
+const T y;
+f(y);
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+class C {public: int x};
+void f0(const C & y) {}|\tikzmarknode{const0}{}|
+void f1(C & y) {}
+
+int main()|\xsidebox[0cm]{0cm}{}{constbox0}{Reminder:\\\texttt{f0()} cannot change \texttt{y} \\\texttt{f1()} can change \texttt{y}}|
+{
+    C a;
+    f0(a); f1(a);
+    return 0;
+}
+\end{consolethree}
+\DrawArrow{constbox0}{const0}
+Example:
+
+\begin{consolethree}[escapeinside=||]
+class IntPointer|\xsidebox[0cm]{0cm}{}{constbox1}{The member variable of \texttt{a} is not changed so we make \texttt{a} constant}|
+{
+public:
+    ...         |\tikzmarknode{const1}{}|
+    IntPointer(|\EMPHASIZE{const}| IntPointer & a)
+        : p_(new int)
+    { *p_ = *(a.p_); }
+    ...
+private:
+    int * p_;
+};
+\end{consolethree}
+\DrawArrow{constbox1}{const1}
+
+Example:
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    Int(int x)
+        : x_(x)
+    {}
+    Int max(Int & a)|\tikzmarknode{const2}{} \xsidebox[0cm]{0cm}{}{constbox2}{This method does not change \texttt{a}}|
+    {
+        if (x_ < a.x_)
+            return a;
+        else
+            return (*this);
+    }
+private:
+    int x_;
+};
+\end{consolethree}
+\DrawArrow{constbox2}{const2}
+So
+
+\begin{consolethree}[escapeinside=||]
+...
+class Int
+{
+public:
+    Int(int x)
+        : x_(x)
+    {}
+    Int max(|\EMPHASIZE{const}| Int & a)
+    {
+        if (x_ < a.x_)
+            return a;
+        else
+            return (*this);
+    }
+public:
+    int x_;
+};
+...
+\end{consolethree}
+
+Example:
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    void f(int a)
+    {
+        x_ = a;
+    }
+    int g(int a)
+    {
+        return y_ + a;
+    }
+private:
+    int x_, y_;
+};
+
+void j(C & c)|\tikzmarknode{funpar0}{}|
+{
+    c.f(0);|\xsidebox[0cm]{0cm}{}{funparbox0}{Which function param can be made const?}|
+}
+
+void k(C & c)|\tikzmarknode{funpar1}{}|
+{
+    c.g(0);
+}
+
+int main()
+{
+    C c, d;
+    j(c);
+    k(c);
+    return 0;
+}
+\end{consolethree}
+\DrawArrow{funparbox0}{funpar0}
+\DrawArrow{funparbox0}{funpar1}
+
+\textbf{Example.} Invoking \texttt{c.f()} will modify \texttt{c}
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+    ...
+    void f(int a){ x_ = a; } // modifies x_
+    ...
+};
+\end{consolethree}
+
+This means that the following will \EMPHASIZE{\textit{not}} work:
+
+\begin{consolethree}[escapeinside=||]
+void j(|\textbf{\underline{const}}| C & c) { c.f(0); }
+\end{consolethree}
+
+Invoking \texttt{c.g()} will not modify \texttt{c}
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+    ...
+    int g(int a)
+    {
+        return y + a;
+    }
+    ...
+};
+\end{consolethree}
+
+This means that the following \EMPHASIZE{\textit{will}} work:
+
+\begin{consolethree}[escapeinside=||]
+void j(|\textbf{\underline{const}}| C & c) { c.f(0); }
+\end{consolethree}
+
+\begin{ex}
+Which parameters in \texttt{j,k} can be made constant?
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    void f(int a)
+    {
+        x_ = a;
+    }
+    int g(int a)
+    {
+        return y_ + a;
+    }
+    void h(C & c)
+    {
+        f(c.x_);
+    }
+    void i(C & c)
+    {
+        c.x_ = g(5);
+    }
+private:
+    int x_, y_;
+};
+
+void j(C & c, C & d)
+{
+    c.h(d);
+}
+
+void k(C & c, C & d)
+{
+    c.i(d);
+}
+
+int main()
+{
+    C c, d;
+    j(c, d);
+    k(c, d);
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Which parameter should be made \texttt{const}?
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    Int(int x0)
+        : x_(x0)
+    {}
+    void incrementBy(Int & a)
+    {
+        x_ += a.x_;
+    }
+    void increment(Int & a)
+    {
+        a.x_ += x_;
+    }
+    int get()
+    {
+        return x_;
+    }
+private:
+    int x_;
+};
+
+int main()
+{
+    Int a(1), b(5);
+    a.incrementBy(b);
+    a.increment(b);
+    std::cout << a.get() << ' ' << b.get() << '\n';
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+
+\newpage\EMPHASIZE{Forcing a return reference to be constant}
+
+Recall this example from above:
+
+\begin{consolethree}[escapeinside=||]
+class Point2d
+{
+public:
+    int & get_x()
+    {
+        return x_;
+    }
+    void print()
+    {
+        std::cout << x_ << ',' << y_ << '\n';
+    }
+private:
+    int x_, y_;
+};
+
+int main()
+{
+    Point2d p;
+    p.print();
+    int & a = p.get_x();
+    a = 0;
+    p.print();
+    return 0;
+}
+\end{consolethree}
+
+The \texttt{p.get\_x()} method returns a reference to \texttt{p.x\_}. This
+reference is then given to \texttt{a}:
+
+\begin{consolethree}[escapeinside=||]
+int & a = p.get_x();
+\end{consolethree}
+
+This means that a is a reference to p.x\_. Therefore changing a will
+mean changing p.x\_.
+
+But remember what I said earlier about information hiding. Clients
+usually should not have direct access to instance variables. The class
+(and the objects) should provide services to clients through methods and
+hide internal implementation from outsiders. This makes the software
+more maintainable. So to prevent \texttt{main()} from changing
+\texttt{p.x\_} directly, you can do this:
+
+\begin{consolethree}[escapeinside=||]
+class Point2d
+{
+public:
+    |\EMPHASIZE{const}| int & get_x()
+    {
+        return x_;
+    }
+    ...
+\end{consolethree}
+
+The reference returned will not be able to change the x\_ of the object.
+In fact, now the \texttt{main()} above cannot be compiled. Why?
+
+\begin{consolethree}[escapeinside=||]
+class Point2d
+{
+public:
+    const int & get_x()
+    {
+        return x_;
+    }
+    ...
+};
+
+int main()
+{
+    Point2d p;
+    p.print();
+    int & a = p.get_x();
+    ...
+}
+\end{consolethree}
+
+Because the \texttt{a} in \texttt{main()} is a reference that can
+potentially attempt to the the value of \texttt{p.x\_}. The issue is not
+whether \texttt{a} will actually change or not. The only way for the above
+to compile is to make it impossible for a to change, i.e., you would
+have to do this:
+
+\begin{consolethree}[escapeinside=||]
+class Point2d
+{
+public:
+    const int & get_x()
+    {
+        return x_;
+    }
+    ...
+};
+
+int main()
+{
+    Point2d p;
+    p.print();
+    |\EMPHASIZE{const}| int & a = p.get_x();
+    ...
+}
+\end{consolethree}
+
+
+\newpage\EMPHASIZE{How to make \texttt{*this} constant?}
+
+But what about \texttt{this}? It's passed in automatically and is not shown in the parameter list! How do you ``\texttt{const}'' \texttt{this}?
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    Int(int x)
+        : x_(x)
+    {}
+    Int max(|\EMPHASIZE{const}| Int & a)    |\tikzmarknode{a0}{}|
+    {
+        if (x_ < a.x_)|\xsidebox[0cm]{0cm}{}{abx0}{\texttt{a} is not changed so we made it constant}|
+            return a;                    |\tikzmarknode{a1}{}|
+        else
+            return (*this);
+    }
+private:
+    int x_;
+};
+\end{consolethree}
+\DrawArrow{abx0}{a0}
+\DrawArrow{abx0}{a1}
+
+But ....
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    Int(int x)
+        : x_(x)
+    {}
+    Int max(|\EMPHASIZE{const}| Int & a)
+    {
+        if (x_ < a.x_)
+            return a;
+        else
+            return (*this);|\tikzmarknode{a2}{} \xsidebox[0cm]{0cm}{}{abx1}{But \texttt{this} is also not changed. How do we make it constant?}|
+    }
+private:
+    int x_;
+};
+\end{consolethree}
+\DrawArrow{abx1}{a2}
+
+Do this:
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    Int(int x)
+        : x_(x)
+    {}
+    Int max(|\EMPHASIZE{const}| Int & a) |\EMPHASIZE{\underline{const}} \tikzmarknode{a3}{}|
+    {
+        if (x_ < a.x_)
+            return a;
+        else
+            return (*this);|\xsidebox[0cm]{0cm}{}{abx2}{\texttt{const} after function header will make \texttt{*this} constant in the method}|
+    }
+private:
+    int x_;
+};
+\end{consolethree}
+\DrawArrow{abx2}{a3}
+Example:
+
+\begin{consolethree}[escapeinside=||]
+class Date
+{
+public:
+    int get_d() |\EMPHASIZE{const;}|
+private:
+    int yyyy_, mm_, dd_;|\xsidebox[0cm]{0cm}{}{abx3}{Makes \texttt{*this} constant in the body of the function}|
+};
+
+int Date::get_d() |\EMPHASIZE{const}|
+{
+    return dd_;
+}
+\end{consolethree}
+
+\begin{ex}
+Correct the error(s)!
+
+\begin{consolethree}[escapeinside=||]
+class Date
+{
+public:
+    int get_d() const
+    {
+        return dd_;
+    }
+    void set_d(int dd) const
+    {
+        dd_ = dd;
+    }
+private:
+    int yyyy_, mm_, dd_;
+};
+\end{consolethree}
+\end{ex}
+
+\EMPHASIZE{WARNING:}
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    void f() |\EMPHASIZE{const} \tikzmarknode{c0}{} \xsidebox[0cm]{0cm}{}{cbawx0}{Note: this is for inlined method}|
+    {}
+    
+    void g() |\EMPHASIZE{const;} \tikzmarknode{c1}{}|
+};
+
+void C::g() |\EMPHASIZE{const} \tikzmarknode{c2}{} \xsidebox[0cm]{0cm}{}{cbawx1}{Note: for non-inlined method. \texttt{const} must appear in the method prototype \emph{\textbf{and}} the method definition!!!}|
+{}
+\end{consolethree}
+\DrawArrow{cbawx0}{c0}
+\DrawArrow{cbawx1}{c1}
+\DrawArrow{cbawx1}{c2}
+Go ahead and experiment with this:
+
+\begin{consolethree}[escapeinside=||]
+class C{
+public:
+    void f() |\EMPHASIZE{const}| 
+    {}
+    void g() |\EMPHASIZE{const;}| 
+};
+
+void C::g() |\EMPHASIZE{\sout{const}} \tikzmarknode{ca0}{} \xsidebox[0cm]{0cm}{}{cabawx0}{Experiment: Try compiling this without \texttt{const}. Read the error message.}|
+{}
+
+int main()
+{}
+\end{consolethree}
+\DrawArrow{cabawx0}{ca0}
+
+\begin{ex}
+Which methods should be constant?
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    Int(int x)
+        : x_(x)
+    {}
+    void incrementBy(Int & a)
+    {
+        x_ += a.x_;
+    }
+    void increment(Int & a)
+    {
+        a.x_ += x_;
+    }
+    int get()
+    {
+        return x_;
+    }
+private:
+    int x_;
+};
+
+int main()
+{
+    Int a(1), b(5);
+    a.incrementBy(b);
+    a.increment(b);
+    std::cout << a.get() << ' ' << b.get() << '\n';
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+Functions with \texttt{const} at the end are called \EMPHASIZE{constant
+member functions}. In other words, constant member functions
+are methods that will not modify the object invoking the method.
+
+\begin{ex}
+Which statement in \texttt{main()} is incorrect? Next,
+Compile this and read the error message. Correct and check by compiling
+the program.
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    void m1()
+    {}
+    void m2() const
+    {}
+};
+
+int main()
+{
+    const C a;
+    C b;
+    a.m1();
+    a.m2();
+    b.m1();
+    b.m2();
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Which methods should be constant? Which parameters
+should be constant?
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    void m(C & a, C & b)
+    {
+        x_ = a.x_;
+        y_ = b.y_;
+    }
+    void m(C & a, C & b)
+    {
+        x_ = a.x_;
+        b.y_ = y_;
+    }
+    void m(C & a, C & b)
+    {
+        a.x_ = x_;
+        y_ = b.y_;
+    }
+    void m(C & a, C & b)
+    {
+        a.x_ = x_;
+        b.y_ = y_;
+    }
+private:
+    int x_, y_;
+};
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Go over \texttt{all} the previous classes you have
+built (\texttt{Date}, \texttt{Vehicle}, \texttt{WeatherCtrl}, \texttt{Int},
+\texttt{IntPointer}, \texttt{IntArray}, \texttt{IntDynArr}, etc.) Make all
+relevant parameters constant whenever possible. Make all methods
+constant whenever possible.
+\end{ex}
+
+\begin{ex}
+Does this compile?
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    void m()
+    {}
+    void m() const
+    {}
+};
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Look at the \texttt{IntPointer} class very carefully.
+In particular look at the de-reference operator, \texttt{operator*()}:
+
+\begin{consolethree}[escapeinside=||]
+class IntPointer
+{
+public:
+    ...
+    int & operator*()
+    {
+        return *p_;
+    }
+    ...
+};
+\end{consolethree}
+
+Should \texttt{operator*()} be constant? The question to ask is this: is
+\texttt{p} changed? The important point ... There is a difference
+between asking if \texttt{p} should be constant and if \texttt{*p} should be
+constant.
+\end{ex}
+
+\begin{ex}
+Continuing the above idea, look at \texttt{IntArray}
+and \texttt{IntDynArr}. There is a similar issue for
+\texttt{operator[](int)}. Should it be a constant operator?
+\end{ex}
+
+
+\newpage\EMPHASIZE{Summary}
+
+\begin{itemize}
+\item When an object \texttt{obj} invokes a method \texttt{m}, a pointer called
+  \texttt{this} is in the scope of \texttt{m}. The \texttt{this} pointer
+  points to \texttt{obj}. In other words, in a method, the \texttt{this}
+  pointer always point to the object invoking the method. (See section
+  on static methods for exception.)
+
+\item In the body of a method, if an object \texttt{obj} has instance variable
+  \texttt{x\_}, then the following are the same:
+
+\texttt{x\_} is the same as \texttt{this->x\_}
+
+\item In the body of a method, if an object \texttt{obj} has another method
+  called \texttt{m}, then the following are the same:
+
+\texttt{m()} is the same as \texttt{this->m()}
+
+\item A method can return a copy of the value of the object of class
+  \texttt{C}:
+
+\begin{consolethree}[escapeinside=||]
+C C::m()
+{
+    ...
+    return *this;
+}
+\end{consolethree}
+
+\item or a reference to itself:
+
+\begin{consolethree}[escapeinside=||]
+C & C::m()
+{
+    ...
+    return *this;
+}
+\end{consolethree}
+
+\item If a method returns a reference to itself, then you can chain up
+  methods:
+
+\texttt{obj.m().m1()}
+
+  where \texttt{m1} is another method and \texttt{m1} is also invoked by
+  \texttt{obj}.
+
+\item WARNING: If \texttt{m} does not return a reference of the invoking
+  object, then in the following:
+
+\texttt{obj.m().m1()}
+
+  \texttt{m1()} is not invoked by \texttt{obj}, but rather by a copy of
+  \texttt{obj}.
+
+\item A constant method is a method that cannot modify the object invoking
+  the method.
+
+\item A method is made constant by putting the word \texttt{const} on the
+  right of the method header. This is done in the header file and if the
+  method is defined outside the class definition, then it must also be
+  done in the definition of the method.
+\end{itemize}
+
+\end{document}

@@ -1,0 +1,135 @@
+\newpage\EMPHASIZE{91. Namespace}
+
+\textsc{Objectives}
+
+\begin{itemize}
+\item
+  Create a namespace
+\item
+  Place identifiers in a namespace
+\end{itemize}
+
+\newpage\EMPHASIZE{Namespace}
+
+Run this:
+\begin{console}
+#include <iostream>
+namespace yliow
+{    
+     int x;
+     void f()
+     {    
+          std::cout << "hello world" <<
+          std::endl;
+     }
+     
+     class C
+     {};
+}
+
+int main()
+{   
+    yliow::x = 42;
+    yliow::f();
+    yliow::C obj;
+    return 0;
+}
+ 
+\end{console}
+
+A \EMPHASIZE{namespace} is just a container of names (i.e., variables, functions, structs, classes.)
+
+Why?
+
+Allows you to put names into a namespace to avoid naming conflicts.
+
+For instance suppose John and Mary work on the same project. They can choose different namespaces for their own things:
+
+\begin{itemize}
+\item
+  \verb!john::print_helloworld()!
+\item
+  \verb!mary::print_helloworld()!
+\end{itemize}
+
+\newpage\EMPHASIZE{Openness of namespace}
+
+Namespaces are \EMPHASIZE{open}: you can open it after it's closed.
+\begin{console}
+namespace yliow
+{    
+     class C
+     {};
+}
+
+namespace yliow // open again!!!
+{    
+     class D
+     {};
+}
+int main()
+{   
+     yliow::C obj1;
+     yliow::D obj2;
+     return 0;
+}
+ 
+\end{console}
+
+The most common usage of namespace is probably to hold classes and function prototypes:
+
+\begin{console}
+// GameLib.h
+namespace GameLib
+{    
+     class vec2d { ... };
+     class graphics { ... };
+     class sound { ... }; 
+     class physics { ... };
+}
+               
+\end{console}
+
+If you' re writing games and scientific simulations. You
+can split the above.
+
+\begin{console}
+// Physics.h
+namespace GameLib
+{    
+     class vec2d { ... };
+     class physics { ... };
+} 
+\end{console}
+
+\begin{console}
+// GameLib.h
+#include "Physics.h"
+namespace GameLib
+{    
+     class graphics { ... };
+     class sound { ... };
+} 
+\end{console}
+
+In this way, when you're writing a text-based sci simulations, you don't need to compile with the graphics and sound class.
+
+\newpage\EMPHASIZE{Using}
+
+You can avoid typing a namespace when you use it:
+
+\begin{console} 
+namespace yliow
+{    
+     class X {};
+     class Y {};
+}
+
+using namespace yliow;
+int main()
+{    
+     X obj; // do not need yliow::X
+     return 0;
+}
+\end{console}
+        

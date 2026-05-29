@@ -1,0 +1,2813 @@
+\newpage\EMPHASIZE{27. Pointers and Arrays}
+
+\textsc{Objectives}
+\begin{itemize}
+\item Pointer arithmetic
+\item Understand the relationship between pointers and arrays
+\item Allocate and deallocate memory for dynamic arrays in the heap
+\item Understand array parameters in functions
+\item Implement stacks and queues using dynamic arrays
+\item Understand and implement directed graph using adjacency matrix
+\item Model social media graphs
+\end{itemize}
+
+In this set of notes, we see how pointers can be used to create dynamic arrays, i.e., pointers that point to arrays of with variable sizes.
+
+Pointers are not arrays. But rather they have the address of the first value in an array. However in terms of syntax and usage, pointers do seem like arrays. I'll talk about the some of the similarities and differences between arrays and pointers. But the point is, once p points to an array, then the i-th index value of the array that p points to is p[i], which is exactly the array notation that you're already used to.
+
+An array is like a container of values. We store information in these containers. (At this point you have only seen array of integers, of doubles, etc. Later on you will learn about complex values, values such as products in a company where each product contains product name,
+price, UPC code, etc.) The problem is that the arrays you have seen up to this point have fixed sizes. But no one can predict how large a container should be. You might think an array of size 10000 is enough. But what if after some time, you actually need 100000? Think for instance of a game. At the beginning of the game, maybe there are only 10 enemy spaceships and at most 100 lasers are flying around in the screen. But at a later level, maybe there are 1000 enemy spaceships and 1000000 lasers. Is that enough? Maybe not for an even later level.
+
+Dynamic arrays allows you to handle the situations like the above and they are therefore extremely important. There are actually many, many, many types of containers: fixed size arrays, dynamic arrays, and then in CISS350, I'll show you linked lists, trees, hashtables, etc.
+
+Pointers also allow you to create complex 2D arrays which are not rectangles. For instance if you want to create a 2D array where the first row has 1000000 values, the second has 5000, the third has 20000, and the fourth has 20, it can be done. Without pointers, you would have to create a 2D array with 4 rows and each with 1000000 values.
+
+
+\newpage\EMPHASIZE{Pointer arithmetic}
+
+Try this:
+
+\begin{consolethree}[escapeinside=||]
+int x = 42;
+int * p = &x;
+int * q = p + 1;
+std::cout << (unsigned int)(p) << ' '
+          << (unsigned int)(q) << '\n';
+\end{consolethree}
+
+Aha! You can add integers to pointers. Well this is not exactly shocking
+since addresses are integers.
+
+Note the address value stored in \texttt{q} ... numerically speaking the value of \texttt{q} is actully the numerical value of \texttt{p} plus 4. when you add 1 to the address of an \texttt{int} address -- IT'S NOT ONE!!! Why 4? Because \ldots{} \EMPHASIZE{4 comes from \texttt{sizeof(int)}}.
+
+But why does it work this way? Because this allows you to think like this:
+
+\begin{itemize}
+\item ``\textit{p + 1} points to the \textit{int} value that is immediately
+  after the \textit{int} value that \textit{p} points to.''
+\end{itemize}
+
+Of course p + 2 has address value that is 8 away from 8. So if p has address value 124500, then you should have this picture in your mind:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(0, 1, 3, 5, label='\\EMPHASIZE{42}', linewidth=0.0, background='gray!20!')
+p += Rect(0, 5, 3, 9, label='\\EMPHASIZE{3467}', linewidth=0.0, background='gray!65!')
+p += Rect(0, 9, 3, 13, label='\\EMPHASIZE{829}', linewidth=0.0, background='gray!20!')
+
+p += Rect(0, 14, 3, 15, label='...', linewidth=0.0)
+p += Rect(0, 13, 3, 14, linewidth=0.05)
+p += Rect(0, 12, 3, 13, linewidth=0.05)
+p += Rect(0, 11, 3, 12, linewidth=0.05)
+p += Rect(0, 13, 3, 11, linewidth=0.05)
+p += Rect(0, 9, 3, 13, linewidth=0.05)
+p += Rect(0, 8, 3, 9, linewidth=0.05)
+p += Rect(0, 7, 3, 8, linewidth=0.05)
+p += Rect(0, 6, 3, 7, linewidth=0.05)
+p += Rect(0, 5, 3, 6, linewidth=0.05)
+p += Rect(0, 4, 3, 5, linewidth=0.05)
+p += Rect(0, 3, 3, 4, linewidth=0.05)
+p += Rect(0, 2, 3, 3, linewidth=0.05)
+p += Rect(0, 1, 3, 2, linewidth=0.05)
+p += Rect(0, 0, 3, 1, linewidth=0.05)
+p += Rect(0, -1, 3, 0, linewidth=0.05)
+p += Rect(0, -2, 3, -1, label='...', linewidth=0.0)
+
+p += Rect(-3, 13, 0, 14, label='124512', align='r', linewidth=0.0)
+p += Rect(-3, 12, 0, 13, label='124511', linewidth=0.0)
+p += Rect(-3, 11, 0, 12, label='124510', linewidth=0.0)
+p += Rect(-3, 10, 0, 11, label='124509', linewidth=0.0)
+p += Rect(-3, 9, 0, 10, label='124508', linewidth=0.0)
+p += Rect(-3, 8, 0, 9, label='124507', linewidth=0.0)
+p += Rect(-3, 7, 0, 8, label='124506', linewidth=0.0)
+p += Rect(-3, 6, 0, 7, label='124505', linewidth=0.0)
+p += Rect(-3, 5, 0, 6, label='124504', linewidth=0.0)
+p += Rect(-3, 4, 0, 5, label='124503', linewidth=0.0)
+p += Rect(-3, 3, 0, 4, label='124502', linewidth=0.0)
+p += Rect(-3, 2, 0, 3, label='124501', linewidth=0.0)
+p += Rect(-3, 1, 0, 2, label='124500', linewidth=0.0)
+
+p += Rect(-4.5, 1.5, -4.5, 1.5, label='p', align='l', linewidth=0.0)
+p += Rect(-4.5, 2.5, -4.5, 2.5, label='p + 1', align='l', linewidth=0.0)
+p += Rect(-4.5, 3.5, -4.5, 3.5, label='p + 2', align='l', linewidth=0.0)
+
+p += Line(points=[(-3.7, 1.5), (-2.5, 1.5)], linewidth=0.1, endstyle='>')
+p += Line(points=[(-3.7, 2.5), (-2.2, 5)], linewidth=0.1, endstyle='>')
+p += Line(points=[(-3.7, 3.5), (-2.2, 9)], linewidth=0.1, endstyle='>')
+
+print(p)
+\end{python}
+
+Now you might be wondering: ``Wait \ldots{} \texttt{p} points to \texttt{x} and I do see that the value of \texttt{x} is 42. But what is the 3467 that \texttt{p + 1} points to?''.
+
+\texttt{p + 1} simply points to an integer (because \texttt{p} is a pointer to \texttt{int}), i.e., the four bytes starting at \texttt{p + 1} as an integer just happens to be 3467. It does not belong to any variable. It's just part of your computer's memory. And of course it could be garbage and the value would be different next time you run the same program.
+
+The above applies to any type and not just \texttt{int}. In general suppose \texttt{T} is a type (\texttt{int} or a \texttt{char} or a \texttt{double} or a \texttt{bool} or what-have-you), and you have the following:
+
+\verb!T * p = &x;!
+
+and suppose a value of type \texttt{T} uses k bytes (which can be obtained using \texttt{sizeof(T)}), then numerically the address value of \texttt{p + 1} is always the address value of \texttt{p} plus \texttt{k}. Also, if we have
+
+\begin{consolethree}[escapeinside=||]
+T * p = &x;
+T * q = p - 1;
+\end{consolethree}
+
+then \texttt{q} is k smaller than \texttt{p}.
+
+\EMPHASIZE{Remember ...}
+
+\begin{itemize}
+\item if \texttt{p} is an \texttt{int} pointer (and if you're
+  using a 32-bit machine), then \texttt{p + 1} does \EMPHASIZE{not} mean
+  ``next address value after \texttt{p}''. Rather, it means address of the
+  next \EMPHASIZE{integer} after the \EMPHASIZE{integer} \texttt{p} points to.
+\item If \texttt{q} is a pointer that points to a \texttt{double}, then \texttt{q
+  + 1} is the address of the next \EMPHASIZE{double} after the
+  \EMPHASIZE{double} \texttt{q} points to.
+\item If \texttt{r} is a pointer that points to a character, then \texttt{r + 1}
+  is address of the next \EMPHASIZE{character} after the \EMPHASIZE{character}
+  \texttt{r} points to.
+\end{itemize}
+
+Get it?
+
+By the way:
+
+\texttt{sizeof(double)}      is 8 (a double value takes up 8 bytes)
+
+\texttt{sizeof(char)}        is 1 (a char value takes up 1 byte)
+
+However the \texttt{sizeof(int)} can vary depending on your machine.
+
+If you want to measure the difference between two pointers, you have to type cast the address values not to unsigned int, but to int so that you can get negative values. Here's an example:
+
+\begin{consolethree}[escapeinside=||]
+int x = 42;
+int * p = &x;
+int * q = p + 1;
+int * r = p - 1;
+std::cout << (int) q - (int) p << ' '
+          << (int) r - (int) p << '\n';
+\end{consolethree}
+
+\begin{ex}
+Think about this: Is \texttt{(int) (p + 1)} the same as (\texttt{(int) p) + 1}?
+\end{ex}
+
+\begin{ex}
+There are four pointer values (i.e., address values) in the following code segment. The first one is \texttt{p}. As for the rest:
+
+\begin{itemize}
+\item Is \texttt{p + 2} larger or smaller than \texttt{p}? How far apart are
+  they?
+\item Is \texttt{p - 1} larger or smaller than \texttt{p}? How far apart are
+  they?
+\item Is \texttt{p - 3} larger or smaller than \texttt{p}? How far apart are
+  they?
+\end{itemize}
+
+\begin{consolethree}[escapeinside=||]
+int x = 42;
+int * p = &x;
+std::cout << (unsigned int)(p) << ' '
+          << (unsigned int)(p + 2) << ' '
+          << (unsigned int)(p - 1) << ' '
+          << (unsigned int)(p - 3) << '\n';
+\end{consolethree}
+
+Verify your answer by running the program.
+\end{ex}
+
+\begin{ex}
+There are four pointer values (i.e., address values) in the following code segment. The first one is \texttt{p}. As for the rest:
+
+\begin{itemize}
+\item Is \texttt{p + 2} larger or smaller than \texttt{p}? How far apart are
+  they?
+\item Is \texttt{p - 1} larger or smaller than \texttt{p}? How far apart are
+  they?
+\item Is \texttt{p - 3} larger or smaller than \texttt{p}? How far apart are
+  they?
+\end{itemize}
+
+\begin{consolethree}[escapeinside=||]
+double d = 3.14;
+double * p = &d;
+std::cout << (unsigned int)(p) << ' '
+          << (unsigned int)(p + 5) << ' '
+          << (unsigned int)(p - 2) << ' '
+          << (unsigned int)(p - 4) << '\n';
+\end{consolethree}
+
+Verify your answer by running the program.
+\end{ex}
+
+\begin{ex}
+\begin{itemize}
+\item Can we use pre- and post- increment and decrement operators on
+  pointers?
+\item What about augmented assignment operators?
+\item What is the numeric value of the difference in address value of
+  \texttt{q}, \texttt{r}, \texttt{s} and \texttt{p} in the following:
+\end{itemize}
+
+\begin{consolethree}[escapeinside=||]
+int x = 42;
+int * p;
+int * q = p;
+int * r = p;
+int * s = p;
+q++;
+r += 5;
+s--;
+std::cout << (int) q - (int) p
+          << ' '
+          << (int) r - (int) p
+          << ' '
+          << (int) s - (int) p
+          << '\n';
+\end{consolethree}
+
+(Recall that if you have a newer laptop, you might need to use \texttt{\textbf{long long int}}.)
+\end{ex}
+
+\begin{ex}
+What is the output:
+
+\begin{consolethree}[escapeinside=||]
+double d = 3.14;
+double * p = &d;
+double * q = p;
+--q;
+double * r = q;
+r += 4
+double * s = r;
+--s;
+std::cout << (int) q - (int) p
+          << ' '
+          << (int) r - (int) p
+          << ' '
+          << (int) s - (int) p << '\n';
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+You have the following:
+
+\begin{consolethree}[escapeinside=||]
+char c = 'a';
+char * p = &c;
+char * q = p + 8;
+\end{consolethree}
+
+How much larger is \texttt{q} when compared with \texttt{p}? Verify it yourself. (If you get something different from the expected on your computer, don't panic. Talk to me.)
+\end{ex}
+
+\begin{ex}
+For a 32-bit machine, the integer values you can represent is
+about -2 billion to 2 billion. More exactly, the range of values is from
+\begin{center}
+-2\textsuperscript{31}, ...2\textsuperscript{31} - 1
+\end{center}
+(Why 31? It's 1 less than 32, the number of bits for a 32-bit machine.) There is another integer type called the \EMPHASIZE{long integer}. The formal name is \texttt{long} or \texttt{long int}. Example:
+
+\begin{consolethree}[escapeinside=||]
+long i = 0L;
+long int j = 42; // OK ... C++ will type cast
+                 // 42 to 42L for you
+\end{consolethree}
+
+(Most programmers type \texttt{long} instead of \texttt{long int}.)
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\item How many bytes of memory is used by a \texttt{long} value on your
+  compiler? (Write a simple program.)
+\item What is the output of the following code segment?
+\end{enumerate}
+
+\begin{consolethree}[escapeinside=||]
+long * p = new long;
+std::cout << (int) p - (int) (p + 2) << '\n';
+\end{consolethree}
+
+(First do this without your compiler. Then, check with your compiler.)
+\end{ex}
+
+\begin{ex}
+There is yet another integer type called the \EMPHASIZE{long long integer}. The formal name is \texttt{long long} or \texttt{long long int}. Example:
+
+\begin{consolethree}[escapeinside=||]
+long long i = 0LL;
+long long int j = 42; // OK ... C++ will type
+                      // cast 42 to 42LL for you
+\end{consolethree}
+
+(Most programmers just use \texttt{long long} instead of \texttt{long long
+int}.)
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\item How many bytes of memory is used by a \texttt{long long} value on
+  your compiler? (Write a simple program.)
+\item What is the output of the following code segment?
+\end{enumerate}
+
+\begin{consolethree}[escapeinside=||]
+long long * p = new long long;
+std::cout << (int) p - (int) (p + 2) << '\n';
+\end{consolethree}
+
+(First do this without your compiler. Then, check with your compiler.)
+\end{ex}
+
+
+\newpage\EMPHASIZE{Memory layout of local variables}
+
+Suppose you have two integer variables declared next to each other:
+
+\begin{consolethree}[escapeinside=||]
+int x = 42;
+int y = 43;
+\end{consolethree}
+
+Then the address of y is \EMPHASIZE{4 smaller} than the address of x -- assuming that \texttt{\EMPHASIZE{sizeof(int)}}\EMPHASIZE{ is 4}. (If on your machine, the \texttt{sizeof(int)} is 8, then the address of \texttt{y} is 8 smaller.)
+
+\EMPHASIZE{Caveat:} Note that that difference between \texttt{\&x} and \texttt{\&y} can be more than 4 on your computer, but it cannot be less than \texttt{4}. The point is that an integer takes up \texttt{sizeof(int)} number of bytes. But your computer (and your compiler) might pad some extra bytes between the memory used by two adjacent integer variables.
+
+On my Windows machine, 8 extra bytes were padded. On my linux machine, the padding is 0. In the notes below, I'm going to assume that the amount of extra padding is 0. To check on the padding of your machine, using the above code, print the address of x and the address of y and subtract. If the difference is 12, then you know that the padding is 12 -- 4 = 8 since the \texttt{sizeof(int)} is 4.
+
+First run this:
+
+\begin{consolethree}[escapeinside=||]
+int x = 42, y = 43, z = 44;
+std::cout << (unsigned int) &x << ' '
+          << (unsigned int) &y << ' '
+          << (unsigned int) &z << '\n';
+int * p = &x;
+int * q = p - 1;
+std::cout << (unsigned int)(p) << ' '
+          << (unsigned int)(q) << '\n';
+\end{consolethree}
+
+(Recall: you might want to use \texttt{unsigned long long}.) AHA \ldots{} so \ldots{} q is indeed pointing to x! Try this:
+
+\begin{consolethree}[escapeinside=||]
+int x = 42, y = 43, z = 44;
+std::cout << (unsigned int) &x << ' '
+          << (unsigned int) &y << ' '
+          << (unsigned int) &z << '\n';
+int * p = &x;
+int * q = p - 1;
+std::cout << (unsigned int)(p) << ' '
+          << (unsigned int)(q) << '\n';
+*q = 0;
+std::cout << x << '\n';
+\end{consolethree}
+
+Sure enough, \texttt{*q = 0} changes \texttt{x} to 0!!!
+
+\EMPHASIZE{Caveat:} In my case, because my linux machine does not pad extra bytes between the memory of \texttt{x} and the memory of \texttt{y}, for \texttt{q} to point to \texttt{y}, I only need \texttt{q = p - 1}.
+
+On my Windows machine, there is a padding of 8 bytes, which means that for my Windows machine, I would need to do \texttt{q = p - 1 - 2}, i.e., I have to subtract 2 more because of the 8-byte padding.
+
+So if the address of \texttt{x} is 1000 (and assuming there is no extra padding), then the address of \texttt{y} is 996 and the address of \texttt{z} is 992.
+
+(In some rare cases, your computer might arrange to have the addresses going up instead of down. But that's rare.)
+
+In general if you have two variables x and y of type T which are declared next to each other (x first, then y), then
+
+address of \texttt{y} = address of \texttt{x - sizeof(T)}
+
+\begin{ex}
+Verify what I just said. For instance look at this:
+
+\begin{consolethree}[escapeinside=||]
+double a = 3.14, b = 2.71, c = 1.41;
+double * p = &b;
+\end{consolethree}
+
+Check that p + 1 points to a and p - 1 points to c. Since a double takes up 8 bytes, the memory address value in p + 1 will be 8 larger than the value in p and the memory address value in p - 1 will be 8 larger than the value in p
+\end{ex}
+
+\begin{ex}
+What is the output?
+
+\begin{consolethree}[escapeinside=||]
+int x = 42, y = 0, z = 1000;
+int * p = &x;
+int * q = p - 1;
+*q = 5;
+q = p - 2;
+*q = 99;
+std::cout << x << ' ' << y << ' ' << z << std::endl;
+\end{consolethree}
+
+(Again I'm assuming no extra padding; otherwise you would need to adjust the following).
+\end{ex}
+
+\begin{ex}
+Look at this:
+
+\begin{consolethree}[escapeinside=||]
+int a, b, c, d, e, f, g;
+int * p = &a;
+\end{consolethree}
+
+Using a for-loop, set \texttt{a}, \texttt{b}, \texttt{c}, \texttt{d}, \texttt{e},
+\texttt{f}, \texttt{g} to \texttt{0}, \texttt{1}, \texttt{2}, \texttt{3}, \texttt{4},
+\texttt{5}, \texttt{6}. Of course you have to verify. So ...
+
+\begin{consolethree}[escapeinside=||]
+int a, b, c, d, e, f, g;
+int * p = &a;
+// DO YOUR STUFF HERE USING A POINTER
+std::cout << a << ' ' << b << ' ' << c << ' '
+          << d << ' ' << e << ' ' << f << ' '
+          << g << '\n';
+\end{consolethree}
+
+Violà! Even though I have variables a, b, c, d, e, f, g (which does not form an array), I can treat them as though they form an array if I use a pointer to scan over them!!! (As another exercise, replace the print statement with a for-loop that prints a,b,c,d,e,f,g.
+\end{ex}
+
+\begin{ex}
+You are given the information that a \texttt{double}
+takes up 8 bytes. Suppose we have
+
+\begin{consolethree}[escapeinside=||]
+double x = 3.14159;
+double y = 2.718;
+double z = 0.0;
+\end{consolethree}
+
+Suppose that in the memory layout of the above program, the value for \texttt{y} is immediately after the value for \texttt{x} and the value for \texttt{z} is immediately after \texttt{y}. If the address of the value of \texttt{x} is 4800000, what is the address of the value for \texttt{y}? What is the address of \texttt{z}?
+\end{ex}
+
+
+\newpage\EMPHASIZE{Pointer arithmetic and arrays}
+
+Try this:
+
+\begin{consolethree}[escapeinside=||]
+int x[3] = {1, 2, 3};
+std::cout << (unsigned int) &x[0] << ' '
+          << (unsigned int) &x[1] << ' '
+          << (unsigned int) &x[2] << '\n';
+int * p = &x[0];
+std::cout << (unsigned int) p << ' '
+          << (unsigned int) (p + 1) << ' '
+          << (unsigned int) (p + 2) << '\n';
+\end{consolethree}
+
+Note two things:
+
+\begin{itemize}
+\item the values in the array are laid out in \EMPHASIZE{ascending} address
+  values and
+\item there are \EMPHASIZE{no gaps} in the layout of the memory between values
+  of the array (there's no memory padding -- see previous section)
+\end{itemize}
+
+Since \texttt{sizeof(int)} is 4,
+\begin{center}
+\EMPHASIZE{ the address of }\texttt{\EMPHASIZE{x[i + 1]}}\EMPHASIZE{ is the address } \EMPHASIZE{ of }\texttt{\EMPHASIZE{x[i]}}\EMPHASIZE{ plus 4}
+\end{center}
+
+Note in particular the big difference between a bunch of \texttt{int} variables declared together and an array of integer values. In the previous section, you saw that the addresses of a bunch of variables go down. For an array the address of the values go up. For a bunch of variables, there might be extra byte padding. But in the case of an array, there's no extra byte padding.
+
+In the same way, if we have
+
+\begin{consolethree}[escapeinside=||]
+double y[4];
+\end{consolethree}
+
+since \texttt{sizeof(double)} is 8, the addresses of \texttt{y[0]}, \texttt{y[1]}, \texttt{y[2]}, \texttt{y[3]} go up by a step of 8.
+
+In general if \texttt{z} is an array of type \texttt{T} values, then
+\begin{center}
+\EMPHASIZE{the address of \texttt{z[i + 1]} is the address of \texttt{z[i]} plus \texttt{sizeof(T)}}
+\end{center}
+This is great because
+\begin{center}
+\EMPHASIZE{if \texttt{p} points to \texttt{z[i]}, then \texttt{p + 1} points to
+\texttt{z[i + 1]}}
+\end{center}
+and
+\begin{center}
+\EMPHASIZE{if \texttt{p} points to \texttt{z[0]}, then \texttt{p + i} points to \texttt{z[i]} and so \texttt{*(p + i)} is the same as \texttt{z[i]}}
+\end{center}
+
+You will see why this is important when we talk about dynamic memory management of arrays in the memory heap.
+
+\begin{ex}
+What is the output of this code segment:
+
+\begin{consolethree}[escapeinside=||]
+int x[] = {2, 3, 5, 7, 11, 13};
+int * p = &(x[2]);
+std::cout << *p << std::endl;
+++p;
+std::cout << *p << std::endl;
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+What is the output of this code segment:
+
+\begin{consolethree}[escapeinside=||]
+double x[] = {0.0, 2.718, 3.141, 42.0};
+double * p = &(x[1]);
+std::cout << (*p + *(p + 1)) << std::endl;
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+What is the output of this code fragment:
+
+\begin{consolethree}[escapeinside=||]
+int x[] = {5, 4, 3, 2, 1};
+for (int * p = &x[0]; p <= &x[4]; ++p)
+{
+    std::cout << *p << ' ';
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Complete this code segment.
+
+\begin{consolethree}[escapeinside=||]
+int x[] = {1, 3, 5, 7, 9};
+int sum = 0;
+
+// Complete the following to compute the sum
+// of the array.
+// You must not use an integer index variable but
+// rather integer pointer variables.
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Complete this code segment.
+
+\begin{consolethree}[escapeinside=||]
+int x[] = {1, 5, 3, 7, 9};
+int * p = &x[0];
+int * q = &x[4];
+
+int max = *p;
+
+// Complete the following to compute the maximum
+// value in the array.
+// You must not use an integer index variable but
+// rather integer pointer variables.
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+What is the output of this code segment?
+
+\begin{consolethree}[escapeinside=||]
+char x[] = {'h', 'e', 'l', 'l', 'o'};
+char * p = &(x[0]);
+char * q = &(x[4]);
+*p = 'j';
+*(p + 2) = 'L';
+while (p <= q)
+{
+    std::cout << *p;
+    p++;
+}
+std::cout << std::endl;
+\end{consolethree}
+
+(First do this without your compiler. Next, check with your compiler.)
+\end{ex}
+
+\begin{ex}
+What is the output of this code segment:
+
+\begin{consolethree}[escapeinside=||]
+int x[] = {2, 3, 5, 7, 11, 13};
+int * p = &(x[2]);
+(*p)++;
+std::cout << *p << std::endl;
+*(p++);
+std::cout << *p << std::endl;
+\end{consolethree}
+
+Can you explain what's happening? (By the way, do you need the
+parentheses?)
+\end{ex}
+
+\begin{ex}
+What is the output of this code segment:
+
+\begin{consolethree}[escapeinside=||]
+char x[] = "c++ rules";
+char * p = &x[0];
+while (*p)
+{
+    std::cout << *p++;
+}
+\end{consolethree}
+
+Can you explain what's happening? (By the way, do you need the
+parentheses?)
+\end{ex}
+
+
+\newpage\EMPHASIZE{Static arrays}
+
+One of the problems with arrays is that they have fixed size.
+
+\verb!int x[SIZE]!
+
+The \texttt{SIZE} must be constant.
+
+(WARNING: Some C++ compilers allow you to declare arrays with variable sizes. However this is not standard. Therefore do NOT use variable size for arrays. You do want your C++ code to be as portable as possible, right?)
+
+The nice thing about an array is that it is a local variable, where the memory of the values in the array is allocated within the scope of its declaration and when the array goes out of the scope, the memory is reclaimed. For instance:
+
+\begin{consolethree}[escapeinside=||]
+if (a < 0)
+{
+    int x[SIZE];
+    // ... do something useful with x ...
+
+} // x goes out of scope, and array of values
+  // used by x is reclaim by the program.
+\end{consolethree}
+
+In other words, \texttt{x} an automatic variable.
+
+Such arrays are called \EMPHASIZE{static arrays}.
+
+The next 4 experiments are extremely important in your understanding of the array, in the context of addresses. Make sure you run them all!
+
+First experiment:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+int main()
+{
+    int x[5];
+    std::cout << x << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+You will see an address!!! That tells you that the array \texttt{x} is somehow an address!!!
+
+Second experiment:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+int main()
+{
+    int x[5];
+    std::cout << x << std::endl;
+    std::cout << &x[0] << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+This tells you that if you think of \texttt{x} as a pointer, then \texttt{\EMPHASIZE{x}}\EMPHASIZE{is the address of the first value} of your array of value.
+
+So what's happening?!?
+
+Whenever you use \texttt{x} as though it's a value, the compiler will actually replace \texttt{x} with \texttt{\&x[0]}, i.e., the address of the first value of of the array:
+\begin{center}
+\texttt{\EMPHASIZE{x}}\EMPHASIZE{ is the same as }\texttt{\EMPHASIZE{\&x[0]}}
+\end{center}
+You also know that you can perform pointer arithmetic. Since \texttt{x} (besides being an array/collection of values) can be thought as a pointer, you can think about the pointers:
+\begin{center}
+\texttt{x}, \texttt{x + 1}, \texttt{x + 2}, \texttt{x + 3}, \texttt{x + 4}
+\end{center}
+which are the same as
+\begin{center}
+\texttt{\&x[0]}, \texttt{\&x[1]}, \texttt{\&x[2]}, \texttt{\&x[3]}, \texttt{\&x[4]}
+\end{center}
+We'll verify this fact using the next experiment \ldots{}
+
+Third experiment:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+int main()
+{
+    int x[5];
+    for (int i = 0; i < 5; ++i)
+    {
+        std::cout << x + i << ' ';
+    }
+    std::cout << std::endl;
+    for (int i = 0; i < 5; ++i)
+    {
+        std::cout << &x[i] << ' ';
+    }
+    std::cout << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+The above is about the addresses of the values in an array. What about
+the values of the array? You know that you can access the values in the
+array using
+\begin{center}
+\texttt{x[0]}, \texttt{x[1]}, \texttt{x[2]}, \texttt{x[3]}, \texttt{x[4]}
+\end{center}
+But since \texttt{x}, \texttt{x + 1}, \texttt{x + 2}, \texttt{x + 3}, \texttt{x + 4} points to the above values, we conclude that you can also access the values of the array using:
+
+\begin{center}
+\texttt{*x}, \texttt{*(x + 1)}, \texttt{*(x + 2)}, \texttt{*(x + 3)}, \texttt{*(x + 4)}
+\end{center}
+
+Let's check that \ldots{}
+
+Fourth experiment ...
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+int main()
+{
+    int x[5] = {2, 3, 5, 7, 11};
+    for (int i = 0; i < 5; ++i)
+    {
+        std::cout << *(x + i) << ' ';
+    }
+    std::cout << std::endl;
+    for (int i = 0; i < 5; ++i)
+    {
+        std::cout << x[i] << ' ';
+    }
+    std::cout << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+You now arrive at the conclusion that
+\begin{center}
+\texttt{x[i]} is like \texttt{*(x + i)}
+\end{center}
+
+In fact given \EMPHASIZE{any} pointer \texttt{p} (not just an array) and integer \texttt{i}, in C/C++,
+
+\texttt{\EMPHASIZE{p[i] }}\EMPHASIZE{is the same as }\texttt{\EMPHASIZE{*(p + i)}}
+
+Remember that!!!
+
+So let me summarize. When you declare this array variable:
+
+\verb!int x[5];!
+
+\begin{itemize}
+\item You can think of \texttt{x} as a pointer that points to the first value
+  in the array of 5 integers, i.e. \texttt{x} has the address of
+  \texttt{x[0]}. In fact in your code, \texttt{x}, is actually
+  translated into \texttt{\&x[0]}.
+\item The values \texttt{x[0]}, \texttt{x[1]}, \texttt{x[2]},
+  \texttt{x[3]}, \texttt{x[4]} are laid out in memory in increasing
+  address values with no gaps.
+\item The following addresses are the same:
+  \begin{itemize}
+  \item \texttt{x + i}          is the same as      \texttt{\&x[i]}
+  \end{itemize}
+\item The following values are the same:
+  \begin{itemize}
+  \item \texttt{*(x + i)}       is the same as      \texttt{x[i]}
+  \end{itemize}
+\end{itemize}
+
+\begin{ex}
+You are given that the address of the first value of the following array
+
+\verb!int x[100];!
+
+is 72008004. Assuming that each \texttt{int} value takes up 4 bytes of memory, what is the address of the value \texttt{x[3]}? What is the memory address of \texttt{x[56]}?
+\end{ex}
+
+\begin{ex}
+You have the following declarations:
+
+\begin{consolethree}[escapeinside=||]
+int x = 0;
+double y = 2.14;
+int a[100];
+double b[100];
+\end{consolethree}
+
+Assuming that an \texttt{int} takes up 4 bytes and a \texttt{double} takes up 8 byte, the address of \texttt{x} is 120004000, what is the address of \texttt{a[3]} and \texttt{b[20]}? (Assume that there is no gaps in the memory layout of variables and address value grows.)
+\end{ex}
+
+\begin{ex}
+What is the output of this code fragment:
+
+\begin{consolethree}[escapeinside=||]
+int a[5] = {2, 3, 5, 7, 11};
+int * b = a;
+std::cout << *(b + 2) << '\n';
+\end{consolethree}
+
+Verify!
+\end{ex}
+
+\begin{ex}
+What is the output of this code fragment:
+
+\begin{consolethree}[escapeinside=||]
+int a[5] = {2, 3, 5, 7, 11};
+int * b = (a + 2);
+std::cout << *(b + 1) << '\n';
+\end{consolethree}
+
+Verify!
+\end{ex}
+
+\begin{ex}
+What is the output of this code fragment:
+
+\begin{consolethree}[escapeinside=||]
+int a[5] = {2, 3, 5, 7, 11};
+int * b = (a + 3);
+std::cout << *(b - 2) + b[1] << '\n';
+\end{consolethree}
+
+Verify!
+\end{ex}
+
+\begin{ex}
+What is the output of this code fragment:
+
+\begin{consolethree}[escapeinside=||]
+int a[5] = {2, 3, 5, 7, 11};
+int * b = (a + 3);
+std::cout << *(b + 1) + b[-2] << '\n';
+\end{consolethree}
+
+Verify!
+\end{ex}
+
+\begin{ex}
+What is the output of this code fragment:
+
+\begin{consolethree}[escapeinside=||]
+int a[5] = {2, 3, 5, 7, 11};
+int b = 0;
+for (int i = 0; i < 5; ++i)
+{
+    b += *(a + i);
+}
+std::cout << b << '\n';
+\end{consolethree}
+
+Verify!
+\end{ex}
+
+\begin{ex}
+What is the output of this code fragment:
+
+\begin{consolethree}[escapeinside=||]
+int a[5] = {2, 3, 5, 7, 11};
+int b = a + 3;
+std::cout << *(b - 1) << '\n';
+\end{consolethree}
+
+Verify!
+\end{ex}
+
+\begin{ex}
+What is the output of this code fragment:
+
+\begin{consolethree}[escapeinside=||]
+int a[5] = {2, 3, 5, 7, 11};
+int * b = a + 4;
+std::cout << *(b - 3) + *b << '\n';
+\end{consolethree}
+
+Verify!
+\end{ex}
+
+\begin{ex}
+What is the output of this code fragment:
+
+\begin{consolethree}[escapeinside=||]
+int a[5] = {2, 3, 5, 7, 11};
+int * b = a;
+int * c = a + 1;
+int s = 0;
+for (int i = 0; i < 3; ++i)
+{
+    s += *c - *b;
+    ++b;
+    ++c;
+}
+std::cout << s << '\n';
+\end{consolethree}
+
+Verify!
+\end{ex}
+
+\begin{ex}
+Rewrite the following so that the array bracket
+operator \texttt{[]} is not used.
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <ctime>
+#include <cstdlib>
+int main()
+{
+    srand((unsigned int) time(NULL));
+    const int SIZE = 100;
+    const double MAX = double(RAND_MAX);
+    double x[SIZE];
+    for (int i = 0; i < SIZE; i++)
+    {
+        |\textbf{\underline{x[i]}}| = rand() / MAX * 2 - 1;
+    }
+    double min = |\textbf{\underline{x[0]}}|;
+    int index = 0;
+    for (int i = 1; i < SIZE; i++)
+    {
+        if (|\textbf{\underline{x[i]}}| < m)
+        {
+            min = |\textbf{\underline{x[i]}}|;
+            index = i;
+        }
+    }
+    std::cout << "min:" << min
+              << " at index:" << index
+              << '\n';
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+
+\newpage\EMPHASIZE{Dynamic arrays (in the heap)}
+
+With pointers you can allocate memory for an array (on the heap) with \EMPHASIZE{variable size}. Try this:
+
+\begin{consolethree}[escapeinside=||]
+int s;
+std::cin >> s;
+
+int * x = |\EMPHASIZE{new int[s]}|; // s can be a variable!!!
+
+// Do something with array that x points to.
+//
+// (Technically speaking x points to the first value
+// of the array in the heap.)
+
+|\textbf{delete [] x;}|
+\end{consolethree}
+
+Basically the command
+
+\verb!new int[s]!
+
+tells the heap:
+
+``hey heap \ldots{} gimme a chunk of an \texttt{int} array of \texttt{s} values''
+
+Note that \texttt{s} can be a variable!
+
+Mr Heap then goes through its memory and looks for an unused \EMPHASIZE{contiguous} chunk of memory for an array of \texttt{s} \texttt{int} values, marks this chunk as ``in use'' (i.e. not free) and \EMPHASIZE{returns the address of the }\texttt{\EMPHASIZE{first}}\EMPHASIZE{integer value of this array}. Therefore, after calling
+
+\begin{consolethree}[escapeinside=||]
+int * x = new int[s];
+\end{consolethree}
+
+x points to (i.e., has the address of) the \EMPHASIZE{first} int value of an array of s int values. Again, this array of values is in the heap and the number of int values allocated is exactly s. I will usually say x points to the array although technically speaking x has the address of the first int value of this array, If the value for s is 3, then the memory model looks like this (I just put random integers into the array):
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(0, 0, 6, 4)
+p += Rect(1, 1, 3, 2)
+p += Rect(0.5, 1.5, 0.5, 1.5, label='x', linewidth=0)
+
+p += Rect(8.25, 4.5, 8.25, 4.5, label='Free store', linewidth=0)
+p += Rect(7, 0, 15, 4)
+p += Rect(8.5, 2.5, 10.5, 3.5, label='512')
+p += Rect(10.5, 2.5, 12.5, 3.5, label='4')
+p += Rect(12.5, 2.5, 14.5, 3.5, label='-75')
+
+p += Rect(10.5, 5, 14.5, 7, linewidth=0.1, linecolor='red', innersep=0.25, s='The heap will mark these 3 integers as "in use".', align='c')
+
+p += Line(points=[(2, 1.5), (8.25, 3.25)], linewidth=0.15, endstyle='>')
+p += Line(points=[(12.5, 5), (13.5, 3.5)], linewidth=0.15, linecolor='red', endstyle='>')
+
+print(p)
+\end{python}
+
+When you do not need the array that \texttt{x} points to, you deallocate
+the memory of this array by doing this:
+
+\begin{consolethree}[escapeinside=||]
+delete [] x;
+\end{consolethree}
+
+This will release the whole array of \texttt{int} values at address \texttt{x} back to the heap so that the heap can reuse this memory for another memory allocation.
+
+A \EMPHASIZE{big mistake} is to do this:
+
+\begin{consolethree}[escapeinside=||]
+delete x;
+\end{consolethree}
+
+which will \EMPHASIZE{only release one value} (i.e. the single value that \texttt{x} points to), not the whole array, back to the heap. The problem is that the compiler will not tell you that this is a mistake! This will result in a \EMPHASIZE{memory leak}. This means that if you do
+
+\begin{consolethree}[escapeinside=||]
+int * x = new int[10];
+delete x;
+\end{consolethree}
+
+you are going to have a memory leak of 9 \texttt{int}s. For a 32-bit
+machine, that's a loss of 9x4=36 bytes. The right thing
+to do is
+
+\begin{consolethree}[escapeinside=||]
+int * x = new int[10];
+delete [] x;
+\end{consolethree}
+
+So remember that in general,
+
+\begin{itemize}
+\item If you use \texttt{new} for a single value, then you should do
+  \texttt{delete}.
+\item If you do \texttt{new []} for a whole array, you must do
+  \texttt{delete []}.
+\end{itemize}
+
+Here's an example:
+
+\begin{consolethree}[escapeinside=||]
+int * x;
+
+x = new int;     // ask for one int value ...
+delete x;        // ... give back one
+
+x = new int[10]; // ask for 10 int values ...
+delete [] x;     // ... give back 10
+
+x = new int[42]; // ask for 42 int values ...
+delete [] x;     // ... give back 42
+
+x = new int;     // ask for one int value ...
+delete x;        // ... give back one
+\end{consolethree}
+
+As in the case of dynamic memory management, it's also a good idea to set a pointer to NULL after deallocation:
+
+\begin{consolethree}[escapeinside=||]
+int * x;
+
+x = new int;     // ask for one int value ...
+delete x;        // ... give back one
+x = NULL;
+
+x = new int[10]; // ask for 10 int values ...
+delete [] x;     // ... give back 10
+x = NULL;
+\end{consolethree}
+
+\begin{ex}
+Run this \ldots{} and see the program crash ...
+
+\begin{consolethree}[escapeinside=||]
+int * x;
+while (1)
+{
+    x = new int[5000];
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Run this \ldots{} and see the program crash ...
+
+\begin{consolethree}[escapeinside=||]
+int * x;
+while (1)
+{
+    x = new int[5000];
+    delete x;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Run this \ldots{} and see what happens:
+
+\begin{consolethree}[escapeinside=||]
+int * x;
+while (1)
+{
+    x = new int[1000];
+    delete [] x;
+}
+\end{consolethree}
+
+Stop after a couple of minutes.
+\end{ex}
+
+\begin{ex}
+Fixit time ...
+
+\begin{consolethree}[escapeinside=||]
+int * w;
+int * x = new int;
+int * y = new int[100];
+int * z;
+delete w;
+delete [] x;
+delete y;
+delete [] z;
+\end{consolethree}
+\end{ex}
+
+After
+
+\verb!int * x = new int[s];!
+
+your x points to the first value in the array. How do you get to the
+i-th value in this array? It's just
+
+\texttt{x[i]}
+
+Remember? Recall that the address of the \texttt{i}-th value in this array
+is
+
+\texttt{x + i}
+
+Therefore, dereferencing, the value at the address is
+
+\texttt{*(x + i)}
+
+Recall that \texttt{x[i]} is just a shorthand for \texttt{*(x + i):}
+
+\texttt{x[i]}         is the same as              \texttt{*(x + i)}
+
+Most programmers use \texttt{x[i]} since we want to think of \texttt{x} as an array (although technically it's a pointer.) The above explanation was already presented in the previous section. Why am I repeating? BECAUSE IT'S IMPORTANT!!!
+
+Try this:
+
+\begin{consolethree}[escapeinside=||]
+int size;
+std::cin >> size;
+double * x = new double[size];
+for (int i = 0; i < size; i++)
+{
+    std::cin >> x[i];
+}
+double product = 1.0;
+for (int i = 0; i < size; i++)
+{
+    product *= x[i];
+    std::cout << product << '\n';
+}
+delete [] x;
+\end{consolethree}
+
+\begin{ex}
+What's wrong with this:
+
+\begin{consolethree}[escapeinside=||]
+int size;
+std::cin >> size;
+double * x = new double[size];
+for (int i = 0; i < size; i++)
+{
+    std::cin >> x[i];
+}
+double product = 1.0;
+for (int i = 0; i < size; i++)
+{
+    product *= x[i];
+    std::cout << product << '\n';
+}
+delete x;
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Write a program that continually prompts the user for
+a value for integer variable \texttt{i}, allocate an array of integers of
+size \texttt{i} for pointer \texttt{p}, put \texttt{i} random integer values
+into the array, sort the array using bubblesort, print all the values
+\texttt{p} points to, deallocate the memory. Terminate the program when
+the user enters a 0 for \texttt{i}.
+\end{ex}
+
+\begin{ex}
+Write a program that
+
+\begin{itemize}
+\item Prompts the user for s.
+\item Creates a dynamic array (on the heap) and declare pointer p to point
+  to an array of s integer values.
+\item Sets all values in the array to 1.
+\item Sets all values at index 0, 2, 4, \ldots{} and toggle the value
+  between 0 and 1, i.e., if the value is 1, set it to 0 and if it's 0,
+  set it to 1.
+\item Sets all values at index 0, 3, 6, \ldots{} and toggle the value
+  between 0 and 1, i.e., if the value is 1, set it to 0 and if it's 0,
+  set it to 1.
+\item Sets all values at index 0, 4, 8, \ldots{} and toggle the value
+  between 0 and 1, i.e., if the value is 1, set it to 0 and if it's 0,
+  set it to 1.
+\item Etc.
+\item At the end of this process, prints the index values where the value is
+  1.
+\item Deallocates the array.
+\end{itemize}
+\end{ex}
+
+
+\newpage\EMPHASIZE{Comparing pointers and arrays}
+
+There are three concepts here:
+
+\begin{itemize}
+\item static arrays,
+\item dynamic arrays in the heap, and
+\item pointers.
+\end{itemize}
+
+You have to be clear about the three because there are similarities and differences. Most of the comparisons below are already presented earlier. However, because of the similarities and differences, it's best I put everything here so that you can study all the facts in one place.
+
+A pointer can be used to access any value in your computer if you have the address of that value (and if you have access rights). In particular, if a pointer points to the first value of an array (static or dynamic array), using pointer arithmetic, you can access value of the
+array.
+
+In terms of syntax, there are many similarities between a pointer and an array (static of not). This is deliberate -- the designers of C++ made it so.
+
+\EMPHASIZE{Static and dynamic arrays}
+
+\textbf{SIMILARITY \#1: Array}
+Both static arrays and dynamic arrays are arrays (i.e., linear collection) of values, not just one value.
+
+\textbf{SIMILARITY \#2: Homogeneity}                           \tikzmarknode{hm2}{}                \xsidebox[0cm]{3cm}{}{hm2box}{ASIDE: Once you know more about pointers, even this can be blurred. For instance it's possible to store integers, doubles and characters in an integer array. But I won't go into this.}
+
+Both types of arrays are homogeneous, i.e., all the values in an array have the same type.
+\DrawArrowH{hm2box}{hm2}
+
+\textbf{SIMILARITY \#3: Bracket operator.}
+The i-th value of a static array and the i-value of a dynamic array can
+both be accessed using the bracket operator.
+
+\begin{consolethree}[escapeinside=||]
+char x[10] = {'a', 'b', 'c'};
+char * y = x;
+int size = 10;
+char * z = new char[size];
+//
+// index-2 value of x is x[2] or y[2]
+// index-2 value of array z is pointing to is z[2]
+\end{consolethree}
+
+Remember that \texttt{z[2]} is a shorthand for \texttt{*(z + 2)}.
+
+\textbf{SIMILARITY \#4: Bracket operator and out of bound access}      \tikzmarknode{hm4}{}                \xsidebox[0cm]{0cm}{}{hm4box}{ASIDE: I've said before that both data and code reside in your computer's memory. This means that a pointer can potentially access \textbf{CODE}. If you can change data, then you can change code in your code!}
+\DrawArrow{hm4box}{hm4}
+
+After you declare declare a static array or allocate memory for a dynamic array (in the heap) with a size s, the array has s values starting with index 0 and ending with index s - 1. HOWEVER, it's possible to access values \EMPHASIZE{OUTSIDE} the array -- remember what I said about pointers being able to access any value in your computer (as long as you have the address and the access rights). For instance is x is a static array of size 10 or a pointer to a dynamic array of size 10 in the heap, then \texttt{x[i]} is just the value at location \texttt{x + i}. You can have \texttt{x[42]}, \texttt{x[-5]}, etc.!!! You can access the value at address \texttt{x + 42} and \texttt{x + (-5)} as long as you have the access rights!!!
+
+Now for the differences \ldots{}
+
+\textbf{DIFFERENCE \#1:} \textbf{Memory location.}
+
+The most obvious difference is the location of the values of the array.
+In the case of
+
+\begin{consolethree}[escapeinside=||]
+const int size = 10;
+char x[size];
+\end{consolethree}
+
+the memory allocation is local (i.e. in the current execution block).
+When you exit the block, the memory use for this array is reclaimed
+automatically. Therefore static arrays are automatic variables. Dynamic
+arrays created in the heap using \texttt{new[]}, i.e.
+
+\begin{consolethree}[escapeinside=||]
+int size = 10;
+char * y = new char[size];
+\end{consolethree}
+
+lives in the heap, not in the local scope. (Of course the pointer
+\texttt{x} is local). The values of this array is not reclaimed
+automatically; \texttt{x} is local so the pointer value of \texttt{x} is
+reclaimed. You must deallocate the memory of this array yourself (when
+you're done using the array) by doing this:
+
+\begin{consolethree}[escapeinside=||]
+delete [] y;
+\end{consolethree}
+
+\textbf{DIFFERENCE \#2:} \textbf{Size.}
+
+The second difference is that the size of the array must be a constant
+for static array:
+
+\begin{consolethree}[escapeinside=||]
+const int size = 10;
+char x[size]; // size must be constant
+\end{consolethree}
+
+However the size used in creating an array in the heap can be any
+variable expression:
+
+\begin{consolethree}[escapeinside=||]
+int size = 10;
+char * y = new char[size];
+...
+delete [] y;
+\end{consolethree}
+
+\textbf{DIFFERENCE 3.} \textbf{Initialization.}
+
+An array can be initialized. For instance
+
+\begin{consolethree}[escapeinside=||]
+const int size = 10;
+char x[size] = {'a', 'b', 'c'};
+\end{consolethree}
+
+There is no corresponding syntax for the case for a dynamic array on the heap.
+
+\begin{consolethree}[escapeinside=||]
+int size = 10;
+char * y = new char[size] {'a', 'b', 'c'}; // WHAT?!?
+delete [] y;
+\end{consolethree}
+
+You have to perform assignment:
+
+\begin{consolethree}[escapeinside=||]
+int size = 10;
+char * y = new char[size];
+y[0] = 'a';
+y[1] = 'b';
+y[2] = 'c';
+delete [] y;
+\end{consolethree}
+
+\EMPHASIZE{Static arrays and pointers}
+
+\textbf{SIMILARITY 1. Array name is like a pointer.}
+
+You can do this:
+
+\begin{consolethree}[escapeinside=||]
+const int SIZE = 10;
+char x[SIZE];
+char * y = x; // Remember that x is &x[0]
+\end{consolethree}
+
+The reason (as stated above) is because in the above \texttt{x} is the same as \texttt{\&x[0]}. So the above make \texttt{x} like a pointer (syntactically speaking).
+
+\textbf{DIFFERENCE 1: Array name is constant pointer, not just pointer.}
+
+However static arrays are not exactly pointers. If x and y are pointers of the same type (with values), then you can assign between them:
+
+\verb!x = y;!
+
+But try this:
+
+\begin{consolethree}[escapeinside=||]
+char x[10];
+char * y;
+char * z = new char[10];
+char w[10];
+y = x; // OK
+x = z; // NOPE!!!
+\end{consolethree}
+
+So what's \texttt{x} if \texttt{x} is an array since it's not a pointer? You can view \texttt{x} as a constant pointer. In other words, you can think of \texttt{x} as a pointer but the address of \texttt{x} cannot be changed. So for this code fragment:
+
+\begin{consolethree}[escapeinside=||]
+char x[10];
+char * y;
+y = x; // OK
+\end{consolethree}
+
+If you want to make \texttt{y} as close to \texttt{x} as possible, you can do this:
+
+\begin{consolethree}[escapeinside=||]
+char x[10];
+char * const y = x; // OK
+\end{consolethree}
+
+In that case the address value in \texttt{y} cannot be changed.
+
+\textbf{DIFFERENCE 2:} \texttt{\textbf{sizeof().}}
+
+Another difference is in the behavior of the \texttt{sizeof()} function. Try this:
+
+\begin{consolethree}[escapeinside=||]
+char x[10];
+char * y = x;
+
+std::cout << sizeof(x) << '\n';
+std::cout << sizeof(y) << '\n';
+\end{consolethree}
+
+The \texttt{sizeof()} on an array returns the size of memory used for the array of values. The \texttt{sizeof()} on a pointer returns the size of memory used for the pointer itself, i.e., the memory used for the address of the first value of the array, not the array.
+
+
+\newpage\EMPHASIZE{Array and pointer parameters}
+
+I've already talked about pointers and arrays. Let's see what happens
+when they are used as parameters of functions.
+
+When you make a function call like this:
+
+\begin{consolethree}[escapeinside=||]
+void f(int x)
+{}
+
+int main()
+{
+    int y = 42;
+    f(y); // give value of y to x of
+          // function f()
+    return 0;
+}
+\end{consolethree}
+
+you can pretty much understand the data passed from \texttt{main()} to
+\texttt{f()} by running this code segment:
+
+\begin{consolethree}[escapeinside=||]
+int y = 42;
+int x = y; // give value of y to x
+\end{consolethree}
+
+(This is pass-by-value.)
+
+However there is one case where this does not work. The following that
+passes an array to a function does work:
+
+\begin{consolethree}[escapeinside=||]
+void f(int x[])
+{}
+
+int main()
+{
+    int y[100] = {1, 2, 3};
+    f(y);
+    return 0;
+}
+\end{consolethree}
+
+You might be tempted to run this code segment:
+
+\begin{consolethree}[escapeinside=||]
+int y[100] = {1, 2, 3};
+int x[] = y;
+\end{consolethree}
+
+You \textbf{\underline{will}} get an error.
+
+However \EMPHASIZE{this works}:
+
+\begin{consolethree}[escapeinside=||]
+int y[100] = {1, 2, 3};
+int * x = y;
+\end{consolethree}
+
+So here's the thing you need to know:
+\begin{center}
+\EMPHASIZE{An array parameter is like a pointer}
+\end{center}
+Now the question is this: Is the pointer parameter a
+\EMPHASIZE{constant} pointer? Let's try an experiment:
+
+\begin{consolethree}[escapeinside=||]
+void f(int x[])
+{
+    int * y = new int[10];
+    x = y; // can parameter x be changed?
+}
+
+int main()
+{
+    int y[100] = {1, 2, 3};
+    f(y);
+    return 0;
+}
+\end{consolethree}
+
+It turns out that the above does work. This means that the \EMPHASIZE{x is not a constant pointer}. This means that
+
+\begin{consolethree}[escapeinside=||]
+void f(int x[])
+{}
+\end{consolethree}
+
+is the same as
+
+\begin{consolethree}[escapeinside=||]
+void f(int * x)
+{}
+\end{consolethree}
+
+You can verify this piece of information using the following trick to get your compiler to tell you the truth. Compile this program:
+
+\begin{consolethree}[escapeinside=||]
+void f(int x[])
+{
+    abc; // a deliberate error
+}
+
+int main()
+{
+    return 0;
+}
+\end{consolethree}
+
+Your compiler will give you an error. For g++, here's
+the error:
+
+\begin{consolethree}[escapeinside=||]
+c.cpp: In function 'void f(int*)':
+c.cpp:3:3: error: 'abc' was not declared in this scope
+\end{consolethree}
+
+AHA!!! The function header of \texttt{f()} is really
+
+\verb!void f(int *)!
+
+and \EMPHASIZE{not}
+
+\verb!void f(int [])!
+
+So here's the extremely important principle to remember:
+\begin{center}
+\EMPHASIZE{An array parameter is actually a non-constant pointer}
+\end{center}
+
+\newpage\EMPHASIZE{Default values}
+
+There's another thing that we should investigate: What about default values? Let's try this:
+
+\begin{consolethree}[escapeinside=||]
+void f(int x[] = {1, 2, 3})
+{}
+
+int main()
+{
+    f();
+    return 0;
+}
+\end{consolethree}
+
+You will get an error. Of course you will. You already know that pointers cannot be initialized with an array. In other words the following is invalid:
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    int * x = {1, 2, 3};
+    return 0;
+}
+\end{consolethree}
+
+You can try other cases (with constantness):
+
+\begin{consolethree}[escapeinside=||]
+const int * a = {1, 2, 3};
+int * const b = {1, 2, 3};
+const int * const c = {1, 2, 3};
+\end{consolethree}
+
+None of them will work.
+
+In general the only default value you should use is NULL:
+
+\begin{consolethree}[escapeinside=||]
+void f(int x[] = NULL)
+{}
+\end{consolethree}
+
+There \EMPHASIZE{is} one case where a pointer can be initialized to point to values and only for certain compilers. Therefore you shouldn't use the following in real code:
+
+\verb!const char * x = "hello world";!
+
+Again. Don't use this in real code. It's better to just be simple, like this:
+
+\verb!char x[] = "hello world";!
+
+
+\newpage\EMPHASIZE{Functions with array parameters: where to start}
+
+This is an old example:
+
+\begin{consolethree}[escapeinside=||]
+int sum(int x[])
+{
+    int s = 0;
+    for (int i = 0; i < 10; ++i)
+    {
+        s += x[i];
+    }
+    return s;
+}
+\end{consolethree}
+
+This adds up the values x[0], \ldots, x[9]. Great. But this one is even better because it allows to specify how many values to add:
+
+\begin{consolethree}[escapeinside=||]
+int sum(int x[], int size)
+{
+    int s = 0;
+    for (int i = 0; i < size; ++i)
+    {
+        s += x[i];
+    }
+    return s;
+}
+\end{consolethree}
+
+You can use it like this:
+
+\begin{consolethree}[escapeinside=||]
+int a[] = {1, 3, 5, 7, 2, 4, 6, 8};
+std::cout << sum(a, 8) << '\n';
+\end{consolethree}
+
+which will add up all the 8 values in the array. Of course if I want to sum up only the first 4 numbers, I would do this:
+
+\begin{consolethree}[escapeinside=||]
+int a[] = {1, 3, 5, 7, 2, 4, 6, 8};
+std::cout << sum(a, 8) << '\n';
+std::cout << sum(a, 4) << '\n';
+\end{consolethree}
+
+But what if I want to compute \texttt{x[4] + x[5] + x[6]}? In other words, I want to specify the starting index of the summation. The function starts with index position 0. Recall that in the notes on functions and arrays, I have to rewrite the above function so that it accepts a starting index value, like this:
+
+\begin{consolethree}[escapeinside=||]
+int sum(int x[], int start, int size)
+{
+    int s = 0;
+    for (int i = start; i < size; ++i)
+    {
+        s += x[i];
+    }
+    return s;
+}
+\end{consolethree}
+
+Actually it's \EMPHASIZE{not necessary at all (if you know pointers)!}
+
+You see I can do this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+int sum(int x[], int size)
+{
+    int s = 0;
+    for (int i = 0; i < size; i++)
+    {
+        s += x[i];
+    }
+    return s;
+}
+int main()
+{
+    int a[] = {1,3,5,7,2,4,6,8};
+    std::cout << sum(a, 8) << '\n';
+    std::cout << sum(a, 4) << '\n';
+    std::cout << |\EMPHASIZE{sum(a + 4, 3)}| << '\n';
+    return 0;
+}
+\end{consolethree}
+
+to compute \texttt{x[4] + x[5] + x[6]}. In this case, the value for size is the number of terms that is added.
+
+Neat right? This means that when writing functions for arrays, you \EMPHASIZE{never have to specify an option for a starting index value}!!! (For languages that do not support pointers and pointer arithmetic, the alternative is almost always slower.)
+
+\begin{ex}
+What is the output of this program:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+int sum(int x[], int size)
+{
+    int s = 0;
+    for (int i = 0; i < size; i++)
+    {
+        s += x[i];
+    }
+    return s;
+}
+double avg(int x[], size)
+{
+    return double(sum(x, size)) / size;
+}
+int main()
+{
+    int a[] = {1, 3, 5, 7, 2, 4, 6, 8};
+    std::cout << avg(a + 4, 3) << '\n';
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Rewrite the following program so that the prototype of the max function looks like this:
+
+\verb!int max(int x[], int size);!
+
+Modify the test code in \texttt{main()} so that the same result is produced.
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+int max(int x[], int start, int end)
+{
+    int m = x[start];
+    for (int i = start + 1; i <= end; i++)
+    {
+        if (m < x[i]) m = x[i];
+    }
+    return m;
+}
+int main()
+{
+    int a[] = {1, 3, 5, 7, 2, 4, 6, 8};
+    std::cout << max(a, 0, 2) << '\n';
+    std::cout << max(a, 4, 6) << '\n';
+    std::cout << max(a, 6, 6) << '\n';
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+
+\newpage\EMPHASIZE{Functions with array parameters: where to start and where to end}
+
+Let's continue with the example from the previous section:
+
+\begin{consolethree}[escapeinside=||]
+int sum(int x[], int size)
+{
+    int s = 0;
+    for (int i = 0; i < size; ++i)
+    {
+        s += x[i];
+    }
+    return s;
+}
+int main()
+{
+    int a[] = {1,3,5,7,2,4,6,8};
+    std::cout << sum(a, 8) << '\n';
+    std::cout << sum(a, 4) << '\n';
+    std::cout << sum(a + 4, 3) << '\n';
+    return 0;
+}
+\end{consolethree}
+
+Again, in function sum, you want to think of x as a pointer to an array
+of values. When you call
+
+\verb!... sum(a + 4, 3) ...!
+
+You are basically telling the function to start at the value which is 4
+integers away from the address a (i.e., the 5\textsuperscript{th}
+integer in the array).
+
+I can rewrite the \texttt{sum} function like this so that it's really
+clear that the array parameter is really a pointer parameter:
+
+\begin{consolethree}[escapeinside=||]
+int sum(int * start_pointer, int size)
+{
+    int s = 0;
+    for (int i = 0; i < size; ++i)
+    {
+        s += start_pointer[i];
+    }
+    return s;
+}
+\end{consolethree}
+
+Since you're using a starting pointer address to specify where to find the first value, why not specify the pointer address of the last value? In that case your code becomes \EMPHASIZE{more uniform} like this:
+
+\begin{consolethree}[escapeinside=||]
+int sum(int * start_pointer, int * end_pointer)
+{
+    int s = 0;
+    for (int * p = start_pointer;
+         p <= end_pointer; ++p)
+    {
+        s += *p;
+    }
+    return s;
+}
+\end{consolethree}
+
+You do have to know for instance that ++p on a pointer will move the pointer p to the next integer (and I've already talked about it.)
+
+Now, it's actually more common to specifying the ending address value to be the value that is just \EMPHASIZE{one step outside} the array of values to be processed:
+
+\begin{consolethree}[escapeinside=||]
+int sum(int * start_pointer, int * end_pointer)
+{
+    int s = 0;
+    for (int * p = start_pointer;
+         p < end_pointer; ++p)
+    {
+        s += *p;
+    }
+    return s;
+}
+\end{consolethree}
+
+Simplifying the parameter names a little, I get \ldots{}
+
+\begin{consolethree}[escapeinside=||]
+int sum(int * start, int * end)
+{
+    int s = 0;
+    for (int * p = start; p < end; ++p)
+    {
+        s += *p;
+    }
+    return s;
+}
+\end{consolethree}
+
+(Instead of start and end, it's also common to name the pointers begin and end.)
+
+In this form, \texttt{main()} would have to look like this:
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    int a[] = {1, 3, 5, 7, 2, 4, 6, 8};
+    std::cout << sum(a, a + 8) << '\n';
+    std::cout << sum(a, a + 4) << '\n';
+    std::cout << sum(a + 4, a + 7) << '\n';
+    return 0;
+}
+\end{consolethree}
+
+Let me repeat: the general practice is that \texttt{end} points to one
+value beyond what you want to process. So the values processed are
+
+\texttt{*start}, \texttt{*(start + 1)}, \texttt{*(start + 2)}, \ldots,
+\texttt{*(end - 1)}
+
+Note that no values are process if start equals end.
+
+\begin{ex}
+Complete and test this function that does the
+obvious:
+
+\verb!void println(int * start, int * end);!
+
+(It's clear when you should stop.) Here's the format of the output:
+
+\verb!{5, 1, 2, 4}!
+
+A newline should be printed. When \texttt{start} and \texttt{end} have the
+same value, the output looks like this:
+
+\verb!{}!
+\end{ex}
+
+\begin{ex}
+Complete and test this function that does the
+obvious:
+
+\verb!int max(int * start, int * end);!
+
+(It's clear when you should stop.) You maybe assume at least one value
+is processed, i.e., assume \texttt{start} <= \texttt{end - 1}.
+\end{ex}
+
+\begin{ex}
+Complete and test this function:
+
+\verb!int * max(int * start, int * end);!
+
+that returns the address of the maximum value in \texttt{*start}, \ldots,
+\texttt{*(end - 1)} if \texttt{start <= end - 1}. Otherwise
+\texttt{NULL} is returned. You maybe assume at least one value is
+processed, i.e., assume \texttt{start} <= \texttt{end - 1}.
+\end{ex}
+
+\begin{ex}
+Complete and test this function:
+
+\verb!int * linearsearch(int * start, int * end, int target);!
+
+that returns the address of the first \texttt{target} (left-to-right) that
+occurs in the array of values \texttt{*start}, \ldots, \texttt{*(end - 1)}.
+If \texttt{target} does not occur in the array, \texttt{NULL} is returned.
+\end{ex}
+
+\begin{ex}
+Complete and test this very important function:
+
+\verb!void fill(int * start, int * end, int value);!
+
+that copies \texttt{value} to the values at \texttt{start}, \texttt{start +
+1}, etc.
+\end{ex}
+
+\begin{ex}
+Complete and test this very important function:
+
+\verb!void copy(int * start0, int * start1, int * end1);!
+
+that copies the value at \texttt{start1} to the value at location
+\texttt{start0}, etc. (It's clear when you should stop.)
+\end{ex}
+
+\begin{ex}
+Complete and test this very important function:
+
+\verb!void resize(int ** start, int * size, int newsize);!
+
+Initially, \texttt{*start} describes an array of \texttt{size} integers in
+the heap. When we return from the above function call, \texttt{*start}
+contains the address of an array of \texttt{newsize} integers in the heap
+and it contains (as many as possible) the values from the original
+array. For instance if you have
+
+\verb!int * p = NULL, size = 0;!
+
+after calling
+
+\verb!resize(&p, &size, 5);!
+
+\texttt{p} points to an array of 5 integers in the heap and \texttt{size} is
+changed to 5. Suppose we continue the above with
+
+\begin{consolethree}[escapeinside=||]
+p[0] = 2;
+p[1] = 3;
+p[2] = 5;
+\end{consolethree}
+
+Here's the memory model:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Rect(0, 0, 5, 2.5, linewidth=0.1)
+p += Rect(1.75, 0.25, 2.25, 0.75, linewidth=0.05)
+p += Rect(1.25, 0.35, 1.25, 0.35, linewidth=0, label=r'\texttt{x}')
+
+p += Rect(6, 0, 11, 2.5, linewidth=0.1)
+p += Rect(6.05, 2.5, 8, 3, linewidth=0, label='Free Store')
+startx = 6.25
+labelz = None
+for i in range(5):
+    match (i):
+          case 0:
+               labelz = str(2)
+          case 1:
+               labelz = str(3)
+          case 2:
+               labelz = str(5)
+          case _:
+               labelz= ''
+    p += Rect(startx, 1.5, startx + 0.5, 2, linewidth=0.05, label=labelz)
+    startx += 0.5
+p += Line(points=[(1.95, 0.5), (6.24, 1.75)], linewidth=0.075, endstyle='>')
+print(p)
+\end{python}
+Next if we call
+
+\verb!resize(&p, &size, 7);!
+
+\texttt{p} points to an array of 7 integers in the heap and \texttt{size} is
+changed to 7. Furthermore the first three values of the new array
+\texttt{p} points to are 2, 3, and 5. The memory model at this point looks
+like this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Rect(0, 0, 5, 2.5, linewidth=0.1)
+p += Rect(1.75, 0.25, 2.25, 0.75, linewidth=0.05)
+p += Rect(1.25, 0.35, 1.25, 0.35, linewidth=0, label=r'\texttt{x}')
+
+p += Rect(6.05, 2.5, 8, 3, linewidth=0, label='Free Store')
+p += Rect(6, 0, 11, 2.5, linewidth=0.1)
+startx = 6.85
+labelz = None
+for i in range(7):
+    match (i):
+          case 0:
+               labelz = str(2)
+          case 1:
+               labelz = str(3)
+          case 2:
+               labelz = str(5)
+          case _:
+               labelz= ''
+    p += Rect(startx, 0.25, startx + 0.5, 0.75, linewidth=0.05, label=labelz)
+    startx += 0.5
+p += Line(points=[(1.95, 0.5), (6.84, 0.5)], linewidth=0.075, endstyle='>')
+print(p)
+\end{python}
+
+(Note: \texttt{newsize} can be smaller than \texttt{size}.)
+\end{ex}
+
+\newpage\EMPHASIZE{Difference of pointers: binary search}
+
+Note that we have been using addition operator pointers:
+
+Here's continue with the example from the previous section:
+
+\begin{consolethree}[escapeinside=||]
+int a[] = {1,3,5,7,2,4,6,8};
+int * p = &a[1];
+int * q = &a[4];
+\end{consolethree}
+
+That's addition of a pointer value and a constant integer.
+
+Go ahead and try this:
+
+\begin{consolethree}[escapeinside=||]
+int a[] = {1,3,5,7,2,4,6,8};
+int * p = &a[1];
+int * q = p + 3;
+std::cout << |\EMPHASIZE{p + q}| << '\n';
+\end{consolethree}
+
+Read the error message carefully.
+
+You \EMPHASIZE{cannot add pointers}.
+
+However try this:
+
+\begin{consolethree}[escapeinside=||]
+int a[] = {1,3,5,7,2,4,6,8};
+int * p = &a[1];
+int * q = &a[4];
+std::cout << |\EMPHASIZE{p - q}| << '\n';
+\end{consolethree}
+
+It works. This tells you (of course) that the integer \texttt{q} points to is 3 integers away from the integer that \texttt{p} points.
+
+Why is this important?
+
+Recall from the previous section, when it comes to functions that computes on a section of an array, i.e. a subarray, you want to call the function with two pointers. For instance:
+
+\begin{consolethree}[escapeinside=||]
+int sum(int * start, int * end)
+{
+    // returns sum of *start, ..., *(end - 1)
+    ...
+}
+\end{consolethree}
+
+Sometimes you want to know how many terms of the array is involved. This
+is
+
+\verb!end -- start!
+
+This is the size of the subarray that the function works with.
+
+Another reason why the difference of pointers is important is because of binary search. In the scenario when you are performing binary search on a subarray where you specify the subarray using index values, the function looks like this:
+
+\begin{consolethree}[escapeinside=||]
+int binarysearch(int x[], int start, int end,
+                 int target)
+{
+    int left = start, right = end -- 1;
+    while (left <= right)
+    {
+        int mid = (left + right) / 2};
+        ...
+    }
+}
+\end{consolethree}
+
+See chapter on 1D arrays of CISS240.
+
+This version has a problem. Remember that an integer is usually (at least for now) is made up of 32 bits. So the range of an integer value is $-2^{31}$, \ldots, $2^{31} - 1$. So when your \texttt{left} and \texttt{right} are both large, for instance they are both very close to $2^{31} - 1$, then \texttt{left + right} will overflow and become a negative integer!!!
+
+The way to fix this is to compute the \texttt{mid} index like this:
+
+\begin{consolethree}[escapeinside=||]
+int binarysearch(int x[], int start, int end,
+                 int target)
+{
+    int left = start, right = end -- 1;
+    while (left <= right)
+    {
+        int mid = |\EMPHASIZE{ left + (right - left) / 2;}|
+        ...
+    }
+}
+\end{consolethree}
+
+This version will not cause an integer overflow. So from now on, you must use this version of binary search.
+
+In the above, \texttt{right} is the largest index of the subarray the current iteration of your binary search is working on.
+
+You can also do this where \texttt{right} is \EMPHASIZE{one index beyond} the subarray your binary search is working on:
+
+\begin{consolethree}[escapeinside=||]
+int binarysearch(int x[], start, int end,
+                 int target)
+{
+    int left = start, right = |\EMPHASIZE{ end}|;
+    while (left |\EMPHASIZE{ <}| right)
+    {
+        int mid = left + (right - left) / 2;
+        ...
+    }
+}
+\end{consolethree}
+
+This is now the index value version of binary search that you must use:
+
+\begin{consolethree}[escapeinside=||]
+int binarysearch(int x[], int start, int end,
+                 int target)
+{
+    int left = start, right = end;
+    while (left < right)
+    {
+        int mid = (left + right) / 2;
+        if (x[mid] == target)
+        {
+            return mid;
+        }
+        else if (x[mid] > target)
+        {
+            right = mid; // note: no "- 1"
+        }
+        else
+        {
+            left = mid + 1;
+        }
+    }
+}
+\end{consolethree}
+
+What about a pointer version of binary search? Using the CISS240 version as a guide, when you try this:
+
+\begin{consolethree}[escapeinside=||]
+int * binarysearch(int * start, int * end,
+                   int target)
+{
+    int * left = start;
+    int * right = end;
+    while (left < right)
+    {
+        int * mid = (left + right) / 2;
+        ...
+    }
+}
+\end{consolethree}
+
+you'll see that it does not even compile \ldots{} because you \EMPHASIZE{cannot add pointers}.
+
+\begin{consolethree}[escapeinside=||]
+...
+int * mid = (left |\EMPHASIZE{ +}| right) / 2;
+...
+\end{consolethree}
+
+The solution is to compute the middle pointer in a different way:
+
+\begin{consolethree}[escapeinside=||]
+int * binarysearch(int * start, int * end,
+                   int target)
+{
+    int * left = start;
+    int * right = end;
+    while (left < right)
+    {
+        int * mid = left + (right -- left) / 2;
+        ...
+    }
+}
+\end{consolethree}
+
+The quantity
+
+\verb!(right -- left) / 2!
+
+is half the number of integer from left to just before right. It's slightly less than half if the number of such values is odd. Add this to left would then of course give you the address of the integer in the middle of integers \textbf{\texttt{*left,\ldots,*(right -- 1)}}.
+\begin{python}
+from latextool_basic import *
+p = Plot()
+startx = 0
+for i in range(11):
+    p += Rect(startx, 0, startx + 1, 1, linewidth=0.05)
+    startx += 1
+p += Line(points=[(2.5, -1.5),(2.5, -0.1)], linewidth=0.1, endstyle='>')
+p += Rect(2.5, -1.8, 2.5, -1.8, linewidth=0, label=r'\texttt{left}')
+p += Line(points=[(4.5, -2.5),(4.5, -0.1)], linewidth=0.1, endstyle='>')
+p += Rect(4.5, -2.8, 4.5, -2.8, linewidth=0, label=r'\texttt{left + (right - left) / 2}')
+p += Line(points=[(8.5, -1.5),(8.5, -0.1)], linewidth=0.1, endstyle='>')
+p += Rect(8.5, -1.8, 8.5, -1.8, linewidth=0, label=r'\texttt{right}')
+p += Line(points=[(2.5, 1.5),(4.5, 1.5)], linewidth=0.1, startstyle='>', endstyle='>')
+p += Rect(9, 1.2, 9, 2, linewidth=0, label=r'\texttt{(right - left) / 2}')
+p += Line(points=[(2.5, 2.5),(7.5, 2.5)], linewidth=0.1, startstyle='>', endstyle='>')
+p += Rect(9.5, 2.5, 9.5, 2.5, linewidth=0, label=r'\texttt{right - left}')
+print(p)
+\end{python}
+This middle pointer computation is just like the middle index computation.
+
+From now on you should use the midpoint calculation
+
+\verb!mid = left + (right - left) / 2!
+
+for both middle index and middle pointer computation for binary search.
+
+By the way, in general, there's no reason to compute the difference of
+two addresses other than the address of two values in the same array.
+One last thing: if you want to store the difference of two pointers, you
+need to know that there's a type for pointer differences:
+
+\verb!std::ptrdiff_t d = p -- q;!
+
+You need to \verb!#include <cstddef>! if you want to use
+\texttt{std::ptrdiff\_t}.
+
+\begin{ex}
+Implement the pointer version of bubblesort and
+binary search:
+
+\verb!void bubblesort(int * start, int * end);!
+
+\verb!int * binarysearch(int * start, * end, int target);!
+
+In your \texttt{main()}, get integers \texttt{n}, \texttt{start}, \texttt{end},
+\texttt{target} from the user and then do the following:
+
+\begin{itemize}
+\item
+  Allocate memory for a dynamic integer array of size \texttt{n} and put
+  random integers (from 0..9) into the array.
+\item
+  Print the array.
+\item
+  Bubblesort \texttt{x[start]}, \ldots, \texttt{x[end-1]}.
+\item
+  Print the array.
+\item
+  Perform binary search for \texttt{target} in \texttt{x[start]},
+  \ldots, \texttt{x[end-1]} and print the address and the value at
+  that address.
+\end{itemize}
+\end{ex}
+
+\begin{ex}
+Let \texttt{x} be an integer array of size \texttt{n}.
+Let \texttt{y} be an array of integer pointers where \texttt{y[0]}
+points to \texttt{x[0]}, \texttt{y[1]} points to \texttt{x[1]},
+etc. Write a bubblesort on \texttt{y} so that \texttt{y[0]}, \ldots,
+\texttt{y[n - 1]} each points to a unique values in x and
+\texttt{*y[0] <= *y[1]}, \texttt{*y[1] <= *y[2]}, etc. The values in \texttt{x} are not moved. For instance say
+\texttt{x} is \texttt{\{1, 5, 0\}} (when \texttt{n} = 3). Initially
+\texttt{y[0]} points to \texttt{x[0]}, \texttt{y[1]} points to
+\texttt{x[1]} and \texttt{y[2]} points to \texttt{x[2]}. After
+your bubblesort is done, \texttt{y[0]} points to \texttt{x[2]},
+\texttt{y[1]} points to \texttt{x[0]} and \texttt{y[2]} points to
+\texttt{x[1]}.
+\end{ex}
+
+\newpage\EMPHASIZE{Stack using a dynamic array}
+
+A \EMPHASIZE{stack} is like an array except that it supports the following
+operations:
+
+\begin{itemize}
+\item
+  You can put a value into the stack. This is called \EMPHASIZE{push}. The
+  value you just put into the stack is called the \EMPHASIZE{top} of the
+  stack.
+\item
+  You can remove a value from the stack. The value that is removed is
+  always the last one that was put into the stack. This is called
+  \EMPHASIZE{pop}.
+\item
+  You have access to the number of values in the stack. I'm going to
+  call this the \EMPHASIZE{size} of the stack.
+\item
+  You can also look at the value that is to be popped. I'll call this
+  \EMPHASIZE{peek}. Peeking at a stack returns a copy of the value, it does
+  not remove the top.
+\end{itemize}
+
+Think of a stack of plates at a buffet restaurant: When you add a plate to the stack, that new plate goes on top. When you take a plate, you take the one on top (well \ldots{} usually).
+
+You can implement a stack using a dynamic array. The top of the stack is the value at the last index of the array. If you push a value onto the stack, you will need to enlarge the array by 1. If you pop the stack, you will need to replace the array with another one that is 1 size smaller; of course you need to copy the original values to the new stack (except for the top.)
+
+Pushing the stack is not new, you have actually seen this in an earlier exercise on the \texttt{array\_append()} function.
+
+Stacks are very important and are used in many areas of CS including AI, language processing, etc. A stack should be thought of as a memory device. You can ask the stack ``Hey stack \ldots{} what was the \EMPHASIZE{last thing} I put into you?''
+
+\begin{ex}
+Write a program that implements a stack of integers using dynamic arrays. Test it thoroughly! You can test your stack implementation with the following:
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    int * stack = NULL;
+    int stack_size = 0;
+    println(stack, stack_size); // Get {}
+    push(&stack, &stack_size, 5);
+    println(stack, stack_size); // Get {5}
+    push(&stack, &stack_size, 3);
+    println(stack, stack_size); // Get {5, 3}
+    push(&stack, &stack_size, 9);
+    println(stack, stack_size); // Get {5, 3, 9}
+    int x;
+    x = peek(stack, stack_size);
+    std::cout << x << std::endl; // Get 9
+    println(stack, stack_size); // Get {5, 3, 9}
+    pop(&stack, &stack_size);
+    println(stack, stack_size); // Get {5, 3}
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+There are many ways to implement a stack. Later you'll see that a more efficient way of implementing a stack is to use a \EMPHASIZE{singly linked list}, something that uses pointers.
+
+\newpage\EMPHASIZE{Queue using a dynamic array}
+
+A \EMPHASIZE{queue} is like an array except that it supports the following operations:
+
+\begin{itemize}
+\item
+  You can put a value into a queue. This is called \EMPHASIZE{enqueue}. The
+  value you just put into the queue is called the \EMPHASIZE{back} of the
+  queue.
+\item
+  You can remove a value from the queue. The value that is removed is
+  always the value in the queue that has been in the queue the longest.
+  This is called the \EMPHASIZE{front} of the queue. This operation is
+  called \EMPHASIZE{dequeue}.
+\item
+  You have access to the number of values in the queue. I'm going to
+  call this the \EMPHASIZE{size} of the queue.
+\item
+  You can also look at the value of the front and back of the queue
+  without removing these values. These operations are sometimes called
+  \EMPHASIZE{front} and \EMPHASIZE{back}.
+\end{itemize}
+
+You think of a queue as a line of people in front of a ticket booth: When a person joins a queue, he/she joins it at the back. When the booth is ready to serve the next customer, the person to leave the queue to go to the booth is the one in front of the queue.
+
+You can implement a queue using a dynamic array. The front of the queue is the value at index 0 of the array. The back of the queue is the value at the last index of the array. If you enqueue a value into the queue, you will need to enlarge the array by 1. If you dequeue the stack, you will need to replace the array with another one that is 1 size smaller.
+
+Like stacks, queues are very important and are used in many areas of CS including AI, language processing, etc. A queue should be thought of as a memory device. You can ask the queue ``Hey queue \ldots{} what was the \EMPHASIZE{earliest thing} that you can think of?''
+
+\begin{ex}
+Write a program that implements a queue of integers using dynamic arrays. Test it thoroughly! You can test your queue implementation with the following:
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    int * queue = NULL;
+    int queue_size = 0;
+    println(queue, queue_size); // Get {}
+    enqueue(&queue, &queue_size, 5);
+    println(queue, queue_size); // Get {5}
+    enqueue(&queue, &queue_size, 3);
+    println(queue, queue_size); // Get {5, 3}
+    enqueue(&queue, &queue_size, 9);
+    println(queue, queue_size); // Get {5, 3, 9}
+    int x;
+    x = front(queue);
+    std::cout << x << std::endl; // Get 5
+    x = back(queue, queue_size);
+    std::cout << x << std::endl; // Get 9
+    println(queue, queue_size); // Get {5, 3, 9}
+    dequeue(&queue, &queue_size);
+    println(queue, queue_size); // Get {3, 9}
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+There are many ways to implement a queue. Later you'll see that a more efficient way of implementing a queue is to use a \EMPHASIZE{doubly linked list}, something that uses pointers (and is very similar to singly linked list.)
+
+\newpage\EMPHASIZE{Set using a dynamic array}
+
+A \EMPHASIZE{set} is a container of values where you don't care about the number of times a value occurs and you don't really care about the index position of a value. It supports the following operations:
+
+\begin{itemize}
+\item
+  You can \EMPHASIZE{add} a value to a set. You can put it anywhere you
+  like in your dynamic array. For instance you can put is at the last
+  index position, like the \texttt{array\_append()} function. Since you
+  don't really care how many times a value occurs, if you try to add a
+  value into the set and the set already contains that value, you simply
+  do NOT add the value into the set, i.e., a set does not contain
+  duplicates.
+\item
+  You can \EMPHASIZE{remove} a value from a set. If you attempt to remove a
+  value not in the set, then nothing happens -- the set is unchanged.
+\item
+  You can check if a value is \EMPHASIZE{in} a set. I'll call this
+  \texttt{has\_member()} function.
+\item
+  You have access to the number of values in the set. I'll call this
+  \EMPHASIZE{size}.
+\end{itemize}
+
+You can think of a set also as a memory device except that you don't care about when you started remembering a value.
+
+\begin{ex}
+Write a program that implements a set of integers using dynamic arrays. Test it thoroughly! You can test your set implementation with the following:
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    int * set = NULL;
+    int set_size = 0;
+    println(set, set_size); // Get {}
+    add(&set, &set_size, 5);
+    println(set, set_size); // Get {5}
+    add(&stack, &set_size, 3);
+    println(set, set_size); // Get {5, 3}
+    add(&set, &set_size, 5);
+    println(set, set_size); // Get {5, 3}
+    add(&set, &set_size, 3);
+    println(set, set_size); // Get {5, 3}
+    bool b;
+    b = has_member(set, set_size, 5);
+    std::cout << b << std::endl; // Get 1
+    println(set, set_size); // Get {5, 3}
+    b = has_member(set, set_size, 3);
+    std::cout << b << std::endl; // Get 1
+    println(set, set_size); // Get {5, 3}
+    b = has_member(set, set_size, 2);
+    std::cout << b << std::endl; // Get 0
+    println(set, set_size); // Get {5, 3}
+    remove(&set, &set_size, 3);
+    println(set, set_size); // Get {5}
+    remove(&set, &set_size, 0);
+    println(set, set_size); // Get {5}
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+There are many ways to implement a set. The above is actually not
+efficient. Later you will see that better ways to implement a set
+includes using a balanced tree and a hashtable.
+
+\newpage\EMPHASIZE{Array of pointers and multi-dimensional dynamic arrays}
+
+I want you to think deeply about this
+
+If I do "\verb!int x[10];!" I have a fixed size 1D array x of size 10.
+
+and
+
+If I do "\verb!int * x = new int[10];!" x points to a 1D array of size 10.
+
+\begin{ex}
+Take a deep breath \ldots{} Draw the memory model of
+the following code fragment. Study the code very carefully.
+
+\begin{consolethree}[escapeinside=||]
+int ** p;
+p = new int*[3];
+// Draw a memory model here
+for (int i = 0; i < 3; i++)
+{
+    p[i] = new int[5];
+    // Update memory model
+}
+p[1][1] = 42;
+p[2][3] = 24;
+// Update memory model
+for (int i = 0; i < 3; i++)
+{
+    delete [] p[i];
+    // Update memory model
+}
+// Update memory model
+\end{consolethree}
+
+So what exactly is \texttt{p} pointing to (so to speak?)
+\end{ex}
+
+\begin{ex}
+Take a deep breath \ldots{} Draw the memory model of the following code fragment. Read the code very carefully.
+
+\begin{consolethree}[escapeinside=||]
+int ** p;
+p = new int*[3];
+// Draw a memory model here
+for (int i = 0; i < 3; i++)
+{
+    p[i] = new int[i + 2];
+    // Draw a memory model
+}
+p[1][1] = 42;
+p[2][3] = 24;
+// Update memory model
+for (int i = 0; i < 3; i++)
+{
+    delete [] p[i];
+    // Update memory model
+}
+// Update memory model
+\end{consolethree}
+
+See the power of pointers yet?
+\end{ex}
+
+\newpage\EMPHASIZE{Graphs and social media}
+
+One of the most important structures in CS is the graph. A \EMPHASIZE{directed graph} is just a bunch of dots and arrows between the dots. For instance here's a social media graph:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+john_x, john_y = 4, 1
+sue_x, sue_y = 1, 4
+tom_x, tom_y = 7, 4
+
+p += ellipse(john_x-0.6, john_y-0.4, john_x+0.6, john_y+0.4, linewidth=0.1)
+p += ellipse(sue_x-0.6, sue_y-0.4, sue_x+0.6, sue_y+0.4, linewidth=0.1)
+p += ellipse(tom_x-0.6, tom_y-0.4, tom_x+0.6, tom_y+0.4, linewidth=0.1)
+
+p += Line(points=[(john_x-0.6, john_y), (sue_x, sue_y-0.35)], linewidth=0.1, endstyle='>')
+
+p += Line(points=[(john_x+0.6, john_y), (tom_x, tom_y-0.35)], linewidth=0.1, endstyle='>')
+p += Line(points=[(john_x, john_y+0.3), (tom_x-0.6, tom_y)], linewidth=0.1, startstyle='>')
+
+p += Line(points=[(sue_x+0.6, sue_y), (tom_x-0.6, tom_y)], linewidth=0.1, startstyle='>', endstyle='>')
+
+p += Rect(john_x, john_y, john_x, john_y, label='John', linewidth=0)
+p += Rect(sue_x, sue_y, sue_x, sue_y, label='Sue', linewidth=0)
+p += Rect(tom_x, tom_y, tom_x, tom_y, label='Tom', linewidth=0)
+
+print(p)
+\end{python}
+
+say this represents ``follows the twitters of''. For instance John follows Sue's twitters. In general, nowadays social media type graphs are extremely huge and complex -- and they keep growing. Trying to get information out of social media graphs without computers is impossible. (Obviously information gathered from social media graphs of all types would be extremely valuable.)
+
+One way to represent the above graph is to use a table or spreadsheet like this:
+
+%% \begin{tabular}{llll}
+%% & john & sue & tom \\
+%% john & 0 & 1 & 1 \\
+%% sue & 0 & 0 & 1 \\
+%% tom & 1 & 0 & 0 \\
+%% \end{tabular}
+\begin{python}
+from latextool_basic import table
+print(table([('', 'john', 'sue', 'tom'), ('john', '0', '1', '1'), ('sue', '0', '0', '1'), ('tom', '1', '0', '0')]))
+\end{python}
+
+It's pretty obvious how you should interpret the table. Like I said, in the real world, graphs can be extremely huge. So we need to find a way to put the table into a program and answer interesting questions such as:
+
+\begin{itemize}
+\item
+  Is there a sequence of arrows joining X to Y?
+\end{itemize}
+
+Clearly the table looks like a 2D array!
+\begin{python}
+from latextool_basic import table
+print(table([('0', '1', '1'), ('0', '0', '1'), ('1', '0', '0')]))
+\end{python}
+%% \begin{tabular}{lll}
+%% 0 & 1 & 1 \\
+%% 0 & 0 & 1 \\
+%% 1 & 0 & 0 \\
+%% \end{tabular}
+
+This matrix (a matrix is just a 2D array of numbers) that described a directed graph is called the \EMPHASIZE{adjacency matrix} of the graph.
+
+Of course we need to remember that john has a row and column index of 0, sue has a row and column index of 1, and tom has a row and column index of 2. So we can have an array of strings. Don't forget that strings are character arrays (containing the null character `\textbackslash 0'). So the index-name associate can be described by a 2D array of characters:
+
+\begin{python}
+from latextool_basic import table
+print(table([("\'j\'", "\'o\'", "\'n\'", "'\\textbackslash 0'", '', '', '', '', ''),
+("\'s\'", "\'u\'", "\'e\'", "'\\textbackslash 0'", '', '', '', '', ''),
+("\'t\'", "\'o\'", "\'m\'", "'\\textbackslash 0'", '', '', '', '', ''),
+]))
+\end{python}
+%% \begin{tabular}{llllllllll}
+%% `j' & `o' & `h' & `n' & `\textbackslash 0' & & & & & \\
+%% `s' & `u' & `e' & `\textbackslash 0' & & & & & & \\
+%% `t' & `o' & `m' & `\textbackslash 0' & & & & & & \\
+%% \end{tabular}
+
+In the above, I'm assuming that there are 3 persons in the social media graph and their names are at most 9 characters long (don't forget that you need one character space for the null character.)
+
+Therefore all in all, the space requirement is like this:
+
+\begin{consolethree}[escapeinside=||]
+char name[3][10];
+int matrix[3][3];
+\end{consolethree}
+
+a total of 9 integers and 30 characters. In general, if there are k
+people, then the space requirement is k x k integers and k x 10
+characters (if names have a maximum string length of 9.)
+
+\begin{ex}
+Write a program that will allow you to manage the
+above social media graph, assuming that there will always be only 3
+persons and their names are at most 9 characters long. Your program of
+course should be able to display the names and the social media matrix.
+You should allow the user to change the names and the matrix (but always
+assuming that there are 3 persons in the social media graph.)
+\end{ex}
+
+\begin{ex}
+Now improve on your above program by allowing the user to add
+and delete person(s) from the social media graph.
+\end{ex}
+
+\begin{ex}
+Now improve on your above program so that if a person's name
+has 6 characters, then you use 7 characters for this person.
+Furthermore, your program should allow names of length greater than 9.
+This will save some memory. For instance for tom, you only need 4
+characters for him.
+\end{ex}
+
+\begin{ex}
+Now, how can we save memory for the social media matrix? You see the problem is: If there are k people, then the matrix is made up of k x k integers. Think about this: How many people do you think have a facebook account? It's approximately 1.2 billion. If you use the above 2D array to represent the social media graph in FB, then the matrix needs 1.2 billion x 1.2 billion integers!!! That's 1.44 x 10\textsuperscript{18} integers!!! [HINT: Most people are not friends of everyone in the world. In other words, in a row of a social media adjacency matrix, most of the values are actually 0s.]
+\end{ex}
+
+\begin{ex}
+Path connectivity problem. Now add the following to your program: The user to enter two names, X and Y, and the program prints a sequence of names going X to Y, following the arrows. If possible, print the sequence that is the shortest. [This is not easy! You will probably need \EMPHASIZE{everything} in the notes up to this point!]
+\end{ex}
+
+By the way, in the real world, many graphs are ``bidirectional'':
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+john_x, john_y = 4, 1
+sue_x, sue_y = 1, 4
+tom_x, tom_y = 7, 4
+
+p += ellipse(john_x-0.6, john_y-0.4, john_x+0.6, john_y+0.4, linewidth=0.1)
+p += ellipse(sue_x-0.6, sue_y-0.4, sue_x+0.6, sue_y+0.4, linewidth=0.1)
+p += ellipse(tom_x-0.6, tom_y-0.4, tom_x+0.6, tom_y+0.4, linewidth=0.1)
+
+p += Line(points=[(john_x-0.6, john_y), (sue_x, sue_y-0.35)], linewidth=0.1, startstyle='>', endstyle='>')
+
+p += Line(points=[(john_x+0.6, john_y), (tom_x, tom_y-0.35)], linewidth=0.1, startstyle='>', endstyle='>')
+
+p += Line(points=[(sue_x+0.6, sue_y), (tom_x-0.6, tom_y)], linewidth=0.1, startstyle='>', endstyle='>')
+
+p += Rect(john_x, john_y, john_x, john_y, label='John', linewidth=0)
+p += Rect(sue_x, sue_y, sue_x, sue_y, label='Sue', linewidth=0)
+p += Rect(tom_x, tom_y, tom_x, tom_y, label='Tom', linewidth=0)
+
+print(p)
+\end{python}
+
+In that case, the directed graph diagram is usually drawn like this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+john_x, john_y = 4, 1
+sue_x, sue_y = 1, 4
+tom_x, tom_y = 7, 4
+
+p += ellipse(john_x-0.6, john_y-0.4, john_x+0.6, john_y+0.4, linewidth=0.1)
+p += ellipse(sue_x-0.6, sue_y-0.4, sue_x+0.6, sue_y+0.4, linewidth=0.1)
+p += ellipse(tom_x-0.6, tom_y-0.4, tom_x+0.6, tom_y+0.4, linewidth=0.1)
+
+p += Line(points=[(john_x-0.6, john_y), (sue_x, sue_y-0.35)], linewidth=0.1)
+
+p += Line(points=[(john_x+0.6, john_y), (tom_x, tom_y-0.35)], linewidth=0.1)
+
+p += Line(points=[(sue_x+0.6, sue_y), (tom_x-0.6, tom_y)], linewidth=0.1)
+
+p += Rect(john_x, john_y, john_x, john_y, label='John', linewidth=0)
+p += Rect(sue_x, sue_y, sue_x, sue_y, label='Sue', linewidth=0)
+p += Rect(tom_x, tom_y, tom_x, tom_y, label='Tom', linewidth=0)
+
+print(p)
+\end{python}
+
+where each line represents the fact that the relationship between two dots go both ways. A graph where the lines do not have arrowheads is called an \EMPHASIZE{undirected graph}.
+
+Both directed and undirected graphs appear everywhere in CS and engineering. As long as you have relationships between data, you will have graphs. And they have been around for a very long time -- a family tree is a directed graph. But it's also used in modern scenarios such as social media graphs, a graph of nodes in a computer network, food web, etc.
+
+\newpage\EMPHASIZE{Solutions}
+
+\begin{ex}
+Implement the pointer version of bubblesort and binary search:
+
+\verb!int * bubblesort(int * start, * end)!
+
+\verb!int * binarysearch(int * start, * end, int target)!
+
+In your \texttt{main()}, get integers \texttt{n}, \texttt{start}, \texttt{end}, \texttt{target} from the user and then do the following:
+
+\begin{itemize}
+\item
+  Allocate memory for a dynamic integer array of size \texttt{n}. and put
+  random integers (from 0..9) into the array.
+\item
+  Print the array.
+\item
+  Bubblesort \texttt{x[start]}, \ldots, \texttt{x[end-1]}.
+\item
+  Print the array.
+\item
+  Perform binary search for \texttt{target} in \texttt{x[start]},
+  \ldots, \texttt{x[end-1]} and print the address and the value at
+  that address.
+\end{itemize}
+
+Solution is below. Don't memorize the code. Understand the motivation and intention of bubblesort and binarysearch, implement them using index values, then convert to pointers.
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+// print *start, .., *(end - 1)
+void println(int * start, int * end) // or begin and end
+{
+    for (int * p = start; p < end; ++p)
+    {
+        std::cout << (*p) << ' ';
+    }
+    std::cout << '\n';
+}
+
+// bubblesort *start, .., *(end - 1)
+void bubblesort(int * start, int * end)
+{
+    for (int * q = end - 2; q >= start; --q)
+    {
+        for (int * p = start; p <= q; ++p)
+        {
+            if (*p > *(p + 1))
+            {
+                int t = *p; *p = *(p + 1); *(p + 1) = t;
+            }
+        }
+    }
+}
+
+// binarysearch for target in *start, .., *(end - 1)
+int * binarysearch(int * start, int * end, int target)
+{
+    while (start < end)
+    {
+        int * mid = start + (end - start) / 2;
+        if (*mid == target)
+        {
+            return mid;
+        }
+        else if (*mid > target)
+        {
+            end = mid;
+        }
+        else
+        {
+            start = mid + 1;
+        }
+    }
+    return NULL;
+}
+
+int main()
+{
+    int n, start, end, target;
+    std::cin >> n >> start >> end >> target;
+    int * x = new int[n];
+    for (int i = 0; i < n; ++i)
+    {
+        x[i] = rand() % 10;
+    }
+    print(&x[0], &x[n]);
+    bubblesort(&x[start], &x[end]);
+    print(&x[0], &x[n]);
+    int * p = binarysearch(&x[start], &x[end], target);
+    std::cout << p << ' '
+              << (p != NULL ? *p : -1) << '\n';
+    return 0;
+}
+\end{consolethree}
+\end{ex}
