@@ -1,0 +1,251 @@
+\tinysidebar{\debug{exercises/{test/question.tex}}}
+\begin{ex}
+You are given the following code that declares a 5-by-5 array of characters, initializing it with spaces.
+  
+\begin{consolethree}
+const int ROW_SIZE = 5;
+
+int x[ROW_SIZE][ROWS_SIZE]= {{0}};
+
+// YOUR CODE
+
+for (int row = 0; row < ROW_SIZE; row++)
+{
+     for (int col = 0; col < ROW_SIZE; col++)
+     {
+       std::cout << x[row][col]  << ' ';
+     }
+     std::cout << std::endl;
+}
+
+std::cout << std::endl; 
+\end{consolethree}
+
+Write a for-loop that sets the values on the main diagonal of the array
+to \texttt{'*'}. In other words the output
+should be
+
+\begin{consolethree}
+*
+
+*
+
+*
+
+*
+
+*
+\end{consolethree}
+
+[Hint: See previous example.] Now modify your code so that it
+produces this output:
+
+\begin{consolethree}
+* *
+
+* *
+
+*
+
+* *
+
+* * 
+\end{consolethree}
+
+Of course that tells you that you can use a 2D array to do ASCII art!!! You can think of the 2D array as a drawing canvas. There is a big difference between the ASCII art problems in the notes for loops and using a 2D array. You can draw a star any where you like in the array. On the other hand, ASCII art using only loops and print statements requires you to print on the console window from left-to-right, row-by-row.
+
+There is however a restriction when using arrays for ASCII art: You have to specify the row and column sizes of your array. This is what you can do: You can specify a really huge 2D array (say 1000-by-1000) and then only use part of it for drawing.
+
+\sectionthree{Functions}
+
+Everything is similar to functions for 1-dimensional arrays except for one thing. \textbf{LISTEN UP!!!} When you wrote function prototypes or function headers to be general, instead of writing
+
+\verb!void f(int x[3]);!
+
+we write
+
+\verb!void f(int x[]);!
+
+When declaring a 2D array (of ints or doubles or bools or ...) you \textbf{must specify the size of the second dimension}. For instance this is \textbf{WRONG}
+
+\verb!void f(int x[][]);!
+
+This is \textbf{CORRECT}:
+
+\verb!void f(int x[][42]);!
+
+Here's a simple example:
+
+\begin{consolethree}
+#include <iostream>
+
+const int COL_SIZE = 2;
+
+void print(int x[][COL_SIZE], int numRows)
+{
+     for (int row = 0; row < numRows; row++)
+     {
+          for (int col = 0; col < COL_SIZE; col++)
+          {
+            std::cout << x[row][col] << ' ';
+          }
+     }
+     std::cout << std::endl; // goto next line
+}
+
+int main()
+{
+    int x[2][COL_SIZE];
+
+    x[0][0] = 1;
+    
+    x[0][1] = 2;
+
+    x[1][0] = 3;
+
+    x[1][1] = 4;
+
+    print(x, 2);
+
+    return 0;
+}
+\end{consolethree}
+
+Note that the code now seems to be highly ``nonsymmetric'': you do not have control over the second dimension.
+
+To make the code more symmetric, you might want to do this, especially if you do not need full generality for the first dimension:
+
+\begin{consolethree}
+#include <iostream>
+
+const int ROW_SIZE = 2;
+
+const int COL_SIZE = 2;
+
+void print(int x[ROW_SIZE][COL_SIZE])
+{
+     for (int row = 0; row < ROW_SIZE; row++)
+     {
+          for (int col = 0; col < COL_SIZE; col++)
+          {
+               std::cout << x[row][col] << ' ';
+          }
+     }
+     std::cout << std::endl; // goto next line
+}
+
+int main()
+{
+    int x[ROW_SIZE][COL_SIZE];
+    x[0][0] = 1;
+    x[0][1] = 2;
+    x[1][0] = 3;
+    x[1][1] = 4;
+    print(x);
+    return 0;
+}
+\end{consolethree}
+
+\begin{ex}
+Can you change values in a 2D array through a function? Write a simple program and verify.
+
+``Why do I need to specify the size for the second dimension?''
+
+Why? You have to wait till CISS3 ... oh well ... OK I'll explain.
+
+Suppose you have this code:
+
+\begin{consolethree}
+int x[4][10];
+
+std::cin << x[2][6];
+\end{consolethree}
+
+First of all, our mental picture of the values of array x looks like this:
+
+\begin{align*}
+& & & & & & & & & \\
+& & & & & & & & & \\
+& & & & & & & & & \\
+& & & & & & & & & \\
+& & & & & & & & & \\
+\end{align*}
+
+(i.e., \texttt{x} has 4 rows of 10 integers).
+
+Actually in your computer (at least up to this point in history!), memory is organized in a \textbf{linear} fashion, i.e., \textbf{on a straight line}. So here's a picture of the memory with the part occupied by x shown. I've colored alternate blocks of 10 integers. The location in the computer's memory for
+
+\texttt{x[2][6]} is shown.
+
+\begin{consolethree}[escapeinside=||]
+& & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & \\
+& & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & \\
+\end{consolethree}
+
+How does C++ locate the value in the array that you want? C++ actually only remembers the location of \texttt{x[0][0]}. When you want \texttt{x[2][6]}, C++ computes the position of \texttt{x[2][6]} as an offset from \texttt{x[0][0]}.
+
+Now the location of \texttt{x[2][6]} is
+
+\begin{center}
+2 * 10 + 6
+\end{center}
+
+away from the first value \texttt{x[0][0]}. Right? Once C++ knows the computer memory location of the value you want, it can then retrieve the value or assign a value to that spot.
+
+So ... one more time:
+
+\begin{itemize}
+\tightlist
+\item
+  Values are stored in memory which is organized in a straight line.
+\item
+  For an array, C++ remembers the position of the first element of the array.
+\item
+  If your program needs \texttt{x[i][j]} of an array x, C++ will compute the location of that value by computing it's offset from \texttt{x[0][0]}.
+\end{itemize}
+
+OK. So now look at the above example:
+
+\begin{consolethree}
+int x[20][10];
+
+std::cin << x[2][6];
+\end{consolethree}
+
+If you need \texttt{x[2][6]}, C++ will look at the value that is
+
+\begin{center}
+2 * 10 + 6
+\end{center}
+
+away from \texttt{x[0][0]}. But ... notice something? The offset is
+
+\begin{center}
+2 * 10 + 6
+\end{center}
+
+which depends on 2 and 6 which is provided in your code when you write \texttt{x[2][6]}. But notice that it also depends on ... \textbf{the number 10:}
+\begin{center}
+2 * \textbf{10} + 6
+
+Where does that come from? It's the \textbf{size of the second dimension}
+
+This is the reason why the size of the second dimension must be stated. Otherwise C++ does not know how to access a required value in the 2D array.
+
+\sectionthree{Exercise: tic-tac-toe}
+
+Write a tic-tac-toe program using a 2D array for the board.
+
+\begin{ex}
+Write a function
+
+\begin{consolethree}
+const int n = 3;
+
+void init(char board[n][n]); 
+\end{consolethree}
+that initialization a tic-tao-toe board.. Note your program should have
+a global constant for the board size. That way if we change 3 to another
+size such as 5, you'll get a 5-by-5 tic-tac-toe board. So in your code
+do not assume the board size is 3-by-3.
+\end{ex}

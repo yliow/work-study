@@ -1,19 +1,50 @@
 from latextool_basic import *
 p = Plot()
-p += Rect(0, 0, 13, 6, linewidth=0.05)
-p += Rect(1, 3, 4, 4, linewidth=0.05, label='4')
-p += Rect(4, 3, 8, 4, linewidth=0.05, label='2')
-p += Rect(8, 3, 12, 4, linewidth=0.05, label='42')
-p += Rect(0.5, 3.5, 0.5, 3.5, linewidth=0, label='a')
-p += Rect(0.5, 2, 0.5, 2, linewidth=0, label='x')
-p += Rect(1, 1.5, 4, 2.5, linewidth=0.05, label='4')
+M = r'''
+int x = 0;
 
-p += Rect(8, 7, 12, 8, linewidth=0.05, linecolor='red', label='This is a[0]')
-p += Rect(8, 6, 12, 7, linewidth=0.05, linecolor='red', label='This is a[1]')
-p += Rect(8, 5, 12, 6, linewidth=0.05, linecolor='red', label='This is a[2]')
+std::cin >> x;
 
-p += Line(points=[(8, 7.5), (3, 4)], linecolor='red', linewidth=0.05, endstyle='>')
-p += Line(points=[(8, 6.5), (6, 4)], linecolor='red', linewidth=0.05, endstyle='>')
-p += Line(points=[(10.5, 5), (10, 4)], linecolor='red', linewidth=0.05, endstyle='>')
+if (x > 0)
+
+   std::cout << "spam!" << std::endl;
+
+std::cout << "eggs" << std::endl;
+'''.strip()
+
+points = [(-1.5, 0.72), (-1.5, -0.72), (13.7, -0.72), (13.7, -2.1), (-1.5, -2.1), (-1.5, -3.72), (13.7, -3.72), (13.7, -5.1), (-1.5, -5.1), (-1.5, -6.3), (-0.8, -6.3), (13, -9.7), (13.7, -9.7), (13.7, -11.72), (-1.5, -11.72), (-1.5, -12.72), (-0.8, -12.72)]
+
+p += Line(points = [(-1.5, 0.72), (-1.5, -0.72)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-1.5, -0.72), (-0.8, -0.72)], linewidth = 0.1, endstyle='>', linecolor='red')
+p += Line(points = [(13, -0.72), (13.7, -0.72)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(13.7, -0.72), (13.7, -2.1)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(13.7, -2.1), (-1.5, -2.1)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-1.5, -2.1), (-1.5, -3.72)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-1.5, -3.72), (-0.8, -3.72)], linewidth = 0.1, endstyle='>', linecolor='red')
+p += Line(points = [(13, -3.72), (13.7, -3.72)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(13.7, -3.72), (13.7, -5.1)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(13.7, -5.1), (-1.5, -5.1)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-1.5, -5.1), (-1.5, -6.3)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-1.5, -6.3),(-0.8, -6.3)], linewidth = 0.1, endstyle='>', linecolor='red')
+p += Line(points = [(13, -9), (13.7, -9)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(13.7, -9), (13.7, -11.72)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(13.7, -11.72), (-1.5, -11.72)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-1.5, -11.72), (-1.5, -12.72)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-1.5, -12.72), (-0.8, -12.72)], linewidth = 0.1, endstyle='>', linecolor='red')
+
+p += Line(points = [(2.5, -7.22), (2.5, -8.22)], linewidth=0.1, linecolor='red')
+p += Line(points = [(-0.1, -8.22), (13, -8.22)], endstyle='>', linewidth=0.1, linecolor='red')
+p += Line(points = [(-0.1, -8.22), (-0.1, -9.6)], linewidth=0.1, linecolor='red')
+p += Line(points = [(-0.1, -9.6), (0.45, -9.6)], endstyle='>', linewidth=0.1, linecolor='red')
+p += Line(points = [(12.2, -9.6), (13, -9.6)], endstyle='>', linewidth=0.1, linecolor='red')
+
+p += Rect(-0.8, -1.2, 13, -0.22, linecolor='red', linewidth=0.1, name='b1')
+p += Rect(-0.8, -4.2, 13, -3.22, linecolor='red', linewidth=0.1, name='b2')
+p += Rect(-0.8, -11.2, 13, -5.8, linecolor='red', linewidth=0.1, name='b3')
+p += Rect(0.8, -7.22, 3.5, -6.22, linecolor='red', linewidth=0.1, name='b4')
+p += Rect(0.45, -10.2, 12.2, -9.22, linecolor='red', linewidth=0.1, name='b5')
+p += Rect(-0.8, -13.2, 13, -12.22, linecolor='red', linewidth=0.1, name='b6')
+code(p, M, x=0, y=0, height=1.5, width=0.33, border_linewidth=0.01, innersep=0.8)
+
 print(p)
 
