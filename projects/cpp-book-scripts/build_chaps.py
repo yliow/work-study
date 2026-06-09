@@ -2,6 +2,7 @@
 moves requisite files to compile individual chapters
 should be executed AFTER extract_exercises.py and split_chapters.py
 '''
+
 import os
 
 #constants
@@ -10,11 +11,12 @@ thispre = 'thispreamble.tex'
 thispost = 'thispostamble.tex'
 thispack = 'thispackages.tex'
 thistitle = 'thistitle.tex'
-latexcirc = 'latexcircuit.py'
-latextool = 'latextool_basic.py'
 make = 'makefile'
-compilation_files = [thismac, thispre, thispost, thispack, thistitle, latexcirc, latextool, make]
+#already installed on vm, not needed
+# latexcirc = 'latexcircuit.py'
+# latextool = 'latextool_basic.py'
 
+compilation_files = [thismac, thispre, thispost, thispack, thistitle, make]
 
 #dirs
 dir_ = os.getcwd()
@@ -31,3 +33,9 @@ for chaps in f:
   #copy necessary files to book directory
   for file_ in compilation_files:
     os.system('cp %s %s' % (dir_ + '/' + file_, bookdir))
+  
+  #create a proper "main.tex" for the chapter
+  with open(bookdir + 'main.tex', 'w') as mtex:
+    mtex.write(r'\input{thispreamble.tex}')
+    mtex.write(r'\input{../chap.tex}')    
+    mtex.write(r'\input{thispostamble.tex}')

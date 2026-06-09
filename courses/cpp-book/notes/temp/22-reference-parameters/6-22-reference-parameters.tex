@@ -3,7 +3,29 @@ from solutions import *; clear()
 \end{python0}
 \sectionthree{More examples}
 
-\input{temp/22-reference-parameters/exercises/7-22-reference-parameters/question.tex}\sidenote
+<<<<<<< HEAD
+\input{../exercises/7-22-reference-parameters/question.tex}\sidenote
+=======
+\begin{ex}
+Can you create a reference that refers to a reference?
+
+\begin{consolethree}[escapeinside=||]
+double i = 3.14;
+double & j = i;
+double & k = j; // k references j which references i
+
+i = 2.718;
+std::cout << i << ' ' << j << ' ' << k << std::endl;
+
+j = 1.414;
+std::cout << i << ' ' << j << ' ' << j << std::endl;
+
+k = 0.693;
+std::cout << i << ' ' << j << ' ' << j << std::endl;
+\end{consolethree}
+\end{ex}
+\sidenote
+>>>>>>> parent of 3043c95 (.)
 {
 \begin{tikzpicture}
     \node[draw,text width=4cm,minimum height=4cm,minimum width=2cm, line width=0.1cm, inner sep=0.3cm] (a) at (-4, 2) {};
@@ -25,7 +47,40 @@ from solutions import *; clear()
 }
 Here's the relevant rule: \EMPHASIZE{A reference can refer to another reference}. In other words, a reference variable can reference a variable or it can reference another reference variable.
 
-\input{temp/22-reference-parameters/exercises/8-22-reference-parameters/question.tex}
+<<<<<<< HEAD
+\input{../exercises/8-22-reference-parameters/question.tex}
+=======
+\begin{ex}
+What is the output?
+
+\begin{consolethree}[escapeinside=||]
+void f(int & a, double c)
+{
+    a = a + int(c);
+    c = 1.0;
+}
+
+void g(int & b, double & c)
+{
+    b *= 2 + int(c);
+    c = 0.0;
+    f(b, c);
+}
+
+int main()
+{
+    int x = 42;
+    double y = 3.14;
+    g(x, y);
+    std::cout << x << ' ' << y << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+(Suggestion: Drawing a memory model might help.)
+\end{ex}
+
+>>>>>>> parent of 3043c95 (.)
 Here's another rule: \EMPHASIZE{References must be initialized. Once you declare a reference, it must immediately refer to the memory of another variable}. Try this:
 
 \begin{consolethree}[escapeinside=||]
@@ -34,17 +89,184 @@ int & j; // create a reference variable ...
 j = i;   // ... and *then* make the reference
 \end{consolethree}
 
-\input{temp/22-reference-parameters/exercises/9-22-reference-parameters/question.tex}
+<<<<<<< HEAD
+\input{../exercises/9-22-reference-parameters/question.tex}
 Yet another rule: \EMPHASIZE{Variable references must be initialized to variables or another reference (not an expression)} (This one is kind of obvious.) Here's an example:
 
-\input{temp/22-reference-parameters/exercises/10-22-reference-parameters/question.tex}
+\input{../exercises/10-22-reference-parameters/question.tex}
 Rules, rules, rules ... \EMPHASIZE{The type of a reference must match the type it's referring to}.
 
-\input{temp/22-reference-parameters/exercises/11-22-reference-parameters/question.tex}
-\input{temp/22-reference-parameters/exercises/12-22-reference-parameters/question.tex}
-\input{temp/22-reference-parameters/exercises/13-22-reference-parameters/question.tex}
-\input{temp/22-reference-parameters/exercises/14-22-reference-parameters/question.tex}
-\input{temp/22-reference-parameters/exercises/15-22-reference-parameters/question.tex}
+\input{../exercises/11-22-reference-parameters/question.tex}
+\input{../exercises/12-22-reference-parameters/question.tex}
+\input{../exercises/13-22-reference-parameters/question.tex}
+\input{../exercises/14-22-reference-parameters/question.tex}
+\input{../exercises/15-22-reference-parameters/question.tex}
+=======
+\begin{ex}
+Does this work?
+
+\begin{consolethree}[escapeinside=||]
+int i = 5;
+int & j = i + 1;
+\end{consolethree}
+
+Or this?
+
+\begin{consolethree}[escapeinside=||]
+int i = 5;
+int k = 6;
+int & j = i + k;
+\end{consolethree}
+
+Why?
+\end{ex}
+
+Yet another rule: \EMPHASIZE{Variable references must be initialized to variables or another reference (not an expression)} (This one is kind of obvious.) Here's an example:
+
+\begin{ex}
+Of course you know that you can do this:
+
+\begin{consolethree}[escapeinside=||]
+double x = 3.14;
+int y = x;
+\end{consolethree}
+
+What about this:
+
+\begin{consolethree}[escapeinside=||]
+double x = 3.14;
+int & y = x;
+\end{consolethree}
+\end{ex}
+
+Rules, rules, rules ... \EMPHASIZE{The type of a reference must match the type it's referring to}.
+
+\begin{ex}
+What is the output? (Or find the errors).
+
+\begin{consolethree}[escapeinside=||]
+void swap(int & b, int & c)
+{
+    int t = b;
+    b = c;
+    c = t;
+}
+
+int main()
+{
+    int x = 42;
+    double y = 1.234;
+    swap(x, y);
+    std::cout << x << ' ' << y << std::endl;
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+What is the output? (Or is there an error?)
+
+\begin{consolethree}[escapeinside=||]
+void g(double & b, double & c)
+{
+    b *= 2 + int(c);
+    c = 0.0;
+}
+
+int main()
+{
+    int x = 42;
+    double y = 3.14;
+    g(x, y);
+    std::cout << x << ' ' << y << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+(Suggestion: Drawing a memory model might help.)
+\end{ex}
+
+\begin{ex}
+You now know this works:
+
+\begin{consolethree}[escapeinside=||]
+int i = 0;
+int & a = i;
+\end{consolethree}
+
+What about the following?
+
+\begin{consolethree}[escapeinside=||]
+int i = 0;
+const int & a = i;
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+const int i = 0;
+const int & a = i;
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+const int i = 0;
+int & a = i;
+\end{consolethree}
+
+Try all of them. Give a reason for those that does not work. For those that work, can you change the value of \texttt{i} using \texttt{i}?
+
+\verb!i = 42;!
+
+Can you change the value of \texttt{i} using \texttt{a}?
+
+\verb!a = 42;!
+
+Why?
+\end{ex}
+
+\begin{ex}
+What is the output? (Or find all the errors).
+
+\begin{consolethree}[escapeinside=||]
+void g(const int & b, const double & c)
+{
+    b *= 2 + c;
+    c = 0.0;
+    f(b, c);
+}
+
+int main()
+{
+    const int x = 42;
+    double y = 3.14;
+    g(x, y);
+    std::cout << x << ' ' << y << std::endl;
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+What is the output? (Or find all the errors).
+
+\begin{consolethree}[escapeinside=||]
+void g(int & b, const double & c)
+{
+    b *= 2 + c;
+    c = 0.0;
+    f(b, c);
+}
+
+int main()
+{
+    const int x = 42;
+    double y = 3.14;
+    g(x, y);
+    std::cout << x << ' ' << y << std::endl;
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+>>>>>>> parent of 3043c95 (.)
 As mentioned before, a variable reference must reference a variable (or another reference). One exception is that \EMPHASIZE{a constant reference can refer to a constant}. Try this:
 
 \verb!const int & i = 5;!
@@ -78,8 +300,52 @@ std::cout << x << ' ' << y << '\n'
 y = -1; // changing x using y ... BAD!!!
 \end{consolethree}
 
-\input{temp/22-reference-parameters/exercises/16-22-reference-parameters/question.tex}
-\input{temp/22-reference-parameters/exercises/17-22-reference-parameters/question.tex}
+<<<<<<< HEAD
+\input{../exercises/16-22-reference-parameters/question.tex}
+\input{../exercises/17-22-reference-parameters/question.tex}
+=======
+\begin{ex}
+What is the output? (Or find the error)
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int f(int x[], int & len)
+{
+    int p = 1;
+    for (int i = 0; i < len; i++)
+    {
+        p *= x[i];
+    }
+    return p;
+}
+
+int main()
+{
+    int a[] = {1, 2, 3};
+    std::cout << f(a, 3) << std::endl;
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+After declaring a reference can the reference change the variable it's referring to? Does = work?
+
+\begin{consolethree}[escapeinside=||]
+int x = 1;
+int y = 2;
+int & z = x; // make z refer to x
+z = 0;
+std::cout << x << ' ' << y << ' ' << z << std::endl;
+
+z = y; // make z refer to y ... can we?
+z = -1;
+std::cout << x << ' ' << y << ' ' << z << std::endl;
+\end{consolethree}
+\end{ex}
+
+>>>>>>> parent of 3043c95 (.)
 Here the rule: \EMPHASIZE{a reference variable cannot refer to another variable after it's initialization.}
 
 

@@ -40,7 +40,7 @@ for chap in chap_list:
       for line in file_:
         if r'\newpage\EMPHASIZE' in line:
           #check against empty content list to prevent blank first section 
-          if len(content) and (r'\newpage\EMPHASIZE' in line or r'\sectionthree' in line):
+          if len(content) and r'\newpage\EMPHASIZE' in line:
             sections.append(content)
             content = []
             content.append(line.replace(r'\newpage\EMPHASIZE', r'\sectionthree'))
@@ -50,7 +50,6 @@ for chap in chap_list:
           content.append(line)
           
     print("CHAPTER %s SECTIONS LENGTH = " % chap, len(sections))
-    
     #change this into a directory format with section nums being under the chapter name in temp, then switch references of temp to "chapters" to retain consistency
     if not (os.path.exists(dir_ + '/temp')):
       os.system('mkdir temp')
@@ -82,7 +81,7 @@ for chap in chap_list:
       k += 1
       
       #write sections to chap.tex file
-      with open(dir_ + '/temp/' + chap + '/main.tex', 'w') as chaptex:
+      with open(dir_ + '/temp/' + chap + '/chap.tex', 'w') as chaptex:
         for entry in sections_list:
           chaptex.write("\input{%s}\n" % ('temp/' + chap + '/' + entry) )
 

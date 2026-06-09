@@ -173,18 +173,7 @@ private:
 \verb!signup_date! calls \verb!Date::Date(const Date &)!, i.e., the
 copy constructor explicitly.
 
-\begin{ex} Add a \verb!get_signup_date()! method to the above
-class that does the obvious. Test your code with
-\begin{console}
-int main()
-{   
-    ClubMember john(42, Date(2015, 1, 1));
-    john.get_signup_date().print();
-    return 0;
-}
-\end{console}
-\end{ex}
-\newpage\EMPHASIZE{Member destructor}
+\input{../exercises/0-69-object-members/question.tex}\newpage\EMPHASIZE{Member destructor}
 
 Let's look at what happens with member destructors.
 Consider this example:
@@ -256,98 +245,7 @@ destructor, then the order of destructor calls for members is:
 Putting object(s) inside an object is called \EMPHASIZE{composition}.
 That's one method of software re-use. There's also another type of software re-use in object-oriented programming called \EMPHASIZE{inheritance}. You'll see that in many cases (but not all cases), composition is better than inheritance.
 
-\begin{ex}
-Complete the following circle class
-\begin{console}
-// Circle.h
-class Circle
-{     
-public: 
-       Circle(int x0, int y0, int r0);
-
-       void move(int dx, int dy)
-       {
-           x_ += dx; y_ += dy;
-       }
-       
-       void print() const;
-
-private:
-        int x_, y_, r_;
-}; 
-\end{console}
-\begin{console}
-// Circle.cpp
-void Circle::print() const
-{
-std::cout << "center: (" << x_ << ", " << y_
-          << ")" << ", radius:" << r_ << '\ n';
-}
-
-// Add other method definitions here
-\end{console}
-
-And test it with this program:
-\begin{console}
-int main()
-{   
-    Circle c(10, 10, 5);
-    c.print();
-    for (int i = 0; i < 10; i++)
-    {   
-        c.move(2, 3);
-        c.print();
-    }
-    return 0;
-}
-\end{console}
-
-Now finish the following class:
-\begin{console}
-class vec2i
-{
-public:
-        // constructor
-        // operator +=
-        // operator<<
-private:
-        int x_, y_;
-};
-\end{console}
-
-And rewrite your circle class:
-\begin{console}[commandchars=\~\@\$]
-class Circle
-{
-public:
-        Circle(~EMPHASIZE@const vec2i & v$, int r0);
-        void move(~EMPHASIZE@const vec2i & v$) { ... }
-        void print(~EMPHASIZE@const vec2i & v$) { ... }
-
-private:
-        ~EMPHASIZE@vec2i center_;$
-        int r_;
-}; 
-\end{console}
-
-And test it with this program:
-\begin{console}
-int main()
-{   
-    Circle c(vec2i(10, 10), 5);
-    c.print();
-    vec2i v(2, 3);
-    for (int i = 0; i < 10; i++)
-    {   
-        c.move(v);
-        c.print();
-    }
-    
-    return 0;
-}
-\end{console}
-\end{ex}
-
+\input{../exercises/1-69-object-members/question.tex}
 \newpage\EMPHASIZE{Delegation}
 
 The following is a common practice:
@@ -423,81 +321,4 @@ Maybe have this instead:
 
 In fact some experts say there should be at most one ``\texttt{.}''
 
-\begin{ex} Complete the following class
-
-\begin{console}
-class TicTacToe
-{
-public:
-        // constructor TicTacToe(int size):
-        // initialize board to point size-by-size
-        // chars of and set chars to ' '
-
-        // copy constructor
-
-        // destructor
-
-        // set(int i, int j, char c): board[i][j] = c
-
-        // get(int i, int j): return board[i][j]
-
-        // operator<<
-
-private:
-        int size;
-        char * board;
-};
-\end{console}
-
-Test it with this:
-
-\begin{console}
-int main()
-{   
-    TicTacToe ttt(3);
-    ttt.set(0, 0, 'X');
-    ttt.set(1, 1, 'X');
-    ttt.set(2, 2, 'O');
-
-    std::cout << ttt << std::endl;
-
-    return 0;
-}
-\end{console}
-
-Now rewrite the \texttt{TicTacToe} class so that it uses a class that
-models pointers to arrays of \texttt{chars}:
-
-\begin{console}
-class CharDynArr
-{
-public:
-        // constructor CharDynArr(int size):
-        // initialize p to point to char[size]
-        // array is not initialized.
-
-        // copy constructor
-
-        // destructor
-
-        // operator[] does the obvious thing
-
-private:
-        int size;
-        char * p;
-};
-\end{console}
-
-Now modify your \texttt{TicTacToe} class to use the above
-
-\begin{console}[commandchars=\~\@\$]
-class TicTacToe
-{
-public:
-        ...
-private:
-        int size;
-        ~EMPHASIZE@CharDynArr board; $
-};
-\end{console}
-\end{ex}
+\input{../exercises/2-69-object-members/question.tex}

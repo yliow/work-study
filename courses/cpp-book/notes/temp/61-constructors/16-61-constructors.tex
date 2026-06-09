@@ -74,10 +74,183 @@ private:
 };
 \end{consolethree}
 
-\input{temp/61-constructors/exercises/25-61-constructors/question.tex}
-\input{temp/61-constructors/exercises/26-61-constructors/question.tex}
-\input{temp/61-constructors/exercises/27-61-constructors/question.tex}
-\input{temp/61-constructors/exercises/28-61-constructors/question.tex}
-\input{temp/61-constructors/exercises/29-61-constructors/question.tex}
-\input{temp/61-constructors/exercises/30-61-constructors/question.tex}
+<<<<<<< HEAD
+\input{../exercises/25-61-constructors/question.tex}
+\input{../exercises/26-61-constructors/question.tex}
+\input{../exercises/27-61-constructors/question.tex}
+\input{../exercises/28-61-constructors/question.tex}
+\input{../exercises/29-61-constructors/question.tex}
+\input{../exercises/30-61-constructors/question.tex}
+=======
+\begin{ex}
+Here's a program that uses the above class. Trace the
+program by hand. Draw a picture of the memory during execution. What is
+the output?
+
+\begin{consolethree}[escapeinside=||]
+// What must you #include?
+
+void f()
+{
+    IntPointer p(42);
+    IntPointer q(p);
+    std::cout << q.dereference() << '\n';
+    // memory leak here
+}
+
+int main()
+{
+    f();
+
+    return 0;
+}
+\end{consolethree}
+
+Check your trace by completing the above code and running it. Can you
+explain why there's a memory leak?
+\end{ex}
+
+\begin{ex}
+To make the above object more like a pointer, modify
+the \texttt{dereference} method:
+
+\begin{consolethree}[escapeinside=||]
+int operator*() //change dereference to this
+{
+    return *p_;
+}
+\end{consolethree}
+
+and in \texttt{f} change the call to \texttt{dereference()} to \texttt{*}:
+
+\begin{consolethree}[escapeinside=||]
+void f()
+{
+    IntPointer q(42);
+    std::cout << *q << '\n'; //*q = q.operator*()
+}
+\end{consolethree}
+
+Run the program again.
+\end{ex}
+
+\begin{ex}
+However this does not work:
+
+\begin{consolethree}[escapeinside=||]
+void f()
+{
+    ...
+    std::cout << *q << '\n';
+    *q = 1024;                  // YIKES
+    std::cout << *q << '\n';
+    ...
+}
+\end{consolethree}
+
+Compile and read the error message - remember it! It seems that getting
+\texttt{*q} works but modifying \texttt{*q} does not work.
+\end{ex}
+
+\begin{ex}
+To correct it, change \texttt{operator*} to this:
+
+\begin{consolethree}[escapeinside=||]
+int & operator*()
+{
+    return *p_;
+}
+\end{consolethree}
+
+Compile and run. Remember this fix!
+\end{ex}
+
+\begin{ex}
+Now add a line of code to deallocate memory so that
+there's no memory leak. It's still a problem that we have to deallocate
+memory before object \texttt{q} dies (i.e., goes out of scope). We might
+forget!!! Later you will see that you can tell the object to
+automatically invoke a very special method just before the object dies.
+\end{ex}
+
+\begin{ex}
+Note that I have overwritten the default copy
+constructor:
+
+\begin{consolethree}[escapeinside=||]
+class IntPointer
+{
+public:
+    ...
+    IntPointer(const IntPointer & intptr)
+        : p_(new int)
+    {
+        *p_ = *(intptr.p_);
+    }
+    ...
+};
+\end{consolethree}
+
+Draw a memory model of what happens when you use this copy constructor,
+for instance, like this:
+
+\begin{consolethree}[escapeinside=||]
+...
+int main()
+{
+    IntPointer p(42);
+    IntPointer q = p; // calls copy constructor
+    return 0;
+}
+\end{consolethree}
+
+Check the definition of the default copy constructor. It copies values
+memberwise., i.e., the default copy constructor works like this:
+
+\begin{consolethree}[escapeinside=||]
+class IntPointer
+{
+public:
+    ...
+    IntPointer(const IntPointer & intptr)
+        : p_(intptr.p_)
+    {}
+    ...
+};
+\end{consolethree}
+
+What is the difference between this copy constructor (the default
+provided by the compiler if you do not have one) and the one that I
+wrote? (Hint: Draw a picture).
+
+Now, what if I deallocate while using the default copy constructor?
+
+\begin{consolethree}[escapeinside=||]
+class IntPointer
+{
+public:
+    ...
+    IntPointer(const IntPointer & intptr)
+        : p_(intptr.p_)
+    {}
+    ...
+};
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+...
+int main()
+{
+    IntPointer p(42);
+    IntPointer q = p;
+    q.deallocate();
+    p.deallocate();
+    return 0;
+}
+\end{consolethree}
+
+Why?
+\end{ex}
+
+>>>>>>> parent of 3043c95 (.)
 

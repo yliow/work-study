@@ -3,11 +3,22 @@ from solutions import *; clear()
 \end{python0}
 \sectionthree{Example: Cellular automata}
 
-In an earlier chapter, I talked about the concept of cellular automata. Now that we know functions, let's rewrite and clean up the code using functions. I'll repeat the information of cellular automata here so you don't have to look for the info from that earlier chapter.
+In an earlier chapter, I talked about the concept of cellular automata.
+Now that we know functions, let's rewrite and clean up the code using
+functions. I'll repeat the information of cellular automata here so you
+don't have to look for the info from that earlier chapter.
 
-A \textbf{cellular automata (CA)} is simply a grid of values where the value at a point in the grid can change its value. The way such a value v changes depends on the values near v.
+A \textbf{cellular automata (CA)} is simply a grid of values where the
+value at a point in the grid can change its value. The way such a value
+v changes depends on the values near v.
 
-CAs are studied in math, CS, physics, biology, social science, etc. You name it. They can be as practical as image processing where they are used to remove noise from images to create cleaner images. Yet they can be as abstract and complex as you like -- they appear in AI, dynamical systems, and chaos theory. You can find lots of information about cellular automata on the web -- go ahead and check out the CA entry at wikipedia.
+CAs are studied in math, CS, physics, biology, social science, etc. You
+name it. They can be as practical as image processing where they are
+used to remove noise from images to create cleaner images. Yet they can
+be as abstract and complex as you like -- they appear in AI, dynamical
+systems, and chaos theory. You can find lots of information about
+cellular automata on the web -- go ahead and check out the CA entry at
+wikipedia.
 
 Let me be more specific by looking at a simple example. Suppose we look at a 1-dimensional CA with these values:
 \begin{center}
@@ -264,6 +275,124 @@ void print_n_generations(int n)
 
 Much cleaner right?
 
-\input{temp/20-array-parameters/exercises/19-20-array-parameters/question.tex}
-\input{temp/20-array-parameters/exercises/20-20-array-parameters/question.tex}
-\input{temp/20-array-parameters/exercises/21-20-array-parameters/question.tex}
+<<<<<<< HEAD
+\input{../exercises/19-20-array-parameters/question.tex}
+\input{../exercises/20-20-array-parameters/question.tex}
+\input{../exercises/21-20-array-parameters/question.tex}
+=======
+\begin{ex}
+Keep running your ca above. When will the values of the ca start to repeat? What is the state (the values) of your ca that first gets repeated (you get a cycle)? How many time steps for the first repeat? (I hope it's obvious that the state of your ca will repeat!!!)
+\end{ex}
+
+\begin{ex}
+Now change the initial state (i.e., the intial values) of your ca. For instance instead of a 1 in the middle, try three 1s in the middle, try 1,0,1,0,1,0,\ldots, try all 1s, etc. For each initial state, figure out shortest time for a first repeat. Print out your results. Which initial state of your ca will give you the longest cycle? How would you do this systematically? In other words, how would you write a program to go through ALL possible initial states for your ca? [Challenging: Read the section on BINARY NUMBERS]
+\end{ex}
+
+\begin{ex}
+Find a way to iterate through all possible sets of CA rules. For each set of rules, find the number of steps for the ca to repeat itself. [Challenging: Read the section on BINARY NUMBERS]
+\begin{ex}
+
+\textbf{BINARY NUMBERS}: Recall that a number such as 1425 is just 1*1000 + 4*100 + 2*10 + 5. You can extract the 1, 4, 2, and 5 from 1425 by using integer division / and integer mod \%. This is viewing an integer ``written in base 10''. If I give you 1,0,1 or any sequence of zeroes and ones, then it's sometimes convenient to convert that into a single integer. For instance you can convert 1,0,1 into 5 using ``binary representation'' -- I'll explain the conversion in a bit. But first, why would you want to do that? Well, compare this
+
+\begin{console}
+int a = 1, b = 0, c = 1; // 1,0,1
+
+if (a == 1 && b == 0 && c == 1)
+
+{
+
+...
+
+}
+\end{console}
+with this:
+\begin{console}
+int d = 5;
+
+if (d == 5)
+
+{
+
+...
+
+}
+\end{console}
+Clearly the second code fragment is simpler. Also, because you are
+comparing a single integer value, you can use a switch:
+\begin{console}
+switch (d)
+
+{
+
+case 5:
+
+. . .
+
+break;
+}
+\end{console}
+
+But what is a nice way to convert 1,0,1 to an integer? You use the same idea as base 10 representation of numbers:
+
+\begin{consolethree}[escapeinside=||]
+1,0,1 |$\rightarrow$| 1*4 + 0*2 + 1*1
+\end{consolethree}
+
+i.e., instead of powers of 10, you use powers of 2!!! Here's another example:
+
+\begin{consolethree}[escapeinside=||]
+10111 |$\rightarrow$| 1*16 + 0*8 + 1*4 + 1*2 + 1*1 = 23
+\end{consolethree}
+
+In the case of our CA, the three ``bits'' determining how to change a bit can be converted to an integer. The rules:
+
+\begin{consolethree}[escapeinside=||]
+000 |$\rightarrow$| 0
+
+001 |$\rightarrow$| 1
+
+010 |$\rightarrow$| 0
+
+011 |$\rightarrow$| 1
+
+100 |$\rightarrow$| 1
+
+101 |$\rightarrow$| 0
+
+110 |$\rightarrow$| 1
+
+111 |$\rightarrow$| 0
+\end{consolethree}
+
+if you convert the 0s and 1s on the left to base 10 numbers, becomes
+
+\begin{consolethree}[escapeinside=||]
+0 |$\rightarrow$| 0
+
+1 |$\rightarrow$| 1
+
+2 |$\rightarrow$| 0
+
+3 |$\rightarrow$| 1
+
+4 |$\rightarrow$| 1
+
+5 |$\rightarrow$| 0
+
+6 |$\rightarrow$| 1
+
+7 |$\rightarrow$| 0
+\end{consolethree}
+
+Coding involving the bits (such as 101) instead of base 10 numbers (such as 5) is clearly going to be more tedious.
+
+\begin{ex}
+The above converts a bunch of bits into a regular
+integer. What about the opposite? How would you convert an integer into
+bits? Of course the conversion process are compatible: From 101 you get
+5 and your process for convert an integer back to bits must convert 5 to
+101. Also, the bits 10111 is converted to 23 and your process must
+convert 23 back to 10111.
+\end{ex}
+
+>>>>>>> parent of 3043c95 (.)
