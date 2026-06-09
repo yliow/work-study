@@ -8,7 +8,25 @@
 
 \newpage\EMPHASIZE{Function Prototypes}
 
-\input{../exercises/0-21-function-prototypes/question.tex}
+\begin{ex}
+What's wrong with the program. You have 2 seconds.
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int main()
+{
+    f(1);
+    return 0;
+}
+
+void f(int x)
+{
+    std::cout << x << std::endl;
+}
+\end{consolethree}
+Correct it. Verify with C++.
+\end{ex}
+
 Now try this:
 
 \begin{consolethree}[escapeinside=||]
@@ -113,9 +131,77 @@ int sum(int start, int end, int step)
 }
 \end{consolethree}
 
-\input{../exercises/1-21-function-prototypes/question.tex}
-\input{../exercises/2-21-function-prototypes/question.tex}
-\input{../exercises/3-21-function-prototypes/question.tex}
+\begin{ex}
+Write a function prototype for the given function. Run the
+program to make sure it works.
+
+\begin{consolethree}[escapeinside=||]
+// put prototype of isNiceNumber() here
+
+int main()
+{
+    std::cout << isNiceNumber(1) << std::endl;
+    std::cout << isNiceNumber(42) << std::end;
+}
+
+bool isNiceNumber(int x)
+{
+    return (x == 42);
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Write a function prototype for the given function. Run the
+program to make sure it works.
+\begin{consolethree}[escapeinside=||]
+// put prototype for predictGoogleStockPrice here
+
+int main()
+{
+    std::cout << predictGoogleStockPrice(1, 1, 2008)
+              << '\n'
+              << "don't count on it ..."
+              << std::endl;
+    return 0;
+}
+
+int predictGoogleStockPrice(int mth, int day, int yr)
+{
+    if (yr >= 2004)
+    {
+        return 450 * (yr - 2004)
+               + (mth % 2) * (day - 2);
+    }
+    else
+    {
+        return 0;
+    }
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Write a function that accepts an array x of integers and an
+integer i, computes and returns the sum of values in an array from index
+position 0 to index position i.
+\begin{consolethree}[escapeinside=||]
+// put prototype here
+
+int main()
+{
+    int x[10] = {0, 2, 4, 6, 8, 1, 3, 5, 7, 9};
+    for (int i = 0; i < 10; i++)
+    {
+        std::cout << sum(x, i);
+    }
+    return 0;
+}
+
+// put function definition (actual function) here
+\end{consolethree}
+\end{ex}
+
 Now you might ask: ``Why bother? Why not just put the function
 \texttt{f()} before \texttt{main()}?''
 
@@ -301,7 +387,78 @@ p += Rect(x0=3.2, y0=-2.1, x1=5.3, y1=-1.5, label=r'{\small \texttt{func2()}}', 
 print(p)
 \end{python}
 
-\input{../exercises/4-21-function-prototypes/question.tex}
+\begin{ex}
+Rewrite the following program using function prototypes and
+moving the function bodies below \texttt{main()} and making all constants
+global to remove duplicate constants declarations.
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void printRules()
+{
+    const int MIN_HEADS = 2;
+    const int MAX_HEADS = 10;
+    std::cout << "To join MENSA you need at least "
+              << MIN_HEADS << " and at most "
+              << MAX_HEADS << std::endl;
+    return;
+}
+
+int getHeads()
+{
+    int heads;
+    std::cout << "How many heads to you have? ";
+    std::cin >> heads;
+    return heads;
+}
+
+bool passMinTest(int heads)
+{
+    const int MIN_HEADS = 2;
+    if (heads < MIN_HEADS)
+    {
+        std::cout << "Too few! Try again!"
+                  << std::endl;
+        return false;
+    }
+    else
+        return true;
+}
+
+bool passMaxTest(int heads)
+{
+    const int MAX_HEADS = 10;
+    if (heads > MAX_HEADS)
+    {
+        std::cout << "Don't show off! Try again!"
+                  << std::endl;
+        return false;
+    }
+    else
+        return true;
+}
+
+bool passTest(int x)
+{
+    return passMinTest(x) && passMaxTest(x);
+}
+
+int main()
+{
+    int heads = 0;
+    printRules();
+    heads = getHeads();
+    while (!passTest(heads))
+    {
+        heads = getHeads();
+    }
+    std::cout << "OK. You can join MENSA."
+              << std::endl;
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
 Now for the second reason ...
 
 \newpage\EMPHASIZE{Header Files and Multi-file Compilation}
@@ -656,7 +813,26 @@ print(p)
 \end{python}
 To learn more about issues like machine code (in the file \texttt{testmax.exe}) you need to take CISS360 (Assembly Language andComputer Systems.)
 
-\input{../exercises/5-21-function-prototypes/question.tex}
+\begin{ex}
+Add a \texttt{min()} function to \texttt{mymath.cpp}, add
+a function prototype for \texttt{min()} in \texttt{mymath.h}. Finally modify
+your \texttt{main()} as follows:
+\begin{consolethree}[escapeinside=||]
+// testmax.cpp
+
+#include <iostream>
+#include "mymath.h"
+
+int main()
+{
+    std::cout << max(3, 5) << std::endl;
+    std::cout << min(3, 5) << std::endl;
+    return 0;
+}
+\end{consolethree}
+Run the program.
+\end{ex}
+
 So what have we done?
 
 In our previous example I told you that a function prototype for
@@ -733,7 +909,13 @@ p += Rect(x0=3.5, y0=-1.2, x1=5, y1=-0.6, label=r'{\tt mymath.h}', linewidth=0)
 print(p)
 \end{python}
 
-\input{../exercises/6-21-function-prototypes/question.tex}
+\begin{ex}
+Create a brand new project, copy \texttt{mymath.cpp}
+and \texttt{mymath.h} to the new project folder. Add these files to your
+project. Create a \texttt{main()} that calls \texttt{min()} and
+\texttt{max()}.
+\end{ex}
+
 OK. Let's step back and take a look at what
 we've done. Previously we ``re-use'' the code for
 \texttt{max()} and \texttt{min()} by creating a function from chunks of
@@ -807,7 +989,80 @@ the function can't be found on your hard drive!!! Your
 hard drive is pretty huge, you know. For a really huge hard drive it
 might take even more time.
 
-\input{../exercises/7-21-function-prototypes/question.tex}
+\begin{ex}
+Here's a previous program. Move all
+the function bodies to \texttt{heads.cpp} and create a header file (pun?)
+\texttt{heads.h}. Run your program and make sure it works. The global
+constants should be in the header file.
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void printRules()
+{
+    const int MIN_HEADS = 2;
+    const int MAX_HEADS = 10;
+    std::cout << "To join MENSA you must have at "
+              << "least " << MIN_HEADS
+              << " and at most "
+              << MAX_HEADS << std::endl;
+    return;
+}
+
+int getHeads()
+{
+    int heads;
+    std::cout << "How many heads to you have? ";
+    std::cin >> heads;
+    return heads;
+}
+
+bool passMinTest(int heads)
+{
+    const int MIN_HEADS = 2;
+    if (heads < MIN_HEADS)
+    {
+        std::cout << "Too few! Try again!"
+                  << std::endl;
+        return false;
+    }
+    else
+        return true;
+}
+
+bool passMaxTest(int heads)
+{
+    const int MAX_HEADS = 10;
+    if (heads > MAX_HEADS)
+    {
+        std::cout << "Don't show off! Try again!"
+                  << std::endl;
+        return false;
+    }
+    else
+        return true;
+}
+
+bool passTest(int x)
+{
+    return passMinTest(x) && passMaxTest(x);
+}
+
+int main()
+{
+    int heads = 0;
+    printRules();
+    heads = getHeads();
+    while (!passTest(heads))
+    {
+        heads = getHeads();
+    }
+    std::cout << "OK. You can join MENSA."
+              << std::endl;
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
 \newpage\EMPHASIZE{``Why do I sometimes see Parameter Names for Function Prototypes?''}
 
 I already told you that function prototypes only need the name of the

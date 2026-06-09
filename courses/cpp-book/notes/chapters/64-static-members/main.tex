@@ -59,7 +59,19 @@ void f()
 }
 \end{consolethree}
 
-\input{../exercises/0-64-static-members/question.tex}
+\begin{ex}
+Write a function \texttt{mybankaccount()} such that the
+first time you call \texttt{mybackaccount()}, it prints 0. If you call it
+the second time with 10, the function prints 10. If you call it the
+third time with 20, it prints 30. If you call it the fourth time with
+-5, it prints 25. In other words, it records the cumulative sum of the
+arguments sent into the function. Note that the first function call does
+not pass in a value while the remaining ones do. That tells you that
+\texttt{mybankaccount()} has a parameter with a default value. For
+instance you can use -9999 as the default value to mean ``reset the
+cumulative sum to 0''.
+\end{ex}
+
 
 \newpage\EMPHASIZE{Static members variables (in a class)}
 
@@ -338,7 +350,36 @@ decide if a method should be static or not ...
 If a method of a class \texttt{C} does not work with any regular member
 variable of \texttt{C}, then the method should be made static.
 
-\input{../exercises/1-64-static-members/question.tex}
+\begin{ex}
+Which method should be static?
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    C(char name[]) { strcpy(name_, name); }
+    void print0() const
+    {
+        std::cout << "hello 0\n";
+    }
+    void print1() const
+    {
+        std::cout << "hello " << name_ << std::endl;
+    }
+private:
+    char name_[100];
+};
+
+int main()
+{
+    C c("john");
+    c.print0();
+    c.print1();
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
 Here's our class \texttt{C} again:
 
 \begin{consolethree}[escapeinside=||]
@@ -538,8 +579,31 @@ int main()
 }
 \end{consolethree}
 
-\input{../exercises/2-64-static-members/question.tex}
-\input{../exercises/3-64-static-members/question.tex}
+\begin{ex}
+Add a public static method C::set\_y() to set the
+value of C::y in the above class C. Test your code.
+\end{ex}
+
+\begin{ex}
+What's wrong here?
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    C(int a) : x_(a) {}
+    static void set() { x_ = a; }
+    static C & clear()
+    {
+        x_ = 0;
+        return (*this);
+    }
+private:
+    static int x_;
+};
+\end{consolethree}
+\end{ex}
+
 
 \newpage\EMPHASIZE{Application: Keeping a count of objects which are alive}
 
@@ -598,7 +662,63 @@ Here's what you need to do:
   destructor.
 \end{itemize}
 
-\input{../exercises/4-64-static-members/question.tex}
+\begin{ex}
+Modify the default destructor to decrement
+\texttt{numObjects}. Also, modify the copy constructor so that you
+increment \texttt{numObjects}. Complete the following:
+
+\begin{consolethree}[escapeinside=||]
+// Int.h
+#ifndef INT_H
+#define INT_H
+
+class Int
+{
+public:
+    Int(int a=0)
+        : x(a)
+    {
+        numObjects++;
+    }
+private:
+    static int numObjects;
+    ...
+};
+
+#endif
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+#include "Int.h"
+
+int Int::numObjects(0);
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "Int.h"
+
+int main()
+{
+    Int a;
+    std::cout << Int::get_numObjects() << '\n'; // 1
+    Int b;
+    std::cout << Int::get_numObjects() << '\n'; // 2
+    Int c = a;
+    std::cout << Int::get_numObjects() << '\n'; // 3
+    if (1)
+    {
+        Int d = a;
+        std::cout << Int::get_numObjects()
+                  << '\n'; // 4
+    }
+    std::cout << Int::get_numObjects() << '\n'; // 3
+
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
 
 \newpage\EMPHASIZE{Application: Controlling default constructor using static object member}
 
@@ -828,13 +948,56 @@ private:
 ...
 \end{consolethree}
 
-\input{../exercises/5-64-static-members/question.tex}
-\input{../exercises/6-64-static-members/question.tex}
-\input{../exercises/7-64-static-members/question.tex}
-\input{../exercises/8-64-static-members/question.tex}
-\input{../exercises/9-64-static-members/question.tex}
-\input{../exercises/10-64-static-members/question.tex}
-\input{../exercises/11-64-static-members/question.tex}
+\begin{ex}
+Modify the above \texttt{Date} class so that the constructor
+uses the \texttt{default\_date\_} during the constructor and it uses an
+initializer list.
+\end{ex}
+
+\begin{ex}
+Modify \texttt{Date} class by adding an integer
+\texttt{num\_dates\_} static member that keeps a count of the number of
+\texttt{Date} objects which are still in scope. In other words the value
+of \texttt{num\_dates\_} will tell us how many \texttt{Date} objects are
+still in memory.
+\end{ex}
+
+\begin{ex}
+In the \texttt{IntArray} class, keep track of the number of
+bytes used by all objects of this class.
+\end{ex}
+
+\begin{ex}
+In the \texttt{IntDynArray} class, keep track of the number of
+bytes used by all objects of this class.
+\end{ex}
+
+\begin{ex}
+In the \texttt{IntDynArray} class, keep track of the maximum of
+number of bytes used by all objects in the class.
+\end{ex}
+
+\begin{ex}
+In your \texttt{Date} class, keep a static \texttt{Date} object
+\texttt{earliest\_date} so that the earliest \texttt{Date} object
+instantiated will have the same values as \texttt{earliest\_date}. If the
+constructor is called with values which model a \texttt{Date} before
+\texttt{earliest\_date}, then the value of \texttt{earliest\_date} is used
+instead.
+\end{ex}
+
+\begin{ex}
+You have a class with 200 methods that you are using
+for a computer game. The class is working well but you want to improve
+on the performance to get a smoother animation. The game is very complex
+and it's practically impossible to optimize every single
+one of the 200 methods. But you still have 1 month before the game is to
+be shipped and you think you can optimize one function. You want to
+focus on the most frequently used method. You don't want
+to read the code and manually count the number of times a method is
+called. How would you figure out which method is used most?
+\end{ex}
+
 
 \newpage\EMPHASIZE{Application: Special global objects}
 
@@ -877,7 +1040,27 @@ create \texttt{vec2d(0,0)} during runtime and if you need
 (especially if the class in question has a lot more member variables and
 consumes a lot more memory.)
 
-\input{../exercises/12-64-static-members/question.tex}
+\begin{ex}
+Create a public static \texttt{vec2d} object member in
+your \texttt{vec2d} class so that you can run this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "vec2d.h"
+
+int main()
+{
+    std::cout << vec2d::origin << '\n';
+
+    return 0;
+}
+\end{consolethree}
+
+Next, note that the member variables of \texttt{vec2d::origin} do not
+change their values. Modify \texttt{vec2d::origin} so that it is a
+\textbf{constant} public static member object of \texttt{vec2d}.
+\end{ex}
+
 
 \newpage\EMPHASIZE{Application: Debug printing flag for a class}
 
@@ -1085,7 +1268,26 @@ int main()
 }
 \end{consolethree}
 
-\input{../exercises/13-64-static-members/question.tex}
+\begin{ex}
+Experiment with this class:
+
+\begin{consolethree}[escapeinside=||]
+class Employee {
+public:
+    enum Type {CEO, MGR, FULL_TIME, PART_TIME};
+    Employee(char[], Type);
+private:
+    char name_[1024];
+    Type type_;
+};
+
+int main()
+{
+    std::cout << Employee::CEO << std::endl;
+}
+\end{consolethree}
+\end{ex}
+
 
 \newpage\EMPHASIZE{Summary}
 

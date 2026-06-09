@@ -506,9 +506,84 @@ i.e., without the \texttt{ < int >} and the \texttt{ < double >}.
 Like class templates, if you want to write a function template in a
 separate file, then the whole function template must be a header file.
 
-\input{../exercises/0-72-class-templates/question.tex}\input{../exercises/1-72-class-templates/question.tex}
-\input{../exercises/2-72-class-templates/question.tex}\input{../exercises/3-72-class-templates/question.tex}
-\input{../exercises/4-72-class-templates/question.tex}
+\begin{ex}
+Write a min function template. Test it.
+
+Here's another example for you to study. Add test code in your \texttt{main()} function and run it. Study it carefully. Note that in this case, the type parameter \texttt{T} appears in the body of the function template.
+
+\begin{consolethree}[escapeinside=||]
+template  < typename T >
+
+T swap(T & x, T & y)
+{    
+     |\EMPHASIZE{T}| t = x;
+     x = y;
+     y = t;
+} 
+\end{consolethree}
+\end{ex}
+\begin{ex}
+Write a print function template to print an array of type \texttt{T} values. The function should receive an array of \texttt{T} values and the number of things in the array to print starting at index 0:
+
+\begin{console}
+template  < typename T >
+
+void print(T x[], int n)
+{    
+     ...
+} 
+\end{console}
+\end{ex}
+
+\begin{ex}
+Write a linearsearch function template:
+
+\begin{console}
+template  < typename T >
+
+int linearsearch(T x[], int n, const T & target)
+{
+     ...
+} 
+\end{console}
+
+Test it! Make sure you test it with an array of integer values, double
+values, and char values.
+\end{ex}
+\begin{ex}
+Write a bubblesort function template.
+
+\begin{console}
+template  < typename T >
+void bubblesort(T a[], int size); 
+\end{console}
+
+Test it by performing bubble sort on an array of integers and an array of doubles. Is it possible to write this version?
+
+\begin{console}
+template  < typename T >
+void bubblesort(T * start, T * end); 
+\end{console}
+\end{ex}
+
+\begin{ex}
+Write a binarysearch function template:
+
+\begin{console}
+template  < typename T >
+int binarysearch(T a[], int size, const T & target); 
+\end{console}
+
+Test it! What about this:
+
+\begin{console}
+template  < typename T >
+T * binarysearch(T * start, T * end, T * target); 
+\end{console}
+
+(I have a set of notes just on function templates and just on struct templates. Study them both when you have time.)
+\end{ex}
+
 \newpage\EMPHASIZE{Typename and class}
 
 Instead of
@@ -612,7 +687,36 @@ int main()
 Template specialization is a very important idea and is used quite
 frequently.
 
-\input{../exercises/5-72-class-templates/question.tex}\input{../exercises/6-72-class-templates/question.tex}\input{../exercises/7-72-class-templates/question.tex}That 2-by-1 matrix is sometimes called a ``2-dimensional column vector''. Column vectors are used frequently. Furthermore processing a regular 1-dimensional array of size 2 is faster than viewing it as a 2-by-1 2D array. So \ldots speedup your \texttt{\textbf{Matrix}} library by providing a specialization for the column vector case of a \texttt{\textbf{Matrix}} object where you use a 1-dimensional array in this case The following should then work:
+\begin{ex}
+Add \texttt{\textbf{operator[]}} to both classes.
+Test your code.
+\end{ex}
+\begin{ex}
+Then you realize that \ldots{} wait a minute \ldots this specialization idea is also helpful for a \texttt{\textbf{double}} array of size 3 and a \texttt{\textbf{float}} array of size 3. Hmmm \ldots can we partially specialize? In other words can we have \texttt{\textbf{size}} = 3 but retain \texttt{\textbf{T}} as a template parameter Try to figure it out \texttt{\textbf{on your own}} before turning the page for the answer!!! You have 20 minutes ...
+\end{ex}
+\begin{ex}
+Write a \texttt{\textbf{Matrix}} class template. A matrix is just a 2D array. Here's a sample run:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+|\textbf{\#include "Matrix.h"}|
+
+int main()
+{    
+     int x[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+     Matrix < int, 2, 3 > m(x); // m is 2-by-3.
+     std::cout << m << '\n' // prints
+                            // 0 1 2
+                            // 3 4 5
+     Matrix < int, 2, 1 > n(x); // n is 2-by-1
+     std::cout << n << '\n' // prints
+                            // 0
+                            // 1
+    return 0;
+} 
+\end{consolethree}
+\end{ex}
+That 2-by-1 matrix is sometimes called a ``2-dimensional column vector''. Column vectors are used frequently. Furthermore processing a regular 1-dimensional array of size 2 is faster than viewing it as a 2-by-1 2D array. So \ldots speedup your \texttt{\textbf{Matrix}} library by providing a specialization for the column vector case of a \texttt{\textbf{Matrix}} object where you use a 1-dimensional array in this case The following should then work:
 
 \begin{consolethree}[escapeinside=||]
 #include <iostream>

@@ -80,8 +80,47 @@ int main()
 
 Note the declaration of \textit{g}.
 
-\input{../exercises/0-28-pointers-and-functions/question.tex}
-\input{../exercises/1-28-pointers-and-functions/question.tex}
+\begin{ex}
+Instead of this:
+
+\begin{consolethree}[escapeinside=||]
+...
+double (*g)(int, int);
+...
+\end{consolethree}
+
+can you do this:
+
+\begin{consolethree}[escapeinside=||]
+...
+double *g(int, int);
+...
+\end{consolethree}
+
+Why?
+\end{ex}
+
+\begin{ex}
+It turns out that instead of
+
+\begin{consolethree}[escapeinside=||]
+...
+g = &avg;
+...
+\end{consolethree}
+
+you can also write
+
+\begin{consolethree}[escapeinside=||]
+...
+g = avg;
+...
+\end{consolethree}
+
+In other words, for the case of functions, the address operator \& is
+optional. Try it.
+\end{ex}
+
 
 \newpage\EMPHASIZE{What can you do with a function pointer?}
 
@@ -108,7 +147,13 @@ int main()
 }
 \end{consolethree}
 
-\input{../exercises/2-28-pointers-and-functions/question.tex}
+\begin{ex}
+Write a function \textit{square()} that accepts a value
+(a \textit{double}) and returns the square of the value. Create a function
+pointer \textit{p} and store the address of \textit{square} in \textit{p}.
+Using \textit{p}, print the square of \textit{2}.
+\end{ex}
+
 
 \newpage\EMPHASIZE{Why?}
 
@@ -227,10 +272,57 @@ and then call the above \textit{max} function with this \textit{f}:
 std::cout << max(1, 100, &f) << std::endl;
 \end{consolethree}
 
-\input{../exercises/3-28-pointers-and-functions/question.tex}
-\input{../exercises/4-28-pointers-and-functions/question.tex}
-\input{../exercises/5-28-pointers-and-functions/question.tex}
-\input{../exercises/6-28-pointers-and-functions/question.tex}
+\begin{ex}
+The above \textit{max} function tests x points spaced out in
+such a way that consecutive x values differ by 0.001. Write a max
+function that lets you specify this gap, called \textit{dx}, where the
+default value is \textit{0.001}.
+\end{ex}
+
+\begin{ex}
+Write a \textit{min} function that does the obvious thing
+similar to the above.
+\end{ex}
+
+\begin{ex}
+Write an area function that computes the area of a function
+\textit{f}. For instance \textit{area(1, 5, \&f, 0.0001)} computes the area
+under the curve y = f(x) from x = 1 to x = 5 using the sum of tiny
+rectangular strips of width 0.0001. Let the default width be 0.001.
+\end{ex}
+
+\begin{ex}
+Look at your bubblesort function again:
+
+\begin{consolethree}[escapeinside=||]
+void bubblesort(int x[], int size);
+\end{consolethree}
+
+The problem is that it sorts either in ascending or descending order.
+Note that the difference is only in comparison of values in array x. You
+need to know if x[i] > x[i+1] is true. We can have
+two boolean comparison functions:
+
+\begin{consolethree}[escapeinside=||]
+bool lessthan(int x, int y);
+bool greaterthan(int x, int y);
+\end{consolethree}
+
+and write a \textit{bubblesort} function so that you can call
+
+\begin{consolethree}[escapeinside=||]
+bubblesort(x, size, &lessthan);
+\end{consolethree}
+
+to sort \textit{x} in ascending order and call
+
+\begin{consolethree}[escapeinside=||]
+bubblesort(x, size, &greaterthan);
+\end{consolethree}
+
+to sort \textit{x} in descending order.
+\end{ex}
+
 
 \newpage\EMPHASIZE{Array of function pointers}
 

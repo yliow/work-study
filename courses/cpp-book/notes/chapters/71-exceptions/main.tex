@@ -404,7 +404,63 @@ int main()
 }
 \end{console}
 
-\input{../exercises/0-71-exceptions/question.tex}
+\begin{ex}
+Write a \texttt{Stack} class to contain integers;
+suppose the maximum capacity of the stack is 5 (example: you use an
+array to keep the values). Write a \texttt{StackException} class to handle
+overflow and underflow errors. (Skeleton answer on the next page.)
+\begin{console}[commandchars=\~\@\$]
+#include <iostream>
+#include <cmath>
+#include <ctime>
+
+~EMPHASIZE@class StackException$
+{};
+
+class Stack
+{     
+public:
+      ...
+      void push(int i)
+      {    
+           ~EMPHASIZE@if (size == 5)$
+               ~EMPHASIZE@throw StackException();$
+           ...
+      }
+      int pop()
+      {   
+          ~EMPHASIZE@if (size == 0)$
+              ~EMPHASIZE@throw StackException();$
+      }
+   ...
+};
+
+int main()
+{   
+    srand((unsigned) time(NULL));
+    Stack stack;
+    try
+    {   
+        while (1)
+        {     
+              int option;
+              std::cin >> option;
+              switch (option)
+              {
+                    case 0: stack.push(rand()); break;
+                    case 1: stack.pop(); break;
+              }
+              std::cout << stack << std::endl;
+        }
+    catch (~EMPHASIZE@StackException & e$)
+    {
+          std::cout << ''stack error'' << std::endl;
+    }
+return 0;
+}
+\end{console}
+\end{ex}
+
 
 \newpage\EMPHASIZE{Program 5. Exception objects with members}
 
@@ -456,7 +512,70 @@ following show you that a function, in the example that would be
 
 
 
-\input{../exercises/1-71-exceptions/question.tex}By the way it's a good idea to keep exceptions which are
+\begin{ex}
+Recall a previous exercise:
+
+\begin{console}[commandchars=\~\@\$]
+#include <iostream>
+#include <cmath>
+#include <ctime>
+
+~EMPHASIZE@class StackException$
+~EMPHASIZE@{};$
+
+class Stack
+{     
+public:
+      ...
+      void push(int i)
+      {    
+           ~EMPHASIZE@if (size == 5)$
+                 ~EMPHASIZE@throw StackException();$
+           ...
+      }
+      int pop()
+      {   
+          ~EMPHASIZE@if (size == 0)$
+                 ~EMPHASIZE@throw StackException();$
+          ...
+      }
+  ...
+};
+
+
+
+int main()
+{   
+    srand((unsigned) time(NULL));
+    Stack stack;
+
+    try
+    {   
+        while (1)
+        {     
+              int option;
+              std::cin >> option;
+              switch (option)
+              {
+                    case 0: stack.push(rand()); break;
+                    case 1: stack.pop(); break;}}}}
+              }
+              std::cout << stack << std::endl;
+         }
+     }
+     catch (~EMPHASIZE@StackException e$)
+     {
+          std::cout << "stack error" << std::endl;
+     }
+} 
+\end{console}
+
+Modify the program by replacing StackException with two new classes,
+\texttt{StackOverflowException} and \texttt{StackUnderflowException}, to
+handle the two different errors. The code in \texttt{main()} should catch
+both errors.
+\end{ex}
+By the way it's a good idea to keep exceptions which are
 thrown only in a class together with the class itself in the same header
 file. It makes the exception class easier to find.
 

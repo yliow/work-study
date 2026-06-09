@@ -176,9 +176,29 @@ Make sure you keep the above code handy since I'll be using this again
 and again in this set of notes. I'm going to call the above program our
 ``Basic Example''.
 
-\input{../exercises/0-80-inheritance/question.tex}
-\input{../exercises/1-80-inheritance/question.tex}
-\input{../exercises/2-80-inheritance/question.tex}
+\begin{ex} Get rid of the inheritance clause in our Basic Example:
+\begin{console}[commandchars=\~\@\!]
+...
+class P
+{
+      ...
+};
+class C : ~EMPHASIZE@~redtext@~sout@public P!!!
+{     
+      ...
+};
+\end{console}
+and compile your code again. See the error? Now you cannot execute \verb!c.get_x()!. READ the error message carefully. So we see that object \verb!c! does seem to have the \verb!get_x! method! (Put the ``\verb!: public P!'' back into the code after you're done with this exercise.)
+\end{ex}
+
+\begin{ex} Does \verb!c! have the \verb!set_x}! method? How
+would you check that?
+\end{ex}
+
+\begin{ex} Does \verb!c! have the \verb!x_! member variable?
+How would you check that? (Make \verb!x_! public and print \verb!c.x_! in \verb!main()!.)
+\end{ex}
+
 So \verb!C! seems to have a ``copy'' of \verb!P!'s
 declaration in it. Is that so? There are lots of other questions:
 
@@ -203,7 +223,10 @@ declaration in it. Is that so? There are lots of other questions:
   Etc., etc., etc.!!!
 \end{itemize}
 
-\input{../exercises/3-80-inheritance/question.tex}
+\begin{ex}
+The inheritance stack can be as tall as you like. Create a class \verb!G! (``grandparent'') with integer member \verb!z_! and with \verb!get_z! and \verb!set_z! method. Let the default constructor of \verb!G! initialize \verb!z_! to \verb!42!. Let class \verb!P! inherit class \verb!G!. In \verb!main()!, print the value of \verb!c.z_!.
+\end{ex}
+
 \newpage\EMPHASIZE{Inheritance is not copy-and-paste of code!}
 
 It's really important to understand that inheritance is not a copy-and-paste of code from the parent class to the child class. Inheritance is not like your \lq\lq \verb!#include!'' business.
@@ -367,7 +390,10 @@ print(p)
 When you call upon \verb!c.x_! which one is it??? Why does the compiler
 allow this?
 
-\input{../exercises/4-80-inheritance/question.tex}You really want to think of the members (member variables as well as
+\begin{ex} Can you think of an experiment that can tell you
+which \verb!x_! is used if you access \verb!c.x_! in \verb!main()!?
+\end{ex}
+You really want to think of the members (member variables as well as
 methods) as being organized into two different scopes:
 \begin{python}
 from latextool_basic import *
@@ -640,7 +666,36 @@ int main()
 }
 \end{console}
 
-\input{../exercises/5-80-inheritance/question.tex}\newpage\EMPHASIZE{Private members of the parent class}
+\begin{ex} What is the output? Or is there an error? The
+following is obtained by adding code to our Basic Example:
+\begin{console}[commandchars=\~\@\$]
+...
+
+class P
+{
+public:
+        ...
+        ~textbf@void c() { std::cout << "P::c()\n"; d(); }$
+        ...
+};
+
+class C : public P
+{
+public:
+        ...
+        ~textbf@void d() { std::cout << "C::c()\n"; }$
+        ...
+};
+
+int main()
+{   
+    ...
+    ~textbf@c.c();$
+    return 0;
+}
+\end{console}
+\end{ex}
+\newpage\EMPHASIZE{Private members of the parent class}
 
 For public inheritance, a child cannot access private member variables
 or private methods of parent. Let's do an experiment to verify this.
@@ -807,7 +862,92 @@ int main()
 \end{consolethree}
 \DrawArrow[red, thick]{parentctor.south west}{end42}
 
-\input{../exercises/6-80-inheritance/question.tex}\input{../exercises/7-80-inheritance/question.tex}Add code so that during the initialization of a \verb!Laser! object, the
+\begin{ex} You are given this incomplete code. Add to the
+constructor of \verb!Car! and \verb!Motorcycle! so that a \verb!Car!
+object is initialized to have 4 wheels and a \verb!Motorcycle! object is
+initialized to have 2 wheels.
+
+\begin{console}
+class Vehicle
+{
+public:
+        Vehicle(int numWheels)
+           : numWheels_(numWheels)
+        {}
+        int numWheels() const { return numWheels_; }
+private:
+        int numWheels_;
+};
+
+class Car: public Vehicle
+{
+public:
+        Car(bool keyless_entry)
+           : keyless_entry_(keyless_entry)
+        {}
+private:
+        bool keyless_entry_;
+};
+
+class Motorcycle: public Vehicle
+{
+public:
+        Motorcycle()
+            :
+        {}
+};
+
+int main()
+{   
+    Car aCar;               // aCar has 4 wheels
+    Motorcycle aMotorcycle; // aMotorcycle has 2
+                            // wheels
+    std::cout << "aCar has "
+              << aCar.numWheels() << " wheels\n";
+    std::cout << "aMotorcycle has "
+              << aMotorcycle.numWheels()
+              << " wheels\n";
+    return 0;
+}
+\end{console}
+\sidenote{
+  \begin{tikzpicture}
+  \node[draw,text width=2cm,minimum height=2cm, line width=0.05cm, inner sep=0.3cm, anchor=center] (car) at (1,-2) 
+       {\tikzmark{c} \normalsize\texttt{Car}};
+  \node[draw,text width=2cm,minimum height=2cm, line width=0.05cm, inner sep=0.3cm, anchor=center] (mcycle) at (4,-2) 
+       {\tikzmark{m} \normalsize\texttt{Motor-\\ cycle}};
+  \node[draw,text width=2cm,minimum height=2cm,minimum width=2cm, line width=0.05cm, inner sep=0.3cm, anchor=base] (vehicle) at (2.5,1) 
+       {\tikzmark{v} \normalsize\texttt{Vehicle}};
+  \node[above=4mm of car.north] (Lstart){};
+  \node[above=4mm of mcycle.north] (Lend){};
+  \node[below=6mm of vehicle.south] (Lmid){};
+  \draw[ultra thick]        (car.north)   -- (Lstart) -- (Lend) -- (mcycle.north);
+  \draw[ultra thick, ->]        (Lmid)   -- (vehicle.south);
+\end{tikzpicture}
+}
+
+\end{ex}
+\begin{ex}
+This is an incomplete piece of code:
+\begin{console}
+class GameObject
+{
+private:
+        bool is_alive_;
+        int x_;
+        int y_;
+};
+
+class Laser: public GameObject
+{
+};
+
+class Alien: public GameObject
+{
+};
+\end{console}
+\end{ex}
+Add code so that during the initialization of a \verb!Laser! object, the
 \verb!is_alive_! is set to \verb!false! and during the initialization
 of an \verb!Alien! object, the \verb!is_alive_! is set to \verb!true!.
 
@@ -1159,7 +1299,26 @@ So in summary make sure you remember this:
   ``has a'' -- composition
 \end{itemize}
 
-\input{../exercises/8-80-inheritance/question.tex}\newpage\EMPHASIZE{Type conversion}
+\begin{ex}
+You want to write the Geometry Wars 2D game. You want
+different shapes with different colors. To get a feel for the problem,
+you want to focus on circles and squares. Circles have colors. Squares
+have colors. In fact ... every shape has a color. Therefore create
+a \verb!Shape! class containing color, i.e., R, G, B (\verb!int! instance variables). A circle has a radius. (HINT: Not all shapes have radius -- squares do not have radii. The location of a circle is determined by the center of the circle. A square has a width and height which are the same in value. The location of the square is determined by the coordinates of the top-left corner. A rectangle is similar to the square except that the width and height need not be the same. Write relevant classes so that if you execute this:
+\begin{console}
+// white circle at (2,5) of radius 3
+Circle circle(2, 5, 3, 255, 255, 255);
+
+// red square with top-left corner at (6, 7) with
+// sides of length 8.
+Square square(6, 7, 8, 255, 0, 0);
+
+// green rectangle with top-left corner at (9, 10)
+// with width 11 and height 12.
+Rect rect(9, 10, 11, 12, 0, 255, 0);
+\end{console}
+\end{ex}
+\newpage\EMPHASIZE{Type conversion}
 
 Add the following to our Basic Example:
 \begin{console}[commandchars=\~\@\$]
@@ -1799,7 +1958,10 @@ class Alien
 Now I want to show you how to do template inheritance. Try the following
 exercise:
 
-\input{../exercises/9-80-inheritance/question.tex}Here's the obvious first attempt at the above exercise. Run it.
+\begin{ex}
+Write a class \texttt{\textbf{C< T >}} to be a subclass of \texttt{\textbf{P< T >}}. The class \texttt{\textbf{P< T >}} has a member variable \texttt{\textbf{x}} and method \texttt{\textbf{m()}}. The class \texttt{\textbf{C< T >}}\textbf{ }will have a member variable named \texttt{\textbf{y}} and method \texttt{\textbf{n()}}. In \texttt{\textbf{C< T >::n()}} and \texttt{\textbf{P< T >::m()}} try to access the \texttt{\textbf{x}} defined in \texttt{\textbf{P< T >}}. For simplicity make all members public.
+\end{ex}
+Here's the obvious first attempt at the above exercise. Run it.
 \begin{console}
 #include <iostream>
 

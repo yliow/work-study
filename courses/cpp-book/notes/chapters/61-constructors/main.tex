@@ -144,8 +144,24 @@ Date(2014, 12, 25).print();
 In this case, you create a \texttt{Date} object (without a name) and use
 it to invoke \texttt{print}.
 
-\input{../exercises/0-61-constructors/question.tex}
-\input{../exercises/1-61-constructors/question.tex}
+\begin{ex}
+Write a class \texttt{Being} with instance variables
+\texttt{num\_heads}, \texttt{num\_arms}, \texttt{num\_legs}. Write a
+constructor to initialize all members. Write a \texttt{print} method in
+the class to print the values of all instance variables. Write getter
+and setter methods to get and set all instance variables. Test your
+class.
+\end{ex}
+
+\begin{ex}
+Write a class \texttt{Vehicle} with instance variables
+\texttt{numWheels}, \texttt{numSeats}, \texttt{mileage (double)}, \texttt{year},
+\texttt{make} (C-string, max size of 50), and \texttt{model} (C-string, max
+size of 50). Write a \texttt{print} method in the class to print the
+values of all instance variables. Write a constructor to initialize all
+members. Test your class.
+\end{ex}
+
 
 \newpage\EMPHASIZE{Initializer List}
 
@@ -301,8 +317,18 @@ C::C(int a, int b)
 }
 \end{consolethree}
 
-\input{../exercises/2-61-constructors/question.tex}
-\input{../exercises/3-61-constructors/question.tex}
+\begin{ex}
+Rewrite the constructor of the \texttt{Being} class so
+that the constructor uses an initializer list.
+\end{ex}
+
+\begin{ex}
+Rewrite the constructor of the \texttt{Vehicle} class
+so that the constructor uses an initializer list. (Note that for the
+string members, you have to copy the characters of the strings in the
+body of the constructor. So the body is not empty.)
+\end{ex}
+
 
 \newpage\EMPHASIZE{Gotchas}
 
@@ -489,9 +515,21 @@ public:
 ...
 \end{consolethree}
 
-\input{../exercises/4-61-constructors/question.tex}
-\input{../exercises/5-61-constructors/question.tex}
-\input{../exercises/6-61-constructors/question.tex}
+\begin{ex}
+All the methods in our \texttt{Date} class are pretty
+short. Inline them.
+\end{ex}
+
+\begin{ex}
+Inline all the short methods in the \texttt{Being}
+class.
+\end{ex}
+
+\begin{ex}
+Inline all the short methods in the \texttt{Vehicle}
+class.
+\end{ex}
+
 
 \newpage\EMPHASIZE{Review: Function Signature}
 
@@ -551,7 +589,24 @@ You can see from the above error message that for the second parameter,
 although it's \texttt{const int}, the type as part of the
 signature is \texttt{int}.
 
-\input{../exercises/7-61-constructors/question.tex}
+\begin{ex}
+Pair up functions below with the same signatures.
+Find a way to check your answer with your compiler.
+
+\begin{consolethree}[escapeinside=||]
+void f(int x, const int & y) {}
+void f(int x, const int * y) {}
+void f(int x, const int y) {}
+void f(char x, const int y) {}
+void f(const int y, char x) {}
+void f(int * x) {}
+void f(int x[]) {}
+void f(int x[10]) {}
+void f(int x[10][10]) {}
+void f(int x[10][]) {}
+\end{consolethree}
+\end{ex}
+
 
 \newpage\EMPHASIZE{Review: Function Overloading}
 
@@ -562,17 +617,104 @@ That's because in C++, a function is identified not by
 its name, but by it name and its signature, i.e., the name and the list
 of types of its parameters.
 
-\input{../exercises/8-61-constructors/question.tex}
-\input{../exercises/9-61-constructors/question.tex}
-\input{../exercises/10-61-constructors/question.tex}
+\begin{ex}
+Does this compile? Next, check with your compiler.
+
+\begin{consolethree}[escapeinside=||]
+void f(int x){}          // f and signature int
+void f(int y, int y){}   // f and signature (int,int)
+void f(int x, double y){}// f and signature (int,double)
+
+int main()
+{
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Does this compile? Next, check with your compiler.
+
+\begin{consolethree}[escapeinside=||]
+void f(int x) {}
+int f(int x) {}
+void f(int x, double y) {}
+
+int main()
+{
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Does this compile? Next, check with your compiler.
+
+\begin{consolethree}[escapeinside=||]
+void f(int * x) {}
+int f(int x[]) {}
+
+int main()
+{
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
 When a function is called in your code, C++ will use the function that
 matches both the function name and the type of the values passed in with
 the candidate's signature. If none is found, C++ will try to typecast
 the arguments. The one used is the one with the least number of
 typecasts. If there isn't one, you get an ambiguous invocation error.
 
-\input{../exercises/11-61-constructors/question.tex}
-\input{../exercises/12-61-constructors/question.tex}
+\begin{ex}
+Which function is called (or is there an error)?
+
+\begin{consolethree}[escapeinside=||]
+void f(int x) {}
+void f(double x) {}
+
+int main()
+{
+    f(1);
+}
+\end{consolethree}
+
+Check by running this version:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void f(int x) { std::cout << "f(int)\n"; }
+void f(double x) { std::cout << "f(double)\n"; }
+
+int main()
+{
+    f(1);
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Which function is called (or is there an error)?
+
+\begin{consolethree}[escapeinside=||]
+Void f(double x, int y) {}
+void f(int x, int y) {}
+void f(int x, double y) {}
+void f(double x, double y) {}
+
+int main()
+{
+    f(1, 1);
+
+    return 0;
+}
+\end{consolethree}
+
+Check with a program.
+\end{ex}
+
 If you compile the following with g++:
 
 \begin{consolethree}[escapeinside=||]
@@ -869,8 +1011,19 @@ This is very important because later you will see that there are times
 when you need to have a default constructor, whether it is supplied by
 your C++ compiler (automatically) or by you (manually).
 
-\input{../exercises/13-61-constructors/question.tex}
-\input{../exercises/14-61-constructors/question.tex}
+\begin{ex}
+Create a default constructor for the \texttt{Being}
+class with the following default values: 2 for number of heads, 3 for
+number of arms, and 2 for number of legs. Test your code.
+\end{ex}
+
+\begin{ex}
+Create a default constructor for the \texttt{Vehicle}
+class with the following default values: 4 for number of wheels, 4 for
+number of seats, 45.24 for mileage, 2011 for year, ``Nissan'' for make,
+and ``Sentra'' for model. Test your code.
+\end{ex}
+
 
 \newpage\EMPHASIZE{Review: Default values for functions}
 
@@ -929,8 +1082,36 @@ int main()
 }
 \end{consolethree}
 
-\input{../exercises/15-61-constructors/question.tex}
-\input{../exercises/16-61-constructors/question.tex}
+\begin{ex}
+Does this program compile?
+
+\begin{consolethree}[escapeinside=||]
+void f(int x = 1) {}
+void f() {}
+
+int main()
+{
+    f();
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Which function is called (or is there an error)?
+
+\begin{consolethree}[escapeinside=||]
+void f(int x, int y = 1) {}
+void f(int x) {}
+
+int main()
+{
+    f(1);
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
 
 \newpage\EMPHASIZE{Default value for methods}
 
@@ -955,8 +1136,20 @@ public:
 Now modify the implementation file \texttt{Date.cpp}. Add test cases to
 \texttt{main()}.
 
-\input{../exercises/17-61-constructors/question.tex}
-\input{../exercises/18-61-constructors/question.tex}
+\begin{ex}
+For the \texttt{Being} class, rewrite the constructor
+so that it has default values using the values from the default
+constructor. Modify the setter methods to use the corresponding default
+values.
+\end{ex}
+
+\begin{ex}
+For the \texttt{Vehicle} class, rewrite the constructor
+so that it has default values using the values from the default
+constructor. Modify the setter methods to use the corresponding default
+values.
+\end{ex}
+
 
 \newpage\EMPHASIZE{Copy constructor}
 
@@ -1032,7 +1225,10 @@ constructor with the following prototype:
 Think of the copy constructor as a \EMPHASIZE{cloning operation} and the
 intent is to copy values from one object to another.
 
-\input{../exercises/19-61-constructors/question.tex}
+\begin{ex}
+Inline our \texttt{Date} copy constructor.
+\end{ex}
+
 
 \newpage\EMPHASIZE{Calling the copy constructor}
 
@@ -1108,11 +1304,187 @@ You will find that the compiler will not complain and the program does
 run. Why? Because your C++ compiler supplies the default copy
 constructor.
 
-\input{../exercises/20-61-constructors/question.tex}
-\input{../exercises/21-61-constructors/question.tex}
-\input{../exercises/22-61-constructors/question.tex}
-\input{../exercises/23-61-constructors/question.tex}
-\input{../exercises/24-61-constructors/question.tex}
+\begin{ex}
+Write a copy constructor for the \texttt{Being} class.
+\end{ex}
+
+\begin{ex}
+Write a copy constructor for the \texttt{Vehicle}
+class.
+\end{ex}
+
+\begin{ex}
+Here's the header file for weather control devices:
+
+\begin{consolethree}[escapeinside=||]
+// WeatherCtrl.h
+class WeatherCtrl
+{
+public:
+    WeatherCtrl(double, double);
+    double get_temp();
+    double get_pressure();
+    void set_temp(double);
+    void set_pressure(double);
+private:
+    double temp_;
+    double pressure_;
+};
+\end{consolethree}
+
+Write a cpp file containing the method implementation (i.e., definition)
+for all the prototypes that appear in the header file.
+
+Next go over the following \texttt{main.cpp} that uses the weather control
+class:
+
+\begin{consolethree}[escapeinside=||]
+// main.cpp
+int main()
+{
+// Declare and initialize wc as a WeatherCtrl object with
+// initial temperature reading of 50.5 and pressure reading
+// of 30.5
+
+// Print the temp and pressure value of wc using std::cout
+
+// Set the temp and pressure value of wc to 60 and 40
+
+// print the temp and pressure value of wc using std::cout
+
+// Uncomment the next statement and compile. What's wrong?
+// WeatherCtrl wc2;
+
+// Comment out the above wrong statement and
+// move on ...
+
+// Modify the constructor so that it's inlined in
+// the header and defaults the temp and pressure
+// value to 50 and 60. Use an initializer list.
+
+// Uncomment the next line, compile and run.
+// WeatherCtrl wc2;
+
+// Print the temp and pressure value of wc2.
+
+// Declare wc3 as a pointer to WeatherCtrl and
+// initialize it to point to a WeatherCtrl object in the
+// heap with 110 and 70 for temp and pressure
+// values.
+// Print the temp and pressure of the object wc3 is
+// pointing to.
+
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+If \texttt{C} is a class and \texttt{obj1} is an object
+of class \texttt{C} and you want to clone \texttt{obj1} to another object,
+say \texttt{obj2}. The following works but it's a bad idea. Why?
+
+\begin{consolethree}[escapeinside=||]
+C obj2 = C(obj1);
+\end{consolethree}
+
+If you don't believe me you can try
+
+\begin{consolethree}[escapeinside=||]
+Date date1(1970, 1, 1);
+Date date2 = Date(date1);
+date2.print();
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+The following \texttt{Int} class essentially models an
+integer. Complete it.
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    Int(int x)
+        :              // initialize x_ with x
+    {}
+
+    Int(           ) // copy constructor
+        :
+    {}
+
+    int get()
+    {
+        return x_;
+    }
+
+private:
+    int x_;
+};
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "Int.h"
+
+int main()
+{
+    Int i(5);
+
+    // Construct object j of type Int
+    // using i. Use the copy constructor
+
+    std::cout << j.get() << '\n';
+
+    return 0;
+}
+\end{consolethree}
+
+Now write a set method to set the value of x in the object. Test it with
+this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "Int.h"
+
+int main()
+{
+    Int i(5);
+    // Construct object j of type Int
+    // using i. Use the copy constructor.
+    std::cout << j.get() << '\n';
+
+    i.set(42);
+    std::cout << i.get() << '\n'; // should be 42
+
+    return 0;
+}
+\end{consolethree}
+
+Finally, add an increment method so that this works:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include "Int.h"
+
+int main()
+{
+    Int i(5);
+    // Construct object j of type Int
+    // using i. Use the copy constructor.
+    std::cout << j.get() << '\n';
+
+    i.set(42);
+    std::cout << i.get() << '\n'; // should be 42
+
+    i.increment(j); // i.x is incremented by j.x
+    std::cout << i.get() << '\n'; // should be 47
+
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
 
 \newpage\EMPHASIZE{Example and exercise: \texttt{IntPointer}}
 
@@ -1187,21 +1559,321 @@ private:
 };
 \end{consolethree}
 
-\input{../exercises/25-61-constructors/question.tex}
-\input{../exercises/26-61-constructors/question.tex}
-\input{../exercises/27-61-constructors/question.tex}
-\input{../exercises/28-61-constructors/question.tex}
-\input{../exercises/29-61-constructors/question.tex}
-\input{../exercises/30-61-constructors/question.tex}
+\begin{ex}
+Here's a program that uses the above class. Trace the
+program by hand. Draw a picture of the memory during execution. What is
+the output?
+
+\begin{consolethree}[escapeinside=||]
+// What must you #include?
+
+void f()
+{
+    IntPointer p(42);
+    IntPointer q(p);
+    std::cout << q.dereference() << '\n';
+    // memory leak here
+}
+
+int main()
+{
+    f();
+
+    return 0;
+}
+\end{consolethree}
+
+Check your trace by completing the above code and running it. Can you
+explain why there's a memory leak?
+\end{ex}
+
+\begin{ex}
+To make the above object more like a pointer, modify
+the \texttt{dereference} method:
+
+\begin{consolethree}[escapeinside=||]
+int operator*() //change dereference to this
+{
+    return *p_;
+}
+\end{consolethree}
+
+and in \texttt{f} change the call to \texttt{dereference()} to \texttt{*}:
+
+\begin{consolethree}[escapeinside=||]
+void f()
+{
+    IntPointer q(42);
+    std::cout << *q << '\n'; //*q = q.operator*()
+}
+\end{consolethree}
+
+Run the program again.
+\end{ex}
+
+\begin{ex}
+However this does not work:
+
+\begin{consolethree}[escapeinside=||]
+void f()
+{
+    ...
+    std::cout << *q << '\n';
+    *q = 1024;                  // YIKES
+    std::cout << *q << '\n';
+    ...
+}
+\end{consolethree}
+
+Compile and read the error message - remember it! It seems that getting
+\texttt{*q} works but modifying \texttt{*q} does not work.
+\end{ex}
+
+\begin{ex}
+To correct it, change \texttt{operator*} to this:
+
+\begin{consolethree}[escapeinside=||]
+int & operator*()
+{
+    return *p_;
+}
+\end{consolethree}
+
+Compile and run. Remember this fix!
+\end{ex}
+
+\begin{ex}
+Now add a line of code to deallocate memory so that
+there's no memory leak. It's still a problem that we have to deallocate
+memory before object \texttt{q} dies (i.e., goes out of scope). We might
+forget!!! Later you will see that you can tell the object to
+automatically invoke a very special method just before the object dies.
+\end{ex}
+
+\begin{ex}
+Note that I have overwritten the default copy
+constructor:
+
+\begin{consolethree}[escapeinside=||]
+class IntPointer
+{
+public:
+    ...
+    IntPointer(const IntPointer & intptr)
+        : p_(new int)
+    {
+        *p_ = *(intptr.p_);
+    }
+    ...
+};
+\end{consolethree}
+
+Draw a memory model of what happens when you use this copy constructor,
+for instance, like this:
+
+\begin{consolethree}[escapeinside=||]
+...
+int main()
+{
+    IntPointer p(42);
+    IntPointer q = p; // calls copy constructor
+    return 0;
+}
+\end{consolethree}
+
+Check the definition of the default copy constructor. It copies values
+memberwise., i.e., the default copy constructor works like this:
+
+\begin{consolethree}[escapeinside=||]
+class IntPointer
+{
+public:
+    ...
+    IntPointer(const IntPointer & intptr)
+        : p_(intptr.p_)
+    {}
+    ...
+};
+\end{consolethree}
+
+What is the difference between this copy constructor (the default
+provided by the compiler if you do not have one) and the one that I
+wrote? (Hint: Draw a picture).
+
+Now, what if I deallocate while using the default copy constructor?
+
+\begin{consolethree}[escapeinside=||]
+class IntPointer
+{
+public:
+    ...
+    IntPointer(const IntPointer & intptr)
+        : p_(intptr.p_)
+    {}
+    ...
+};
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+...
+int main()
+{
+    IntPointer p(42);
+    IntPointer q = p;
+    q.deallocate();
+    p.deallocate();
+    return 0;
+}
+\end{consolethree}
+
+Why?
+\end{ex}
+
 
 \newpage\EMPHASIZE{Example and exercise: \texttt{IntArray}}
 
-\input{../exercises/31-61-constructors/question.tex}
-\input{../exercises/32-61-constructors/question.tex}
-\input{../exercises/33-61-constructors/question.tex}
-\input{../exercises/34-61-constructors/question.tex}
-\input{../exercises/35-61-constructors/question.tex}
-\input{../exercises/36-61-constructors/question.tex}
+\begin{ex}
+We frequently use a fixed size array with a length
+variable:
+
+\begin{consolethree}[escapeinside=||]
+int x[1000];
+int length = 0;
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+We should package up an int array with a length
+variable either using \texttt{struct} or \texttt{class}. Of course
+\texttt{class} has class! Here's the \texttt{IntArray} class:
+
+\begin{consolethree}[escapeinside=||]
+class IntArray
+{
+public:
+    IntArray();                   // Initialize length
+                                  // to 0.
+    IntArray(const IntArray &);   // Copy length and
+                                  // also the values!!
+    int get_length();
+    void set_length(int);
+    void print();
+private:
+    int x_[1000];
+    int length_;
+};
+\end{consolethree}
+
+and here's \texttt{main} to test the class:
+
+\begin{consolethree}[escapeinside=||]
+// What's missing here?
+
+int main()
+{
+    IntArray a;
+    a.print();          // prints blank line;
+                        // a.length_ is 0
+    a.set_length(5);
+    a.print();          // prints 5 random values;
+                        // a.length_ is 5
+    return 0;
+}
+\end{consolethree}
+
+Complete the class by implementing all the listed methods. Test your
+code by running it.
+\end{ex}
+
+\begin{ex}
+There's still no way to set the values in the array.
+Add the following to the class:
+
+\begin{consolethree}[escapeinside=||]
+class IntArray
+{
+public:
+    ...
+
+    int operator[](int i); //returns the value of x_[i]
+};
+\end{consolethree}
+
+Define the method (or rather, the operator) and then do this in
+\texttt{main()}:
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    ...
+    std::cout << a[0] << '\n'; //a[0] is a.operator[](0)
+
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Now do this:
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    ...
+    std::cout << a[0] << '\n'; //a[0] is a.operator[](0)
+    a[0] = 42;
+
+    return 0;
+}
+\end{consolethree}
+
+and ... you get a problem! It seems that getting \texttt{a[0]} works
+but modifying \texttt{a[0]} does not work. Fix it. (See
+\texttt{IntPointer}.)
+\end{ex}
+
+\begin{ex}
+Once the \texttt{operator[]} is fixed you can do
+this:
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    IntArray a;
+    a.print(); // prints blank line; a.length_ is 0
+    a.set_length(5);
+    for (int i = 0; i < a.get_length(); i++)
+    {
+        a[i] = i * i;
+    }
+    a.print(); // prints 5 values; a.length_ is 5
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
+\begin{ex}
+Add a sum method that returns the sum of the values
+of \texttt{a.x\_[0], a.x\_[1], ..., a.x\_[a.length\_ - 1]}.
+Test your code with this:
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    IntArray a;
+     a.print(); // prints blank line; a.length_ is 0
+     a.set_length(5);
+     for (int i = 0; i < a.get_length(); i++)
+     {
+          a[i] = i * i;
+     }
+     a.print(); // prints 5 values; a.length_ is 5
+     std::cout << a.sum() << '\n';
+     return 0;
+}
+\end{consolethree}
+\end{ex}
+
 Clearly you can also implement an array of doubles, of bools, of ...
 
 
@@ -1247,7 +1919,75 @@ delete [] x;
 
 Pause ... and study your notes on pointers again ...
 
-\input{../exercises/37-61-constructors/question.tex}
+\begin{ex}
+Write the following dynamic integer array class. What
+I'm calling length in \texttt{IntArray}, I'm calling \texttt{size} here. The
+size of the array requested on the memory heap is \texttt{capacity}. Many
+of the methods requires minimum change from the version in
+\texttt{IntArray}.
+
+\begin{consolethree}[escapeinside=||]
+class IntDynArray
+{
+public:
+    IntDynArray(int capacity); // Allocate capacity
+                               // number of integers
+                               // for pointer x_. Set
+                               // size_ to 0 and
+                               // capacity_ to
+                               // capacity.
+    IntDynArray(const IntDynArray &);
+    int get_size();
+    void set_size(int);
+    void get_capacity();
+    void print();
+private:
+    int * x_;
+    int size_;
+    int capacity_;
+};
+\end{consolethree}
+
+Test your code with this:
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    IntDynArray a(10); request 10 integers
+    a.print(); // prints blank line; a.length is 0
+    a.set_size(5);
+    for (int i = 0; i < a.get_size(); i++)
+    {
+        a[i] = i * i;
+    }
+    a.print(); // prints 5 values
+    std::cout << a.sum() << '\n';
+    return 0;
+}
+\end{consolethree}
+
+Add a method to deallocate all memory allocated:
+
+\begin{consolethree}[escapeinside=||]
+class IntDynArray
+{
+public:
+    void deallocate();
+};
+\end{consolethree}
+
+and in \texttt{main} do this:
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    ...
+    a.deallocate();
+    return 0;
+}
+\end{consolethree}
+\end{ex}
+
 Again, later you will see that you can define a method that will be
 called automatically whenever the object is about to die. All you need
 to do is to deallocate memory in this special method and we don't have
