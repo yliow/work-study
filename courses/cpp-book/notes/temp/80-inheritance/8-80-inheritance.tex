@@ -1,0 +1,216 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Class Reuse: ``has-a'' and ``is-a''}
+
+Do not confuse inheritance and composition. They re-use old classes in
+different ways. Suppose \verb!P! is a class.
+
+There are two ways to reuse \verb!P!:
+
+\begin{itemize}
+\item
+  Using inheritance: \verb!C! inherits from \verb!P!
+\item
+  Using composition: \verb!C! contains a member that is of type \verb!P!
+\end{itemize}
+
+Look at the following example carefully. Make sure you understand what
+is happening.
+%this line goes off the page for some reason? cant figure out a quick fix atm
+\begin{console}
+#include <iostream>
+
+class P
+{
+public:
+        P() : x_(1) { std::cout << "P::P()\n"; }
+        P(int x) : x_(x) { std::cout << "P::P(int)\n"; }
+        ~P() { std::cout << "P::~P()\n"; }
+        int get_x() const { return x_; }
+        void set_x(int x) { x_ = x; }
+private:
+        int x_;
+};
+
+class C: public P
+{
+public:
+        C() : P(42), x_(3), y_(2)
+        { std::cout << "C::C()"; }
+        ~C() { std::cout << "C::~C()\n"; }
+        int get_y() const { return y_; }
+        void set_y(int y) { y_ = y; }
+private:
+        int x_;
+        int y_;
+};
+\end{console}
+
+\newpage\begin{consolethree}[escapeinside=||]
+...
+|\textbf{class D}|
+|\textbf{\{}|
+|\textbf{public:}|
+        |\textbf{D() : p\_(42), x\_(3), y\_(2)}|
+        |\textbf{\{ std::cout << "D::D()"; \}}|
+        |\textbf{~D() \{ std::cout << "D::~D()\textbackslash n"; \}} \sidebox{pobject}{D has a P object}|
+        |\textbf{int get\_y() const \{ return y\_; \}}|
+        |\textbf{void set\_y(int y) \{ y\_ = y; \}}|
+|\textbf{private:}|
+        |\tikzmarknode{enddtor}{\textbf{P p\_;}}| 
+        |\textbf{int x\_;}|
+        |\textbf{int y\_;}|
+|\textbf{\};}|
+\end{consolethree}
+\DrawArrowVH[red, thick]{pobject}{enddtor}
+\begin{console}[commandchars=\~\@\$]    
+int main()
+{   
+    C c;
+    std::cout << "c.x_ =" << c.get_x() << ", "
+              << "c.y_ =" << c.get_y() << '\n';
+    std::cout << "c.x_ =" << c.P::get_x() << ", "
+              << "c.y_ =" << c.C::get_y() << '\n';
+    P p;
+    p = c;
+    
+    !textbf@D d;$
+
+    return 0;
+} 
+\end{console}
+
+Study the above carefully. The \verb!c! object has its own \verb!x_!
+and \verb!y_! and the \verb!get_y! and \verb!set_y! methods. It also
+has (through inheritance) its \verb!P::x_! and method \verb!P::get_x!
+and \verb!P::set_x!. The object \verb!d! also has \verb!x_! and
+\verb!y_! and the \verb!get_x! and \verb!set_x! and it also has
+\verb!p_.x_! and \verb!p_.get_x! and \verb!p_.set_x!. In some
+sense both \verb!c! and \verb!d! have the same ``features''.
+
+\verb!c! has \verb!P!'s features by inheritance while \verb!d! has
+\verb!P!'s features through composition.
+
+If what you want in a class can be found in another class, should you
+use composition or inheritance?
+
+Look at ``is-a'' and ``has-a'' relationships between concepts.
+
+Suppose you have a \verb!Vehicle! class. You want to build a \verb!Car!
+class. Think about the relationship between the concept of a car and a
+vehicle. Which one sounds right:
+
+\begin{itemize}
+\item
+  A car ``is a'' vehicle or a vehicle ``is a'' car
+\item
+  A car ``has a'' vehicle or a vehicle ''has a'' car
+\end{itemize}
+
+Clearly this one sounds better.
+
+\begin{itemize}
+\item
+  A car ``is a'' vehicle
+\end{itemize}
+
+This tells you that you should probably use inheritance:
+\begin{console}
+class Vehicle {...};
+class Car: public Vehicle {...};
+\end{console}
+
+Suppose you have an \verb!Engine! class. You want to build a \verb!Car!
+class. What is the relationship between an engine and a car? Which one
+sounds right:
+
+\begin{itemize}
+\item
+  An engine ``is a'' car or an engine ``is a'' car
+\item
+  An engine car ``has a'' vehicle or a vehicle ``has an'' engine
+\end{itemize}
+
+Clearly this is the best:
+\begin{itemize}
+\item
+  A vehicle ``has an'' engine
+\end{itemize}
+
+This tells you that you should probably use composition:
+\begin{console}
+class Engine {...};
+class Car {
+...
+private:
+        Engine anEngine;
+        ...
+};
+\end{console}
+
+For composition, you want to create methods for methods in the instance
+members (delegation):
+\begin{console}
+class Engine {
+public:
+        void start();
+};
+
+class Car {
+public:
+        void start() { anEngine.start(); }
+private:
+        Engine anEngine;
+};
+\end{console}
+
+Users can then do this:
+\begin{console}
+Car honda_civic;
+honda_civic.start();
+// i.e., honda_civic.start() actually
+// executes honda_civic.anEngine.start()
+// i.e., honda_civic delegates the work of
+// "start" to it's engine
+\end{console}
+
+Otherwise you would need this:
+\begin{console}
+class Engine {
+public:
+        void start();
+};
+
+class Car {
+public:
+        Engine & get_engine() { return anEngine; }
+private:
+        Engine anEngine;
+};
+\end{console}
+
+And users would have to do this:
+\begin{console}
+Car honda_civic;
+honda_civic.get_engine().start();
+\end{console}
+
+This is \EMPHASIZE{not} so good. Why? Because you want to \EMPHASIZE{hide lower level details (engines)} and let users of your \verb!Car! class focus on higher level details (cars) which in this case is to ``start a car'' and not ``start the engine of a car''.
+
+In terms of re-use of code:
+\begin{itemize}
+\item
+  Derivation/inheritance is a form of white-box re-use
+\item
+  Composition is a form of black-box re-use
+\end{itemize}
+
+So in summary make sure you remember this:
+\begin{itemize}
+\item
+  ``is a'' -- inheritance
+\item
+  ``has a'' -- composition
+\end{itemize}
+

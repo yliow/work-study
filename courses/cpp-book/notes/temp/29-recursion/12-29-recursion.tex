@@ -1,0 +1,311 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Recursive computation on arrays: Part 2}
+
+In the previous section, we break the problem of finding the max of x[0],x[1],...,x[n-1] to maximum between x[0] and max of x[1],x[2],...,x[n-1]
+
+But there's another way to do this \ldots{} Suppose I have an array x with the following values:
+
+\verb!{2,3,5,6,4,1}!
+
+I call \verb!max({2,3,5,6,4,1})!. Now, \verb!max({2,3,5,6,4,1})! computes in the following way. It breaks up \{2,3,5,6,4,1\} into \EMPHASIZE{two arrays of roughly the same length}:
+
+\verb!{2,3,5}! and \verb!{6,4,1}!
+
+and call max() on each of these pieces and wait for the result. When it receives the results, it will compare the two values and return the largest.
+
+For instance max(\{2,3,5,6,4,1\}) will wait for max(\{2,3,5\}). What will max(\{2,3,5\}) do? It will break up 2, 3, 5 into two pieces roughly of the same lengths to get
+
+\textbf{\{2\} and \{3,5\}}
+
+and then call max(\{2\}) and max(\{3,5\}) and wait for their results, compare them, and return the larger.
+
+Clearly the maximum of an array with one value (such as 2) must be the value itself (i.e., 2). What about max(\{3,5\})? max(\{3,5\}) breaks up \{3,5\} to get:
+
+\textbf{\{3\} and \{5\}}
+
+and calls max(\{3\}) and max(\{5\}). The max(\{3\}) will return 3 and
+max(\{5\}) will return 5. So 3 and 5 is returned back to max(\{3,5\}).
+max(\{3,5\}) will return the larger of 3 and 5, i.e., it will return 5.
+
+Now who will receive the return value of max(\{3,5\})? You see that it
+is max(\{2,3,5\}). Altogether, max(\{2,3,5\}) will return 2 from
+max(\{2\}) and 5 from max(\{3,5\}). Therefore max(\{2,3,5\}) will return
+the larger of 2 and 5, i.e., 5. Who does max(\{2,3,5\}) return to? The 5
+is returned back to max(\{2,3,5,6,4,1\}). Don't forget
+that max(\{2,3,5,6,4,1\}) calls max(\{2,3,5\}) and max(\{6,4,1\}). Only
+one value, i.e. 5, is returned.
+
+You can check for yourself, using the above scheme, that max(\{6,4,1\}) will be returning 6.
+
+Therefore max(\{2,3,5,6,4,1\}) will return the large of 5 and 6, i.e.,
+it will return 6.
+
+So the pseudocode looks like this:
+
+\begin{consolethree}[escapeinside=||]
+int max(int x[], int start_index, int end_index)
+{
+    if start_index == end_index
+    {
+        // BASE CASE
+        return x[start_index]
+    }
+    else
+    {
+        // RECURSIVE CASE
+        int mid = (start_index + end_index) / 2
+        int maxleft = max(x, start_index, mid)
+        int maxright = max(x, mid+1, end_index)
+        return the large of maxleft, maxright
+    }
+}
+\end{consolethree}
+
+Make sure you study this VERY VERY CAREFULLY!!! It's
+EXTREMELY IMPORTANT!!!
+
+As you know (and I've said this a gazillion times),
+tracing a progam/pseudocode helps in understanding the underlying logic
+behind the program/pseudocode. This is particularly important for
+recursive functions because recursive functions will be in some of your
+later classes. It's not just an interesting trick.
+Recursive functions are fundamental objects of study in both
+mathematical logic and CS. I expect you to study the following two
+traces VERY CAREFULLY.
+
+To make sure you REALLY understand the above pseudocode, here is a trace
+of the computation of max(\{4\}, 0, 0):
+
+\begin{consolethree}
+max({4}, 0, 0):
+    x = {4}
+    start_index = 0
+    end_index = 0
+    start_index == end_index is true:
+        // BASE CASE
+        return x[start_index], i.e., return x[0], i.e., 4
+\end{consolethree}
+
+We're done.
+
+Here's the trace of max(\{2,4\}, 0, 1):
+\begin{python}
+from latextool_basic import *
+p = Plot()
+b0 = r"""
+\begin{consolethree}[escapeinside=||]
+|{ \tiny max({2,4}, 0, 1):}|
+    |{ \tiny x = {2,4}}|
+    |{ \tiny start\_index = 0}|
+    |{ \tiny end\_index = 1}|
+    |{ \tiny start\_index == end\_index is false:}|
+        |{ \tiny // RECURSIVE CASE:}|
+        |{ \tiny mid = (start\_index + end\_index) = (1 + 0)/2 = 0}|
+        |{ \tiny maxleft = max(x, 0, 0) ... WAITING}|
+\end{consolethree}
+"""
+b1 = r"""
+\begin{consolethree}[escapeinside=||]
+|{ \tiny max({2,4}, 0, 0):}|
+    |{ \tiny x = {2,4}}|
+    |{ \tiny start\_index = 0}|
+    |{ \tiny end\_index = 0}|
+    |{ \tiny start\_index == end\_index is true:}|
+        |{ \tiny // BASE CASE:}|
+        |{ \tiny return x[start\_index], i.e., return x[0], i.e., return 2}|
+\end{consolethree}
+"""
+b2 = r"""
+\begin{consolethree}[escapeinside=||]
+|{ \tiny (CONTINUING max({2,4},0,1) ...}|
+|{ \tiny max({2,4}, 0, 1):}|
+    |{ \tiny x = {2,4}}|
+    |{ \tiny start\_index = 0}|
+    |{ \tiny end\_index = 1}|
+    |{ \tiny start\_index == end\_index is false:}|
+        |{ \tiny // RECURSIVE CASE:}|
+        |{ \tiny mid = (start\_index + end\_index) = (1 + 0)/2 = 0}|
+        |{ \tiny maxleft = max(x, 0, 0) = 2}|
+        |{ \tiny maxright = max(x, mid+1, end\_index) = max(x, 1, 1) ... WAITING}|
+\end{consolethree}
+"""
+b3 = r"""
+\begin{consolethree}[escapeinside=||]
+|{ \tiny max(x, 1, 1):}|
+    |{ \tiny x = {2,4}}|
+    |{ \tiny start\_index = 1}|
+    |{ \tiny end\_index = 1}|
+    |{ \tiny start\_index == end\_index is true:}|
+        |{ \tiny // BASE CASE:}|
+        |{ \tiny return x[start\_index], i.e., return x[1], i.e., return 4}|
+\end{consolethree}
+"""
+b4 = r"""
+\begin{consolethree}[escapeinside=||]
+|{ \tiny (CONTINUING max({2,4},0,1) ...}|
+|{ \tiny max({2,4}, 0, 1):}|
+    |{ \tiny x = {2,4}}|
+    |{ \tiny start\_index = 0}|
+    |{ \tiny end\_index = 1}|
+    |{ \tiny start\_index == end\_index is false:}|
+        |{ \tiny // RECURSIVE CASE:}|
+        |{ \tiny mid = (start\_index + end\_index) = (1 + 0)/2 = 0}|
+        |{ \tiny maxleft = max(x, 0, 0) = 2}|
+        |{ \tiny maxright = max(x, mid+1, end\_index) = max(x, 1, 1) = 4}|
+        |{ \tiny return larger of 2 and 4, i.e., return 4}|
+\end{consolethree}
+"""
+p += Rect(0, 8, 10, 12, linewidth=0, innersep=0.1, s=b0, align='c')
+p += Rect(2, 3.75, 10, 7.75, linewidth=0, innersep=0.1, s=b1, align='c')
+p += Line(points=[(1, 8.25), (1, 3.5)], linewidth=0.05, endstyle='>')
+
+p += Rect(0, -1, 10, 3, linewidth=0, innersep=0.1, s=b2, align='c')
+p += Rect(2, -5.5, 10, -1.5, linewidth=0, innersep=0.1, s=b3, align='c')
+p += Line(points=[(1, -1.25), (1, -5.75)], linewidth=0.05, endstyle='>')
+
+p += Rect(0, -10.5, 10, -6, linewidth=0, innersep=0.1, s=b4, align='c')
+print(p)
+\end{python}
+max(\{2,4\}, 0, 1) was the first function call. So the final end result
+is 4.
+
+\input{exercises/38-29-recursion/main.tex}
+\input{exercises/39-29-recursion/main.tex}
+\input{exercises/40-29-recursion/main.tex}
+\input{exercises/41-29-recursion/main.tex}
+\input{exercises/42-29-recursion/main.tex}
+In the previous section, we basically compute by breaking up an array
+into one value and the rest, something like this:
+
+\verb!max of {5,3,1,2,4,6} = larger of 5 and max of {3,1,2,4,6}!
+
+Yes, it is recursion since max is calling max. In \EMPHASIZE{this}
+section we break up the array this way:
+
+\verb!max of {5,3,1,2,4,6} = larger of max of {5,3,1} and max of {2,4,6}!
+
+See the difference?
+
+You can think the length of the array of a measure of the size of the
+problem to be solved. Obviously a large array will require more time. In
+the previous section a problem (array) of size 6 will give rise to a
+problem of size 1 and another size 5.
+
+\verb!max of {5,3,1,2,4,6}) = larger of 5 and max of {3,1,2,4,6}!
+
+
+size 6 \hspace{2cm} size 1 \hspace{2cm} size 5
+
+
+In \EMPHASIZE{this} section a problem of size 6 will give rise to a
+problem of size 3 and another of size 3.
+
+\verb!max of {5,3,1,2,4,6} = larger of max of {5,3,1} and max of {2,4,6}!
+
+
+size 6 \hspace{2cm} size 3 \hspace{2cm} size 3
+
+
+In general, an algorithm that solves a problem using recursion so that a
+problem of size n is solved by recursing on two smaller problems, each
+of about half the size of the original is said to be a
+\EMPHASIZE{divide-and-conquer} algorithm.
+
+If your algorithm divides the problem of size n into three problems
+where each has size roughly n/3, then it is also called a
+divide-and-conquer algorithm (except that it divides into 3 equal parts
+instead of 2.)
+
+\input{exercises/43-29-recursion/main.tex}
+\input{exercises/44-29-recursion/main.tex}
+\input{exercises/45-29-recursion/main.tex}
+\input{exercises/46-29-recursion/main.tex}
+\input{exercises/47-29-recursion/main.tex}
+Refer to the standard binary search in your previous set of notes. We
+will now write the recursive version of the program (in pseudocode):
+
+\begin{console}
+// searches for target in a[left], ..., a[right]
+binarysearch(a, left, right, target):
+    if left > right:
+        return -1
+    else:
+        mid = left + (right - left) / 2
+        if a[mid] == target:
+            return mid
+        else if a[mid] < target:
+            return binarysearch(a, mid + 1, right, target)
+        else
+            return binarysearch(a, left, mid - 1, target)
+\end{console}
+
+Note that the \EMPHASIZE{binary search is also a divide-and-conquer
+algorithm}.
+
+\input{exercises/48-29-recursion/main.tex}
+For divide-and-conquer, when you apply that to an integer array where
+you have two index values \EMPHASIZE{left} and \EMPHASIZE{right}
+and you want to compute the index in the middle of left and right, it's
+easy. It's just
+
+\verb!int mid = left + (right - left) / 2;!
+
+Sometimes the subarray you are computing with is specified in terms of
+pointers, say \EMPHASIZE{start} and \EMPHASIZE{end} where
+\EMPHASIZE{start} is the address of the first value and
+\EMPHASIZE{end} is the address of the value \texttt{just outside} the
+subarray.
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+nums = [1, 3, 5, 2, 4]
+for i in range(5):
+    p += Rect(i, 0, i + 1, 1, innersep=0.1, s=str(nums[i]), align='c', linewidth=0.03)
+p += Rect(0.5, -1.5, 0.5, -1.5, innersep=0.1, s='start', align='c', linewidth=0)
+p += Rect(6, -1.5, 6, -1.5, innersep=0.1, s='end', align='c', linewidth=0)
+p += Line(points=[(0.5, -1.25), (0.5, -0.15)], linewidth=0.03, endstyle='>')
+p += Line(points=[(6, -1.25), (6, -0.15)], linewidth=0.03, endstyle='>')
+print(p)
+\end{python}
+
+In this case you can compute the address of the value in the middle
+using
+
+\verb!int * mid = start + (end - start) / 2;!
+
+Here's the max of array using divide-and-conquer where you specify the
+array using two pointers:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int max(int * start, int * end)
+{
+    if (start == end - 1)
+    {
+        return *start;
+    }
+    else
+    {
+        int * mid = start + (end - start) / 2;
+        int leftmax = max(start, mid);
+        int rightmax = max(mid, end);
+        return (leftmax >= rightmax ? leftmax : rightmax);
+    }
+}
+
+int main()
+{
+    int x[] = {1, 3, 5, 6, 4, 2};
+    std::cout << max(&x[0], &x[6]) << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+\input{exercises/49-29-recursion/main.tex}
+\input{exercises/50-29-recursion/main.tex}
+\input{exercises/51-29-recursion/main.tex}
+

@@ -1,0 +1,146 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Another Example}
+
+Here's a more substantial example. Recall this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+bool arrayEqual(int[], int, int[], int);
+
+int main()
+{
+    int x[] = {1, 2, 3};
+    int y[] = {1, 2, 3};
+    std::cout << arrayEqual(x, 3, y, 3);
+    return 0;
+}
+
+bool arrayEqual(int x[], int xSize, int y[], int ySize)
+{
+    if (xSize == ySize)
+    {
+        bool same = true;
+        for (int i = 0; i < xSize; i++)
+        {
+            if (x[i] != y[i])
+            {
+                same = false;
+                break;
+            }
+        }
+        return same;
+    }
+    else
+    {
+        return false;
+    }
+}
+\end{consolethree}
+
+What if you want to compare arrays of doubles? You need to have another
+function:
+
+\begin{consolethree}[escapeinside=||]
+bool arrayEqual2(double x[], double y[])
+{
+    bool same = true;
+    for (int i = 0; i < xSize; i++)
+    {
+        if (x[i] != y[i])
+        {
+            same = false;
+            break;
+        }
+    }
+    return same;
+}
+\end{consolethree}
+
+Uh oh ... what about comparing array of booleans? Or characters? Etc.
+
+Now try \textbf{\textit{this}}:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+|\EMPHASIZE{template < typename T >}|
+|\EMPHASIZE{bool arrayEqual(T[], int, T[], int);}|
+
+int main()
+{
+    int x[] = {1, 2, 3};
+    int y[] = {1, 2, 3};
+    std::cout << arrayEqual|\textbf{< int >}|(x, 3, y, 3)
+              << std::endl;
+
+    double a[] = {1.2, 3.4, 5.6};
+    double b[] = {2.1, 4.3, 6.5};
+    std::cout << arrayEqual|\EMPHASIZE{< double >}|(a, 3, b, 3)
+              << std::endl;
+    return 0;
+}
+
+|\EMPHASIZE{template < typename T >}|
+bool arrayEqual(|\textbf{T}| x[], int xSize, |\textbf{T}| y[], int ySize)
+{
+    if (xSize == ySize)
+    {
+        bool same = true;
+        for (int i = 0; i < 3; i++)
+        {
+            if (x[i] != y[i])
+            {
+                same = false;
+                break;
+            }
+        }
+        return same;
+    }
+    else
+    {
+        return false;
+    }
+}
+\end{consolethree}
+
+In this example our function template is this:
+
+\begin{consolethree}[escapeinside=||]
+template < typename T >
+bool arrayEqual(T x[], int xSize, T y[], int ySize)
+{
+    ...
+}
+\end{consolethree}
+
+Note that in the body of the function template, x and y are array of
+elements of type T. The elements of the two arrays appear in the code as
+
+\begin{consolethree}[escapeinside=||]
+bool arrayEqual(T x[], int xSize, T y[], int ySize)
+{
+    ...
+    |\EMPHASIZE{if (x[i] != y[i])}|
+    ...
+}
+\end{consolethree}
+
+As long as the \EMPHASIZE{!=} makes sense for type \EMPHASIZE{T}, C++ will be able to generate the actual function.
+
+For instance you can compare characters using !=. Therefore you can
+
+\begin{consolethree}[escapeinside=||]
+...
+|\EMPHASIZE{char}| s[] = {'a', 'b', 'c'};
+|\EMPHASIZE{char}| t[] = {'a', 'b', 'c'};
+std::cout << arrayEqual< |\EMPHASIZE{char}| >(x, 3, y, 3)
+          << std::endl;
+...
+\end{consolethree}
+
+\input{exercises/3-40-function-templates/main.tex}
+\input{exercises/4-40-function-templates/main.tex}
+

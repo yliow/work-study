@@ -1,0 +1,123 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Is the File Open?}
+
+The first thing to check is that when you open the file ... that it's actually opened! So first make sure that you don't have a file called xyz.txt, and next run this program:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <fstream>
+
+int main()
+{   
+    std::ifstream f("xyz.txt", std::ios::in);
+    std::cout << |\textbf{f.is\_open()}| << '\n';
+    f.close();
+    
+    return 0;
+}
+\end{consolethree}
+
+First note that the program does not crash even though you attempted to
+open a non-existentent file. Closing a file that was not opened also did
+not generate a fatal program crash. We definitely did not see any
+unhandled exception thrown.
+
+The method \verb!is_open()! does return the \texttt{false} boolean value (that's why 0 was printed), telling you that the file cannot be opened.
+
+\input{exercises/2-90-fileio/main.tex}Actually you can use the value of \texttt{f} to tell if the file is opened: if \texttt{f} cannot be opened, then the value of \texttt{f} is 0. Otherwise it will be a non-zero value. However using \texttt{is\_open()} is a better idea. Anyway you can try this with a non-existent \texttt{xyz.txt} and then where there's an \texttt{xyz.txt} file:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <fstream>
+
+int main()
+{   
+    std::ifstream f("xyz.txt", std::ios::in);
+    if (|\textbf{!f}|)
+    {   
+         std::cout << "error opening file xyz.txt"
+                   << std::endl;
+    }
+    else
+    {    
+         // do what you want to do ...
+         f.close();
+    }
+
+    return 0;
+
+}
+\end{consolethree}
+
+\input{exercises/3-90-fileio/main.tex}%SOLUTION FOR EX
+Solution:
+
+\begin{console}
+#include <iostream>
+#include <fstream>
+
+class FileOpenError
+{};
+
+int main()
+{   
+    try
+    {   
+         std::ifstream f("xyz.txt", std::ios::in);
+         if (!f.is_open())
+            throw FileOpenError();
+
+         // do what you want to do ...
+         f.close();
+     }
+     catch (FileOpenError & e)
+     {   
+         std::cout << "error opening file!"
+                   << std::endl;
+     }
+
+     return 0;
+}
+\end{console}
+
+Or even this:
+
+\begin{console}
+#include <iostream>
+#include <fstream>
+
+class FileOpenError
+{};
+
+class InputFile: public std::ifstream
+{
+public:
+     InputFile(const char filename[])
+       : std::ifstream(filename, std::ios::in)
+     {
+        if (!this->is_open())
+           throw FileOpenError();
+     }
+};
+
+int main()
+{   
+    try
+    {
+        InputFile f("xyz.txt");
+        // do what you want to do ...
+        f.close();
+    }
+    catch (FileOpenError & e)
+    {   
+        std::cout << "error opening file "
+                  << std::endl;
+    }
+    
+    return 0;
+
+}
+\end{console}
+

@@ -1,0 +1,112 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Memory address values and NULL}
+
+Up to this point I never assign constant address values directly to
+pointer variables like this:
+
+\begin{consolethree}[escapeinside=||]
+int x = 42;         // say the value of x is at
+                    // address 1205000
+int * p = 1205000;  // p points to the value of x
+\end{consolethree}
+To begin with, the address of x is usually different each time you run your program and is definitely different on a different computer. So the above would be a terrible idea.
+
+In general, assigning a constant to a pointer variable is rare. This happens when you're doing something very special such as very low level programming where you need to access hardware or doing embedded systems programming. For instance, say you know that an \texttt{unsigned int} value at memory location 20500080 is used for communication with a hardware device, you would do something like this:
+
+\begin{consolethree}[escapeinside=||]
+unsigned int * device = (unsigned int *) 20500080;
+\end{consolethree}
+
+After that, whenever the device outputs a value, it's sent to the \texttt{unsigned int} at this location and \texttt{device} pointer will be used to access this value.
+
+Unless otherwise stated, for CISS240, 245, 350, you will never assign or work directly with a constant memory address value. The only exception is the memory address \EMPHASIZE{0}. However instead of using memory address 0 like this:
+
+\begin{consolethree}[escapeinside=||]
+int * p = 0;
+double * q = 0;
+char * r = 0;
+\end{consolethree}
+you use the predefined constant \texttt{\EMPHASIZE{NULL}} like this:
+
+\begin{consolethree}[escapeinside=||]
+int * p = NULL;
+double * q = NULL;
+char * r = NULL;
+\end{consolethree}
+
+In order to use \texttt{NULL}, you might have to \texttt{\#include <cstddef>} at the top of your code:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+|\EMPHASIZE{\#include <cstddef>}|
+
+int main()
+{
+    int * p = NULL;
+    double * q = NULL;
+    char * r = NULL;
+    return 0;
+}
+\end{consolethree}
+Just to keep everything uniform, just make sure you include cstddef.
+
+So what is the value at address 0???
+
+Well the only important thing you need to know is this: \EMPHASIZE{you are not allowed to access the value at address 0.} Therefore \ldots{}
+
+\EMPHASIZE{\texttt{NULL} is only used to indicate that a pointer variable is not pointing to anything useful}. (You can also use \texttt{\textbf{nullptr}} instead of \texttt{\textbf{NULL}}. For C++11 compliant compilers, \texttt{\textbf{nullptr}} and \texttt{\textbf{NULL}} are the same. C++11 ISO/IEC 14882 was released 9/2011.)
+
+Because of the above, \texttt{NULL} is sometimes used to initialize a pointer variable before it is being used:
+
+\begin{consolethree}[escapeinside=||]
+int x = 1;
+int * p = NULL;   // p does not point to anything yet
+
+... p is not used for anything useful ...
+
+p = \&x;          // now point p to x
+
+... now p is used to do something useful ...
+\end{consolethree}
+
+\input{exercises/16-26-pointers/main.tex}It's common to draw it like this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(0,0, 8, 3)
+p += Rect(2, 1, 5, 2)
+p += Rect(1.5, 1.5, 1.5, 1.5, label='p')
+
+p += Line(points=[(2, 1), (5, 2)], linewidth=0.01)
+p += Line(points=[(2, 2), (5, 1)], linewidth=0.01)
+
+print(p)
+\end{python}
+
+or like this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(0,0, 8, 3)
+p += Rect(2, 1, 5, 2)
+p += Rect(1.5, 1.5, 1.5, 1.5, label='p')
+
+p += Line(points=[(3.5, 1.5), (6, 1.5), (6, 0.5)], linewidth=0.1, endstyle='>')
+
+p += Line(points=[(5.65, 0.5), (6.35, 0.5)], linewidth=0.1)
+
+p += Line(points=[(5.8, 0.25), (6.2, 0.25)], linewidth=0.1)
+
+p += Line(points=[(5.9, 0), (6.1, 0)], linewidth=0.1)
+
+print(p)
+\end{python}
+
+

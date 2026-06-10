@@ -1,0 +1,52 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Static variables}
+
+First let me talk about static variables in general (which has nothing
+to do with classes.)
+
+Static variables are declared before the program executes, and they stay
+in memory until the program halts. Functions are static, because the
+memory allocated for them is declared before the start of the program,
+and is only reclaimed once the program ends. Global variables are also
+static for the same reason.
+
+Try the following program:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void f()
+{
+    static int x = 0;
+    int y = 0;
+    x++; y++;
+    std::cout << x << ' ' << y << std::endl;
+}
+
+int main()
+{
+    f(); f(); f(); f();
+    return 0;
+}
+\end{consolethree}
+
+What's happening??? Well ...
+
+\begin{consolethree}[escapeinside=||]
+void f()
+{
+    static int x = 0; // this is executed ONCE when
+                      // the program starts up
+                      // and x STAYS AROUND even when
+                      // you return from f(). x goes
+                      // away and only when the
+                      // program ends. So x is NOT
+                      // automatic.
+    ...
+}
+\end{consolethree}
+
+\input{exercises/0-64-static-members/main.tex}
+

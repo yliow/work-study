@@ -1,0 +1,106 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Cleanup -- refactoring}
+
+In writing software, even when you're done, you should
+look at your code to see if you can improve on it. You do not want to
+change the behavior of the code. Rather you want to reorganize the code
+to make it easier to read or to make it more efficient. Such an activity
+is called \EMPHASIZE{refactoring}.
+
+This is something that all problem-solving processes involve, not just
+software development. In particular, this occurs a lot in fundamental
+research as well. For instance mathematicians always rewrite their
+proofs to improve the readability. Sometimes mathematicians will even
+derive different proofs of the same result in order to see things in a
+totally different way. Anyway, let's get back to
+programming.
+
+You realized that there is a lot of duplicate code. There is a lot of
+duplication when the program gives the user a second try:
+
+\begin{align*}
+&\texttt{Generate two random integers between 90 and 99}\\
+&\tab[3em]{\texttt{and give the values to variables x and y}}\\
+&\texttt{Store the product of x and y in variable answer}\\
+&\texttt{Print a prompt string to user to guess the}\\
+&\tab[3em]{\texttt{product of x and y}}\\\\
+&\texttt{Declare integer variable score and initialize it}\\
+&\tab[3em]{\texttt{to 0}}\\\\
+&\texttt{Declare integer variable guess}\\
+&\texttt{Prompt user for integer value for guess}\\\\
+&\texttt{If guess is answer}\\
+&\tab[3em]{\texttt{Print congratulatory message}}\\
+&\tab[3em]{\texttt{score = 2}}\\
+&\texttt{Otherwise if guess is less than the answer:}\\
+&\tab[3em]{\texttt{Tell user the guess is too low}}\\
+&\tab[3em]{\texttt{Print a prompt string to user to guess}}\\
+&\tab[6em]{\texttt{the product of x and y}}\\
+&\tab[3em]{\texttt{If guess is answer}}\\
+&\tab[6em]{\texttt{print congratulatory message}}\\
+&\tab[6em]{\texttt{score = 1}}\\
+&\tab[3em]{\texttt{Otherwise}}\\
+&\tab[6em]{\texttt{print answer}}\\
+&\texttt{Otherwise if guess is greater than the answer:}\\
+&\tab[3em]{\texttt{Tell user the guess is too high}}\\
+&\tab[3em]{\texttt{Print a prompt string to user to guess}}\\
+&\tab[6em]{\texttt{the product of x and y}}\\
+&\tab[3em]{\texttt{If guess is answer}}\\
+&\tab[6em]{\texttt{print congratulatory message}}\\
+&\tab[3em]{\texttt{score = 1}}\\
+&\tab[3em]{\texttt{Otherwise}}\\
+&\tab[6em]{\texttt{print answer}}\\\\
+&\texttt{Print user's score}\\
+\end{align*}
+
+Not everything is similar between the two chunks of code. But you can
+see that the similarities is around this spot:\\
+\begin{align*}
+&\texttt{If guess is answer}\\
+&\tab[3em]{\texttt{print congratulatory message}}\\
+&\tab[3em]{\texttt{score = 2}}\\
+&\texttt{Otherwise if guess is less than the answer:}\\
+&\tab[3em]{\texttt{Tell user the guess is too low}}\\
+&\tab[3em]{\texttt{\textbf{Print a prompt string to user to guess}}}\\
+&\tab[6em]{\texttt{\textbf{the product of x and y}}}\\
+&\tab[3em]\texttt{\textbf{If guess is answer}}\\
+&\tab[6em]{\texttt{\textbf{print congratulatory message}}}\\
+&\tab[6em]{\texttt{\textbf{score = 1}}}\\
+&\tab[3em]{\texttt{\textbf{Otherwise}}}\\
+&\tab[6em]{\texttt{\textbf{print answer}}}\\
+&\texttt{Otherwise if guess is greater than the answer:}\\
+&\tab[3em]{\texttt{Tell the user the guess is too low}}\\
+&\tab[3em]{\texttt{\textbf{Print a prompt string to user to guess}}}\\
+&\tab[6em]{\texttt{\textbf{the product of x and y}}}\\
+&\tab[3em]{\texttt{\textbf{If guess is answer}}}\\
+&\tab[6em]{\texttt{\textbf{print congratulatory message}}}\\
+&\tab[6em]{\texttt{\textbf{score = 1}}}\\
+&\tab[3em]{\texttt{\textbf{Otherwise}}}\\
+&\tab[6em]{\texttt{\textbf{print answer}}}\\
+\end{align*}
+We want to write one chunk of code and not two. To combine the chunks
+(they reside under two different boolean conditions right now) we need
+to have a common condition for both -- and that's when
+the first guess is incorrect:
+\begin{align*}
+& \texttt{If guess is answer}\\
+& \tab[3em]{\texttt{Print congratulatory message}}\\
+& \tab[3em]{\texttt{score = 2}}\\
+& \texttt{Otherwise}\\
+& \tab[3em]{\texttt{\textbf{If guess is less than the answer:}}}\\
+& \tab[3em]{\texttt{\textbf{Tell user the guess is too low}}}\\
+& \tab[3em]{\texttt{\textbf{Otherwise}}}\\
+& \tab[6em]{\texttt{\textbf{Tell user the guess is too high}}}\\
+& \tab[3em]{\texttt{\textbf{Print a prompt string to user to guess}}}\\
+& \tab[6em]{\texttt{\textbf{the product of x and y}}}\\
+& \tab[3em]{\texttt{\textbf{If guess is answer}}}\\
+& \tab[6em]{\texttt{\textbf{print congratulatory message}}}\\
+& \tab[6em]{\texttt{\textbf{score = 1}}}\\
+& \tab[3em]{\texttt{\textbf{Otherwise}}}\\
+& \tab[6em]{\texttt{\textbf{print answer}}}\\
+& \texttt{Print user's score}\\
+\end{align*}
+Now using this pseudocode, clean up your program and see how many lines
+of code shorter your program gets.
+

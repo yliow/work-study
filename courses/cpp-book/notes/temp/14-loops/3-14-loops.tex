@@ -1,0 +1,86 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{When do I use the \texttt{while}-Loop?}
+
+Suppose you want to write a program that adds numbers for a user but you
+do not know in advance how many numbers to add. Of course you need to
+give the user an opportunity to stop the adding process! There are two
+ways of doing this. Either you can ask the user each time if he/she
+wants to enter a number to add or to stop, or ... you can use a
+\EMPHASIZE{sentinel value}. This is a special value entered by the user to
+indicate that the processing loop should stop.
+
+Let's try the simplest possible example. This program
+prompts the user until he/she enters a sentinel value.
+I'm choosing -1 to be the sentinel value.
+
+
+\EMPHASIZE{i dont know how to properly format this right now}
+prompt user for data
+while value of data is not sentinel value:
+process data
+prompt user for data
+Note that there is code duplication:
+prompt user for data
+while value of data is not sentinel value:
+process data
+prompt user for data
+
+\EMPHASIZE{Removing Duplication in the sentinel \texttt{while}-loop}
+
+Look at the sentinel while-loop again:
+
+\EMPHASIZE{i dont know how to properly format this right now}
+prompt user for data
+while value of data is not sentinel value:
+process data
+prompt user for data
+
+Remember that there is code duplication. If you want to get rid of code
+duplication, you can do this:
+
+while (1): // don't forget that 1 is type cast to true
+prompt user for data
+if value is the sentinel value:
+break
+process data
+
+Note that some people do not like \texttt{break}s because
+it's harder to tell when you get out of a loop because
+you can issue a \texttt{break} statement anywhere in the body of the
+\texttt{while} loop. They prefer the exit condition in the header of the
+\texttt{while} loop so that visually one can tell quickly when you get out
+of the loop.
+
+Using the above technique, the following program:
+
+\begin{console}[commandchars=\~\@\$]
+int i = 0, sum = 0;
+
+~textbf@std::cout << "gimme a number: "; // INPUT$
+~textbf@std::cin >> i;$
+while (~textbf@i != -1$) ~textbf@// CONDITION TO REPEAT LOOP$
+{     
+      sum += i;
+      
+      ~textbf@std::cout << "gimme a number: "; // INPUT$
+      ~textbf@std::cin >> i;$
+}
+std::cout << "sum: " << sum << std::endl;
+\end{console}
+becomes:
+\begin{console}[commandchars=\~\@\$]
+int i = 0, sum = 0;
+while (1)
+{     
+      ~textbf@std::cout << "gimme a number: "; // INPUT$
+      ~textbf@std::cin >> i;$
+      ~textbf@if (i == -1) break; // CONDITION TO EXIT LOOP$
+      
+      sum += i;
+}
+std::cout << "sum: " << sum << std::endl;
+\end{console}
+Make sure you study this program carefully!!!
+

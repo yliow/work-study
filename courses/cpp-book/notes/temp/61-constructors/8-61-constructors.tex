@@ -1,0 +1,92 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Method overloading}
+
+Methods in a class can also be overloaded as long as the signatures are
+different.
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    void f(int);
+    void f(int, int);
+    void f(int, double);
+};
+\end{consolethree}
+
+In this case, all the following have different signatures.
+
+\tab[3em]{\texttt{C::f(int)}}\\
+
+\tab[3em]{\texttt{C::f(int, int)}}\\
+
+\tab[3em]{\texttt{C::f(int, double)}}\\
+
+Note that since every method is within a class scope, you can have
+methods with the same name and same signatures but in different classes.
+So the following is OK:
+
+\tab[3em]{\texttt{C::f(int x) \{\}}}\\
+
+\tab[3em]{\texttt{D::f(int x) \{\}}}\\
+
+since if an object \texttt{obj} is of class \texttt{C}, then
+\texttt{obj.f(42)} will result in \texttt{C::f} being executed. There's no
+ambiguity.
+
+We will be overloading the \texttt{Date} constructor: We will later write
+a ``default'' constructor and a ``copy constructor''.
+
+I'll write another constructor so that I can do something like this:
+
+\begin{consolethree}[escapeinside=||]
+Date date1("December 25, 1985");
+\end{consolethree}
+
+The prototype is of course like this:
+
+\begin{consolethree}[escapeinside=||]
+Date(char s[]);
+\end{consolethree}
+
+The pseudocode should be like this:
+
+\begin{consolethree}[escapeinside=||]
+read enough character from s to compute the value for mm_
+read past a space
+read till a comma is reached, computing the value for dd_
+read past a space
+read remaining characters to compute the value for yyyy_
+\end{consolethree}
+
+And we get:
+
+\begin{consolethree}[escapeinside=||]
+Date(char s[])
+{
+    int i = 0;
+    if (s[0] == 'J' && s[1] == 'a') mm_ = 1;
+    else if (s[0] == 'F' && s[1] == 'e') mm_ = 2;
+    ...
+    i = 2;
+    while (s[i] != ' ') i++;
+    i++;
+    dd_ = 0;
+    while ((0 <= s[i] - '0') && (s[i] - '0' <= 9))
+    {
+        dd_ *= 10; dd_ += (s[i] - '0'); i++;
+    }
+    while ((s[i] < '0') || (s[i] > '9')) i++;
+    yyyy_ = 0;
+    while ((0 <= s[i] - '0') && (s[i] - '0' <= 9))
+    {
+        yyyy_ *= 10;
+        yyyy_ += (s[i] - '0');
+        i++;
+    }
+}
+\end{consolethree}
+
+

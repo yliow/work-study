@@ -1,0 +1,183 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Pointer Power \#2: Speeding up function calls}
+
+Now for our second application of pointers (and references): speeding up function calls by passing in pointer values (or references) in order to avoid copying of values
+
+First look at this very simple (and old) program:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int max(int x, int y)
+{
+    return (x > y ? x : y);
+}
+
+int main()
+{
+    int a;
+    std::cin >> a;
+    int b;
+    std::cin >> b;
+    int x = max(a, b);
+    std::cout << x << '\n';
+    return 0;
+}
+\end{consolethree}
+No big deal.
+
+Now run this
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int * max(int * x, int * y)
+{
+    if (*x > *y)
+    {
+        return x;
+    }
+    else
+    {
+        return y;
+    }
+}
+
+int main()
+{
+    int a;
+    std::cin >> a;
+    int b;
+    std::cin >> b;
+    int * p = max(&a, &b);
+    std::cout << *p << '\n';
+    std::cout << &a << ' ' << &b
+              << ' ' << p << '\n';
+    return 0;
+}
+\end{consolethree}
+It's helpful if you draw a picture of the computation and explain what's happening. Don't panic \ldots just draw the picture and explain slowly and carefully.
+
+You can clean up the \texttt{max()} function above like this:
+
+\begin{consolethree}[escapeinside=||]
+int * max(int * x, int * y)
+{
+    return (*x > *y ? x : y);
+}
+\end{consolethree}
+This is what's going on in the program: instead of computing and returning the maximum of two values, the function actually returns a pointer value that points to the address of the variable with the larger value.
+
+We can even do this: Note that the above max function has pointer parameters whose pointer values do not change -- we can make them constant pointers. They also do not change the value they point to -- we can make them point to constant integers. So we can do this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+const int * const max(const int * const x,
+                      const int * const y)
+{
+    return (*x > *y ? x : y);
+}
+
+int main()
+{
+    int a;
+    std::cin >> a;
+    int b;
+    std::cin >> b;
+    const int * const p = max(&a, &b);
+    std::cout << *p << '\n';
+    std::cout << &a << ' ' << &b << ' '
+              << p << '\n';
+    return 0;
+}
+\end{consolethree}
+or this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+const int * const max(const int * const x,
+                      const int * const y)
+{
+    return (*x > *y ? x : y);
+}
+
+int main()
+{
+    int a;
+    std::cin >> a;
+    int b;
+    std::cin >> b;
+    std::cout << *max(&a, &b) << '\n';
+    std::cout << &a << ' ' << &b << ' '
+                    << max(&a, &b) << '\n';
+    return 0;
+}
+\end{consolethree}
+Note that you can also do this using references. Study the following program carefully:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+const int & max(const int & x, const int & y)
+{
+    return (x > y ? x : y);
+}
+
+int main()
+{
+    int a;
+    std::cin >> a;
+    int b;
+    std::cin >> b;
+    const int & r = max(a, b);
+    std::cout << r << '\n';
+    std::cout << &a << ' ' << &b
+                    << ' ' << &r << '\n';
+    return 0;
+}
+\end{consolethree}
+Now why would you want to pass in and return a pointer (or references) to one of the variables that contains the maximum value and not compute and return the maximum value??? Isn't the first method a lot simpler?!?
+
+Because the pointer (or reference method) can save memory (and potentially time). How so?
+
+When you compute the maximum value and return that value, you have to create that value and put it somewhere for returning. (Recall the stack?) For returning the maximum of two doubles, I have to save a double value onto the stack -- that's 8 bytes. For the pointer method (and similarly for the reference method), I have to save the pointer address of the variable holding the maximum value onto the stack. A pointer address is 32-bits (on a 32-bit machine) which is 4 bytes. Also, remember that using pass-by-value, the two doubles would have to saved onto the stack for the max function to retrieve.
+
+And what if the two values I'm computing with actually takes more bytes?
+Then the difference is even greater. For instance in C++, there's a \texttt{long double} type. On my computer, the \texttt{long double} occupies 12 bytes. So for the method that returns the maximum value, I have to
+
+\begin{itemize}
+
+\item
+  copy two \texttt{long double}s values (24 bytes) onto the stack
+\item
+  compute and return a \texttt{long double} (12 bytes)
+\end{itemize}
+
+For the pointer method that returns an address, I have to
+
+\begin{itemize}
+
+\item
+  copy two addresses (8 bytes) of \texttt{long double} variables onto the stack
+\item
+  compute the address (4 bytes) for returning.
+\end{itemize}
+
+There's of course a cost involved for the pointer method -- I have to dereference the pointers. But in any case, when the values to be used for computing occupies a huge amount of space, the pointer (or reference) method is preferred.
+
+\input{exercises/59-26-pointers/main.tex}
+\begin{consolethree}[escapeinside=||]
+int & max(int x, int y)
+{
+    int q;
+    q = (x > y ? x : y);
+    return q;
+}
+\end{consolethree}
+
+Here's a general principle: \EMPHASIZE{Never return a pointer that points to a local variable in a function!!!} Because the pointer will point to a value that will be destroyed when you exit the function!!! In the same way: \EMPHASIZE{Never return a reference that refers to a local variable in a function!!!}
+

@@ -1,0 +1,110 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{\texttt{delete}}
+
+After doing a \texttt{new}, you can return the memory back to the heap by
+doing a \texttt{delete}. For instance:
+
+\xsidebox[0cm]{0cm}{}{refx}{\texttt{"delete p"} does not mean \texttt{p} disappears!!! it means "hey heap ... you can have the memory at \texttt{p} back"}
+
+\begin{consolethree}[escapeinside=||]
+int * p = new int;
+
+// ... do something here with *p ...
+
+delete p;
+\end{consolethree}
+After \texttt{delete p}, the heap will \EMPHASIZE{mark the memory that p is pointing to as available} (i.e. not in use). This is called \EMPHASIZE{deallocating} the memory that \texttt{p} is using or \EMPHASIZE{releasing} the memory \texttt{p} is using back to the heap.
+
+Here are some really important points:
+
+\begin{itemize}
+
+\item
+  Delete pointers ASAP when you don't need them anymore.
+\item
+  As much as possible, delete pointers in the same block where you
+  new'ed them. You should see new and delete for a pointer in the same
+  block. (There are exceptions.)
+\end{itemize}
+
+After a pointer is deleted it should not be dereferenced. If you need memory again, you just do another \texttt{new}:
+
+\begin{consolethree}[escapeinside=||]
+if (x > 42)
+{
+    int * p = new int;
+
+    // ... do something with *p ...
+
+    delete p;
+
+    // DO NOT USE *p HERE
+
+    p = new int;
+
+    // ... do something with *p ...
+
+    delete p;
+
+    // DO NOT USE *p HERE
+}
+
+// p is destroyed 
+\end{consolethree}
+Note that when \texttt{p} is pointing to memory not in the heap obtained by \texttt{new}, then you do NOT \texttt{delete p}. For instance:
+
+\begin{consolethree}[escapeinside=||]
+int x = 42;
+
+int * p = &42;
+
+int * q = new int;
+
+delete p; // BAD!!!
+
+delete q; // OK
+\end{consolethree}
+And of course you do not release if you did not \texttt{new} it:
+
+\begin{consolethree}[escapeinside=||]
+double * p;
+
+delete p; // Huh????
+\end{consolethree}
+Put in a different way: you cannot give a memory back to the heap if you did not get it from the heap to begin with.
+
+The tendency is to forget to deallocate and then re-allocate, like this:
+
+\begin{consolethree}[escapeinside=||]
+int * p;
+
+// I need an int ...
+
+p = new int;
+
+// ... now use *p
+
+// 1000 lines later ...
+
+// Lack of sleep ... I need an int ...
+
+p = new int;
+
+// ... now use *p
+
+// 1000 lines later ...
+
+// Amnesia kicks in ... I need an int ...
+
+p = new int;
+
+// ... now use *p
+\end{consolethree}
+Can you say ``memory leak''?!?! So deallocate ASAP!!! Don't argue!!!
+
+\input{exercises/66-26-pointers/main.tex}\input{exercises/67-26-pointers/main.tex}\input{exercises/68-26-pointers/main.tex}
+\input{exercises/69-26-pointers/main.tex}
+\input{exercises/70-26-pointers/main.tex}
+\input{exercises/71-26-pointers/main.tex}

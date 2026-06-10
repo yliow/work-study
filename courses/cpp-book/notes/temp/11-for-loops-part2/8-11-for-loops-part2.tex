@@ -1,0 +1,123 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Unrolling the for-loop: Another example}
+
+What about this? If the user enters 3 your program has to draw:
+\begin{console}
+  ***
+ ***
+***
+\end{console}
+If the user enters 4 your program has to draw
+\begin{console}
+   ****
+  ****
+ ****
+****
+\end{console}
+The pseudocode for the case when the user enters 3 is (without using the
+for-loop):
+\begin{console}
+draw 2 spaces
+draw 3 stars
+draw 1 space
+draw 3 stars
+draw 3 stars
+\end{console}
+The trick is to make everything as uniform as possible. So write this:
+\begin{console}[commandchars=\~\@\$]
+draw 2 spaces
+draw 3 stars
+draw 1 space
+draw 3 stars
+~textbf@draw 0 space$
+draw 3 stars
+\end{console}
+See the pattern yet? No?
+
+The interleaving of two different things is confusing. Rewrite this as:
+\begin{console}
+draw 2 spaces; draw 3 stars
+draw 1 space; draw 3 stars
+draw 0 space; draw 3 stars
+\end{console}
+What if the user enters 4? The pseudocode becomes
+\begin{console}
+draw 3 spaces; draw 4 stars
+draw 2 spaces; draw 4 stars
+draw 1 space; draw 4 stars
+draw 0 space; draw 4 stars
+\end{console}
+How do you combine the above cases into one common pseudocode?
+
+The first is
+\begin{console}
+for i = 2, 1, 0:
+        draw i spaces; draw 3 stars
+\end{console}
+The second is
+\begin{console}
+for i = 3, 2, 1, 0:
+        draw i spaces; draw 4 stars
+\end{console}
+
+Now both pseudocodes are almost the same!!! Suppose the value entered by
+the user is kept in a variable n. Then you can (finally!) combine both
+pseudocodes into one:
+\begin{console}
+for i = n-1, ..., 0:
+        draw i spaces; draw n stars
+\end{console}
+
+Now you add in the details:
+\begin{console}
+for i = n-1, ..., 0:
+      // draw i spaces
+      for j = 1, ..., i
+          draw a space
+      // draw n stars
+      for j = 1, ..., n
+          draw a star
+      go to next line
+\end{console}
+
+And finally a straightforward translation to C++ yields:
+\begin{console}
+for (int i = n - 1; i >= 0; i--)
+{   
+    for (int j = 1; j <= i; j++)
+    {
+        std::cout << ' ';
+    }
+    for (int j = 1; j <= n; j++)
+    {
+        std::cout << '*';
+    }
+    std::cout << std::endl;
+}
+\end{console}
+Adding the prompt (and some comments) we get:
+\begin{console}
+int n = 0;
+std::cin >> n;
+for (int i = n-1; i >= 0; i--)
+{   
+    // Print i spaces
+    for (int j = 1; j <= i; j++)
+    {
+        std::cout << ' ';
+    }
+    // Print n stars
+    for (int j = 1; j <= n; j++)
+    {
+        std::cout << '*';
+    }
+    std::cout << std::endl;
+}
+\end{console}
+\input{exercises/10-11-for-loops-part2/main.tex}
+[See next page for hints.]
+
+\input{exercises/11-11-for-loops-part2/main.tex}[See next page for hints.]
+

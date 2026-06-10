@@ -1,0 +1,80 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Friends}
+
+You can let \textit{operator<<} have access to the
+private members of the object by making your
+\textit{operator<<} a \textbf{friend} in your class. We
+will re-visit friends later.
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+#ifndef INT_H
+#define INT_H
+
+class C
+{
+public:
+    Int(int x0 = 0)
+        : x_(x0)
+    {}
+    int get() const { return x_; }
+    |{\bf friend}| std::ostream & operator<<(std::ostream &, const Int &);
+private:
+    int x_;
+};
+
+#endif
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+#include "Int.h"
+
+std::ostream & operator<<(std::ostream & cout, const Int & c)
+{
+    cout << |{\bf c.x\_}|;
+    return cout;
+}
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+#include "Int.h"
+
+int main()
+{
+    Int c(42),d(43);
+    std::cout << c << "," << d << "\n";
+    return 0;
+}
+\end{consolethree}
+
+In general, if the header of a function \textit{f} is a friend in a class
+\textit{C}, then \textit{f} has access to things in private section of class
+\textit{C}:
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    |{\bf friend void f(C \& c);}|
+private:
+    int x_;
+    void m() { x++; }
+}
+
+void f(C & c)
+{
+    c.x_ = 0; // f can access c.x_ (private)
+    c.m(); // f can access c.m (private)
+}
+\end{consolethree}
+
+Do NOT declare too many friends in a class -- this breaks the principle
+of information hiding and makes the class harder to maintain in case you
+need private members variables or methods in the future.
+
+Of course friends can be completely avoided.
+
+

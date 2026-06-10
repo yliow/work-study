@@ -1,0 +1,233 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{A mental computational model}
+
+To explain the execution and return of a function call, here's a model of our ``computer''.
+
+We're adding a special container, called the \EMPHASIZE{stack}, that will allow us to do three things:
+
+\begin{itemize}
+\item Remember the point of return
+\item Put value(s) to pass to the function
+\item Put value to pass back from the function
+\end{itemize}
+
+Remember that \EMPHASIZE{this is only a model}.
+
+Here's the program we will execute on our model. (We won't talk about \#\verb!include!. That will come soon.)
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int square(int x)
+{
+    return x * x;
+}
+
+int main()
+{
+    int i = 5;
+    int j = square(i + 1);
+    std::cout << j << std::endl;
+
+    return 0;
+}
+\end{consolethree}
+So here's your computer again:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += ellipse(-2,-1,2,1, linewidth=0.1)
+p += ellipse(3.5,1.5,3.75,1.75, linewidth=0.1)
+p += ellipse(3.35,1.85,3.95,2.05, linewidth=0.1)
+p += ellipse(3.25,2.1,4.25,2.5, linewidth=0.1)
+p += ellipse(2.75,2.65,4.75,3.45, linewidth=0.1)
+p += Rect(-3, -2, 3, 2, linewidth=0.01)
+p += Rect(0, 1.35, 0, 1.35, linewidth=0, label='\\EMPHASIZE{CPU}')
+print(p)
+\end{python}
+
+\newpage
+
+%this block of python code was working fine, it still works fine when i run "python main.py", but now, 12/31/25 im getting this consistent, bewildering error that i have no idea how to fix or why it even showed up:  ! Undefined control sequence.
+%                           %l.385 ....5) {\texttt{int j = square(i + 1)};\node
+                                                                               %[draw,shape=ellipse,
+                                                                               %? 
+%ill finish it sometime later, im moving on to a different chapter altogether
+\begin{python}
+from latextool_basic import *
+p = Plot()
+#p += Grid(-10,-10,7,10)
+p += Rect(-10, 0, -1, 10, s='\\EMPHASIZE{Code}', align='t')
+
+#entries = ['\#include <iostream>', '', 'int square(int x)', '\{', '    return x * x;', '\}', '', 'int main()', '\{', '    int i = 5;', '    int j = square\(i + 1\)', '    std::cout << j << std::endl;', '', '    return 0;', '\}']
+
+num = 1
+b = 8
+for i in entries:
+    #p += Rect(-9.5, b, -0.5, b, linewidth=0, s=r'\texttt{" + str(num) + ".} \texttt{" + i + "}', align='l')
+    b -= 0.5
+    num += 1
+
+p += Rect(-10, -6, -2, -2, innersep=0.1, s='\\EMPHASIZE{Memory}', linewidth=0.05, align='t')
+p += Rect(-8.5, -5.5, -3.5, -3.5, innersep=0.1, s='\\EMPHASIZE{main}', linewidth=0.1, align='t')
+p += Rect(-1, -6, 6, -2, innersep=0.1, s='\\EMPHASIZE{Stack}', linewidth=0.05, align='t')
+p += ellipse(0,-1,6.5,4, linewidth=0.1)
+p += ellipse(0, 4, 1, 4.5, linewidth=0.05)
+p += ellipse(0.25, 3.5, 1, 3.75, linewidth=0.05)
+p += ellipse(0.35, 4.5, 2, 5.5, linewidth=0.05)
+p += ellipse(1, 5, 7.5, 7.5, linewidth=0.05)
+
+p += Rect(-9.5, 4.1, -6.1, 4.65, linewidth=0.05, linecolor='red')
+
+p += Rect(-3, -10, 0, -8, linewidth=0.1, innersep=0.1, linecolor='red', s='Memory for \\texttt{main()} is created', align='c')
+p += Line(points=[(-1.5, -8), (-5, -5.5)], linewidth=0.1, linecolor='red', endstyle='>')
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+#p += Grid(-10,-10,7,10)
+p += Rect(-10, 0, -1, 10, s='\\EMPHASIZE{Code}', align='t')
+entries = ['\#include <iostream>', '', 'int square(int x)', '\{', '    return x * x;', '\}', '', 'int main()', '\{', '    int i = 5;', '    int j = square(i + 1)', '    std::cout << j << std::endl;', '', '    return 0;', '\}']
+num = 1
+b = 8
+for i in entries:
+    p += Rect(-9.5, b, -0.5, b, linewidth=0, s= '\\texttt{' + str(num) + '.} \\texttt{' + i + '}', align='l')
+    b -= 0.5
+    num += 1
+p += Rect(-10, -6, -2, -2, innersep=0.1, s='\\EMPHASIZE{Memory}', linewidth=0.05, align='t')
+p += Rect(-7.5, -5.5, -3.5, -3.5, innersep=0.1, s='\\EMPHASIZE{main}', linewidth=0.1, align='t')
+p += Rect(-6.75, -4.6, -6.75, -4.6, innersep=0.1, s='\\textbf{i}', linewidth=0)
+p += Rect(-6.5, -5, -4.5, -4.25, innersep=0.1, s='5', linewidth=0.05, align='c')
+p += Rect(-1, -6, 6, -2, s='\\EMPHASIZE{Stack}', linewidth=0.05, align='t')
+p += ellipse(0,-1,6.5,4, linewidth=0.1)
+p += ellipse(0, 4, 1, 4.5, linewidth=0.05)
+p += ellipse(0.25, 3.5, 1, 3.75, linewidth=0.05)
+p += ellipse(0.35, 4.5, 2, 5.5, linewidth=0.05)
+p += ellipse(1, 5, 7.5, 7.5, linewidth=0.05)
+
+#p += Rect(-9.5, 3.1, -5.5, 3.65, linewidth=0.05, linecolor='red')
+#p += Rect(-3, -10, 0, -8, linewidth=0.1, innersep=0.1, linecolor='red', s='Memory for \\texttt{main()} is created', align='c')
+#p += Line(points=[(-1.5, -8), (-5, -5.5)], linewidth=0.1, linecolor='red', endstyle='>')
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+#p += Grid(-10,-10,7,10)
+p += Rect(-10, 0, -1, 10, s='\\EMPHASIZE{Code}', align='t')
+entries = ['\#include <iostream>', '', 'int square(int x)', '\{', '    return x * x;', '\}', '', 'int main()', '\{', '    int i = 5;', '    int j = square(i + 1)', '    std::cout << j << std::endl;', '', '    return 0;', '\}']
+num = 1
+b = 8
+for i in entries:
+    p += Rect(-9.5, b, -0.5, b, linewidth=0, s= '\\texttt{' + str(num) + '.} \\texttt{' + i + '}', align='l')
+    b -= 0.5
+    num += 1
+p += Rect(-10, -6, -2, -2, innersep=0.1,s='\\EMPHASIZE{Memory}', linewidth=0.05, align='t')
+p += Rect(-7.5, -5.5, -3.5, -3.5, innersep=0.1, s='\\EMPHASIZE{main}', linewidth=0.1, align='t')
+p += Rect(-6.75, -4.6, -6.75, -4.6, innersep=0.1, s='\\textbf{i}', linewidth=0)
+p += Rect(-6.5, -5, -4.5, -4.25, innersep=0.1, s='5', linewidth=0.05, align='c')
+p += Rect(-1, -6, 6, -2, s='\\EMPHASIZE{Stack}', linewidth=0.05, align='t')
+p += ellipse(0,-1,6.5,4, linewidth=0.1, innersep=0.1, label='\\texttt{int j = square(i + 1)', align='c')
+p += ellipse(0, 4, 1, 4.5, linewidth=0.05)
+p += ellipse(0.25, 3.5, 1, 3.75, linewidth=0.05)
+p += ellipse(0.35, 4.5, 2, 5.5, linewidth=0.05)
+p += ellipse(1, 5, 7.5, 7.5, linewidth=0.05)
+
+p += Rect(-9.5, 3.1, -5.5, 3.65, linewidth=0.05, linecolor='red')
+p += Rect(-3, -10, 0, -8, linewidth=0.1, innersep=0.1, linecolor='red', s='We need to evaluate the right first', align='c')
+p += Line(points=[(-1.5, -8), (-1, 3)], linewidth=0.1, linecolor='red', endstyle='>')
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Grid(-10,-10,7,10)
+p += Rect(-10, 0, -1, 10, s='\\EMPHASIZE{Code}', align='t')
+entries = ['\#include <iostream>', '', 'int square(int x)', '\{', '    return x * x;', '\}', '', 'int main()', '\{', '    int i = 5;', '    int j = square(i + 1)', '    std::cout << j << std::endl;', '', '    return 0;', '\}']
+num = 1
+b = 8
+for i in entries:
+    p += Rect(-9.5, b, -0.5, b, linewidth=0, s= '\\texttt{' + str(num) + '.} \\texttt{' + i + '}', align='l')
+    b -= 0.5
+    num += 1
+p += Rect(-10, -6, -2, -2, innersep=0.1,s='\\EMPHASIZE{Memory}', linewidth=0.05, align='t')
+p += Rect(-7.5, -5.5, -3.5, -3.5, innersep=0.1, s='\\EMPHASIZE{main}', linewidth=0.1, align='t')
+p += Rect(-6.75, -4.6, -6.75, -4.6, innersep=0.1, s='\\textbf{i}', linewidth=0)
+p += Rect(-6.5, -5, -4.5, -4.25, innersep=0.1, s='5', linewidth=0.05, align='c')
+p += Rect(-1, -6, 6, -2, s='\\EMPHASIZE{Stack}', linewidth=0.05, align='t')
+p += ellipse(0,-1,6.5,4, linewidth=0.1, innersep=0.1, label='\\texttt{int j = square(i + 1)', align='c')
+p += ellipse(0, 4, 1, 4.5, linewidth=0.05)
+p += ellipse(0.25, 3.5, 1, 3.75, linewidth=0.05)
+p += ellipse(0.35, 4.5, 2, 5.5, linewidth=0.05)
+p += ellipse(1, 5, 7.5, 7.5, linewidth=0.05)
+
+p += Rect(-9.5, 3.1, -5.5, 3.65, linewidth=0.05, linecolor='red')
+p += Rect(-3, -10, 0, -8, linewidth=0.1, innersep=0.1, linecolor='red', s='We need to evaluate the right first', align='c')
+p += Line(points=[(-1.5, -8), (-1, 3)], linewidth=0.1, linecolor='red', endstyle='>')
+print(p)
+\end{python}
+
+That's it!
+
+There are several important things to observe in this simulation:
+
+\begin{itemize}
+\item The memory for the call to \texttt{square()} is different from the memory of \texttt{main()}
+\item Values are passed between \texttt{main()} and \texttt{square()} and not the variables.
+\end{itemize}
+
+By the way there's something special about the stack. A \EMPHASIZE{stack} is a data structure (i.e. container of data with operations) that allows you to put things into it (this operation is called \EMPHASIZE{push}) and also to get something out of it (the operation is called \EMPHASIZE{pop}). You cannot choose what you want to get out of the stack: It will always be the last thing that you put into it. That's why the stack is also called a \EMPHASIZE{last-in-first-out} \EMPHASIZE{(LIFO)} data structure.
+
+A stack of plates at a buffet is (almost) a stack. The plate you take (if you only take from the top) is the last plate placed onto the stack.
+
+The above model illustrates many concepts in function calling. But it's only a model. For the real picture you have to take CISS360 (Assembly Language and Computer Systems) and to understand how Physics (or electronics) can be used to physically implement a computational device you have to take CISS430 (Computer Architecture).
+
+By the way, it's actually \EMPHASIZE{OK not to use a return value}. For instance the following program is valid:
+
+\begin{consolethree}[escapeinside=||]
+int square(int x)
+{
+    return x * x;
+}
+
+int main()
+{
+    square(4);
+    return 0;
+}
+\end{consolethree}
+
+As you can see in the above code the value 16 is neither being used in any computation or nor in a print statement. It's just thrown away.
+
+In fact something like this is also valid! (Although quite silly).
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    16;
+    return 0;
+}
+\end{consolethree}
+
+Run it. Again the value 16 is not used in any way.
+
+Note again that when C++ returned from \texttt{square()}, the memory used for \texttt{square()}'s variables is destroyed. This is similar to exiting for instance a for-loop. So in this code segment that uses \texttt{square()} twice:
+
+\begin{consolethree}[escapeinside=||]
+...
+std::cout << square(5) << std::endl;
+...
+std::cout << square(i) << std::endl;
+\end{consolethree}
+
+the memory for \texttt{square()} to hold data is created and destroyed twice.
+
+\input{exercises/5-19-functions/main.tex}
+\input{exercises/6-19-functions/main.tex}
+

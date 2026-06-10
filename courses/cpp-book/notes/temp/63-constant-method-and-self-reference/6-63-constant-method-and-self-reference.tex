@@ -1,0 +1,177 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Returning a copy of *this}
+
+\begin{consolethree}[escapeinside=||]
+...
+class Int
+{
+    ...
+    Int max(const Int & c)
+    {
+        if (c.x_ > x_)
+            return c;
+        else
+            return |\EMPHASIZE{*this;}|
+    }
+    ...
+private:
+    int x_;
+};
+...
+\end{consolethree}
+
+And now you can try this:
+
+\begin{consolethree}[escapeinside=||]
+#include "Int.h"
+
+int main()
+{
+    Int a(100), b(1);
+    Int c = a.max(b); // a.max(b) should return an
+                      // Int object with x_ value of
+                      // 100
+    c.print();
+    return 0;
+}
+\end{consolethree}
+
+Of course, this is better:
+
+\begin{consolethree}[escapeinside=||]
+...
+class Int
+{
+public:
+    ...
+    Int max(const Int & c)
+    {
+        return (c.x_ > x_ ? c : *this);
+    }
+    ...
+private:
+    int x_;
+};
+...
+\end{consolethree}
+
+Get it? In this case, we are returning a copy of the \texttt{Int} object
+that \texttt{this} points to, i.e., the object invoking the method.
+
+Notice however that you can also do this:
+
+\begin{consolethree}[escapeinside=||]
+...
+class Int
+{
+    ...
+    Int & max(const Int |\EMPHASIZE{\&}| c)
+    {
+        return (c.x_ > x_ ? c : *this);
+    }
+    ...
+private:
+    int x_;
+};
+...
+\end{consolethree}
+
+In this case, a \EMPHASIZE{reference is returned}.
+
+Why is this important? Look at this code:
+
+\begin{consolethree}[escapeinside=||]
+#include "Int.h"
+
+int main()
+{
+    Int a(100), b(1);
+    Int c = a.max(b);
+    c.print();
+    return 0;
+}
+\end{consolethree}
+
+This means if the return of \texttt{Int::max()} is an \texttt{Int} and not
+an \texttt{Int \&}
+
+\begin{consolethree}[escapeinside=||]
+...
+class Int
+{
+public:
+    ...
+    |\EMPHASIZE{Int}| max(const Int & c)
+    {
+        ...
+    }
+    ...
+};
+...
+\end{consolethree}
+
+then an \texttt{Int} value is returned (it has the same values as \texttt{a}
+or \texttt{b}). This \texttt{Int} value is used for the invocation of the
+\texttt{Int} copy constructor to initialize \texttt{c}.
+
+Make sure you read the last two sentences again (and again and again).
+
+However if a reference is returned:
+
+\begin{consolethree}[escapeinside=||]
+...
+class Int
+{
+public:
+    ...
+    |\EMPHASIZE{Int \&}| max(const Int & c)
+    {
+        ...
+    }
+    ...
+};
+...
+\end{consolethree}
+
+then back in \texttt{main()},
+\begin{consolethree}
+#include "Int.h"
+
+int main()
+{
+    Int a(100), b(1);
+    Int c = a.max(b);
+    c.print();
+    
+    return 0;
+}
+\end{consolethree}
+
+on returning from \texttt{Int::max()}, a reference to a or to b is used by
+the copy constructor to initialize \texttt{c}. There's no
+extra \texttt{Int} object created by \texttt{Int::max()} that is used to
+initialize \texttt{c}.
+
+Let me repeat again: when you return \texttt{Int} (not \texttt{Int \&}), a
+copy of the object to be returned is made (by using the copy
+cconstructor).
+\begin{consolethree}[escapeinside=||]
+...
+class Int
+{
+public:
+    ...
+    |\EMPHASIZE{Int}| max(const Int & c)
+    {|\xsidebox[0cm]{0cm}{}{ctorbx}{Copy constructor is called using \texttt{c} or \texttt{*this}!!! Because return type is \texttt{Int} (and not \texttt{Int \&}) Remember that!!!}|
+        return (c.x > x ? c : *this);
+    }
+    ...
+private:
+\end{consolethree}
+Whereas if you return \texttt{Int \&}, no \texttt{Int} object is created.
+The copy constructor used to create \texttt{c} will simply reference
+\texttt{a} or \texttt{b}.
+
+

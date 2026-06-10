@@ -1,0 +1,125 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Inheritance}
+
+The solution is to use \EMPHASIZE{inheritance}!!!
+
+The general idea is very simple: Basically C++ allows you to define a
+class so that it will have all the ``features'' of another.
+
+That's all. BUT ... there is \EMPHASIZE{a lot} of details beyond the
+general idea of inheritance. So \EMPHASIZE{pay attention}.
+
+Here is the basic syntax to get a class to inherit ``features'' from
+another class:
+\begin{console}[commandchars=\~\@\$]
+class Employee
+{ ... };
+class Manager: ~EMPHASIZE@public Employee$
+{ ... }; 
+\end{console}
+
+This is called \EMPHASIZE{public inheritance}, i.e., the \texttt{Manager}
+class \EMPHASIZE{inherits} everything (i.e. member variables and methods)
+of the \texttt{Employee} class in the sense that the \texttt{Manager} class
+will have all the features (member variables and methods) from the
+\texttt{Employee} class.
+
+Here is some basic terminology that you must know:
+
+\begin{itemize}
+\item
+  \texttt{Employee} is the \EMPHASIZE{parent class} or the
+  \EMPHASIZE{superclass} and \texttt{Manager} is the \EMPHASIZE{child class} or
+  the \EMPHASIZE{subclass}.
+\item
+  \texttt{Manager} is \EMPHASIZE{derived} from \texttt{Employee} or
+  \texttt{Manager} is a \EMPHASIZE{derived subclass} of \texttt{Employee}.
+\end{itemize}
+
+I'm going to use the following very simple example to illustrate
+important principles when working with inheritance.
+
+\begin{itemize}
+\item
+  The parent class \texttt{P} has the integer member \verb!x_! together
+  with \verb!get_x! and \verb!set_x! methods.
+\item
+  The child class \texttt{C} has an integer member \verb!y_! together
+  with \verb!get_y! and \verb!set_y! methods.
+\end{itemize}
+
+I don't have to tell you ... run it.
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+class P
+{
+|\sidebox{methodbox}{\textbf{I'm putting the methods in one line so that we don't have to page up and down.}}|
+public:
+        P() : x_(1) {}
+        int get_x() const { return x_; }
+        void set_x(int x) { x_ = x; }
+private:
+        int x_;
+};
+
+class C : public P
+{
+public:
+        C() : y_(2) {}
+        int get_y() const { return y_; }
+        void set_y(int y) { y_ = y; }
+private:
+        int y_;
+};
+
+int main()
+{   
+    C c;
+    std::cout << "c.x_ =" << c.get_x() << ", "
+              << "c.y_ =" << c.get_y() << '\n';
+return 0;
+
+} 
+\end{consolethree}
+
+Notice that the \texttt{c} object of class \texttt{C} inherits \verb!x_!,
+\verb!get_x!, and \verb!set_x! from \texttt{P}. That's why you can
+execute \verb!c.get_x()! even though class \texttt{C} does not have a
+\verb!get_x()! method.
+
+Make sure you keep the above code handy since I'll be using this again
+and again in this set of notes. I'm going to call the above program our
+``Basic Example''.
+
+\input{exercises/0-80-inheritance/main.tex}
+\input{exercises/1-80-inheritance/main.tex}
+\input{exercises/2-80-inheritance/main.tex}
+So \verb!C! seems to have a ``copy'' of \verb!P!'s
+declaration in it. Is that so? There are lots of other questions:
+
+\begin{itemize}
+\item
+  What about the private section of \verb!P!? Can \verb!C! define
+  methods to access the private members of \verb!P!? If inheritance is a
+  message to the compiler to ``copy-and-paste'' code from \verb!P! to
+  \verb!C!, then surely methods in \verb!C! can access the private
+  members of \verb!P!. Is that so?
+\item
+  Also, what if \verb!C! uses some features of \verb!P! but not all --
+  and in fact some features need to be modified. What can we do?
+\item
+  What about constructor? Clearly \verb!P::P()! constructor was called
+  since in the above experiment \verb!x_! is clearly 1. Can we call a
+  parent constructor explicitly so that we can initialize the
+  \verb!x_!?
+\item
+  What about object destruction?
+\item
+  Etc., etc., etc.!!!
+\end{itemize}
+
+\input{exercises/3-80-inheritance/main.tex}

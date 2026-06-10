@@ -1,0 +1,71 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Inline Methods}
+
+The information in this section applies to inlining of methods and not
+just constructors.
+
+Class methods (i.e., member functions) can also be inlined.
+
+To inline a class method, you can either:
+
+\begin{enumerate}
+\item Put the whole method inside the class definition.
+\item Put the method definition in the header file prepended with
+  \texttt{inline}.
+\end{enumerate}
+
+\textbf{First way:}
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+
+class Date
+{
+public:
+    |\textbf{Date(int yyyy, int mm, int dd)}|
+        |\textbf{: yyyy\_(yyyy), mm\_(mm), dd\_(dd)}|
+    |\textbf{\{\}}|
+
+    ...
+};
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+
+// Date::Date(int, int, int) moved to Date.h
+
+...
+\end{consolethree}
+
+\textbf{Second way:}
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+
+class Date
+{
+public:
+    |\textbf{Date(int yyyy, int mm, int dd);}|
+    ...
+};
+
+|\textbf{inline Date::Date(int yyyy, int mm, int dd)}|
+    |\textbf{: yyyy\_(yyyy), mm\_(mm), dd\_(dd)}|
+|\textbf{\{\}}|
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+
+// Date::Date(int, int, int) moved to Date.h
+
+...
+\end{consolethree}
+
+\input{exercises/4-61-constructors/main.tex}
+\input{exercises/5-61-constructors/main.tex}
+\input{exercises/6-61-constructors/main.tex}
+

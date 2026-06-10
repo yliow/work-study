@@ -1,0 +1,323 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Date class version 2}
+
+Make the following changes:
+
+\EMPHASIZE{In }\texttt{\EMPHASIZE{Date.h}}\EMPHASIZE{:} move the function
+prototypes into the \texttt{struct} and remove all first parameters which
+are \texttt{Date} reference parameters.
+
+\EMPHASIZE{In }\texttt{\EMPHASIZE{Date.cpp}}\EMPHASIZE{:} remove all first
+parameters which are \texttt{Date} reference parameters and remove
+``\texttt{date.}'' in the body of all functions.
+
+\EMPHASIZE{In }\texttt{\EMPHASIZE{main.cpp}}\EMPHASIZE{:} move all \texttt{Date}
+variables which are first arguments outside the function call. Add a dot
+after these \texttt{Date} variables.
+Here are the files with the changes
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+#ifndef DATE_H
+#define DATE_H
+struct Date
+{
+    int yyyy_, mm_, dd_;
+    void init(|\sout{Date \&,}| int, int, int);
+    void print(|\sout{const Date \&}|);
+    void add_y(|\sout{Date \&, int}|);
+    void add_m(|\sout{Date \&, int}|);
+    void add_d(|\sout{Date \&, int}|);
+};
+#endif
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+#include "Date.h"
+void |\EMPHASIZE{Date::}|init(|\sout{Date \& date,}| int yyyy, int mm, int dd)
+{
+    |\sout{date.}|yyyy_ = yyyy;
+    |\sout{date.}|mm_= mm;
+    |\sout{date.}|dd_= dd;
+}
+
+void |\EMPHASIZE{Date::}|print(|\sout{const Date \& date}|)
+{
+    std::cout << |\sout{date.}|yyyy_ << '/'
+              << |\sout{date.}|mm_ << '/'
+              << |\sout{date.}|dd_<< '\n';
+}
+
+void |\EMPHASIZE{Date::}|add_y(|\sout{Date \& date,}| int inc)
+{
+    |\sout{date.}|yyyy_+= inc ;
+}
+
+// etc.
+\end{consolethree}
+\begin{consolethree}[escapeinside=||]
+// main.cpp
+#include "Date.h"
+int main()
+{
+    Date today, yesterday;
+
+    |\EMPHASIZE{today.}|init(|\sout{today,}| 2014, 12, 25);
+    |\EMPHASIZE{today.}|print(|\sout{today}|);
+
+    |\EMPHASIZE{yesterday.}|init(|\sout{yesterday,}| 2014, 12, 24);
+    |\EMPHASIZE{yesterday.}|print(|\sout{yesterday}|);
+
+    return 0;
+}
+\end{consolethree}
+Here's what you get:
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+#ifndef DATE_H
+#define DATE_H
+
+struct Date
+{
+    int yyyy_, mm_, dd_;
+
+    void init(int, int, int);
+    void print();
+    void add_y(int);
+    void add_m(int);
+    void add_d(int);
+};
+
+#endif
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+#include "Date.h"
+
+void Date::init(int yyyy, int mm, int dd)
+{
+    yyyy_ = yyyy;
+    mm_ = mm;
+    dd_ = dd;
+}
+
+void Date::print()
+{
+    std::cout << yyyy_ << '/'
+              << mm_ << '/'
+              << dd_ << '\n';
+}
+
+void Date::add_y(int inc)
+{
+    yyyy_ += inc ;
+}
+
+// etc.
+\end{consolethree}
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+#p += Grid(0, 0, 10, 10)
+strink = r"""
+\begin{consolethree}[escapeinside=||]
+// main.cpp
+#include "Date.h"
+
+int main()
+{
+    Date today, yesterday;
+
+    |\textbf{today.init(2014, 12, 25);}|
+    today.print();
+    
+    yesterday.init(2014, 12, 24);
+    yesterday.print();
+
+    return 0;
+}
+\end{consolethree}
+"""
+p += Rect(0, 0, 8, 5, s=strink, linewidth=0)
+td = [r'\textbf{today}', r'\textbf{yyyy\_}', r'\textbf{mm\_}', r'\textbf{dd\_}', r'\textbf{init}', r'\textbf{print}', r'\textbf{add\_y}', r'\textbf{add\_d}', r'\textbf{add\_m}']
+p += Rect(7, 5, 9, 6, innersep=0.25, s=td[0], align='c', linewidth=0)
+x = 9
+for i in range (1, 4):
+      p += Rect(x, 6, x + 2, 7, innersep=0.25, s=td[i], align='c', linewidth=0.05, linecolor='red')
+      x += 2
+x = 9
+for i in range (4, 7):
+      p += Rect(x, 5, x + 2, 6, innersep=0.25, s=td[i], align='c', linewidth=0.05, linecolor='red')
+      x += 2
+
+p += Rect(9, 4, 12, 5, innersep=0.25, s=td[8], align='c', linewidth=0.05, linecolor='red')
+p += Rect(12, 4, 15, 5, innersep=0.25, s=td[7], align='c', linewidth=0.05, linecolor='red')
+
+p += Rect(9, -1, 13.5, 2, innersep=0.25, s=r'At this point in \texttt{main()\'}s memory, \texttt{today} looks like this... ', align='c', linewidth=0.05)
+p += Line(points=[(12, 2), (12, 4)], linewidth=0.05, linecolor='red', endstyle='>')
+p += Line(points=[(9, 1), (6.75, 1.75)], linewidth=0.05, linecolor='red', endstyle='>')
+print(p)
+\end{python}
+
+As stated earlier, we put the function prototypes into the \texttt{struct} definition.
+
+Note that in \texttt{Date.cpp}, we need to put \EMPHASIZE{Date::} in
+front of the implementation of the member functions. This is because the
+\texttt{Date} \texttt{struct} creates a scope. Therefore outside the
+\texttt{struct}, you need to say ``the \texttt{init} function \EMPHASIZE{of
+}\texttt{\EMPHASIZE{Date}}''. If you just call it \texttt{init,} C++ will think
+of some \texttt{init} function outside the \texttt{Date} \texttt{struct}. This means that
+C++ actually allows you to do this:
+\begin{consolethree}
+// Date.h
+
+...
+
+struct Date
+{
+    ...
+    void init(int, int, int);
+    ...
+};
+
+void init(int, int, int);
+
+#endif
+\end{consolethree}
+In the code, you can see the concept of ``variable calls a function''.
+For instance, you see \texttt{today.init(2014, 12, 25)}.
+
+In the implementation of \texttt{Date::init}, you see \texttt{yyyy\_},
+\texttt{mm\_}, and \texttt{dd\_}. Which \texttt{yyyy\_} are we talking about?
+There's the \texttt{yyyy\_} of \texttt{today} and the
+\texttt{yyyy\_} of \texttt{yesterday}!!! Well, in the body of
+\texttt{Date::init},
+\begin{center}
+\texttt{yyyy\_} refers to \texttt{yyyy\_} of the variable calling \texttt{init()}
+
+\texttt{mm\_} refers to \texttt{mm\_} of the variable calling \texttt{init()}
+
+\texttt{dd\_} refers to \texttt{dd\_} of the variable calling \texttt{init()}
+\end{center}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+#p += Grid(0, 0, 10, 10)
+str0 = r"""
+\begin{consolethree}[escapeinside=||]
+...
+
+int main()
+{
+    ...
+
+    |\EMPHASIZE{today.init(2014, 12, 25);}|
+
+    ...
+\end{consolethree}
+"""
+str1 = r"""
+\begin{consolethree}[escapeinside=||]
+void Date::init(int yyyy, int mm, int dd)
+{
+    |\EMPHASIZE{yyyy\_}| = y0;
+    mm_ = m0;
+    dd_ = y0;
+}
+\end{consolethree}
+"""
+str2 = r"""
+\begin{consolethree}[escapeinside=||]
+...
+
+int main()
+{
+    ...
+
+    |\EMPHASIZE{yesterday.init(2014, 12, 25);}|
+
+    ...
+\end{consolethree}
+"""
+p += Rect(-2, 0, 10, 3, linewidth=0, s=str2)
+
+p += Rect(7, 5.75, 16.5, 6.5, linewidth=0, s=str1)
+
+p += Rect(-2, 9, 10, 12, linewidth=0, s=str0)
+
+p += Rect(10.5, 9, 16.5, 10.25, linewidth=0, s=r'While \\executing \textbf{\texttt{today.init(2014, 12, 25)}}, the \textbf{\texttt{yyyy\_}} refers to the \textbf{\texttt{yyyy\_}} of \textbf{\texttt{today}} ...')
+p += Rect(10.5, 0, 16.5, 3.25, linewidth=0, s=r'While \\executing \textbf{\texttt{yesterday.init(2014, 12, 24)}}, the \textbf{\texttt{yyyy\_}} refers to the \textbf{\texttt{yyyy\_}} of \textbf{\texttt{yesterday}} ...')
+p += Line(points=[(10.25, 9), (8.15, 9.15)], linewidth=0.075, linecolor='red', endstyle='>')
+p += Line(points=[(12, 8), (12, 6.55)], linewidth=0.075, linecolor='red', endstyle='>')
+p += Line(points=[(10.25, 2), (9, 0.65)], linewidth=0.075, linecolor='red', endstyle='>')
+p += Line(points=[(13.5, 2.3), (13.5, 3.65)], linewidth=0.075, linecolor='red', endstyle='>')
+print(p)
+\end{python}
+
+
+Note that
+\begin{itemize}
+\item functions are part of \texttt{Date}
+\item \texttt{Date} variables can invoke \texttt{Date} member functions
+\item Member functions ``know'' which variables invoked them and which
+  \texttt{yyyy\_}, \texttt{mm\_}, \texttt{dd\_} they should work with.
+\item For instance, \texttt{today.mm\_} : Refers to the member variable
+  \texttt{mm\_} in \texttt{today}
+\item For instance, \texttt{today.print()} : Calls/invokes the \texttt{print()}
+  member function of \texttt{today} and while executing the function,
+  \texttt{yyyy\_} refers to the \texttt{yyyy\_} of \texttt{today.}
+\end{itemize}
+
+Make sure you see the differences between version 1 and 2!!!
+
+\input{exercises/1-60-classes-and-objects/main.tex}
+In the above exercise, you will have statements such as
+
+\texttt{c3p0.moveRight(3);}
+
+You can and \EMPHASIZE{should} think of the \texttt{Robot} variable
+\texttt{c3p0} as having the \EMPHASIZE{ability} to \texttt{moveRight} by 3 on
+its own. In other words, you want to think of the \texttt{Robot} as having
+some \EMPHASIZE{autonomous ability} to perform the \texttt{moveRight}
+operation. That is one very important philosophy behind packaging
+functions into a \texttt{struct} so that they become members (i.e. member
+functions) as the \texttt{struct} variable. In
+fact, historically, the earliest example of a programming language that
+allows this is from the MIT AI lab in the late 50s.
+
+This is very different from say if you do
+
+\texttt{Robot\_moveRight(c3p0, 3);}
+
+Written this way, it reads more like \EMPHASIZE{your} program is
+\EMPHASIZE{controlling} the \texttt{Robot c3p0} and making him/her/it move.
+
+For complex software engineering, we want to analyze and develop
+software not by focusing on data and functions separately, but rather by
+focusing on data \EMPHASIZE{with} their functions. This is achieved in version 2
+above. For instance, look at
+
+\tab[3em]{\texttt{today.init(12, 25, 2003);}}
+
+You think of the \texttt{init()} function as being part of \texttt{today}, just like you
+have \texttt{today.mm\_}, \texttt{today.dd\_}, \texttt{today.yyyy\_} etc.
+
+In fact, to emphasize again that \texttt{today} has the autonomous ability
+to execute \texttt{init()}, I will frequently say:
+
+\EMPHASIZE{today invokes init()}
+
+and not ``your program invokes the \texttt{init()} of \texttt{today}''.
+
+\input{exercises/2-60-classes-and-objects/main.tex}
+\input{exercises/3-60-classes-and-objects/main.tex}
+\input{exercises/4-60-classes-and-objects/main.tex}
+\input{exercises/5-60-classes-and-objects/main.tex}
+\input{exercises/6-60-classes-and-objects/main.tex}
+

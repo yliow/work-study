@@ -1,0 +1,262 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Constants for template parameters}
+
+There are three things you can specify as template parameters.
+We'll talk about only two. The template parameters can be for
+
+\begin{itemize}
+\item
+  types
+\end{itemize}
+or
+\begin{itemize}
+\item
+  basic type values
+\end{itemize}
+
+In the above examples, the template parameters are for types:
+
+\begin{console}
+template  < typename T >
+class X
+{
+...
+private:
+     T ...
+...
+}; 
+\end{console}
+
+Here's an example where the template parameter is a value. Run this and
+study it very carefully.
+
+\begin{consolethree}[escapeinside=||]
+#include < iostream >
+
+template < typename T, |\EMPHASIZE{int}| MAX >
+class D
+{
+public:
+     T get(int) const;
+     void set(int, const T &);
+private:
+     T x[MAX];
+};
+
+template < typename T, int MAX>
+T D < T, MAX >::get(int index) const
+{    
+     return x[index];
+}
+
+template < typename T, int MAX>
+void D < T, MAX >::set(int index, const T & c)
+{    
+     x[index] = c;
+};
+
+int main()
+{   
+     D < int, |\EMPHASIZE{10}| > d; // d is an int array of size 10
+     D< char, |\EMPHASIZE{5}| > e; // d is a char array of size 5
+     d.set(1,5);
+     e.set(2,' a');
+     std::cout << d.get(1) << ","
+               << e.get(2) << "\n";
+     return 0;
+}
+ 
+\end{consolethree}
+
+D is a class for fixed size arrays of different types. One of the template parameter is for the type of the array and the other template parameter is for the size of the array.
+
+When instantiating the value must be a \EMPHASIZE{constant expression.}
+
+Run this:
+
+\begin{consolethree}[escapeinside=||]
+const int x = 4;
+int y = 5;
+D< int, 5> d1;
+D< int, x - 2> d2;
+D< int, y> d3; //|\EMPHASIZE{WRONG!!! y is a variable.}|
+\end{consolethree}
+
+Type parameters are:
+
+\begin{itemize}
+\item
+  Any type including basic types (int, bool) or classes.
+\end{itemize}
+
+If D is a class template
+
+\begin{console}
+template < typename T1, typename T2,
+         int x, bool b >
+class D{...} 
+\end{console}
+
+Then
+
+\begin{console}
+D < X, Y, 10, true > 
+\end{console}
+
+and
+
+\begin{console}
+const int x = 12;
+D < X, Y, x - 2, !false > 
+\end{console}
+
+are considered the same type (if \texttt{X} and \texttt{Y} are valid types).
+
+Recall that typedef is only an alias and does not create a new type. So if
+
+\begin{console}
+template< class X >
+class D{...};
+typedef int Salary;
+
+int main()
+{    
+     D < int > x;       
+     D < Salary > y;
+}
+\end{console}
+
+then, \texttt{D < int >}, \texttt{D < Salary >} are of the same type and \texttt{x}, \texttt{y} have the same type.
+
+Error checking can be done with two different levels: syntax errors in template and when the template parameters are being used.
+
+In the definition of the template and class template, the template parameters are not specified yet. So the definition of
+
+\texttt{Array < T >::print} is OK\\
+\texttt{Array < int >::print} is OK\\
+
+\begin{consolethree}[escapeinside=||]
+class vec2d
+{
+public:
+     vec2d(float x0, float y0)
+         : x(x0),y(y0)
+     {}
+private:
+     float x, y;
+};
+
+template < typename T >
+class Array {
+public:
+     Array(int s)
+         : size(s), arr(new T[s])
+     {}
+     void print() const;
+private:
+     int size; T * arr;
+};
+
+template < typename T >
+void Array< T>::print()
+{    
+     for (int i=0; i< size; i++)
+     std::cout << arr[i] << '\n';
+}
+
+int main()
+{    
+     Array< int> a(10); a.print();|\sidebox{whatswrongbox}{What's wrong?}|
+     |\EMPHASIZE{Array < vec2d > b(10); }|
+     |\EMPHASIZE{b.print();}|
+     return 0;
+}
+ 
+\end{consolethree}
+
+You can specify default values for template parameters.
+
+The rules for default parameters are like those for default values for
+function parameters.
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+class C{};
+
+template < typename T0, |\EMPHASIZE{typename T1=int}| >|\sidebox{defaultvaluebox}{Default values are on the right}|
+
+class D{
+public: void f(T1 a) { std::cout << a << "\n"; }
+};
+
+int main()
+{    
+     |\EMPHASIZE{D < C >}| obj1; obj1.f(1.1);
+     |\EMPHASIZE{D < C, double >}| obj2; obj2.f(1.1);
+     return 0;
+}
+ 
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+class C{};
+
+template < typename T0, typename T1=int>
+class D
+{
+public: void f(T1);
+};
+|\sidebox{fdefinebox}{\textbf{Defining \texttt{f} outside the class. Like default values for function arguments, do \underline{\redtext{not}} specify default value here.}}|
+|\tikzmarknode{fdefine}{template  < typename T0, typename T1 >}||\DrawArrow{fdefinebox}{fdefine}|
+void D< T0, T1>::f(T1 a)
+{    
+     std::cout << a << ``\n'';
+}
+
+int main()
+{   
+     D< C> obj1;
+     obj1.f(1.1);
+     D< C, double> obj2;
+     obj2.f(1.1);
+} 
+\end{consolethree}
+
+When programming a class template, try it out for a specific type first.
+After the code works, change to a generic type and include template.
+
+WARNING: The following will give you an error.
+
+\begin{console}
+template < typename T > class C{...};
+template < typename T > class D{...};
+
+int main()
+{    
+     C< D< int>> c;
+     return 0;
+} 
+\end{console}
+
+Why? Because \texttt{>>} is an operator and for
+this code:
+
+\tab[3em]{\verb!C< D< int>> c;!}\\
+
+you compiler will think you are trying ot do this:
+
+\tab[3em]{\verb!...int >> c...!}\\
+
+as if you're doing some input!!!
+
+So write
+\begin{center}
+\texttt{C < D < int > > c;}
+\end{center}
+to prevent the above. In general when working with templates, always have a space on the right of \textless and a space to the left of \textgreater.
+

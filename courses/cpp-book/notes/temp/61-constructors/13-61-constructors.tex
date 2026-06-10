@@ -1,0 +1,79 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Copy constructor}
+
+Suppose you already have a \texttt{Date} object \texttt{date1}. You want to
+create another \texttt{Date} object, \texttt{date2}, so that \texttt{date2}
+has the same values as \texttt{date1}.
+
+\texttt{date2} is not a reference to date1 like this:
+
+\begin{consolethree}[escapeinside=||]
+Date & date2 = date1;
+\end{consolethree}
+
+Rather, you want \texttt{date2} to be an actual Date object with
+its own member variables.
+
+You can do this
+
+\begin{consolethree}[escapeinside=||]
+Date date2(date1.get_y(), date1.get_m(), date1.get_d());
+\end{consolethree}
+
+using the constructor that accepts three integers. But ...
+
+What a pain!
+
+This is cleaner:
+
+\begin{consolethree}[escapeinside=||]
+Date date1;
+Date date2;
+date2 = date1;
+\end{consolethree}
+
+But this means that \texttt{date1} was first initialized to something that
+I do not want, and \texttt{then} I assign the values of \texttt{date1} to
+\texttt{date2}. That's not efficient.
+
+We can achieve a cleaner initialization if we define a constructor that
+accepts a \texttt{Date} object. In other words I would like to do this:
+
+\begin{consolethree}[escapeinside=||]
+Date date2(date1);
+\end{consolethree}
+
+The prototype looks like this:
+
+\begin{consolethree}[escapeinside=||]
+Date(const Date &);
+\end{consolethree}
+
+Note that I'm passing by reference to make the parameter passing
+efficient and since I don't intend to modify the parameter, I make it a
+constant. I'm therefore passing by constant reference.
+
+The implementation looks like this:
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+Date::Date(const Date & date)
+    : yyyy_(date.yyyy_), mm_(date.mm_), dd_(date.dd_)
+{}
+\end{consolethree}
+
+You can think of \texttt{date2} as a clone of \texttt{date1}. You can (and
+should) think of the copy constructor as a cloning operation.
+
+For any class \texttt{C}, the \EMPHASIZE{copy constructor} of that class is a
+constructor with the following prototype:
+
+\texttt{C(const C \&);}
+
+Think of the copy constructor as a \EMPHASIZE{cloning operation} and the
+intent is to copy values from one object to another.
+
+\input{exercises/19-61-constructors/main.tex}
+

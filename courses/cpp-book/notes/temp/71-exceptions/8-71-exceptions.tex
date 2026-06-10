@@ -1,0 +1,172 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Memory Allocation Exception}
+
+You know that if the system is not able to allocate memory for a
+pointer,
+\begin{center}
+\verb!int * p = new int[some_big_number];!
+\end{center}
+the program might (1) crash and stop or (2) the pointer value returned
+is 0. (For the case of g++, when the requested memory cannot be
+fulfilled, the program crashes.)
+
+In case (2), say you're writing network game and the new
+operator returns 0 you might want to do this:
+
+\begin{console}
+int * p = new int[some_big_number];
+if (p == NULL)
+{  
+   // Ooops ... system ran out of memory ...
+   // Print some error message, clean up
+   // (release resources like network
+   // connections, database connections, etc.),
+   // and stop the program}}}
+   else
+   {
+       // continue what you wanted to do
+}
+\end{console}
+
+In case (1) where the system crashes and stop, it actually throws an
+exception. (For newer C++ compilers (1) is actually the norm.) The
+reason why the program crashes and stops is because the exception is not
+caught. The exception object thrown is from the class
+\verb!std::bad_alloc!. Run this:
+
+\begin{console}[commandchars=\~\@\$]
+#include <iostream>
+#include <exception>
+
+int main()
+{   
+    try
+    {
+        int * p = new int[1000000];
+        std::cout << "ok" << std::endl;
+    }
+    catch (~EMPHASIZE@std::bad_alloc$ & e)
+    {
+        std::cout << "bad!!!\n";
+    }
+    return 0;
+}
+\end{console}
+
+Your system should be able to provide memory for \texttt{p} to point to.
+Next modify it like so ...
+
+\begin{console}
+...
+      try
+      {
+          while (1)
+          {
+                int * p = new int[1000000];
+                std::cout << "ok" << std::endl;
+          }
+      }
+... 
+\end{console}
+
+... and system is bound to run out of memory for allocation.
+
+So in the case where your C++ compiler throws a \verb!std::bad_alloc!
+exception when the new operator cannot be satisfied, you can do this:
+
+\begin{console}[commandchars=\~\@\$]
+#include <iostream>
+#include <exception>
+
+int main()
+{   
+    try
+    {
+        game(); // run the game
+    }
+    catch (~EMPHASIZE@std::bad_alloc$ & e)
+    {     
+        // Ooops ... system ran out of memory ...
+        // Print some error message,
+        // clean up (release resources like
+        // network connections, database
+        // connections, etc.).
+    }
+return 0;
+
+}
+\end{console}
+
+But ...
+
+What if the compiler you're using is older and does not
+thrown a \verb!std::bad_alloc! object when there's not
+enough memory or for some reason you do not want the compiler to throw a
+\verb!std::bad_alloc! object when the new operator cannot be satisfied?
+
+First of all you can disable throwing. Try this:
+
+\begin{console}[commandchars=\~\@\$]
+#include <iostream>
+#include <exception>
+~EMPHASIZE@#include <new>$
+
+int main()
+{   
+    try
+    {
+        while (1)
+        {
+             int * p = new ~EMPHASIZE@(std::nothrow)$ int[1000000];
+             std::cout << "ok" << std::endl;
+        }
+    }
+    catch (std::bad_alloc & e)
+    {
+         std::cout << "bad!!!\n";
+    }
+    return 0;
+}
+\end{console}
+
+This will cause \texttt{p} to be set to \texttt{NULL} if
+there's not enough memory for allocation.
+
+Most modern C++ compilers \texttt{\textbf{do}} throw an exception when
+there's not enough memory. But anyway if you have a
+compiler that does not (or you prefer not to) and the compiler
+understands \texttt{std::nothrow} and you want to throw your own memory
+exception object, you can do the following:
+
+\begin{console}[commandchars=\~\@\$]
+#include <iostream>
+#include <exception>
+#include <new>
+
+~textbf@class MemoryAllocationException {};$
+
+int main()
+{   
+    try
+    {
+        while (1)
+        {
+             int *p = new (std::nothrow) int[1000000];
+             
+             ~textbf@if (p == NULL) $
+                   ~textbf@throw MemoryAllocationException();$
+
+             std::cout << "ok" << std::endl;
+        }
+    }
+    catch (~textbf@MemoryAllocationException$ & e)
+    {
+         std::cout << "bad!!!\n";
+    }
+    
+    return 0;
+}
+\end{console}
+

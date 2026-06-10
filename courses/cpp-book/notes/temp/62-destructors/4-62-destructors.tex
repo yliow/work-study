@@ -1,0 +1,79 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Default destructor}
+
+Since objects call their destructors just before they die (i.e. just
+before they go out of scope) and our previous version of \texttt{Date}
+does not have a destructor, how come the previous version can still
+compile and run??? Shouldn't your C++ compiler yell at
+you and tell you that \texttt{\~{}Date()} is not found???
+
+\EMPHASIZE{No.}
+
+Because ... if you don't specify a destructor for a
+class, the C++ compiler actually includes a do-nothing destructor in the
+class. This is the \EMPHASIZE{default destructor}. The default destructor
+is a do-nothing method because it has an empty body:
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    ...
+    ~C() {} // default destructor of C
+    ...
+};
+\end{consolethree}
+
+In the case of the earlier \texttt{Date} class, C++ included this
+destructor into the \texttt{Date} class when there was no destructor:
+
+\begin{consolethree}[escapeinside=||]
+class Date
+{
+public:
+    // constructors
+    ~Date() {}
+    // other methods
+};
+\end{consolethree}
+
+If you do write a destructor, then your C++ compiler will not insert a
+default destructor for you.
+
+Note that the default destructor supplied by C++ does not do anything.
+Since all instance variables are automatic in \texttt{Date}, a destructor
+is not necessary. It's still a good (and common)
+practice to include destructors
+even if it's not necessary. Being explicit is better
+than leaving things implicit.
+
+\input{exercises/2-62-destructors/main.tex}
+Why is knowing the order important? Because in complex systems, there
+might be some dependencies between objects so that some object \texttt{x}
+can exist only if object \texttt{y} exists, i.e., \texttt{y} must be
+constructed before \texttt{x} and \texttt{x} must be destroyed before
+\texttt{y}.
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    Date date1(1970, 1, 1);
+    Date date2(1985, 1, 1);
+    Date date3(2010, 10, 10);
+    return 0; // date3 calls its destructor,
+              // *then* date2 calls its destructor,
+              // *then* date1 calls its destructor.
+}
+\end{consolethree}
+
+So, remember this: \EMPHASIZE{the order of destructor calls is always opposite to the order of constructor calls.}
+
+\input{exercises/3-62-destructors/main.tex}
+\input{exercises/4-62-destructors/main.tex}
+\input{exercises/5-62-destructors/main.tex}
+\input{exercises/6-62-destructors/main.tex}
+\input{exercises/7-62-destructors/main.tex}
+\input{exercises/8-62-destructors/main.tex}
+

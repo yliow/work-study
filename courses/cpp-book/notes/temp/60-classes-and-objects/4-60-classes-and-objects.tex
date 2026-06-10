@@ -1,0 +1,107 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Structured vs OO}
+
+We don't have classes and objects yet (what are they
+anyway?) But even with what we have done so far, we can ask ...
+
+Why? Why are we writing code this way.
+
+The main reason is to control complexity ...
+
+Structured programming focuses on functions. You start with a goal/task
+(big function) and subdivide task into simpler subtask (simpler
+functions). Data is passed between functions. Structured programming and structured
+analysis tend to separate the computational task and the data involved.
+
+OOP and OO analysis tend to focus on both data and functions together at
+the same time. At a higher level of design and engineering, we think of
+OO analysis and design as finding objects and their responsibilities
+(functions), i.e., what the objects do. So in the discipline of OO
+analysis and design, we tend to think of and find high level concepts
+and analyze what the variable (i.e., the objects) associated with that
+high level concept should be be capable of doing.
+
+Let me give you an example.
+Suppose I work for a bank and I need to print a daily report of all the
+transactions (deposit to an account, withdrawal from an account, closing
+of an account, opening of an account, changing the address of the
+customer, etc.)
+
+Structured thinking means this: I want to print a report. To do that, I need
+to read the database for all transaction. For each transaction, there's an
+transaction ID, the customer ID, a transaction type, etc. Now for each
+customer ID, I will read the customer file, look for the matching customer
+ID, read his firstname and lastname, etc. Next, for this transaction, I have
+to look up the meaning of the transaction from the transaction type (for
+instance say 1 means open account, 2 means close account, 3 means
+deposit, etc.) I get the description of the transaction ID from some file, so
+if the transaction is 1, the description for this entry is “Open Account”,
+“Close Account”, etc. This style of thinking is called structured analysis
+and design. And the type of code you write to reflect this way of thinking
+tends to have a certain look – structured programming code.
+
+The object-oriented way is different. You want to think of a report as
+being made up of transaction objects. Each transaction object of course
+has some type and some description (“Open Account”, “Close Account”,
+etc.), but the main program will not get the transaction description.
+Rather for each transaction, you will probably call
+
+\begin{center}
+\texttt{transaction.getDescription()}
+\end{center}
+
+in other words, each transaction object has the ability to provide useful
+computations. You think of “telling the transaction to do its work on its 
+own” and you wait for the description to be returned (probably a string).
+Also, each transaction knows (on its own) that it's a transaction for a
+particular customer. So to know more about the customer, you would ask
+transaction to tell you who is the customer:
+\begin{center}
+\texttt{Customer customer = transaction.getCustomer();}
+\end{center}
+
+And with this customer object now available, you ask the customer to
+give you his/her first and last name (probably string) say for printing:
+
+\tab[3em]{\texttt{std::cout << customer.getLastName() << “, “}}
+\tab[5em]{\texttt{<< customer.getFirstName()}}
+\tab[5em]{\texttt{<< ...}}
+
+So as you can see, the style of thinking (the OO analysis and design) will
+give rise to very different code:
+
+\tab[3em]{for each transaction in today's collection of transactions:}\\
+ \tab[5em]{I ask the transaction for the transaction description and print it.}\\
+ \tab[5em]{I then ask the transaction for the time when it was created and}\\
+ \tab[5em]{print the date and time.}\\
+ \tab[5em]{I then ask the transaction for firstname and lastname of the}\\
+ \tab[5em]{customer responsible for this transaction this will result in the}\\
+ \tab[5em]{transaction asking the cusomter involved for his/her firstname}\\
+ \tab[5em]{and lastname. The customer gives his/her firstname and}\\
+ \tab[5em]{lastname to the transaction and the transaction passes the}\\
+ \tab[5em]{firstname and lastname back to me.}\\
+
+Note that when I ask a transaction for the firstname and lastname of the
+customer, the transaction talks to the customer (object) and asks the
+customer to provide his/her first and last name. When an object needs to
+perform some computation it will either do it himself/herself or will talk to
+some other object to do the work.
+
+You don't need to know the full picture of structured thinking and OO
+thinking. The above is to give you a quick overview of the different
+philosophy between the two.
+
+The goal in this course is to teach you the basics of OO syntax and the
+language features. You will NOT be able to engineer beautiful and well
+constructed OO systems immediately. In fact it takes a very long time to
+be an expert in either the structured or the object-oriented style of
+analyzing and designing systems. Right now, my goal is to give you the
+basic syntax and language features of an OO language. It will take many
+years before you will become a true OO guru because the road is
+challenging, tough, and is just extreme fun. (Which, frankly speaking, is a
+good thing -- if OO is something you can learn in 1-2 years, you wouldn't
+expect it to be fun or worth much, would you?)
+
+

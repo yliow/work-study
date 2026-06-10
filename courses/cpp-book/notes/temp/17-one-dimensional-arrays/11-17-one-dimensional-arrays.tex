@@ -1,0 +1,128 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Bubblesort}
+
+Recall that we have the follow earlier. Suppose you have four integer variables a, b, c, d. You want to sort the values in a, b, c, d into ascending order and put them into a, b, c, d. For instance if we initially have this:
+\begin{center}
+a = 5 b = 3 c = 6 d = 0
+\end{center}
+we want to end up with this:
+\begin{center}
+a = 0 b = 3 c = 5 d = 6
+\end{center}
+Recall that I gave you the \EMPHASIZE{bubblesort algorithm} for doing that:
+
+\tab[3em]{
+Pass 1:\\
+swap the values in a, b so that $a <= b$\\
+swap the values in b, c so that b <= c\\
+swap the values in c, d so that c <= d\\
+// at this point the largest value of a, b, c, d must be in d\\\\
+
+Pass 2:\\
+swap the values in a, b so that a <= b\\
+swap the values in b, c so that b <= c\\
+// at this point the largest value of a, b, c must be in c\\\\
+
+Pass 3:\\
+swap the values in a, b so that a <= b\\
+// at this point the largest value of a, b must be in b\\
+}
+
+[Don't recall any of the above? Quickly review your previous notes on bubblesort!!! Now!!!]
+
+Of course you know what's going to happen next.
+
+We're going to sort values in an array!!! (cheers ... clapping ... and wild whistling).
+
+Let's do this slowly. Using the above pseudocode but with a, b, c, d replaced by a[0], a[1], a[2], a[3], we have the following:
+
+\tab[3em]{Pass 1:\\
+swap the values in a[0], a[1] so that a[0] <= a[1]\\
+swap the values in a[1], a[2] so that a[1] <= a[2]\\
+swap the values in a[2], a[3] so that a[2] <= a[3]\\
+// at this point the largest value of a[0], ..., a[3] must be in a[3]\\\\
+
+Pass 2:\\
+swap the values in a[0], a[1] so that a[0] <= a[1]\\
+swap the values in a[1], a[2] so that a[1] <= a[2]\\
+// at this point the largest value of a[0], ..., a[2] must be in a[2]\\\\
+
+Pass 3:\\
+swap the values in a[0], a[1] so that a[0] <= a[1]\\
+// at this point the largest value of a[0], a[1] must be in a[1]\\
+}
+
+We can rewrite Pass 1 as a for-loop:
+
+\tab[3em]{Pass 1:\\for i = 0, 1, 2:\\\tab[3em]{swap the values in a[i], a[i+1] so that a[i] <= a[i+1]\\}
+}
+
+See it? Pass 2 looks like this:
+
+\tab[3em]{
+Pass 2:\\
+for i = 0, 1:\\
+\tab[3em]{swap the values in a[i], a[i+1] so that a[i] <= a[i+1]}\\
+}
+
+Hmmm ... Pass 2 looks like Pass 1 ... You can combine them like this:
+
+\begin{tabular}{l l}
+Pass 1 and 2:\\
+for j = 2, 1:\\
+& for i = 0, ..., j:\\
+& \tab[3em]{swap the values in a[i], a[i+1] so that a[i] <= a[i+1]}\\
+\end{tabular}
+
+See that? What about Pass 3? Pass 3 looks like this (I'm writing this as a for-loop just to see the pattern):
+
+\begin{tabular}{l}
+Pass 3:
+for i = 0:
+swap the values in a[i], a[i+1] so that a[i] <= a[i+1]
+\end{tabular}
+
+AHA! This can also be combined with Pass 1 and Pass 2:
+
+\begin{tabular}{l}
+Pass 1 and 2 and 3:
+for j = 2, 1, 0:
+for i = 0, ..., j:
+swap the values in a[i], a[i+1] so that a[i] <= a[i+1]
+\end{tabular}
+
+Note that this is for an array of size 4. What about an array of size 5?
+Do you see that the first value of j in the above (i.e. 2) comes from 4
+-- 2. In general if you have an array with size SIZE, the bubblesort to
+sort in ascending order is this:
+
+\begin{tabular}{l}
+for j = SIZE -- 2, ..., 1, 0:\\
+\tab[3em]{for i = 0, ..., j:}\\
+\tab[6em]{swap the values in a[i], a[i+1] so that a[i] <= a[i+1]}\\
+\end{tabular}
+
+Now we translate this to C++:
+
+\begin{consolethree}[escapeinside=||]
+for (int j = SIZE - 2; j >= 0; --j)
+{
+    for (int i = 0; i <= j; ++i)
+    {
+        if (a[i] > a[i+1])
+        {
+            int t = a[i];
+            a[i] = a[i+1];
+            a[i+1] = t;
+        }
+    }
+}
+\end{consolethree}
+
+Make sure you understand and memorize this!!!
+
+\input{exercises/18-17-one-dimensional-arrays/main.tex}
+\input{exercises/19-17-one-dimensional-arrays/main.tex}
+\input{exercises/20-17-one-dimensional-arrays/main.tex}

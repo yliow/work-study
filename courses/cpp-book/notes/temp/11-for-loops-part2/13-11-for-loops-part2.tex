@@ -1,0 +1,136 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Brute force search}
+
+Computer Science, like Mathematics, seeks to find solutions to problems.
+One way to look for solutions is through ``brute-force''search. This
+means going over all possible candidates and seeing which ones are the
+right solutions.
+
+Let's try one. Suppose you want to find \textbf{integer} solution(s) to this equation:
+\begin{center}
+x$^{3}$ = 729
+\end{center}
+If x is a negative integer, x$^{3}$ is negative. So we are definitely only interested in positive integers. Furthermore x must be less than 729 (well ... a lot less!). So we can try x = 0, 1, 2, ..., 729 and see which one satisfies the above equation.
+
+WHOA!!!
+
+That sure looks suspiciously like a for-loop to me ...
+
+\input{exercises/21-11-for-loops-part2/main.tex}Well \ldots the above example is kind of silly since we could have
+computed the cube root of 729 and see if it's an integer
+value \ldots but what if you have \textit{\textbf{two}} variables in the
+equation? Suppose you want to solve for positive integers x and y
+satisfying
+
+\begin{center}
+x$^{2}$ + y$^{2}$= 13$^{2}$
+\end{center}
+
+Well first of all each x and y must be at most 13, right? So all you
+need to do is to check all possible 0, ..., 13 for x and 0, ..., 13 for
+y. In other words you need to check all the following cases:
+
+x = 0, y = 0\\
+x = 0, y = 1\\
+x = 0, y = 2\\
+...\\
+x = 0, y = 13\\
+x = 1, y = 0\\
+x = 1, y = 1\\
+x = 1, y = 2\\
+...\\
+x = 1, y = 13\\
+x = 2, y = 0\\
+x = 2, y = 1\\
+x = 2, y = 2\\
+...\\
+x = 2, y = 13\\
+...\\
+...\\
+...\\
+x = 13, y = 13\\
+
+That sure looks like a double-nested for-loop to me!
+Here's the program:
+\begin{console}
+for (int x = 0; x <= 13; ++x)
+{   
+    for (int y = 0; y <= 13; ++y)
+    {
+        if (x * x + y * y == 13 * 13)
+        {  
+           std::cout << x << ',' << y << '\n';
+        }
+    }
+}
+\end{console}
+Now note that you see some ``repetitions''. I'm saying
+that if x = a, y = b is a solution, then x = b, y = a is also a solution
+because in the equation above, you can switch x and y. What if you do
+not want to include such repetitions? One way would be to ensure x
+<= y. In other words you try to get your program to run through
+these values of x,y:
+
+x = 0, y = 0\\
+x = 0, y = 1\\
+x = 0, y = 2\\
+...\\
+x = 0, y = 13\\
+x = 1, y = 1 (note that y starts with 1 and not 0)\\
+x = 1, y = 2\\
+x = 1, y = 3\\
+...\\
+x = 1, y = 13\\
+x = 2, y = 2 (note that y starts with 2 and not 0)\\
+x = 2, y = 3\\
+x = 2, y = 4\\
+...\\
+x = 2, y = 13\\
+...\\
+...\\
+...\\
+x = 13, y = 13\\
+\begin{console}[commandchars=\~\@\$]
+for (int x = 0; x <= 13; ++x)
+{   
+    for (int y = ~textbf@x$; y <= 13; ++y)
+    {
+        if (x * x + y * y == 13 * 13)
+        {  
+           std::cout << x << ',' << y << '\n';
+        }
+    }
+}
+\end{console}
+Of course you realize that x$^2$ + y$^2$ = 13$^2$ gives the solution of the right-angle triangle with hypotenuse of length 13 and integer sides. Why not find all such triangles with hypotenuse from 1 to 100??? This means solving
+
+\begin{center}
+x$^2$ + y$^2$ = z$^2$
+\end{center}
+
+where 1 <= z <= 100.
+
+\begin{console}[commandchars=\~\@\$]
+~textbf@for (int z = 1; z <= 100; ++z)$
+~textbf@{$   
+    for (int x = 0; x <= z; ++x)
+    {   
+        for (int y = x; y <= z; ++y)
+        {   
+            if (x * x + y * y == z * z)
+            {  
+               std::cout << x << ','
+                         << y << ','
+                         << z << '\n';
+            }
+        }
+    }
+~textbf@}$
+\end{console}
+
+This prints the sides of all right angle triangles with integer sides
+where the hypotenuse is between 1 to 100.
+
+\input{exercises/22-11-for-loops-part2/main.tex}\input{exercises/23-11-for-loops-part2/main.tex}\input{exercises/24-11-for-loops-part2/main.tex}\input{exercises/25-11-for-loops-part2/main.tex}\input{exercises/26-11-for-loops-part2/main.tex}

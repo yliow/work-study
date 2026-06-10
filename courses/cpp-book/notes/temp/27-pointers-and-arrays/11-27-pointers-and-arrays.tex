@@ -1,0 +1,223 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Difference of pointers: binary search}
+
+Note that we have been using addition operator pointers:
+
+Here's continue with the example from the previous section:
+
+\begin{consolethree}[escapeinside=||]
+int a[] = {1,3,5,7,2,4,6,8};
+int * p = &a[1];
+int * q = &a[4];
+\end{consolethree}
+
+That's addition of a pointer value and a constant integer.
+
+Go ahead and try this:
+
+\begin{consolethree}[escapeinside=||]
+int a[] = {1,3,5,7,2,4,6,8};
+int * p = &a[1];
+int * q = p + 3;
+std::cout << |\EMPHASIZE{p + q}| << '\n';
+\end{consolethree}
+
+Read the error message carefully.
+
+You \EMPHASIZE{cannot add pointers}.
+
+However try this:
+
+\begin{consolethree}[escapeinside=||]
+int a[] = {1,3,5,7,2,4,6,8};
+int * p = &a[1];
+int * q = &a[4];
+std::cout << |\EMPHASIZE{p - q}| << '\n';
+\end{consolethree}
+
+It works. This tells you (of course) that the integer \texttt{q} points to is 3 integers away from the integer that \texttt{p} points.
+
+Why is this important?
+
+Recall from the previous section, when it comes to functions that computes on a section of an array, i.e. a subarray, you want to call the function with two pointers. For instance:
+
+\begin{consolethree}[escapeinside=||]
+int sum(int * start, int * end)
+{
+    // returns sum of *start, ..., *(end - 1)
+    ...
+}
+\end{consolethree}
+
+Sometimes you want to know how many terms of the array is involved. This
+is
+
+\verb!end -- start!
+
+This is the size of the subarray that the function works with.
+
+Another reason why the difference of pointers is important is because of binary search. In the scenario when you are performing binary search on a subarray where you specify the subarray using index values, the function looks like this:
+
+\begin{consolethree}[escapeinside=||]
+int binarysearch(int x[], int start, int end,
+                 int target)
+{
+    int left = start, right = end -- 1;
+    while (left <= right)
+    {
+        int mid = (left + right) / 2};
+        ...
+    }
+}
+\end{consolethree}
+
+See chapter on 1D arrays of CISS240.
+
+This version has a problem. Remember that an integer is usually (at least for now) is made up of 32 bits. So the range of an integer value is $-2^{31}$, \ldots, $2^{31} - 1$. So when your \texttt{left} and \texttt{right} are both large, for instance they are both very close to $2^{31} - 1$, then \texttt{left + right} will overflow and become a negative integer!!!
+
+The way to fix this is to compute the \texttt{mid} index like this:
+
+\begin{consolethree}[escapeinside=||]
+int binarysearch(int x[], int start, int end,
+                 int target)
+{
+    int left = start, right = end -- 1;
+    while (left <= right)
+    {
+        int mid = |\EMPHASIZE{ left + (right - left) / 2;}|
+        ...
+    }
+}
+\end{consolethree}
+
+This version will not cause an integer overflow. So from now on, you must use this version of binary search.
+
+In the above, \texttt{right} is the largest index of the subarray the current iteration of your binary search is working on.
+
+You can also do this where \texttt{right} is \EMPHASIZE{one index beyond} the subarray your binary search is working on:
+
+\begin{consolethree}[escapeinside=||]
+int binarysearch(int x[], start, int end,
+                 int target)
+{
+    int left = start, right = |\EMPHASIZE{ end}|;
+    while (left |\EMPHASIZE{ <}| right)
+    {
+        int mid = left + (right - left) / 2;
+        ...
+    }
+}
+\end{consolethree}
+
+This is now the index value version of binary search that you must use:
+
+\begin{consolethree}[escapeinside=||]
+int binarysearch(int x[], int start, int end,
+                 int target)
+{
+    int left = start, right = end;
+    while (left < right)
+    {
+        int mid = (left + right) / 2;
+        if (x[mid] == target)
+        {
+            return mid;
+        }
+        else if (x[mid] > target)
+        {
+            right = mid; // note: no "- 1"
+        }
+        else
+        {
+            left = mid + 1;
+        }
+    }
+}
+\end{consolethree}
+
+What about a pointer version of binary search? Using the CISS240 version as a guide, when you try this:
+
+\begin{consolethree}[escapeinside=||]
+int * binarysearch(int * start, int * end,
+                   int target)
+{
+    int * left = start;
+    int * right = end;
+    while (left < right)
+    {
+        int * mid = (left + right) / 2;
+        ...
+    }
+}
+\end{consolethree}
+
+you'll see that it does not even compile \ldots{} because you \EMPHASIZE{cannot add pointers}.
+
+\begin{consolethree}[escapeinside=||]
+...
+int * mid = (left |\EMPHASIZE{ +}| right) / 2;
+...
+\end{consolethree}
+
+The solution is to compute the middle pointer in a different way:
+
+\begin{consolethree}[escapeinside=||]
+int * binarysearch(int * start, int * end,
+                   int target)
+{
+    int * left = start;
+    int * right = end;
+    while (left < right)
+    {
+        int * mid = left + (right -- left) / 2;
+        ...
+    }
+}
+\end{consolethree}
+
+The quantity
+
+\verb!(right -- left) / 2!
+
+is half the number of integer from left to just before right. It's slightly less than half if the number of such values is odd. Add this to left would then of course give you the address of the integer in the middle of integers \textbf{\texttt{*left,\ldots,*(right -- 1)}}.
+\begin{python}
+from latextool_basic import *
+p = Plot()
+startx = 0
+for i in range(11):
+    p += Rect(startx, 0, startx + 1, 1, linewidth=0.05)
+    startx += 1
+p += Line(points=[(2.5, -1.5),(2.5, -0.1)], linewidth=0.1, endstyle='>')
+p += Rect(2.5, -1.8, 2.5, -1.8, linewidth=0, label=r'\texttt{left}')
+p += Line(points=[(4.5, -2.5),(4.5, -0.1)], linewidth=0.1, endstyle='>')
+p += Rect(4.5, -2.8, 4.5, -2.8, linewidth=0, label=r'\texttt{left + (right - left) / 2}')
+p += Line(points=[(8.5, -1.5),(8.5, -0.1)], linewidth=0.1, endstyle='>')
+p += Rect(8.5, -1.8, 8.5, -1.8, linewidth=0, label=r'\texttt{right}')
+p += Line(points=[(2.5, 1.5),(4.5, 1.5)], linewidth=0.1, startstyle='>', endstyle='>')
+p += Rect(9, 1.2, 9, 2, linewidth=0, label=r'\texttt{(right - left) / 2}')
+p += Line(points=[(2.5, 2.5),(7.5, 2.5)], linewidth=0.1, startstyle='>', endstyle='>')
+p += Rect(9.5, 2.5, 9.5, 2.5, linewidth=0, label=r'\texttt{right - left}')
+print(p)
+\end{python}
+This middle pointer computation is just like the middle index computation.
+
+From now on you should use the midpoint calculation
+
+\verb!mid = left + (right - left) / 2!
+
+for both middle index and middle pointer computation for binary search.
+
+By the way, in general, there's no reason to compute the difference of
+two addresses other than the address of two values in the same array.
+One last thing: if you want to store the difference of two pointers, you
+need to know that there's a type for pointer differences:
+
+\verb!std::ptrdiff_t d = p -- q;!
+
+You need to \verb!#include <cstddef>! if you want to use
+\texttt{std::ptrdiff\_t}.
+
+\input{exercises/47-27-pointers-and-arrays/main.tex}
+\input{exercises/48-27-pointers-and-arrays/main.tex}

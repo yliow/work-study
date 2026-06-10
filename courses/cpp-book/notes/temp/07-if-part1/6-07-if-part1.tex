@@ -1,0 +1,126 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Random integers}
+
+Generating a random integer occurs commonly in computer programs. For instance if you want to write a strategy role-playing game, you might have different rooms in a mansion and you want to put different things in different rooms. Suppose you have a magic potion in a bottle. Now suppose the rooms are numbered from 1 to 1000. You don' t want your magic potion bottle to be in room 5 whenever you start the game. You want each game to be different.
+
+At a more complex level you might want to randomly make doors between two rooms. This creates a random maze.
+
+So you' d better learn how to generate random things.
+
+Try this:
+\begin{console}[commandchars=\~\@\$]
+#include < iostream>
+
+int main()
+{
+std::cout << "the potion is in room " << ~textbf@rand()$
+          << std::endl;
+std::cout << "the potion is in room " << ~textbf@rand()$
+          << std::endl;
+std::cout << "the potion is in room "<< ~textbf@rand()$
+          << std::endl;
+std::cout << "total number of rooms: "
+          << ~textbf@RAND_MAX$ << std::endl;
+          
+return 0;
+} 
+\end{console}
+(Note: You might need \verb!#include <cstdlib>!\\just after \verb!#include <iostream>!. This depends on your compiler.)
+
+Looks like you' re getting random integers. But wait ...
+run the program a second time ... a third time ... a fourth time. Notice
+something?
+
+OK. Let' s modify the program:
+\begin{console}[commandchars=\~\@\$]
+#include <iostream>
+~textbf@#include <ctime>$
+int main()
+{
+~textbf@srand((unsigned int) time(NULL));$   
+std::cout << "the potion is in room " << rand()
+          << std::endl;
+std::cout << "the potion is in room " << rand()
+          << std::endl;
+std::cout << "the potion is in room " << rand()
+          << std::endl;
+std::cout << "total number of rooms: "
+          << RAND_MAX << std::endl;
+return 0;
+\end{console}
+
+Run this program several times. Notice that the room number is different
+each time you run the program.
+
+I will not go into details on the statement
+\begin{center}
+\texttt{srand((unsigned int) time(NULL));}
+\end{center}
+The only thing I will say is that it \lq\lq seeds'' the random generator so
+as to make it \lq\lq more random''. The important thing to remember is that
+you must execute this statement and furthermore you execute it
+\textbf{\underline{once}} (usually) and \textbf{\underline{before}} you call the \texttt{rand()} function. The standard practice is to execute the seeding
+in \texttt{main()} and at the beginning:
+\begin{console}[commandchars=\~\@\$]
+#include <iostream>
+~textbf@#include <ctime>$
+int main()
+{
+   ~textbf@srand((unsigned int) time(NULL));$
+   . . .
+   return 0;
+}
+\end{console}
+Since \verb!rand()! gives you a random number from \verb!0! to \verb!RAND_MAX!,
+\begin{center}
+\texttt{rand() / RAND\_MAX}
+\end{center}
+will give you a random \verb!double! between \verb!0.0! and \verb!1.0!.
+But this is not right because the / is an \textit{\textbf{integer}}
+division. Therefore we do this:
+\begin{center}
+\texttt{double(rand()) / RAND\_MAX}
+\end{center}
+to get a random double from 0.0 to 1.0.
+
+\input{exercises/14-07-if-part1/main.tex}
+\input{exercises/15-07-if-part1/main.tex}
+\input{exercises/16-07-if-part1/main.tex}
+What about generating random integers from 5,..., 20? In this case the the lower bound is 5 and not 1. You use the same idea. Note that if you do something like
+\begin{center}
+\texttt{rand() \% 10}
+\end{center}
+or
+\begin{center}
+\texttt{rand() \% 18}
+\end{center}
+the range of numbers starts from 0. So if you want to generate random
+numbers in the range of 5,..., 20, the first thing you do is to think
+about the range
+\begin{center}
+0, \dots, 15
+\end{center}
+first. In other words move the given range 5, \ldots, 20 so that the
+lower bound of the range becomes 0. That means subtracting 5 from the
+range. To generate a number in the range of 0, \ldots, 15, you do
+\begin{center}
+\texttt{rand() \% 16}
+\end{center}
+This gives a number in the range 0, \ldots, 15. You then add 5 to it:
+\begin{center}
+\texttt{5 + rand() \% 10}
+\end{center}
+\textbf{Exercise.} Verify that the expression\\
+\begin{center}
+\texttt{5 + rand() \% 10}
+\end{center}
+does give you numbers in the range of 5, \dots, 20. .
+
+\input{exercises/17-07-if-part1/main.tex}
+\input{exercises/18-07-if-part1/main.tex}
+\input{exercises/19-07-if-part1/main.tex}
+\input{exercises/20-07-if-part1/main.tex}
+\input{exercises/21-07-if-part1/main.tex}
+\input{exercises/22-07-if-part1/main.tex}

@@ -1,0 +1,291 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Divisors and primes}
+
+Quick review of divisors and primes (See previous notes on integers for
+more information.)
+
+Let n be a positive integer at least 1 and let d be a positive integer
+greater than 0. We say that d \EMPHASIZE{divides} n or that d is a
+\EMPHASIZE{divisor} of n if you can find an integer x such that dx = n.
+(Yes, we've seen this before, in earlier notes and also
+in the prerequisite math courses.) You already know that the statement
+\begin{center}
+``d divides n''
+\end{center}
+in C++ is
+
+\[n \% d == 0\]
+
+Of course for d to be a divisor of n, d must be at most n.
+
+\input{exercises/15-11-for-loops-part2/main.tex}A \EMPHASIZE{prime} is a positive integer which is greater than 1 and is
+divisible by only 1 and itself.
+
+Let's try to get C++ to list primes.
+
+Look at the statement: ``A prime is a positive integer which is greater
+than 1 and is divisible by only 1 and itself.''
+
+Let's say the value of the integer is in variable n.
+There are two conditions to check on n
+
+\begin{itemize}
+\item
+  \begin{quote}
+  n greater than 1
+  \end{quote}
+\item
+  \begin{quote}
+  n is divisible by only 1 and itself
+  \end{quote}
+\end{itemize}
+
+The first condition is easy. The second one is tricky. But its not too
+bad.
+
+Suppose n has value 7. We just need to check that 2, 3, 4, 5, and 6
+cannot divide 7 to conclude that 7 is a prime.
+
+Hmmm .... ``2, 3, 4, 5, and 6''... sure sounds like a for-loop.
+
+What about ``cannot divide''??? Well ``i divides n''is the same as
+saying n \% i is zero. So for ``i does not divide n'', the remainder
+when you divide n by i must be nonzero, i.e. n \% i is not zero. (Duh.)
+
+Try this:
+\begin{console}
+int n = 7;
+for (int i = 2; i < n; ++i)
+{   
+    std::cout << i << ' '<< n % i << std::endl;
+}
+\end{console}
+Now try this:
+\begin{console}
+int n = 25;
+for (int i = 2; i < n; i++)
+{   
+    std::cout << i << ' '<< n % i << std::endl;
+}
+\end{console}
+AHA! If you do get a nonzero value, it's not a prime and
+you can stop the check right?
+\begin{console}
+int n = 25;
+for (int i = 2; i < n; ++i)
+{   
+    std::cout << n % i << std::endl;
+    if (n % i == 0) break;
+}
+\end{console}
+But \ldots of course you still need to know if your \texttt{n} is a
+prime!!! You can't tell from the above code. Why?
+Because it's possible to get out of the loop in
+\EMPHASIZE{two} different ways:
+
+\begin{itemize}
+\item
+  you could have gotten out of the loop because \texttt{i} reached
+  \texttt{n} (therefore \texttt{n} is a prime); or
+\item
+  \texttt{break} was executed (therefore \texttt{n} is not a prime)
+\end{itemize}
+
+We need to \EMPHASIZE{disambiguate} the exit condition of the for-loop!!!
+
+To do that, we create a variable that tells us why we are out of the
+for-loop. Let's call it \texttt{flag}.
+I'll let our program get the value of \texttt{n} from us
+so that it's easier to test the program:
+\begin{console}
+int n;
+std::cin >> n;
+int flag;
+for (int i = 2; i < n; ++i)
+{   
+    std::cout << n % i << std::endl;
+    if (n % i == 0)
+    {
+        flag = 1; // flag equals 1 means n not prime
+        break;
+    }
+}
+\end{console}
+
+But what if \texttt{n} is indeed a prime? It would pass all the tests
+(i.e.the body of the if statement will not execute). In that case
+\texttt{flag} will not be assigned a value!!! We had better give
+\texttt{flag} an initial value:
+\begin{console}
+int n = 25;
+int flag = 0; // flag equals 0 means n is prime
+for (int i = 2; i < n; ++i)
+{   
+    std::cout << n % i << std::endl;
+    if (n % i == 0)
+    {
+        flag = 1; // flag equals 1 means n not prime
+        break;
+    }
+}
+// At this point ...
+// if flag is 0, then n is prime
+// if flag is 1, then n is not prime \\
+\end{console}
+Let's insert a print statement after the loop:
+\begin{console}
+int n = 25;
+int flag = 0; // flag equals 0 means n is prime
+for (int i = 2; i < n; ++i)
+{   
+    std::cout << n % i << std::endl;
+    if (n % i == 0)
+    {
+        flag = 1; // flag equals 1 means n not prime
+        break;
+    }
+}
+
+std::cout << (flag == 0 ? "prime" : "not prime")
+          << std::endl;
+\end{console}
+(Review the ternary operator if you have forgotten about it.)
+
+Go ahead and test your program with a couple of values for n.
+
+Note that \texttt{flag} only needs to have two possible values because the
+only purpose of \texttt{flag} is to tell us why we exit the loop and there
+are only two reasons for exiting the for-loop. Although the program
+works, the variable \EMPHASIZE{name} \texttt{flag} can be better. The
+\EMPHASIZE{purpose} of \texttt{flag} is to tell if \texttt{n} is a
+\texttt{prime}. So ...
+
+I will use a \texttt{\EMPHASIZE{bool}} variable \texttt{\EMPHASIZE{isprime}}
+instead. Why boolean? Because this variable only needs to take on
+\EMPHASIZE{two possible values}. Of course if there are three exit points
+in the for-loop, then you should not use a boolean variable.
+\begin{console}
+int n = 25;
+bool isprime = true;
+for (int i = 2; i < n; ++i)
+{   
+    std::cout << n % i << std::endl;
+    if (n % i == 0)
+    {  
+        isprime = false;
+        break;
+    }
+}
+std::cout << (isprime ? "prime" : "not prime") << std::endl;
+\end{console}
+Let us now remove the print statement in the for-loop:
+\begin{console}
+int n = 25;
+bool isprime = true;
+for (int i = 2; i < n; ++i)
+{   
+    if (n % i == 0)
+    {
+        isprime = false;
+        break;
+    }
+}
+
+std::cout << (isprime ? "prime" : "not prime")
+          << std::endl;
+\end{console}
+Study the above program very carefully. Make sure you see that the
+choice of the name of the variable \texttt{isprime} makes the program
+easier to understand.
+
+Note that it's possible to remove the \texttt{break}
+statement; study this program very carefully:
+\begin{console}
+bool isprime = true;
+for (int i = 2; i < n && isprime; i++)
+{   
+    if (n % i == 0)
+    {
+        isprime = false;
+    }
+}
+
+std::cout << (isprime ? "prime" : "not prime")
+          << std::endl;
+\end{console}
+
+Note that the loop keeps running as long as
+\begin{center}
+\texttt{i < n \&\& isprime}
+\end{center}
+is \texttt{true}. The only way to get out of the for-loop is when the
+boolean expression
+\begin{center}
+\texttt{i < n \&\& isprime}
+\end{center}
+evaluates to false which is when \texttt{i} reaches \texttt{n} or when
+\texttt{isprime} is \texttt{false}.
+
+\input{exercises/16-11-for-loops-part2/main.tex}Note that it's obvious that, for instance when
+you're testing if n = 87 is a prime, you need
+\EMPHASIZE{not} test if 86 is a divisor of n = 87. 86 is obviously too big
+to divide 87!!!
+
+It can be proven that instead of testing i from 2 to n - 1, you really only need to test up to the \underline{\textbf{square root of n}}. (I won't prove this. You can take, for instance, a class on cryptography to find out why.)
+\begin{console}[commandchars=\~\@\$]
+bool isprime = true;
+for (int i = 2; i ~textbf@<= sqrt(n)$ && isprime; ++i)
+{   
+    if (n % i == 0)
+    {
+        isprime = false;
+    }
+}
+
+std::cout << (isprime ? "prime" : "not prime")
+          << std::endl;
+\end{console}
+(Don't forget: if you want to use the \texttt{sqrt} function, you must add \texttt{\#include < cmath>} at the top of your code. Also don't forget that if you're using MS VS, you might need to convert the value of \texttt{n} to a \texttt{double}, i.e. you should use \texttt{sqrt(double(n))} instead of \texttt{sqrt(n)}.)
+
+Now, for instance when you test if 1023457 is prime, your program will
+run \texttt{i} from 2 to 1011 instead of from 2 to 1023456.
+That's quite a lot of CPU time saved!!!
+
+\input{exercises/17-11-for-loops-part2/main.tex}But there's still something else you can do. Note that
+\texttt{sqrt(n)} is computed many times, once every time the boolean
+expression in the for-loop is evaluated. We can compute and store the
+square root of n to avoid recomputation:
+\begin{console}[commandchars=\~\@\$]
+bool isprime = true;
+~textbf@int sqrtn = sqrt(n);$
+for (int i = 2; i ~textbf@<= sqrtn$ && isprime; ++i)
+{   
+    if (n % i == 0)
+    {
+        isprime = false;
+    }
+}
+
+std::cout << (isprime ? "prime" : "not prime")
+          << std::endl;
+\end{console}
+\input{exercises/18-11-for-loops-part2/main.tex}There's yet another thing we can do. Note that \texttt{sqrtn} is used only in the for-loop. We can actually declare \texttt{sqrtn} at the initialization part of the for-loop so that the scope of \texttt{sqrtn} stays inside the loop:
+\begin{console}[commandchars=\~\@\$]
+bool isprime = true;
+for (int i = 2~textbf@, sqrtn = sqrt(n)$; i <= sqrtn && isprime; ++i)
+{   
+    if (n % i == 0)
+    {
+        isprime = false;
+    }
+}
+
+std::cout << (isprime ? "prime" : "not prime")
+          << std::endl;
+\end{console}
+Note that this does not improve the speed of your program. It simply
+shrinks the scope of variable \texttt{sqrtn}.
+
+\input{exercises/19-11-for-loops-part2/main.tex}\input{exercises/20-11-for-loops-part2/main.tex}

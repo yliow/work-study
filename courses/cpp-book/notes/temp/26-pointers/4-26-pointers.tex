@@ -1,0 +1,144 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Mental Picture}
+
+Look at this code:
+
+\begin{consolethree}[escapeinside=||]
+int x = 42;
+int * p;
+p = &x;
+\end{consolethree}
+
+Suppose the \texttt{int} value of x is at memory location 124500 in the computer and the memory location is at 124504. The computer's memory would look like this:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Rect(-3, 9, 0, 10, label='124508', linewidth=0.0)
+p += Rect(-3, 8, 0, 9, label='124507', linewidth=0.0)
+p += Rect(-3, 7, 0, 8, label='124506', linewidth=0.0)
+p += Rect(-3, 6, 0, 7, label='124505', linewidth=0.0)
+p += Rect(-3, 5, 0, 6, label='124504', linewidth=0.0)
+p += Rect(-3, 4, 0, 5, label='124503', linewidth=0.0)
+p += Rect(-3, 3, 0, 4, label='124502', linewidth=0.0)
+p += Rect(-3, 2, 0, 3, label='124501', linewidth=0.0)
+p += Rect(-3, 1, 0, 2, label='124500', linewidth=0.0)
+#
+p += Rect(0, 5, 3, 9, label='\EMPHASIZE{124500}', linewidth=0.0, background='gray!45!white!')
+p += Rect(0, 1, 3, 5, label='\EMPHASIZE{42}', linewidth=0.0, background='gray!25!white!')
+#
+p += Rect(0, 10, 3, 11, label='\EMPHASIZE{...}', linewidth=0)
+p += Rect(0, 9, 3, 10, label=' ', linewidth=0.1)
+p += Rect(0, 8, 3, 9, label=' ', linewidth=0.05)
+p += Rect(0, 7, 3, 8, label=' ', linewidth=0.05)
+p += Rect(0, 6, 3, 7, label=' ', linewidth=0.05)
+p += Rect(0, 5, 3, 6, label=' ', linewidth=0.05)
+p += Rect(0, 4, 3, 5, label=' ', linewidth=0.05)
+p += Rect(0, 3, 3, 4, label=' ', linewidth=0.05)
+p += Rect(0, 2, 3, 3, label=' ', linewidth=0.05)
+p += Rect(0, 1, 3, 2, label=' ', linewidth=0.05)
+p += Rect(0, 0, 3, 1, label=' ', linewidth=0.05)
+p += Rect(0, -1, 3, 0, label=' ', linewidth=0.05)
+p += Rect(0, -2, 3, -1, label=' ', linewidth=0.05)
+p += Rect(0, -3, 3, -2, label='\EMPHASIZE{...}', linewidth=0)
+print(p)
+\end{python}
+
+Here's the memory model that you are already used to:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(0, 1.5, 5, 5.5)
+
+p += Rect(0.5, 2.5, 0.5, 2.5, label='p')
+p += Rect(1, 2, 4, 3, label='124500')
+
+p += Rect(0.5, 4.5, 0.5, 4.5, label='x')
+p += Rect(1, 4, 4, 5, label='42')
+
+print(p)
+\end{python}
+
+To indicate that the value 42 of variable x is at memory address 124500,
+I will draw this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(0, 1.5, 5, 5.5)
+
+p += Rect(1.5, 5.25, 1.5, 5.25, label='124500')
+p += Rect(0.5, 2.5, 0.5, 2.5, label='p')
+p += Rect(1, 2, 4, 3, label='124500')
+
+p += Rect(0.5, 4.5, 0.5, 4.5, label='x')
+p += Rect(1, 4, 4, 5, label='42')
+
+print(p)
+\end{python}
+
+Well \ldots{} actually important thing is the \EMPHASIZE{relationship} between \texttt{p} and the value of \texttt{x}: Think of \texttt{p} as knowing where to find the value of \texttt{x}. So we usually have this mental picture in mind when we talk about pointers:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(0, 1.5, 5, 5.5)
+
+xbawx = Rect(1, 2, 4, 3, label='124500')
+
+p += xbawx
+p += Rect(0.5, 4.5, 0.5, 4.5, label='x')
+p += Rect(1, 4, 4, 5, label='42')
+
+pbawx = Rect(1.5, 5.25, 1.5, 5.25, label='124500')
+p += pbawx
+p += Rect(0.5, 2.5, 0.5, 2.5, label='p')
+
+p += Line(points=[(3.5, 2.5), (4.5, 2.5), (4.5, 4.5), (2.8, 4.5)], linewidth=0.15, endstyle='>')
+print(p)
+\end{python}
+
+Sometimes, I will even simplify the mental picture by drawing this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(0, 1.5, 5, 5.5)
+
+xbawx = Rect(1, 2, 4, 3, label='124500')
+
+p += xbawx
+p += Rect(0.5, 4.5, 0.5, 4.5, label='x')
+p += Rect(1, 4, 4, 5, label='42')
+
+#pbawx = Rect(1.5, 5.25, 1.5, 5.25, label='124500')
+#p += pbawx
+p += Rect(0.5, 2.5, 0.5, 2.5, label='p')
+
+p += Line(points=[(3.5, 2.5), (4.5, 2.5), (4.5, 4.5), (2.8, 4.5)], linewidth=0.15, endstyle='>')
+print(p)
+\end{python}
+
+(Later, we'll see how to access access the value of x using p.)
+
+Note that the arrow drawn in the diagram is to help us (human beings) see quickly what value a pointer is pointing to. Your computer only works with numbers (as in bits). The arrows in the drawing above are only a visual guide for us to see pointer relations quickly. There are no ``hardware arrows'' in your computer or CPU!!! Remember that!!!
+
+\input{exercises/10-26-pointers/main.tex}
+\input{exercises/11-26-pointers/main.tex}
+\input{exercises/12-26-pointers/main.tex}
+\begin{consolethree}[escapeinside=||]
+
+double pi[] = {3.1, 3.14, 3.141, 3.1415, 3.14159};
+
+double * p = &pi[1];
+\end{consolethree}
+
+\input{exercises/13-26-pointers/main.tex}
+\input{exercises/14-26-pointers/main.tex}
+\input{exercises/15-26-pointers/main.tex}

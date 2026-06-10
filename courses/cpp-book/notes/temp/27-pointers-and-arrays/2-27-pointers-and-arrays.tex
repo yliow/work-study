@@ -1,0 +1,65 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Memory layout of local variables}
+
+Suppose you have two integer variables declared next to each other:
+
+\begin{consolethree}[escapeinside=||]
+int x = 42;
+int y = 43;
+\end{consolethree}
+
+Then the address of y is \EMPHASIZE{4 smaller} than the address of x -- assuming that \texttt{\EMPHASIZE{sizeof(int)}}\EMPHASIZE{ is 4}. (If on your machine, the \texttt{sizeof(int)} is 8, then the address of \texttt{y} is 8 smaller.)
+
+\EMPHASIZE{Caveat:} Note that that difference between \texttt{\&x} and \texttt{\&y} can be more than 4 on your computer, but it cannot be less than \texttt{4}. The point is that an integer takes up \texttt{sizeof(int)} number of bytes. But your computer (and your compiler) might pad some extra bytes between the memory used by two adjacent integer variables.
+
+On my Windows machine, 8 extra bytes were padded. On my linux machine, the padding is 0. In the notes below, I'm going to assume that the amount of extra padding is 0. To check on the padding of your machine, using the above code, print the address of x and the address of y and subtract. If the difference is 12, then you know that the padding is 12 -- 4 = 8 since the \texttt{sizeof(int)} is 4.
+
+First run this:
+
+\begin{consolethree}[escapeinside=||]
+int x = 42, y = 43, z = 44;
+std::cout << (unsigned int) &x << ' '
+          << (unsigned int) &y << ' '
+          << (unsigned int) &z << '\n';
+int * p = &x;
+int * q = p - 1;
+std::cout << (unsigned int)(p) << ' '
+          << (unsigned int)(q) << '\n';
+\end{consolethree}
+
+(Recall: you might want to use \texttt{unsigned long long}.) AHA \ldots{} so \ldots{} q is indeed pointing to x! Try this:
+
+\begin{consolethree}[escapeinside=||]
+int x = 42, y = 43, z = 44;
+std::cout << (unsigned int) &x << ' '
+          << (unsigned int) &y << ' '
+          << (unsigned int) &z << '\n';
+int * p = &x;
+int * q = p - 1;
+std::cout << (unsigned int)(p) << ' '
+          << (unsigned int)(q) << '\n';
+*q = 0;
+std::cout << x << '\n';
+\end{consolethree}
+
+Sure enough, \texttt{*q = 0} changes \texttt{x} to 0!!!
+
+\EMPHASIZE{Caveat:} In my case, because my linux machine does not pad extra bytes between the memory of \texttt{x} and the memory of \texttt{y}, for \texttt{q} to point to \texttt{y}, I only need \texttt{q = p - 1}.
+
+On my Windows machine, there is a padding of 8 bytes, which means that for my Windows machine, I would need to do \texttt{q = p - 1 - 2}, i.e., I have to subtract 2 more because of the 8-byte padding.
+
+So if the address of \texttt{x} is 1000 (and assuming there is no extra padding), then the address of \texttt{y} is 996 and the address of \texttt{z} is 992.
+
+(In some rare cases, your computer might arrange to have the addresses going up instead of down. But that's rare.)
+
+In general if you have two variables x and y of type T which are declared next to each other (x first, then y), then
+
+address of \texttt{y} = address of \texttt{x - sizeof(T)}
+
+\input{exercises/8-27-pointers-and-arrays/main.tex}
+\input{exercises/9-27-pointers-and-arrays/main.tex}
+\input{exercises/10-27-pointers-and-arrays/main.tex}
+\input{exercises/11-27-pointers-and-arrays/main.tex}
+

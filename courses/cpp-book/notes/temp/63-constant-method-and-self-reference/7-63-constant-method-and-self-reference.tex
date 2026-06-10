@@ -1,0 +1,193 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Returning references}
+
+In the previous section, I have shown you an example of returning a
+reference.
+
+Certain methods and operators update the values of the variables or
+objects and return the values of the variables or objects. Run this:
+
+\begin{consolethree}[escapeinside=||]
+int x = 5;
+x++;
+std::cout << x << std::endl;
+int y = x++;
+std::cout << x << ',' << y << std::endl;
+y = (x += 5);
+std::cout << x << ',' << y << std::endl;
+(x += 5) += 5;
+std::cout << x << std::endl;
+\end{consolethree}
+
+Don't overdo this! Why? Because
+
+\begin{consolethree}[escapeinside=||]
+y = (x += 5);
+\end{consolethree}
+
+does too many things. A function/method/operator should do
+\EMPHASIZE{\texttt{one}} thing to avoid confusion. This is clearly easier to
+understand:
+
+\begin{consolethree}[escapeinside=||]
+x += 5;
+y = x;
+\end{consolethree}
+
+Note that the \texttt{+=} when called twice:
+
+\begin{consolethree}[escapeinside=||]
+(x += 5) += 5;
+\end{consolethree}
+
+operates on the same \texttt{x}. This means that \texttt{+=}, besides
+incrementing \texttt{x}, also returns a reference to x so that the second
+\texttt{+=} operators on the same \texttt{x}. If \texttt{+=} returns a new
+\texttt{int} value that has the same value as \texttt{x} after incrementing,
+then the second \texttt{+=} would have operated on this new \texttt{int}
+value and not on \texttt{x}. Therefore the right thing to do is to return
+a reference to \texttt{x} and not a copy of \texttt{x}.
+
+Of course returning a reference is faster than returning an object since
+objects tend to consume more memory. References are implemented using
+pointers and pointers take up very little memory.
+
+Refer to the \texttt{Date} example. Suppose the \texttt{add\_y} method is to
+add an integer value to the year value, \texttt{and} return the value of
+the object.
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+...
+class Date
+{
+public:
+    ...
+    |\EMPHASIZE{Date \&}| add_y(int);
+    ...
+private:
+    int yyyy_, mm_, dd_;
+};
+...
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+...
+|\EMPHASIZE{Date \&}| Date::add_y(int inc)
+{
+    yyyy_ += inc;
+    |\EMPHASIZE{return *this;}|
+}
+...
+\end{consolethree}
+
+With the above, I can now do this:
+
+\begin{consolethree}[escapeinside=||]
+Date today(1, 1, 1970);
+today.add_y(1).add_y(3);
+\end{consolethree}
+
+The first invocation of \texttt{add\_y} will add 1 to the year of
+\texttt{today} and then a reference to \texttt{today} is returned. Therefore
+the second \texttt{add\_y} is called by this reference, which means that
+the second \texttt{add\_y} is called by \texttt{today}.
+
+However if you do this:
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+...
+|\EMPHASIZE{Date}| Date::add_y(int inc)
+{
+    y += inc;
+    |\EMPHASIZE{return *this;}|
+}
+...
+\end{consolethree}
+
+i.e., return a \texttt{Date} object instead of a reference, then
+\texttt{Date}'s copy constructor is used to create a new
+\texttt{Date} object from \texttt{*this}. This object is returned to
+\texttt{main()} and the \texttt{add\_y} is called by this object so that
+\texttt{today} does not have its year incremented by 3.
+
+We now look at returning references from a function call or method call.
+There's nothing new here about references.
+
+\EMPHASIZE{WARNING:} Pay attention to the next programs!!!
+
+Run the following pair of programs. Explain their outputs.
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int & f(int & x)
+{
+    x++;
+    return x;
+}
+
+int main()
+{
+    int a = 42;
+    int & b = f(a);
+    std::cout << a << ' ' << b << '\n';
+    std::cout << &a << ' ' << &b << '\n';
+    b++;
+    std::cout << a << ' ' << b << '\n';
+    return 0;
+}
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int & f(int & x)
+{
+    x++;
+    return x;
+}
+
+int main()
+{
+    int a = 42;
+    int b = f(a);
+    std::cout << a << ' ' << b << '\n';
+    std::cout << a << ' ' << b << '\n';
+    b++;
+    std::cout << a << ' ' << b << '\n';
+    return 0;
+}
+\end{consolethree}
+
+The point:
+
+\begin{consolethree}[escapeinside=||]
+int a = 42;
+int & b = a;
+int & receiver1 = b;  // receiver1 references a
+int receiver2 = b;    // receiver2 gets the value of a
+receiver1 = 0;        // a is changed
+receiver2 = 0;        // receiver2 is changed, not a.
+\end{consolethree}
+
+What about this?
+
+\begin{consolethree}[escapeinside=||]
+int & f()
+{
+    int x = 42;
+    return x;
+}
+\end{consolethree}
+
+This returns a reference to a local variable but you cannot refer to
+this local variable once it goes out of scope since it will be destroyed
+at that point. (Note: this is OLD stuff. Yes I have already talked about
+it.)
+
+

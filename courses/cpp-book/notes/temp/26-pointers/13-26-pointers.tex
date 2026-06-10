@@ -1,0 +1,43 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Differences between pointers and references}
+
+The above might lead you to think that pointers and references are the same (except for syntax). There are actually lots of differences between pointers and references. With your understanding of pointers, let's take a closer look \ldots
+
+1. There's a pointer value, \texttt{NULL}, that can be assigned to all pointers. This frequently acts as a default pointer value. Recall that \texttt{NULL} does not point to anything useful. References (of any type) MUST refer to a value of a variable (or constant) of the same type -- there's no such thing as \texttt{NULL} reference. So a function that accepts a pointer has the option of being called with ``nothing'':
+
+\begin{consolethree}[escapeinside=||]
+void print_cash(int * p_cash_in_cents = NULL)
+{
+    if (p_cash_in_cents == NULL)
+    {
+        std::cout << "no cash!!!\n"
+    }
+    else
+    {
+        int dollar = *p_cash_in_cents / 100.0;
+        int cents = *p_cash_in_cents - dollar * 100.0;
+        std::cout << '$' << dollar
+                  << '.' << cents << '\n';
+    }
+}
+\end{consolethree}
+2. A pointer can be a constant pointer or non-constant pointer:
+
+
+For a non-constant pointer, the address value in the pointer can change so that it can point to another value.
+
+\begin{consolethree}[escapeinside=||]
+p = &x; *p++; // increments x
+p = &y; *p++; // increments y
+p = &z; *p++; // increments z
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+int x = 0, y = 0, z = 0;
+int & r = x; r++;           // increments x
+r = y; r++;                 // increments y ... NO!!!
+\end{consolethree}
+The fact that a pointer can point to different values is actually extremely important later when it comes to pointers and arrays.
+

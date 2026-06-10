@@ -1,0 +1,73 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Scope}
+
+It's important to note that the \texttt{Date::init} refer
+to the \texttt{init} function inside the \texttt{Date} class, i.e.,
+\texttt{init} is inside the scope called \texttt{Date}.
+That's right: classes create scopes just like the block
+of your for-loop forms a scope. The only difference is that in the case
+of the class, the scope has a name: its name is the name of the class.
+
+It's perfectly OK to have another \texttt{init} function
+OUTSIDE the class like this:
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+...
+class Date
+{
+public:
+    void init(int, int, int);
+    ...
+private:
+    int yyyy_, mm_, dd_;
+};
+
+void init(int, int, int);
+
+#endif
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+
+...
+
+void Date::init(int yyyy, int mm, int dd)
+{
+    yyyy_ = yyyy;
+    mm_ = mm;
+    dd_ = dd;
+}
+
+void init(int x, int y, int z)
+{
+    std::cout << "init outside Date\n";
+}
+
+...
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// main.cpp
+
+#include <iostream>
+#include "Date.h"
+
+int main()
+{
+    Date today, yesterday;
+
+    today.init(2014, 12, 25);
+    init(0, 0, 0);
+
+    ...
+}
+\end{consolethree}
+
+In C++, functions outside a class are sometimes called \EMPHASIZE{nonmember functions}.
+
+\input{exercises/10-60-classes-and-objects/main.tex}
+

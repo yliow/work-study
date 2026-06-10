@@ -1,0 +1,120 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Sums again: Area computation}
+
+I'm going to use the \texttt{for}-loop to compute a certain sum.
+This time it's going to be the area under a curve. The computation of areas is extremely important in many areas of science.
+
+The idea is actually very simple: you need to know how to compute the area of rectangles and you need to be able to add lots of these areas.
+
+The idea is pretty simple and illustrates the power of being able to do perform repetitions quickly.
+
+First you draw the graph of the function, for example, y = f(x) = x*x, the standard parabola):
+
+%%\includegraphics[width=4.5in,height=2.7736in]{Pictures/10000000000002B3000001AAC5D1A577C30A5997.png}
+
+Suppose you want to compute the area under this curve and above the
+x-axis and from x = 2 to x = 7:
+
+%\includegraphics[width=4.5in,height=2.5165in]{Pictures/10000000000002CD000001911B1B47C442016F8D.png}
+
+You can make an approximation by computing the areas of the rectangles
+with
+\begin{align*}
+\text{x=2 to x=3 with height f(2)}\\
+\text{x=3 to x=4 with height f(3)}\\
+\text{x=4 to x=5 with height f(4)}\\
+\text{x=5 to x=6 with height f(5)}\\
+\text{x=6 to x=7 with height f(6)}\\
+\end{align*}
+There are altogether 5 rectangles. Draw these rectangles into the graph
+above.
+
+%\includegraphics[width=4.5in,height=2.5362in]{Pictures/10000000000002CB00000193C61596A9DE7C6C44.png}
+
+Note that for each rectangle, the base has width 1. Also, for each
+rectangle, I am using the left endpoint on the width to determine the
+height. The areas of these rectangles is smaller than the area under the
+parabola from x = 2 to 2 = 7.
+
+\input{exercises/57-10-for-loops-part1/main.tex}Now we \lq\lq move'' the sum of areas of our rectangles towards the parabola
+in the following way: we will use \textbf{more} rectangles. Previously the
+base of the rectangles had a width of 1. Now I'm going
+to use rectangles with base of length 0.5. Altogether we now have 10
+rectangles:
+\begin{align*}
+\text{x=2.0 to x=2.5 with height f(2.0)}\\
+\text{x=2.5 to x=3.0 with height f(2.5)}\\
+\text{x=3.0 to x=3.5 with height f(3.0)}\\
+\text{x=3.5 to x=4.0 with height f(3.5)}\\
+\text{x=4.0 to x=4.5 with height f(4.0)}\\
+\text{x=4.5 to x=5.0 with height f(4.5)}\\
+\text{x=5.0 to x=5.5 with height f(5.0)}\\
+\text{x=5.5 to x=6.0 with height f(5.5)}\\
+\text{x=6.0 to x=6.5 with height f(6.0)}\\
+\text{x=6.5 to x=7.0 with height f(6.5)}\\
+\end{align*}
+Draw these 10 rectangles into the above graph.
+
+%\includegraphics[width=4.5in,height=2.5492in]{Pictures/10000000000002C9000001940CA977BFEBA1D44B.png}
+
+Do you see that the total area of these rectangles are closer to the
+actual area under the parabola than the one from our first
+approximation?
+
+Do you see that, intuitively, the total area of the rectangles gets
+closer and closer to the area under the parabola from x = 2 to x = 7 as
+the number of rectangles used increases? Here's the case
+where the length of the base of the rectangles is 0.25:
+
+%\includegraphics[width=4.5in,height=2.5181in]{Pictures/10000000000002C90000018F19E7A9D9A73C9FA9.png}
+and here's the case where the length is 0.125
+
+%\includegraphics[width=4.4272in,height=2.139in]{Pictures/10000000000002CA00000191D2EF8AEA529C84AC.png}
+
+Using the code that computes equally spaced point, the sum of the areas
+of these rectangles can thus be computed as follows:
+\begin{console}
+double a = 2;
+double b = 7;
+int n = 11; // 10 rects mean 11 points
+double sum = 0;
+double x = 0;
+double d = double(b - a) / (n - 1);
+for (int i = 0; i < n - 1; ++i)
+{   
+    sum += d * (x * x);
+    x += d;
+}
+
+// Why do we NOT need to execute the following?
+// x = b;
+// sum += d * (x * x);
+\end{console}
+\input{exercises/58-10-for-loops-part1/main.tex}\input{exercises/59-10-for-loops-part1/main.tex}
+Now write a program that prompts the user for the number of rectangles!
+Say we call this variable n. Run the program with n = 1000 rectangles!!!
+You bet the value computed by your program is extremely close to the
+real area of the parabola. Of course you wouldn't add
+the areas of 1000 rectangles by hand -- it would take too long!
+That's what a program is for -- if you know C++!!!
+
+\input{exercises/60-10-for-loops-part1/main.tex}
+\input{exercises/61-10-for-loops-part1/main.tex}
+\input{exercises/62-10-for-loops-part1/main.tex}
+\input{exercises/63-10-for-loops-part1/main.tex}
+The computation of areas under a curve is important. For instance in
+Physics, the work done by a force F is the area under the
+force-displacement graph where you plot the force acting on an object
+and the displacement of the object. By Newton's law of
+universal gravitation, we know the gravitational force between two
+objects which are apart from each other at a fixed distance. So if a
+rocket wants to move away from earth, you can compute the work done
+moving the rocket to a distance from the surface of earth to a far away
+point in space. Knowing the work to be done moving the rocket from earth
+through a required distance, you can then compute the amount of chemical
+fuel that is needed to combust in order to convert the chemical energy
+into required work done. Of course there are many other applications of
+the computation of areas.
+

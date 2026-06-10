@@ -1,0 +1,258 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Pointers to structs}
+
+Since you can create pointers to any kind of variable, you can create
+pointers to structs too.(Review your notes/books on pointers if
+necessary.) Here's a quick review.
+
+Recall that to declare a pointer to point to a value of type X you do this:
+
+\verb!X * p;!
+
+For instance here's an int pointer:
+
+\verb!int * p;!
+
+If you are pointing to a value that already exists you can access that
+value using your pointer:
+
+\begin{consolethree}[escapeinside=||]
+Time t;
+t.hour = 5;
+t.min = 18;
+t.sec = 0;
+
+Time * p;
+p = &t;
+std::cout << (*p).hour << '\n';
+\end{consolethree}
+
+If not you have to give your pointer a value to point to. This is how you do
+it:
+
+\begin{consolethree}[escapeinside=||]
+int * p = new int;
+*p = 42;
+std::cout << *p << '\n';
+delete p;
+\end{consolethree}
+
+That's called \EMPHASIZE{allocating memory} for \texttt{p}. (You have already
+seen this concept.) You can do it in one step:
+
+\begin{consolethree}[escapeinside=||]
+int * p = new int;
+\end{consolethree}
+
+Where does this memory (the int) come from? It's from a pool of
+available memory that was created before your program runs; it's called
+the \EMPHASIZE{heap} or the \EMPHASIZE{free store}. Once you're done with using the value your
+pointer is pointing to you must release the memory back to the heap.
+This is called \EMPHASIZE{deallocating memory}. You do this:
+
+\begin{consolethree}[escapeinside=||]
+int * p = new int;
+... do something with p ...
+delete p;
+\end{consolethree}
+
+Note (yet again) that \texttt{delete p} releases the memory that \texttt{p} is pointing
+to; \texttt{p} itself is not somehow removed from the program until it goes out of
+scope. Therefore you can use it again:
+
+\begin{consolethree}[escapeinside=||]
+int * p = new int;
+... do something with p ...
+delete p;
+...
+p = new int;
+... do something else with p ...
+delete p;
+\end{consolethree}
+
+You can also get pointers to point to an array of values in the heap:
+
+\begin{consolethree}[escapeinside=||]
+int * p = new int[10];
+for (int i = 0; i < 10; ++i)
+{
+    p[i] = i * i;
+}
+for (int i = 0; i < 10; ++i)
+{
+    std::cout << p[i] << '\n';
+}
+delete[] p;
+\end{consolethree}
+
+Once \texttt{p} points to an array, you can use \texttt{p} like an array:
+
+\begin{consolethree}[escapeinside=||]
+int size = 42;
+p = new int[size];
+for (int i = 0; i < size; i++)
+{
+    |\EMPHASIZE{p[i]}| = i * i;
+}
+delete [] p; // <--- WARNING!!!
+\end{consolethree}
+
+The \EMPHASIZE{address} of the \texttt{i}-th value that \texttt{p} points to is \verb!p + i! and
+therefore the value of this value is \verb!*(p+i)!. So remember that the \texttt{i}-th
+value of the array that \texttt{p} points is is both \verb!p[i]! and \verb!*(p + i)!. They are
+the same. The preference is to use \verb!p[i]!.
+
+This is only a quick review. You should go over your previous notes on
+pointers. Now try this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+struct Time
+{
+    int hour;
+    int min;
+    int sec;
+};
+
+int main()
+{
+    Time * p = new Time;
+    (*p).hour = 5;
+    (*p).min = 18;
+    (*p).sec = 0;
+
+    std::cout << (*p).hour << ':'
+              << (*p).min << ':'
+              << (*p).sec << '\n';
+
+    delete p;
+    return 0;
+}
+\end{consolethree}
+
+And for an array of structs:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+struct Time
+{
+    int hour;
+    int min;
+    int sec;
+};
+
+int main()
+{
+    Time * p = new Time[3];
+
+    p[0].hour = 5;
+    p[0].min = 18;
+    p[0].sec = 0;
+
+    p[1].hour = 6;
+    p[1].min = 30;
+    p[1].sec = 45;
+
+    p[2].hour = 12;
+    p[2].min = 0;
+    p[2].sec = 0;
+
+    for (int i = 0; i < 3; ++i)
+    {
+        std::cout << p[i].hour << ':'
+                  << p[i].min << ':'
+                  << p[i].sec << '\n';
+    }
+
+    delete[] p;
+    return 0;
+}
+\end{consolethree}
+
+Read the code carefully. There is really no new concepts at all. While \texttt{p}
+is the pointer to a \texttt{Time} value, \verb!*p! is the actual \texttt{Time} value \texttt{p} is pointing
+to. Therefore
+
+\verb!(*p).hour!
+
+is the hour of the value \texttt{p} is pointing to. There is actually a shorthand
+notation for this. Note that \verb!(*p).hour! involves two operators: the \texttt{*} and
+the \texttt{.} operators. Let me emphasize that:
+
+\EMPHASIZE{\texttt{(*p).hour}}
+
+is the same as
+
+\EMPHASIZE{\texttt{p->hour}}
+
+The operator \texttt{->} is called the \EMPHASIZE{de-referencing operator}.
+Unfortunately \texttt{*} as in \verb!*p! is also called the de-referencing operator!!! You
+should use this instead of doing de-referencing-followed-by-the-dot-operator, i.e. write
+
+\EMPHASIZE{\texttt{p->hour}} \hspace{1cm} GOOD
+
+\EMPHASIZE{\texttt{(*p).hour}} \hspace{1cm} BAD
+
+Of course one quick question to ask is this. Suppose we omit the
+parentheses so that we have two operators, like this \verb!*x.y!. Which
+operator goes first? Is \verb!*x.y! really \verb!(*x).y! or is it \verb!*(x.y)!? The dot
+operator actually goes first. In other words \verb!*x.y! is really \verb!*(x.y)!.
+
+\input{exercises/9-30-structures/main.tex}
+Now try this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <iomanip>
+
+int main()
+{
+  struct Time
+  {
+    int hour;
+    int min;
+    int sec;
+  };
+
+  Time t0;
+  t0.hour = 5;
+  t0.min = 18;
+  t0.sec = 0;
+
+  std::cout
+    << std::setw(2) << std::setfill('0') << t0.hour
+    << ':'
+    << std::setw(2) << std::setfill('0') << t0.min
+    << ':'
+    << std::setw(2) << std::setfill('0') << t0.sec
+    << std::endl;
+
+  Time * p = new Time[100];
+
+  for (int i = 0; i < 100; i++)
+  {
+    p[i] = t0;
+    p[i].sec++;
+    std::cout
+      << std::setw(2) << std::setfill('0') << p[i].hour
+      << ':'
+      << std::setw(2) << std::setfill('0') << p[i].min
+      << ':'
+      << std::setw(2) << std::setfill('0') << p[i].sec
+      << std::endl;
+  }
+
+  delete [] p;
+
+  return 0;
+}
+\end{consolethree}
+
+Study the code carefully. Again there is really no new concept.
+
+\input{exercises/10-30-structures/main.tex}
+

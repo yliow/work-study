@@ -1,0 +1,54 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Avoid similar names}
+
+\begin{consolethree}[escapeinside=||]
+int x_ = 0;|\tikzmarknode{x0}{} \xsidebox[-1cm]{0cm}{}{arghbox}{Arrghh! Global names and members have the same name!!!}|
+|\xsidebox[-8cm]{0cm}{}{mbawx0}{which x\_?}|
+int m2()|\tikzmarknode{x1}{}|
+{
+    return 5;
+}
+
+class C
+{
+public:
+    void m1()
+    {       |\tikzmarknode{x2}{} \xsidebox[0cm]{0cm}{}{mbawx1}{which m2?}|
+        x_ = m2();|\tikzmarknode{x3}{}|
+    }
+    void m2()
+    {
+        return 0;
+    }
+private:
+    int x_;
+};
+\end{consolethree}
+\DrawArrow{mbawx0}{x0}
+\DrawArrow{mbawx0}{x2}
+\DrawArrow{mbawx1}{x1}
+\DrawArrow{mbawx1}{x3}
+
+Avoid such ambiguities! What's this about ...
+
+\begin{consolethree}[escapeinside=||]
+class C|\xsidebox[0cm]{0cm}{}{yikesbox0}{Yikes!!! Instance variable and parameter have the same name!!!}|
+{
+public:
+    void m(int x_)|\tikzmarknode{yikes0}{}|
+    {|\xsidebox[-6cm]{0cm}{}{yikesbox1}{which x\_?}|
+        std::cout << x_;
+    }
+private:
+    int x_;|\tikzmarknode{yikes1}{}|
+};
+\end{consolethree}
+\DrawArrow{yikesbox1}{yikes0}
+\DrawArrow{yikesbox1}{yikes1}
+In general here's how C++ search for names in the above
+cases: first local variables are searched, then instance variables
+(member variables), and then globals.
+
+

@@ -1,0 +1,100 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{operator[]}
+
+If \textit{c} is a \textit{C} object, C++ translates \textit{c[n]} like
+this:
+
+\textit{c[n]} is the same as \textit{c.operator[](n)}
+
+\textit{operator[]} must be a member function.
+
+\begin{consolethree}[escapeinside=||]
+class IntDynArr
+{
+public:
+    IntDynArr(int s)
+        : size_(s), p_(new int[s])
+    {}
+    ~IntDynArr() { delete [] p_; }
+    |{\bf int operator[](int n)}| { return p_[n]; }
+private:
+    int size_;
+    int * p_;
+};
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    IntDynArr c(100);
+    std::cout << c[5] << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+But what about this?
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    IntDynArr c(100);
+    c[5] = 23; // ERROR!
+    std::cout << c[5] << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+class IntDynArr
+{
+public:
+    IntDynArr(int s)
+        : size_(s), p_(new int[s])
+    {}
+    ~IntDynArr() { delete [] p_; }
+    ...
+    |{\bf int \& operator[](int n)}|
+    {
+        return p_[n];
+    }
+    ...
+private:
+    int size_;
+    int * p_;
+};
+\end{consolethree}
+
+Of course you can includes checks like \textit{size >= 0} for
+constructor, and argument of \textit{[]} is within bounds:
+
+\begin{consolethree}[escapeinside=||]
+...
+int & operator[](int n)
+{
+    if (n >= 0 && n < size)
+        return p_[n];
+}
+...
+\end{consolethree}
+
+But what if \textit{n < 0} or \textit{n >= size}?
+
+Later, we will handle such errors with \textbf{exceptions}.
+
+Now include
+
+\begin{consolethree}[escapeinside=||]
+...
+int & operator[](int n) const
+{
+    if (n >= 0 && n < size)
+        return p_[n];
+}
+...
+\end{consolethree}
+
+What is the point of this?
+
+

@@ -1,0 +1,123 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Standard operations on arrays}
+
+As mentioned in the previous section, standard operations for variables of basic types (int, double, bool, char) such as assignment (i.e., =) and equality comparison (I.e., ==) does not work for arrays.
+
+The correct thing to do is compare the values in the arrays manually.
+
+Try this:
+
+\begin{consolethree}[escapeinside=||]
+int x[] = {1, 2, 3};
+int y[] = {1, 2, 3};
+bool same = true;
+for (int i = 0; i < 3; i++)
+{
+    if (x[i] != y[i])
+    {
+        same = false;
+        break;
+    }
+}
+if (same)
+{
+    std::cout << "same" << std::endl;
+}
+else
+{
+    std::cout << "different" << std::endl;
+}
+\end{consolethree}
+
+So let' s say you compare lots of arrays. You say to yourself, ``I'm smart enough to write a function to do that!'' So you rewrite the above as this:
+
+\begin{consolethree}[escapeinside=||]
+bool array_isequal(int x[], int y[])
+{
+    for (int i = 0; i < 3; i++)
+    {
+        if (x[i] != y[i])
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+int main()
+{
+    int x[] = {1, 2, 3};
+    int y[] = {1, 2, 3};
+    std::cout << array_isequal(x, y) << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+Of course we want to make sure our ``array equal comparison function'' works for general arrays of any sizes. Of course the arrays have difference sizes, they are different. (Right? The array \texttt{{1, 2, 3}} is different from \texttt{{1, 2, 3, [blah]}} regardless of the value of \texttt{[blah]}.)
+
+\begin{consolethree}[escapeinside=||]
+bool array_isequal(int x[], |\EMPHASIZE{int x\_len}|,
+                    int y[], |\EMPHASIZE{int y\_len}|)
+{
+    if (x_len == y_len)
+    {
+        for (int i = 0; i < x_len; ++i)
+        {
+            if (x[i] != y[i])
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+int main()
+{
+    int x[] = {1, 2, 3};
+    int y[] = {1, 2, 3};
+    std::cout << array_isequal(x, y) << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+But ... we' re used to something like
+
+\begin{consolethree}[escapeinside=||]
+if (x == y)
+{
+    std::cout << "same" << std::endl;
+}
+else
+{
+    std::cout << "different" << std::endl;
+}
+\end{consolethree}
+
+instead of
+
+\begin{consolethree}[escapeinside=||]
+if (array_isequal(x, x_len, y, y_len))
+{
+    std::cout << "same" << std::endl;
+}
+else
+{
+    std::cout << "different" << std::endl;
+}
+\end{consolethree}
+
+It turns out that you can actually define your own version of the \texttt{==} operator! ... but you have to wait for CISS245 (Advanced Programming) to learn to write your own ==. In other words not only can you create your own functions, you can also create your own operators as well.
+
+\begin{itemize}
+
+\item
+\input{exercises/16-20-array-parameters/main.tex}\end{itemize}
+\input{exercises/17-20-array-parameters/main.tex}
+\input{exercises/18-20-array-parameters/main.tex}

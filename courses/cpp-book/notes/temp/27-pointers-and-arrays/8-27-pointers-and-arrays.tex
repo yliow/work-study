@@ -1,0 +1,54 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Default values}
+
+There's another thing that we should investigate: What about default values? Let's try this:
+
+\begin{consolethree}[escapeinside=||]
+void f(int x[] = {1, 2, 3})
+{}
+
+int main()
+{
+    f();
+    return 0;
+}
+\end{consolethree}
+
+You will get an error. Of course you will. You already know that pointers cannot be initialized with an array. In other words the following is invalid:
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    int * x = {1, 2, 3};
+    return 0;
+}
+\end{consolethree}
+
+You can try other cases (with constantness):
+
+\begin{consolethree}[escapeinside=||]
+const int * a = {1, 2, 3};
+int * const b = {1, 2, 3};
+const int * const c = {1, 2, 3};
+\end{consolethree}
+
+None of them will work.
+
+In general the only default value you should use is NULL:
+
+\begin{consolethree}[escapeinside=||]
+void f(int x[] = NULL)
+{}
+\end{consolethree}
+
+There \EMPHASIZE{is} one case where a pointer can be initialized to point to values and only for certain compilers. Therefore you shouldn't use the following in real code:
+
+\verb!const char * x = "hello world";!
+
+Again. Don't use this in real code. It's better to just be simple, like this:
+
+\verb!char x[] = "hello world";!
+
+

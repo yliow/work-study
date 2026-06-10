@@ -1,0 +1,127 @@
+'''
+extracts exercises from a main.tex file for a given chapter, creates an "exercises" folder if one does not exist.
+
+a given exercises will take the form of "num-of-exercise_chapter.tex", and will be inserted at the line the program found an instance of \begin{ex}, while stripping out the entire exercise block
+
+the file layout should be
+
+../notes/
+  |
+  +-- chapters/ <- all our chapters are in here
+      |
+      +-- exercises/ <- all our exercises are in here, each under their own "chapname/chapname_ex_1/" folder
+
+'''
+
+import os
+
+'''
+ex_dest = file location string
+note = specific chapter string
+ex_content = ordered list of strings representing the exercise
+number = int ID of exercise
+'''
+
+def extraction_to_file(ex_dest, note, ex_content, number):
+  #formatting for file/console printout, should just be 'num-chapter' 
+  note = note.replace('/main.tex', '')
+  
+  #'solutions' works off the local dir so we change to that dir, we change back on return
+  os.chdir(ex_dest)
+
+  #assign file name and string for exercise main.tex
+  ex_file = str(number) + '-' + note
+  question = ex_file + '/question.tex'
+  
+  #call solutions for this exercise
+  os.system("solutions make-ex %s" % ex_file)
+  
+  try:
+    with open(question, 'w') as x:
+      x.write("\\tinysidebar{\\debug{exercises/{%s/question.tex}}}\\n" % ex_file)
+      for entry in ex_content:
+        x.write(f"{entry}\n")
+        
+  except Exception as e:
+    print("!!!!!!! ERROR WRITING EXERCISE %s TO FILE, MESSAGE = %s" % (question, e))
+    ex_file = None
+    
+  return ex_file
+
+#constants
+begin = r'\begin{ex}'
+end = r'\end{ex}'
+
+#directory access
+dir_ = os.getcwd()
+
+#set working notes dir
+dir_ = dir_[:dir_.rfind('projects')] + 'courses/cpp-book/notes'
+
+chapters = dir_ + '/chapters/'
+
+chap_list = os.listdir(chapters)
+
+write_dir = dir_ + '/temp/'
+
+if not os.path.exists(write_dir):
+  print("making temp dir at %s\n" % write_dir)
+  os.system("mkdir %s" % write_dir)
+  
+for chap in chap_list:
+  note = chapters + chap + '/main.tex'
+  exercises= []
+
+  ex_acc = []
+  note_acc = []
+  
+  new_note_dir = dir_ + '/temp/' + chap + '/'
+  ex_dest = new_note_dir + 'exercises/'
+  try:
+    #check if note dir exists    
+    if not os.path.exists(new_note_dir):
+      print("making chapter %s dir at %s..." % (chap, new_note_dir))
+      os.system("mkdir %s" % (new_note_dir))
+      
+    #check if exercise dir exists
+    if not os.path.exists(ex_dest):
+      os.system("mkdir %s" % ex_dest)
+      print("making exercise folder for chapter", chap)
+
+    with open(note, 'r') as n:
+      counter = 0
+      flag = False
+      n = n.readlines()
+      
+      for line in n:
+
+        if begin in line:
+          flag = True
+          
+        elif end in line:
+          flag = False
+          
+          #call exercise maker
+          exercise = extraction_to_file(ex_dest, note.replace(chapters, ''), ex_acc, counter)
+          ex_acc = []
+          
+          if exercise != None:
+            counter += 1
+            note_acc.append("\\input{../exercises/%s/main.tex}" % exercise )
+          else:
+            raise Exception("MALFORMED EXERCISE, COULD NOT CREATE")
+          
+        elif flag:
+          ex_acc.append(line)
+          
+        else:
+          note_acc.append(line)
+      
+    #write new file
+    with open(new_note_dir + 'main.tex', 'w') as f:
+      for line in note_acc:
+        f.write(line)
+        
+  #remove chapter on failure? dont want to include half-baked chaps
+  except Exception as e:
+    print("ERROR: could not extract exercises from chapter %s, message: %s" % (chap, e))

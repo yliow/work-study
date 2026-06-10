@@ -1,0 +1,142 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{IntPointer}
+
+When you want a pointer, you declare it and allocate memory (using
+\texttt{new}) from the heap for the pointer to point to. You never forget
+to \texttt{new} the pointer because your program will not work immediately
+if you don't \texttt{new}.
+
+But it's easy to forget to deallocate / release the
+memory (using \texttt{delete}) after you're done with
+using the value that \texttt{p} points to. The problem is this: the
+program will continue to work until it runs out of memory which will be
+much later. By then you have to find that one bad pointer among hundreds
+or thousands of pointers in your code.
+
+Here's our \texttt{IntPointer}:
+
+\begin{consolethree}[escapeinside=||]
+...
+class IntPointer
+{
+public:
+    IntPointer(int x = 0)
+        : p_(new int)
+    {
+        *p_ = x;
+    }
+    IntPointer(const IntPointer & intptr)
+        : p_(new int)
+    {
+        *p_ = *(intptr.p_);
+    }
+    int & operator*()
+    {
+        return *p_;
+    }
+    void deallocate()
+    {
+        delete p_;
+    }
+private:
+    int * p_;
+};
+...
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+...
+int main()
+{
+    for (int i = 0; i < 5; i++)
+    {
+        IntPointer intptr(i);
+    }
+    return 0;
+}
+\end{consolethree}
+
+Note that each of the five \texttt{intptr} contain a pointer \texttt{p\_}
+which points to an allocated integer in the free store. Note however
+that the integer \texttt{intptr.p\_} points to is not deallocated. You can
+see the point in time when each \texttt{intptr} dies (and when one
+additional memory leak occurs). Add the following destructor:
+
+\begin{consolethree}[escapeinside=||]
+...
+class IntPointer
+{
+public:
+    ...
+    ~IntPointer()
+    {
+        std::cout << "memory leak ... :(\n";
+    }
+    ...
+\end{consolethree}
+
+Run your program again. If you don't believe me that
+you'll run out of memory, resulting in program abort,
+try this:
+
+\begin{consolethree}[escapeinside=||]
+...
+int main()
+{
+    while (1)
+    {
+        IntPointer intptr(0);
+    }
+    return 0;
+}
+\end{consolethree}
+
+(You may want to comment out the print statement in the destructor
+because printing slows down your program and delays the program from
+crashing.)
+
+Now we make our pointer object smart enough to deallocate memory used by
+itself:
+
+\begin{consolethree}[escapeinside=||]
+...
+class IntPointer
+{
+public:
+    ...
+    ~IntPointer()
+    {
+        delete p_;
+    }
+    ...
+\end{consolethree}
+
+Run this again and see if you have memory leaks:
+
+\begin{consolethree}[escapeinside=||]
+...
+int main()
+{
+    while (1)
+    {
+        IntPointer intptr(0);
+    }
+    return 0;
+}
+\end{consolethree}
+
+You won't.
+
+Now, if ever we need an integer pointer, we can use this class and we
+will never have to worry about memory leaks. (There are a few more
+things to add to this class to really complete it ...)
+
+Typically, if you have a class that grabs hold of some resource (not
+just memory) in the constructor of the class, you should probably
+include code in the destructor to release the resource.
+
+\input{exercises/9-62-destructors/main.tex}
+\input{exercises/10-62-destructors/main.tex}
+

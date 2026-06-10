@@ -1,0 +1,90 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Chaining}
+
+Look at this (this is old stuff \ldots no biggy):
+
+\begin{consolethree}[escapeinside=||]
+void inc(int * p)
+{
+    *|\textbf{p = *p + 1; // OR: ++(*p)}|
+}
+
+int main()
+{
+    int x = 0;
+    inc(&x); inc(&x); inc(&x);
+    std::cout << x << std::endl;
+    return 0;
+}
+\end{consolethree}
+Now look at this version:
+
+\begin{consolethree}[escapeinside=||]
+
+|\textbf{int *}| inc(int * p)
+{
+    *p = *p + 1;
+    |\textbf{return p;}|
+}
+
+int main()
+{
+    int x = 0;
+    inc(inc(inc(&x)));
+    std::cout << x << std::endl;
+    return 0;
+}
+\end{consolethree}
+Study the above code very carefully!!! (Chaining will be used a lot later when woirking with classes and objects.)
+
+When a function accepts a pointer value and returns the same pointer value, that function allows chaining, i.e., calling the function multiple times using the same pointer value.
+
+Study this version too (this one does not use references -- the idea is the same):
+
+\begin{consolethree}[escapeinside=||]
+
+int * const inc(int * const p)
+{
+    *p = *p + 1;
+    return p;
+}
+
+int main()
+{
+    int x = 0;
+    inc(inc(inc(&x)));
+    std::cout << x << std::endl;
+    return 0;
+}
+\end{consolethree}
+(i.e., the pointer can be constant.) Study this one that uses references::
+
+\begin{consolethree}[escapeinside=||]
+int & inc(int & r)
+{
+    r = r + 1;
+    return r;
+}
+
+int main()
+{
+    int x = 0;
+    inc(inc(inc(x)));
+    std::cout << x << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+\input{exercises/60-26-pointers/main.tex}
+\input{exercises/61-26-pointers/main.tex}
+To increments the first three values of the array x, we can do this:
+
+\begin{consolethree}[escapeinside=||]
+int index = 0;
+
+int x[] = {3, 5, 7, 9, 2);
+
+inc(inc(inc(&index, x), x), x); 
+\end{consolethree}

@@ -1,0 +1,84 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Recursive computation on arrays: Part 1}
+
+Here's another example. You already know that you can
+write a loop to compute the max value in an array. Let's
+look at this problem recursively. Suppose I write x is an array of
+value 2,3,5,6,4,1 and we want a function that looks like this:
+
+\verb!max(x)!
+
+If you split the array x into the first value of the array
+
+\verb!2!
+
+and the rest say we call it y of value 3,5,6,4,1, then we have this
+relation:
+
+\verb!max(x) = maximum of 2 and max(y)!
+
+You see that the max function occurs on both sides. This is a recursive
+relation. Furthermore, we need the function max to accept index values.
+Then
+
+\begin{consolethree}[escapeinside=||]
+// Returns max of x[start], x[1], x[2], ...,
+// x[end - 1]
+int max(int x[], int start, int end)
+{
+    if (start == end - 1)
+    {
+        return x[start];
+    }
+    else
+    {
+        if (x[start] < max(x, start + 1, end))
+        {
+            return max(x, start + 1, end);
+        }
+        else
+        {
+            return x[start];
+        }
+    }
+}
+\end{consolethree}
+
+Note that \texttt{max(x, start + 1, end)} is computed twice. To save
+computations, we can do this:
+
+\begin{consolethree}[escapeinside=||]
+int max(int x[], int start, int end)
+{
+    if (start == end - 1)
+    {
+        return x[start];
+    }
+    else
+    {
+        int y = max(x, start + 1, end);
+        if (x[start] < y)
+        {
+            return y;
+        }
+        else
+        {
+            return x[start];
+        }
+    }
+}
+\end{consolethree}
+
+Essentially you break the problem of finding the max of
+x[0],x[1],...,x[n-1] to
+
+\textbf{maximum between x[0] and max of x[1],x[2],...,x[n-1]}
+
+\input{exercises/33-29-recursion/main.tex}
+\input{exercises/34-29-recursion/main.tex}
+\input{exercises/35-29-recursion/main.tex}
+\input{exercises/36-29-recursion/main.tex}
+\input{exercises/37-29-recursion/main.tex}
+

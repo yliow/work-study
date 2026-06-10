@@ -1,0 +1,48 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Conversion using a constructor}
+
+C++ will generate an automatic conversion using a constructor call if
+necessary in order to find a best match for a method.
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    Int(int a)
+        : x_(a)
+    {}
+    void m(Int c) { std::cout << x_ << '\n'; }
+private:
+    int x_;
+};
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    Int c(0), d(1);
+    c.m(d);
+    |{\bf c.m(2);}|
+    return 0;
+}
+\end{consolethree}
+
+However, there is an exception: The constructor is \textbf{not} invoked
+for the left-hand side of \textit{.} And \textit{->}:
+\textit{3.m(1)} will not become \textit{C(3).m(1)}. You still might want to
+write your own \textit{m(int)} for efficiency.
+
+But there are problems with conversion using constructors:
+
+\begin{itemize}
+\item You cannot convert \textbf{to} built-in types (int, double, etc.)
+  because they are not objects
+\item You cannot convert from an object of class \textit{C} to an object of
+  class \textit{D} (without changing the declaration of \textit{D})
+\end{itemize}
+
+So ...
+
+

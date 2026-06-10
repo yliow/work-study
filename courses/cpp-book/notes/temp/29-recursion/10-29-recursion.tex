@@ -1,0 +1,453 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Recursion and a tiling problem}
+
+Here's one such problem: How many ways are there to tile
+a 1-by-5 board
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+for i in range(5):
+    p += Rect(i, 0, i+1, 1, linewidth=0.03)
+print(p)
+\end{python}
+
+with 1-by-1 squares and 1-by-2 rectangles:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Rect(0, 0, 1, 1, linewidth=0.1)
+p += Rect(3, 0, 5, 1, linewidth=0.1)
+print(p)
+\end{python}
+
+Here's one way:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+for i in range(5):
+    p += Rect(i, 0, i+1, 1, linewidth=0.1)
+print(p)
+\end{python}
+
+and here's another:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Rect(0, 0, 5, 1, linewidth=0.1)
+sq = [0, 3, 4]
+for i in sq:
+    p += Rect(i, 0, i+1, 1, linewidth=0.1)
+print(p)
+\end{python}
+
+and another:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Rect(0, 0, 1, 1, linewidth=0.1)
+p += Rect(1, 0, 3, 1, linewidth=0.1)
+p += Rect(3, 0, 5, 1, linewidth=0.1)
+print(p)
+\end{python}
+
+Of course this is not difficult: Just do it yourself. How many can you find? However if I say since the number of ways to tile not a 1-by-5 board but a 1-by-100 \ldots{} then you'd find that a na\"ive and brute-force way of listing all the tilings is not the best way to solve this problem. Believe it or not \ldots{} this problem is recursive. Why? Look at the 1-by-5 board.
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Rect(0, 0, 1, 1, linewidth=0.1)
+for i in range(1, 5):
+    p += Rect(i, 0, i+1, 1, linewidth=0.03)
+print(p)
+\end{python}
+
+You have to start either with a 1-by-1 or a 1-by-2:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Rect(0, 0, 1, 1, linewidth=0.1)
+for i in range(1, 5):
+    p += Rect(i, 0, i+1, 1, linewidth=0.03)
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Rect(0, 0, 2, 1, linewidth=0.1)
+for i in range(2, 5):
+    p += Rect(i, 0, i+1, 1, linewidth=0.03)
+print(p)
+\end{python}
+
+Suppose the number of ways to tile a 1-by-n board is written T(n). In
+other words I'm interested in T(5).
+Where's the recursion? Look at the above:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Rect(0, 0, 1, 1, linewidth=0.1)
+for i in range(1, 5):
+    p += Rect(i, 0, i+1, 1, linewidth=0.03)
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Rect(0, 0, 2, 1, linewidth=0.1)
+for i in range(2, 5):
+    p += Rect(i, 0, i+1, 1, linewidth=0.03)
+print(p)
+\end{python}
+
+For the first case, after putting a 1-by-1 tile down,
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Rect(0, 0, 1, 1, linewidth=0.1)
+for i in range(1, 5):
+    p += Rect(i, 0, i+1, 1, linewidth=0.03)
+print(p)
+\end{python}
+
+I'm left with a 1-by-4. This means that there are T(4)
+ways to complete the first case!!!
+
+Furthermore, for the second case, after putting down a 1-by-2
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Rect(0, 0, 2, 1, linewidth=0.1)
+for i in range(2, 5):
+    p += Rect(i, 0, i+1, 1, linewidth=0.03)
+print(p)
+\end{python}
+
+I'm left with a 1-by-3 space to tile. And there are T(3)
+ways to complete the tiling.
+
+Hence altogether the number of ways to tile a 1-by-5 board, i.e. T(5),
+must be T(4) + T(3).
+
+Get it? Here's the recursion:
+
+$T(5) = T(4) + T(3)$
+
+Convince yourself that
+
+$T(n) = T(n - 1) + T(n - 2)$
+
+if $n > 2$. It's easy to see that
+
+$T(1) = 1$
+
+$T(2) = 2$
+
+(Make sure you see why!!!) Altogether we have
+
+$T(1) = 1$
+
+$T(2) = 2$
+
+$T(n) = T(n - 1) + T(n - 2)$, if $n > 2$
+
+Therefore to compute T(5) we have
+
+$T(5) = T(4) + T(3)$
+
+$T(4) = T(3) + T(2) = T(3) + 2$
+
+$T(3) = T(2) + T(1) = 2 + 1 = 3$
+
+Putting $T(3)$ into the second equation we get
+
+$T(4) = T(3) + 2 = 3 + 2 = 5$
+
+and putting $T(3) = 3$ and $T(4) = 5$ into the first equation we get
+
+$T(5) = 5 + 3 = 8$
+
+\input{exercises/29-29-recursion/main.tex}
+\input{exercises/30-29-recursion/main.tex}
+If you write down $T(1)$, $T(2)$, $T(3)$, $T(4)$, \ldots{} you would see this sequence:
+
+\textbf{1, 2, 3, 5, 8, 13, 21, 34, 55, 89, \ldots{}}
+
+Of course note that after the first two terms, every term is the sum of
+the previous two. That's because of
+
+\textbf{$T(n) = T(n - 1) + T(n - 2)$, if $n > 2$}
+
+We can set $T(0) = 1$ (there is only one way to tile the 1-by-0 board: don't tile!) In that case the sequence of $T(0)$, $T(1)$, $T(2)$, $T(3)$, $T(4)$, \ldots{} is
+
+\textbf{1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, \ldots{}}
+
+This is the famous \EMPHASIZE{Fibonacci sequence} that you have seen
+earlier!!!
+
+$fib(0) = 1$
+
+$fib(1) = 1$
+
+$fib(n) = fib(n - 1) + fib(n - 2)$, if $n > 1$
+
+This sequence of numbers appears in many areas of math, physics, chemistry, finance, \ldots{} you name it.
+
+You see from this example that we try to solve a problem by restating it xin terms of small subproblems:
+
+\begin{center}
+\begin{tabular}{ll}
+\texttt{Problem} & \texttt{Subproblems} \\
+\hline
+tiling a 1-by-5 board & tiling a 1-by-4 board \\
+                      & tiling a 1-by-3 board \\
+\end{tabular}
+\end{center}
+
+Specifically:
+
+a \textbf{1-by-5 tiling} is either a \textbf{1-by-1 tile} followed by a \textbf{1-by-4 tiling} or a \textbf{1-by-2 tile} followed by a \textbf{1-by-3 tiling}
+
+\input{exercises/31-29-recursion/main.tex}
+You might think ``Aw.... this is just one of those academic math
+problems. I don't see how a puzzle like this can be used
+in the real world.'' The essence of the technique, i.e. recursion,
+appears all the time in the real world. Here's one: Find
+the shortest path on this ``simplified internet'' from machine A to B in
+this configuration
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+nodes = [
+    (0, 2),      # 0 - A (left)
+    (1.5, 3.2),  # 1
+    (1.5, 0.8),  # 2
+    (2.8, 2.2),  # 3
+    (2.5, 4),    # 4
+    (3.5, 0.5),  # 5
+    (4, 3),      # 6
+    (4.5, 1.5),  # 7
+    (5.5, 3.5),  # 8
+    (5.5, 2),    # 9
+    (5.2, 0.5),  # 10
+    (6.5, 2.5),  # 11 - B (right)
+]
+
+r = 0.2
+for (x, y) in nodes:
+    p += Circle(x=x, y=y, r=r, background='black', linewidth=0.01)
+
+edges = [
+    (0, 1), (0, 2), (0, 3),
+    (1, 3), (1, 4), (1, 6),
+    (2, 3), (2, 5),
+    (3, 6), (3, 7),
+    (4, 6), (4, 8),
+    (5, 7), (5, 10),
+    (6, 8), (6, 9),
+    (7, 9), (7, 10),
+    (8, 9), (8, 11),
+    (9, 11),
+    (10, 11),
+]
+
+for (i, j) in edges:
+    x0, y0 = nodes[i]
+    x1, y1 = nodes[j]
+    p += Line(points=[(x0, y0), (x1, y1)], linewidth=0.02)
+
+p += Rect(0, 1.3, 0, 1.3, linewidth=0, innersep=0.1, s='A', align='c')
+p += Rect(6.5, 1.8, 6.5, 1.8, linewidth=0, innersep=0.1, s='B', align='c')
+
+print(p)
+\end{python}
+
+where each dot is a machine and each line is a communication line
+between the two machines. This can be thought as a made up of finding
+shortest path from A1,A2,A3 to B in the following configurations or
+subproblems:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+nodes = [
+    (0, 2),      # 0 - A (left)
+    (1.5, 3.2),  # 1
+    (1.5, 0.8),  # 2
+    (2.8, 2.2),  # 3
+    (2.5, 4),    # 4
+    (3.5, 0.5),  # 5
+    (4, 3),      # 6
+    (4.5, 1.5),  # 7
+    (5.5, 3.5),  # 8
+    (5.5, 2),    # 9
+    (5.2, 0.5),  # 10
+    (6.5, 2.5),  # 11 - B (right)
+]
+
+r = 0.2
+for (x, y) in nodes:
+    p += Circle(x=x, y=y, r=r, background='black', linewidth=0.01)
+
+edges = [
+    (0, 1), (0, 2), (0, 3),
+    (1, 3), (1, 4), (1, 6),
+    (2, 3), (2, 5),
+    (3, 6), (3, 7),
+    (4, 6), (4, 8),
+    (5, 7), (5, 10),
+    (6, 8), (6, 9),
+    (7, 9), (7, 10),
+    (8, 9), (8, 11),
+    (9, 11),
+    (10, 11),
+]
+
+for (i, j) in edges:
+    x0, y0 = nodes[i]
+    x1, y1 = nodes[j]
+    p += Line(points=[(x0, y0), (x1, y1)], linewidth=0.02)
+
+p += Rect(0.8, 3.25, 0.8, 3.25, linewidth=0, innersep=0.1, s='A1', align='c')
+p += Rect(6.5, 1.8, 6.5, 1.8, linewidth=0, innersep=0.1, s='B', align='c')
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+nodes = [
+    (0, 2),      # 0 - A (left)
+    (1.5, 3.2),  # 1
+    (1.5, 0.8),  # 2
+    (2.8, 2.2),  # 3
+    (2.5, 4),    # 4
+    (3.5, 0.5),  # 5
+    (4, 3),      # 6
+    (4.5, 1.5),  # 7
+    (5.5, 3.5),  # 8
+    (5.5, 2),    # 9
+    (5.2, 0.5),  # 10
+    (6.5, 2.5),  # 11 - B (right)
+]
+
+r = 0.2
+for (x, y) in nodes:
+    p += Circle(x=x, y=y, r=r, background='black', linewidth=0.01)
+
+edges = [
+    (0, 1), (0, 2), (0, 3),
+    (1, 3), (1, 4), (1, 6),
+    (2, 3), (2, 5),
+    (3, 6), (3, 7),
+    (4, 6), (4, 8),
+    (5, 7), (5, 10),
+    (6, 8), (6, 9),
+    (7, 9), (7, 10),
+    (8, 9), (8, 11),
+    (9, 11),
+    (10, 11),
+]
+
+for (i, j) in edges:
+    x0, y0 = nodes[i]
+    x1, y1 = nodes[j]
+    p += Line(points=[(x0, y0), (x1, y1)], linewidth=0.02)
+
+p += Rect(0.8, 0.5, 0.8, 0.5, linewidth=0, innersep=0.1, s='A2', align='c')
+p += Rect(6.5, 1.8, 6.5, 1.8, linewidth=0, innersep=0.1, s='B', align='c')
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+nodes = [
+    (0, 2),      # 0 - A (left)
+    (1.5, 3.2),  # 1
+    (1.5, 0.8),  # 2
+    (2.8, 2.2),  # 3
+    (2.5, 4),    # 4
+    (3.5, 0.5),  # 5
+    (4, 3),      # 6
+    (4.5, 1.5),  # 7
+    (5.5, 3.5),  # 8
+    (5.5, 2),    # 9
+    (5.2, 0.5),  # 10
+    (6.5, 2.5),  # 11 - B (right)
+]
+
+r = 0.2
+for (x, y) in nodes:
+    p += Circle(x=x, y=y, r=r, background='black', linewidth=0.01)
+
+edges = [
+    (0, 1), (0, 2), (0, 3),
+    (1, 3), (1, 4), (1, 6),
+    (2, 3), (2, 5),
+    (3, 6), (3, 7),
+    (4, 6), (4, 8),
+    (5, 7), (5, 10),
+    (6, 8), (6, 9),
+    (7, 9), (7, 10),
+    (8, 9), (8, 11),
+    (9, 11),
+    (10, 11),
+]
+
+for (i, j) in edges:
+    x0, y0 = nodes[i]
+    x1, y1 = nodes[j]
+    p += Line(points=[(x0, y0), (x1, y1)], linewidth=0.02)
+
+p += Rect(2.3, 3.5, 2.3, 3.5, linewidth=0, innersep=0.1, s='A3', align='c')
+p += Rect(6.5, 1.8, 6.5, 1.8, linewidth=0, innersep=0.1, s='B', align='c')
+
+print(p)
+\end{python}
+
+
+Not only that, this is more or less also similar to finding a winning
+chess strategy where each ``machine'' (each black dot) is replaced by a
+particular ``chess board setup'' and the lines are replaced by an arrow
+that depicts a chess move that changes one chess board state to another.
+
+Also, tiling problems do appear in the real world. Tiling problems are
+related to ``space packing'' problems. For instance shipping companies
+are interested in optimizing the space in a cargo container. They are
+therefore interested in algorithms to solve problems like this: Given
+the (3-dimensional) measurement of cargo containers and a list of
+(3-dimensional) measurements of items to be placed in the container,
+find the best possible way to pack the items in the container. It also
+appears in diverse areas such as packing gates in a chips, protein
+folding, liquid crystal packing in an LCD screen, etc.
+
+I will stop here for our first introduction to recursion. There is not a
+complete set of notes on recursion. So this is not the last time you
+will be thinking recursively. But \ldots{} why did I bring up recursion
+at this point?
+
+The reason is because you will see later (when we do recursion again),
+that loops can be achieved through recursive programming, i.e. using
+recursive functions.
+
+\input{exercises/32-29-recursion/main.tex}
+

@@ -1,0 +1,132 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Pass-by-Reference}
+
+Now try this
+
+\begin{consolethree}[escapeinside=||]
+void swap(int & a, int & b)
+{
+    int t = a;
+    a = b;
+    b = t;
+}
+
+int main()
+{
+    int x = 0;
+    int y = 42;
+    swap(x, y);
+    std::cout << x << ' ' << y << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+The variables \texttt{a} and \texttt{b} are called \EMPHASIZE{reference variable}, in particular they are integer reference variables. They are different from the regular plain-jane variables. They \EMPHASIZE{do not have their own memory for keeping values}. They \textbf{refer} to other variables. A reference variable is an \EMPHASIZE{alias} of another variable.
+\newpage
+Now back to our program with the \texttt{swap()} function:
+
+\begin{consolethree}[escapeinside=||]
+void swap(int & a, int & b)
+{
+    int t = a;
+    a = b;
+    b = t;
+}
+
+int main()
+{
+    int x = 0;
+    int y = 42;
+    swap(x, y);
+    std::cout << x << ' ' << y << std::endl;
+    return 0;
+}
+\end{consolethree}
+\sidenote
+{
+\begin{tikzpicture}
+    \node[draw,text width=3cm,minimum height=3cm,minimum width=2cm, line width=0.05cm, inner sep=0.3cm] (a) at (-4,-2) {};
+    \node[draw,text width=3cm,minimum height=3cm,minimum width=2cm, line width=0.05cm, inner sep=0.3cm, yshift=-4cm] (b) at (a.south) {};
+    \node[xshift=-8mm, yshift=8mm] (a_arr) at (a.west) {};
+    \node[xshift=-8mm, yshift=8mm] (a0_arr) at (b.west) {};
+    \node[xshift=-6mm] (b_arr) at (a.west) {};
+    \node[xshift=-6mm, yshift=-1mm] (b0_arr) at (b.west) {};
+    \node[xshift=-6mm, yshift=-8mm] (c_arr) at (a.west) {};
+    \node[xshift=-6mm, yshift=-8mm] (c0_arr) at (b.west) {};
+
+    \node[text width=1mm,minimum height=1mm,minimum width=1mm, line width=0.05cm, inner sep=0.3cm, xshift=5mm, yshift=8mm] (aval) at (a.west) {\large{a}};
+    \node[text width=1mm,minimum height=1mm,minimum width=1mm, line width=0.05cm, inner sep=0.3cm, xshift=5mm] (bval) at (a.west) {\large{b}};
+
+    \node[text width=1mm,minimum height=1mm,minimum width=1mm, line width=0.05cm, inner sep=0.3cm, xshift=5mm, yshift=-8mm] (tval) at (a.west) {\large{t}};
+    \node[draw, text width=9mm,minimum height=1mm,minimum width=5mm, line width=0.05cm, inner sep=0.3cm, yshift=-8mm] (tvalbox) at (a.center) {\large{0}};
+
+    \node[text width=9mm,minimum height=1mm,minimum width=1mm, line width=0.05cm, inner sep=0.3cm, xshift=8mm, yshift=8mm] (xval) at (b.west) {\large{x}};
+    \node[draw, text width=9mm,minimum height=1mm,minimum width=5mm, line width=0.05cm, inner sep=0.3cm, yshift=8mm] (xvalbox) at (b.center) {\large{42}};
+
+    \node[text width=9mm,minimum height=1mm,minimum width=5mm, line width=0.05cm, inner sep=0.3cm, xshift=8mm, yshift=-5mm] (yval) at (b.west) {\large{y}};
+    \node[draw, text width=9mm,minimum height=1mm,minimum width=5mm, line width=0.05cm, inner sep=0.3cm, yshift=-5mm] (yvalbox) at (b.center) {\large{0}};
+
+    \draw [dashed, ultra thick, ->] (aval) -- (a_arr) -- (a0_arr) -- (xval);
+    \draw [dashed, ultra thick, ->] (bval) -- (b_arr) -- (b0_arr) -- (yval)[xshift=-5mm];
+    %this really doesnt look as good as i want it to, definitely needs another go after all other notes are finished
+    \node[draw, text width=5cm,minimum height=2cm,minimum width=5cm, line width=0.0mm, inner sep=0.5cm, yshift=2cm] (text0) at (a.north) {\normalsize{The memory models just before the return from \texttt{swap()} to \texttt{main()}. Note that a and b do not have their own memory for values}};
+
+\end{tikzpicture}
+}
+
+when \texttt{main()} calls \texttt{swap()}, the integer reference variable \texttt{a} in \texttt{swap()} will \EMPHASIZE{refer} to the memory of \texttt{x}; it \EMPHASIZE{does not receive a value} from \texttt{x}. As a matter of fact, referring the diagram, you see that \texttt{a} does not even have its own memory!
+
+Likewise the integer reference variable \texttt{b} in \texttt{swap()} does not have have its own memory but rather it refers to the memory of \texttt{y}.
+
+We call this type of parameter passing \EMPHASIZE{pass-by-reference}. We say that the \texttt{a} in \texttt{swap()} is a pass-by-reference parameter.
+
+To simplify the scenario, let's forget about functions and just look at reference variables alone. Try this:
+
+\begin{consolethree}[escapeinside=||]
+int i = 5;
+int & j = i;
+std::cout << i << ' ' << j << std::endl;
+i = 42;
+std::cout << i << ' ' << j << std::endl;
+j = 0;
+std::cout << i << ' ' << j << std::endl;
+\end{consolethree}
+
+As you can see \texttt{j} has type
+
+\texttt{int \&}
+
+i.e. \texttt{j} is an integer reference. It's initialized to \texttt{i}. That means that \texttt{j} refers to the memory of \texttt{i}.
+
+\input{exercises/0-22-reference-parameters/main.tex}
+See how a reference variable behaves? \texttt{j} refers to the memory of \texttt{i}. \texttt{j} is just another name for \texttt{i}; it's an alias for \texttt{i.}
+
+In terms of our program
+
+\begin{consolethree}[escapeinside=||]
+void swap(int |\textbf{\&}| a, int |\textbf{\&}| b)
+{
+    int t = a;
+    a = b;
+    b = t;
+}
+
+int main()
+{
+    int x = 0;
+    int y = 42;
+    swap(x, y);
+    std::cout << x << ' ' << y << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+when \texttt{swap()} is called, the reference variable \texttt{a} is created and is assigned \texttt{x} which makes \texttt{a} a reference to \texttt{x} -- \texttt{a} uses the memory of \texttt{x.} Whatever you do to \texttt{a} in \texttt{swap()} therefore also change \texttt{x.}
+
+\input{exercises/1-22-reference-parameters/main.tex}
+\input{exercises/2-22-reference-parameters/main.tex}
+Advice: In general we only use references only when a function is meant to change the value of a variable that is passed in. We do not want accidental changes in the function to propagate back to the caller. In other words, use references only when you need to. Therefore you should minimize the use of reference variables.
+
+

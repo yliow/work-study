@@ -1,0 +1,147 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Template parameters}
+
+In all previous examples we have only one parameter. And the parameter
+is used as a type. You can have as many template parameters as you like.
+You can actually use value parameters. Try these examples.
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+template < typename T, typename S >
+void spam(T x, S y)
+{
+    std::cout << x << ", " << y << std::endl;
+}
+
+int main()
+{
+    spam< int, double >(1, 2.2);
+    spam< double, int >(1.1, 2);
+    spam< double, double >(1.1, 2.2);
+    spam< int, int >(1.1, 2.2);
+    return 0;
+}
+\end{consolethree}
+
+(Of course for the last function there is a typecast from the two
+doubles 1.1 and 2.2 into integers).
+
+And here's an example where a template parameter is actually is an \EMPHASIZE{int} value:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+template < typename T, |\EMPHASIZE{int}| S >
+T eggs(T x)
+{
+    return x + S;
+}
+
+int main()
+{
+    std::cout << eggs< int, 1 >(42) << std::endl;
+    std::cout << eggs< int, 11 >(42) << std::endl;
+    std::cout << eggs< double, 1 >(2.2) << std::endl;
+    std::cout << eggs< char, 3 >('a') << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+So now you know that a template parameter is declared with the word \EMPHASIZE{``typename''} if it is a type and if it is an integer value you use the word \EMPHASIZE{``int''}.
+
+\input{exercises/5-40-function-templates/main.tex}
+\input{exercises/6-40-function-templates/main.tex}
+So now you know you can have either this
+
+\begin{consolethree}[escapeinside=||]
+template < typename T>
+int max(T x[], int size)
+{
+    ...
+}
+\end{consolethree}
+
+Or this:
+
+\begin{consolethree}[escapeinside=||]
+template < typename T, int SIZE >
+int max(T x[])
+{
+    ... SIZE appears in code ...
+}
+\end{consolethree}
+
+The big question is ... what's the difference between the two? Why
+does C++ allow integer template parameters?
+
+Well for the first version, an example of a function call is this:
+\begin{console}
+max< int >(x, 10);
+\end{console}
+For the second version , an example of a function call is this:
+
+\begin{console}
+max< int, 10 >(x);
+\end{console}
+
+In the second case, the \EMPHASIZE{int 10} is not passed into the function.
+
+Review the \EMPHASIZE{very important} pages in the first chapter on
+functions where I did a trace. When you call a function, in your CPU,
+the program has to put the arguments for a function call into the
+function call stack. The first version has to put two values into the
+stack. The second version has to put one value into the stack:
+
+\begin{consolethree}[escapeinside=||]
+max< int >(|\EMPHASIZE{x}, \EMPHASIZE{10}|);
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+max< int, 10>(|\EMPHASIZE{x}|);
+\end{consolethree}
+
+See it? This is the benefit.
+
+However there's a disadvantage. Recall that if you make the following
+function call in your code:
+
+\begin{console}
+max< int, 10 >(x);
+\end{console}
+
+then your compiler will instantiate (i.e., create) the functions
+
+\begin{consolethree}[escapeinside=||]
+template <>
+int max< int, 10 >(int x[])
+{
+    ...
+}
+\end{consolethree}
+
+If you also have
+
+\begin{console}
+max< double, 20 >(y);
+\end{console}
+
+then your compiler will also instantiate
+
+\begin{consolethree}[escapeinside=||]
+template <>
+int max< double, 10 >(int x[])
+{
+    ...
+}
+\end{consolethree}
+
+This means that the second version will generate a large executable
+binary code.
+
+\input{exercises/7-40-function-templates/main.tex}
+\input{exercises/8-40-function-templates/main.tex}
+\input{exercises/9-40-function-templates/main.tex}
+

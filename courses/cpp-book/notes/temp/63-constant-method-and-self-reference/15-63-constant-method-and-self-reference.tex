@@ -1,0 +1,137 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{How to make \texttt{*this} constant?}
+
+But what about \texttt{this}? It's passed in automatically and is not shown in the parameter list! How do you ``\texttt{const}'' \texttt{this}?
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    Int(int x)
+        : x_(x)
+    {}
+    Int max(|\EMPHASIZE{const}| Int & a)    |\tikzmarknode{a0}{}|
+    {
+        if (x_ < a.x_)|\xsidebox[0cm]{0cm}{}{abx0}{\texttt{a} is not changed so we made it constant}|
+            return a;                    |\tikzmarknode{a1}{}|
+        else
+            return (*this);
+    }
+private:
+    int x_;
+};
+\end{consolethree}
+\DrawArrow{abx0}{a0}
+\DrawArrow{abx0}{a1}
+
+But ....
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    Int(int x)
+        : x_(x)
+    {}
+    Int max(|\EMPHASIZE{const}| Int & a)
+    {
+        if (x_ < a.x_)
+            return a;
+        else
+            return (*this);|\tikzmarknode{a2}{} \xsidebox[0cm]{0cm}{}{abx1}{But \texttt{this} is also not changed. How do we make it constant?}|
+    }
+private:
+    int x_;
+};
+\end{consolethree}
+\DrawArrow{abx1}{a2}
+
+Do this:
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    Int(int x)
+        : x_(x)
+    {}
+    Int max(|\EMPHASIZE{const}| Int & a) |\EMPHASIZE{\underline{const}} \tikzmarknode{a3}{}|
+    {
+        if (x_ < a.x_)
+            return a;
+        else
+            return (*this);|\xsidebox[0cm]{0cm}{}{abx2}{\texttt{const} after function header will make \texttt{*this} constant in the method}|
+    }
+private:
+    int x_;
+};
+\end{consolethree}
+\DrawArrow{abx2}{a3}
+Example:
+
+\begin{consolethree}[escapeinside=||]
+class Date
+{
+public:
+    int get_d() |\EMPHASIZE{const;}|
+private:
+    int yyyy_, mm_, dd_;|\xsidebox[0cm]{0cm}{}{abx3}{Makes \texttt{*this} constant in the body of the function}|
+};
+
+int Date::get_d() |\EMPHASIZE{const}|
+{
+    return dd_;
+}
+\end{consolethree}
+
+\input{exercises/2-63-constant-method-and-self-reference/main.tex}
+\EMPHASIZE{WARNING:}
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    void f() |\EMPHASIZE{const} \tikzmarknode{c0}{} \xsidebox[0cm]{0cm}{}{cbawx0}{Note: this is for inlined method}|
+    {}
+    
+    void g() |\EMPHASIZE{const;} \tikzmarknode{c1}{}|
+};
+
+void C::g() |\EMPHASIZE{const} \tikzmarknode{c2}{} \xsidebox[0cm]{0cm}{}{cbawx1}{Note: for non-inlined method. \texttt{const} must appear in the method prototype \emph{\textbf{and}} the method definition!!!}|
+{}
+\end{consolethree}
+\DrawArrow{cbawx0}{c0}
+\DrawArrow{cbawx1}{c1}
+\DrawArrow{cbawx1}{c2}
+Go ahead and experiment with this:
+
+\begin{consolethree}[escapeinside=||]
+class C{
+public:
+    void f() |\EMPHASIZE{const}| 
+    {}
+    void g() |\EMPHASIZE{const;}| 
+};
+
+void C::g() |\EMPHASIZE{\sout{const}} \tikzmarknode{ca0}{} \xsidebox[0cm]{0cm}{}{cabawx0}{Experiment: Try compiling this without \texttt{const}. Read the error message.}|
+{}
+
+int main()
+{}
+\end{consolethree}
+\DrawArrow{cabawx0}{ca0}
+
+\input{exercises/3-63-constant-method-and-self-reference/main.tex}
+Functions with \texttt{const} at the end are called \EMPHASIZE{constant
+member functions}. In other words, constant member functions
+are methods that will not modify the object invoking the method.
+
+\input{exercises/4-63-constant-method-and-self-reference/main.tex}
+\input{exercises/5-63-constant-method-and-self-reference/main.tex}
+\input{exercises/6-63-constant-method-and-self-reference/main.tex}
+\input{exercises/7-63-constant-method-and-self-reference/main.tex}
+\input{exercises/8-63-constant-method-and-self-reference/main.tex}
+\input{exercises/9-63-constant-method-and-self-reference/main.tex}
+

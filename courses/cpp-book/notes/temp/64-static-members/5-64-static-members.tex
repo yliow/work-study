@@ -1,0 +1,62 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Application: Keeping a count of objects which are alive}
+
+Suppose you want to maintain a count of the number of objects which are
+``alive''. This is what I mean:
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    Car a; // at this point, there's 1 Car obj
+    Car b; // at this point, there are 2 Car objs
+    int x = 42;
+    if (x < 42)
+    {
+        ...
+    }
+    else
+    {
+        Car a; // at this point, there are 3 Car objs
+        Car z; // at this point, there are 4 Car objs
+    }
+    // at this point, there are 2 Car objs
+    Car c; // at this point, there are 3 Car objs
+    Car * p = new Car;
+    // at this point, there are 4 Car objs
+    Car d = c; // at this point, there are 5 Car objs
+    delete p; // at this point, there are 4 Car objs
+    return 0; // at this point, there are 0 Car objs
+}
+\end{consolethree}
+
+All you need to do is to declare a static member in Car to keep track of
+objects which are live:
+
+\begin{consolethree}[escapeinside=||]
+class Car
+{
+public:
+    static int numObjects;
+    ...
+private:
+    ...
+};
+
+int C::numObjects(0);
+\end{consolethree}
+
+Here's what you need to do:
+
+\begin{itemize}
+\item You want to increment each time an object is created, therefore
+  \texttt{numObjects} should increment in each constructor, including the
+  copy constructor.
+\item You also want to decrement \texttt{numObjects} each time an object is
+  destroyed so you want to decrement \texttt{numObjects} in the
+  destructor.
+\end{itemize}
+
+\input{exercises/4-64-static-members/main.tex}
+

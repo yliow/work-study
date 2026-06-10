@@ -1,0 +1,233 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\input{exercises/5-16-scope/main.tex}\input{exercises/6-16-scope/main.tex}\sectionthree{Principle of minimal scope}
+
+Here's the principle of minimal scope:
+\begin{center}
+\EMPHASIZE{Keep the scope of variables}\\
+\EMPHASIZE{as small as possible.}\\
+\end{center}
+
+(The above is suppose to blink).
+
+For instance this is NOT GOOD:
+\begin{console}
+// compute the factorial of n
+int i = 0;
+int prod = 1;
+
+int n = 0;
+std::cin >> n;
+
+for (i = 1; i <= n; i++)
+{
+    prod *= i;
+}
+std::cout << prod << std::endl;
+\end{console}
+
+This is BETTER
+
+\begin{console}
+// compute the factorial of n
+int prod = 1;
+
+int n = 0;
+std::cin >> n;
+
+for (int i = 1; i <= n; i++)
+{    
+     prod *= i;
+}
+std::cout << prod << std::endl;
+\end{console}
+
+\input{exercises/7-16-scope/main.tex}For our program above you should be able to see these steps:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+#p += Grid(x0=-4,y0=-4,x1=4,y1=4)
+
+B1 = Rect(-2,2,2,3,label=r'Prompt user for n',linewidth=0.05)
+B2 = Rect(-4,-1,4,0,label=r'Compute factorial of n and store in prod',linewidth=0.05)
+B3 = Rect(-2,-4,2,-3,label=r'Print prod',linewidth=0.05)
+
+p += B1
+p += B2
+p += B3
+p += Line(points=[(0,5),(0,3)], linewidth=0.1, endstyle='>')
+p += Line(points=[(0,2),(0,0)], linewidth=0.1, endstyle='>')
+p += Line(points=[(0,-1),(0,-3)], linewidth=0.1, endstyle='>')
+p += Line(points=[(0,-4),(0,-6)], linewidth=0.1, endstyle='>')
+
+print(p)
+\end{python}
+
+A well-written program will always try to minimize the inputs and
+outputs (or change) within a step such as this:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+#p += Grid(x0=-4,y0=-4,x1=4,y1=4)
+B2 = Rect(-4,-1,4,0,label=r'Compute factorial of n and store in prod',linewidth=0.05)
+p += B2
+p += Line(points=[(0,2),(0,0)], linewidth=0.1, endstyle='>')
+p += Line(points=[(0,-1),(0,-3)], linewidth=0.1, endstyle='>')
+print(p)
+\end{python}
+
+Why? Because the more stuff you have in a step the more complex it will be. That means that the code is harder to read, debug, and maintain for future change. In the real world, software engineers write new code and maintain code base (maintain = correct, add and delete). Now look at this:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+#p += Grid(x0=-4,y0=-4,x1=4,y1=4)
+B2 = Rect(-4,-1,4,0,label=r'Compute factorial of n and store in prod',linewidth=0.05)
+p += B2
+p += Line(points=[(0,2),(0,0)], linewidth=0.1, endstyle='>')
+p += Line(points=[(0,-1),(0,-3)], linewidth=0.1, endstyle='>')
+print(p)
+\end{python}
+
+What variables are involved in this step? Don't think about the internals of this chunk of code. Think of the code as a black box. You need n (that's the input) and you want to compute the factorial of n (that's the output) and you want to put that value in to prod (that's the transformation).
+
+So two variables take part in this step.
+
+Now look at the code from the first program (the part in bold):
+
+\begin{consolethree}[escapeinside=||]
+// compute the factorial of n
+int i = 0;
+int prod = 1;
+
+int n = 0;
+std::cin >> n;
+
+|\textbf{for (i = 1; i <= n; i++)}|
+|\textbf{\{}|
+    |\textbf{prod *= i;}|
+|\textbf{\}}|
+
+std::cout << prod << std::endl; 
+\end{consolethree}
+
+You see clearly that besides ``sending in'' variables \texttt{n} and \texttt{prod} to this step, \underline{\textbf{you also ``send in'' variable }\textbf{i}}.
+
+Now look at the improved version:
+
+\begin{consolethree}[escapeinside=||]
+// compute the factorial of n
+int prod = 1;
+
+int n = 0;
+std::cin >> n;
+
+|\textbf{for (int i = 1; i <= n; i++)}|
+|\textbf{\{}|
+    |\textbf{prod *= i;}|
+|\textbf{\}}|
+
+std::cout << prod << std::endl; 
+\end{consolethree}
+
+Variable \texttt{i} is internal to the step that computes the factorial of \texttt{n} and stores it in \texttt{prod}. Outside the code that computes and stores the factorial of \texttt{n} in \texttt{prod}, variable \texttt{i} does not exist.
+
+Get it?
+
+This also prevent ``side effects'' in code. (I've already mentioned this.) If a variable has a large scope, and you modify it in some place, it might have unexpected effects. Here's something similar to a previous example -- it's important enough to repeat!!! For instance suppose work in a team and you're given this code segment:
+
+\begin{console}
+...
+int i = 42;
+...
+for (; i < 100; i++)
+{
+    ...
+}
+.... 
+\end{console}
+
+where you expect the \texttt{for}-loop to run from \texttt{i} = 42 to \texttt{i} = 99. One of your colleagues might see the variable \texttt{i} and add some code like so:
+
+\begin{console}
+...
+int i = 42;
+...
+for (i = 1000; i > 0; --i)
+{    
+     ...
+}
+...
+for (; i < 100; i++)
+{     
+     ...
+}
+.... 
+\end{console}
+
+So guess what? When you use \texttt{i}, the initial value for you is now 0 and not 42 and your program doesn't work anymore. Tough. What's worse is when you try to debug, you might not even see it because you kept saying to yourself ``But, but, but ... I didn't change anything ever since it was working!!! ... and my code looks the same as before!!!''
+
+This is one of the most important reasons why we also try to restrict the scope of a variable. If it's meant to be a ``scratch'' variable, then create it in such a way that it gets destroy ASAP.
+
+As you can see from the example, one way to minimize scopes is to declare only when you need to and in the \EMPHASIZE{innermost block} whenever possible. For our example, we declare \texttt{i} within the for-loop block.
+
+\EMPHASIZE{NOTE: }Some people declare all variables at the beginning of a function. That's because \underline{\textbf{some}} programming languages specify that \underline{\textbf{all}} declaration statements must come before other types of statements.
+That's not the case for C++ or other modern programming languages.
+
+Now let's go back to that program again. There's one other spot where you can minimize the scope of a variable.
+
+\begin{consolethree}[escapeinside=||]
+// compute the factorial of n
+|\textbf{int prod = 1;}|
+
+int n = 0;
+std::cin >> n;
+
+for (int i = 1; i <= n; i++)
+{    
+     prod *= i;
+}
+
+std::cout << prod << std::endl;
+\end{consolethree}
+
+Note that \texttt{prod} is not used until the \texttt{for}-loop. So you can
+write this:
+
+\begin{consolethree}[escapeinside=||]
+// compute the factorial of n
+int n = 0;
+std::cin >> n;
+
+|\textbf{int prod = 1;}|
+for (int i = 1; i <= n; i++)
+{    
+     prod *= i;
+}
+std::cout << prod << std::endl;
+\end{consolethree}
+
+This however is \textbf{not as crucial} as the previous change because \texttt{prod} is not destroyed. Furthermore \texttt{prod} is part of the larger goal of computing the factorial. Hence it's OK to declare \texttt{prod} early so that readers of your code can see it early, especially if you mention \texttt{prod} in your comments like this:
+
+\begin{consolethree}[escapeinside=||]
+// compute the factorial of n and store it in prod
+int n = 0;
+|\textbf{int prod = 1;}|
+
+std::cin >> n;
+
+for (int i = 0; i <= n; i++)
+{    
+     prod *= i;
+}
+
+std::cout << prod << std::endl;
+\end{consolethree}
+
+See that?
+
+\input{exercises/8-16-scope/main.tex}
+
+

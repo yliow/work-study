@@ -1,0 +1,82 @@
+\tinysidebar{\debug{exercises/{0-62-destructors/question.tex}}}Do a simple experiment yourself to show that the
+
+destructor is indeed called:
+
+
+
+\begin{consolethree}[escapeinside=||]
+
+class Thingy
+
+{
+
+public:
+
+    Thingy()             // memory allocation
+
+        : y_(new char)   // during constructor call
+
+    {}
+
+    |\EMPHASIZE{~Thingy()}|
+
+    |\EMPHASIZE{\{}|
+
+        |\EMPHASIZE{std::cout << "Thingy::~Thingy()\n";}|
+
+        |\EMPHASIZE{delete y_;}|
+
+    |\EMPHASIZE{\}}|
+
+private:
+
+    int x_;     // x_ is automatic
+
+    char * y_;  // y_ is automatic, but the *memory*
+
+                // that y_ points to, if allocated,
+
+                // is not automatic.
+
+};
+
+
+
+int main()
+
+{
+
+    int x = 1;
+
+    if (x > 0)
+
+    {
+
+        Thingy thing; // memory for thing.x_,
+
+                      // thing.y_, *(thing.y_)
+
+                      // allocated.
+
+        // do something with thing
+
+    } // At the end of the body of the if-statement,
+
+      // memory for x, y_ is reclaimed
+
+      // automatically ...
+
+      // BUT before that ... (and this is the point):
+
+      // thing.~Thingy() executes so that the
+
+      // memory that thing.y_ points to is reclaimed
+
+      // by the free store.
+
+    return 0;
+
+}
+
+\end{consolethree}
+

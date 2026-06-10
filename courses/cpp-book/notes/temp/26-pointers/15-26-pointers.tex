@@ -1,0 +1,141 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Protecting function from accidentally changing data}
+
+Before we go on to the next use of pointers, let's look at the previous section on functions that accept pointers and/or references.
+
+Recall that if you have a function that accepts variables which are ``big'',
+
+\begin{consolethree}[escapeinside=||]
+int f(long long int x, long double y)
+{
+    return (x > y ? 0 : 1);
+}
+
+int main()
+{
+    long long int x = 42;
+    long double y = 3.14;
+    int x = f(x, y);
+
+    return 0;
+}
+\end{consolethree}
+Then the act of making a function call is faster if you pass in pointers (or references) because the data to be passed in is not copied, only the addresses of the data are passed in:
+
+\begin{consolethree}[escapeinside=||]
+int f(long long int & px, long double & py)
+{
+    return (*px > *py ? 0 : 1);
+
+}
+
+int main()
+{
+    long long int x = 42;
+    long double y = 3.14;
+    f(&x, &y);
+
+    return 0;
+}
+\end{consolethree}
+Note that the larger the data, the more crucial it is to use pointers or references.
+
+If \texttt{f()} is meant to change the \texttt{x} and y back in \texttt{main()}, then of course you must pass in pointers or references.
+
+However if \texttt{f()} is not meant to change \texttt{x} and \texttt{y} back in \texttt{main()}, then passing pointers (or references) into \texttt{f()} can be dangerous since f() can potentially change the \texttt{x} and \texttt{y} in \texttt{main()}. To overcome this, you pass in pointer-to-constants (or constant reference):
+
+\begin{consolethree}[escapeinside=||]
+int f(const long long int * px,
+      const long double * py)
+{
+    return (*px > *py ? 0 : 1);
+}
+\end{consolethree}
+or
+
+\begin{consolethree}[escapeinside=||]
+void f(const long long int & x,
+       const long double & y)
+{
+    return (x > y ? 0 : 1);
+}
+\end{consolethree}
+
+In general do the following for a function call \texttt{f(..., x, ...)} (say from\texttt{ main()}) where \texttt{x} has type \texttt{T}:
+
+\begin{consolethree}[escapeinside=||]
+void f(..., T x, ...)
+{
+    ... x ...
+}
+
+int main()
+{
+    T x;
+    f(..., x, ...);
+}
+\end{consolethree}
+Do the following:
+
+\textbf{CASE 1.} If \texttt{f()} needs to change the \texttt{x} in \texttt{main()}, then parameter \texttt{x} needs to be a reference \textbf{(pass-by-reference)}:
+
+\begin{consolethree}[escapeinside=||]
+void f(..., T & x, ...)
+{
+    ... x ...
+}
+
+int main()
+{
+    T x;
+    f(..., x, ...);
+}
+\end{consolethree}
+or parameter \texttt{x} should be changed to a pointer
+
+\begin{consolethree}[escapeinside=||]
+void f(..., T * x, ...)
+{
+    ... *x ...
+}
+
+int main()
+{
+    T x;
+    f(..., &x, ...);
+}
+\end{consolethree}
+\textbf{CASE 2A.} If \texttt{f()} does not need to change the \texttt{x} in \texttt{main()}, and \texttt{x} in \texttt{main()} does not use much memory, NO CHANGE IN ABOVE.
+
+\textbf{CASE 2B.} If \texttt{f()} does not need to change the \texttt{x} in \texttt{main()}, and \texttt{x} in \texttt{main()} uses a lot of memory, then parameter \texttt{x} need to be a pointer to a constant:
+
+\begin{consolethree}[escapeinside=||]
+void f(..., const T * const x, ...)
+{
+    ... *x ...
+}
+
+int main()
+{
+    T x;
+    f(..., &x, ...);
+}
+\end{consolethree}
+Or you can use a constant reference:
+\textbf{(pass-by-constant-reference)}
+
+\begin{consolethree}[escapeinside=||]
+void f(..., const T & x, ...)
+{
+    ... x ...
+}
+
+int main()
+{
+    T x;
+    f(..., x, ...);
+}
+\end{consolethree}
+

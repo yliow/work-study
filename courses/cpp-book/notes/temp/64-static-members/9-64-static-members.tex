@@ -1,0 +1,81 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Initialization of static constant integer members (DIY)}
+
+You can initialize static, \textbf{constant} integer members (int, char,
+etc) in class declaration with constant expression. In other words
+instead of this:
+
+\begin{consolethree}[escapeinside=||]
+// C.h
+class C
+{
+public:
+    static const int c;
+};
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// C.cpp
+const int C::c(1);
+\end{consolethree}
+
+You can do this:
+
+\begin{consolethree}[escapeinside=||]
+// C.h
+class C
+{
+public:
+    static const int c |{\bf = 1}|;
+};
+\end{consolethree}
+
+This ``inline initialization'' is valid only for integer constants
+(which includes character constants):
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    static const int c1 = 1;        // OK
+    static const int c2 = f(5.3);   // ERROR
+    static int c3 = 33;             // ERROR
+    const int c4 = 4444;            // ERROR
+    static const double c5 = 5.5;   // ERROR
+};
+\end{consolethree}
+
+(For \texttt{c4}, a later C++ compiler which is C++11 compliant might
+allow you to initialize \texttt{c4} inside the class definition.)
+
+Here's a valid use of static constant integer member:
+
+\begin{consolethree}[escapeinside=||]
+class GameEngine
+{
+public:
+    static const int version = 3;
+    ...
+};
+\end{consolethree}
+
+You can also use \texttt{enum} to create static constant integer members:
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    enum {c1=1, c2=22, c3=333, c4=44, c5=5};
+};
+
+int main()
+{
+    std::cout << C::c1 << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+\input{exercises/13-64-static-members/main.tex}
+

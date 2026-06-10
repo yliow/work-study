@@ -1,0 +1,239 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{\texttt{const\_cast}}
+
+Look at this program:
+
+\begin{console}
+void g(int & y)
+{}
+
+void f(const int & x)
+{   
+    g(x);
+}
+
+int main()
+{   
+    f(42);
+    return 0;
+}
+\end{console}
+
+Will it compile? (I'll give you 5 seconds.) Next, try to compile it.
+
+Of course it won't.
+
+If you did not answer the above question correctly, you should review
+notes on references and also on pointers right away because the above is
+similar to
+\begin{console}
+void g(int * y)
+{}
+
+void f(const int * x)
+{    
+     g(x);
+}
+
+int main()
+{   
+    int i = 42;
+    f(&i);
+    return 0;
+}
+\end{console}
+
+
+In particular look at constantness of pointers (and of references).
+
+This will not compile
+
+\begin{console}
+void g(int & y)
+{}
+
+void f(const int & x)
+{    
+     g(x);
+}
+
+int main()
+{   
+    int i = 42;
+    f(i);
+    return 0;
+}
+\end{console}
+
+
+because the \texttt{y} of \texttt{g()} references the \texttt{x} of
+\texttt{f()}, but\texttt{y} is a reference while \texttt{x} is a reference to
+a constant. This means that \EMPHASIZE{x cannot change the value it is referencing} and yet \texttt{x} wants to \EMPHASIZE{allow y to reference that value with the power to change it.} That's \EMPHASIZE{not possible.} This is similar to this issue (for references):
+
+\begin{console}
+int i = 42;
+const int & x = i;   // x is weak ... change change i
+int & y = x;         // y wants to be strong and wants
+                     // to change i, through x. NOPE!!!
+\end{console}
+
+which has the same issue as this (for pointers):
+
+\begin{console}
+int i = 42;
+const int * x = &i;
+int * y = x;
+\end{console}
+
+Going back to
+
+\begin{console}
+void g(int & y)
+{}
+
+void f(const int & x)
+{    
+     g(x);
+}
+
+int main()
+{   
+    f(42);
+    return 0;
+}
+\end{console}
+
+The issue is the \texttt{x} in \texttt{g(x)} \EMPHASIZE{cannot} be referencing a constant \texttt{int}, i.e., you want to \EMPHASIZE{remove the constantness} of the \texttt{x}:
+
+\begin{consolethree}[escapeinside=||]
+void g(int & y)
+{}
+
+void f (|\EMPHASIZE{const}| int & x)
+{    
+     g(x);
+}
+int main()
+{   
+    f(42);
+    return 0;
+}
+\end{consolethree}
+
+Of course one solution is this:
+\begin{consolethree}[escapeinside=||]
+void g(|\EMPHASIZE{const}| int & y)
+{}
+
+void f (const int & x)
+{    
+     g(x);
+}
+int main()
+{   
+    f(42);
+    return 0;
+}
+\end{consolethree}
+Then everything works. But if the function \texttt{g()} was written by someone else and you cannot change the source code, then what are you doing to do? (This does happen. For instance \texttt{g()} might be a function in a library that someone else wrote and you only have the header file and the compiled binary code, but not the source file. This means that although you can change the prototype in the header file it won't help because you cannot change \texttt{g()} in the cpp file.)
+
+You can remove the constantness of the \texttt{x} in \texttt{f()}:
+
+\begin{consolethree}[escapeinside=||]
+void g(int & y)
+{}
+
+void f(|\EMPHASIZE\sout\redtext{const}| int & x)
+{    
+     g(x);
+}
+
+int main()
+{   
+    f(42);
+    return 0;
+}
+\end{console}
+
+But what if the function \texttt{f()} should not change the value that \texttt{x} references? For instance what if \texttt{f()} is a printing function? Then \texttt{x} should be a constant reference \ldots \EMPHASIZE{except when calling \texttt{g()}}. In other words, you only want to remove the constantness of \texttt{x} \EMPHASIZE{temporarily.} Then you can use the constant cast:
+
+\begin{consolethree}[escapeinside=||]
+void g(int & y)
+{}
+
+void f(const int & x)
+{    
+     g(|\EMPHASIZE\texttt{const\_cast< int \& >}|(x));
+}
+int main()
+{   
+    f(42);
+    return 0;
+}
+\end{consolethree}
+
+Go ahead and compile it now.
+
+NOTE: This is (in my opinion) a wrong name. Because it makes you think that you are making something constant. In fact the point of this cast is to \EMPHASIZE{remove} the constantness. A better name would be ``remove\_const\_cast''!!!
+
+This can happen in the following scenario. Suppose in your \texttt{Date} class, you forgot to make the \texttt{get\_year()} method constant. Then this will not compile:
+
+\begin{console}
+class Date
+{
+public:
+     ...
+     int get_yyyy() // OOPS ... forgot to make method
+                    // constant!!!
+     {
+          return yyyy_;
+     }
+     ...
+};
+
+std::ostream & operator<<(std::ostream & cout,
+                          const Date & date)
+{    
+     cout << date.get_yyyy()
+          << ...
+     return cout;
+}
+
+int main()
+{   
+    f(42);
+    return 0;
+}
+\end{console}
+
+\input{exercises/0-83-casting/main.tex}
+In general, use of \texttt{const\_cast} indicates an issue with the design
+of the code (just like the above scenario) -- the issue is really that
+\texttt{get\_yyyy()} should be made constant. But there are times when you
+have no choice when you don't have access to the source cpp file and the
+definition of the function/method is in the cpp file and not in the
+header file.
+
+For the analogous pointer case, you can also use constant cast to
+resolve the issue:
+
+\begin{consolethree}[escapeinside=||]
+void g(int * x)
+{}
+
+void f(const int * x)
+{    
+     g(|\EMPHASIZE\redtext{const\_cast< int * >(x)}|);
+}
+
+int main()
+{   
+    int i = 42;
+    f(&i);
+
+    return 0;
+}
+\end{consolethree}
+

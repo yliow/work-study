@@ -1,0 +1,200 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Assignment Operator}
+
+It's not too surprising that you can do assignments on pointers \ldots{}
+
+First try to guess what this does:
+
+\begin{consolethree}[escapeinside=||]
+int x = 42;
+int y = 123;
+
+int * p = &x;
+int * q = &y;
+std::cout << *p << "\n";
+
+p = q;
+std::cout << *p << "\n";
+\end{consolethree}
+Now run it and verify.
+
+Here are some pictures. Up to this point:
+
+\begin{consolethree}[escapeinside=||]
+int x = 42;
+int y = 123;
+
+int * p = &x;
+int * q = &y;
+
+std::cout << *p << "\n";
+\end{consolethree}
+the memory model looks like this:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(0, -1, 8, 8)
+p += Rect(2, 6, 5, 7, label='42')
+p += Rect(1.5, 6.5, 1.5, 6.5, label='x')
+p += Rect(2, 4, 5, 5, label='123')
+p += Rect(1.5, 4.5, 1.5, 4.5, label = 'y')
+p += Rect(2, 2, 5, 3)
+p += Rect(1.5, 2.5, 1.5, 2.5, label = 'p')
+p += Rect(2, 0, 5, 1)
+p += Rect(1.5, 0.5, 1.5, 0.5, label = 'q')
+p += Line(points=[(3, 2.5), (7, 2.5), (7, 6.5), (5, 6.5)], linewidth=0.05, endstyle='>')
+p += Line(points=[(3, 0.5), (6, 0.5), (6, 4.5), (5, 4.5)], linewidth=0.05, endstyle='>')
+
+print(p)
+\end{python}
+The next statement
+
+\begin{consolethree}[escapeinside=||]
+p = q;
+\end{consolethree}
+
+gives the memory address in \texttt{q} to \texttt{p}. Since \texttt{q} has the memory address of \texttt{y}, this means that \texttt{p} ends up with the memory address of \texttt{y}. So we get:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(0, -1, 8, 8)
+p += Rect(2, 6, 5, 7, label='42')
+p += Rect(1.5, 6.5, 1.5, 6.5, label='x', linecolor='white')
+p += Rect(2, 4, 5, 5, label='123')
+p += Rect(1.5, 4.5, 1.5, 4.5, label = 'y', linecolor='white')
+p += Rect(2, 2, 5, 3)
+p += Rect(1.5, 2.5, 1.5, 2.5, label = 'p', linecolor='white')
+p += Rect(2, 0, 5, 1)
+p += Rect(1.5, 0.5, 1.5, 0.5, label = 'q', linecolor='white')
+p += Line(points=[(3, 2.5), (7, 2.5), (7, 4.75), (5, 4.75)], linewidth=0.05, endstyle='>')
+p += Line(points=[(3, 0.5), (6, 0.5), (6, 4.25), (5, 4.25)], linewidth=0.05, endstyle='>')
+
+print(p)
+\end{python}
+
+Since \texttt{p} points to \texttt{y}, or rather, \texttt{p} point to the \texttt{int} box that contains the value of \texttt{y}, of course \texttt{*p} gives us \texttt{123}.
+
+Let me explain everything above all over again, this time using (made up) memory addresses \ldots{} \EMPHASIZE{PAY ATTENTION!}
+
+Here's the above code again, except that I've included some made-up addresses for the value of \texttt{x} and the value of \texttt{y}:
+
+\begin{consolethree}[escapeinside=||]
+int x = 42;         // value of x is at address 80000
+int y = 123;        // value of y is at address 80004
+
+...
+\end{consolethree}
+At this point in the code
+\xsidebox[0cm]{-1cm}{}{madeupx}{The addresses are made up. Don't worry about them. I just gave them values of x and y addresses to illustrate the concepts below}
+\begin{consolethree}[escapeinside=||]
+int x = 42;         // value of x is at address 80000
+int y = 123;        // value of y is at address 80004
+
+int * p = &x;       // p = 80000
+int * q = &y;       // q = 80004
+std::cout << *p << "\n";
+\end{consolethree}
+the picture looks like this:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(0, -1, 8, 8)
+p += Rect(2.5, 7.25, 2.5, 7.25, label = '80000', linecolor='white')
+p += Rect(2, 6, 5, 7, label='42')
+p += Rect(1.5, 6.5, 1.5, 6.5, label='x')
+p += Rect(2, 4, 5, 5, label='123')
+p += Rect(2.5, 5.25, 2.5, 5.25, label = '80004', linecolor='white')
+p += Rect(1.5, 4.5, 1.5, 4.5, label = 'y')
+p += Rect(2, 2, 5, 3,label = '80000')
+p += Rect(1.5, 2.5, 1.5, 2.5, label = 'p')
+p += Rect(2, 0, 5, 1, label = '80004')
+p += Rect(1.5, 0.5, 1.5, 0.5, label = 'q')
+
+print(p)
+\end{python}
+
+and if I draw in arrows for pointers to help us see the pointer-to-value
+relationship it would look like this:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(0, -1, 8, 8)
+p += Rect(2.5, 7.25, 2.5, 7.25, label = '80000', linecolor='white')
+p += Rect(2, 6, 5, 7, label='42')
+p += Rect(1.5, 6.5, 1.5, 6.5, label='x', linecolor='white')
+p += Rect(2, 4, 5, 5, label='123')
+p += Rect(2.5, 5.25, 2.5, 5.25, label = '80004', linecolor='white')
+p += Rect(1.5, 4.5, 1.5, 4.5, label = 'y', linecolor='white')
+p += Rect(2, 2, 5, 3, label = '80000')
+p += Rect(1.5, 2.5, 1.5, 2.5, label = 'p', linecolor='white')
+p += Rect(2, 0, 5, 1, label = '80004')
+p += Rect(1.5, 0.5, 1.5, 0.5, label = 'q', linecolor='white')
+p += Line(points=[(4, 2.5), (7, 2.5), (7, 6.5), (5, 6.5)], linewidth=0.05, endstyle='>')
+p += Line(points=[(4, 0.5), (6, 0.5), (6, 4.5), (5, 4.5)], linewidth=0.05, endstyle='>')
+
+print(p)
+\end{python}
+Next, the statement
+
+\begin{consolethree}[escapeinside=||]
+p = q;
+\end{consolethree}
+
+gives the value of \texttt{q} to \texttt{p}. The value of \texttt{q} is 80004.
+Therefore the value of \texttt{p} becomes 80004. The diagram now looks like this:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(0, -1, 8, 8)
+p += Rect(2.5, 7.25, 2.5, 7.25, label = '80000', linecolor='white')
+p += Rect(2, 6, 5, 7, label='42')
+p += Rect(1.5, 6.5, 1.5, 6.5, label='x', linewidth=0.0,linecolor='white')
+p += Rect(2, 4, 5, 5, label='123')
+p += Rect(2.5, 5.25, 2.5, 5.25, label = '80004', linecolor='white')
+p += Rect(1.5, 4.5, 1.5, 4.5, label = 'y', linewidth=0.0,linecolor='white')
+p += Rect(2, 2, 5, 3, label = '80000')
+p += Rect(1.5, 2.5, 1.5, 2.5, label = 'p', linewidth=0.0,linecolor='white')
+p += Rect(2, 0, 5, 1, label = '80004')
+p += Rect(1.5, 0.5, 1.5, 0.5, label = 'q', linewidth=0.0,linecolor='white')
+
+print(p)
+\end{python}
+
+And if I now draw the arrows, I have
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(0, -1, 8, 8)
+p += Rect(2.5, 7.25, 2.5, 7.25, label = '80000', linecolor='white')
+p += Rect(2, 6, 5, 7, label='42')
+p += Rect(1.5, 6.5, 1.5, 6.5, label='x', linewidth=0.0,linecolor='white')
+p += Rect(2, 4, 5, 5, label='123')
+p += Rect(2.5, 5.25, 2.5, 5.25, label = '80004', linecolor='white')
+p += Rect(1.5, 4.5, 1.5, 4.5, label = 'y', linewidth=0.0,linecolor='white')
+p += Rect(2, 2, 5, 3,label = '80000')
+p += Rect(1.5, 2.5, 1.5, 2.5, label = 'p', linewidth=0.0,linecolor='white')
+p += Rect(2, 0, 5, 1, label = '80004')
+p += Rect(1.5, 0.5, 1.5, 0.5, label = 'q', linewidth=0.0,linecolor='white')
+p += Line(points=[(4, 2.5), (7, 2.5), (7, 4.75), (5, 4.75)], linewidth=0.05, endstyle='>')
+p += Line(points=[(4, 0.5), (6, 0.5), (6, 4.25), (5, 4.25)], linewidth=0.05, endstyle='>')
+
+print(p)
+\end{python}
+
+Get it?
+\input{exercises/36-26-pointers/main.tex}
+\input{exercises/37-26-pointers/main.tex}
+\input{exercises/38-26-pointers/main.tex}
+\input{exercises/39-26-pointers/main.tex}
+\input{exercises/40-26-pointers/main.tex}
+\input{exercises/41-26-pointers/main.tex}

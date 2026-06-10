@@ -1,0 +1,144 @@
+\tinysidebar{\debug{exercises/{0-40-function-templates/question.tex}}}In this example the same type parameter appears as a \EMPHASIZE{return type}. You are given the following program:
+
+
+
+\begin{consolethree}[escapeinside=||]
+
+#include <iostream>
+
+
+
+int addOne(int x)
+
+{
+
+    return x + 1;
+
+}
+
+
+
+int main()
+
+{
+
+    int a = 1;
+
+    std::cout << addOne(a) << '\n';
+
+    return 0;
+
+}
+
+\end{consolethree}
+
+
+
+Run it. Easy program right? Now run this:
+
+
+
+\begin{consolethree}[escapeinside=||]
+
+#include <iostream>
+
+
+
+int addOne(int x)
+
+{
+
+    return x + 1;
+
+}
+
+
+
+int main()
+
+{
+
+    int a = 1;
+
+    std::cout << addOne(a) << '\n';
+
+    std::cout << addOne(3.3) << '\n';
+
+    return 0;
+
+}
+
+\end{consolethree}
+
+
+
+The 3.3 is passed to the x of \texttt{addOne()} which will typecast the
+
+value to an integer, i.e. 3. Now rewrite the program so that the
+
+\texttt{addOne()} function becomes a function template; some test code is
+
+included to test your function template. The types that needs to be
+
+parameterized (made into a variable) is in bold and larger font.
+
+
+
+\begin{consolethree}[escapeinside=||]
+
+#include <iostream>
+
+
+
+|\EMPHASIZE{int}| addOne(|\EMPHASIZE{int}| x)
+
+{
+
+    return x + 1;
+
+}
+
+
+
+int main()
+
+{
+
+    int a = 1;
+
+    std::cout << addOne|\textbf{< int >}|(a) << '\n';
+
+    |\textbf{std::cout << addOne< double >(3.3) << '\textbackslash n';}|
+
+    |\textbf{std::cout << addOne< char >('c') << '\textbackslash n';}|
+
+
+
+    |\textbf{int * p = new int;}|
+
+    |\textbf{std::cout << addOne< int * >(p) << '\textbackslash n';}|
+
+
+
+    return 0;
+
+}
+
+\end{consolethree}
+
+
+
+(Note that I'm using the \texttt{addOne()} function with
+
+\texttt{double}, \texttt{char}, \texttt{int*} values which have the +
+
+operator, i.e. if \texttt{x} in either an \texttt{int}, or a \texttt{double},
+
+or a char, or an \texttt{int*}, the following makes sense in C++:
+
+
+
+\verb!x + 1;!
+
+
+

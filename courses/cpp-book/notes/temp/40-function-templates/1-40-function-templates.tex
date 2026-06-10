@@ -1,0 +1,169 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{An example of a function template}
+
+Function templates are great ... really. It's perfect
+for people who want to write less code. Let's try an
+example.
+
+Run this program.
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void println(int x)
+{
+    std::cout << x << std::endl;
+}
+
+int main()
+{
+    println(1);
+    println(3.14);
+    println('c');
+    return 0;
+}
+\end{consolethree}
+
+When you call println(3.14), C++ will try to find a function that best
+fit the value passed in (i.e. a \texttt{double}). The closest is our
+\texttt{println()} function but it accepts as \texttt{int}. So C++ typcast
+the \texttt{double} 3.14 to an \texttt{int}, i.e. 3, and call println().
+
+Let's say we do not want C++ to typecast. So
+here's the program we want:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void println(int x)
+{
+    std::cout << x << std::endl;
+}
+
+void println(double y)
+{
+    std::cout << y << std::endl;
+}
+
+void println(char z)
+{
+    std::cout << z << std::endl;
+}
+
+int main()
+{
+    println(1);
+    println(3.14);
+    println('c');
+    return 0;
+}
+\end{consolethree}
+
+Boy ... what a pain!!! Furthermore the functions all look pretty
+similar. Smart people hate to do silly things like this: mindless
+duplication of code.
+
+OK. Before you swear at C++, rewrite this program like this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+|\EMPHASIZE{template < typename T >}|
+void println(|\EMPHASIZE{T}| x)
+{
+    std::cout << x << std::endl;
+}
+
+int main()
+{
+    println|\EMPHASIZE{< int >}|(1);
+    println|\EMPHASIZE{< double >}|(3.14);
+    println|\EMPHASIZE{< char >}|('c');
+    return 0;
+}
+\end{consolethree}
+
+WOW!!! There is only one function and it seems to work for all three
+cases!!!
+
+The ``function''
+
+\begin{consolethree}[escapeinside=||]
+template < typename T >
+void println(T x)
+{
+    ...
+}
+\end{consolethree}
+
+is called a \EMPHASIZE{function template}. It's actually
+not a function. It's like a rubber stamp for producing
+functions. You should think of the \EMPHASIZE{T} as a \EMPHASIZE{type variable} for the compiler. Here's how the compiler use
+this \texttt{T}. When the compiler see this statement in your program:
+
+\begin{consolethree}[escapeinside=||]
+...
+println|\textbf{< int >}|(1);
+...
+\end{consolethree}
+
+it (i.e., the compile) says: ``Aha! So you need
+\texttt{println\EMPHASIZE{< int >}}.
+OK I'll take the rubber stamp \texttt{println} (i.e. the
+function template) and create one with \EMPHASIZE{T} replaced by
+\EMPHASIZE{int}.''
+
+In other words C++ will insert this into the program:
+
+\begin{consolethree}[escapeinside=||]
+...
+void println(|\EMPHASIZE{int}| x)
+{
+    std::cout << x << std::endl;
+}
+...
+\end{consolethree}
+
+It might be better to think of the instantiated function as:
+
+\begin{consolethree}[escapeinside=||]
+|\textbf{template <>}|
+void println(|\textbf{int}| x)
+{
+    std::cout << x << std::endl;
+}
+\end{consolethree}
+
+This ``production of a C++ function'' by a function template is called a
+\EMPHASIZE{function instantiation}. Note that if
+\texttt{println< char * >()} was not called, the
+following function will \EMPHASIZE{not} appear in your program:
+
+\begin{consolethree}[escapeinside=||]
+...
+|\textbf{template <>}|
+void println(char * x)
+{
+    std::cout << x << std::endl;
+}
+...
+\end{consolethree}
+
+Note that the function template itself is actually not included in the
+binary executable code that is executed. It's only used
+as a rubber stamp by the compiler for creating actual functions.
+
+Writing function templates is sort of like writing \EMPHASIZE{code that \underline{produces} code}. Specifically a function template can produce functions. This style of programming is called \EMPHASIZE{generic programming}. Templates also lead to something called \EMPHASIZE{metaprogramming}, but I won't get into that because that's beyond the scope of basic programming.
+
+Do you see the power of function templates?
+
+The variable type \texttt{T} (usually called a \EMPHASIZE{type parameter}) can appear anywhere in the function template, not just in the function header. Below is an example where the type parameter appears as a return type.
+
+Another thing to remember is that you can use any identifier name for the type parameter. I used \texttt{T}. You can use \texttt{X} if you like. But the practice is to use a single uppercase letter.
+
+\input{exercises/0-40-function-templates/main.tex}
+\input{exercises/1-40-function-templates/main.tex}
+\input{exercises/2-40-function-templates/main.tex}
+

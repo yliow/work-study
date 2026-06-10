@@ -1,0 +1,125 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Why?}
+
+OK. The above looks bizarre. But what good is it? Why not just use
+\textit{avg}?
+
+Because now even functions can be viewed as values. The following will
+make things clear.
+
+For instance suppose you have two functions \textit{f1}, \textit{f2}, both
+accepting two integers and returning a \textit{double} and you have a
+program that looks like where \textit{f1}, \textit{f2} are used a lot but in
+two different scenarios:
+
+\begin{consolethree}[escapeinside=||]
+if (x < 0)
+{
+    double a = f1(x + a, b);
+    double b = f1(a, b + c / 2);
+    double c = a + b + f1(5.0, a + b);
+    z = a + b + c + f1(1, 1);
+}
+else
+{
+    double a = f2(x + a, b);
+    double b = f2(a, b + c / 2);
+    double c = a + b + f2(5.0, a + b);
+    z = a + b + c + f2(1, 1);
+}
+std::cout << z << '\n';
+\end{consolethree}
+
+Note that the computation in both case are essentially the same other
+than a difference in which of \textit{f1}, \textit{f2} should be used. Now
+if your programming language has the concept of function pointers like
+C++, you can do this:
+
+\begin{consolethree}[escapeinside=||]
+double (*g)(int, int) = (x < 0 ? &f1 : &f2);
+double a = g(x + a, b);
+double b = g(a, b + c / 2);
+double c = a + b + g(5.0, a + b);
+z = a + b + c + g(1, 1);
+std::cout << z << '\n';
+\end{consolethree}
+
+Note in particular, you can create a function that accepts functions as
+parameters! If you think of functions as computing with inputs values
+such as integer and doubles, then you can also think of functions as
+performing computations on functions ... functions operating on
+functions!!!
+
+Are there such things in real life? Of course. Suppose you want to find
+the maximum value of a function like the function x*x + x - 5 in the
+interval [a, b]. You might do this:
+
+\begin{consolethree}[escapeinside=||]
+double max(double a, double b)
+{
+    double m = a * a + a - 5;
+    for (double x = a + 0.001; x <= b; x += 0.001)
+    {
+        double y = x * x + x - 5;
+        if (y > m)
+        {
+            m = y;
+        }
+    }
+    return m;
+}
+\end{consolethree}
+
+Unfortunately, the function x * x + x - 5 is ``hard-coded'' into the
+above \textit{max()} function. It cannot be used to compute for instance
+the maximum value of 3 * x * x * x - 5 * x * x + 12. You would have to
+write another function, say \textit{max2()}, that does more or less the
+same thing.
+
+But ... ahhh ... since C/C++ allows function pointers, you can
+do this:
+
+\begin{consolethree}[escapeinside=||]
+double max(double a, double b, double (*f) (double))
+{
+    double m = f(a);
+    for (double x = a + 0.001; x < b; x += 0.001)
+    {
+        double y = f(x);
+        if (y > m)
+        {
+            m = y;
+        }
+    }
+    double y = f(b);
+    if (y > m)
+    {
+        m = y;
+    }
+    return m;
+}
+\end{consolethree}
+
+Now if you want to compute the maximum of 3 * x * x * x - 5 * x * x +
+12 for 1<= x <= 100, all you need to do is to do this:
+
+\begin{consolethree}[escapeinside=||]
+double f(double x)
+{
+    return 3 * x * x * x - 5 * x * x + 12;
+}
+\end{consolethree}
+
+and then call the above \textit{max} function with this \textit{f}:
+
+\begin{consolethree}[escapeinside=||]
+std::cout << max(1, 100, &f) << std::endl;
+\end{consolethree}
+
+\input{exercises/3-28-pointers-and-functions/main.tex}
+\input{exercises/4-28-pointers-and-functions/main.tex}
+\input{exercises/5-28-pointers-and-functions/main.tex}
+\input{exercises/6-28-pointers-and-functions/main.tex}
+

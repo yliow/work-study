@@ -1,0 +1,73 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Gotchas}
+
+Here are two very common gotchas for you ...
+
+\EMPHASIZE{First:} The initializer syntax can only be used in constructors:
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+...
+void Date::set_d(int dd)
+    : dd_(dd)             // BAD BAD BAD WRONG WRONG WRONG
+{}
+\end{consolethree}
+
+\EMPHASIZE{Second:} Order of initialization is the order of member
+declaration:
+
+\begin{consolethree}[escapeinside=||]
+// C.h
+class C
+{
+public:
+    C(int, int);
+private:
+    int avg_, x_, y_;
+    // avg_ = average of x_, y_
+};
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// C.cpp
+
+C::C(int a, int b)
+    : x_(a), y_(b), avg_((x + y) / 2)
+// avg_ is initialized with x_, y_ before they are
+// initialized!!! YIKES!!!
+{}
+\end{consolethree}
+
+To fix this problem, either
+
+(1) use \texttt{a} and \texttt{b} in the initialization of \texttt{avg\_:}
+
+\begin{consolethree}[escapeinside=||]
+// C.cpp
+C::C(int a, int b)
+    : x_(a), y_(b), avg_((a + b) / 2)
+    // avg_ doesn't rely on x_ and y_, so it's safe
+{}
+\end{consolethree}
+
+or
+
+(2) declare \texttt{avg\_} after \texttt{x\_} and \texttt{y\_} in the class
+definition (after all, the \texttt{avg\_} average should clearly be set
+after \texttt{x\_} and \texttt{y\_}, right?!?!)
+
+\begin{consolethree}[escapeinside=||]
+// C.h
+class C
+{
+public:
+    C(int, int);
+private:
+    int x_, y_, avg_;
+    // avg_ = average of x_, y_
+};
+\end{consolethree}
+
+

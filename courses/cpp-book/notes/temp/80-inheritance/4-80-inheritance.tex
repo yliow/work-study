@@ -1,0 +1,85 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\input{exercises/5-80-inheritance/main.tex}\sectionthree{Private members of the parent class}
+
+For public inheritance, a child cannot access private member variables
+or private methods of parent. Let's do an experiment to verify this.
+Here's our Basic Example:
+\begin{console}
+#include <iostream>
+
+class P
+{
+public:
+        P() : x_(1) {}
+        int get_x() const { return x_; }
+        void set_x(int x) { x_ = x; }
+private:
+        int x_;
+};
+
+class C: public P
+{
+public:
+        C() : x_(3), y_(2) {}
+        int get_y() const { return y_; }
+        void set_y(int y) { y_ = y; }
+private:
+        int x_;
+        int y_;
+};
+
+int main()
+{   
+    C c;
+    std::cout << "c.x_ =" << c.get_x() << ", "
+              << "c.y_ =" << c.get_y() << '\n';
+    std::cout << "c.x_ =" << c.P::get_x() << ", "
+              << "c.y_ =" << c.C::get_y() << '\n';
+return 0;
+}
+\end{console}
+
+Now let's create a method in \verb!C! to access a private member of
+\verb!P!:
+\begin{console}[commandchars=\~\@\$]
+...
+class C : public P
+{
+public:
+        ...
+        ~EMPHASIZE@~redtext@void m() { P::x_ = 42; }$$
+private:
+        int x_;
+        int y_;
+};
+
+... 
+\end{console}
+
+You will get an error when you compile your program -- make sure you
+read the error message. This is the same for private method in the
+parent:
+\begin{console}[commandchars=\~\@\$]
+...
+
+class P
+{     
+...
+private:
+        ~EMPHASIZE@~redtext@void m() {}$$
+        int x_;
+};
+
+class C: public P
+{
+public:
+        ...
+        ~EMPHASIZE@~redtext@void n() { m(); }$$
+        ...
+};
+
+...
+\end{console}
+

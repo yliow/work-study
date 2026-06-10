@@ -1,0 +1,92 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Constructor}
+
+Now add some print statements in the parent and child constructor:
+\begin{console}[commandchars=\~\@\$]
+#include <iostream>
+
+class P
+{
+public:
+        P() : x_(1) { ~textbf@std::cout << "P::P()\n"; $}
+        int get_x() const { return x_; }
+        void set_x(int x) { x_ = x; }
+private:
+        int x_;
+};
+
+class C: public P
+{
+public:
+        C() : x_(3), y_(2) { ~textbf@std::cout << "C::C()";$ }
+        int get_y() const { return y_; }       
+        void set_y(int y) { y_ = y; }
+private:
+        int x_;
+        int y_;
+};
+
+int main()
+{   
+    C c;
+    std::cout << "c.x_ =" << c.get_x() << ", "
+              << "c.y_ =" << c.get_y() << '\n';
+    std::cout << "c.x_ =" << c.P::get_x() << ", "
+              << "c.y_ =" << c.C::get_y() << '\n';
+return 0;
+
+}
+\end{console}
+
+Run it. You'll see that the parent constructor is indeed executed. This means that the child constructor actually called the parent's constructor.
+
+Note that the \EMPHASIZE{parent constructor} was \EMPHASIZE{called before} the \EMPHASIZE{child constructor.} Why is that? Because during child construction, you may use data already constructed in the parent. You cannot do the opposite.
+
+Now what if you want to choose how to initialize the parent part of the
+\verb!c! object? How do you explicitly call the parent's constructor?
+Let's add a new constructor in \verb!P!, one that accepts an integer
+value and get the \verb!C!'s constructor to call \verb!P::P(int):!
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+|\sidebox{parentctor}{\textbf{Call parent's constructor explicitly in the initializer list}}|
+class P
+{
+public:
+        P() : x_(1) { std::cout << "P::P()\n"; }
+        |\textbf{P(int x) : x\_(x) \{ std::cout << "P::P(int)"}||\verb!\n"; }!|
+        int get_x() const { return x_; }
+        void set_x(int x) { x_ = x; }
+private:
+        int x_;
+};
+
+class C: public P
+{
+public:
+        C() : |\tikzmarknode{end42}{\EMPHASIZE{P(42)}}|, x_(3), y_(2)
+                     { std::cout << "C::C()"; }
+        int get_y() const { return y_; }
+        void set_y(int y) { y_ = y; }
+private:
+        int x_;
+        int y_;
+};
+
+int main()
+{   
+    C c;
+    std::cout << "c.x_ =" << c.get_x() << ", "
+              << "c.y_ =" << c.get_y() << '\n';
+    std::cout << "c.x_ =" << c.P::get_x() << ", "
+              << "c.y_ =" << c.C::get_y() << '\n';
+    return 0;
+}
+\end{consolethree}
+\DrawArrow[red, thick]{parentctor.south west}{end42}
+
+\input{exercises/6-80-inheritance/main.tex}\input{exercises/7-80-inheritance/main.tex}Add code so that during the initialization of a \verb!Laser! object, the
+\verb!is_alive_! is set to \verb!false! and during the initialization
+of an \verb!Alien! object, the \verb!is_alive_! is set to \verb!true!.
+

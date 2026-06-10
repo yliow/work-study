@@ -1,0 +1,83 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Example and exercise: \texttt{IntPointer}}
+
+The next few exercises are extremely important!!! Some will in fact
+appear in assignments!!!
+
+One of the problems regarding pointers (pointing to either a single
+value or an array of values) is that there's a danger of forgetting to
+deallocate memory:
+
+\begin{consolethree}[escapeinside=||]
+void f()
+{
+    int * p = new int;
+    int * q = new int[10];
+    // do something with *p
+    // do something with q[0],...,q[9]
+    return; // oops ... forgot delete p and
+            // delete [] q;
+}
+
+int main()
+{
+    f();
+    // oops ... memory leak ... lost 11 integers!!!
+    return 0;
+}
+\end{consolethree}
+
+You will see later (see notes on Destructors) that classes will help
+solve this very dangerous problem. For this section,
+let's talk about a pointer to a single value and write a
+class for that.
+
+The following class models an integer pointer. This is an important
+example. But it's incomplete. (Clearly once
+you're done with this, you can also talk about a class
+to model the pointer to a double, to a char, etc.)
+
+\begin{consolethree}[escapeinside=||]
+class IntPointer
+{
+public:
+    IntPointer(int x)
+        : p_(new int) // allocate memory for p_
+    {
+        *p_ = x;      // store an int at memory that p_
+                      // points to
+    }
+    IntPointer(const IntPointer & intptr)
+        : p_(new int)
+    {
+        *p_ = *(intptr.p_);
+    }
+    int dereference()
+    {
+        return *p_;
+    }
+    void allocate()
+    {
+        if (p_ == NULL)
+        {
+            p_ = new int;
+        }
+    }
+    void deallocate()
+    {
+        delete p_;
+    }
+private:
+    int * p_;
+};
+\end{consolethree}
+
+\input{exercises/25-61-constructors/main.tex}
+\input{exercises/26-61-constructors/main.tex}
+\input{exercises/27-61-constructors/main.tex}
+\input{exercises/28-61-constructors/main.tex}
+\input{exercises/29-61-constructors/main.tex}
+\input{exercises/30-61-constructors/main.tex}
+

@@ -1,0 +1,93 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{How does C++ search for a variable?}
+
+In looking for a variable C++ will always start from the block where the execution occurs. If the variable cannot be found, C++ will look for that variable in the nearest outer enclosing block.
+
+Here's a simple example:
+\sidenote
+{
+\begin{tikzpicture}
+\node[draw, line width=1,text width=4cm, minimum height=5cm] (obbybox) at (0,4) {};
+\node[yshift=-1cm,draw,line width=0.2,text width=2.5cm, minimum height=1.25cm] (obbybox5) at (obbybox.north) {\large\texttt{\ \ \ \ \ \ \ \ \ \ \ \ \ \ 5}};
+\node[draw, line width=0.2,text width=2.5cm, minimum height=1.25cm] (obbybox6) at (obbybox.center) {\large\texttt{\ \ \ \ \ \ \ \ \ \ \ \ \ \ 6}};
+\node[yshift=-0.5cm, draw, line width=1, text width=3.5cm, minimum height=2.5cm] (obby2box6) at (obbybox6.center) {};
+\node[xshift=-2mm] (obbyj) at (obbybox5.west) {\large{i}};
+\node[xshift=-2mm] (obbyi) at (obbybox6.west) {\large{j}};
+
+\node[yshift=-1.5cm, align=center] (obbydesc) at (obbybox.south) {\normalsize{i is not found in this} \\ \normalsize{block. Look for i in the} \\ \normalsize{nearest enclosing}\\\normalsize{block. FOUND!}};
+\node[xshift=0.35cm] (obbyredarrend) at (obbybox5.east){};
+\node[xshift=0.35cm,yshift=-2cm] (obbyredarrstart) at (obbybox5.east){};
+\node[xshift=-1.3cm,yshift=-1.2cm] (obbyboxend1) at (obbybox.center){};
+\node[xshift=1.3cm,yshift=-1.2cm] (obbyboxend2) at (obbybox.center){};
+\draw[ultra thick, ->] (obbydesc) to (obbyboxend1);
+\draw[ultra thick, ->] (obbydesc) to (obbyboxend2);
+\draw[ultra thick, ->, color=red] (obbyredarrstart) to (obbyredarrend);
+\end{tikzpicture}
+}
+
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int main()
+{    
+     int i = 5;
+
+     if ( i > 0 )
+     {    
+          int j = 6;
+          |\begin{tikzpicture}\node[draw=red, thick, inner sep=2pt](nestconsolebox){std::cout << i;};\end{tikzpicture}|
+     }
+
+     return 0;
+}
+\end{consolethree}
+
+\DrawArrowVH{obbybox.center}{nestconsolebox}
+
+
+Of course C++ might need to search in several enclosing blocks before it's found.
+\sidenote
+{
+\begin{tikzpicture}
+\node[draw,line width=1,text width=4cm, minimum height=6cm] (sbox) at (0,-2){};
+\node[yshift=-0.5cm, draw, line width=1, text width=3.5cm, minimum height=4.5cm] (sbox1) at (sbox.center){};
+\node[yshift=-0.5cm,draw, line width=1, text width=3cm, minimum height=3cm] (sbox2) at (sbox1.center){};
+\node[draw, line width=1, text width=2.5cm, minimum height=2cm] (sbox3) at (sbox2.center){};
+\node[draw, line width=1, text width=2cm, minimum height=1.5cm] (sbox4) at (sbox3.center){};
+\node[xshift=0.5cm,yshift=-0.5cm] (sarrend) at (sbox.north){};
+\node[xshift=0.5cm,yshift=-1cm] (sarrstart) at (sbox.center){};
+\draw[line width=0.3, red, ultra thick, dashed, ->] (sarrstart) to (sarrend);
+\node[xshift=1cm,yshift=1.5cm,align=center] (stxt) at (sbox.north){\normalsize{C++ keeps searching}\\ \normalsize{for i from the current}\\ \normalsize{block of memory to the}\\ \normalsize{next enclosing block}\\ \normalsize{until its found.}};
+\node[xshift=-1.5cm,yshift=0.3cm,align=center] (stxti) at (sbox.north){\normalsize\textbf{i is here}};
+\node[xshift=-1.5cm,yshift=-1cm] (sarrendi) at (sbox.north){};
+\draw[line width=0.3, ultra thick, ->] (stxti.south) to (sarrendi);
+\node[xshift=-5mm] (scons) at (stxti){};
+\end{tikzpicture}
+}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int main()
+{    
+     int i = 5;
+     while (i > 0)
+     {    
+          int j = 6;
+
+          for (int k = 0; k < j; ++k)
+          {   
+               |\begin{tikzpicture}\node[draw=red, thick, inner sep=2pt](csearchnode){std::cout << i;};\end{tikzpicture}|
+          }
+          --i;
+     }
+}
+\end{consolethree}
+\DrawArrow[dashed,red,ultra thick, -]{csearchnode}{scons}
+\newpage
+\input{exercises/2-16-scope/main.tex}In this case when the variable \texttt{a} in the inner if-statement is created, we say that the innermost \texttt{a} \EMPHASIZE{hides} the outer \texttt{a}.
+
+\input{exercises/3-16-scope/main.tex}
+\input{exercises/4-16-scope/main.tex}

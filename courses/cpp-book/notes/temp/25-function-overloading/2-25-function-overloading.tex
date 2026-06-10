@@ -1,0 +1,161 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Function Overloading}
+
+This is from the previous section:
+
+\begin{consolethree}[escapeinside=||]
+int max(int, int);
+double max2(double, double);
+
+int main()
+{
+    std::cout << max(3, 42) << ' '
+              << max2(3.14, 2.718) << std::endl;
+    return 0;
+}
+
+int max(int x, int y)
+{
+    if (x < y) return y;
+    else return x;
+}
+
+double max2(double x, double y)
+{
+    if (x < y) return y;
+    else return x;
+}
+\end{consolethree}
+
+Make this change:
+
+\begin{consolethree}[escapeinside=||]
+int max(int, int);
+double max(double, double);
+
+int main()
+{
+    std::cout << max(3, 42) << ' '
+              << max(3.14, 2.718) << std::endl;
+    return 0;
+}
+
+int max(int x, int y)
+{
+    if (x < y) return y;
+    else return x;
+}
+
+double max(double x, double y)
+{
+    if (x < y) return y;
+    else return x;
+}
+\end{consolethree}
+
+Run it.
+
+\EMPHASIZE{:O}
+
+How come C++ is not confused by two functions with the \textbf{\textit{same name}}?
+
+The reason is because C++ recognizes functions by their \EMPHASIZE{names \textit{\underline{and}} the types of the parameters}. Here are the prototypes of the above function:
+
+\begin{consolethree}[escapeinside=||]
+int max(int, int);
+double max(double, double);
+\end{consolethree}
+
+You can think of it this way: the integer \texttt{max()} function is identified by \texttt{(max, int, int)} and the double \texttt{max()} function is identified by \texttt{(max, double, double)}.
+
+You see what happens is that the actual function name of \texttt{max(int, int)} might be \texttt{max\_int\_int()} and the name of \texttt{max(double, double) }might be \texttt{max\_double\_double()}. I say ``might'' because it depends on the compiler. For instance another compiler might use \texttt{max\_\_\_\_int\_\_\_\_int()} instead of \texttt{max\_int\_int()}.
+
+This change of function name is called name mangling.
+
+The types of the parameters is called the \EMPHASIZE{signature} of the function. So the signature of
+
+\begin{consolethree}[escapeinside=||]
+int max(int, int);
+\end{consolethree}
+
+is \texttt{(int, int)}.
+
+The important thing to remember that a function is identified by its \EMPHASIZE{name} \textit{and} \EMPHASIZE{signature}.
+
+Of course now that a function is determined by its name and signature, this tells you that you cannot have two different functions with the same name and signature. Therefore this is BAD:
+
+\begin{consolethree}[escapeinside=||]
+void bad(int x, double y, char z)
+{
+    std::cout << "first bad ..." << '\n';
+    ...
+}
+
+int bad(int x, double y, char z)
+{
+    std::cout << "second bad ..." << '\n';
+    ...
+}
+\end{consolethree}
+
+Yes, yes, yes \ldots{} the return type is different \ldots{} but C++ only looks at the name and the signature when choosing a function to execute.
+
+So we revise the way C++ searches for identifiers (i.e. names):
+
+\begin{itemize}
+\item The search for variables is still the same
+\item The search for functions when they are called is different.
+  \begin{quote}
+  If the function name can be found and the types of the arguments
+  passed in matches the function signature (the type of the parameters),
+  then that function is used.
+  \end{quote}
+  \begin{quote}
+  Otherwise, C++ will try to typecast the arguments to values that will
+  match a signature.
+  \end{quote}
+\end{itemize}
+
+Here's one more example. Run it.
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void f(int, int, int);
+void f(double, double, double);
+
+int main()
+{
+    f(1, 2, 3);
+    f(1.1, 2.2, 3.3);
+    return 0;
+}
+
+void f(int x, int y, int z)
+{
+    std::cout << "f(int, int, int)" << std::endl;
+}
+
+void f(double x, double y, double z)
+{
+    std::cout << "f(double, double, double)"
+              << std::endl;
+}
+\end{consolethree}
+
+When you have several functions with the same name (but different signatures!), we say that the function is \EMPHASIZE{overloaded}.
+
+\input{exercises/0-25-function-overloading/main.tex}
+\input{exercises/1-25-function-overloading/main.tex}
+\input{exercises/2-25-function-overloading/main.tex}
+Remember earlier in the semester when I said that there are two + operators. Example:
+
+\verb!1 + 2! integer addition operator
+
+\verb!1.2 + 3.4! double addition operator
+
+At that point I told you to remember this important distinction. This is very similar to function overloading, except that these are operators and not functions. We say that + is an \EMPHASIZE{overloaded operator}. In CISS245 you will learn to define your own operators so for instance you can define your own operators including +.
+
+

@@ -1,0 +1,71 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{The dangling else problem}
+
+Here's a trick question (and it's another reason why C/C++/Java programmers use { } even when the block has only one statement). So ...
+\begin{center}
+\EMPHASIZE{PAY ATTENTION}
+\end{center}
+First figure out the output (without a compiler) when x has a value of
+0.
+
+\begin{console}
+if (x < 0)
+   if (x == -2) std::cout << "1" << std::endl;
+else
+   std::cout << "2" << std::endl; 
+\end{console}
+Now run the program.
+
+Mamamia ... ?!?
+
+This is called the \lq\lq dangling else'' problem.
+
+What actually happens is that an \texttt{else} always follows the closest
+\texttt{if}. This means that the above code is better indented this way:
+\begin{console}
+if (x < 0)
+   if (x == -2) std::cout << "1" << std::endl;
+   else
+       std::cout << "2" << std::endl; 
+\end{console}
+
+Of course the C++ compiler doesn't care about
+whitespaces. However this version of indentation makes it easier for
+human beings to follow the logic.
+
+Now if what I intended was actually something like the previous version,
+then I would have to do this:
+\begin{console}
+if (x < 0)
+{
+   if (x == -2) std::cout << "1" << std::endl;
+}
+else
+    std::cout << "2" << std::endl; 
+\end{console}
+In this case, the closest if-part that the else-part can attach to is
+the if-part on the first line since the else-part cannot \lq\lq go inside''
+the block.
+
+This is the reason why it's a good practice to ALWAYS
+use blocks even when the if-part or the else-part has only one line to
+execute. It prevents the misleading dangling else problem. So if I write
+this:
+\begin{console}
+if (x < 0)
+{
+   if (x == -2)
+   {
+       std::cout << "1" << std::endl;
+   }
+}
+else
+{
+     std::cout << "2" << std::endl;
+}
+\end{console}
+
+there will be no confusion.
+

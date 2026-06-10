@@ -1,0 +1,176 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Date class version 3 (the real deal)}
+
+Now do this:
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+#ifndef DATE_H
+#define DATE_H
+
+|\EMPHASIZE{class}| Date
+{
+public:
+    void init(int, int, int);
+    void print();
+    void add_y(int);
+    void add_m(int);
+    void add_d(int);
+    // etc.
+
+|\EMPHASIZE{private:}|
+    int yyyy_, mm_, dd_;
+};
+
+#endif
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+#include <iostream>
+#include "Date.h"
+
+void Date::init(int yyyy, int mm, int dd)
+{
+    yyyy_ = yyyy;
+    mm_ = mm;
+    dd_ = dd;
+}
+
+void Date::print()
+{
+    std::cout << yyyy_ << '/'
+              << mm_ << '/'
+              << dd_ << '\n';
+}
+
+void Date::add_y(int inc)
+{
+    yyyy_ += inc ;
+}
+
+// etc.
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// main.cpp
+#include <iostream>
+#include "Date.h"
+
+int main()
+{
+    Date today, yesterday;
+    
+    today.init(2014, 12, 25);
+    today.print();
+    
+    yesterday.init(2014, 12, 24);
+    yesterday.print();
+    
+    return 0;
+}
+\end{consolethree}
+
+Note that there's no change in \texttt{main.cpp}.
+
+The \texttt{struct} is now called a \EMPHASIZE{class}.
+
+Note the \texttt{public} and \texttt{private} sections in the \texttt{Date}
+class. Try the following code:
+
+\begin{consolethree}[escapeinside=||]
+// main.cpp
+#include "Date.h"
+
+int main()
+{
+    Date today, yesterday;
+    
+    today.init(2014, 12, 25);
+    |\EMPHASIZE{today.dd_ = 1;}|
+    ...
+    return 0;
+}
+\end{consolethree}
+
+Read the error message from your C++ compiler. Get it?
+
+Basically: Anything under \texttt{public} is accessible outside the
+\texttt{Date} class. Anything under \texttt{private} is not. (We'll see
+exceptions later). Inside the \texttt{Date} class, everything is freely
+available. For instance, since \texttt{Date::init()} is part of the
+\texttt{Date} class, of course the function body of \texttt{Date::init()}
+can access \texttt{yyyy\_}. But \texttt{main()} is \EMPHASIZE{outside} the
+\texttt{Date} class. So \texttt{main()} \EMPHASIZE{cannot} touch
+\texttt{today.yyyy\_} directly.
+
+The practice of putting \texttt{yyyy\_}, \texttt{mm\_}, \texttt{dd\_} under
+the private section to disallow access from outside the class is called
+data or information hiding. This is a form of encapsulation.
+
+You can also put member functions into the private section as well. And
+you can have as many private and public sections as you wish.
+
+\input{exercises/9-60-classes-and-objects/main.tex}
+Now for some very important techno jargon ...
+
+The above \texttt{Date} is a \EMPHASIZE{class}. You can think of a class as a rubber stamp for creating a certain kind of values. A value created from a class includes values such as member variables. But it also contains member functions. Such a value is called an \EMPHASIZE{object}.
+
+Sometimes we will call the name of the object as object as well. For instance when I do this:
+
+\texttt{Date today;}
+
+You can think of \texttt{today} as the name of a chunk of memory in your computer's RAM. I will usually call \texttt{today} an object. However (depending on who you talk to), sometimes, \texttt{today} is called an \EMPHASIZE{instance} of the \texttt{Date} class. Make sure you think about the difference between the name \texttt{today} and the chunk of memory in your RAM that \texttt{today} refers to. I will however use object and instance interchangeably.
+
+In C++, the variables inside the class are called \EMPHASIZE{member variables}. For instance \texttt{yyyy\_} is a member variable of \texttt{today}. I will also say that \texttt{yyyy\_} is a member variable of \texttt{Date}. Outside of C++, when you talk about object-oriented programming in general, the general term is \EMPHASIZE{instance variable}. So when you talk to someone using an object-oriented language such as Python or Java, do not use the term member variable -- use instance variable. That's the safest thing to do. In other words, instance variable is a general OOP concept while member variable is a C++ term.
+
+In C++, objects also have functions -- we call them \EMPHASIZE{member functions}. In general OOP, you would call them \EMPHASIZE{methods}.
+
+So, in general, an object contains instance variables and methods. Get it?
+
+The point of a class is to (1) bundle data and methods together into
+objects and also to (2) provide some access control mechanism so that
+outsiders of the class cannot access certain parts of the class (or
+certain parts of the objects). The act of doing (1) and (2) is called
+\EMPHASIZE{encapsulation}.
+
+The above is a class. It's split into the header file and the cpp file. The
+header file specifies the interface of the class, i.e., the function
+prototypes in the public section(s) tell the outside world what an object
+can do and what they need to do anything. The cpp file implements the
+behavior promised in the header file. As long as the resulting object
+fulfills the promises made by the interface in the header file, nobody
+using your code cares how you implement the interface.
+
+\EMPHASIZE{Information hiding} refers to hiding the internal representation
+of the objects from outsiders of the class.
+
+Source code that uses a class is called a \EMPHASIZE{client} of the
+class. For instance, our \texttt{main.cpp} is a client of the
+\texttt{Date} class.
+
+By default, every member of a \texttt{class} in C++ is \texttt{private}.
+
+In C++, a \texttt{struct} is just a \texttt{class} where every member
+(member variable or member function) is \texttt{public}, i.e.,
+
+\begin{consolethree}[escapeinside=||]
+|\EMPHASIZE{struct X}|
+{
+    ...
+};
+\end{consolethree}
+
+is just
+
+\begin{consolethree}[escapeinside=||]
+|\EMPHASIZE{class X}|
+{
+public:
+    ...
+};
+\end{consolethree}
+
+

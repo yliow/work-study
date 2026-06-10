@@ -1,0 +1,81 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Review: Automatic variables and automatic reclaim of memory}
+
+Constructors let you initialize objects when they are created. Objects
+also need to ``die'' just like ``regular'' variables, i.e., automatic
+variables. When I say a variable ``dies'', I mean that the name of the
+variable goes out of scope. When a variable goes out of scope, the
+memory used by the variable in the local scope is reclaimed
+automatically. (Remember that the memory used in the free store is not
+reclaimed automatically -- the memory in the free store was requested
+manually by a memory allocation command using \texttt{new} and you have to
+reclaim it yourself using \texttt{delete} or \texttt{delete[]}.)
+
+Here are some examples and scenarios ... MAKE SURE YOU STUDY THEM
+CAREFULLY!!!
+
+\begin{consolethree}[escapeinside=||]
+if (x > 0)
+{
+    int i; // i created
+    ...
+} // i goes out of scope at the end of the
+  // if-block and i's memory is reclaimed
+  // automatically.
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+for (int i = 0; i < 10; i++)
+{
+    int x[100]; // x created
+} // x goes out of scope after the body of
+  // the for-loop. x is destroyed and memory
+  // for x (100 integers) is reclaimed and
+  // execution returns to the update section
+  // of the for-loop
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+void f()
+{
+    int i; // i created
+    return; // i goes out of scope and i's memory
+            // is reclaimed automatically.
+}
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+void g()
+{
+    double * i; // i created
+    i = new double[100]; // 100 doubles allocated
+                         // in the heap (and i's
+                         // value is to set to the
+                         // address of the first
+                         // double of this array of
+                         // doubles)
+    return; // i goes out of scope and i's memory is
+            // reclaimed automatically. However the
+            // 100 doubles allocated from the heap is
+            // not deallocated ... MEMORY LEAK!
+}
+
+int main()
+{
+    g();
+    g();
+    g();
+    g();
+    return 0;
+}
+\end{consolethree}
+
+All the above is OLD STUFF. If you don't remember, you
+have to comb through the old notes and look for information on scopes on
+variables.
+
+Now ...
+
+

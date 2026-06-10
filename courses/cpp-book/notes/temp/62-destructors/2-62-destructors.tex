@@ -1,0 +1,79 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Automatic objects and automatic reclaim of memory}
+
+What happens when an \EMPHASIZE{object} goes out of scope? Memory of all
+\EMPHASIZE{automatic instance variables} of the object will be reclaimed
+automatically:
+
+\begin{consolethree}[escapeinside=||]
+if (x > 0)
+{
+    Date date = Date(1970, 1, 1);
+    ...
+} // date goes out of scope after the if-block.
+  // date.yyyy, date.mm, date.dd are int variables
+  // which are *automatic* and are therefore
+  // automatically reclaimed. No memory leak.
+...
+\end{consolethree}
+
+Of course in the case where the object is in the free store, you will
+have to delete it manually. So this is BAD:
+
+\begin{consolethree}[escapeinside=||]
+if (x > 0)
+{
+    Date * p = new Date(1970, 1, 1);
+    ...
+} // p goes out of scope after the if-block. p is
+  // automatic since it's in this local scope.
+  // So the memory used for pointer p is
+  // automatically reclaimed. However the object
+  // in the free store that p points to is not
+  // reclaimed!!! MEMORY LEAK!!!
+...
+\end{consolethree}
+
+It should be this instead:
+
+\begin{consolethree}[escapeinside=||]
+if (x > 0)
+{
+    Date * p = new Date(1970, 1, 1);
+    ...
+    delete p; // Deallocate the memory used by p,
+              // i.e., the object that p points to is
+              // reclaimed by the free store. In this
+              // since all instance variables in Date
+              // objects are automatic, their memory
+              // used are automatically reclaimed.
+} // ... and p goes out of scope after the
+  // if-block. p is automatic since it's in this
+  // local score.
+  // So the memory used for pointer p is
+  // automatically reclaimed. No memory leak.
+...
+\end{consolethree}
+
+Likewise this is correct:
+
+\begin{consolethree}[escapeinside=||]
+if (x > 0)
+{
+    Date * p = new Date[1000];
+    ...
+    delete [] p; // Deallocate the memory used by p,
+                 // i.e., the 1000 objects that p
+                 // points to is reclaimed by the
+                 // free store ...
+} // ... and p goes out of scope after the
+  // if-block. p is automatic since it's in this
+  // local score.
+  // So the memory used for pointer p is
+  // automatically reclaimed. No memory leak.
+...
+\end{consolethree}
+
+

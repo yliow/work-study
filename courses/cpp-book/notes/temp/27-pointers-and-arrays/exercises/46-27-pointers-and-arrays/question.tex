@@ -1,0 +1,178 @@
+\tinysidebar{\debug{exercises/{46-27-pointers-and-arrays/question.tex}}}Complete and test this very important function:
+
+
+
+\verb!void resize(int ** start, int * size, int newsize);!
+
+
+
+Initially, \texttt{*start} describes an array of \texttt{size} integers in
+
+the heap. When we return from the above function call, \texttt{*start}
+
+contains the address of an array of \texttt{newsize} integers in the heap
+
+and it contains (as many as possible) the values from the original
+
+array. For instance if you have
+
+
+
+\verb!int * p = NULL, size = 0;!
+
+
+
+after calling
+
+
+
+\verb!resize(&p, &size, 5);!
+
+
+
+\texttt{p} points to an array of 5 integers in the heap and \texttt{size} is
+
+changed to 5. Suppose we continue the above with
+
+
+
+\begin{consolethree}[escapeinside=||]
+
+p[0] = 2;
+
+p[1] = 3;
+
+p[2] = 5;
+
+\end{consolethree}
+
+
+
+Here's the memory model:
+
+\begin{python}
+
+from latextool_basic import *
+
+p = Plot()
+
+p += Rect(0, 0, 5, 2.5, linewidth=0.1)
+
+p += Rect(1.75, 0.25, 2.25, 0.75, linewidth=0.05)
+
+p += Rect(1.25, 0.35, 1.25, 0.35, linewidth=0, label=r'\texttt{x}')
+
+
+
+p += Rect(6, 0, 11, 2.5, linewidth=0.1)
+
+p += Rect(6.05, 2.5, 8, 3, linewidth=0, label='Free Store')
+
+startx = 6.25
+
+labelz = None
+
+for i in range(5):
+
+    match (i):
+
+          case 0:
+
+               labelz = str(2)
+
+          case 1:
+
+               labelz = str(3)
+
+          case 2:
+
+               labelz = str(5)
+
+          case _:
+
+               labelz= ''
+
+    p += Rect(startx, 1.5, startx + 0.5, 2, linewidth=0.05, label=labelz)
+
+    startx += 0.5
+
+p += Line(points=[(1.95, 0.5), (6.24, 1.75)], linewidth=0.075, endstyle='>')
+
+print(p)
+
+\end{python}
+
+Next if we call
+
+
+
+\verb!resize(&p, &size, 7);!
+
+
+
+\texttt{p} points to an array of 7 integers in the heap and \texttt{size} is
+
+changed to 7. Furthermore the first three values of the new array
+
+\texttt{p} points to are 2, 3, and 5. The memory model at this point looks
+
+like this:
+
+
+
+\begin{python}
+
+from latextool_basic import *
+
+p = Plot()
+
+p += Rect(0, 0, 5, 2.5, linewidth=0.1)
+
+p += Rect(1.75, 0.25, 2.25, 0.75, linewidth=0.05)
+
+p += Rect(1.25, 0.35, 1.25, 0.35, linewidth=0, label=r'\texttt{x}')
+
+
+
+p += Rect(6.05, 2.5, 8, 3, linewidth=0, label='Free Store')
+
+p += Rect(6, 0, 11, 2.5, linewidth=0.1)
+
+startx = 6.85
+
+labelz = None
+
+for i in range(7):
+
+    match (i):
+
+          case 0:
+
+               labelz = str(2)
+
+          case 1:
+
+               labelz = str(3)
+
+          case 2:
+
+               labelz = str(5)
+
+          case _:
+
+               labelz= ''
+
+    p += Rect(startx, 0.25, startx + 0.5, 0.75, linewidth=0.05, label=labelz)
+
+    startx += 0.5
+
+p += Line(points=[(1.95, 0.5), (6.84, 0.5)], linewidth=0.075, endstyle='>')
+
+print(p)
+
+\end{python}
+
+
+
+(Note: \texttt{newsize} can be smaller than \texttt{size}.)
+

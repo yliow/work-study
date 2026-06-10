@@ -1,0 +1,181 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{operator()}
+
+Suppose you have class \textit{C} and \textit{c} is an object of class
+\textit{C}. C++ translates \textit{c(a)} like this:
+
+\textit{c(a)} is the same as \textit{c.operator()(a)}
+
+\textbf{The point:} makes object look like a function
+
+\begin{consolethree}[escapeinside=||]
+class Square
+{
+public:
+    int operator()(int x)
+    {
+        return x * x;
+    }
+};
+
+int main()
+{
+    Square square;
+    std::cout << square(5);
+    return 0;
+}
+\end{consolethree}
+
+Why not just use functions? Make object remember previous
+computation(s).
+
+\begin{consolethree}[escapeinside=||]
+class Square
+{
+public:
+    Square()
+        : last_square_(-1)
+    {}
+    int operator()(int x)
+    {
+        if (last_square_ != -1 && x == last_x_)
+        {
+            return last_square_;
+        }
+        else
+        {
+            last_x_ = x;
+            last_square_ = x * x;
+            return last_square_;
+        }
+    }
+private:
+    int last_x_, last_square_;
+};
+\end{consolethree}
+
+This is helpful if you frequently compute the last square and the
+computation of \textit{x * x} costs more than the computation of the
+boolean values in the code.
+
+You can also remember not just the history of one computation, but use
+an array.
+
+Some computations are so intensive that some form of ``history'' of
+computations is absolutely necessary.
+
+Here's the Fibonacci sequence:
+
+0, 1, 1, 2, 3, 5, 8, 13, 21, ...
+
+You start off with 0, 1. Subsequent terms are the sum of the previous
+two. Here's a simple Fibonacci function:
+
+\begin{consolethree}[escapeinside=||]
+int fib(int n)
+{
+    if (n == 0)
+        return 0;
+    else if (n == 1)
+        return 1;
+    else
+        return fib(n-1) + fib(n-2);
+}
+\end{consolethree}
+
+Try to execute \textit{fib} for high values of \textit{n}:
+
+\begin{consolethree}[escapeinside=||]
+for (int n = 0; n < 100; n++)
+{
+    Std::cout << n << ',' << fib(n) << '\n';
+}
+\end{consolethree}
+
+Why is it so slow? \textit{fib(90)} calls \textit{fib(89)} and
+\textit{fib(88)} and adds their return values. \textit{fib(89)} calls
+\textit{fib(88)} and \textit{fib(87)} and adds their return values. Etc.
+There are many re-computations!!!
+
+Let's remedy this by making a class:
+
+\begin{consolethree}[escapeinside=||]
+class Fibonacci
+{
+public:
+    Fibonacci()
+    {
+        lookup_[0] = 0;
+        lookup_[1] = 1;
+        for (int i = 2; i < 100; i++)
+        {
+            lookup_[i] = -1;
+        }
+    }
+private:
+    int lookup_[100];
+}
+\end{consolethree}
+
+In \textit{lookup\_}, if \textit{lookup\_[i]} is \textit{-1}, it means
+that the \textit{i}th value of Fibonacci has not been stored in
+\textit{lookup\_[i]} yet.
+
+Now add \textit{operator()}:
+
+\begin{consolethree}[escapeinside=||]
+int Fibonacci::operator(int n)
+{
+    if (n < 100) // within lookup_'s range
+    {
+        // not stored in lookup_ yet
+        if (lookup_[n] == -1)
+            lookup_[n] = (*this)(n - 1) + (*this)(n - 2);
+        return lookup_[n];
+    }
+    else // outside lookup_'s range
+    {
+        return (*this)(n - 1) + (*this)(n - 2);
+    }
+}
+\end{consolethree}
+
+Now test this version of the Fibonacci computation:
+
+\begin{consolethree}[escapeinside=||]
+Fibonacci fib;
+for (int n = 0; n < 100; n++)
+{
+    std::cout << n << ',' << fib(n) << '\n';
+}
+\end{consolethree}
+
+Another reason to use objects that look like function: the computation
+involves two (or more) values but one of them does not change. Store
+that unchanging value in the object.
+
+\begin{consolethree}[escapeinside=||]
+class AddBy
+{
+public:
+    AddBy(int x) : x_(x) {}
+    int operator()(int y) { return x_ + y; }
+private:
+    int x_;
+};
+\end{consolethree}
+
+Test it with:
+
+\begin{consolethree}[escapeinside=||]
+AddBy f(5);
+std::cout << f(3) << ',' << f(11) << '\n';
+AddBy g(10);
+std::cout << g(3) << ',' << g(11) << '\n';
+\end{consolethree}
+
+You can also provide methods to modify the \textit{x\_} in the class.
+
+

@@ -1,0 +1,301 @@
+\begin{python0}
+from solutions import *; clear()
+\end{python0}
+\sectionthree{Function Prototypes}
+
+\input{exercises/0-21-function-prototypes/main.tex}
+Now try this:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+|\tikzmarknode{proto}{void f(int);} \xsidebox[0cm]{0cm}{}{protobox}{Function prototype for \texttt{f()}}|
+
+int main()
+{
+    f(1);
+    return 0;
+}
+
+void f(int x)
+{
+    std::cout << x << std::endl;
+    return;
+}
+\end{consolethree}
+\DrawArrow{protobox}{proto}
+A \EMPHASIZE{function prototype} basically tells C++ that the function does exist. The information contained in a function prototype includes:
+
+\begin{itemize}
+\item \EMPHASIZE{name} of the function
+\item the \EMPHASIZE{return type} and
+\item the \EMPHASIZE{types of the parameters}.
+\end{itemize}
+
+The function prototype is the minimal amount of information needed to get your C++ compiler to work with your C++ file.
+
+Why?
+
+Well C++ needs to compile \texttt{main()} to work which means from the side of \texttt{main()}, the \texttt{main()} function needs to know what to push onto the stack to communication with \texttt{f()} and also what value (if any) is expected from the return of calling \texttt{f()}. As far as \texttt{main()} is concerned, all \texttt{main()} needs is the ``communication infrastructure'' of \texttt{f()}. \texttt{main()} doesn't need to know how \texttt{f()} carries out its duty. We'll come back to this again later.
+
+The format of a function prototype is exactly the same as the header of a function except for the following:
+
+\begin{itemize}
+\item a function prototype must end with a semicolon
+\item the parameter names can be left out. (You can retain them if you wish).
+\end{itemize}
+
+Here's another example. First the program without prototype:
+
+\begin{consolethree}[escapeinside=||]
+int sum(int start, int end, int step)
+{
+    int sum = 0;
+    if (step > 0)
+    {
+        for (int i = start; i <= end; i += step)
+        {
+            sum += i;
+        }
+    }
+    else if (step < 0)
+    {
+        for (int i = start; i >= end; i += step)
+        {
+            sum += i;
+        }
+    }
+    return sum;
+}
+
+int main()
+{
+    std::cout << sum(1, 10, 1) << std::endl;
+    std::cout << sum(2, 10, 4) << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+And now the program with prototype:
+
+\begin{consolethree}[escapeinside=||]
+|\textbf{int sum(int, int, int);}|
+
+int main()
+{
+    std::cout << sum(1, 10, 1) << std::endl;
+    return 0;
+}
+
+int sum(int start, int end, int step)
+{
+    int sum = 0;
+    if (step > 0)
+    {
+        for (int i = start; i <= end; i += step)
+        {
+            sum += i;
+        }
+    }
+    else if (step < 0)
+    {
+        for (int i = start; i >= end; i += step)
+        {
+            sum += i;
+        }
+    }
+    return sum;
+}
+\end{consolethree}
+
+\input{exercises/1-21-function-prototypes/main.tex}
+\input{exercises/2-21-function-prototypes/main.tex}
+\input{exercises/3-21-function-prototypes/main.tex}
+Now you might ask: ``Why bother? Why not just put the function
+\texttt{f()} before \texttt{main()}?''
+
+There are two reasons.
+
+First read this program and figure out what the program is trying to do:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void f(int x)
+{
+    std::cout << "in f() ..." << std::endl;
+    if (x > 0) g(x - 1);
+    return;
+}
+
+void g(int x)
+{
+    std::cout << "in g() ..." << std::endl;
+    if (x > 0) f(x - 1);
+    return;
+}
+
+int main()
+{
+    f(5);
+    return 0;
+}
+\end{consolethree}
+
+Next tell me why it won't work. You have 5 seconds ...
+
+And finally, tell me why moving functions around won't help!!! The point is
+that \texttt{f()} and \texttt{g()} calls each other!!!
+
+Now try this ...
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+void g(int);
+
+void f(int x)
+{
+    std::cout << "in f() ... x = " << x << std::endl;
+    if (x > 0) g(x - 1);
+    return;
+}
+
+void g(int x)
+{
+    std::cout << "in g() ... x = " << x << std::endl;
+    if (x > 0) f(x - 1);
+    return;
+}
+
+int main()
+{
+    f(5);
+    return 0;
+}
+\end{consolethree}
+
+Do you see now that for this scenario, you \textbf{must} have a function
+prototype to make this program work?
+
+For the above situation, we say that \texttt{f()} and \texttt{g()} are \EMPHASIZE{mutually recursive}. A function say \texttt{h()} can also call itself; we say that \texttt{h()} is \textbf{recursive}. I don't want to spend any more time on recursion since there will be a set of notes for that later. The point here is to show you that there are cases where you have to untangle function dependencies using function prototypes.
+
+Before I go on to the second reason, you should know that the standard ``layout'' of a C/C++ program looks like this:
+
+\begin{consolethree}[escapeinside=||]
+... documentation (comments) ...
+
+... #includes ...
+
+... global constants ...
+
+... function prototypes ...
+
+int main()
+{
+    ...
+}
+
+... function definitions ...
+\end{consolethree}
+
+(There are other parts but we haven't talked about them yet.)
+
+So our above program can be professionally (ahem ...) written like this:
+
+\begin{consolethree}[escapeinside=||]
+// This program demonstrates the use of prototypes
+// with two mutually recursive functions.
+
+#include <iostream>
+
+void g(int);
+void f(int);
+
+int main()
+{
+    f(5);
+    return 0;
+}
+
+void f(int x)
+{
+    std::cout << "in f() ... x = " << x << std::endl;
+    if (x > 0) g(x - 1);
+    return;
+}
+
+void g(int x)
+{
+    std::cout << "in g() ... x = " << x << std::endl;
+    if (x > 0) f(x - 1);
+    return;
+}
+\end{consolethree}
+
+(Actually moving the function bodies below \texttt{main()} is not that crucial).
+
+Once again in C/C++, a function, say \texttt{func1()}, can call another,
+say \texttt{func2()}, if \texttt{func1()} knows the ``communication
+structure'' of \texttt{func2()}. \texttt{func1()} does not need the
+definition or body of \texttt{func2()}. And the communication structure is
+made up of the types of the parameters of \texttt{func2()} and the return
+type of \texttt{func2()}. That's why I drew this picture
+for you earlier showing the types of data passed in and the type of
+value returned.
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+func2 = Rect(x0=3, y0=0, x1=6, y1=3, label=r'{\tt func2()}', linewidth=0.05)
+p += func2
+
+p += Rect(x0=0, y0=2.2, x1=2.2, y1=2.8, label=r'{\small param-1 type}', linewidth=0.05)
+p += Rect(x0=0.5, y0=1.3, x1=1.5, y1=1.7, label=r'{\small ...}', linewidth=0)
+p += Rect(x0=0, y0=0.2, x1=2.2, y1=0.8, label=r'{\small param-n type}', linewidth=0.05)
+
+p += Line(points=[(2.2, 2.5), (3, 2.5)], linewidth=0.05, endstyle='>')
+p += Line(points=[(2.2, 0.5), (3, 0.5)], linewidth=0.05, endstyle='>')
+
+p += Rect(x0=7, y0=1.2, x1=9, y1=1.8, label=r'{\small return type}', linewidth=0)
+p += Line(points=[(6, 1.5), (7, 1.5)], linewidth=0.05, endstyle='>')
+
+print(p)
+\end{python}
+
+The function prototype of \texttt{func2()} is sometimes called the
+\textbf{interface} of \texttt{func2()}. Why? Because that is how
+\texttt{func2()} interfaces with the outside world.
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+# func1 box
+p += Rect(x0=0, y0=0, x1=2.5, y1=2, label=r'{\tt func1()}', linewidth=0.05)
+
+# Interface bar (tall thin rectangle)
+p += Rect(x0=4, y0=-0.5, x1=4.5, y1=2.5, label='', linewidth=0.05)
+
+# func2 box
+p += Rect(x0=6, y0=0, x1=8.5, y1=2, label=r'{\tt func2()}', linewidth=0.05)
+
+# Arrows between func1 and interface
+p += Line(points=[(2.5, 1.3), (4, 1.3)], linewidth=0.05, endstyle='>')
+p += Line(points=[(4, 0.7), (2.5, 0.7)], linewidth=0.05, endstyle='>')
+
+# Arrows between interface and func2
+p += Line(points=[(4.5, 1.3), (6, 1.3)], linewidth=0.05, endstyle='>')
+p += Line(points=[(6, 0.7), (4.5, 0.7)], linewidth=0.05, endstyle='>')
+
+# Label
+p += Rect(x0=3.2, y0=-1.5, x1=5.3, y1=-0.8, label=r'{\small interface of}', linewidth=0)
+p += Rect(x0=3.2, y0=-2.1, x1=5.3, y1=-1.5, label=r'{\small \texttt{func2()}}', linewidth=0)
+
+print(p)
+\end{python}
+
+\input{exercises/4-21-function-prototypes/main.tex}
+Now for the second reason ...
+
