@@ -1,53 +1,74 @@
+\sectionthree{static\_cast}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Casting}
 
-Recall that from CISS240, you can typecast an \texttt{int} to a \texttt{double}, a \texttt{double} to an \texttt{int}, a \texttt{char} to an \texttt{int}, an \texttt{int} to a \texttt{char}, etc.:
+The \texttt{\textbf{static\_cast}} is most similar to the basic
+typecasting of types which are very similar or only result in loss of
+precision, i.e., casting such as
 \begin{console}
 int i = 42;
 double d = 3.14;
 char c = 'A';
-int flag = 1;
+bool flag = true;
 
-double j = double(i); // or (double) i
-int e = int(d); // or (int) d
-int f = int(c); // or (int) c
-bool flag2 = bool(flag);
+double j = double(i);        // or (double) i
+int e = int(d);              // or (int) i
+int d = int(c);              // or (int) c
+int flag2 = bool(flag);      // or (int) flag
+
+// ...
+\end{console}
+All the above can be executed using \textbf{\texttt{static\_cast}}:
+
+\begin{console}
+int i = 42;
+double d = 3.14;
+char c = 'A';
+bool flag = true;
+
+double i1 = static_cast< double >(i);
+int d1 = static_cast< int >(d);
+int c1 = static_cast< int >(c);
+bool flag1 = static_cast< bool> (flag);
 
 // ...
 \end{console}
 
-Recall from the notes on pointers, you cannot assign pointer values to a
-pointer variable if the pointer types are not the same:
+In general static cast is allowed when automatic typecasting is allowed.
+For instance
+
 \begin{console}
 int i = 42;
-int * p = &i; // OK
-double * q = &i; // BAD!!!
+double i1 = i;                        // automatic
+double i2 = double(i);                // OK
+double i3 = static_cast< double >(i); // OK
 \end{console}
 
-But in fact you can \ldots if you perform an explicit typecast:
+However this is not allowed:
+
 \begin{console}
 int i = 42;
-int * p = &i; // OK
-double * q = (double *)i; // OK ... but probably a
-                          // bad idea ...
+double * p = &i;
 \end{console}
-In general, it's a good idea to think carefully before you typecast.
 
-The above typecast has been around since C (the parent language of C++
-and also the ancestor language of many programming languages) and these
-are available in C++. C++ has also introduced it's own casting
-mechanisms through four different casting operators:
+Therefore this will not compile:
 
-\begin{itemize}
-\item
-  \verb!static_cast!
-\item
-  \verb!const_cast!
-\item
-  \verb!reinterpret_cast!
-\item
-  \verb!dynamic_cast!
-\end{itemize}
+\begin{console}
+int i = 42;
+double * p = static_cast< double *>(&i); // BAD!!!
+\end{console}
+
+Of course C-style casting allows you to do this:
+
+\begin{console}
+int i = 42;
+double * p = (double *)(&i);
+\end{console}
+
+And this is \EMPHASIZE{the whole point of C++ typecasting}. It's to subdivide C style castings into various kinds of C++ type casting so as to provide finer control and to provide more warnings.
+
+That being said, note that in many areas of C++ programming, as long as you know what you are doing, i.e., you are only typecasting when automatic typecasting is allowed (and not crazy typecasting between pointers of different types), then you'll see that C-style typecasting is still used when writing C++ code.
+
+For instance when you look OpenCV programs (CV = computer vision, OpenCV is a very famous open source CV library written in C/C++), it's very common to see C-style typecasting rather than C++ style typecasting. Also, OpenGL C++ program (for computer graphics) tend to use C-style typecasting.
 

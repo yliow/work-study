@@ -1,39 +1,43 @@
+\sectionthree{Testing}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Functions calling functions}
 
-A function can call another function. For instance here's a \texttt{max3()} that uses \texttt{max2()}:
+Not only is it easier to reuse your code when you broke up your program into functions, it's also easier to test your code.
+
+For instance suppose you have written your function to compute max of three integer values. You can write a function \texttt{test\_max3()} that call \texttt{max3()} with specific values and verifies that the return values are correct:
 
 \begin{consolethree}[escapeinside=||]
-#include <iostream>
-
-int max2(int x, int y)
+void test_max3()
 {
-    if (x >= y)
+    // max of 1, 2, 3 should be 3
+    if (max3(1, 2, 3) != 3)
     {
-        return x;
+        std::cout << "test failed: max3(1,2,3) should return 3\n";
     }
-    else
-    {
-        return y;
-    }
-}
-
-int max3(int x, int y, int z)
-{
-    return max2(max2(x, y), z);
-}
-
-int main()
-{
-    std::cout << max3(3, 5, 2) << '\n';
-    return 0;
+    // repeat for other test cases
 }
 \end{consolethree}
 
-In fact you have been using functions since day one: \verb!main()! is a function. When you run the program (for instance in Visual Studio .NET, you do that with Ctrl-F5), main() is the first function to execute.
+Primes are used a lot in cryptography and computer security. So perhaps you want to make sure your \texttt{isprime()} is absolutely correct:
 
-Without going into details, not only can you get functions to call other functions, \texttt{main()} is called by something called the operating system. The convention is the if program Y executed successfully, the error code returned to the operating system is 0, which explains return 0 for \texttt{main()}.
+\begin{consolethree}[escapeinside=||]
+void test_isprime()
+{
+    if (isprime(2) != true)
+    {
+        std::cout << "test failed: isprime(2) should be true\n";
+    }
+    if (isprime(3) != true)
+    {
+        std::cout << "test failed: isprime(3) should be true\n";
+    }
+    if (isprime(4) != false)
+    {
+        std::cout << "test failed: isprime(4) should be false\n";
+    }
+    // ... more test cases
+}
+\end{consolethree}
 
 

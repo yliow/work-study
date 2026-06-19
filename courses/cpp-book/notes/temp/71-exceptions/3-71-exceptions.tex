@@ -1,49 +1,66 @@
+\sectionthree{Program 4. Writing your own exception}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Program 3. Rethrowing an exception}
 
-
-This is helpful when the error handling involves several functions
-within the function call stack.
 \begin{console}[commandchars=\~\@\$]
 #include <iostream>
 #include <exception>
+~EMPHASIZE@class MyException$
+~EMPHASIZE@{$     
+      ~EMPHASIZE@// dummy class$
+~EMPHASIZE@};$
+
+
+
 void f()
 {    
-     std::cout << "f ... 1\n";
-     throw exception();
-     std::cout << "f ... 2\n";
+     throw MyException();
 }
 
-void g()
-{    
-     try
-     {    
-          std::cout << "g ... 1\n";
-          f();
-          std::cout << "g ... 2\n";
-     }
-     catch (exception & e)
-     {     
-          std::cout << "g ... caught\n";
-          ~EMPHASIZE@throw;$
-     }
-}
 int main()
 {   
     try
     {    
-         std::cout << "main ... 1\n";
-         g();
-         std::cout << "main ... 2\n";
+         f();
     }
-    catch (exception & e)
+    catch (MyException e)
     {
-         std::cout << "main ... caught \n";
-    }    
-    std::cout << "end\n";
+         std::cout << "caught a MyException object\n";
+    }
 }
 return 0;
 \end{console}
+
+Here's an example on handling division by zero.
+\begin{console}[commandchars=\~\@\$]
+#include <iostream>
+#include <exception>
+
+
+~EMPHASIZE@class ZeroDivisionError$
+~EMPHASIZE@{};$
+
+
+int f(int x, int y, int z)
+{   
+    if (y == 0) throw ZeroDivisionError();
+    return x / y + z;
+}
+
+int main()
+{   
+    try
+    {   
+        f(1, 0, 2);
+    }
+    catch (ZeroDivisionError & e)
+    {     
+        std::cout << "You cannot divide by zero!\n";
+    }
+    return 0;
+}
+\end{console}
+
+\input{exercises/0-71-exceptions/main.tex}
 

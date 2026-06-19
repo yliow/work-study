@@ -1,54 +1,71 @@
+\sectionthree{Inline Methods}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Review: Inline Functions}
 
-Review the notes on inline functions. The following is only a quick
-recap.
+The information in this section applies to inlining of methods and not
+just constructors.
 
-Recall that an inline function is like a rubber stamp for a function:
+Class methods (i.e., member functions) can also be inlined.
 
-\begin{consolethree}[escapeinside=||]
-#include <iostream>
+To inline a class method, you can either:
 
-inline int max(int x, int y)
-{
-    return (x < y ? y : x);
-}
+\begin{enumerate}
+\item Put the whole method inside the class definition.
+\item Put the method definition in the header file prepended with
+  \texttt{inline}.
+\end{enumerate}
 
-int main()
-{
-    std::cout << max(2, 3) << '\n';
-
-    return 0;
-}
-\end{consolethree}
-
-This means that there is really no \texttt{max()} function. Rather, at the
-place where the inline function is called, C++ substitutes the code for
-\texttt{max()} so that the program compiled is:
+\textbf{First way:}
 
 \begin{consolethree}[escapeinside=||]
-#include <iostream>
+// Date.h
 
-int main()
+class Date
 {
-    std::cout << (2 < 3 ? 3 : 2) << '\n';
+public:
+    |\textbf{Date(int yyyy, int mm, int dd)}|
+        |\textbf{: yyyy\_(yyyy), mm\_(mm), dd\_(dd)}|
+    |\textbf{\{\}}|
 
-    return 0;
-}
+    ...
+};
 \end{consolethree}
 
-Inline functions can speed up program execution since the act of making
-a function call takes time.
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
 
-The compiler can choose to ignore making a function an inline function
-so that it becomes a real function. This can happen if the function is
-too long.
+// Date::Date(int, int, int) moved to Date.h
 
-For multi-file compilation, the \texttt{whole} inline function must be in
-the header file. You cannot have an inline prototype in the header file
-and the definition of the body of the function in the implementation
-file.
+...
+\end{consolethree}
 
+\textbf{Second way:}
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
+
+class Date
+{
+public:
+    |\textbf{Date(int yyyy, int mm, int dd);}|
+    ...
+};
+
+|\textbf{inline Date::Date(int yyyy, int mm, int dd)}|
+    |\textbf{: yyyy\_(yyyy), mm\_(mm), dd\_(dd)}|
+|\textbf{\{\}}|
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+
+// Date::Date(int, int, int) moved to Date.h
+
+...
+\end{consolethree}
+
+\input{exercises/4-61-constructors/main.tex}
+\input{exercises/5-61-constructors/main.tex}
+\input{exercises/6-61-constructors/main.tex}
 

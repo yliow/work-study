@@ -1,14 +1,32 @@
+\sectionthree{``When should I inline a function?''}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Why inline functions?}
 
-Why do we have inline functions?
+Now you might say: ``In that case, let's inline every function! That will make my program super fast!''
 
-Like I said it's faster (see caveat later). Why?
+Well ...
 
-Because there is some CPU cost in just making a function call. Look at the notes on Functions. Recall that to make a function call, the CPU must set up a stack which contains at least information on how to go back to the caller function. That takes time. It's the same when a function call returns. In other words, just \EMPHASIZE{the act of calling the function and returning from a function call} (i.e. not including the computation done in the body of function called) \textbf{takes time}. In fact it's even possible that the cost of making a function call and returning from the call takes more time than the actual computation in the body of the function!!!
+Yes, you can inline any function.
 
-Inline functions calls do \textbf{\textit{not}} involve function calls at all because the inline function's body has already been copied to the place where you make the function call.
+The problem is that the your program might become larger than what it should be.
+
+Good choices for functions to be changed to inline functions are those which are very small, especially those which are used frequently. Function bodies with only one or two lines of code are good candidates.
+
+Now for some caveats \ldots{}
+
+\begin{itemize}
+\item If the compiler feels that the function body is too huge, it might
+  actually ignore your request to inline a function. So an inline
+  function is only a \textbf{\textit{request}} to the compiler to inline
+  the function.
+\item Some C++ compilers actually honor inline requests unless told it to do
+  otherwise.
+\item If too many functions are inlined, the executable binary code can be
+  huge, which of course means that you need more memory to run the code
+  which means that you might be slowing it down!!! If the executable
+  binary code is too huge it might cause memory thrashing where memory
+  pages constantly gets swapped in and out of your computer memory.
+\end{itemize}
 
 

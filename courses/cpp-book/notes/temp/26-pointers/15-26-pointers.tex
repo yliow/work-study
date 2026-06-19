@@ -1,141 +1,90 @@
+\sectionthree{Chaining}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Protecting function from accidentally changing data}
 
-Before we go on to the next use of pointers, let's look at the previous section on functions that accept pointers and/or references.
-
-Recall that if you have a function that accepts variables which are ``big'',
+Look at this (this is old stuff \ldots no biggy):
 
 \begin{consolethree}[escapeinside=||]
-int f(long long int x, long double y)
+void inc(int * p)
 {
-    return (x > y ? 0 : 1);
+    *|\textbf{p = *p + 1; // OR: ++(*p)}|
 }
 
 int main()
 {
-    long long int x = 42;
-    long double y = 3.14;
-    int x = f(x, y);
-
+    int x = 0;
+    inc(&x); inc(&x); inc(&x);
+    std::cout << x << std::endl;
     return 0;
 }
 \end{consolethree}
-Then the act of making a function call is faster if you pass in pointers (or references) because the data to be passed in is not copied, only the addresses of the data are passed in:
+Now look at this version:
 
 \begin{consolethree}[escapeinside=||]
-int f(long long int & px, long double & py)
-{
-    return (*px > *py ? 0 : 1);
 
+|\textbf{int *}| inc(int * p)
+{
+    *p = *p + 1;
+    |\textbf{return p;}|
 }
 
 int main()
 {
-    long long int x = 42;
-    long double y = 3.14;
-    f(&x, &y);
-
+    int x = 0;
+    inc(inc(inc(&x)));
+    std::cout << x << std::endl;
     return 0;
 }
 \end{consolethree}
-Note that the larger the data, the more crucial it is to use pointers or references.
+Study the above code very carefully!!! (Chaining will be used a lot later when woirking with classes and objects.)
 
-If \texttt{f()} is meant to change the \texttt{x} and y back in \texttt{main()}, then of course you must pass in pointers or references.
+When a function accepts a pointer value and returns the same pointer value, that function allows chaining, i.e., calling the function multiple times using the same pointer value.
 
-However if \texttt{f()} is not meant to change \texttt{x} and \texttt{y} back in \texttt{main()}, then passing pointers (or references) into \texttt{f()} can be dangerous since f() can potentially change the \texttt{x} and \texttt{y} in \texttt{main()}. To overcome this, you pass in pointer-to-constants (or constant reference):
-
-\begin{consolethree}[escapeinside=||]
-int f(const long long int * px,
-      const long double * py)
-{
-    return (*px > *py ? 0 : 1);
-}
-\end{consolethree}
-or
+Study this version too (this one does not use references -- the idea is the same):
 
 \begin{consolethree}[escapeinside=||]
-void f(const long long int & x,
-       const long double & y)
-{
-    return (x > y ? 0 : 1);
-}
-\end{consolethree}
 
-In general do the following for a function call \texttt{f(..., x, ...)} (say from\texttt{ main()}) where \texttt{x} has type \texttt{T}:
-
-\begin{consolethree}[escapeinside=||]
-void f(..., T x, ...)
+int * const inc(int * const p)
 {
-    ... x ...
+    *p = *p + 1;
+    return p;
 }
 
 int main()
 {
-    T x;
-    f(..., x, ...);
+    int x = 0;
+    inc(inc(inc(&x)));
+    std::cout << x << std::endl;
+    return 0;
 }
 \end{consolethree}
-Do the following:
-
-\textbf{CASE 1.} If \texttt{f()} needs to change the \texttt{x} in \texttt{main()}, then parameter \texttt{x} needs to be a reference \textbf{(pass-by-reference)}:
+(i.e., the pointer can be constant.) Study this one that uses references::
 
 \begin{consolethree}[escapeinside=||]
-void f(..., T & x, ...)
+int & inc(int & r)
 {
-    ... x ...
+    r = r + 1;
+    return r;
 }
 
 int main()
 {
-    T x;
-    f(..., x, ...);
+    int x = 0;
+    inc(inc(inc(x)));
+    std::cout << x << std::endl;
+    return 0;
 }
 \end{consolethree}
-or parameter \texttt{x} should be changed to a pointer
+
+\input{exercises/60-26-pointers/main.tex}
+\input{exercises/61-26-pointers/main.tex}
+To increments the first three values of the array x, we can do this:
 
 \begin{consolethree}[escapeinside=||]
-void f(..., T * x, ...)
-{
-    ... *x ...
-}
+int index = 0;
 
-int main()
-{
-    T x;
-    f(..., &x, ...);
-}
+int x[] = {3, 5, 7, 9, 2);
+
+inc(inc(inc(&index, x), x), x); 
 \end{consolethree}
-\textbf{CASE 2A.} If \texttt{f()} does not need to change the \texttt{x} in \texttt{main()}, and \texttt{x} in \texttt{main()} does not use much memory, NO CHANGE IN ABOVE.
-
-\textbf{CASE 2B.} If \texttt{f()} does not need to change the \texttt{x} in \texttt{main()}, and \texttt{x} in \texttt{main()} uses a lot of memory, then parameter \texttt{x} need to be a pointer to a constant:
-
-\begin{consolethree}[escapeinside=||]
-void f(..., const T * const x, ...)
-{
-    ... *x ...
-}
-
-int main()
-{
-    T x;
-    f(..., &x, ...);
-}
-\end{consolethree}
-Or you can use a constant reference:
-\textbf{(pass-by-constant-reference)}
-
-\begin{consolethree}[escapeinside=||]
-void f(..., const T & x, ...)
-{
-    ... x ...
-}
-
-int main()
-{
-    T x;
-    f(..., x, ...);
-}
-\end{consolethree}
-

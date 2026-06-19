@@ -1,32 +1,43 @@
+\sectionthree{Differences between pointers and references}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\input{exercises/56-26-pointers/main.tex}\input{exercises/57-26-pointers/main.tex}\input{exercises/58-26-pointers/main.tex}\sectionthree{Connection between pointers and references}
 
-The previous section shows you that the behavior of pass-by-references can be achieved by pass-by-value where the value passed into a function is a pointer value (i.e., address value).
+The above might lead you to think that pointers and references are the same (except for syntax). There are actually lots of differences between pointers and references. With your understanding of pointers, let's take a closer look \ldots
 
-As I've mentioned before when you use pass-by-reference, your compiler actually converts your function to one using pointers.
-
-To illustrate the connection further run this program:
+1. There's a pointer value, \texttt{NULL}, that can be assigned to all pointers. This frequently acts as a default pointer value. Recall that \texttt{NULL} does not point to anything useful. References (of any type) MUST refer to a value of a variable (or constant) of the same type -- there's no such thing as \texttt{NULL} reference. So a function that accepts a pointer has the option of being called with ``nothing'':
 
 \begin{consolethree}[escapeinside=||]
-int x = 42;
-int & r = x;    // r is a reference to x
-int * p = &x;   // p is a pointer to x
-
-std::cout << x << ' ' << r << ' ' << *p << '\n';
-
-std::cout << &x << ' ' << &r << ' ' << p << '\n';
+void print_cash(int * p_cash_in_cents = NULL)
+{
+    if (p_cash_in_cents == NULL)
+    {
+        std::cout << "no cash!!!\n"
+    }
+    else
+    {
+        int dollar = *p_cash_in_cents / 100.0;
+        int cents = *p_cash_in_cents - dollar * 100.0;
+        std::cout << '$' << dollar
+                  << '.' << cents << '\n';
+    }
+}
 \end{consolethree}
-You will see that if \texttt{r} is a reference to \texttt{x}, the address of \texttt{r}, i.e. \texttt{\&r}, is the same as \texttt{\&x}. This means that the value \texttt{r} refers to resides at the address of \texttt{x}, i.e., the output of the second line contains the same address.
+2. A pointer can be a constant pointer or non-constant pointer:
 
-Let me repeat: The address of a reference variable is the address of the value the reference is referring to. Therefore if \texttt{r} reference x and \texttt{p} points to \texttt{x}, then
 
-\texttt{\&r} and \texttt{p }are the same
+For a non-constant pointer, the address value in the pointer can change so that it can point to another value.
 
-and
+\begin{consolethree}[escapeinside=||]
+p = &x; *p++; // increments x
+p = &y; *p++; // increments y
+p = &z; *p++; // increments z
+\end{consolethree}
 
-\texttt{r} and \texttt{*p }are the same.
-
-Think, understand, and remember!
+\begin{consolethree}[escapeinside=||]
+int x = 0, y = 0, z = 0;
+int & r = x; r++;           // increments x
+r = y; r++;                 // increments y ... NO!!!
+\end{consolethree}
+The fact that a pointer can point to different values is actually extremely important later when it comes to pointers and arrays.
 

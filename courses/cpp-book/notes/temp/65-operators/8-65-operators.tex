@@ -1,20 +1,81 @@
+\sectionthree{Operators <op> and <op>=}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Hiding pre-defined operators}
 
-Here are the pre-defined class operators:
+Defining \textit{+} does not give you \textit{+=} automatically.
 
-\textit{= \& ,}
-
-If you do not want these pre-defined operators to be callable, just
-declare them as private. You need \textbf{not} define them:
+Here's some advice: define + in terms of \textit{+=},
+\textit{-} in terms of \textit{-=}, etc. For instance:
 
 \begin{consolethree}[escapeinside=||]
-class C
+class Int
 {
+public:
+    ...
+    Int & operator+=(const Int & c)
+    {
+        x_ += c.x_;
+        return (*this);
+    }
+    Int operator+(Int c) const
+    {
+        return (Int(*this) += c);
+    }
+    ...
 private:
-    C & operator=(const C &);
+    int x_;
+};
+\end{consolethree}
+
+A \textbf{nonmember function} is just a function not in a class (i.e.,
+not a method). If the function works with objects from a particular
+class, then the function is included with the class. You should
+
+\begin{enumerate}
+\item Put the function prototype in the header file (\textit{*.h})
+\item Define the function in the implementation file (\textit{*.cpp})
+\item Note that the function prototype is outside the class declaration
+\end{enumerate}
+
+Since the function prototype is out the class, it does \textbf{not} have
+access to the private members of the class. You can overwrite this for
+efficiency (later). Note that here \textit{+=} is more efficient than \textit{+}, same
+for integer \textit{+} and \textit{+=}. Also note that we want to do
+
+\textit{(a += b) += b;}
+
+\textit{c = (a += b); // i.e., a+=b; c=a;}
+
+That's why \textit{operator+=} returns a reference to
+\textit{*this}.
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    ...
+    |{\bf Int \&}| operator+=(const C & c)
+    {
+        x += c.x;
+        |{\bf return (*this);}|
+    }
+    ...
+};
+\end{consolethree}
+
+And \textit{operator+} can be written like this:
+
+\begin{consolethree}[escapeinside=||]
+class Int
+{
+public:
+    ...
+    Int operator+(const Int c) const
+    {
+        |{\bf return (Int(*this) += c);}|
+    }
+    ...
 };
 \end{consolethree}
 

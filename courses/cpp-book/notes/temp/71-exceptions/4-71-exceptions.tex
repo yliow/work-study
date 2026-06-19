@@ -1,66 +1,44 @@
+\sectionthree{Program 5. Exception objects with members}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Program 4. Writing your own exception}
 
-\begin{console}[commandchars=\~\@\$]
+Of course you can put anything in your exception object.
+Here's an example where our own handcrafted exception
+class, \texttt{MyException}, contains an integer error code.
+
+\begin{console}
 #include <iostream>
 #include <exception>
-~EMPHASIZE@class MyException$
-~EMPHASIZE@{$     
-      ~EMPHASIZE@// dummy class$
-~EMPHASIZE@};$
 
-
+class MyException
+{
+public:
+        MyException(int err_code0)
+        : err_code(err_code0)
+        {}
+        
+        int err_code;
+};
 
 void f()
 {    
-     throw MyException();
-}
-
-int main()
-{   
-    try
-    {    
-         f();
-    }
-    catch (MyException e)
-    {
-         std::cout << "caught a MyException object\n";
-    }
-}
-return 0;
-\end{console}
-
-Here's an example on handling division by zero.
-\begin{console}[commandchars=\~\@\$]
-#include <iostream>
-#include <exception>
-
-
-~EMPHASIZE@class ZeroDivisionError$
-~EMPHASIZE@{};$
-
-
-int f(int x, int y, int z)
-{   
-    if (y == 0) throw ZeroDivisionError();
-    return x / y + z;
+     throw MyException(5);
 }
 
 int main()
 {   
     try
     {   
-        f(1, 0, 2);
+        f();
     }
-    catch (ZeroDivisionError & e)
+    catch (MyException & e)
     {     
-        std::cout << "You cannot divide by zero!\n";
+          std::cout << "caught a MyException object. "
+                    << "Error code:" << e.err_code
+                    << "\n";
     }
     return 0;
 }
 \end{console}
-
-\input{exercises/0-71-exceptions/main.tex}
 

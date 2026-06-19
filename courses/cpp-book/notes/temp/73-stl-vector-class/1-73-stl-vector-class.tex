@@ -1,34 +1,121 @@
+\sectionthree{Member Functions/Methods}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{STL}
 
-STL = Standard Template Library .
+\begin{console}
+assign()        // Erases a vector and copies the
+                // specified elements to the empty
+                // vector.
 
-STL is a collection of C++ class templates that come with most
+at()            // Returns a reference to the element at
+                // a specified location in the vector.
 
-C++ compilers . STL provides many useful classes. We will only scratch
-the surface. More information on STL will appear in CISS350, CISS358,
-CISS362, etc.
+back()          // Returns a reference to the last
+                // element of the vector.
 
-Vector class template
+capacity()      // Returns the number of elements
+                // that the vector could contain
+                // without allocating more storage.
 
-Recall you have an \texttt{IntDynArr} class for modeling dynamic arrays.
-There is a similar class called \texttt{vector}. To use it, you must include the \texttt{vector} header (i.e. \verb!#include< vector>!). The vector class is in the namespace \texttt{std}. So
-\begin{center}
-\verb!std::vector< int > v;!
-\end{center}
-will declare object \texttt{v} so that \texttt{x} models a dynamic array of
-integer values. In this case the size of \texttt{v} is 0 -- it has no
-values. You can also do this:
-\begin{center}
-\texttt{ std::vector< int > v(10);}
-\end{center}
-In this case the size of \texttt{v} is 10. You can also do
-\begin{center}
-\texttt{std::vector< int > v(10, 42);}
-\end{center}
-in which case \texttt{v} is size 10 and all the values in \texttt{v} are set
-to 42.
+clear()         // Erases all elements of the vector.
 
-\input{exercises/0-73-stl-vector-class/main.tex}
+empty()         // Tests if the vector container is
+                // empty.
+
+erase()         // Removes an element or a range
+                // of elements in a vector from
+                // specified positions.
+
+front()         // Returns a reference to the first
+                // element in a vector.
+
+insert()        // Inserts an element or a number of
+                // elements into the vector at a
+                // specified position.
+
+max_size()      // Returns the maximum possible
+                // length of the vector.
+
+pop_back()      // Deletes the element at the end of the
+                // vector.
+
+push_back()     // Add an element to the end of the
+                // vector.
+
+resize()        // Specifies a new size for a vector.
+
+reserve()       // Reserves a minimum length of storage
+                // for a vector object.
+
+size()          // Returns the number of elements in the
+                // vector.
+
+swap()          // Exchanges the elements of two vectors.
+
+vector()        // Constructor. Constructs a vector of a
+                // specific size or with elements of
+                // specific value.
+
+operator[]      // Returns a reference to the vector
+                // element at a specified position.
+\end{console}
+
+Operators \texttt{==}, \texttt{!=}, \texttt{=} do the obvious things.
+
+Now for a quick experiment on some of the methods. Run the following
+program and study the output carefully.
+
+\begin{console}
+#include <iostream>
+#include <vector>
+
+std::ostream & operator<<(std::ostream & cout,
+               const std::vector< int > & v)
+{     
+      std::string sep = "";
+      cout << '{';
+      for (int i = 0; i < v.size() - 1; ++i)
+      {   
+          cout << sep << v[i];
+          if (i == 0) sep = ", ";
+      }
+      cout << '}';
+      return cout;
+}
+
+int main()
+{   
+    int s = 3;
+    std::vector< int > v(s);
+    
+    v[0] = 1; v[1] = 10; v[2] = 100;
+
+    std::cout << "v: " << v << "\n";
+    v[0] = 42;
+    std::cout << "v: " << v << "\n";
+
+    std::vector< int > u(v);
+    std::cout << "u: " << u << "\n";
+
+    if (u == v)
+    {  
+       std::cout << "same\n";
+    }
+
+    v.resize(10);
+    std::cout << "v: " << v << "\n";
+
+    std::vector< int > w(4);
+    std::cout << "w: " << w << "\n";
+
+    w = u;
+    std::cout << "w: " << w << "\n";
+
+    return 0;
+}
+\end{console}
+
+Study the output carefully. Try all the methods on your own -- most of
+them are very similar to the methods in the \texttt{IntDynArr} class.
+

@@ -1,12 +1,64 @@
+\sectionthree{Automatic resolution}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Header Files}
 
-Here's a very common gotcha. (I see this all the time.)
+Sometimes you don't have to tell C++ which ``version''
+of the function to use. Here's a previous exercise:
 
-When you organize your template functions, you should remember to
-include the \EMPHASIZE{body of the function template in the header file} not a cpp file. That's because function templates are inline functions.
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
 
-\input{exercises/10-40-function-templates/main.tex}
+template < typename T >
+void println(T x)
+{
+    std::cout << x << std::endl;
+}
+
+int main()
+{
+    println< int >(1);
+    println< double >(3.14);
+    println< char >('c');
+    return 0;
+}
+\end{consolethree}
+
+Modify and run this instead:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+template < typename T >
+void println(T x)
+{
+    std::cout << x << std::endl;
+}
+
+int main()
+{
+    println(1);
+    println(3.14);
+    println('c');
+    return 0;
+}
+\end{consolethree}
+
+You see, when you call
+
+\verb!println(1);!
+
+this matches the version with
+
+\begin{consolethree}[escapeinside=||]
+template <>
+void println(int x)
+{
+    std::cout << x << std::endl;
+}
+\end{consolethree}
+
+and deduce that the T is int.
+
+\input{exercises/11-40-function-templates/main.tex}
 

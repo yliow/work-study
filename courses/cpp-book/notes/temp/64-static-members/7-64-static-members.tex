@@ -1,46 +1,133 @@
+\sectionthree{Application: Debug printing flag for a class}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Application: Special global objects}
 
-In class \texttt{vec2d}, suppose you \textbf{frequently} use a
-\texttt{vec2d} object with x value of 0 and y value of 0. Because of its
-values, let's call this concept (or object) the origin.
+Sometimes when you first write a class, you might need to print low
+level information on the objects created from that class. You can switch
+between usual printing and low level debug printing for this class by
+keeping a boolean flag in the class.
 
-You can create \texttt{origin} as a public static \texttt{vec2d} object in
-\texttt{vec2d} class. This allows you do this in \texttt{main()}:
+Here's out IntDynArr class for handling dynamic array of
+integer values:
 
 \begin{consolethree}[escapeinside=||]
+// IntDynArr.h
+#ifndef INTDYNARRAY_H
+#define INTDYNARRAY_H
+
+class IntDynArr
+{
+public:
+    ...
+    void print() const;
+private:
+    int * x_;
+    int size_;
+    int capacity_;
+};
+
+#endif
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// IntDynArr.cpp
 #include <iostream>
-#include "vec2d.h"
+
+void IntDynArray::print() const
+{
+    std::cout << '[';
+    for (int i = 0; i < size_ - 1; ++i)
+    {
+        std::cout << x_[i] << ", ";
+    }
+    if (size_ - 1 >= 0)
+    {
+        std::cout << x_[size_ - 1];
+    }
+    std::cout << ']';
+}
+\end{consolethree}
+
+If \texttt{arr} is an object of the above class and the array
+\texttt{arr.x\_} points to has values 2, 4, 6 (the size is 3), then
+\texttt{arr.print()} will print
+
+\begin{consolethree}[escapeinside=||]
+[2, 4, 6]
+\end{consolethree}
+
+While you're writing (and debugging!) the class, you
+might want to print \texttt{arr.size\_} and \texttt{arr.capacity\_} You
+might want to do this:
+
+\begin{consolethree}[escapeinside=||]
+// IntDynArr.h
+#ifndef INTDYNARRAY_H
+#define INTDYNARRAY_H
+
+class IntDynArr
+{
+public:
+    ...
+    void print() const;
+    |{\bf static void set\_debug(bool);}|
+private:
+    |{\bf static bool debug;}|
+    int * x_;
+    int size_;
+    int capacity_;
+};
+
+#endif
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// IntDynArr.cpp
+#include <iostream>
+
+bool IntDynArry::debug(false);
+
+void IntDynArray::print() const
+{
+    std::cout << '[';
+    for (int i = 0; i < size_ - 1; ++i)
+    {
+        std::cout << x_[i] << ", ";
+    }
+    if (size_ - 1 >= 0)
+    {
+        std::cout << x_[size_ - 1];
+    }
+    std::cout << ']';
+    |{\bf if (debug)}|
+    {
+        std::cout << size_ << ' '
+                  << capacity_;
+    }
+}
+\end{consolethree}
+
+Or you can even print all the value \texttt{arr.x\_[0]}, ...,
+\texttt{arr.x\_[arr.capacity\_]} when \texttt{IntDynArry::debug} is
+\texttt{true}.
+
+Your \texttt{main()} can then turn on/off debug printing:
+
+\begin{consolethree}[escapeinside=||]
+...
 
 int main()
 {
-    std::cout << vec2d::origin << '\n';
-
+    IntDynArray::set_debug(true); // turn on debug
+                                  // printing
+    IntDynArr arr;
+    arr.print();
+    IntDynArr::set_debug(false); // turn off debug
+                                 // printing
+    arr.print();
     return 0;
 }
 \end{consolethree}
 
-which has the same effect as
-
-\begin{consolethree}[escapeinside=||]
-#include <iostream>
-#include "vec2d.h"
-
-int main()
-{
-    std::cout << vec2d(0, 0) << '\n';
-
-    return 0;
-}
-\end{consolethree}
-
-except that the first method is faster since the second method has to
-create \texttt{vec2d(0,0)} during runtime and if you need
-\texttt{vec2d(0,0)} again and again and again and again it might be slower
-(especially if the class in question has a lot more member variables and
-consumes a lot more memory.)
-
-\input{exercises/12-64-static-members/main.tex}
 

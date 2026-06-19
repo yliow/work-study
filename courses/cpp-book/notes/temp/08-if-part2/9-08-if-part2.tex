@@ -1,65 +1,113 @@
+\sectionthree{Nested \texttt{if}-\texttt{else}}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Boolean expressions again}
 
-We started with boolean expressions such as
+Now the plot thickens. Since we can put any statement inside an \texttt{if} or an \texttt{else}, and \texttt{if} and \texttt{if}-\texttt{else} are themselves statements, that means that we can nest if and if-else statements.
 
-\[x > 0\]
+That's mind-boggling. Let's have an example.
 
-and went on to expressions such as
+Run this with input 1. Run it again with input 2. Repeat that with 3.
+Finally try it with -1.
+\begin{console}
+int numHeads = 0;
+std::cout << "How many heads do you have? " << std::endl;
+std::cout << numHeads;
 
-\[x > y\]
-
-and then to
-
-\[x * x + y * y != 0\]
-
-and finally to
-
-\[\texttt{a * a + b * b  c * c + d * d}\]
-
-i.e.
-\begin{center}
-\EMPHASIZE{\texttt{[expr1] [boolop] [expr2]}}
-\end{center}
-where \texttt{[expr1]} and \texttt{[expr2]} are boolean expressions
-and \texttt{[boolop]} is a binary boolean operator accepting two
-numeric values. Let's recall a few more binary operators.
-
-First of all let's not forget that we also have the unary ! operator. The following prints x if \textbf{it is not true that x is 0}.
-\begin{console}[commandchars=\~\@\$]
-int x = 0;
-std::cin >> x;
-if (~textbf@!(x == 0)$)
-   std::cout << x << std::endl; 
+if (numHeads == 1)
+{
+    std::cout << "Let me introduce you to our surgeons."
+              << std::endl;
+}
+else
+{
+    if (numHeads == 2)
+    {
+        std::cout << "Are you Zaphod?" << std::endl;
+    }
+    else
+    {
+        std::cout << "Hmm ... neither 1 nor 2 ..."
+                  << std::endl;
+    }
+}
 \end{console}
 
-\input{exercises/9-08-if-part2/main.tex}\input{exercises/10-08-if-part2/main.tex}
-But note you should not simplify expressions (boolean or numeric) if by
-doing so it makes your program harder to read. Furthermore, modern-day
-compilers are actually smart enough to simplify it for you
-automatically!
+\input{exercises/14-08-if-part2/main.tex}Here's another example. Run this with inputs 1, 2, 3,
+-1.
 
-Of course we also have the boolean operators \texttt{\&\&} and
-\texttt{\textbar\textbar}. So we can have the following boolean
-expression:
-\begin{center}
-$(x < y)$   \&\&  $(y < z)$
-\end{center}
-Note that \texttt{(x < y)} and \texttt{(y < z)} are
-boolean expressions. So in general we can have
-\begin{center}
-\EMPHASIZE{\texttt{[boolexpr1] [boolop] [boolexpr2]}}
-\end{center}
-where \texttt{[boolexpr1]} and \texttt{[boolexpr2]} are boolean
-expressions and \texttt{[boolop]} is either \&\& or \textbar\textbar.
+\begin{console}[commandchars=\~\@\$]
+int numHeads = 0;
+std::cout << "How many heads do you have? ");
+std::cin >> numHeads;
+~textbf@if (numHeads < 1)$
+~textbf@{$
+   ~textbf@std::cout << "Huh?" << std::endl;$
+~textbf@}$
+~textbf@else$
+~textbf@{$
+   if (numHeads == 1)
+   {
+      std::cout << "Let me introduce you to our "
+                << "surgeons." << std::endl;
+   }
+   else
+   {
+        if (numHeads == 2)
+        {
+            std::cout << "Are you Zaphod?");
+        }
+        else
+        {
+            std::cout << "You have way too many."
+                      << std::endl;
+        }
+   }
+~textbf@}$
+\end{console}
 
-This should be a DIY review:
 
-\input{exercises/11-08-if-part2/main.tex}
-\input{exercises/12-08-if-part2/main.tex}You should check with your previous notes.
+\input{exercises/15-08-if-part2/main.tex}By the way look at this program:
+\begin{console}
+if (score < 100)
+{
+    std::cout << "lousy gamer" << std::endl;
+}
+else
+{
+    if (100 <= score && score < 200)
+    {
+        std::cout << "not bad" << std::endl;
+    }
+    else
+    {
+        if (200 <= score)
+        {
+            std::cout << "great!" << std::endl;
+        }
+     }
+}
+\end{console}
+Do you see why the above is the same as:
+\begin{console}[commandchars=\~\@\$]
+if (score < 100)
+{
+    std::cout << "lousy gamer" << std::endl;
+}
+else
+{
+    ~textbf@if (score < 200)$
+    {
+        std::cout << "not bad" << std::endl;
+    }
+    else
+    {
+        if (200 <= score)
+        {
+            std::cout << "great!" << std::endl;
+        }
+     }
+}
+\end{console}
 
-\input{exercises/13-08-if-part2/main.tex}You should create some test cases by hand and then test your code
-against your test cases.
-
+\input{exercises/16-08-if-part2/main.tex}\input{exercises/17-08-if-part2/main.tex}

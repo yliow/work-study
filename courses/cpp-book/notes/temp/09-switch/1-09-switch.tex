@@ -1,184 +1,106 @@
+\sectionthree{\texttt{switch}}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Diagram of flow of execution of \emph{if} statements}
 
-Here' s the big picture for if.
+Now I' ll show you something that' s very
+similar to the if and if-else statement. Watch out! There are
+\EMPHASIZE{subtle differences} ....
 
-Before the if statement, the code in main executes one statement at a
-time. For example:
-\begin{console}[commandchars=\~\@\$]
-~textbf@int x = 1;$
-~textbf@int y = 2;$
-~textbf@int z = x * y + 3;$
-\end{console}
-\begin{python}
-from latextool_basic import *
-p = Plot()
-D = '''
-   int x = 1;
-
-
-int y = 2;
-
-
-int z = x * y + 3;
-'''.strip()
-p += Rect(-0.15, -0.5, 2.1, 0.2, linewidth = 0.1, linecolor='red')
-p += Rect(-0.15, -1.7, 2.1, -1.1, linewidth = 0.1, linecolor='red')
-p += Rect(-0.15, -2.95, 3.7, -2.2, linewidth = 0.1, linecolor='red')
-p += Line(points = [(-0.9, 0.5), (-0.9, -0.3)], linewidth=0.1, linecolor='red')
-p += Line(points = [(-0.9, -0.3), (-0.15, -0.3)], linewidth=0.1, linecolor='red', endstyle='>')
-p += Line(points = [(2.1, -0.3), (4.7, -0.3)], linewidth=0.1, linecolor='red')
-p += Line(points = [(4.7, -0.3),(4.7, -0.8)], linewidth=0.1, linecolor='red')
-p += Line(points = [(4.7, -0.8), (-0.9, -0.8)], linewidth=0.1, linecolor='red')
-p += Line(points = [(-0.9, -0.8), (-0.9, -1.4)], linewidth=0.1, linecolor='red')
-p += Line(points = [(-0.9, -1.4), (-0.15, -1.4)], linewidth=0.1, linecolor='red', endstyle='>')
-p += Line(points = [(2.1, -1.4), (4.7, -1.4)], linewidth=0.1, linecolor='red')
-p += Line(points = [(4.7, -1.4), (4.7, -2)], linewidth=0.1, linecolor='red')
-p += Line(points = [(4.7, -2), (-0.9, -2)], linewidth=0.1, linecolor='red')
-p += Line(points = [(-0.9, -2), (-0.9, -2.6)], linewidth=0.1, linecolor='red')
-p += Line(points = [(-0.9, -2.6), (-0.15, -2.6)], linewidth=0.1, linecolor='red')
-p += Line(points = [(3.7, -2.6),(4.7, -2.6)], linewidth=0.1, linecolor='red')
-p += Line(points = [(4.7, -2.6), (4.7, -3.5)], linewidth=0.1, linecolor='red', endstyle='>')
-code(p, D, x=0, y=0, innersep=0.8)
-print(p)
-\end{python}
-Now with the if statement we have:
-\begin{console}[commandchars=\~\@\$]
-~textbf@int x = 1;$
-~textbf@int y = 2;$
-~textbf@if (x + y < 10)$
-   ~textbf@y = 0;$
-~textbf@x = 3;$
-\end{console}
-\begin{python}
-from latextool_basic import *
-p = Plot()
-D = '''
-int x = 1;
-
-
-int y = 2;
-
-
-if (x + y < 10)
-
-   true
-
-        y = 0;
-
-   false
-
-
-
-x = 3;
-'''.strip()
-p += Rect(-0.2, -0.5, 5, 0.2, linewidth = 0.1, linecolor='red')
-p += Rect(-0.2, -1.7, 5, -1.1, linewidth = 0.1, linecolor='red')
-p += Rect(-0.2, -5.76, 5, -2.2, linewidth = 0.1, linecolor='red')
-p += Rect(1.4, -4.5, 2.9, -3.9, linewidth = 0.1, linecolor='red')
-p += Rect(-0.2, -6.9, 5, -6.3, linewidth = 0.1, linecolor='red')
-
-p += Line(points = [(-0.9, 0.5), (-0.9, -0.3)], linewidth=0.1, linecolor='red')
-p += Line(points = [(-0.9, -0.3), (-0.2, -0.3)], linewidth = 0.1, linecolor='red')
-p += Line(points = [(5, -0.3), (6, -0.3)], linewidth = 0.1, linecolor='red') 
-p += Line(points = [(6, -0.3), (6, -0.8)], linewidth = 0.1, linecolor='red')
-p += Line(points = [(6, -0.8), (-0.9, -0.8)], linewidth = 0.1, linecolor='red')
-p += Line(points = [(-0.9, -0.8), (-0.9, -1.4)], linewidth = 0.1, linecolor='red')
-p += Line(points = [(-0.9, -1.4), (-0.2, -1.4)], linewidth = 0.1, linecolor='red', endstyle='>')
-p += Line(points = [(5, -1.4), (6, -1.4)], linewidth = 0.1, linecolor='red')
-p += Line(points = [(6, -1.4), (6, -2)], linewidth = 0.1, linecolor='red')
-p += Line(points = [(6, -2), (-0.9, -2)], linewidth = 0.1, linecolor='red')
-p += Line(points = [(-0.9, -2), (-0.9, -2.6)], linewidth = 0.1, linecolor='red')
-p += Line(points = [(-0.9, -2.6), (-0.2, -2.6)], linewidth = 0.1, linecolor='red', endstyle='>')
-p += Line(points = [(0.5, -2.9), (0.5, -5.3)], linewidth = 0.1, linecolor='red')
-p += Line(points = [(0.5, -5.3), (5, -5.3)], linewidth = 0.1, linecolor='red', endstyle='>')
-p += Line(points = [(0.5, -4.3), (1.4, -4.3)], linewidth = 0.1, linecolor='red', endstyle='>')
-p += Line(points = [(2.9, -4.3), (5, -4.3)], linewidth = 0.1, linecolor='red', endstyle='>')
-p += Line(points = [(5, -5), (6, -5)], linewidth = 0.1, linecolor='red')
-p += Line(points = [(6, -5), (6, -6)], linewidth = 0.1, linecolor='red')
-p += Line(points = [(6, -6), (-0.9, -6)], linewidth = 0.1, linecolor='red')
-p += Line(points = [(-0.9, -6), (-0.9, -6.6)], linewidth = 0.1, linecolor='red')
-p += Line(points = [(-0.9, -6.6), (-0.2, -6.6)], linewidth = 0.1, linecolor='red', endstyle='>')
-p += Line(points = [(5, -6.6), (6, -6.6)], linewidth = 0.1, linecolor='red')
-p += Line(points = [(6, -6.6), (6, -7.5)], linewidth = 0.1, linecolor='red', endstyle='>')
-
-code(p, D, x=0, y=0, innersep=0.8)
-print(p)
-\end{python}
-Of course it' s just as easy to visualize the flow of
-execution for if-else. If you have:
-\begin{console}[commandchars=\~\@\$]
-~textbf@int x = 1;$
-~textbf@int y = 2;$
-~textbf@int z = 0;$
-~textbf@if (x + y < 10)$
-~textbf@{$
-    ~textbf@y = 0;$
-~textbf@}$
-~textbf@else$
-~textbf@{$
-    ~textbf@y = 1;$
-~textbf@}$
-~textbf@x = 3;$
-\end{console}
-
-then
-\begin{python}
-from latextool_basic import *
-p = Plot()
-D = '''
-int x = 1;
-
-
-int y = 2;
-
-
-if (x + y < 10)
-
-     true
-
-          y = 0;
+OK. First run this:
+\begin{console}
+int x = 0;
+std::cin >> x;
+if (x == 1)
+{
+     std::cout << "yo" << std::endl;
+}
+else if (x == 2)
+{
+     std::cout << "right ..." << std::endl;
+}
+else if (x == 3)
+{
+     std::cout << "oh?" << std::endl;
+}
 else
-     false
+{
+     std::cout << "huh?" << std::endl;
+}
+std::cout << "out of if-else" << std::endl;
+\end{console}
+
+Run this with x = 0, x = 1, x = 2, x = 3, x = 4. No surprises right?
+
+Note that all the conditions uses the == boolean operator and it is used
+to compare integer values.
+
+Modify the above:
+
+\begin{console}[commandchars=\~\@\$]
+int x = 0;
+std::cin >> x;
+~textbf@switch (x)$
+~textbf@{$
+     ~textbf@case 1:$
+        std::cout << "yo" << std::endl;
+        ~textbf@break;$
+
+     ~textbf@case 2:$
+        std::cout << "right ..." << std::endl;
+        ~textbf@break;$
+        
+     ~textbf@case 3:$
+        std::cout << "oh?" << std::endl;
+        ~textbf@break;$
+        
+     ~textbf@default:$
+        std::cout << "huh?" << std::endl;
+~textbf@}$
+std::cout << "out of switch" << std::endl;
+\end{console}
 
 
+Run it again.
 
-x = 3;
-'''.strip()
-p += Rect(-0.2, -0.5, 5, 0.2, linewidth = 0.1, linecolor='red')
-p += Rect(-0.2, -1.7, 5, -1.1, linewidth = 0.1, linecolor='red')
-p += Rect(-0.2, -5.76, 5, -2.2, linewidth = 0.1, linecolor='red')
-p += Rect(1.9, -4.6, 3.4, -3.9, linewidth = 0.1, linecolor='red')
-p += Rect(-0.2, -6.9, 5, -6.3, linewidth = 0.1, linecolor='red')
+The \texttt{switch} statement is like a switchboard, directing the flow of
+execution based on the integer value of a variable. The flow of
+execution is passed to the case whose value matches the value of the
+variable.
 
-p += Line(points = [(-0.9, 0.5), (-0.9, -0.3)], linewidth=0.1, linecolor='red')
-p += Line(points = [(-0.9, -0.3), (-0.2, -0.3)], linewidth = 0.1, linecolor='red')
-p += Line(points = [(5, -0.3), (6, -0.3)], linewidth = 0.1, linecolor='red') 
-p += Line(points = [(6, -0.3), (6, -0.8)], linewidth = 0.1, linecolor='red')
-p += Line(points = [(6, -0.8), (-0.9, -0.8)], linewidth = 0.1, linecolor='red')
-p += Line(points = [(-0.9, -0.8), (-0.9, -1.4)], linewidth = 0.1, linecolor='red')
-p += Line(points = [(-0.9, -1.4), (-0.2, -1.4)], linewidth = 0.1, linecolor='red', endstyle='>')
-p += Line(points = [(5, -1.4), (6, -1.4)], linewidth = 0.1, linecolor='red')
-p += Line(points = [(6, -1.4), (6, -2)], linewidth = 0.1, linecolor='red')
-p += Line(points = [(6, -2), (-0.9, -2)], linewidth = 0.1, linecolor='red')
-p += Line(points = [(-0.9, -2), (-0.9, -2.6)], linewidth = 0.1, linecolor='red')
-p += Line(points = [(-0.9, -2.6), (-0.2, -2.6)], linewidth = 0.1, linecolor='red', endstyle='>')
-p += Line(points = [(0.9, -2.9), (0.9, -5.3)], linewidth = 0.1, linecolor='red')
-p += Line(points = [(0.9, -5.3), (5, -5.3)], linewidth = 0.1, linecolor='red', endstyle='>')
-p += Line(points = [(0.9, -4.3), (1.9, -4.3)], linewidth = 0.1, linecolor='red', endstyle='>')
-p += Line(points = [(3.4, -4.3), (5, -4.3)], linewidth = 0.1, linecolor='red', endstyle='>')
-p += Line(points = [(5, -5), (6, -5)], linewidth = 0.1, linecolor='red')
-p += Line(points = [(6, -5), (6, -6)], linewidth = 0.1, linecolor='red')
-p += Line(points = [(6, -6), (-0.9, -6)], linewidth = 0.1, linecolor='red')
-p += Line(points = [(-0.9, -6), (-0.9, -6.6)], linewidth = 0.1, linecolor='red')
-p += Line(points = [(-0.9, -6.6), (-0.2, -6.6)], linewidth = 0.1, linecolor='red', endstyle='>')
-p += Line(points = [(5, -6.6), (6, -6.6)], linewidth = 0.1, linecolor='red')
-p += Line(points = [(6, -6.6), (6, -7.5)], linewidth = 0.1, linecolor='red', endstyle='>')
+Now modify it again by getting rid of the \texttt{break} statement in case 2:
+\begin{console}
+int x = 0;
+std::cin >> x;
+switch (x)
+{
+     case 1:
+        std::cout << "yo" << std::endl;
+        break;
 
-code(p, D, x=0, y=0, innersep=0.8)
-print(p)
-\end{python}
-Note that the path of execution is determined by the \EMPHASIZE{boolean value} of a boolean expression.
+     case 2:
+        std::cout << "right ..." << std::endl;
+        
+     case 3:
+        std::cout << "oh?" << std::endl;
+        break;
+        
+     default:
+        std::cout << "huh?" << std::endl;
+}
+std::cout << "out of switch" << std::endl;
+\end{console}
+
+
+What does the \texttt{break} statement do? If you do \EMPHASIZE{not} have a
+\texttt{break} statement, execution will actually \EMPHASIZE{go to the statements of the next case without checking the value for that case!!!}
+
+There are \EMPHASIZE{two} ways to get \EMPHASIZE{out} of a \texttt{switch}:
+either through a \texttt{\textbf{break}} statement or when execution has
+reached the \EMPHASIZE{end of the \texttt{switch} block}.
+
+By now, I don' t have to tell you that you can put any
+statement in the switch statement. You can put an if or an if-else into
+the switch. You can put a switch into a switch. You can put a switch
+into an if-else, etc. Isn' t life ever so colorful?
 

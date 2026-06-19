@@ -1,133 +1,81 @@
+\sectionthree{Initialization of static constant integer members (DIY)}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Application: Debug printing flag for a class}
 
-Sometimes when you first write a class, you might need to print low
-level information on the objects created from that class. You can switch
-between usual printing and low level debug printing for this class by
-keeping a boolean flag in the class.
-
-Here's out IntDynArr class for handling dynamic array of
-integer values:
+You can initialize static, \textbf{constant} integer members (int, char,
+etc) in class declaration with constant expression. In other words
+instead of this:
 
 \begin{consolethree}[escapeinside=||]
-// IntDynArr.h
-#ifndef INTDYNARRAY_H
-#define INTDYNARRAY_H
-
-class IntDynArr
+// C.h
+class C
 {
 public:
-    ...
-    void print() const;
-private:
-    int * x_;
-    int size_;
-    int capacity_;
+    static const int c;
 };
-
-#endif
 \end{consolethree}
 
 \begin{consolethree}[escapeinside=||]
-// IntDynArr.cpp
-#include <iostream>
-
-void IntDynArray::print() const
-{
-    std::cout << '[';
-    for (int i = 0; i < size_ - 1; ++i)
-    {
-        std::cout << x_[i] << ", ";
-    }
-    if (size_ - 1 >= 0)
-    {
-        std::cout << x_[size_ - 1];
-    }
-    std::cout << ']';
-}
+// C.cpp
+const int C::c(1);
 \end{consolethree}
 
-If \texttt{arr} is an object of the above class and the array
-\texttt{arr.x\_} points to has values 2, 4, 6 (the size is 3), then
-\texttt{arr.print()} will print
+You can do this:
 
 \begin{consolethree}[escapeinside=||]
-[2, 4, 6]
-\end{consolethree}
-
-While you're writing (and debugging!) the class, you
-might want to print \texttt{arr.size\_} and \texttt{arr.capacity\_} You
-might want to do this:
-
-\begin{consolethree}[escapeinside=||]
-// IntDynArr.h
-#ifndef INTDYNARRAY_H
-#define INTDYNARRAY_H
-
-class IntDynArr
+// C.h
+class C
 {
 public:
-    ...
-    void print() const;
-    |{\bf static void set\_debug(bool);}|
-private:
-    |{\bf static bool debug;}|
-    int * x_;
-    int size_;
-    int capacity_;
+    static const int c |{\bf = 1}|;
 };
-
-#endif
 \end{consolethree}
 
+This ``inline initialization'' is valid only for integer constants
+(which includes character constants):
+
 \begin{consolethree}[escapeinside=||]
-// IntDynArr.cpp
-#include <iostream>
-
-bool IntDynArry::debug(false);
-
-void IntDynArray::print() const
+class C
 {
-    std::cout << '[';
-    for (int i = 0; i < size_ - 1; ++i)
-    {
-        std::cout << x_[i] << ", ";
-    }
-    if (size_ - 1 >= 0)
-    {
-        std::cout << x_[size_ - 1];
-    }
-    std::cout << ']';
-    |{\bf if (debug)}|
-    {
-        std::cout << size_ << ' '
-                  << capacity_;
-    }
-}
+public:
+    static const int c1 = 1;        // OK
+    static const int c2 = f(5.3);   // ERROR
+    static int c3 = 33;             // ERROR
+    const int c4 = 4444;            // ERROR
+    static const double c5 = 5.5;   // ERROR
+};
 \end{consolethree}
 
-Or you can even print all the value \texttt{arr.x\_[0]}, ...,
-\texttt{arr.x\_[arr.capacity\_]} when \texttt{IntDynArry::debug} is
-\texttt{true}.
+(For \texttt{c4}, a later C++ compiler which is C++11 compliant might
+allow you to initialize \texttt{c4} inside the class definition.)
 
-Your \texttt{main()} can then turn on/off debug printing:
+Here's a valid use of static constant integer member:
 
 \begin{consolethree}[escapeinside=||]
-...
+class GameEngine
+{
+public:
+    static const int version = 3;
+    ...
+};
+\end{consolethree}
+
+You can also use \texttt{enum} to create static constant integer members:
+
+\begin{consolethree}[escapeinside=||]
+class C
+{
+public:
+    enum {c1=1, c2=22, c3=333, c4=44, c5=5};
+};
 
 int main()
 {
-    IntDynArray::set_debug(true); // turn on debug
-                                  // printing
-    IntDynArr arr;
-    arr.print();
-    IntDynArr::set_debug(false); // turn off debug
-                                 // printing
-    arr.print();
+    std::cout << C::c1 << std::endl;
     return 0;
 }
 \end{consolethree}
 
+\input{exercises/13-64-static-members/main.tex}
 

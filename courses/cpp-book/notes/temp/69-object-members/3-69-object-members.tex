@@ -1,20 +1,18 @@
+\sectionthree{Member constructor: explicit}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{No constructor found}
 
-Now we'll look at a very common case that you may run
-into: the case when your compiler cannot find a constructor to call. For
-example,
+So what if I don't want to call the default constructor (the constructor that does not have any parameters), but some other constructor?? You can actually specify your constructor call ...
 
-\begin{console}
+\begin{console}[commandchars=\~\@\$]
 class C
 {
 public:
-        C(int a)
-              : x_(a)
+        C(int x)
+            : x_(x)
         {
-              std::cout << "C()\ n";
+            std::cout << "C()\ n";
         }
         
 private:
@@ -23,24 +21,39 @@ private:
 
 class D
 {
+public:
+        D(int x)
+        : ~EMPHASIZE@c_(a)$
+        {}
 private:
         C c_;
 };
+
+int main()
+{   
+    D d = D(0);
+    return 0;
+}
 \end{console}
 
-\textbf{Error:} no appropriate constructor. Why? Examine the above code
-carefully. Notice that the class \texttt{C} contains a constructor that
-takes an \texttt{int} parameter.
+Member \texttt{c\_} calls constructor \texttt{C::C(int)} explicitly.
 
-So what's the problem? Well, if an object of type
-\texttt{D} were created, then it would have to create its member,
-\texttt{c}. However, an \texttt{int} parameter for the constructor is
-necessary to create an object of type \texttt{C} (since \texttt{C} does not
-have a default constructor). The question is, assuming this code
-actually works, where would the \texttt{int} parameter come from? This
-produces an error because there is \EMPHASIZE{no} \texttt{int} parameter
-passed into the constructor.
+Here's another example:
 
-No surprise there. Recall that you must pass in all parameters for any
-function that takes them.
+\begin{console}[commandchars=\~\@\$]
+class ClubMember
+{
+public:
+        ClubMember(int id, const Date & d)
+             : member_id_(id), ~EMPHASIZE@signup_date_(d)$
+        {}
+        
+private:
+        int member_id_;
+        Date signup_date_;
+};
+\end{console}
+
+\verb!signup_date! calls \verb!Date::Date(const Date &)!, i.e., the
+copy constructor explicitly.
 

@@ -1,105 +1,76 @@
+\sectionthree{Mental picture: flow of execution for \texttt{if-else}}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{\texttt{if}-\texttt{else} statements}
 
-Run this twice by entering 42 and then 24 for input:
+The following picture shows you the flow of execution of a simple
+program containing the if-else statement.
 \begin{console}
-int a = 0;
-std::cout << "C++: What's your favorite number?"
-          << std::endl << "User: ";
-std::cin >> a;
+int x = 0;
+std::cin >> x;
 
-if (a == 42)
-   std::cout << "C++: Mine too!" <<std::endl;
-if (a != 42)
-   std::cout << "C++: boo!" << std::endl;
-\end{console}
-
-You want to either do one thing or another based on whether a boolean
-condition is true or false (respectively). The above does work ...
-\textit{but} it is the \EMPHASIZE{WRONG} way of doing it.
-
-Now change the above to this:
-\begin{console}[commandchars=\~\@\$]
-int a = 0;
-std::cout << "C++: What's your favorite number?"
-          << std::endl << "User: ";
-std::cin >> a;
-
-if (a == 42)
-   std::cout << "C++: Mine too!" << std::endl;
-~textbf@else$
-   std::cout << "C++: boo!" << std::endl;
-\end{console}
-
-You should \EMPHASIZE{NEVER} have a program like the earlier one with two
-if's with opposite conditions next to each other:
-\begin{console}
-if (a == 42)
-   std::cout << "C++: Mine too!" <<std::endl;
-if (a != 42)      // BAD!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-   std::cout << "C++: boo!" << std::endl;
-\end{console}
-
-In other words if you can rewrite a bunch of ifs with if-else, then you
-should. Why? Because this avoids evaluating boolean expressions
-unnecessarily and hence speed up your program. (There are other
-reasons).
-
-The \EMPHASIZE{second} way (the if-else) is the \EMPHASIZE{right} way:
-
-\begin{console}
-if (a == 42)
-   std::cout << "C++: Mine too!" << std::endl;
+if (x > 0)
+   std::cout << "spam!" << std::endl;
 else
-   std::cout << "C++: boo!" << std::endl;
+   std::cout << "ham!" << std::endl;
+   
+std::cout << "eggs" << std::endl;
 \end{console}
+\begin{python}
+from latextool_basic import *
+p = Plot()
+M = r'''
+int x = 0;
 
-The format of the if-else statement is
-\begin{center}
-\EMPHASIZE{if (\texttt{[bool expr]})}\\
-\EMPHASIZE{\texttt{[stmt1]}}\\
-\EMPHASIZE{else}\\
-\EMPHASIZE{\texttt{[stmt2]}}\\
-\end{center}
+std::cin >> x;
+                                                                          
+if (x > 0)
 
-If \textit{\texttt{[bool expr}} evaluates to \texttt{true}, \textit{\texttt{[stmt1}}
-executes. When that's completed, the else part is
-bypassed. If \textit{\texttt{[bool expr}} evaluates to \texttt{false}
-\textit{\texttt{[stmt2}} is executed.
+   std::cout << "spam!" << std::endl;   
+else
+   std::cout << "ham!" << std::endl;
+   
+std::cout << "eggs" << std::endl;
+'''.strip()
 
-Obviously you can't write an else statement without an if!!!
+points = [(-1.5, 0.72), (-1.5, -0.72), (13.7, -0.72), (13.7, -2.1), (-1.5, -2.1), (-1.5, -3.72), (13.7, -3.72), (13.7, -5.1), (-1.5, -5.1), (-1.5, -6.3), (-0.8, -6.3), (13, -9.7), (13.7, -9.7), (13.7, -11.72), (-1.5, -11.72), (-1.5, -12.72), (-0.8, -12.72)]
 
-%\textbf{Exercise.} 
-\input{exercises/0-08-if-part2/main.tex}
-Next modify it to use if-else instead of two if's. Run
-the program and test it. Here are some tests:
-\begin{console}[commandchars=\~\@\$]
-How many heads do you have? ~textbf@1$
-You are not Zaphod
-\end{console}
+p += Line(points = [(-1.5, 0.72), (-1.5, -0.72)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-1.5, -0.72), (-0.8, -0.72)], linewidth = 0.1, endstyle='>', linecolor='red')
+p += Line(points = [(13, -0.72), (13.7, -0.72)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(13.7, -0.72), (13.7, -2.1)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(13.7, -2.1), (-1.5, -2.1)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-1.5, -2.1), (-1.5, -3.72)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-1.5, -3.72), (-0.8, -3.72)], linewidth = 0.1, endstyle='>', linecolor='red')
+p += Line(points = [(13, -3.72), (13.7, -3.72)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(13.7, -3.72), (13.7, -5.1)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(13.7, -5.1), (-1.5, -5.1)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-1.5, -5.1), (-1.5, -6.3)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-1.5, -6.3),(-0.8, -6.3)], linewidth = 0.1, endstyle='>', linecolor='red')
+p += Line(points = [(13, -11), (13.7, -11)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(13.7, -11), (13.7, -13.9)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(13.7, -13.9), (-1.5, -13.9)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-1.5, -13.9), (-1.5, -15.7)], linewidth = 0.1, linecolor='red')
+p += Line(points = [(-1.5, -15.7), (-0.8, -15.7)], linewidth = 0.1, endstyle='>', linecolor='red')
 
-And here's an execution of the same program:
 
-\begin{console}[commandchars=\~\@\$]
-How many heads do you have? ~textbf@2$
-Are you Zaphod?
-\end{console}
+p += Line(points = [(2.5, -7.22), (2.5, -8.22)], linewidth=0.1, linecolor='red')
+p += Line(points = [(2.5, -8.22), (-0.1, -8.22)], linewidth=0.1, linecolor='red')
+p += Line(points = [(-0.1, -8.22), (-0.1, -12.6)], linewidth=0.1, linecolor='red')
+p += Line(points = [(-0.1, -12.6), (0.8, -12.6)], linewidth=0.1, endstyle='>', linecolor='red')
+p += Line(points = [(11.9, -12.6), (13, -12.6)], linewidth=0.1, endstyle='>', linecolor='red')
+p += Line(points = [(-0.1, -9.6), (0.45, -9.6)], endstyle='>', linewidth=0.1, linecolor='red')
+p += Line(points = [(12.2, -9.6), (13, -9.6)], endstyle='>', linewidth=0.1, linecolor='red')
 
-\input{exercises/1-08-if-part2/main.tex}Rewrite the program using if-else.
+p += Rect(-0.8, -1.2, 13, -0.22, linecolor='red', linewidth=0.1, name='b1')
+p += Rect(-0.8, -4.2, 13, -3.22, linecolor='red', linewidth=0.1, name='b2')
+p += Rect(-0.8, -13.6, 13, -5.8, linecolor='red', linewidth=0.1, name='b3')
+p += Rect(0.8, -7.22, 3.5, -6.22, linecolor='red', linewidth=0.1, name='b4')
+p += Rect(0.45, -10.2, 12.2, -9.22, linecolor='red', linewidth=0.1, name='b5')
+p += Rect(-0.8, -16.1, 13, -15.1, linecolor='red', linewidth=0.1, name='b6')
+p += Rect(0.8, -13.2, 12, -12.2, linecolor='red', linewidth=0.1, name='b7') 
 
-\input{exercises/2-08-if-part2/main.tex}Here's another:
-\begin{console}[commandchars=\~\@\$]
-gimme an int ~textbf@~underline@35$$
-odd!!!
-\end{console}
+code(p, M, x=0, y=0, height=1.5, width=0.33, border_linewidth=0.01, innersep=0.8)
 
-\input{exercises/3-08-if-part2/main.tex}Here's another
-\begin{console}[commandchars=\~\@\$]
-~textbf@3.4 23.4$
-you will live more than 100 years!!!
-\end{console}
-
-\textbf{Exercise.}
-\input{exercises/4-08-if-part2/main.tex}
+print(p)
+\end{python}

@@ -1,48 +1,30 @@
+\sectionthree{Restriction on arguments}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Pre and post operators}
 
-\begin{consolethree}[escapeinside=||]
-class Int
-{
-public:
-    Int(int x=0)
-        : x_(x)
-    {}
-    void operator++()
-    {
-        std::cout << "pre\n"; ++x_;
-    }
-    void operator++(int a)
-    {
-        std::cout << "post " << a << "\n"; x_++;
-    }
-    int get() { return x_; }
-private:
-    int x_;
-};
-\end{consolethree}
+Whether the operator is unary or binary is fixed. Just try to recall
+their meanings from CISS240. For example, \textit{\%} (remainder operator)
+is a \textbf{binary} operator: \textit{3 \% 5} is meaningful; \textit{5\%}
+has no meaning. So you cannot overload \textit{operator\%} by declaring
+and defining a unary \textit{\%}:
 
-\begin{consolethree}[escapeinside=||]
-int main()
-{
-    C x(4);
-    ++x;
-    std::cout << x.get() << "\n";
-    x++;
-    std::cout << x.get() << "\n";
-    return 0;
-}
-\end{consolethree}
+\textit{C C::operator\%()}
 
-C++ translates \textit{++x} and \textit{x++} as:
+\textit{operator\%} \textbf{must} be
 
-\textit{++x} is the same as \textit{x.operator++()}
+\textit{C C::operator\%(C)}
 
-\textit{x++} is the same as \textit{x.operator++(0)}
+or
 
-i.e., for post operators, C++ calls operator with a value of 0.
+\textit{C C::operator\%(const C \&)}
 
-\input{exercises/0-65-operators/main.tex}
+etc.
+
+Other correct declarations:
+
+\textit{C* operator\&();}
+
+See operators \textit{[], (), ->}, etc. later.
+
 

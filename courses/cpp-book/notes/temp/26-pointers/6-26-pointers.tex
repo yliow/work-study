@@ -1,112 +1,196 @@
+\sectionthree{Dereferencing Pointers}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Memory address values and NULL}
 
-Up to this point I never assign constant address values directly to
-pointer variables like this:
+Recall: If \texttt{p} is a pointer, then the value of \texttt{p} is the \EMPHASIZE{memory address} of the value \texttt{p} is pointing to.
+
+You can access the \EMPHASIZE{value} \texttt{p} is pointing to. That's call \EMPHASIZE{dereferencing} \texttt{p} and you do it using \EMPHASIZE{*p}. The \texttt{*} used in this way is called the \EMPHASIZE{dereferencing operator}. It's also called the indirection operator.
+
+Try this:
 
 \begin{consolethree}[escapeinside=||]
-int x = 42;         // say the value of x is at
-                    // address 1205000
-int * p = 1205000;  // p points to the value of x
+int x = 42;
+int * p;
+p = \&x;
+
+std::cout << x << ' ' << *p << '\n';
+
+x = 0;
+std::cout << x << ' ' << *p << '\n';
+
+*p = 42;
+std::cout << x << ' ' << *p << '\n';
 \end{consolethree}
-To begin with, the address of x is usually different each time you run your program and is definitely different on a different computer. So the above would be a terrible idea.
+Suppose \texttt{\&x} is 124500, then the memory model looks like this:
 
-In general, assigning a constant to a pointer variable is rare. This happens when you're doing something very special such as very low level programming where you need to access hardware or doing embedded systems programming. For instance, say you know that an \texttt{unsigned int} value at memory location 20500080 is used for communication with a hardware device, you would do something like this:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(0, 1.5, 5, 5.5)
+
+xbawx = Rect(1, 2, 4, 3, label='124500')
+refbawx = Rect(8, 7, 12, 9, linecolor='red', linewidth=0.1, align='c', s='You can refer to this box using \\texttt{x} or \\texttt{*p}')
+p += xbawx
+p += refbawx
+p += Rect(0.5, 4.5, 0.5, 4.5, label='x')
+p += Rect(1, 4, 4, 5, label='42')
+p += Line(points = [(8, 8), (2.5, 5)], linewidth=0.1, linecolor='red', endstyle='>')
+pbawx = Rect(1.5, 5.25, 1.5, 5.25, label='124500')
+p += pbawx
+p += Rect(0.5, 2.5, 0.5, 2.5, label='p')
+
+p += Line(points=[(3.5, 2.5), (4.5, 2.5), (4.5, 4.5), (2.8, 4.5)], linewidth=0.15, endstyle='>')
+print(p)
+\end{python}
+
+
+\EMPHASIZE{MAKE SURE YOU SEE THE DIFFERENCE BETWEEN \texttt{p} and \texttt{*p}!!!:}
+
+\begin{itemize}
+\item
+  \EMPHASIZE{\texttt{p} is 124500}
+\item
+  \EMPHASIZE{\texttt{*p} is 42}
+\end{itemize}
+
+\EMPHASIZE{WARNING:}
+
+There are now \EMPHASIZE{3 different meanings for *}!!!
 
 \begin{consolethree}[escapeinside=||]
-unsigned int * device = (unsigned int *) 20500080;
+int x = 2 * 3;           // * = multiplication
+int * p = &x;            // * = for pointer type
+std::cout << x
+          << ',' << *p   // * = for dereferencing
+          << '\n';
+\end{consolethree}
+It's really important to remember that if a pointer \texttt{p} points to a box, then the dereference of \texttt{p}, i.e. \texttt{*p}, refer to the contents or the ``inside'' of the box.
+
+In particular, if I give you this picture without showing you the name of the variable with a value of 23:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(0,0, 8, 5)
+p += Rect(2, 3, 5, 4, label='23')
+p += Rect(2, 1, 5, 2)
+p += Rect(1.5, 1.5, 1.5, 1.5, label='p')
+p += Line(points=[(2.5, 1.5), (6.5, 1.5), (6.5, 3.5), (5, 3.5)], linewidth=0.05, endstyle='>')
+
+print(p)
+\end{python}
+
+you tell me right away that \texttt{*p} is 23. You don't need to know the variable name of that box.
+
+Note that \texttt{*p} refers to the contents of the box \texttt{p} points to in two ways and can be used in two ways, for reading and for writing:
+
+\begin{itemize}
+\item
+  you can use \texttt{*p} to \EMPHASIZE{read} the value that \texttt{p} points
+  to
+\item
+  you can use \texttt{*p} to \EMPHASIZE{overwrite} the value \texttt{p} points
+  to
+\end{itemize}
+
+For instance:
+
+\begin{consolethree}[escapeinside=||]
+int x = 42;
+int * p = &x;
+int i;
+i = *p;         // read the value that p points to (and
+                // give it to i)
+*p = 100;       // write the value (i.e. 100) onto the
+                // value that p points to
 \end{consolethree}
 
-After that, whenever the device outputs a value, it's sent to the \texttt{unsigned int} at this location and \texttt{device} pointer will be used to access this value.
 
-Unless otherwise stated, for CISS240, 245, 350, you will never assign or work directly with a constant memory address value. The only exception is the memory address \EMPHASIZE{0}. However instead of using memory address 0 like this:
+So \texttt{*p} can appear on either the right or the left of the
+assignment operator.
 
-\begin{consolethree}[escapeinside=||]
-int * p = 0;
-double * q = 0;
-char * r = 0;
-\end{consolethree}
-you use the predefined constant \texttt{\EMPHASIZE{NULL}} like this:
+\input{exercises/17-26-pointers/main.tex}
+Let me repeat the above. Suppose the address value in \texttt{p} is 124500. Then if you see something like
 
 \begin{consolethree}[escapeinside=||]
-int * p = NULL;
-double * q = NULL;
-char * r = NULL;
+a = b + *p + c;
 \end{consolethree}
 
-In order to use \texttt{NULL}, you might have to \texttt{\#include <cstddef>} at the top of your code:
+you should think of it as
 
 \begin{consolethree}[escapeinside=||]
-#include <iostream>
+a = b + (the value at address 124500) + c;
+\end{consolethree}
 
-|\EMPHASIZE{\#include <cstddef>}|
+And if you see
 
-int main()
-{
-    int * p = NULL;
-    double * q = NULL;
-    char * r = NULL;
-    return 0;
+\begin{consolethree}[escapeinside=||]
+*p = b + c;
+\end{consolethree}
+
+you should think of it as
+
+\begin{consolethree}[escapeinside=||]
+store value of (b + c) at address 124500
+\end{consolethree}
+
+In summary,
+\begin{python}
+from latextool_basic import table
+#print(table([(1, 2, 3), (2, 2, 5), (5, 2), (-1, 2, 6), (1, 2, 3), ]))
+print(table([("\\texttt{*p}", "Statement", "Same as"), ("lvalue", "\\texttt{*p = ...}", "store ... in memory at address \\texttt{p}"), ("rvalue", "\\texttt{... = ... *p}", "... = ... (value in memory at address \\texttt{p}) ...")]))
+\end{python}
+
+\input{exercises/18-26-pointers/main.tex}
+\input{exercises/19-26-pointers/main.tex}
+\input{exercises/20-26-pointers/main.tex}
+\input{exercises/21-26-pointers/main.tex}
+\input{exercises/22-26-pointers/main.tex}
+\input{exercises/23-26-pointers/main.tex}
+\input{exercises/24-26-pointers/main.tex}
+\input{exercises/25-26-pointers/main.tex}
+\input{exercises/26-26-pointers/main.tex}
+\input{exercises/27-26-pointers/main.tex}
+\input{exercises/28-26-pointers/main.tex}
+\begin{consolethree}[escapeinside=||]
+int s = 0;
+int * p = &s;
+
+// Modify code below so that variable name s is not
+// used.
+
+for (int i = 0; i < 100; i++)
+
+{   
+    s += i;
+    std::cout << i << ' ' << s << '\n';
 }
+
+std::cout << "1 + ... + 100 = " << s << '\n';
 \end{consolethree}
-Just to keep everything uniform, just make sure you include cstddef.
+\input{exercises/29-26-pointers/main.tex}\input{exercises/30-26-pointers/main.tex}
+\input{exercises/31-26-pointers/main.tex}
+\input{exercises/32-26-pointers/main.tex}
+\input{exercises/33-26-pointers/main.tex}
+Do you need the parentheses? Can you apply the augmented assignment operators to \texttt{*p?}
 
-So what is the value at address 0???
+Note that if you do not assign a memory address to your pointer, it would have an arbitrary address value, pointing to some arbitrary value.
+Reading that value might result result in printing something that looks like garbage. It might even cause your program to crash if you do not have access rights to that location!!!
 
-Well the only important thing you need to know is this: \EMPHASIZE{you are not allowed to access the value at address 0.} Therefore \ldots{}
-
-\EMPHASIZE{\texttt{NULL} is only used to indicate that a pointer variable is not pointing to anything useful}. (You can also use \texttt{\textbf{nullptr}} instead of \texttt{\textbf{NULL}}. For C++11 compliant compilers, \texttt{\textbf{nullptr}} and \texttt{\textbf{NULL}} are the same. C++11 ISO/IEC 14882 was released 9/2011.)
-
-Because of the above, \texttt{NULL} is sometimes used to initialize a pointer variable before it is being used:
+Another thing to note is that the dereferencing operator works with an address -- it does not have to be applied to a pointer. In other words if you're doing this:
 
 \begin{consolethree}[escapeinside=||]
-int x = 1;
-int * p = NULL;   // p does not point to anything yet
-
-... p is not used for anything useful ...
-
-p = \&x;          // now point p to x
-
-... now p is used to do something useful ...
+std::cout << *p << std::endl;
 \end{consolethree}
 
-\input{exercises/16-26-pointers/main.tex}It's common to draw it like this:
+and if you know that \texttt{p} has value 124500, then the above can also be
 
-\begin{python}
-from latextool_basic import *
-p = Plot()
+\begin{consolethree}[escapeinside=||]
+std::cout << *124500 << std::endl;
+\end{consolethree}
 
-p += Rect(0,0, 8, 3)
-p += Rect(2, 1, 5, 2)
-p += Rect(1.5, 1.5, 1.5, 1.5, label='p')
-
-p += Line(points=[(2, 1), (5, 2)], linewidth=0.01)
-p += Line(points=[(2, 2), (5, 1)], linewidth=0.01)
-
-print(p)
-\end{python}
-
-or like this:
-
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-p += Rect(0,0, 8, 3)
-p += Rect(2, 1, 5, 2)
-p += Rect(1.5, 1.5, 1.5, 1.5, label='p')
-
-p += Line(points=[(3.5, 1.5), (6, 1.5), (6, 0.5)], linewidth=0.1, endstyle='>')
-
-p += Line(points=[(5.65, 0.5), (6.35, 0.5)], linewidth=0.1)
-
-p += Line(points=[(5.8, 0.25), (6.2, 0.25)], linewidth=0.1)
-
-p += Line(points=[(5.9, 0), (6.1, 0)], linewidth=0.1)
-
-print(p)
-\end{python}
-
-
+\input{exercises/34-26-pointers/main.tex}
+\input{exercises/35-26-pointers/main.tex}

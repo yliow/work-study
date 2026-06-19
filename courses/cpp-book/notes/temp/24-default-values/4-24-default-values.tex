@@ -1,14 +1,13 @@
+\sectionthree{Multi-file compilation}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Prototypes for default values}
 
-First try this:
+I have nothing to add here. Just remember that the \EMPHASIZE{default values appear only in the function prototypes}, not in the function headers when defining function bodies (see previous section) if you want to give that function a prototype. In other words, this \EMPHASIZE{does not work}:
 
 \begin{consolethree}[escapeinside=||]
 #include <iostream>
-
-void printHeads(int = 1);
+#include "test.h"
 
 int main()
 {
@@ -16,6 +15,22 @@ int main()
     printHeads(42);
     return 0;
 }
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// test.h
+#ifndef TEST_H
+#define TEST_H
+
+void printHeads(int numHeads = 1);
+
+#endif
+\end{consolethree}
+
+\begin{consolethree}[escapeinside=||]
+// test.cpp
+#include <iostream>
+#include "test.h"
 
 void printHeads(int numHeads = 1)
 {
@@ -24,21 +39,12 @@ void printHeads(int numHeads = 1)
 }
 \end{consolethree}
 
-It does \EMPHASIZE{not} work. Remember that!!!
-
-Now try this:
+Modify your test.cpp:
 
 \begin{consolethree}[escapeinside=||]
+// test.cpp
 #include <iostream>
-
-void printHeads(int = 1);
-
-int main()
-{
-    printHeads();
-    printHeads(42);
-    return 0;
-}
+#include "test.h"
 
 void printHeads(int numHeads)
 {
@@ -47,14 +53,7 @@ void printHeads(int numHeads)
 }
 \end{consolethree}
 
-See the difference?
+and it works. Make sure you run this.
 
-The \EMPHASIZE{default values appear only in the prototype if you want to have a prototype} and not in the function header when you define the function bodies.
-
-(This is not arbitrary. There's a reason for this. But you would need to know how compilers work to understand why this is the case. So for now you just have to remember this fact.)
-
-Of course if you don't have a prototype, then you can include the default value in the function header -- but NOT if you have a prototype.
-
-That's the only gotcha you should remember. This is a very common mistake for beginners.
-
+\input{exercises/5-24-default-values/main.tex}
 

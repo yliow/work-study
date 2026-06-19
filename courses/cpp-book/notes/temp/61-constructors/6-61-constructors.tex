@@ -1,63 +1,69 @@
+\sectionthree{Review: Function Overloading}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Review: Function Signature}
 
-Review notes on function loading. This is a quick recap.
+A function is \EMPHASIZE{overloaded} if its name is used more than once.
 
-The \EMPHASIZE{signature} of a function is the list of types of the
-parameters of the function.
+The signature of the functions with the same name must be different.
+That's because in C++, a function is identified not by
+its name, but by it name and its signature, i.e., the name and the list
+of types of its parameters.
 
-WARNING: Note that the return type is \EMPHASIZE{\texttt{not}} part of the
-function signature.
+\input{exercises/8-61-constructors/main.tex}
+\input{exercises/9-61-constructors/main.tex}
+\input{exercises/10-61-constructors/main.tex}
+When a function is called in your code, C++ will use the function that
+matches both the function name and the type of the values passed in with
+the candidate's signature. If none is found, C++ will try to typecast
+the arguments. The one used is the one with the least number of
+typecasts. If there isn't one, you get an ambiguous invocation error.
 
-Here's an example: the signature of
-
-\begin{consolethree}[escapeinside=||]
-int f(int x, char y) {}
-\end{consolethree}
-
-is \texttt{(int, char)}
-
-Here are some warnings:
-
-\begin{itemize}
-\item The type of "\texttt{const X}" is \texttt{X.}
-\item The type of "\texttt{const X *}" is \texttt{const X *.}
-\item The type of "\texttt{X[]}" is \texttt{X*}.
-\end{itemize}
-
-Here's a trick to get your C++ compiler to tell you the signature of a
-function. Deliberately include an error in the function.
+\input{exercises/11-61-constructors/main.tex}
+\input{exercises/12-61-constructors/main.tex}
+If you compile the following with g++:
 
 \begin{consolethree}[escapeinside=||]
-// main.cpp
-
-void f(int x, const int y, const int * const z)
-{
-    abc;
-}
-
-int main()
-{
-    f();
-
-    return 0;
-}
+void f(double x, int y) {}
+void f(int x, double y) {}
+int main() { f(1, 1); }
 \end{consolethree}
 
-When you compile, the compiler will have to tell you there's an error in
-the above function, listing the prototype. For g++, you will get:
+it will complain with this message:
 
 \begin{consolethree}[escapeinside=||]
-main.cpp: In function void f(int, int, const int*):
-main.cpp:3:5: error: abc was not declared in this
-scope
+a.cpp: In function int main():
+a.cpp:3:20: error: call of overloaded f(int, int) is
+    ambiguous
+a.cpp:1:6: note: candidates are: void f(double, int)
+a.cpp:2:6: note: void f(int, double)
 \end{consolethree}
 
-You can see from the above error message that for the second parameter,
-although it's \texttt{const int}, the type as part of the
-signature is \texttt{int}.
+Basically, when looking for a function to execute
 
-\input{exercises/7-61-constructors/main.tex}
+\texttt{f(1, 1);}
+
+there is no exact match. So C++ attempts to typecast. If C++ typecasts
+the first value to 1.0:
+
+\verb!f(double(1), 1);!
+
+it will be able to match this:
+
+\verb!void f(double x, int y) {}!
+
+and if C++ typecasts the second value to get 1.0:
+
+\verb!f(1, double(1));!
+
+it will match this:
+
+\verb!void f(int x, double y) {}!
+
+So, in this case, since both functions match \texttt{f(1, 1)} with 1
+typecast, your C++ compiler does not know what to do and will complain.
+Of course if there's no exact match and
+there's only one option with one typecast, then C++ will
+happily choose that function that matches\texttt{f(1, 1)} with one typecast.
+
 

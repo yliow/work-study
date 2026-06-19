@@ -1,72 +1,107 @@
+\sectionthree{Operator in/outside the class}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Operator as a Method}
+
+In general suppose \textit{a,b} are objects of class \textit{C}.
+
+C++ will interpret \textit{a + b} as either
+
+\textit{a + b} is the same as \textit{a.operator+(b)}
+
+or
+
+\textit{a + b} is the same as \textit{operator+(a, b)}
+
+For \textit{a.operator+(b)}, C++ will look for \textit{operator+} in the
+class \textit{C} (i.e., the class of \textit{a}) that accepts \textit{b}
+(object of class \textit{C})
+
+For \textit{operator+(a, b)}, C++ will look for an \textit{operator+} not in
+any class that accepts \textit{a,b} of class \textit{C}
+
+For instance, for \textit{Fraction} class
 
 \begin{consolethree}[escapeinside=||]
-// Fraction.h
 class Fraction
 {
 public:
-    Fraction(int n=0, int d=1)
-        : n_(n), d_(d)
-    {}
-    Fraction operator+(const Fraction &) const;
-private:
-    int n_, d_; // numerator,denominator
+    ...
+    Fraction operator+(const Fraction & b) const {...}
 };
 \end{consolethree}
 
-\begin{consolethree}[escapeinside=||]
-// Fraction.cpp
-#include "Fraction.h"
+will let you execute \textit{a + b} where \textit{a,b} are \textit{Fraction}
+objects as \textit{a.operator+(b)}
 
-Fraction Fraction::operator+(const Fraction & b) const
+... or ...
+
+... if you prefer an operator \textbf{outside} the class:
+
+\begin{consolethree}[escapeinside=||]
+class Fraction
 {
-    return Fraction(n_ * b.d_ + d_ * b.n_, d_ * b.d_);
+public:
+    ...
+};
+
+Fraction operator+(const Fraction & a, const Fraction & b)
+{
+    ...
 }
 \end{consolethree}
 
-Re-defining \textit{+}, so that we have \textit{+} for \textit{int},
-\textit{double}, and \textit{Fraction}.
+will let you execute \textit{a + b}, where \textit{a,b} are \textit{Fraction}
+objects, as \textit{operator+(a, b)}.
+
+It is preferable to have an operator in a class if possible. You
+\textbf{cannot} have both:
 
 \begin{consolethree}[escapeinside=||]
-#include "Fraction.h"
-
-int main()
+class Fraction
 {
-    Fraction a(1,3), b(1,4);
-    Fraction c = a + b;
-    Fraction d = a.operator+(b);
-    return 0;
+public:
+    Fraction operator+(const Fraction & b) const
+    {
+        ...
+    }
+};
+
+// |{\bf DANGER!}| can't have both above and the following together
+
+Fraction operator+(const Fraction & a, const Fraction & b)
+{
+    ...
 }
 \end{consolethree}
 
-Most programming languages allow you to define operators (with their own
-syntax). There are languages that do not have operator overloading.
-Example: Java.
+Why? Because C++ does not know which \textit{operator+} to use if you give
+C++ both options. So you should only have either:
 
-\begin{consolethree}[escapeinside=||]
-// Fraction.cpp
-#include "Fraction.h"
+\textit{Fraction Fraction::operator+(const Fraction \&) const}
 
-Fraction Fraction::operator*(const Fraction & b) const
-{
-    return Fraction(n_ * b.n_, d_ * b.d_);
-}
-\end{consolethree}
+or
 
-Test it:
+\textit{Fraction operator+(const Fraction \&, const Fraction \&)}
 
-\begin{consolethree}[escapeinside=||]
-#include "Fraction.h"
+but not both.
 
-int main()
-{
-    Fraction a(1, 3), b(1, 4);
-    Fraction c = a * b;
-    return 0;
-}
-\end{consolethree}
+You can overload the following:
+
+\texttt{+ - * / \% \^{} \& |}
+
+\texttt{+= -= *= /= \%= \^{}= \&= |=}
+
+\texttt{! = < > << >> \~{} [ ]}
+
+\texttt{!= == <= >= <<= >>=}
+
+\texttt{\&\& || ++ -{}- ->* , -> ()}
+
+\texttt{new new[] delete delete[]}
+
+Warning: You cannot define your own functions for
+
+\textit{:: . .* ?: sizeof}
 
 

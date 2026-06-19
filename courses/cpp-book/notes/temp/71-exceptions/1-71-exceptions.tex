@@ -1,86 +1,202 @@
+\sectionthree{Program 1. A Simple Example}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Exceptions}
 
-Exceptions are error control devices. Here's the big picture ...
-
-Suppose you write a piece of code. Say function \texttt{f()} calls
-function \texttt{g(),} and something terrible happens in \texttt{g()}.
-\texttt{g()} can tell \texttt{f()} that something really bad happened in
-different ways. For instance the return value of \texttt{g()} can be an
-error code. Another way is to get \texttt{g()} to set a global variable to
-some error code; \texttt{f()} can check this global variable after
-execution has returned back to \texttt{f()}. In both cases, you control
-the flow of execution to handle some error.
-
-There's a better way. It involves \EMPHASIZE{exceptions}.
-
-In the case of exceptions, to tell the calling function something has gone wrong, you \EMPHASIZE{throw} an object or value back to the calling function; this object/value is called the \EMPHASIZE{exception}. The calling function can choose to \EMPHASIZE{catch} the exception or not. But the interesting thing is that if \texttt{h()} calls \texttt{f()} and \texttt{f()} calls \texttt{g()} and \texttt{g()} throws an exception back, if \texttt{f()} does not catch it but \texttt{h()} does, then the flow of execution goes to the code in h() that catches the exception (or error).
-
-That's the big picture. Now how do you try to catch the error? If \texttt{f()} wants to catch an exception, it must wrap the code where an exception might occur in a \EMPHASIZE{try-block}. The try-block is followed by a \EMPHASIZE{catch-block}. If \texttt{g()} throws an object or value of some type, say it's an integer, then your catch must specify that it's trying to catch an integer exception:
-
+Run this program. Then uncomment the \texttt{throw} statement and run it
+again.
 \begin{console}[commandchars=\~\@\$]
+#include <iostream>
+#include <exception>
 void f()
 {    
-     ~EMPHASIZE@try$
-     ~EMPHASIZE@{$
-         // code
-         g();
-         // more code
-     ~EMPHASIZE@}$
-     ~EMPHASIZE@catch (int i)$
-     ~EMPHASIZE@{$
-         // code to clean up the mess caused
-         // by the error
-     ~EMPHASIZE@}$
-} 
-\end{console}
-
-What about on \texttt{g()}'s side? If something goes wrong
-\texttt{g()} throws an integer back. This is achieved by:
-
-\begin{console}
-void g()
-{    
-     // ... some code ...
-     throw 5;
-     // ... some code ...
-}
-\end{console}
-
-Your code can catch exceptions of different types, not necessarily an
-integer. It can even be an object.
-
-\begin{console}
-void g()
-{    
-     std::cout << "g(): about to throw 5...\n";
-     throw 5;
-     std::cout << "g(): after throw 5 ...\n";
-
-}
-
-void f()
-{    
-     try
-     {
-           std::cout << "f(): about to call g()...\n";
-           g();
-           std::cout << "f(): after calling g()...\n";
-     }
-     catch (int i)
-     {     
-           std::cout << "f(): caught int " << i << '\n';
-     }
+     std::cout << "f ... 1\n";
+     throw std::exception();
+     
+     //~EMPHASIZE@throw std::exception();$
+     std::cout << "f ... 2\n";
 }
 
 int main()
 {   
-    f();
-    return 0;
+    ~EMPHASIZE@try$
+    ~EMPHASIZE@{$   
+        std::cout << "try ... 1\n";
+        f();
+        std::cout << "try ... 2\n";
+    ~EMPHASIZE@}$
+    ~EMPHASIZE@catch (std::exception & e)$
+    ~EMPHASIZE@{$     
+        std::cout << "caught exception ... \n";
+        std::cout << "end\n";
+    ~EMPHASIZE@}$
+}
+return 0;
+\end{console}
+
+
+WARNING: Depending on your compiler, you might need to write
+\texttt{std::exception} instead of \texttt{exception}. You might or might
+not need to \texttt{\#include} exception.
+
+\texttt{\EMPHASIZE{exception}} is a class that comes with your compiler. In this case I'm throwing a standard \texttt{exception} object. You can actually throw any object or any value. If you prefer, you can create your own class for an exception object to throw, or you can just throw any value (\texttt{int}, \texttt{double}, \texttt{bool}, etc.)
+
+This is really handy. Why? Suppose you're writing a program without exceptions and the code looks like the following, i.e., \texttt{f()} calls \texttt{g()}, \texttt{g()} calls \texttt{h()}, and \texttt{h()} calls \texttt{i()}:
+
+\begin{console}
+void i()
+{    
+     ...
+}
+
+void h()
+{    
+     ...
+     i();
+     ...
+}
+
+void g()
+{    
+     ...
+     h();
+     ...
+}
+
+void f()
+{    
+     ...
+     g();
+     ...
 }
 \end{console}
 
-Run the following programs/experiments and \EMPHASIZE{trace their execution}. That is in fact the reason for exceptions: they alter the flow of normal program execution.
+Here's a diagram that describes the function call
+relationship:
+\begin{console}
+f → g → h → i
+\end{console}
+where the → means "calls".
+
+After it's done you analyze your code and realize that
+some errors might occur in \texttt{i()}
+
+\begin{console}
+void i()
+{    
+     ...
+     z = x / y; // oops what if y is zero???
+     ...
+}
+\end{console}
+
+Suppose you want \texttt{f()} to handle this error. Then you might need to
+pass an error code back to \texttt{f()} like this (we return 0 for no
+error and 1 if there's an error). This means that the
+error code must pass from \texttt{i} to \texttt{h}, \texttt{h} must pass the
+error code to \texttt{g}, and \texttt{g} must pass the error code to
+\texttt{f}:
+
+\begin{console}[commandchars=\~\@\$]
+~EMPHASIZE@int$ i()
+{    
+     ...
+     // return 1 if there's an error
+     ~EMPHASIZE@if (y == 0)$
+         ~EMPHASIZE@return 1;$
+
+     z = x / y; // oops what if y is zero???
+
+     ...
+
+     ~EMPHASIZE@return 0;$ // return 0 if there's no error
+}
+
+~EMPHASIZE@int$ h()
+{    
+     ...
+     ~EMPHASIZE@if (i() != 0) return 1;$
+     ...
+     ~EMPHASIZE@return 0;$
+}
+
+~EMPHASIZE@int$ g()
+{    
+     ...
+     ~EMPHASIZE@if (h() != 0) return 1;$
+     ...
+     ~EMPHASIZE@return 0;$
+}
+
+void f()
+{    
+     ...
+     ~EMPHASIZE@if (g() != 0)$
+     {
+          ~EMPHASIZE@// ... do some error$
+          ~EMPHASIZE@// handling ...$
+     }
+     ...
+}
+\end{console}
+
+Boy ... what a pain!!! Look at the amount of changes you need to make!!!
+Not to worry ... exceptions to the rescue ...
+
+\begin{consolethree}[escapeinside=||]%[commandchars=\~\@\$]
+void i()
+{    
+     ...
+     |\EMPHASIZE{if (y == 0) throw exception();}|
+     z = x / y; // oops what if y is zero???
+     ...
+}
+
+void h()
+{    
+     ...
+     i();
+     ...
+}
+
+void g()
+{    
+     ...
+     h();
+     ...
+}
+
+void f()
+{    
+     ...
+     |\EMPHASIZE{try}|
+     |\EMPHASIZE{\{}|
+          g();
+     |\EMPHASIZE{\}}|
+     |\EMPHASIZE{catch (exception \& e)}|
+     |\EMPHASIZE{\{}|
+          |\EMPHASIZE{// ... do some error}|
+          |\EMPHASIZE{// handling ...}|
+     |\EMPHASIZE{\}}|
+     ...
+}
+\end{consolethree}
+
+Much cleaner!!!
+
+The important thing is this ...
+
+You only need to modify the function code that might run into an error
+and the function that should handle the error. In other words you only
+need to change \texttt{i()} and \texttt{f()}. We say that \texttt{i()} is the
+thrower and \texttt{f()} is the catcher.
+
+Now, just imagine the nightmare if you have a chain of 20 function
+calls: You would need to modify 20 functions from the thrower all the
+way back to the catcher.
+
+In a real piece of software, the exception handling code can for
+instance print a message to the user to let them know that an email was
+sent to the company and bug fixes will come soon. The program can (for
+instance) shut down or maybe restart.
 

@@ -1,169 +1,146 @@
+\sectionthree{Another Example}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{An example of a function template}
 
-Function templates are great ... really. It's perfect
-for people who want to write less code. Let's try an
-example.
-
-Run this program.
+Here's a more substantial example. Recall this:
 
 \begin{consolethree}[escapeinside=||]
 #include <iostream>
 
-void println(int x)
-{
-    std::cout << x << std::endl;
-}
+bool arrayEqual(int[], int, int[], int);
 
 int main()
 {
-    println(1);
-    println(3.14);
-    println('c');
+    int x[] = {1, 2, 3};
+    int y[] = {1, 2, 3};
+    std::cout << arrayEqual(x, 3, y, 3);
     return 0;
+}
+
+bool arrayEqual(int x[], int xSize, int y[], int ySize)
+{
+    if (xSize == ySize)
+    {
+        bool same = true;
+        for (int i = 0; i < xSize; i++)
+        {
+            if (x[i] != y[i])
+            {
+                same = false;
+                break;
+            }
+        }
+        return same;
+    }
+    else
+    {
+        return false;
+    }
 }
 \end{consolethree}
 
-When you call println(3.14), C++ will try to find a function that best
-fit the value passed in (i.e. a \texttt{double}). The closest is our
-\texttt{println()} function but it accepts as \texttt{int}. So C++ typcast
-the \texttt{double} 3.14 to an \texttt{int}, i.e. 3, and call println().
-
-Let's say we do not want C++ to typecast. So
-here's the program we want:
+What if you want to compare arrays of doubles? You need to have another
+function:
 
 \begin{consolethree}[escapeinside=||]
-#include <iostream>
-
-void println(int x)
+bool arrayEqual2(double x[], double y[])
 {
-    std::cout << x << std::endl;
-}
-
-void println(double y)
-{
-    std::cout << y << std::endl;
-}
-
-void println(char z)
-{
-    std::cout << z << std::endl;
-}
-
-int main()
-{
-    println(1);
-    println(3.14);
-    println('c');
-    return 0;
+    bool same = true;
+    for (int i = 0; i < xSize; i++)
+    {
+        if (x[i] != y[i])
+        {
+            same = false;
+            break;
+        }
+    }
+    return same;
 }
 \end{consolethree}
 
-Boy ... what a pain!!! Furthermore the functions all look pretty
-similar. Smart people hate to do silly things like this: mindless
-duplication of code.
+Uh oh ... what about comparing array of booleans? Or characters? Etc.
 
-OK. Before you swear at C++, rewrite this program like this:
+Now try \textbf{\textit{this}}:
 
 \begin{consolethree}[escapeinside=||]
 #include <iostream>
 
 |\EMPHASIZE{template < typename T >}|
-void println(|\EMPHASIZE{T}| x)
-{
-    std::cout << x << std::endl;
-}
+|\EMPHASIZE{bool arrayEqual(T[], int, T[], int);}|
 
 int main()
 {
-    println|\EMPHASIZE{< int >}|(1);
-    println|\EMPHASIZE{< double >}|(3.14);
-    println|\EMPHASIZE{< char >}|('c');
+    int x[] = {1, 2, 3};
+    int y[] = {1, 2, 3};
+    std::cout << arrayEqual|\textbf{< int >}|(x, 3, y, 3)
+              << std::endl;
+
+    double a[] = {1.2, 3.4, 5.6};
+    double b[] = {2.1, 4.3, 6.5};
+    std::cout << arrayEqual|\EMPHASIZE{< double >}|(a, 3, b, 3)
+              << std::endl;
     return 0;
+}
+
+|\EMPHASIZE{template < typename T >}|
+bool arrayEqual(|\textbf{T}| x[], int xSize, |\textbf{T}| y[], int ySize)
+{
+    if (xSize == ySize)
+    {
+        bool same = true;
+        for (int i = 0; i < 3; i++)
+        {
+            if (x[i] != y[i])
+            {
+                same = false;
+                break;
+            }
+        }
+        return same;
+    }
+    else
+    {
+        return false;
+    }
 }
 \end{consolethree}
 
-WOW!!! There is only one function and it seems to work for all three
-cases!!!
-
-The ``function''
+In this example our function template is this:
 
 \begin{consolethree}[escapeinside=||]
 template < typename T >
-void println(T x)
+bool arrayEqual(T x[], int xSize, T y[], int ySize)
 {
     ...
 }
 \end{consolethree}
 
-is called a \EMPHASIZE{function template}. It's actually
-not a function. It's like a rubber stamp for producing
-functions. You should think of the \EMPHASIZE{T} as a \EMPHASIZE{type variable} for the compiler. Here's how the compiler use
-this \texttt{T}. When the compiler see this statement in your program:
+Note that in the body of the function template, x and y are array of
+elements of type T. The elements of the two arrays appear in the code as
 
 \begin{consolethree}[escapeinside=||]
-...
-println|\textbf{< int >}|(1);
-...
-\end{consolethree}
-
-it (i.e., the compile) says: ``Aha! So you need
-\texttt{println\EMPHASIZE{< int >}}.
-OK I'll take the rubber stamp \texttt{println} (i.e. the
-function template) and create one with \EMPHASIZE{T} replaced by
-\EMPHASIZE{int}.''
-
-In other words C++ will insert this into the program:
-
-\begin{consolethree}[escapeinside=||]
-...
-void println(|\EMPHASIZE{int}| x)
+bool arrayEqual(T x[], int xSize, T y[], int ySize)
 {
-    std::cout << x << std::endl;
-}
-...
-\end{consolethree}
-
-It might be better to think of the instantiated function as:
-
-\begin{consolethree}[escapeinside=||]
-|\textbf{template <>}|
-void println(|\textbf{int}| x)
-{
-    std::cout << x << std::endl;
+    ...
+    |\EMPHASIZE{if (x[i] != y[i])}|
+    ...
 }
 \end{consolethree}
 
-This ``production of a C++ function'' by a function template is called a
-\EMPHASIZE{function instantiation}. Note that if
-\texttt{println< char * >()} was not called, the
-following function will \EMPHASIZE{not} appear in your program:
+As long as the \EMPHASIZE{!=} makes sense for type \EMPHASIZE{T}, C++ will be able to generate the actual function.
+
+For instance you can compare characters using !=. Therefore you can
 
 \begin{consolethree}[escapeinside=||]
 ...
-|\textbf{template <>}|
-void println(char * x)
-{
-    std::cout << x << std::endl;
-}
+|\EMPHASIZE{char}| s[] = {'a', 'b', 'c'};
+|\EMPHASIZE{char}| t[] = {'a', 'b', 'c'};
+std::cout << arrayEqual< |\EMPHASIZE{char}| >(x, 3, y, 3)
+          << std::endl;
 ...
 \end{consolethree}
 
-Note that the function template itself is actually not included in the
-binary executable code that is executed. It's only used
-as a rubber stamp by the compiler for creating actual functions.
-
-Writing function templates is sort of like writing \EMPHASIZE{code that \underline{produces} code}. Specifically a function template can produce functions. This style of programming is called \EMPHASIZE{generic programming}. Templates also lead to something called \EMPHASIZE{metaprogramming}, but I won't get into that because that's beyond the scope of basic programming.
-
-Do you see the power of function templates?
-
-The variable type \texttt{T} (usually called a \EMPHASIZE{type parameter}) can appear anywhere in the function template, not just in the function header. Below is an example where the type parameter appears as a return type.
-
-Another thing to remember is that you can use any identifier name for the type parameter. I used \texttt{T}. You can use \texttt{X} if you like. But the practice is to use a single uppercase letter.
-
-\input{exercises/0-40-function-templates/main.tex}
-\input{exercises/1-40-function-templates/main.tex}
-\input{exercises/2-40-function-templates/main.tex}
+\input{exercises/3-40-function-templates/main.tex}
+\input{exercises/4-40-function-templates/main.tex}
 

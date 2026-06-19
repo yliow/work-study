@@ -1,177 +1,193 @@
+\sectionthree{Returning references}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Returning a copy of *this}
+
+In the previous section, I have shown you an example of returning a
+reference.
+
+Certain methods and operators update the values of the variables or
+objects and return the values of the variables or objects. Run this:
 
 \begin{consolethree}[escapeinside=||]
+int x = 5;
+x++;
+std::cout << x << std::endl;
+int y = x++;
+std::cout << x << ',' << y << std::endl;
+y = (x += 5);
+std::cout << x << ',' << y << std::endl;
+(x += 5) += 5;
+std::cout << x << std::endl;
+\end{consolethree}
+
+Don't overdo this! Why? Because
+
+\begin{consolethree}[escapeinside=||]
+y = (x += 5);
+\end{consolethree}
+
+does too many things. A function/method/operator should do
+\EMPHASIZE{\texttt{one}} thing to avoid confusion. This is clearly easier to
+understand:
+
+\begin{consolethree}[escapeinside=||]
+x += 5;
+y = x;
+\end{consolethree}
+
+Note that the \texttt{+=} when called twice:
+
+\begin{consolethree}[escapeinside=||]
+(x += 5) += 5;
+\end{consolethree}
+
+operates on the same \texttt{x}. This means that \texttt{+=}, besides
+incrementing \texttt{x}, also returns a reference to x so that the second
+\texttt{+=} operators on the same \texttt{x}. If \texttt{+=} returns a new
+\texttt{int} value that has the same value as \texttt{x} after incrementing,
+then the second \texttt{+=} would have operated on this new \texttt{int}
+value and not on \texttt{x}. Therefore the right thing to do is to return
+a reference to \texttt{x} and not a copy of \texttt{x}.
+
+Of course returning a reference is faster than returning an object since
+objects tend to consume more memory. References are implemented using
+pointers and pointers take up very little memory.
+
+Refer to the \texttt{Date} example. Suppose the \texttt{add\_y} method is to
+add an integer value to the year value, \texttt{and} return the value of
+the object.
+
+\begin{consolethree}[escapeinside=||]
+// Date.h
 ...
-class Int
+class Date
 {
+public:
     ...
-    Int max(const Int & c)
-    {
-        if (c.x_ > x_)
-            return c;
-        else
-            return |\EMPHASIZE{*this;}|
-    }
+    |\EMPHASIZE{Date \&}| add_y(int);
     ...
 private:
-    int x_;
+    int yyyy_, mm_, dd_;
 };
 ...
 \end{consolethree}
 
-And now you can try this:
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+...
+|\EMPHASIZE{Date \&}| Date::add_y(int inc)
+{
+    yyyy_ += inc;
+    |\EMPHASIZE{return *this;}|
+}
+...
+\end{consolethree}
+
+With the above, I can now do this:
 
 \begin{consolethree}[escapeinside=||]
-#include "Int.h"
+Date today(1, 1, 1970);
+today.add_y(1).add_y(3);
+\end{consolethree}
+
+The first invocation of \texttt{add\_y} will add 1 to the year of
+\texttt{today} and then a reference to \texttt{today} is returned. Therefore
+the second \texttt{add\_y} is called by this reference, which means that
+the second \texttt{add\_y} is called by \texttt{today}.
+
+However if you do this:
+
+\begin{consolethree}[escapeinside=||]
+// Date.cpp
+...
+|\EMPHASIZE{Date}| Date::add_y(int inc)
+{
+    y += inc;
+    |\EMPHASIZE{return *this;}|
+}
+...
+\end{consolethree}
+
+i.e., return a \texttt{Date} object instead of a reference, then
+\texttt{Date}'s copy constructor is used to create a new
+\texttt{Date} object from \texttt{*this}. This object is returned to
+\texttt{main()} and the \texttt{add\_y} is called by this object so that
+\texttt{today} does not have its year incremented by 3.
+
+We now look at returning references from a function call or method call.
+There's nothing new here about references.
+
+\EMPHASIZE{WARNING:} Pay attention to the next programs!!!
+
+Run the following pair of programs. Explain their outputs.
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int & f(int & x)
+{
+    x++;
+    return x;
+}
 
 int main()
 {
-    Int a(100), b(1);
-    Int c = a.max(b); // a.max(b) should return an
-                      // Int object with x_ value of
-                      // 100
-    c.print();
+    int a = 42;
+    int & b = f(a);
+    std::cout << a << ' ' << b << '\n';
+    std::cout << &a << ' ' << &b << '\n';
+    b++;
+    std::cout << a << ' ' << b << '\n';
     return 0;
 }
 \end{consolethree}
 
-Of course, this is better:
-
 \begin{consolethree}[escapeinside=||]
-...
-class Int
+#include <iostream>
+
+int & f(int & x)
 {
-public:
-    ...
-    Int max(const Int & c)
-    {
-        return (c.x_ > x_ ? c : *this);
-    }
-    ...
-private:
-    int x_;
-};
-...
-\end{consolethree}
-
-Get it? In this case, we are returning a copy of the \texttt{Int} object
-that \texttt{this} points to, i.e., the object invoking the method.
-
-Notice however that you can also do this:
-
-\begin{consolethree}[escapeinside=||]
-...
-class Int
-{
-    ...
-    Int & max(const Int |\EMPHASIZE{\&}| c)
-    {
-        return (c.x_ > x_ ? c : *this);
-    }
-    ...
-private:
-    int x_;
-};
-...
-\end{consolethree}
-
-In this case, a \EMPHASIZE{reference is returned}.
-
-Why is this important? Look at this code:
-
-\begin{consolethree}[escapeinside=||]
-#include "Int.h"
+    x++;
+    return x;
+}
 
 int main()
 {
-    Int a(100), b(1);
-    Int c = a.max(b);
-    c.print();
+    int a = 42;
+    int b = f(a);
+    std::cout << a << ' ' << b << '\n';
+    std::cout << a << ' ' << b << '\n';
+    b++;
+    std::cout << a << ' ' << b << '\n';
     return 0;
 }
 \end{consolethree}
 
-This means if the return of \texttt{Int::max()} is an \texttt{Int} and not
-an \texttt{Int \&}
+The point:
 
 \begin{consolethree}[escapeinside=||]
-...
-class Int
-{
-public:
-    ...
-    |\EMPHASIZE{Int}| max(const Int & c)
-    {
-        ...
-    }
-    ...
-};
-...
+int a = 42;
+int & b = a;
+int & receiver1 = b;  // receiver1 references a
+int receiver2 = b;    // receiver2 gets the value of a
+receiver1 = 0;        // a is changed
+receiver2 = 0;        // receiver2 is changed, not a.
 \end{consolethree}
 
-then an \texttt{Int} value is returned (it has the same values as \texttt{a}
-or \texttt{b}). This \texttt{Int} value is used for the invocation of the
-\texttt{Int} copy constructor to initialize \texttt{c}.
-
-Make sure you read the last two sentences again (and again and again).
-
-However if a reference is returned:
+What about this?
 
 \begin{consolethree}[escapeinside=||]
-...
-class Int
+int & f()
 {
-public:
-    ...
-    |\EMPHASIZE{Int \&}| max(const Int & c)
-    {
-        ...
-    }
-    ...
-};
-...
-\end{consolethree}
-
-then back in \texttt{main()},
-\begin{consolethree}
-#include "Int.h"
-
-int main()
-{
-    Int a(100), b(1);
-    Int c = a.max(b);
-    c.print();
-    
-    return 0;
+    int x = 42;
+    return x;
 }
 \end{consolethree}
 
-on returning from \texttt{Int::max()}, a reference to a or to b is used by
-the copy constructor to initialize \texttt{c}. There's no
-extra \texttt{Int} object created by \texttt{Int::max()} that is used to
-initialize \texttt{c}.
-
-Let me repeat again: when you return \texttt{Int} (not \texttt{Int \&}), a
-copy of the object to be returned is made (by using the copy
-cconstructor).
-\begin{consolethree}[escapeinside=||]
-...
-class Int
-{
-public:
-    ...
-    |\EMPHASIZE{Int}| max(const Int & c)
-    {|\xsidebox[0cm]{0cm}{}{ctorbx}{Copy constructor is called using \texttt{c} or \texttt{*this}!!! Because return type is \texttt{Int} (and not \texttt{Int \&}) Remember that!!!}|
-        return (c.x > x ? c : *this);
-    }
-    ...
-private:
-\end{consolethree}
-Whereas if you return \texttt{Int \&}, no \texttt{Int} object is created.
-The copy constructor used to create \texttt{c} will simply reference
-\texttt{a} or \texttt{b}.
+This returns a reference to a local variable but you cannot refer to
+this local variable once it goes out of scope since it will be destroyed
+at that point. (Note: this is OLD stuff. Yes I have already talked about
+it.)
 
 

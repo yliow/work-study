@@ -1,239 +1,97 @@
+\sectionthree{reinterpret\_cast and void *}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{\texttt{const\_cast}}
 
-Look at this program:
-
-\begin{console}
-void g(int & y)
-{}
-
-void f(const int & x)
-{   
-    g(x);
-}
-
-int main()
-{   
-    f(42);
-    return 0;
-}
-\end{console}
-
-Will it compile? (I'll give you 5 seconds.) Next, try to compile it.
-
-Of course it won't.
-
-If you did not answer the above question correctly, you should review
-notes on references and also on pointers right away because the above is
-similar to
-\begin{console}
-void g(int * y)
-{}
-
-void f(const int * x)
-{    
-     g(x);
-}
-
-int main()
-{   
-    int i = 42;
-    f(&i);
-    return 0;
-}
-\end{console}
-
-
-In particular look at constantness of pointers (and of references).
-
-This will not compile
-
-\begin{console}
-void g(int & y)
-{}
-
-void f(const int & x)
-{    
-     g(x);
-}
-
-int main()
-{   
-    int i = 42;
-    f(i);
-    return 0;
-}
-\end{console}
-
-
-because the \texttt{y} of \texttt{g()} references the \texttt{x} of
-\texttt{f()}, but\texttt{y} is a reference while \texttt{x} is a reference to
-a constant. This means that \EMPHASIZE{x cannot change the value it is referencing} and yet \texttt{x} wants to \EMPHASIZE{allow y to reference that value with the power to change it.} That's \EMPHASIZE{not possible.} This is similar to this issue (for references):
+Recall that while you can do C-style casting for pointer types:
 
 \begin{console}
 int i = 42;
-const int & x = i;   // x is weak ... change change i
-int & y = x;         // y wants to be strong and wants
-                     // to change i, through x. NOPE!!!
+float * p = (float *)(&i);
 \end{console}
 
-which has the same issue as this (for pointers):
+Using C++ typecasting, the above is done using the \texttt{reinterpret\_cast}. Try this:
 
 \begin{console}
 int i = 42;
-const int * x = &i;
-int * y = x;
+float * p = reinterpret_cast< float * >(&i);
 \end{console}
 
-Going back to
+You should try to do the above with \texttt{\EMPHASIZE{static\_cast}} and \texttt{\EMPHASIZE{const\_cast}} to check that neither of them works.
+
+You should try this:
 
 \begin{console}
-void g(int & y)
-{}
-
-void f(const int & x)
-{    
-     g(x);
-}
-
-int main()
-{   
-    f(42);
-    return 0;
-}
-\end{console}
-
-The issue is the \texttt{x} in \texttt{g(x)} \EMPHASIZE{cannot} be referencing a constant \texttt{int}, i.e., you want to \EMPHASIZE{remove the constantness} of the \texttt{x}:
-
-\begin{consolethree}[escapeinside=||]
-void g(int & y)
-{}
-
-void f (|\EMPHASIZE{const}| int & x)
-{    
-     g(x);
-}
-int main()
-{   
-    f(42);
-    return 0;
-}
-\end{consolethree}
-
-Of course one solution is this:
-\begin{consolethree}[escapeinside=||]
-void g(|\EMPHASIZE{const}| int & y)
-{}
-
-void f (const int & x)
-{    
-     g(x);
-}
-int main()
-{   
-    f(42);
-    return 0;
-}
-\end{consolethree}
-Then everything works. But if the function \texttt{g()} was written by someone else and you cannot change the source code, then what are you doing to do? (This does happen. For instance \texttt{g()} might be a function in a library that someone else wrote and you only have the header file and the compiled binary code, but not the source file. This means that although you can change the prototype in the header file it won't help because you cannot change \texttt{g()} in the cpp file.)
-
-You can remove the constantness of the \texttt{x} in \texttt{f()}:
-
-\begin{consolethree}[escapeinside=||]
-void g(int & y)
-{}
-
-void f(|\EMPHASIZE\sout\redtext{const}| int & x)
-{    
-     g(x);
-}
-
-int main()
-{   
-    f(42);
-    return 0;
-}
-\end{console}
-
-But what if the function \texttt{f()} should not change the value that \texttt{x} references? For instance what if \texttt{f()} is a printing function? Then \texttt{x} should be a constant reference \ldots \EMPHASIZE{except when calling \texttt{g()}}. In other words, you only want to remove the constantness of \texttt{x} \EMPHASIZE{temporarily.} Then you can use the constant cast:
-
-\begin{consolethree}[escapeinside=||]
-void g(int & y)
-{}
-
-void f(const int & x)
-{    
-     g(|\EMPHASIZE\texttt{const\_cast< int \& >}|(x));
-}
-int main()
-{   
-    f(42);
-    return 0;
-}
-\end{consolethree}
-
-Go ahead and compile it now.
-
-NOTE: This is (in my opinion) a wrong name. Because it makes you think that you are making something constant. In fact the point of this cast is to \EMPHASIZE{remove} the constantness. A better name would be ``remove\_const\_cast''!!!
-
-This can happen in the following scenario. Suppose in your \texttt{Date} class, you forgot to make the \texttt{get\_year()} method constant. Then this will not compile:
-
-\begin{console}
-class Date
-{
-public:
-     ...
-     int get_yyyy() // OOPS ... forgot to make method
-                    // constant!!!
-     {
-          return yyyy_;
-     }
-     ...
-};
-
-std::ostream & operator<<(std::ostream & cout,
-                          const Date & date)
-{    
-     cout << date.get_yyyy()
-          << ...
-     return cout;
-}
-
-int main()
-{   
-    f(42);
-    return 0;
-}
-\end{console}
-
-\input{exercises/0-83-casting/main.tex}
-In general, use of \texttt{const\_cast} indicates an issue with the design
-of the code (just like the above scenario) -- the issue is really that
-\texttt{get\_yyyy()} should be made constant. But there are times when you
-have no choice when you don't have access to the source cpp file and the
-definition of the function/method is in the cpp file and not in the
-header file.
-
-For the analogous pointer case, you can also use constant cast to
-resolve the issue:
-
-\begin{consolethree}[escapeinside=||]
-void g(int * x)
-{}
-
-void f(const int * x)
-{    
-     g(|\EMPHASIZE\redtext{const\_cast< int * >(x)}|);
-}
+#include <iostream>
 
 int main()
 {   
     int i = 42;
-    f(&i);
-
+    float * p = reinterpret_cast< float * >(&i);
+    *p = 0.0f;
+    std::cout << i << '\n'; // you get 0 because the
+                            // bit pattern of 0.0f
+                            // happens to be the same
+                            // bit pattern of 0.
+    *p = 3.14f;
+    std::cout << i << '\n'; // you do NOT get 3
+                            // because the bit
+                            // pattern of 3.14f is
+                            // NOT 3.
     return 0;
 }
-\end{consolethree}
+\end{console}
+
+The second output is \texttt{1078523331}. Why? Because the bit pattern for \texttt{3.14f} happens to be the bit pattern of the integer \texttt{1078523331}.
+
+In general you should probably not use \texttt{reinterpret\_cast} of pointers until you have taken CISS360 where you will learn more about bit representations and C/C++ bit programming.
+
+Note that in the above \texttt{p} points to a \texttt{float} (the smaller version of \texttt{double}). So C++ will treat \texttt{*p} is a \texttt{float}. Sometimes (in the future), you might simply \EMPHASIZE{want an address} and you \EMPHASIZE{don't really want to interpret the value at that address} as an \texttt{int} or \texttt{double} or \texttt{float} or \texttt{char} or \texttt{bool} or anything at all. In that case, the pointer type you want is called
+
+\begin{center}
+\EMPHASIZE{void *}
+\end{center}
+
+Of course if \texttt{q} is a \texttt{void *}, you can print the address
+stored in \texttt{q}, you can give that address value to another pointer
+variable. But you should not work with \texttt{*q} since C++ does not know
+how to interpret the bits at that address. Run this:
+
+\begin{console}
+int i = 42;
+float * p = reinterpret_cast< float * >(&i);
+*p = 0.0f;
+std::cout << i << '\n';
+*p = 3.14f;
+std::cout << i << '\n';
+
+void * q = reinterpret_cast< float * >(&i);
+std::cout << q << '\n';    // OK
+std::cout << (*q) << '\n'; // ARGH!!!! WRONG!!!
+\end{console}
+
+Run this too where you store an \texttt{int*} value in a \texttt{void*} pointer, pass the value of the pointer to another \texttt{void*} pointer, cast the \texttt{void*} value to a \texttt{double*}:
+
+\begin{console}
+int * p0 = new int;
+void * p1 = p0;
+void * p2 = reinterpret_cast< void * >(p0);
+double * p3 = reinterpret_cast< double * >(p2);
+std::cout << p0 << ' ' << p1 << ' ' << p2 << ' '
+          << p3 << '\n';
+\end{console}
+
+As I mentioned earlier, in the area of OpenCV and OpenGL, you'll see
+that many software engineers do not use the C++ style casting. For
+instance one function in OpenGL is
+\begin{center}
+\verb!void glVertexAttribPointer(GLuint index,                                                                   GLint size,                                                                     GLenum type,                                                                    GLboolean normalized,                                                           GLsizei stride,                                                                 const void * pointer);!
+\end{center}
+and you'll see that most OpenGL programmers will simply use the simple
+C/C++ cast like this to call the above function:
+\begin{center}
+\verb!glVertexAttribPointer(0,                                                                              3,                                                                       GL_FLOAT,                                                                       GL_FALSE,                                                           5 * sizeof (GLfloat),                                                                   (GLvoid*) 0);!
+\end{center}
+
+(note: GLvoid is just a typedef of void.)
 

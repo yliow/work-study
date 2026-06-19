@@ -1,47 +1,83 @@
+\sectionthree{Example and exercise: \texttt{IntPointer}}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Default copy constructor}
 
-If a copy constructor is not specified, your C++ compiler will supply a
-default copy constructor that initializes all instance variables of the
-object invoking the constructor with the corresponding members of the
-object that is passed in.
+The next few exercises are extremely important!!! Some will in fact
+appear in assignments!!!
 
-\begin{consolethree}[escapeinside=||]
-// C has instance variables a_, b_, c_, d_
-C::C(const C & obj)
-    : a_(obj.a_), b_(obj.b_), c_(obj.c_), d_(obj.d_)
-{}
-\end{consolethree}
-
-So technically we don't need the copy constructor for our \texttt{Date}
-class. However, you will see very soon, that there are cases (many
-cases!!!) where you want your own copy constructor to do something else.
-So here's the warning just so you catch it ...
-
-\EMPHASIZE{WARNING:} There are cases where the default member-by-member
-copy is \EMPHASIZE{\texttt{not}} what you want. (See later examples.)
-
-If you define a copy constructor, of course the compiler will not supply
-one. You can't possibly have two copy constructors. (Why?)
-
-Comment out our copy constructor in \texttt{Date} and then execute in
-\texttt{main()}:
+One of the problems regarding pointers (pointing to either a single
+value or an array of values) is that there's a danger of forgetting to
+deallocate memory:
 
 \begin{consolethree}[escapeinside=||]
-Date date1(2050, 1, 1);
-Date date2(date1);  // clone date2 from date1
-Date date3 = date1; // clone date3 from date1
+void f()
+{
+    int * p = new int;
+    int * q = new int[10];
+    // do something with *p
+    // do something with q[0],...,q[9]
+    return; // oops ... forgot delete p and
+            // delete [] q;
+}
+
+int main()
+{
+    f();
+    // oops ... memory leak ... lost 11 integers!!!
+    return 0;
+}
 \end{consolethree}
 
-You will find that the compiler will not complain and the program does
-run. Why? Because your C++ compiler supplies the default copy
-constructor.
+You will see later (see notes on Destructors) that classes will help
+solve this very dangerous problem. For this section,
+let's talk about a pointer to a single value and write a
+class for that.
 
-\input{exercises/20-61-constructors/main.tex}
-\input{exercises/21-61-constructors/main.tex}
-\input{exercises/22-61-constructors/main.tex}
-\input{exercises/23-61-constructors/main.tex}
-\input{exercises/24-61-constructors/main.tex}
+The following class models an integer pointer. This is an important
+example. But it's incomplete. (Clearly once
+you're done with this, you can also talk about a class
+to model the pointer to a double, to a char, etc.)
+
+\begin{consolethree}[escapeinside=||]
+class IntPointer
+{
+public:
+    IntPointer(int x)
+        : p_(new int) // allocate memory for p_
+    {
+        *p_ = x;      // store an int at memory that p_
+                      // points to
+    }
+    IntPointer(const IntPointer & intptr)
+        : p_(new int)
+    {
+        *p_ = *(intptr.p_);
+    }
+    int dereference()
+    {
+        return *p_;
+    }
+    void allocate()
+    {
+        if (p_ == NULL)
+        {
+            p_ = new int;
+        }
+    }
+    void deallocate()
+    {
+        delete p_;
+    }
+private:
+    int * p_;
+};
+\end{consolethree}
+
+\input{exercises/25-61-constructors/main.tex}
+\input{exercises/26-61-constructors/main.tex}
+\input{exercises/27-61-constructors/main.tex}
+\input{exercises/28-61-constructors/main.tex}
+\input{exercises/29-61-constructors/main.tex}
+\input{exercises/30-61-constructors/main.tex}
 

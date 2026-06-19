@@ -1,60 +1,62 @@
+\sectionthree{operator>> and operator<<}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Avoiding member-wise copy}
 
-If your object is going to use some resource that requires code to
-manually acquire and release, you \textbf{must} write your own
+You've been using \textit{<<} and
+\textit{>>} since day 1 of CISS240. From your
+previous notes you know that you can overload
+\textit{operator>>} and
+\textit{operator<<}. You also know from CISS240 that you
+can output
 
-\begin{itemize}
-\item constructor (to acquire resource)
-\item destructor (to release resource)
-\item copy constructor (to prevent memberwise copy)
-\item \textit{operator=} (to prevent memberwise copy)
-\end{itemize}
+\textit{int, char[], double}, etc., i.e., C++ has overloaded
+\textit{operator>>} in iostream.h. You also know
+that you can do
 
-Here's a standard example where the ``resource'' is
-memory ...
+\textit{std::cout << "A" << 3 << 5.5;}
+
+So the operators return an object.
 
 \begin{consolethree}[escapeinside=||]
-class IntPointer
+#include <iostream>
+
+#ifndef INT_H
+#define INT_H
+
+class Int
 {
 public:
-    IntPointer()
-        : p_(new int)
-    {}
-    IntPointer(const IntPointer & intptr)
-        : p_(new int)
-    {
-        *p_ = *(intptr.p_);
-    }
-    ~IntPointer() { delete p_; }
-    IntPointer & operator=(const IntPointer & intptr)
-    {
-        if (this == &intptr)
-        {
-            return (*this);
-        }
-        *p_ = *(intptr.p_);
-        return (*this);
-    }
+    Int(int x0 = 0) : x_(x0) {}
+    int get() const { return x_; }
+    ...
+    void operator<<(std::ostream &, const Int &);
+    ...
 private:
-    int * p_;
+    int x_;
 };
+
+#endif
 \end{consolethree}
 
-You should document your \textit{IntPointer} to let the user know that
-\textit{IntPointer} objects do not share memory. Why? Because if you use
-the regular pointers:
+\begin{consolethree}[escapeinside=||]
+#include "Int.h"
 
-\textit{int * p = new int;}
+void operator<<(std::ostream & cout, const Int & c)
+{
+    cout << c.get();
+}
+\end{consolethree}
 
-\textit{int * q;}
+\begin{consolethree}[escapeinside=||]
+#include "Int.h"
 
-\textit{q = p;}
+int main()
+{
+    Int c(42);
+    std::cout << c;
+    return 0;
+}
+\end{consolethree}
 
-then \textit{p} and \textit{q} do point to the same integer value.
-
-\input{exercises/2-65-operators/main.tex}
-\input{exercises/3-65-operators/main.tex}
 

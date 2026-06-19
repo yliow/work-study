@@ -1,125 +1,113 @@
+\sectionthree{Default value parameter and nonconstant value}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Default Values}
 
-Try this:
-
-\begin{consolethree}[escapeinside=||]
-#include <iostream>
-
-void printHeads(int numHeads = 1)
-{
-    std::cout << "number of heads: " << numHeads
-              << std::endl;
-}
-
-int main()
-{
-    printHeads(); // NO ARGUMENT PASSED IN!!!
-    printHeads(42);
-    return 0;
-}
-\end{consolethree}
-
-(Forget about prototypes for the time being. They will come in a bit ...)
-
-Parameter \texttt{numHeads} of function \texttt{printHeads()} is called a parameter with a \EMPHASIZE{default value}.
-
-One obvious use of default values is that you can make it easier for other programmers to use your function: You choose the most common value for a parameter and make it the default value for that parameter. Any time someone (including yourself) uses the function in the ``most commonly used'' manner, he/she need not send in an argument.
-
-Here's another example:
+One more example. Recall we have the \texttt{isprime()} that returns \texttt{true} if the values passed in is a prime number, otherwise \texttt{false} is returned.
 
 \begin{consolethree}[escapeinside=||]
-#include <iostream>
-
-void printHello(int i = 0)
+bool isprime(int n)
 {
-    std::cout << "hello ";
-    switch (i)
+    for (int i = 2; i <= sqrt((double)n); i++)
     {
-        case 0: std::cout << "world\n"; break;
-        case 1: std::cout << "galaxy\n"; break;
-        case 2: std::cout << "universe\n"; break;
-        case 3: std::cout << "underverse\n"; break;
+        if (n % i == 0) return false;
     }
-}
-
-int main()
-{
-    printHello();
-    printHello(1);
-    return 0;
+    return true;
 }
 \end{consolethree}
 
-Right now there are only \EMPHASIZE{three rules} to remember: Think of the parameters of a function as parameters without default values and parameters with default values. \EMPHASIZE{All the parameters with default values must be together} and appear \EMPHASIZE{after those without default values}.
+Suppose for some reason you know something about n: if there is a prime divisor of n, then it must be at least 11. You might want to tell \texttt{isprime()} to start the search for a divisor from 11.
 
-In other words this is OK:
-
-\begin{consolethree}[escapeinside=||]
-bool spam(int a, double b, |\textbf{\underline{char c = '\$', int d = 42}}|)
-{
-    ...
-}
-\end{consolethree}
-
-But this is WRONG:
-
-\begin{consolethree}[escapeinside=||]
-bool spam(int a, |\textbf{\underline{double b = 3.14}}|, char c, |\textbf{\underline{int d = 42}}|)|\xsidebox[0cm]{0cm}{}{txt2}{\texttt{c} does not have a default value but appears after \texttt{b} which has a default value.}|
-{
-    ...
-}
-\end{consolethree}
-
-Make sure you try this or you won't remember.
-
-So remember to group up the parameters into those with default values
-and those without. The ones without (if any) must come first.
-
-Another rule: \textbf{default values must be constants} (example:
-constant literals such as 5 or constant expressions.) In other words
-this is OK:
-
-\begin{consolethree}[escapeinside=||]
-const int X = 42;
-bool spam(int a, double b, char c = '$', int d = X+1)
-{
-    ...
-}
-\end{consolethree}
-
-But this is WRONG:
-
-\begin{consolethree}[escapeinside=||]
-int X = 42;
-bool spam(int a, double b, char c = '$', int d = X)
-{
-    ...
-}
-\end{consolethree}
-
-\input{exercises/0-24-default-values/main.tex}
-Last one: \EMPHASIZE{You cannot have default values for array parameters.} For instance the following will not compile:
+Let's modify the function preserving the older use:
 
 \begin{consolethree}[escapeinside=||]
 #include <iostream>
+#include <cmath>
 
-void print(int x[] = {2, 3})
+bool isprime(int n, int start = 2)
 {
-    std::cout << x[0] << ' ' << x[1];
+    for (int i = start; i <= sqrt((double)n); i++)
+    {
+        if (n % i == 0) return false;
+    }
+    return true;
 }
 
 int main()
 {
-    print();
+    std::cout << isprime(5) << '\n'
+              << isprime(5, 3) << '\n'
+              << isprime(169, 11) << std::endl;
     return 0;
 }
 \end{consolethree}
 
-(See last section for exception.)
+Now let's try to generalize the upper bound of the search. Let's try this:
 
-\input{exercises/1-24-default-values/main.tex}
-\input{exercises/2-24-default-values/main.tex}
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <cmath>
+
+bool isprime(int n,
+             int start = 2,
+             |\textbf{int end = sqrt((double)n))}|
+{
+    for (int i = start; i <= end; i++)
+    {
+        if (n % i == 0) return false;
+    }
+    return true;
+}
+
+int main()
+{
+    std::cout << isprime(5) << '\n'
+              << isprime(5, 3) << '\n'
+              << isprime(169, 11) << std::endl;
+    return 0;
+}
+\end{consolethree}
+
+Does it work?
+
+It \EMPHASIZE{won't work} because remember you can only use constants for default values. So how do you set a parameter to ``default value'' that depends on an expression like the above? This is how you do it:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+#include <cmath>
+
+bool isprime(int n, int start = 2, int end = -1)
+{
+    |\textbf{if (end == -1) end = sqrt(double(n));}|
+    for (int i = start; i <= end; i++)
+    {
+        if (n % i == 0) return false;
+    }
+    return true;
+}
+
+int main()
+{
+    std::cout << isprime(5) << '\n'
+              << isprime(5, 3) << '\n'
+              << isprime(169, 11) << '\n'
+              << isprime(21, 3, 7);
+    return 0;
+}
+\end{consolethree}
+
+Of course in this case we must choose a reasonable default value for parameter \texttt{end}. In the above case, I choose a value the user won't be using. This is similar to the use of the sentinel values in terminating a while-loop.
+
+Note that a default values can be from a function call as long as the function call involves only constants. Make sure you run this:
+
+\begin{consolethree}[escapeinside=||]
+int g(int x)
+{
+    return x * x;
+}
+
+void f(int x, int y = g(42))
+{}
+\end{consolethree}
+
 

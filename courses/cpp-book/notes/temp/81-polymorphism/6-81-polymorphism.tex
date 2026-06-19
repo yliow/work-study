@@ -1,42 +1,90 @@
+\sectionthree{Packaging auto destructor}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Virtual constructors and destructors}
 
-Constructors cannot be virtual \ldots try this:
+Now look at this:
 
 \begin{console}
+#include <iostream>
+
 class P
 {
 public:
-     virtual P() {}
+     virtual ~ P() { std::cout << "P::~ P()\ n"; }
+     void m() { std::cout << "P::m()\ n"; }
+     
+private:
 };
 
 class C: public P
 {
 public:
-     virtual C() {}
+     C() : q(new int) {}
+     ~ C() { std::cout <<
+     "C::~ C()\ n"; delete q; }
+     void m() { std::cout << "C::m()\ n"; }
+     int * q;
 };
 
 int main()
 {   
     P * p = new C;
+    p-> m();
+    delete p;
     return 0;
 }
 \end{console}
 
-A virtual function is about choosing the right method when an object
+This allows us to work with objects through polymorphism. But this is achieved through pointers. Recall a benefit of classes -- you can auto execute the destructor when an object is going out of scope. In the above example, we have to remember to deallocate the memory used by the object that \texttt{p} points to:
 
-invokes the method. But that implies that the object exists. In the above:
+\tab[5em]{\verb!delete p;!}\\
+
+Using the idea in the chapter on destructor, we do this:
+
 \begin{console}
-    P * p = new C;
+#include <iostream>
+
+class P
+{
+public:
+     virtual ~ P() { std::cout << "P::~ P()\ n"; }
+     void m() { std::cout << "P::m()\ n"; }
+private:
+};
+
+class C: public P
+{
+public:
+     C() : q(new int) {}
+     ~ C() { std::cout << "C::~ C()\ n"; delete q; }
+     void m() { std::cout << "C::m()\ n"; }
+     int * q;
+};
+
+class autoP
+{
+public:
+     autoP()
+         : p_(new C)
+     {}
+     ~ autoP()
+     { delete p_; }
+     void m() { p_-> m(); }
+     
+private:
+     P * p_;
+};
+
+int main()
+{   
+    autoP p;
+    p.m();
+    return 0;
+}
 \end{console}
 
-has nothing to do with executing a method through \verb!p!.
-
-Therefore \ldots \EMPHASIZE{if you plan to use polymorphism, make sure your constructors are not virtual}.
-
-The above can be caught by the compiler. So it's not as serious as the following problem. Make sure you run it!
+Of course we need to figure out what to do with the copy constructor and \texttt{operator=}. If you don't plan to do that, you can put the prototypes in the \texttt{private} section.
 
 \begin{console}
 #include <iostream>
@@ -45,7 +93,8 @@ class P
 {
 public:
      P() : p(new int) {}
-     ~ P() { std::cout << "P::~ P()\ n"; }
+     virtual ~ P() { std::cout << "P::~ P()\ n"; }
+     void m() { std::cout << "P::m()\ n"; }
      
 private:
      int * p;
@@ -56,31 +105,53 @@ class C: public P
 public:
      C() : q(new int) {}
      ~ C() { std::cout << "C::~ C()\ n"; delete q; }
+     void m() { std::cout << "C::m()\ n"; }
      int * q;
+};
+
+class autoP
+{
+public:
+     autoP()
+         : p_(new C)
+     {}
+     ~ autoP()
+     { delete p_; }
+     void m() { p_->m(); }
+     
+private:
+     autoP(const autoP & p);
+     const auto P & operator=(const autoP &);
+     P * p_;
 };
 
 int main()
 {   
-    P * p = new C;
-    delete p;
+    autoP p;
+    p.m();
     return 0;
 }
 \end{console}
 
-Read the output very carefully.
+If you do want to allow copy constructor and \texttt{operator=}, you have to decide on what they should do, i.e., after
 
-Why is this a problem? The destructor called is the destructor in the parent. Of course the object to destroy is a child class object (which includes a parent part), not just the parent class object. The above code therefore will cause a \EMPHASIZE{memory leak} because the resource used by the child class is not released.
+\tab[5em]{\verb!autoP p0;!}\\
+\tab[5em]{\verb!autoP p1;!}\\
+\tab[5em]{\verb!p1 = p0;!}\\
 
-Now try this:
+does \texttt{p1} points to the same object that \texttt{p0} points to or is the object that \texttt{p1} points to have the same values as the object that \texttt{p0} points to (i.e., it's a copy)?
 
-\begin{consolethree}[escapeinside=||]
+By the way, since the parent destructor is virtual, calling delete in autoP will execute the destructor in the child class. But what is the parent also has some memory allocation in its constructor like this:
+
+\begin{console}
 #include <iostream>
 
 class P
 {
 public:
      P() : p(new int) {}
-     |\textbf{ virtual }|~ P() { std::cout << "P::~ P()\ n"; }
+     virtual ~ P() { std::cout << "P::~ P()\ n"; }
+     void m() { std::cout << "P::m()\ n"; }
 
 private:
      int * p;
@@ -91,32 +162,44 @@ class C: public P
 public:
      C() : q(new int) {}
      ~ C() { std::cout << "C::~ C()\ n"; delete q; }
+     void m() { std::cout << "C::m()\ n"; }
      int * q;
 };
+... 
+\end{console}
 
-int main()
-{   
-    P * p = new C;
-    delete p;
-    return 0;
-}
-\end{consolethree}
+Then the child has to deallocate the memory allocation in the parent.
+Assuming the pointer in the parent is private, one might want to do
+this:
 
-You should see two outputs. Why? Because of polymorphism, when you do
-
-\tab[5em]{\verb!delete p;!}\\
-
-the destructor used is \verb!C::~ C()!. But remember from the notes on inheritance that this would execute the body of \verb!C::~ C()! and then \verb!P::~ P()! would be executed.
-
-Therefore \ldots \EMPHASIZE{if you plan to use polymorphism with your (parent) class, and you perform delete on your pointer, you must have a public virtual destructor.}
-
-Of course if the child object executes its destructor on its own, then
-that would be a different story since the pointer is then not responsible for
-the deallocation. For instance
 \begin{console}
-if (true)
-{   
-    C c;
-    P * p = &c;
-}   // c goes out of scope and called c::~ C()
+#include <iostream>
+
+class P
+{
+public:
+     P() : p(new int) {}
+     virtual ~ P() { std::cout << "P::~ P()\ n"; }
+     void m() { std::cout << "P::m()\ n"; }
+     void deallocate() { delete p; }
+     
+private:
+     int * p;
+};
+
+class C: public P
+{
+public:
+     C() : q(new int) {}
+     ~ C()
+     {
+         std::cout << "C::~ C()\ n";
+         deallocate();
+         delete q;
+     }   
+     void m() { std::cout << "C::m()\ n"; }
+     int * q;
+};
+... 
+\end{console}
 

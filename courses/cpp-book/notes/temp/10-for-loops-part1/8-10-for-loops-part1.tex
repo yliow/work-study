@@ -1,134 +1,1390 @@
+\sectionthree{Mental picture of flow of execution}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Scope}
 
-The scope of a variable refers to where you can reference the variable.
-In the following program:
-\begin{console}
-for (int i = 10; i > 0; i--)
-{   
-    std::cout << i;
-    std::cout << " ... ";
-}
-std::cout << "blast off!" << std::endl;
-\end{console}
-
-The variable \texttt{i} is created in the \texttt{for}-loop. Once you step
-out of the \texttt{for}-loop, the variable \texttt{i} goes out of scope and
-is \EMPHASIZE{destroyed}.
-\begin{center}
-\EMPHASIZE{THIS IS VERY IMPORTANT!!!}
-\end{center}
-Try this:
-\sidenote
-{
-\begin{tikzpicture}
-    \node[draw,text width=4cm,minimum height=5cm,minimum width=1.5cm, line width=0.05cm, inner sep=0.3cm] (a) at (-3.8,-2) 
-        {\normalsize{\tikzmark{start}}};
-    \node[draw,minimum height=1.6cm,text width=1.8cm, line width=0.05cm, inner sep=0.3cm] (b) at (-3.7,-1.1) {};
-    \node[above right=0.1cm, inner sep=4pt] (forloop) at (a.north) {\normalsize{for-loop}};
-    \node[anchor=south west, inner sep=4pt] (main) at (a.north west) {\normalsize{main}};
-    \node[below right=0.2cm of a, inner sep=8pt] (ivar) at (a.south west) {\normalsize{i is here}};
-    \node[align=left, above right=1cm of a, inner sep=2pt, font=\normalsize\bfseries] at (a.north west) {Memory while \\ in the for-loop};
-    \draw [dashed, thick, ->] (ivar.north) to (b.center);
-    \draw [dashed, thick, ->] (forloop.south) to (b.north);
-    
-\end{tikzpicture}
-}
+Recall that the flow of execution for the for-loop looks like this:
 \begin{python}
 from latextool_basic import *
-D = r'''
-#include <iostream>
-int main()
-{   
-    for (int i = 10; i > 0; i--)
-    {   
-        std::cout << i;
-        std::cout << " ... ";
-    }
+p = Plot()
+#p += Grid(x0=-3,y0=-10,x1=14,y1=10)
+D = '''
 
-    std::cout << "blast off!" << std::endl;
-    std::cout << i << std::endl;
 
-    return 0;
-}
-'''
-print(verbatim(D.strip(), command=['textbf', 'std::cout << i << std::endl;']))
+
+
+
+for (         ;                   ;              )
+
+
+
+
+
+
+
+
+true
+
+         
+
+false
+
+
+
+
+
+'''.strip()
+p += Rect(-1.2, 1.6, 10, 3, linewidth=0.1)
+p += Rect(1.1, -0.6, 2.7, 0.2, linewidth=0.1)
+p += Rect(4.2, -0.6, 6.8, 0.2, linewidth=0.1)
+p += Rect(7.5, -0.6, 9.5, 0.2, linewidth=0.1)
+p += Rect(-1.2, -6.3, 10, 0.8, linewidth=0.1)
+p += Rect(1.6, -4.9, 7.5, -4.3, linewidth=0.1)
+p += Rect(-0.2, -8.5, 10.4, -7.1, linewidth=0.1)
+
+p += Line(points=[(-2.3, -7.3),(-0.2, -7.3)] , linewidth=0.1, linecolor='red', endstyle='>')
+
+p += Line(points=[(-2.3, -6.8),(-2.3, -7.3)] , linewidth=0.1, linecolor='red')
+
+p += Line(points=[(10.7, -6.8),(-2.3, -6.8)] , linewidth=0.1, linecolor='red')
+
+p += Line(points=[(10.7, -5.65), (10.7, -6.8)] , linewidth=0.1, linecolor='red')
+
+p += Line(points=[(10, -5.65),(10.7, -5.65)] , linewidth=0.1, linecolor='red')
+
+p += Line(points=[(8.5, -0.5),(8.5,-1),(7,-1),(7,0.5),(5.8,0.5),(5.8, 0.15)] , linewidth=0.1, linecolor='red', endstyle='>')
+
+p += Line(points=[(-0.7, -4.5),(1.6, -4.5)] , linewidth=0.1, linecolor='red', endstyle='>')
+
+p += Line(points=[(7.5, -4.6),(9,-4.6),(9, -0.5)] , linewidth=0.1, linecolor='red', endstyle='>')
+
+p += Line(points=[(-0.7, -5.65),(10, -5.65)] , linewidth=0.1, linecolor='red', endstyle='>')
+
+p += Line(points=[(-0.7, -3.4),(-0.7, -5.65)] , linewidth=0.1, linecolor='red')
+
+p += Line(points=[(5.7, -3.4),(-0.7, -3.4)] , linewidth=0.1, linecolor='red')
+
+p += Line(points=[(5.7, -2.4),(5.7, -3.4)], linewidth=0.1, linecolor='red')
+
+p += Line(points=[(3, -0.3),(4.1, -0.3)] , linewidth=0.1, linecolor='red', endstyle='>')
+
+p += Line(points=[(-1, 0),(-0.5, 0),(-0.5, 0.4),(1.9, 0.4),(1.9, 0.1)], linewidth=0.1, linecolor='red', endstyle='>')
+
+p += Line(points=[(10, 2.5),(11, 2.5),(11, 1.2),(-2.3, 1.2),(-2.3, 0),(-1.2, 0)], linewidth=0.1, linecolor='red', endstyle='>')
+
+
+code(p, D)
+
 print(p)
 \end{python}
 
+For you to be a competent programmer, it's extremely important to ``visualize''the flow of execution and roughly how the computer thinks. So I'm going to simulate the execution of a simple for-loop.
 
-(WARNING: If you're using Microsoft Visual Studio, you
-MUST Disable Language Extensions. Some versions of MSVS do NOT destroy
-variables created inside a \texttt{for}-loop.)
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+D = r'''
 
-\newpage Now try this:
+
+
+int sum = 0;
+
+    for ( int i = 3;     i < 5;     i = i + 1 )
+
+
+        sum = sum + i;
+
+
+
+'''.strip()
+
+p = Plot()
+code(p, D, x=-4.5, y=0, border_linewidth=0.05, innersep=0.6)
+#p += Grid(x0=-5,y0=-10,x1=10,y1=2)
+
+p += ellipse(x0=-5,y0=-8,x1=1,y1=-4, linewidth=0.1)
+p += Rect(x0=3,y0=-8,x1=10,y1=-4, linewidth=0.1)
+
+X = POINT(x=-2.3, y=-3.9, r=0, label='CPU', anchor='flushtopleft')
+Y = POINT(x=6.1, y=-3.9, r=0, label='main', anchor='flushtopleft')
+p += str(X)
+p += str(Y)
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+D = r'''
+
+
+
+int sum = 0;
+
+    for ( int i = 3;     i < 5;     i = i + 1 )
+
+
+        sum = sum + i;
+
+
+
+'''.strip()
+
+p = Plot()
+code(p, D, x=-4.5, y=0, border_linewidth=0.05, innersep=0.6)
+#p += Grid(x0=-5,y0=-10,x1=10,y1=2)
+
+p += ellipse(x0=-5,y0=-8,x1=1,y1=-4, linewidth=0.1)
+p += Rect(x0=3,y0=-8,x1=10,y1=-4, linewidth=0.1)
+p += Rect(x0=-4.8,y0=-0.7,x1=-1.9,y1=0.3, linewidth=0.12, linecolor='red')
+
+p += Rect(x0=5,y0=-5.5,x1=8,y1=-4.5, linewidth=0.1, label='0')
+
+X = POINT(x=-2.3, y=-3.9, r=0, label='CPU', anchor='flushtopleft')
+Y = POINT(x=6.1, y=-3.9, r=0, label='main', anchor='flushtopleft')
+Z = POINT(x=5, y=-5, r=0, label='sum', anchor='east')
+p += str(X)
+p += str(Y)
+p += str(Z)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+D = r'''
+
+
+
+int sum = 0;
+
+    for ( int i = 3;     i < 5;     i = i + 1 )
+
+
+        sum = sum + i;
+
+
+
+'''.strip()
+
+p = Plot()
+code(p, D, x=-4.5, y=0, border_linewidth=0.05, innersep=0.6)
+#p += Grid(x0=-5,y0=-10,x1=10,y1=2)
+
+p += ellipse(x0=-5,y0=-8,x1=1,y1=-4, linewidth=0.1)
+p += Rect(x0=3,y0=-8,x1=10,y1=-4, linewidth=0.1)
+p += Rect(x0=-2.7,y0=-1.3,x1=-0.4,y1=-0.7, linewidth=0.12, linecolor='red')
+
+p += Rect(x0=5,y0=-5.5,x1=8,y1=-4.5, linewidth=0.1, label='0')
+p += Rect(x0=5,y0=-7,x1=8,y1=-6, linewidth=0.1, label='3')
+
+X = POINT(x=-2.3, y=-3.9, r=0, label='CPU', anchor='flushtopleft')
+Y = POINT(x=6.1, y=-3.9, r=0, label='main', anchor='flushtopleft')
+Z = POINT(x=5, y=-5, r=0, label='sum', anchor='east')
+A = POINT(x=5, y=-6.5, r=0, label='i', anchor='east')
+
+p += str(X)
+p += str(Y)
+p += str(Z)
+p += str(A)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+D = r'''
+
+
+
+int sum = 0;
+
+    for ( int i = 3;     i < 5;     i = i + 1 )
+
+
+        sum = sum + i;
+
+
+
+'''.strip()
+
+p = Plot()
+code(p, D, x=-4.5, y=0, border_linewidth=0.05, innersep=0.6)
+#p += Grid(x0=-5,y0=-10,x1=10,y1=2)
+
+p += ellipse(x0=-5,y0=-8,x1=1,y1=-4, linewidth=0.1, label = 'i $<$ 5')
+p += Rect(x0=3,y0=-8,x1=10,y1=-4, linewidth=0.1)
+p += Rect(x0=0.3,y0=-1.3,x1=1.9,y1=-0.7, linewidth=0.12, linecolor='red')
+
+p += Rect(x0=5,y0=-5.5,x1=8,y1=-4.5, linewidth=0.1, label='0')
+p += Rect(x0=5,y0=-7,x1=8,y1=-6, linewidth=0.1, label='3')
+
+X = POINT(x=-2.3, y=-3.9, r=0, label='CPU', anchor='flushtopleft')
+Y = POINT(x=6.1, y=-3.9, r=0, label='main', anchor='flushtopleft')
+Z = POINT(x=5, y=-5, r=0, label='sum', anchor='east')
+A = POINT(x=5, y=-6.5, r=0, label='i', anchor='east')
+
+p += str(X)
+p += str(Y)
+p += str(Z)
+p += str(A)
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+D = r'''
+
+
+
+int sum = 0;
+
+    for ( int i = 3;     i < 5;     i = i + 1 )
+
+
+        sum = sum + i;
+
+
+
+'''.strip()
+
+p = Plot()
+code(p, D, x=-4.5, y=0, border_linewidth=0.05, innersep=0.6)
+#p += Grid(x0=-5,y0=-10,x1=10,y1=2)
+
+p += ellipse(x0=-5,y0=-8,x1=1,y1=-4, linewidth=0.1, label = '3 $<$ 5')
+p += Rect(x0=3,y0=-8,x1=10,y1=-4, linewidth=0.1)
+p += Rect(x0=0.3,y0=-1.3,x1=1.9,y1=-0.7, linewidth=0.12, linecolor='red')
+
+p += Rect(x0=5,y0=-5.5,x1=8,y1=-4.5, linewidth=0.1, label='0')
+p += Rect(x0=5,y0=-7,x1=8,y1=-6, linewidth=0.1, label='3')
+
+X = POINT(x=-2.3, y=-3.9, r=0, label='CPU', anchor='flushtopleft')
+Y = POINT(x=6.1, y=-3.9, r=0, label='main', anchor='flushtopleft')
+Z = POINT(x=5, y=-5, r=0, label='sum', anchor='east')
+A = POINT(x=5, y=-6.5, r=0, label='i', anchor='east')
+
+p += str(X)
+p += str(Y)
+p += str(Z)
+p += str(A)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+D = r'''
+
+
+
+int sum = 0;
+
+    for ( int i = 3;     i < 5;     i = i + 1 )
+
+
+        sum = sum + i;
+
+
+
+'''.strip()
+
+p = Plot()
+code(p, D, x=-4.5, y=0, border_linewidth=0.05, innersep=0.6)
+#p += Grid(x0=-5,y0=-10,x1=10,y1=2)
+
+p += ellipse(x0=-5,y0=-8,x1=1,y1=-4, linewidth=0.1, label = 'true')
+p += Rect(x0=3,y0=-8,x1=10,y1=-4, linewidth=0.1)
+p += Rect(x0=0.3,y0=-1.3,x1=1.9,y1=-0.7, linewidth=0.12, linecolor='red')
+
+p += Rect(x0=5,y0=-5.5,x1=8,y1=-4.5, linewidth=0.1, label='0')
+p += Rect(x0=5,y0=-7,x1=8,y1=-6, linewidth=0.1, label='3')
+
+X = POINT(x=-2.3, y=-3.9, r=0, label='CPU', anchor='flushtopleft')
+Y = POINT(x=6.1, y=-3.9, r=0, label='main', anchor='flushtopleft')
+Z = POINT(x=5, y=-5, r=0, label='sum', anchor='east')
+A = POINT(x=5, y=-6.5, r=0, label='i', anchor='east')
+
+p += str(X)
+p += str(Y)
+p += str(Z)
+p += str(A)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+D = r'''
+
+
+
+int sum = 0;
+
+    for ( int i = 3;     i < 5;     i = i + 1 )
+
+
+        sum = sum + i;
+
+
+
+'''.strip()
+
+p = Plot()
+code(p, D, x=-4.5, y=0, border_linewidth=0.05, innersep=0.6)
+#p += Grid(x0=-5,y0=-10,x1=10,y1=2)
+
+p += ellipse(x0=-5,y0=-8,x1=1,y1=-4, linewidth=0.1, label = 'sum = sum + i')
+p += Rect(x0=3,y0=-8,x1=10,y1=-4, linewidth=0.1)
+p += Rect(x0=-3,y0=-2.5,x1=0,y1=-1.9, linewidth=0.12, linecolor='red')
+
+p += Rect(x0=5,y0=-5.5,x1=8,y1=-4.5, linewidth=0.1, label='0')
+p += Rect(x0=5,y0=-7,x1=8,y1=-6, linewidth=0.1, label='3')
+
+X = POINT(x=-2.3, y=-3.9, r=0, label='CPU', anchor='flushtopleft')
+Y = POINT(x=6.1, y=-3.9, r=0, label='main', anchor='flushtopleft')
+Z = POINT(x=5, y=-5, r=0, label='sum', anchor='east')
+A = POINT(x=5, y=-6.5, r=0, label='i', anchor='east')
+
+p += str(X)
+p += str(Y)
+p += str(Z)
+p += str(A)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+D = r'''
+
+
+
+int sum = 0;
+
+    for ( int i = 3;     i < 5;     i = i + 1 )
+
+
+        sum = sum + i;
+
+
+
+'''.strip()
+
+p = Plot()
+code(p, D, x=-4.5, y=0, border_linewidth=0.05, innersep=0.6)
+#p += Grid(x0=-5,y0=-10,x1=10,y1=2)
+
+p += ellipse(x0=-5,y0=-8,x1=1,y1=-4, linewidth=0.1, label = 'sum = 0 + i')
+p += Rect(x0=3,y0=-8,x1=10,y1=-4, linewidth=0.1)
+p += Rect(x0=-3,y0=-2.5,x1=0,y1=-1.9, linewidth=0.12, linecolor='red')
+
+p += Rect(x0=5,y0=-5.5,x1=8,y1=-4.5, linewidth=0.1, label='0')
+p += Rect(x0=5,y0=-7,x1=8,y1=-6, linewidth=0.1, label='3')
+
+X = POINT(x=-2.3, y=-3.9, r=0, label='CPU', anchor='flushtopleft')
+Y = POINT(x=6.1, y=-3.9, r=0, label='main', anchor='flushtopleft')
+Z = POINT(x=5, y=-5, r=0, label='sum', anchor='east')
+A = POINT(x=5, y=-6.5, r=0, label='i', anchor='east')
+
+p += str(X)
+p += str(Y)
+p += str(Z)
+p += str(A)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+D = r'''
+
+
+
+int sum = 0;
+
+    for ( int i = 3;     i < 5;     i = i + 1 )
+
+
+        sum = sum + i;
+
+
+
+'''.strip()
+
+p = Plot()
+code(p, D, x=-4.5, y=0, border_linewidth=0.05, innersep=0.6)
+#p += Grid(x0=-5,y0=-10,x1=10,y1=2)
+
+p += ellipse(x0=-5,y0=-8,x1=1,y1=-4, linewidth=0.1, label = 'sum = 0 + 3')
+p += Rect(x0=3,y0=-8,x1=10,y1=-4, linewidth=0.1)
+p += Rect(x0=-3,y0=-2.5,x1=0,y1=-1.9, linewidth=0.12, linecolor='red')
+
+p += Rect(x0=5,y0=-5.5,x1=8,y1=-4.5, linewidth=0.1, label='0')
+p += Rect(x0=5,y0=-7,x1=8,y1=-6, linewidth=0.1, label='3')
+
+X = POINT(x=-2.3, y=-3.9, r=0, label='CPU', anchor='flushtopleft')
+Y = POINT(x=6.1, y=-3.9, r=0, label='main', anchor='flushtopleft')
+Z = POINT(x=5, y=-5, r=0, label='sum', anchor='east')
+A = POINT(x=5, y=-6.5, r=0, label='i', anchor='east')
+
+p += str(X)
+p += str(Y)
+p += str(Z)
+p += str(A)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+D = r'''
+
+
+
+int sum = 0;
+
+    for ( int i = 3;     i < 5;     i = i + 1 )
+
+
+        sum = sum + i;
+
+
+
+'''.strip()
+
+p = Plot()
+code(p, D, x=-4.5, y=0, border_linewidth=0.05, innersep=0.6)
+#p += Grid(x0=-5,y0=-10,x1=10,y1=2)
+
+p += ellipse(x0=-5,y0=-8,x1=1,y1=-4, linewidth=0.1, label = 'sum = 3')
+p += Rect(x0=3,y0=-8,x1=10,y1=-4, linewidth=0.1)
+p += Rect(x0=-3,y0=-2.5,x1=0,y1=-1.9, linewidth=0.12, linecolor='red')
+
+p += Rect(x0=5,y0=-5.5,x1=8,y1=-4.5, linewidth=0.1, label='0')
+p += Rect(x0=5,y0=-7,x1=8,y1=-6, linewidth=0.1, label='3')
+
+X = POINT(x=-2.3, y=-3.9, r=0, label='CPU', anchor='flushtopleft')
+Y = POINT(x=6.1, y=-3.9, r=0, label='main', anchor='flushtopleft')
+Z = POINT(x=5, y=-5, r=0, label='sum', anchor='east')
+A = POINT(x=5, y=-6.5, r=0, label='i', anchor='east')
+
+p += str(X)
+p += str(Y)
+p += str(Z)
+p += str(A)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+D = r'''
+
+
+
+int sum = 0;
+
+    for ( int i = 3;     i < 5;     i = i + 1 )
+
+
+        sum = sum + i;
+
+
+
+'''.strip()
+
+p = Plot()
+code(p, D, x=-4.5, y=0, border_linewidth=0.05, innersep=0.6)
+#p += Grid(x0=-5,y0=-10,x1=10,y1=2)
+
+p += ellipse(x0=-5,y0=-8,x1=1,y1=-4, linewidth=0.1)
+p += Rect(x0=3,y0=-8,x1=10,y1=-4, linewidth=0.1)
+p += Rect(x0=-3,y0=-2.5,x1=0,y1=-1.9, linewidth=0.12, linecolor='red')
+
+p += Rect(x0=5,y0=-5.5,x1=8,y1=-4.5, linewidth=0.1, label='3')
+p += Rect(x0=5,y0=-7,x1=8,y1=-6, linewidth=0.1, label='3')
+
+X = POINT(x=-2.3, y=-3.9, r=0, label='CPU', anchor='flushtopleft')
+Y = POINT(x=6.1, y=-3.9, r=0, label='main', anchor='flushtopleft')
+Z = POINT(x=5, y=-5, r=0, label='sum', anchor='east')
+A = POINT(x=5, y=-6.5, r=0, label='i', anchor='east')
+
+p += str(X)
+p += str(Y)
+p += str(Z)
+p += str(A)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+D = r'''
+
+
+
+int sum = 0;
+
+    for ( int i = 3;     i < 5;     i = i + 1 )
+
+
+        sum = sum + i;
+
+
+
+'''.strip()
+
+p = Plot()
+code(p, D, x=-4.5, y=0, border_linewidth=0.05, innersep=0.6)
+#p += Grid(x0=-5,y0=-10,x1=10,y1=2)
+
+p += ellipse(x0=-5,y0=-8,x1=1,y1=-4, linewidth=0.1, label='i = i + 1')
+p += Rect(x0=3,y0=-8,x1=10,y1=-4, linewidth=0.1)
+p += Rect(x0=2.5,y0=-1.3,x1=4.65,y1=-0.7, linewidth=0.12, linecolor='red')
+
+p += Rect(x0=5,y0=-5.5,x1=8,y1=-4.5, linewidth=0.1, label='3')
+p += Rect(x0=5,y0=-7,x1=8,y1=-6, linewidth=0.1, label='3')
+
+X = POINT(x=-2.3, y=-3.9, r=0, label='CPU', anchor='flushtopleft')
+Y = POINT(x=6.1, y=-3.9, r=0, label='main', anchor='flushtopleft')
+Z = POINT(x=5, y=-5, r=0, label='sum', anchor='east')
+A = POINT(x=5, y=-6.5, r=0, label='i', anchor='east')
+
+p += str(X)
+p += str(Y)
+p += str(Z)
+p += str(A)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+D = r'''
+
+
+
+int sum = 0;
+
+    for ( int i = 3;     i < 5;     i = i + 1 )
+
+
+        sum = sum + i;
+
+
+
+'''.strip()
+
+p = Plot()
+code(p, D, x=-4.5, y=0, border_linewidth=0.05, innersep=0.6)
+#p += Grid(x0=-5,y0=-10,x1=10,y1=2)
+
+p += ellipse(x0=-5,y0=-8,x1=1,y1=-4, linewidth=0.1, label='i = 3 + 1')
+p += Rect(x0=3,y0=-8,x1=10,y1=-4, linewidth=0.1)
+p += Rect(x0=2.5,y0=-1.3,x1=4.65,y1=-0.7, linewidth=0.12, linecolor='red')
+
+p += Rect(x0=5,y0=-5.5,x1=8,y1=-4.5, linewidth=0.1, label='3')
+p += Rect(x0=5,y0=-7,x1=8,y1=-6, linewidth=0.1, label='3')
+
+X = POINT(x=-2.3, y=-3.9, r=0, label='CPU', anchor='flushtopleft')
+Y = POINT(x=6.1, y=-3.9, r=0, label='main', anchor='flushtopleft')
+Z = POINT(x=5, y=-5, r=0, label='sum', anchor='east')
+A = POINT(x=5, y=-6.5, r=0, label='i', anchor='east')
+
+p += str(X)
+p += str(Y)
+p += str(Z)
+p += str(A)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+D = r'''
+
+
+
+int sum = 0;
+
+    for ( int i = 3;     i < 5;     i = i + 1 )
+
+
+        sum = sum + i;
+
+
+
+'''.strip()
+
+p = Plot()
+code(p, D, x=-4.5, y=0, border_linewidth=0.05, innersep=0.6)
+#p += Grid(x0=-5,y0=-10,x1=10,y1=2)
+
+p += ellipse(x0=-5,y0=-8,x1=1,y1=-4, linewidth=0.1, label='i = 4')
+p += Rect(x0=3,y0=-8,x1=10,y1=-4, linewidth=0.1)
+p += Rect(x0=2.5,y0=-1.3,x1=4.65,y1=-0.7, linewidth=0.12, linecolor='red')
+
+p += Rect(x0=5,y0=-5.5,x1=8,y1=-4.5, linewidth=0.1, label='3')
+p += Rect(x0=5,y0=-7,x1=8,y1=-6, linewidth=0.1, label='3')
+
+X = POINT(x=-2.3, y=-3.9, r=0, label='CPU', anchor='flushtopleft')
+Y = POINT(x=6.1, y=-3.9, r=0, label='main', anchor='flushtopleft')
+Z = POINT(x=5, y=-5, r=0, label='sum', anchor='east')
+A = POINT(x=5, y=-6.5, r=0, label='i', anchor='east')
+
+p += str(X)
+p += str(Y)
+p += str(Z)
+p += str(A)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+D = r'''
+
+
+
+int sum = 0;
+
+    for ( int i = 3;     i < 5;     i = i + 1 )
+
+
+        sum = sum + i;
+
+
+
+'''.strip()
+
+p = Plot()
+code(p, D, x=-4.5, y=0, border_linewidth=0.05, innersep=0.6)
+#p += Grid(x0=-5,y0=-10,x1=10,y1=2)
+
+p += ellipse(x0=-5,y0=-8,x1=1,y1=-4, linewidth=0.1)
+p += Rect(x0=3,y0=-8,x1=10,y1=-4, linewidth=0.1)
+p += Rect(x0=2.5,y0=-1.3,x1=4.65,y1=-0.7, linewidth=0.12, linecolor='red')
+
+p += Rect(x0=5,y0=-5.5,x1=8,y1=-4.5, linewidth=0.1, label='3')
+p += Rect(x0=5,y0=-7,x1=8,y1=-6, linewidth=0.1, label='4')
+
+X = POINT(x=-2.3, y=-3.9, r=0, label='CPU', anchor='flushtopleft')
+Y = POINT(x=6.1, y=-3.9, r=0, label='main', anchor='flushtopleft')
+Z = POINT(x=5, y=-5, r=0, label='sum', anchor='east')
+A = POINT(x=5, y=-6.5, r=0, label='i', anchor='east')
+
+p += str(X)
+p += str(Y)
+p += str(Z)
+p += str(A)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+D = r'''
+
+
+
+int sum = 0;
+
+    for ( int i = 3;     i < 5;     i = i + 1 )
+
+
+        sum = sum + i;
+
+
+
+'''.strip()
+
+p = Plot()
+code(p, D, x=-4.5, y=0, border_linewidth=0.05, innersep=0.6)
+#p += Grid(x0=-5,y0=-10,x1=10,y1=2)
+
+p += ellipse(x0=-5,y0=-8,x1=1,y1=-4, linewidth=0.1, label='i $<$ 5')
+p += Rect(x0=3,y0=-8,x1=10,y1=-4, linewidth=0.1)
+p += Rect(x0=0.3,y0=-1.3,x1=1.9,y1=-0.7, linewidth=0.12, linecolor='red')
+
+p += Rect(x0=5,y0=-5.5,x1=8,y1=-4.5, linewidth=0.1, label='3')
+p += Rect(x0=5,y0=-7,x1=8,y1=-6, linewidth=0.1, label='4')
+
+X = POINT(x=-2.3, y=-3.9, r=0, label='CPU', anchor='flushtopleft')
+Y = POINT(x=6.1, y=-3.9, r=0, label='main', anchor='flushtopleft')
+Z = POINT(x=5, y=-5, r=0, label='sum', anchor='east')
+A = POINT(x=5, y=-6.5, r=0, label='i', anchor='east')
+
+p += str(X)
+p += str(Y)
+p += str(Z)
+p += str(A)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+D = r'''
+
+
+
+int sum = 0;
+
+    for ( int i = 3;     i < 5;     i = i + 1 )
+
+
+        sum = sum + i;
+
+
+
+'''.strip()
+
+p = Plot()
+code(p, D, x=-4.5, y=0, border_linewidth=0.05, innersep=0.6)
+#p += Grid(x0=-5,y0=-10,x1=10,y1=2)
+
+p += ellipse(x0=-5,y0=-8,x1=1,y1=-4, linewidth=0.1, label='4 $<$ 5')
+p += Rect(x0=3,y0=-8,x1=10,y1=-4, linewidth=0.1)
+p += Rect(x0=0.3,y0=-1.3,x1=1.9,y1=-0.7, linewidth=0.12, linecolor='red')
+
+p += Rect(x0=5,y0=-5.5,x1=8,y1=-4.5, linewidth=0.1, label='3')
+p += Rect(x0=5,y0=-7,x1=8,y1=-6, linewidth=0.1, label='4')
+
+X = POINT(x=-2.3, y=-3.9, r=0, label='CPU', anchor='flushtopleft')
+Y = POINT(x=6.1, y=-3.9, r=0, label='main', anchor='flushtopleft')
+Z = POINT(x=5, y=-5, r=0, label='sum', anchor='east')
+A = POINT(x=5, y=-6.5, r=0, label='i', anchor='east')
+
+p += str(X)
+p += str(Y)
+p += str(Z)
+p += str(A)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+D = r'''
+
+
+
+int sum = 0;
+
+    for ( int i = 3;     i < 5;     i = i + 1 )
+
+
+        sum = sum + i;
+
+
+
+'''.strip()
+
+p = Plot()
+code(p, D, x=-4.5, y=0, border_linewidth=0.05, innersep=0.6)
+#p += Grid(x0=-5,y0=-10,x1=10,y1=2)
+
+p += ellipse(x0=-5,y0=-8,x1=1,y1=-4, linewidth=0.1, label='true')
+p += Rect(x0=3,y0=-8,x1=10,y1=-4, linewidth=0.1)
+p += Rect(x0=0.3,y0=-1.3,x1=1.9,y1=-0.7, linewidth=0.12, linecolor='red')
+
+p += Rect(x0=5,y0=-5.5,x1=8,y1=-4.5, linewidth=0.1, label='3')
+p += Rect(x0=5,y0=-7,x1=8,y1=-6, linewidth=0.1, label='4')
+
+X = POINT(x=-2.3, y=-3.9, r=0, label='CPU', anchor='flushtopleft')
+Y = POINT(x=6.1, y=-3.9, r=0, label='main', anchor='flushtopleft')
+Z = POINT(x=5, y=-5, r=0, label='sum', anchor='east')
+A = POINT(x=5, y=-6.5, r=0, label='i', anchor='east')
+
+p += str(X)
+p += str(Y)
+p += str(Z)
+p += str(A)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+D = r'''
+
+
+
+int sum = 0;
+
+    for ( int i = 3;     i < 5;     i = i + 1 )
+
+
+        sum = sum + i;
+
+
+
+'''.strip()
+
+p = Plot()
+code(p, D, x=-4.5, y=0, border_linewidth=0.05, innersep=0.6)
+#p += Grid(x0=-5,y0=-10,x1=10,y1=2)
+
+p += ellipse(x0=-5,y0=-8,x1=1,y1=-4, linewidth=0.1, label = 'sum = sum + i')
+p += Rect(x0=3,y0=-8,x1=10,y1=-4, linewidth=0.1)
+p += Rect(x0=0.3,y0=-1.3,x1=1.9,y1=-0.7, linewidth=0.12, linecolor='red')
+
+p += Rect(x0=5,y0=-5.5,x1=8,y1=-4.5, linewidth=0.1, label='3')
+p += Rect(x0=5,y0=-7,x1=8,y1=-6, linewidth=0.1, label='4')
+
+X = POINT(x=-2.3, y=-3.9, r=0, label='CPU', anchor='flushtopleft')
+Y = POINT(x=6.1, y=-3.9, r=0, label='main', anchor='flushtopleft')
+Z = POINT(x=5, y=-5, r=0, label='sum', anchor='east')
+A = POINT(x=5, y=-6.5, r=0, label='i', anchor='east')
+
+p += str(X)
+p += str(Y)
+p += str(Z)
+p += str(A)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+D = r'''
+
+
+
+int sum = 0;
+
+    for ( int i = 3;     i < 5;     i = i + 1 )
+
+
+        sum = sum + i;
+
+
+
+'''.strip()
+
+p = Plot()
+code(p, D, x=-4.5, y=0, border_linewidth=0.05, innersep=0.6)
+#p += Grid(x0=-5,y0=-10,x1=10,y1=2)
+
+p += ellipse(x0=-5,y0=-8,x1=1,y1=-4, linewidth=0.1, label = 'sum = 3 + i')
+p += Rect(x0=3,y0=-8,x1=10,y1=-4, linewidth=0.1)
+p += Rect(x0=-3,y0=-2.5,x1=0,y1=-1.9, linewidth=0.12, linecolor='red')
+
+p += Rect(x0=5,y0=-5.5,x1=8,y1=-4.5, linewidth=0.1, label='3')
+p += Rect(x0=5,y0=-7,x1=8,y1=-6, linewidth=0.1, label='4')
+
+X = POINT(x=-2.3, y=-3.9, r=0, label='CPU', anchor='flushtopleft')
+Y = POINT(x=6.1, y=-3.9, r=0, label='main', anchor='flushtopleft')
+Z = POINT(x=5, y=-5, r=0, label='sum', anchor='east')
+A = POINT(x=5, y=-6.5, r=0, label='i', anchor='east')
+
+p += str(X)
+p += str(Y)
+p += str(Z)
+p += str(A)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+D = r'''
+
+
+
+int sum = 0;
+
+    for ( int i = 3;     i < 5;     i = i + 1 )
+
+
+        sum = sum + i;
+
+
+
+'''.strip()
+
+p = Plot()
+code(p, D, x=-4.5, y=0, border_linewidth=0.05, innersep=0.6)
+#p += Grid(x0=-5,y0=-10,x1=10,y1=2)
+
+p += ellipse(x0=-5,y0=-8,x1=1,y1=-4, linewidth=0.1, label = 'sum = 3 + 4')
+p += Rect(x0=3,y0=-8,x1=10,y1=-4, linewidth=0.1)
+p += Rect(x0=-3,y0=-2.5,x1=0,y1=-1.9, linewidth=0.12, linecolor='red')
+
+p += Rect(x0=5,y0=-5.5,x1=8,y1=-4.5, linewidth=0.1, label='3')
+p += Rect(x0=5,y0=-7,x1=8,y1=-6, linewidth=0.1, label='4')
+
+X = POINT(x=-2.3, y=-3.9, r=0, label='CPU', anchor='flushtopleft')
+Y = POINT(x=6.1, y=-3.9, r=0, label='main', anchor='flushtopleft')
+Z = POINT(x=5, y=-5, r=0, label='sum', anchor='east')
+A = POINT(x=5, y=-6.5, r=0, label='i', anchor='east')
+
+p += str(X)
+p += str(Y)
+p += str(Z)
+p += str(A)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+D = r'''
+
+
+
+int sum = 0;
+
+    for ( int i = 3;     i < 5;     i = i + 1 )
+
+
+        sum = sum + i;
+
+
+
+'''.strip()
+
+p = Plot()
+code(p, D, x=-4.5, y=0, border_linewidth=0.05, innersep=0.6)
+#p += Grid(x0=-5,y0=-10,x1=10,y1=2)
+
+p += ellipse(x0=-5,y0=-8,x1=1,y1=-4, linewidth=0.1, label = 'sum = 7')
+p += Rect(x0=3,y0=-8,x1=10,y1=-4, linewidth=0.1)
+p += Rect(x0=-3,y0=-2.5,x1=0,y1=-1.9, linewidth=0.12, linecolor='red')
+
+p += Rect(x0=5,y0=-5.5,x1=8,y1=-4.5, linewidth=0.1, label='3')
+p += Rect(x0=5,y0=-7,x1=8,y1=-6, linewidth=0.1, label='4')
+
+X = POINT(x=-2.3, y=-3.9, r=0, label='CPU', anchor='flushtopleft')
+Y = POINT(x=6.1, y=-3.9, r=0, label='main', anchor='flushtopleft')
+Z = POINT(x=5, y=-5, r=0, label='sum', anchor='east')
+A = POINT(x=5, y=-6.5, r=0, label='i', anchor='east')
+
+p += str(X)
+p += str(Y)
+p += str(Z)
+p += str(A)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+D = r'''
+
+
+
+int sum = 0;
+
+    for ( int i = 3;     i < 5;     i = i + 1 )
+
+
+        sum = sum + i;
+
+
+
+'''.strip()
+
+p = Plot()
+code(p, D, x=-4.5, y=0, border_linewidth=0.05, innersep=0.6)
+#p += Grid(x0=-5,y0=-10,x1=10,y1=2)
+
+p += ellipse(x0=-5,y0=-8,x1=1,y1=-4, linewidth=0.1)
+p += Rect(x0=3,y0=-8,x1=10,y1=-4, linewidth=0.1)
+p += Rect(x0=-3,y0=-2.5,x1=0,y1=-1.9, linewidth=0.12, linecolor='red')
+
+p += Rect(x0=5,y0=-5.5,x1=8,y1=-4.5, linewidth=0.1, label='7')
+p += Rect(x0=5,y0=-7,x1=8,y1=-6, linewidth=0.1, label='4')
+
+X = POINT(x=-2.3, y=-3.9, r=0, label='CPU', anchor='flushtopleft')
+Y = POINT(x=6.1, y=-3.9, r=0, label='main', anchor='flushtopleft')
+Z = POINT(x=5, y=-5, r=0, label='sum', anchor='east')
+A = POINT(x=5, y=-6.5, r=0, label='i', anchor='east')
+
+p += str(X)
+p += str(Y)
+p += str(Z)
+p += str(A)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+D = r'''
+
+
+
+int sum = 0;
+
+    for ( int i = 3;     i < 5;     i = i + 1 )
+
+
+        sum = sum + i;
+
+
+
+'''.strip()
+
+p = Plot()
+code(p, D, x=-4.5, y=0, border_linewidth=0.05, innersep=0.6)
+#p += Grid(x0=-5,y0=-10,x1=10,y1=2)
+
+p += ellipse(x0=-5,y0=-8,x1=1,y1=-4, linewidth=0.1, label='i = i + 1')
+p += Rect(x0=3,y0=-8,x1=10,y1=-4, linewidth=0.1)
+p += Rect(x0=2.5,y0=-1.3,x1=4.65,y1=-0.7, linewidth=0.12, linecolor='red')
+
+p += Rect(x0=5,y0=-5.5,x1=8,y1=-4.5, linewidth=0.1, label='7')
+p += Rect(x0=5,y0=-7,x1=8,y1=-6, linewidth=0.1, label='4')
+
+X = POINT(x=-2.3, y=-3.9, r=0, label='CPU', anchor='flushtopleft')
+Y = POINT(x=6.1, y=-3.9, r=0, label='main', anchor='flushtopleft')
+Z = POINT(x=5, y=-5, r=0, label='sum', anchor='east')
+A = POINT(x=5, y=-6.5, r=0, label='i', anchor='east')
+
+p += str(X)
+p += str(Y)
+p += str(Z)
+p += str(A)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+D = r'''
+
+
+
+int sum = 0;
+
+    for ( int i = 3;     i < 5;     i = i + 1 )
+
+
+        sum = sum + i;
+
+
+
+'''.strip()
+
+p = Plot()
+code(p, D, x=-4.5, y=0, border_linewidth=0.05, innersep=0.6)
+#p += Grid(x0=-5,y0=-10,x1=10,y1=2)
+
+p += ellipse(x0=-5,y0=-8,x1=1,y1=-4, linewidth=0.1, label='i = 4 + 1')
+p += Rect(x0=3,y0=-8,x1=10,y1=-4, linewidth=0.1)
+p += Rect(x0=2.5,y0=-1.3,x1=4.65,y1=-0.7, linewidth=0.12, linecolor='red')
+
+p += Rect(x0=5,y0=-5.5,x1=8,y1=-4.5, linewidth=0.1, label='7')
+p += Rect(x0=5,y0=-7,x1=8,y1=-6, linewidth=0.1, label='4')
+
+X = POINT(x=-2.3, y=-3.9, r=0, label='CPU', anchor='flushtopleft')
+Y = POINT(x=6.1, y=-3.9, r=0, label='main', anchor='flushtopleft')
+Z = POINT(x=5, y=-5, r=0, label='sum', anchor='east')
+A = POINT(x=5, y=-6.5, r=0, label='i', anchor='east')
+
+p += str(X)
+p += str(Y)
+p += str(Z)
+p += str(A)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+D = r'''
+
+
+
+int sum = 0;
+
+    for ( int i = 3;     i < 5;     i = i + 1 )
+
+
+        sum = sum + i;
+
+
+
+'''.strip()
+
+p = Plot()
+code(p, D, x=-4.5, y=0, border_linewidth=0.05, innersep=0.6)
+#p += Grid(x0=-5,y0=-10,x1=10,y1=2)
+
+p += ellipse(x0=-5,y0=-8,x1=1,y1=-4, linewidth=0.1, label='i = 5')
+p += Rect(x0=3,y0=-8,x1=10,y1=-4, linewidth=0.1)
+p += Rect(x0=2.5,y0=-1.3,x1=4.65,y1=-0.7, linewidth=0.12, linecolor='red')
+
+p += Rect(x0=5,y0=-5.5,x1=8,y1=-4.5, linewidth=0.1, label='7')
+p += Rect(x0=5,y0=-7,x1=8,y1=-6, linewidth=0.1, label='4')
+
+X = POINT(x=-2.3, y=-3.9, r=0, label='CPU', anchor='flushtopleft')
+Y = POINT(x=6.1, y=-3.9, r=0, label='main', anchor='flushtopleft')
+Z = POINT(x=5, y=-5, r=0, label='sum', anchor='east')
+A = POINT(x=5, y=-6.5, r=0, label='i', anchor='east')
+
+p += str(X)
+p += str(Y)
+p += str(Z)
+p += str(A)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+D = r'''
+
+
+
+int sum = 0;
+
+    for ( int i = 3;     i < 5;     i = i + 1 )
+
+
+        sum = sum + i;
+
+
+
+'''.strip()
+
+p = Plot()
+code(p, D, x=-4.5, y=0, border_linewidth=0.05, innersep=0.6)
+#p += Grid(x0=-5,y0=-10,x1=10,y1=2)
+
+p += ellipse(x0=-5,y0=-8,x1=1,y1=-4, linewidth=0.1)
+p += Rect(x0=3,y0=-8,x1=10,y1=-4, linewidth=0.1)
+p += Rect(x0=2.5,y0=-1.3,x1=4.65,y1=-0.7, linewidth=0.12, linecolor='red')
+
+p += Rect(x0=5,y0=-5.5,x1=8,y1=-4.5, linewidth=0.1, label='7')
+p += Rect(x0=5,y0=-7,x1=8,y1=-6, linewidth=0.1, label='5')
+
+X = POINT(x=-2.3, y=-3.9, r=0, label='CPU', anchor='flushtopleft')
+Y = POINT(x=6.1, y=-3.9, r=0, label='main', anchor='flushtopleft')
+Z = POINT(x=5, y=-5, r=0, label='sum', anchor='east')
+A = POINT(x=5, y=-6.5, r=0, label='i', anchor='east')
+
+p += str(X)
+p += str(Y)
+p += str(Z)
+p += str(A)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+D = r'''
+
+
+
+int sum = 0;
+
+    for ( int i = 3;     i < 5;     i = i + 1 )
+
+
+        sum = sum + i;
+
+
+
+'''.strip()
+
+p = Plot()
+code(p, D, x=-4.5, y=0, border_linewidth=0.05, innersep=0.6)
+#p += Grid(x0=-5,y0=-10,x1=10,y1=2)
+
+p += ellipse(x0=-5,y0=-8,x1=1,y1=-4, linewidth=0.1, label='i $<$ 5')
+p += Rect(x0=3,y0=-8,x1=10,y1=-4, linewidth=0.1)
+p += Rect(x0=-3,y0=-2.5,x1=0,y1=-1.9, linewidth=0.12, linecolor='red')
+
+p += Rect(x0=5,y0=-5.5,x1=8,y1=-4.5, linewidth=0.1, label='7')
+p += Rect(x0=5,y0=-7,x1=8,y1=-6, linewidth=0.1, label='5')
+
+X = POINT(x=-2.3, y=-3.9, r=0, label='CPU', anchor='flushtopleft')
+Y = POINT(x=6.1, y=-3.9, r=0, label='main', anchor='flushtopleft')
+Z = POINT(x=5, y=-5, r=0, label='sum', anchor='east')
+A = POINT(x=5, y=-6.5, r=0, label='i', anchor='east')
+
+p += str(X)
+p += str(Y)
+p += str(Z)
+p += str(A)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+D = r'''
+
+
+
+int sum = 0;
+
+    for ( int i = 3;     i < 5;     i = i + 1 )
+
+
+        sum = sum + i;
+
+
+
+'''.strip()
+
+p = Plot()
+code(p, D, x=-4.5, y=0, border_linewidth=0.05, innersep=0.6)
+#p += Grid(x0=-5,y0=-10,x1=10,y1=2)
+
+p += ellipse(x0=-5,y0=-8,x1=1,y1=-4, linewidth=0.1, label='5 $<$ 5')
+p += Rect(x0=3,y0=-8,x1=10,y1=-4, linewidth=0.1)
+p += Rect(x0=0.3,y0=-1.3,x1=1.9,y1=-0.7, linewidth=0.12, linecolor='red')
+
+p += Rect(x0=5,y0=-5.5,x1=8,y1=-4.5, linewidth=0.1, label='7')
+p += Rect(x0=5,y0=-7,x1=8,y1=-6, linewidth=0.1, label='5')
+
+X = POINT(x=-2.3, y=-3.9, r=0, label='CPU', anchor='flushtopleft')
+Y = POINT(x=6.1, y=-3.9, r=0, label='main', anchor='flushtopleft')
+Z = POINT(x=5, y=-5, r=0, label='sum', anchor='east')
+A = POINT(x=5, y=-6.5, r=0, label='i', anchor='east')
+
+p += str(X)
+p += str(Y)
+p += str(Z)
+p += str(A)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+D = r'''
+
+
+
+int sum = 0;
+
+    for ( int i = 3;     i < 5;     i = i + 1 )
+
+
+        sum = sum + i;
+
+
+
+'''.strip()
+
+p = Plot()
+code(p, D, x=-4.5, y=0, border_linewidth=0.05, innersep=0.6)
+#p += Grid(x0=-5,y0=-10,x1=10,y1=2)
+
+p += ellipse(x0=-5,y0=-8,x1=1,y1=-4, linewidth=0.1, label='false')
+p += Rect(x0=3,y0=-8,x1=10,y1=-4, linewidth=0.1)
+p += Rect(x0=0.3,y0=-1.3,x1=1.9,y1=-0.7, linewidth=0.12, linecolor='red')
+
+p += Rect(x0=5,y0=-5.5,x1=8,y1=-4.5, linewidth=0.1, label='7')
+p += Rect(x0=5,y0=-7,x1=8,y1=-6, linewidth=0.1, label='5')
+
+X = POINT(x=-2.3, y=-3.9, r=0, label='CPU', anchor='flushtopleft')
+Y = POINT(x=6.1, y=-3.9, r=0, label='main', anchor='flushtopleft')
+Z = POINT(x=5, y=-5, r=0, label='sum', anchor='east')
+A = POINT(x=5, y=-6.5, r=0, label='i', anchor='east')
+
+p += str(X)
+p += str(Y)
+p += str(Z)
+p += str(A)
+
+print(p)
+\end{python}
+
+\begin{python}
+from latextool_basic import *
+from latexcircuit import *
+D = r'''
+
+
+
+int sum = 0;
+
+    for ( int i = 3;     i < 5;     i = i + 1 )
+
+
+        sum = sum + i;
+
+
+
+'''.strip()
+
+p = Plot()
+code(p, D, x=-4.5, y=0, border_linewidth=0.05, innersep=0.6)
+
+#p += Grid(x0=-5,y0=-10,x1=10,y1=2)
+
+p += ellipse(x0=-5,y0=-8,x1=1,y1=-4, linewidth=0.1)
+
+p += Rect(x0=3,y0=-8,x1=10,y1=-4, linewidth=0.1)
+p += Rect(x0=-4,y0=-2.9,x1=2,y1=-2.71, linewidth=0.12, linecolor='red')
+#p += Rect(x0=7.5,y0=-2,x1=11,y1=1, linewidth=0.2, linecolor='red', align='l', font='\normalsize\bfseries', s = 'When you leave the for-loop, \\ variable i is destroyed')
+
+p += Rect(x0=5,y0=-5.5,x1=8,y1=-4.5, linewidth=0.1, label='7')
+
+X = POINT(x=-2.3, y=-3.9, r=0, label='CPU', anchor='flushtopleft')
+Y = POINT(x=6.1, y=-3.9, r=0, label='main', anchor='flushtopleft')
+Z = POINT(x=5, y=-5, r=0, label='sum', anchor='east')
+
+p += str(X)
+p += str(Y)
+p += str(Z)
+
+print(p)
+\end{python}
 \sidenote
 {
 \begin{tikzpicture}
-    \node[draw,text width=4cm,minimum height=5cm,minimum width=1.5cm, line width=0.05cm, inner sep=0.3cm] (a) at (-3.8,-2) 
-        {\normalsize{\tikzmark{start}}};
-    \node[draw,minimum height=1.6cm,text width=1.8cm, line width=0.05cm, inner sep=0.3cm] (b) at (-3.7,-1.1) {};
-    \node[above right=0.1cm, inner sep=4pt] (forloop) at (a.north) {\normalsize{for-loop}};
-    \node[anchor=south west, inner sep=4pt] (main) at (a.north west) {\normalsize{main}};
-    \node[below right=0.2cm of a, inner sep=8pt] (ivar) at (a.south west) {\normalsize{i is here}};
-    \node[align=left, above right=1cm of a, inner sep=2pt, font=\normalsize\bfseries] at (a.north west) {Memory while \\ in the for-loop};
-    \draw [dashed, thick, ->] (ivar.north) to ([yshift=-5mm] main.south);
-    \draw [dashed, thick, ->] (forloop.south) to (b.north);
-    
+        \node[draw,minimum height=2cm,text width=3.5cm, line width=0.15cm, color=red, font=\normalsize\bfseries, inner sep=0.3cm] (b) at (-6.7,10.1) {When you leave the for-loop,\\variable i is destroyed};
 \end{tikzpicture}
 }
 
-\begin{console}[commandchars=\~\@\$]
-#include <iostream>
-int main()
-{
-    ~textbf@int i = 0;$
-    for (int i = 10; i > 0; i--)
-    {   
-        std::cout << i;
-        std::cout << " ... ";
-    }
+Note that the above simulation is only a \emph{\textbf{\underline{model}}}.
+Furthermore, it does not explain how the computer knew that 4 $<$ 5 was true. And what does \lq\lq true'' really mean to a computer anyway? In fact, does a computer \lq\lq know'' what's a \lq\lq 4''  (as in four)??? For details like these you will have to take Assembly Language (CISS360) and Computer Architecture (CISS420).
 
-    std::cout << "blast off!" << std::endl;
-    ~textbf@std::cout << i << std::endl;$
 
-    return 0;
-}
-\end{console}
+\input{exercises/31-10-for-loops-part1/main.tex}
+\input{exercises/32-10-for-loops-part1/main.tex}What is the output? Now run the program with your C++ compiler and
+verify.
 
-There are other scenarios and other scope rules but this is enough for
-the time being.
+\input{exercises/33-10-for-loops-part1/main.tex}
+What is the output? Now run the program with your C++ compiler and
+verify.
 
-It's really important to understand the scope of a
-for-loop. The presence of a block (and not just a statement) that is
-controlled by the for-loop visually makes things slightly more
-complicated. So let's look at the basic for-loop again.
-
-\sidenote
-{
-\begin{tikzpicture}
-    \node[draw,text width=4cm,minimum height=5cm,minimum width=1.5cm, line width=0.05cm, inner sep=0.3cm] (a) at (-3.8,-2) 
-        {\normalsize{\tikzmark{start}}};
-    \node[anchor=south west, inner sep=4pt] (main) at (a.north west) {\normalsize{main}};
-    \node[below right=0.2cm of a, inner sep=8pt] (ivar) at (a.south west) {\normalsize{i is here}};
-    \node[align=left, above right=1cm of a, inner sep=2pt, font=\normalsize\bfseries] at (a.north west) {Memory after \\ the for-loop};
-    \draw [dashed, thick, ->] (ivar.north) to ([yshift=-5mm] main.south);
-    
-\end{tikzpicture}
-}
-Here's a simple for-loop:
-\begin{console}
-for (int i = 0; i < 10; i++)
-    std::cout << i << std::endl;
-
-std::cout << i << std::endl;
-\end{console}
-
-Again you see that the \texttt{i} lives inside the \texttt{for}-loop and
-dies and once the \texttt{for}-loop is finished, the \texttt{i} is
-destroyed.
-
-There are other scope rules but this is enough for the time being.
+\input{exercises/34-10-for-loops-part1/main.tex}What is the output (or is there an error)? Now run the program with your
+C++ compiler and verify.
 

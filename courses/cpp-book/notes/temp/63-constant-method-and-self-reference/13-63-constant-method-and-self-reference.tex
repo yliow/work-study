@@ -1,290 +1,112 @@
+\sectionthree{Forcing a return reference to be constant}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Forcing a reference parameter to be constant}
 
-Recall: When writing a function, it's a good idea to use \texttt{const}
-for arguments that should not be changed. This is the case for both
-(regular) functions and methods of a class:
+Recall this example from above:
 
 \begin{consolethree}[escapeinside=||]
-// function
-void f(|\EMPHASIZE{const}| C & c) { ... }
-
-// method in class C
-void C::g(|\EMPHASIZE{const}| C & c) { ... }
-\end{consolethree}
-
-The following example shows 4 possible ways of pass-by-reference:
-
-\begin{itemize}
-\item Non-const to non-const \&
-\item Non-const to const \&
-\item Const to non-const \&
-\item Const to const \&
-\end{itemize}
-
-Which ones work and which do not? Here's an experiment
-that will help.
-
-\begin{consolethree}[escapeinside=||]
-void f(const int & i) {}
-void g(int & i) {}
-
-int main()
-{
-    int i = 0;
-    const int j = 0;
-    f(i); // nonconst passed to const reference
-    f(j); // const passed to const reference
-    g(i); // nonconst passed to nonconst reference
-    g(j); // const passed to nonconst reference
-    return 0;
-}
-\end{consolethree}
-
-First figure out on your own which is reasonable. Compile this and read
-the error message. Correct and check by compiling the program.
-
-Answer:
-
-\begin{itemize}
-\item Non-const to non-const \&         OK
-\item Non-const to const \&             OK
-\item Const to non-const \&             BAD!!!
-\item Const to const \&                 OK
-\end{itemize}
-
-Why?
-
-\begin{consolethree}[escapeinside=||]
-void g(int & i) {} // i not constant
-                   // g() can change i
-
-int main()
-{
-    const int j = 0; // j cannot be changed
-    g(j); // oops ... now what?
-}
-\end{consolethree}
-
-The case of object parameters is the same.
-
-The following example shows 4 possible ways of pass-by-reference:
-
-\begin{itemize}
-\item Non-const to non-const \&
-\item Non-const to const \&
-\item Const to non-const \&
-\item Const to const \&
-\end{itemize}
-
-Which ones work and which do not?
-
-\begin{consolethree}[escapeinside=||]
-class C {};
-
-void f(const C & y) {}
-void g(C & y) {}
-
-int main()
-{
-    C a;
-    const C b = C();
-    f(a);
-    f(b);
-    g(a);
-    g(b);
-    return 0;
-}
-\end{consolethree}
-
-Answer:
-
-\begin{itemize}
-\item Non-const to non-const \&     OK
-\item Non-const to const \&         OK
-\item Const to non-const \&         BAD!!!
-\item Const to const \&             OK
-\end{itemize}
-
-Why?
-
-\begin{consolethree}[escapeinside=||]
-class C{};
-
-void h(C & x) {} // h can modify x
-
-int main()
-{
-    const C y = C(); // y cannot be modified
-    h(y); // oops ... now what???
-}
-\end{consolethree}
-
-In summary if \texttt{T} is any type (\texttt{int}, \texttt{char}, ...,
-some \texttt{class}, ...), and \texttt{f()} has the following prototype:
-
-\texttt{void f(\EMPHASIZE{T \& x});}
-
-and y is a \textbf{\textit{constant}} \texttt{T} object, then the following
-is incorrect:
-
-\begin{consolethree}[escapeinside=||]
-const T y;
-f(y);
-\end{consolethree}
-
-\begin{consolethree}[escapeinside=||]
-class C {public: int x};
-void f0(const C & y) {}|\tikzmarknode{const0}{}|
-void f1(C & y) {}
-
-int main()|\xsidebox[0cm]{0cm}{}{constbox0}{Reminder:\\\texttt{f0()} cannot change \texttt{y} \\\texttt{f1()} can change \texttt{y}}|
-{
-    C a;
-    f0(a); f1(a);
-    return 0;
-}
-\end{consolethree}
-\DrawArrow{constbox0}{const0}
-Example:
-
-\begin{consolethree}[escapeinside=||]
-class IntPointer|\xsidebox[0cm]{0cm}{}{constbox1}{The member variable of \texttt{a} is not changed so we make \texttt{a} constant}|
+class Point2d
 {
 public:
-    ...         |\tikzmarknode{const1}{}|
-    IntPointer(|\EMPHASIZE{const}| IntPointer & a)
-        : p_(new int)
-    { *p_ = *(a.p_); }
-    ...
-private:
-    int * p_;
-};
-\end{consolethree}
-\DrawArrow{constbox1}{const1}
-
-Example:
-
-\begin{consolethree}[escapeinside=||]
-class Int
-{
-public:
-    Int(int x)
-        : x_(x)
-    {}
-    Int max(Int & a)|\tikzmarknode{const2}{} \xsidebox[0cm]{0cm}{}{constbox2}{This method does not change \texttt{a}}|
+    int & get_x()
     {
-        if (x_ < a.x_)
-            return a;
-        else
-            return (*this);
+        return x_;
     }
-private:
-    int x_;
-};
-\end{consolethree}
-\DrawArrow{constbox2}{const2}
-So
-
-\begin{consolethree}[escapeinside=||]
-...
-class Int
-{
-public:
-    Int(int x)
-        : x_(x)
-    {}
-    Int max(|\EMPHASIZE{const}| Int & a)
+    void print()
     {
-        if (x_ < a.x_)
-            return a;
-        else
-            return (*this);
-    }
-public:
-    int x_;
-};
-...
-\end{consolethree}
-
-Example:
-
-\begin{consolethree}[escapeinside=||]
-class C
-{
-public:
-    void f(int a)
-    {
-        x_ = a;
-    }
-    int g(int a)
-    {
-        return y_ + a;
+        std::cout << x_ << ',' << y_ << '\n';
     }
 private:
     int x_, y_;
 };
 
-void j(C & c)|\tikzmarknode{funpar0}{}|
-{
-    c.f(0);|\xsidebox[0cm]{0cm}{}{funparbox0}{Which function param can be made const?}|
-}
-
-void k(C & c)|\tikzmarknode{funpar1}{}|
-{
-    c.g(0);
-}
-
 int main()
 {
-    C c, d;
-    j(c);
-    k(c);
+    Point2d p;
+    p.print();
+    int & a = p.get_x();
+    a = 0;
+    p.print();
     return 0;
 }
 \end{consolethree}
-\DrawArrow{funparbox0}{funpar0}
-\DrawArrow{funparbox0}{funpar1}
 
-\textbf{Example.} Invoking \texttt{c.f()} will modify \texttt{c}
+The \texttt{p.get\_x()} method returns a reference to \texttt{p.x\_}. This
+reference is then given to \texttt{a}:
 
 \begin{consolethree}[escapeinside=||]
-class C
-{
-    ...
-    void f(int a){ x_ = a; } // modifies x_
-    ...
-};
+int & a = p.get_x();
 \end{consolethree}
 
-This means that the following will \EMPHASIZE{\textit{not}} work:
+This means that a is a reference to p.x\_. Therefore changing a will
+mean changing p.x\_.
+
+But remember what I said earlier about information hiding. Clients
+usually should not have direct access to instance variables. The class
+(and the objects) should provide services to clients through methods and
+hide internal implementation from outsiders. This makes the software
+more maintainable. So to prevent \texttt{main()} from changing
+\texttt{p.x\_} directly, you can do this:
 
 \begin{consolethree}[escapeinside=||]
-void j(|\textbf{\underline{const}}| C & c) { c.f(0); }
-\end{consolethree}
-
-Invoking \texttt{c.g()} will not modify \texttt{c}
-
-\begin{consolethree}[escapeinside=||]
-class C
+class Point2d
 {
-    ...
-    int g(int a)
+public:
+    |\EMPHASIZE{const}| int & get_x()
     {
-        return y + a;
+        return x_;
+    }
+    ...
+\end{consolethree}
+
+The reference returned will not be able to change the x\_ of the object.
+In fact, now the \texttt{main()} above cannot be compiled. Why?
+
+\begin{consolethree}[escapeinside=||]
+class Point2d
+{
+public:
+    const int & get_x()
+    {
+        return x_;
     }
     ...
 };
+
+int main()
+{
+    Point2d p;
+    p.print();
+    int & a = p.get_x();
+    ...
+}
 \end{consolethree}
 
-This means that the following \EMPHASIZE{\textit{will}} work:
+Because the \texttt{a} in \texttt{main()} is a reference that can
+potentially attempt to the the value of \texttt{p.x\_}. The issue is not
+whether \texttt{a} will actually change or not. The only way for the above
+to compile is to make it impossible for a to change, i.e., you would
+have to do this:
 
 \begin{consolethree}[escapeinside=||]
-void j(|\textbf{\underline{const}}| C & c) { c.f(0); }
+class Point2d
+{
+public:
+    const int & get_x()
+    {
+        return x_;
+    }
+    ...
+};
+
+int main()
+{
+    Point2d p;
+    p.print();
+    |\EMPHASIZE{const}| int & a = p.get_x();
+    ...
+}
 \end{consolethree}
 
-\input{exercises/0-63-constant-method-and-self-reference/main.tex}
-\input{exercises/1-63-constant-method-and-self-reference/main.tex}
 

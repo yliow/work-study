@@ -1,71 +1,63 @@
+\sectionthree{Review: Function Signature}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Inline Methods}
 
-The information in this section applies to inlining of methods and not
-just constructors.
+Review notes on function loading. This is a quick recap.
 
-Class methods (i.e., member functions) can also be inlined.
+The \EMPHASIZE{signature} of a function is the list of types of the
+parameters of the function.
 
-To inline a class method, you can either:
+WARNING: Note that the return type is \EMPHASIZE{\texttt{not}} part of the
+function signature.
 
-\begin{enumerate}
-\item Put the whole method inside the class definition.
-\item Put the method definition in the header file prepended with
-  \texttt{inline}.
-\end{enumerate}
-
-\textbf{First way:}
+Here's an example: the signature of
 
 \begin{consolethree}[escapeinside=||]
-// Date.h
+int f(int x, char y) {}
+\end{consolethree}
 
-class Date
+is \texttt{(int, char)}
+
+Here are some warnings:
+
+\begin{itemize}
+\item The type of "\texttt{const X}" is \texttt{X.}
+\item The type of "\texttt{const X *}" is \texttt{const X *.}
+\item The type of "\texttt{X[]}" is \texttt{X*}.
+\end{itemize}
+
+Here's a trick to get your C++ compiler to tell you the signature of a
+function. Deliberately include an error in the function.
+
+\begin{consolethree}[escapeinside=||]
+// main.cpp
+
+void f(int x, const int y, const int * const z)
 {
-public:
-    |\textbf{Date(int yyyy, int mm, int dd)}|
-        |\textbf{: yyyy\_(yyyy), mm\_(mm), dd\_(dd)}|
-    |\textbf{\{\}}|
+    abc;
+}
 
-    ...
-};
-\end{consolethree}
-
-\begin{consolethree}[escapeinside=||]
-// Date.cpp
-
-// Date::Date(int, int, int) moved to Date.h
-
-...
-\end{consolethree}
-
-\textbf{Second way:}
-
-\begin{consolethree}[escapeinside=||]
-// Date.h
-
-class Date
+int main()
 {
-public:
-    |\textbf{Date(int yyyy, int mm, int dd);}|
-    ...
-};
+    f();
 
-|\textbf{inline Date::Date(int yyyy, int mm, int dd)}|
-    |\textbf{: yyyy\_(yyyy), mm\_(mm), dd\_(dd)}|
-|\textbf{\{\}}|
+    return 0;
+}
 \end{consolethree}
+
+When you compile, the compiler will have to tell you there's an error in
+the above function, listing the prototype. For g++, you will get:
 
 \begin{consolethree}[escapeinside=||]
-// Date.cpp
-
-// Date::Date(int, int, int) moved to Date.h
-
-...
+main.cpp: In function void f(int, int, const int*):
+main.cpp:3:5: error: abc was not declared in this
+scope
 \end{consolethree}
 
-\input{exercises/4-61-constructors/main.tex}
-\input{exercises/5-61-constructors/main.tex}
-\input{exercises/6-61-constructors/main.tex}
+You can see from the above error message that for the second parameter,
+although it's \texttt{const int}, the type as part of the
+signature is \texttt{int}.
+
+\input{exercises/7-61-constructors/main.tex}
 

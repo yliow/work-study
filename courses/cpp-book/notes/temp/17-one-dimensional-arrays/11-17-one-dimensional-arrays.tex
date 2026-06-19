@@ -1,128 +1,238 @@
+\sectionthree{Binary search}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Bubblesort}
 
-Recall that we have the follow earlier. Suppose you have four integer variables a, b, c, d. You want to sort the values in a, b, c, d into ascending order and put them into a, b, c, d. For instance if we initially have this:
-\begin{center}
-a = 5 b = 3 c = 6 d = 0
-\end{center}
-we want to end up with this:
-\begin{center}
-a = 0 b = 3 c = 5 d = 6
-\end{center}
-Recall that I gave you the \EMPHASIZE{bubblesort algorithm} for doing that:
+One reason for sorting an array is to improve search. Once an array is
+sorted in ascending order we can perform a \textbf{binary search} on the
+array. Let's do a simple example before we talk about
+code.
 
-\tab[3em]{
-Pass 1:\\
-swap the values in a, b so that $a <= b$\\
-swap the values in b, c so that b <= c\\
-swap the values in c, d so that c <= d\\
-// at this point the largest value of a, b, c, d must be in d\\\\
-
-Pass 2:\\
-swap the values in a, b so that a <= b\\
-swap the values in b, c so that b <= c\\
-// at this point the largest value of a, b, c must be in c\\\\
-
-Pass 3:\\
-swap the values in a, b so that a <= b\\
-// at this point the largest value of a, b must be in b\\
-}
-
-[Don't recall any of the above? Quickly review your previous notes on bubblesort!!! Now!!!]
-
-Of course you know what's going to happen next.
-
-We're going to sort values in an array!!! (cheers ... clapping ... and wild whistling).
-
-Let's do this slowly. Using the above pseudocode but with a, b, c, d replaced by a[0], a[1], a[2], a[3], we have the following:
-
-\tab[3em]{Pass 1:\\
-swap the values in a[0], a[1] so that a[0] <= a[1]\\
-swap the values in a[1], a[2] so that a[1] <= a[2]\\
-swap the values in a[2], a[3] so that a[2] <= a[3]\\
-// at this point the largest value of a[0], ..., a[3] must be in a[3]\\\\
-
-Pass 2:\\
-swap the values in a[0], a[1] so that a[0] <= a[1]\\
-swap the values in a[1], a[2] so that a[1] <= a[2]\\
-// at this point the largest value of a[0], ..., a[2] must be in a[2]\\\\
-
-Pass 3:\\
-swap the values in a[0], a[1] so that a[0] <= a[1]\\
-// at this point the largest value of a[0], a[1] must be in a[1]\\
-}
-
-We can rewrite Pass 1 as a for-loop:
-
-\tab[3em]{Pass 1:\\for i = 0, 1, 2:\\\tab[3em]{swap the values in a[i], a[i+1] so that a[i] <= a[i+1]\\}
-}
-
-See it? Pass 2 looks like this:
-
-\tab[3em]{
-Pass 2:\\
-for i = 0, 1:\\
-\tab[3em]{swap the values in a[i], a[i+1] so that a[i] <= a[i+1]}\\
-}
-
-Hmmm ... Pass 2 looks like Pass 1 ... You can combine them like this:
-
-\begin{tabular}{l l}
-Pass 1 and 2:\\
-for j = 2, 1:\\
-& for i = 0, ..., j:\\
-& \tab[3em]{swap the values in a[i], a[i+1] so that a[i] <= a[i+1]}\\
-\end{tabular}
-
-See that? What about Pass 3? Pass 3 looks like this (I'm writing this as a for-loop just to see the pattern):
-
-\begin{tabular}{l}
-Pass 3:
-for i = 0:
-swap the values in a[i], a[i+1] so that a[i] <= a[i+1]
-\end{tabular}
-
-AHA! This can also be combined with Pass 1 and Pass 2:
-
-\begin{tabular}{l}
-Pass 1 and 2 and 3:
-for j = 2, 1, 0:
-for i = 0, ..., j:
-swap the values in a[i], a[i+1] so that a[i] <= a[i+1]
-\end{tabular}
-
-Note that this is for an array of size 4. What about an array of size 5?
-Do you see that the first value of j in the above (i.e. 2) comes from 4
--- 2. In general if you have an array with size SIZE, the bubblesort to
-sort in ascending order is this:
-
-\begin{tabular}{l}
-for j = SIZE -- 2, ..., 1, 0:\\
-\tab[3em]{for i = 0, ..., j:}\\
-\tab[6em]{swap the values in a[i], a[i+1] so that a[i] <= a[i+1]}\\
-\end{tabular}
-
-Now we translate this to C++:
+Suppose you have the following list of numbers:
 
 \begin{consolethree}[escapeinside=||]
-for (int j = SIZE - 2; j >= 0; --j)
+i      0    1    2    3    4    5    6    7
+a[i]   1    5    6    8    9    10   11   15
+\end{consolethree}
+
+and you want to search for the number 10; 10 is our target. You can
+start from the leftmost and scan to the right until the number is found.
+Here's another way of doing it. Put your left finger at
+index 0 and your right finger at index 7:
+
+\begin{consolethree}[escapeinside=||]
+i      0    1    2    3    4    5    6    7
+a[i]   1    5    6    8    9    10   11   15
+    left                                  right
+\end{consolethree}
+
+Look at the middle index between left and right. This is
+
+(left + right) / 2 = (0 + 7) / 2 = 7 / 2 = 3
+
+(don't forget it's integer division!). So put your nose at index 3 (or one of your toes): nose = 3
+
+\begin{consolethree}[escapeinside=||]
+i      0    1    2    3    4    5    6    7
+a[i]   1    5    6    8    9    10   11   15
+    left            nose                  right
+\end{consolethree}
+
+Now ask yourself this question:
+
+a[nose] = a[3] = 8 which is less than the target (i.e. 10)
+
+where should you look? a[left], ..., a[nose-1] or a[nose+1],...,a[right]?
+
+Is it obvious (because the array is ascending) that the target (if present in the array) must be in a[nose+1], ..., a[right]. Right?
+
+So let's put our left finger at nose + 1, i.e. left = nose + 1. We now have
+
+\begin{consolethree}[escapeinside=||]
+i      0    1    2    3    4    5    6    7
+a[i]   1    5    6    8    9    10   11   15
+                          left           right
+\end{consolethree}
+
+Let's repeat the process:
+
+nose = (left + right) / 2 = (4 + 7) / 2 = 11 / 2 = 5
+
+\begin{consolethree}[escapeinside=||]
+i      0    1    2    3    4    5    6    7
+a[i]   1    5    6    8    9    10   11   15
+                          left nose      right
+\end{consolethree}
+
+And
+\begin{center}
+a[nose] is target
+\end{center}
+TARGET IS FOUND!
+
+What about a scenario where the target is \texttt{\textbf{not}} found?
+Then at some point left and right will cross over each other. Let me
+explain with an example.
+
+Say we look for target = 7. Again we start with this:
+
+\begin{consolethree}[escapeinside=||]
+i      0    1    2    3    4    5    6    7
+a[i]   1    5    6    8    9    10   11   15
+      left                                right
+\end{consolethree}
+
+And
+
+nose = (left + right) / 2 = 3
+
+and the picture is:
+
+\begin{consolethree}[escapeinside=||]
+i      0    1    2    3    4    5    6    7
+a[i]   1    5    6    8    9    10   11   15
+      left           nose                 right
+\end{consolethree}
+
+Since
+\begin{center}
+a[nose] $>$ target
+\end{center}
+we look search for target in a[left], ..., a[nose-1], i.e. we set
+\begin{center}
+right = nose -- 1 = 3 -- 1 = 2
+\end{center}
+and the picture is now
+
+\begin{consolethree}[escapeinside=||]
+i      0    1    2    3    4    5    6    7
+a[i]   1    5    6    8    9    10   11   15
+    left        right
+\end{consolethree}
+
+Again we compute the midpoint between left and right:
+\begin{center}
+nose = (left + right) / 2 = (0 + 2) / 2 = 1
+\end{center}
+i.e.,
+
+\begin{consolethree}[escapeinside=||]
+i      0    1    2    3    4    5    6    7
+a[i]   1    5    6    8    9    10   11   15
+    left  nose  right
+\end{consolethree}
+
+We have
+\begin{center}
+a[nose] = a[1] = 5 is less than target
+\end{center}
+So we look in a[nose+1], ..., a[right], i.e.
+\begin{center}
+left = nose + 1 = 1 + 1 = 2
+\end{center}
+\begin{consolethree}[escapeinside=||]
+i      0    1    2    3    4    5    6    7
+a[i]   1    5    6    8    9    10   11   15
+               left
+               right
+\end{consolethree}
+
+We look for the mid point again:
+\begin{center}
+nose = (left + right) / 2 = (2 + 2) / 2 = 2
+\end{center}
+and the picture becomes:
+
+\begin{consolethree}[escapeinside=||]
+i      0    1    2    3    4    5    6    7
+a[i]   1    5    6    8    9    10   11   15
+                left
+                nose
+                right
+\end{consolethree}
+
+Since
+\begin{center}
+a[nose] = 6 is less than the target
+\end{center}
+
+We set
+\begin{center}
+left = nose + 1 = 3
+\end{center}
+Now note that left is actually greater than right!!!
+
+\begin{consolethree}[escapeinside=||]
+i      0    1    2    3    4    5    6    7
+a[i]   1    5    6    8    9    10   11   15
+               right left
+\end{consolethree}
+
+This means that the target cannot be found.
+
+Now I'm ready to give you the code. This will set \texttt{index} to the index where the target is found. If it is not found \texttt{index} is set to -1. The name of the array is \texttt{x} and the size of the array is \texttt{SIZE}.
+
+\begin{consolethree}[escapeinside=||]
+int lower = 0;
+int upper = SIZE - 1;
+int mid = 0;
+int index = -1;
+
+while (lower <= upper)
 {
-    for (int i = 0; i <= j; ++i)
+    mid = (lower + upper) / 2;
+    if (x[mid] < target)
     {
-        if (a[i] > a[i+1])
-        {
-            int t = a[i];
-            a[i] = a[i+1];
-            a[i+1] = t;
-        }
+        lower = mid + 1;
+    }
+    else if (x[mid] > target)
+    {
+        upper = mid - 1;
+    }
+    else
+    {
+        index = mid;
+        break;
     }
 }
 \end{consolethree}
 
-Make sure you understand and memorize this!!!
+Now if you have an array of length $n$ that is not sorted, linear searching will require on the average $n/2$ searches. The worse case requires $n$ searches. What about binary search? In the worse case scenario, it takes $\log_{2}n$. Here's a table of comparison:
 
-\input{exercises/18-17-one-dimensional-arrays/main.tex}
-\input{exercises/19-17-one-dimensional-arrays/main.tex}
-\input{exercises/20-17-one-dimensional-arrays/main.tex}
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+$n$ & linear search ($n$) & binary search ($\log_{2}n$) \\
+\hline
+10 & 10 & 3.3 \\
+100 & 100 & 6.6 \\
+1000 & 1000 & 10.0 \\
+1000000 & 1000000 & 19.9 \\
+1000000000 & 1000000000 & 29.9 \\
+\hline
+\end{tabular}
+\end{center}
+
+See the difference? Better organization and a good search algorithm implies less time in data retrieval.
+
+[For math geeks, if you have taken Calculus you know that the gap between $n$ and $\log_{2}n$ widens. Specifically, by l'H\^{o}pital's rule, the limit of $n/(\log_{2}n)$ as $n$ approaches infinity is in fact infinity.]
+
+Why is the worse case $\log_{2}n$? Well look at the algorithm. In each iteration, you cut down the search space by $\frac{1}{2}$ right? Supposing the worse case, your search space reaches one value. So the sizes of the search spaces looks like this:
+\begin{center}
+\[n \rightarrow n/2 \rightarrow n/4 \rightarrow n/8 \rightarrow \ldots \rightarrow 1\]
+\end{center}
+and you go through say $k$ iterations. In other words you have
+\begin{center}
+\[n/2^{k} = 1\]
+\end{center}
+i.e.
+\begin{center}
+\[2^{k} = n\]
+\end{center}
+If you take log-to-base-2 you get
+\begin{center}
+\[\log_{2}2^{k} = \log_{2}n,\]
+i.e., the number of iteration $k = \log_{2}n$
+\end{center}
+Details on the study of algorithms and measure of what we call ``time complexity'' is found in CISS350 (Data Structure and Advanced algorithms) and CISS358 (Algorithmic Analysis). Deep studies in the extent of computability is found in CISS362 (Automata theory) where one is even interested in questions like ``What are computers? Are there computational problems that cannot be solved by an algorithm or by a computer?''
+

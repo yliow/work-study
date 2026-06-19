@@ -1,263 +1,79 @@
+\sectionthree{Default destructor}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Destructors!!!}
 
-However, in general, some objects are more complicated and might need
-special \EMPHASIZE{``cleaning up''}. This is because some objects
-\EMPHASIZE{acquire resources (such as memory) which are not automatically
-released}.
+Since objects call their destructors just before they die (i.e. just
+before they go out of scope) and our previous version of \texttt{Date}
+does not have a destructor, how come the previous version can still
+compile and run??? Shouldn't your C++ compiler yell at
+you and tell you that \texttt{\~{}Date()} is not found???
 
-Here's an example:
+\EMPHASIZE{No.}
 
-\begin{consolethree}[escapeinside=||]
-class Thingy
-{
-public:
-    Thingy()
-        : y_(new char) // memory allocation during
-    {}                 // constructor call
-private:
-    int x_;     // x_ is automatic
-    char * y_;  // y_ is automatic, but the *memory*
-                // that y_ points to, if allocated,
-                // is *not* automatic.
-};
-
-int main()
-{
-    int x = 1;
-    if (x > 0)
-    {
-        Thingy thing; // memory for thing.x_,
-                      // thing.y_ and *(thing.y_)
-                      // allocated.
-        // do something with thing
-    } // At the end of the body of the if-statement,
-      // memory for thing.x_, thing.y_ is reclaimed
-      // automatically ...
-      // BUT the memory that thing.y_ points to is
-      // NOT deallocated!!!
-    return 0;
-}
-\end{consolethree}
-
-What's the problem? Note that \texttt{thing.y\_} has
-requested for memory in the constructor. So I really need to execute
-
-\EMPHASIZE{\texttt{delete thing.y\_;}}
-
-before \texttt{thing} goes out of scope!!! In other words I should do
-something like this:
+Because ... if you don't specify a destructor for a
+class, the C++ compiler actually includes a do-nothing destructor in the
+class. This is the \EMPHASIZE{default destructor}. The default destructor
+is a do-nothing method because it has an empty body:
 
 \begin{consolethree}[escapeinside=||]
-class Thingy
-{
-    ...
-};
-
-int main()
-{
-    int x = 1;
-    if (x > 0)
-    {
-        Thingy thing;
-        // do something with thing
-        // *** delete thing.y_ ***
-    }
-    return 0;
-}
-\end{consolethree}
-
-Of course, you can't do that because \texttt{thing.y\_} is
-private. No big deal! I can create a method and call that method.
-
-\begin{consolethree}[escapeinside=||]
-class Thingy
+class C
 {
 public:
     ...
-    |\EMPHASIZE{void cleanup()}
-    |\EMPHASIZE{\{}|
-        |\EMPHASIZE{delete y_;}|
-    |\EMPHASIZE{\}}|
+    ~C() {} // default destructor of C
     ...
 };
-
-int main()
-{
-    int x = 1;
-    if (x > 0)
-    {
-        Thingy thing;
-        // do something with thing
-        
-        |\EMPHASIZE{thing.cleanup();}|
-    }
-    return 0;
-}
 \end{consolethree}
 
-But what if I forget?
-
-WAIT ... don't even do that!!! The destructor comes
-to the rescue!!!
-
-A \EMPHASIZE{destructor} is a member function that is
-\EMPHASIZE{automatically called} when an object is about to be destroyed (i.e., about to
-go out of scope):
+In the case of the earlier \texttt{Date} class, C++ included this
+destructor into the \texttt{Date} class when there was no destructor:
 
 \begin{consolethree}[escapeinside=||]
-class Thingy
-{
-    ...
-};
-
-int main()
-{
-    int x = 1;
-    if (x > 0)
-    {
-        Thingy thing;
-        // do something with thing
-    } // thing calls its destructor here just
-      // before thing goes out of scope.
-    return 0;
-}
-\end{consolethree}
-
-(The above is for the case where the object is in the local scope.
-I'll talk about objects in the free store in a bit.)
-
-TADA!!!
-
-... so what???
-
-Well, let me write a destructor for the \texttt{Thingy} class. But first
-...
-
-There are three rules for writing a destructor ...
-
-\begin{itemize}
-\item For class \texttt{C}, the name of the destructor must be
-  \texttt{\~{}C}.
-\item Destructors have an empty list of parameters -- no parameters, i.e.,
-  the prototype must be \texttt{\~{}C()}.
-\item Destructors do not have return type. You can't even
-  put \texttt{void} as a return type. (This is just like constructors.)
-\end{itemize}
-
-So I do the following:
-
-\begin{consolethree}[escapeinside=||]
-class Thingy
-{
-public:
-    Thingy()             // memory allocation
-        : y_(new char)   // during constructor call
-    {}
-    |\EMPHASIZE{~Thingy()}|
-    |\EMPHASIZE{\{}|
-        |\EMPHASIZE{delete y_;}|
-    |\EMPHASIZE{\}}|
-private:
-    int x_;     // x_ is automatic
-    char * y_;  // y_ is automatic, but the *memory*
-                // that y_ points to, if allocated,
-                // is not automatic.
-};
-
-int main()
-{
-    int x = 1;
-    if (x > 0)
-    {
-        Thingy thing; // memory for thing.x_,
-                      // thing.y_, *(thing.y_)
-                      // allocated.
-                      
-        // do something with thing
-        
-    } // At the end of the body of the if-statement,
-      // memory for thing.x_, thing.y_ is reclaimed
-      // automatically ...
-      // BUT before that ... (and this is the point):
-      // thing.~Thingy() executes so that the
-      // memory that thing.y_ points to is reclaimed
-      // by the free store.
-    return 0;
-}
-\end{consolethree}
-
-And note that in my code in \texttt{main()} ... I do not have to
-write code to deallocate the memory used by \texttt{thing.y\_} because
-that's written in \texttt{Thingy.\~{}Thingy()}
-and \texttt{thing} will call this method automatically just before going
-out of scope. I don't have to worry about forgetting to
-deallocate memory used by \texttt{thing} (i.e. through \texttt{thing.y\_}).
-The danger of accidental memory leaks is reduced.
-
-TADA!!! GET IT!!!
-
-It's a common practice to do the following:
-
-\begin{itemize}
-\item A destructor is placed just after the constructor in the class
-  definition.
-\item Destructors are usually inlined.
-\end{itemize}
-
-\input{exercises/0-62-destructors/main.tex}
-\input{exercises/1-62-destructors/main.tex}
-Destructors are used (in classes) to include code for releasing
-resources acquired, not just memory. For instance, there are other
-resources like:
-
-\begin{itemize}
-\item Member variable might be a pointer
-\item Member variable might be holding onto the CD player
-\item Member variable might be holding a file
-\item Member variable might be a network connection
-\item Etc.
-\end{itemize}
-
-Let's write a destructor for \texttt{Date}. Technically we
-don't have to clean up anything since all instance
-members (or member variables) in \texttt{Date} are automatic. This is just
-a drill and also to check that \texttt{Date} objects do call their
-destructor just before they die.
-
-\begin{consolethree}[escapeinside=||]
-// Date.h
-...
 class Date
 {
 public:
-    ...
-    |\EMPHASIZE{~Date()}|
-    |\EMPHASIZE{\{}|
-        |\EMPHASIZE{std::cout << "Date::~Date ...\n";}|
-    |\EMPHASIZE{\}}|
-    ...
-}
-...
+    // constructors
+    ~Date() {}
+    // other methods
+};
 \end{consolethree}
+
+If you do write a destructor, then your C++ compiler will not insert a
+default destructor for you.
+
+Note that the default destructor supplied by C++ does not do anything.
+Since all instance variables are automatic in \texttt{Date}, a destructor
+is not necessary. It's still a good (and common)
+practice to include destructors
+even if it's not necessary. Being explicit is better
+than leaving things implicit.
+
+\input{exercises/2-62-destructors/main.tex}
+Why is knowing the order important? Because in complex systems, there
+might be some dependencies between objects so that some object \texttt{x}
+can exist only if object \texttt{y} exists, i.e., \texttt{y} must be
+constructed before \texttt{x} and \texttt{x} must be destroyed before
+\texttt{y}.
 
 \begin{consolethree}[escapeinside=||]
-// main.cpp
-...
 int main()
 {
-    ...
-    for (int i = 0; i < 5; i++)
-    {
-        std::cout << '\n' << i << "... \n";
-        Date date(1970, 1, 1);
-        date.print();
-        // does date call its destructor ~Date?
-    }
-    return 0;
+    Date date1(1970, 1, 1);
+    Date date2(1985, 1, 1);
+    Date date3(2010, 10, 10);
+    return 0; // date3 calls its destructor,
+              // *then* date2 calls its destructor,
+              // *then* date1 calls its destructor.
 }
 \end{consolethree}
 
+So, remember this: \EMPHASIZE{the order of destructor calls is always opposite to the order of constructor calls.}
+
+\input{exercises/3-62-destructors/main.tex}
+\input{exercises/4-62-destructors/main.tex}
+\input{exercises/5-62-destructors/main.tex}
+\input{exercises/6-62-destructors/main.tex}
+\input{exercises/7-62-destructors/main.tex}
+\input{exercises/8-62-destructors/main.tex}
 

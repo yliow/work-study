@@ -1,132 +1,20 @@
+\sectionthree{Clearing the Error and Continuing}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Read Error}
 
-Now suppose you've checked that the file is open for reading, what can happen?
+Once your file f hits an error, the error is stored in object f. If you do want to somehow continue with your processing of the file, you need to clear the error information stored in \texttt{f}. This is easy enough. You just do this:
 
-You might be attempting reading an integer from file \texttt{f}:
+\tab[3em]{\texttt{f.clear();}}\\
 
-\begin{console}
-int x;
-f >> x;
-\end{console}
+Now why and when would you want to do this?
 
-when the contents from \texttt{f} to be processed is not an integer. For instance from the file pointer, the next sequence of data is \texttt{"hello"}. This is sometimes called a format error.
+There are times when you cannot simply stop your program when you hit
+some corrupted data in your file. You have to attempt to guess how
+damaged is your file, and try to reach a point where you are passed the
+garbage so that your program can continue to do something useful.
 
-Such an error can be detected like this:
-\begin{console}
-int x;
-f >> x;
-if (f.fail())
-{  
-    std::cout <<"x is garbage\n";
-    char y[100];
-    f >> y;
-    std::cout << "data read: " << y << '\n';
-}
-else
-{   
-    // do something useful with x
-}
-\end{console}
-
-In this case data is not lost. In other words, the file pointer does not
-move:
-
-\begin{consolethree}[escapeinside=||]
-int x;
-f >> x;
-if (f.fail())
-{    
-     std::cout << "x is garbage\n";
-     |\textbf{char y[100];}|
-     |\textbf{f >> y;}|
-     |\textbf{std::cout << " data read: " << y << '\textbackslash n';}|
-}
-else
-{    
-     // do something useful with x
-}
-\end{consolethree}
-
-There are other situations where error is more serious (example:
-hardware failure) where data can be lost. This is how you check for such
-errors:
-
-\begin{console}
-int x;
-f >> x;
-if (f.bad())
-{  
-    std::cout << "fatal error\n";
-}
-else
-{   
-    // do something useful with x
-}
-\end{console}
-
-Such cases are really bad and recovery is difficult.
-
-A detailed error handling code (assuming the file is already checked to be open) might look like this:
-
-\begin{console}
-f >> x;
-if (f.fail())
-{   
-    // try to do some recovery, maybe read x in a
-    // different way and proceed
-}
-else if (f.bad())
-{   
-    // fatal error ... maybe print error message and
-    // halt the program
-}
-else
-{   
-    // everything is OK with reading x
-}
-\end{console}
-
-If you don't care to handle \texttt{f.fail()} and
-\texttt{f.bad()} cases separately you can of course do this:
-
-\begin{console}
-f >> x;
-if (f.fail() || f.bad())
-{   
-    // don't bother with recovery ... data was bad
-    // anyway ... GIGO
-    // just print an error message and halt the
-    // program
-}
-else
-{   
-    // everything is OK with reading x ... MOVE ON!!!
-}
-\end{console}
-
-There's a shorthand for doing the above.
-
-The opposite of \texttt{f.bad()} is \texttt{f.good()}. So you can do this if you like:
-
-\begin{console}
-f >> x;
-if (f.good())
-{    
-     // everything is OK with reading x ... MOVE ON!!!
-}
-else
-{   
-     // don't bother with recovery ... data was bad
-     // anyway ... GIGO
-     // just print an error message and halt the
-     // program
-} 
-\end{console}
-
-So let's say you have a file containing first name, last name, monthly pay:
+For instance suppose a payroll file looks like this on Monday:
 
 \begin{console}
 John Doe 1234.56
@@ -134,37 +22,19 @@ Jane Smith 2345.67
 Harry Lee 3456.78
 \end{console}
 
-You can do this (assuming you have already checked that your file \texttt{f} is opened successfully):
+and on Tuesday someone from the HR department accidentally entered two
+new employees, forgetting that middle names should not be included in
+the file:
 
 \begin{console}
-double total = 0.0;
-bool error = false;
-while (!f.eof())
-{   
-     char[100] fname;
-     char[100] lname;
-     double pay;
-     f >> fname >> lname >> pay;
-     if (f.good())
-     {
-          total += pay;
-          std::cout << fname << ' ' << lname
-                    << " is paid "
-                    << pay << std::endl;
-}
-else
-{    
-     error = true;
-     break;
-}
-if (!error) // or use f.good()
-{    
-     std::cout << "total: " << total << std::endl;
-}
-else
-{
-std::cout << "DATA IN FILE IS CORRUPTED!!!"
-          << std::endl;
-}
+John Doe 1234.56
+Jane Smith 2345.67
+Harry Lee 3456.78
+George E. Danger 4567.89
+Susan Doyle 5678.90
 \end{console}
+
+The payroll program that prints out company checks might hit an error on line 4, printing out only checks for the first 3 employees. A smarter program will attempt to read past the corrupted line, and hope that the next line is correct. If so, this program will continue to print the check for Susan Doyle.
+
+This is why we want to be able to clear the error information in the file object. We'll come back to this later when I've explained to you how to for instance read passed the current line of data.
 

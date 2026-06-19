@@ -1,177 +1,46 @@
+\sectionthree{Summary}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Function prototype}
 
-First, try this:
+A function looks like this:
 
-\begin{consolethree}[escapeinside=||]
-#include <iostream>
+\texttt{ [return type] [func name]}( \texttt{[param type] [var name]} )
 
-void mamamia()
-{
-    std::cout << "ma ma mia\n";
-}
+\{
 
-int main()
-{
-    mamamia();
-    return 0;
-}
-\end{consolethree}
+\texttt{[body of function]}
 
-Next, try this:
+\}
 
-\begin{consolethree}[escapeinside=||]
-#include <iostream>
+There can be more than one parameter type and name. A parameter is just a variable that receives a value passed into the function. The return type can be any valid type including \texttt{void} if the function does not return a value.
 
-int main()
-{
-    mamamia();
-    return 0;
-}
+The function body can be any valid C++ statement. To return a value the
+function executes
 
-void mamamia()
-{
-    std::cout << "ma ma mia\n";
-}
-\end{consolethree}
+\texttt{return [expression];}
 
-Of course the program won't compile. The reason is because the function \texttt{mamamia()} is defined after the function call of \texttt{mamamia()} in \texttt{main()}. This is not new. I have already talked about it.
+in its body. If the function does not return a value, executing
+\begin{center}
+\texttt{return;}
+\end{center}
+will return to the point of function call.
 
-This means that we need to arrange our function code so that the definition of a function is before the function is called. There's a way around this issue ...
+If a function has return type void, return need not be present. In that case when the execution reached the end of the function block, a return is executed.
 
-Try this:
+Functions cannot be nested.
 
-\begin{consolethree}[escapeinside=||]
-#include <iostream>
+The largest scope in a program file is the global scope. You can declare variables and constants in the global scope. These are called global variables and global constants respectively. However you should avoid (if possible) the declaration of global variables.
 
-void mamamia();
+On returning from a function, since the program leaves the scope of the function, all variables created within the function's scope are destroyed.
 
-int main()
-{
-    mamamia();
-    return 0;
-}
-
-void mamamia()
-{
-    std::cout << "ma ma mia\n";
-}
-\end{consolethree}
-
-Voila! It works.
-
-The statement in the above code:
-
-\begin{consolethree}[escapeinside=||]
-...
-void mamamia();
-...
-\end{consolethree}
-
-is called a \EMPHASIZE{function prototype}.
-
-A \EMPHASIZE{function prototype} is just the header of a function (without the function body) which ends with a semicolon -- it's a complete statement. The function prototype announces the existence of a function somewhere in the code. That way, you can define the function anywhere in your source file. This will save you some time on re-organizing your code. That's it.
-
-Here's another example. This will not compile:
-
-\begin{consolethree}[escapeinside=||]
-#include <iostream>
-
-int main()
-{
-    int a = 0, b = 999;
-    swap(a, b);
-    std::cout << a << ' ' << b << '\n';
-    return 0;
-}
-
-void swap(int & x, int & y)
-{
-    int t = x;
-    x = y;
-    y = t;
-}
-\end{consolethree}
-
-I can add a function prototype for the \texttt{swap()} function:
-
-\begin{consolethree}[escapeinside=||]
-#include <iostream>
-
-void swap(int & x, int & y);
-
-int main()
-{
-    int a = 0, b = 999;
-    swap(a, b);
-    std::cout << a << ' ' << b << '\n';
-    return 0;
-}
-
-void swap(int & x, int & y)
-{
-    int t = x;
-    x = y;
-    y = t;
-}
-\end{consolethree}
-
-Now it compiles.
-
-Another thing to note is that in function prototypes, \EMPHASIZE{parameter names} are actually \EMPHASIZE{optional}. Try this:
-
-\begin{consolethree}[escapeinside=||]
-#include <iostream>
-
-void swap(int &, int &);
-
-int main()
-{
-    int a = 0, b = 999;
-    swap(a, b);
-    std::cout << a << ' ' << b << '\n';
-    return 0;
-}
-
-void swap(int & x, int & y)
-{
-    int t = x;
-    x = y;
-    y = t;
-}
-\end{consolethree}
-
-Again it works.
-
-As I mentioned earlier, using function prototypes relieves you of the
-pain of having to spend time organizing your code so that functions
-definitions can be anywhere in your source file. There's actually more
-to it. There's a later set of notes on function prototype. But this is
-enough for now. We'll come back function prototypes again later.
-
-How do you write function prototypes for pass-by-reference parameters?
-Easy! It's the same as your other variables. For
-instance if you have this function:
-
-\begin{consolethree}[escapeinside=||]
-void f(int a, double & b, char & c, const bool & b)
-{
-    ... code ...
-}
-\end{consolethree}
-
-The function prototype is just
-
-\begin{consolethree}[escapeinside=||]
-void f(int, double &, char &, const bool &);
-\end{consolethree}
-
-That's all there is to it. So there's nothing new here.
-
-\input{exercises/23-19-functions/main.tex}
-\input{exercises/24-19-functions/main.tex}
-\input{exercises/25-19-functions/main.tex}
-\input{exercises/26-19-functions/main.tex}
+A parameter is pass-by-value if the parameter has its own value. A parameter is pass-by-reference if the parameter does not have its own value but references the value of a variable that is passed to that parameter. Changing the value of the parameter that is pass-by-reference will change the value of the variable passed to the parameter. By default, parameters of basic types (int, double, char, bool) are pass-by-value. The following parameter \texttt{x} is pass-by-value:
+\begin{center}
+\texttt{void f(..., int x, ...) { ... }}
+\end{center}
+while the following parameter \texttt{y} is pass-by-reference:
+\begin{center}
+\texttt{void g(..., int \& x, ...) { ... }}
+\end{center}
+A function prototype is just the header of a function as a statement. A function prototype is usually placed near the top of source files in order to indicate to the compiler the existence that function. If a function prototype is seen by the compiler, then calling that function will be compiled correctly by the compiler even if the function definition is below the point where the function call is made.
 

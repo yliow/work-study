@@ -1,70 +1,102 @@
+\sectionthree{The \texttt{std::cin.getline()} function}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{The \texttt{strnlen(), strncmp(), strncat()} functions}
 
-All the string functions we talked about run into problems if the character arrays passed into these function do not contain \texttt{'\textbackslash 0'} resulting in buffer overflow.
+Recall that there is a problem with input of strings ...
 
-In fact this is one scenario of the so-called \EMPHASIZE{buffer overflow attack}, a technique used in many virus software (malware).
-
-Accompanying these functions are similar functions that allow you to specify a stopping point. For instance in the case of \verb!strlen()! (the string length function) there is a function called \verb!strnlen()!
-
-Besides passing in a string, you also pass in a maximum possible length
-for the string.
+\texttt{std::cin} cuts up inputs at spaces, tabs, or newline (i.e. whitespaces). So if you run this code:
 
 \begin{consolethree}[escapeinside=||]
-char s[100] = ""; // s[0] = '\0';
+char s[100];
 std::cin >> s;
-std::cout << strnlen(s, 99) << std::endl;
+std::cout << s << std::endl;
 \end{consolethree}
 
-Note that I pass in 99 and not 100. If s has a \EMPHASIZE{size of 100} the \EMPHASIZE{maximum possible length is 99} since in this case the \EMPHASIZE{last character is used by '\textbackslash 0'}. Therefore \texttt{s} (of size 100) has a maximum length of 99.
-
-\input{exercises/12-18-characters-and-cstrings/main.tex}
-The accompanying safer functions for strcmp() and strcat() are strncmp() and strncat(). So we have the following \textbf{\underline{pairs}} of functions:
-
-\begin{tabular}{ll}
-strlen() & strnlen() \\
-strcmp() & strncmp() \\
-strcat() & strncat() \\
-\end{tabular}
-
-Try this program:
+with this input
 
 \begin{consolethree}[escapeinside=||]
-char s[100] = "aaa";
-char t[100] = "bbb";
+|\textbf{to be or not to be}|
+\end{consolethree}
+
+you will find that the output is
+
+\begin{console}
+to
+\end{console}
+
+In other words C++ chops up the input at spaces, tabs and newlines. So \texttt{s} is only assigned the string \texttt{"to"}.
+
+Now \ldots{} what ever happened to the rest of the input:
+
+\begin{console}
+be or not to be
+\end{console}
+
+?!? Try this:
+
+\begin{consolethree}[escapeinside=||]
+char s[100];
+char t[100];
 char u[100];
-
-// string copy function
-// In this case at most 100 chars are copied
-// from s to u
-strncpy(u, s, 100);
-std::cout << u << std::endl;
-
-// string concatenation function
-// In this case at most 100 chars are
-// concatenated from t to u
-strncat(u, t, 100);
-std::cout << u << std::endl;
-
-// string comparison function
-// In this case at most 100 characters are
-// compared.
-int i = strncmp(u, s, 100);
-std::cout << i << std::endl;
+std::cin >> s >> t >> u;
+std::cout << s << '\n' << t << '\n' << u << '\n';
 \end{consolethree}
 
-The only problem in the above example is the call to strncat() function. You see if \texttt{u} already has a string of length 10, then only 90 characters are left for concatenation. If \texttt{t} has length greater than that, the program might crash. Therefore it's safe to write this:
+with input
 
 \begin{consolethree}[escapeinside=||]
-// string concatenation function
-// In this case at most 100 chars are
-// concatenated from t to u
-strncat(u, t, 100 - strnlen(u, 100));
-std::cout << u << std::endl;
+i'm zaphod beeblebrox
 \end{consolethree}
 
-But in this case some character might not be copied from \texttt{t} to \texttt{u}. Depending on what your program is supposed to do, you might want to print an error message and halt the program.
+Get it?
 
+\input{exercises/13-18-characters-and-cstrings/main.tex}
+So how do you handle the problem of spaces and tabs? What if you really want spaces and tabs to go into a string? Then you have to use another function. Try running this:
+
+\begin{consolethree}[escapeinside=||]
+char s[100];
+std::cin.getline(s, 100);
+std::cout << s << std::endl;
+\end{consolethree}
+
+with this input:
+
+\begin{consolethree}[escapeinside=||]
+|\textbf{to be or not to be}|
+\end{consolethree}
+
+Note that the \texttt{std::cin.getline()} function also allows you to specify the size of \texttt{s}. In the above example, C++ will only read in at most 99 characters, reserving the last for \texttt{'\textbackslash 0'}. This prevents buffer overflow.
+
+The \texttt{std::cin.getline()} function will assign all the characters up to but not including \texttt{'\textbackslash n'} (when you press the enter key you are including a \texttt{'\textbackslash n'} in your input. In other words \verb!getline()! cuts up input at the \verb!'\n'! character.
+
+The \texttt{std::cin.getline()} function can actually do a lot more. You can get it to cut up input at any character you specify. For instance
+
+\begin{center}
+\verb!std::cin.getline(s, 100, '\t');!
+\end{center}
+
+will cut up input at \verb!'\t'! (tab) characters. (The \verb!'\t'! in this case is sometimes called the stop character.)
+
+Try this
+
+\begin{consolethree}[escapeinside=||]
+char s[10];
+char t[10];
+char u[10];
+std::cin.getline(s, 10, ',');
+std::cin.getline(t, 10, ',');
+std::cin.getline(u, 10, ',');
+std::cout << '[' << s << "]\n"
+          << '[' << t << "]\n"
+          << '[' << u << "]\n" ;
+\end{consolethree}
+
+with input
+
+\begin{console}
+aaa, bbb ,c c c,
+\end{console}
+
+\input{exercises/14-18-characters-and-cstrings/main.tex}
 

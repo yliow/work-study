@@ -1,92 +1,165 @@
+\sectionthree{\texttt{for}-loops and \texttt{while}-loops}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Scope}
 
-A variable has a name, a value, and you should know by now, a variable also has a \EMPHASIZE{scope}. This refers to the place in your code where you can refer to that variable.
+You should think of the \texttt{for}-loop as having a block and the body
+of the for-loop as having an inner block.
+\sidenote
+{
+\begin{tikzpicture}
+    \node[draw,text width=4cm,minimum height=6cm,minimum width=3cm, line width=0.05cm, inner sep=0.3cm] (fora) at (-3,-2) {};
+    \node[draw,text width=2cm,minimum height=1cm,line width=0.01cm,yshift=-8mm] (forxbox) at (fora.north){\normalsize{\texttt{\ \ \ \ \ \ \ \ \ }42}};
+    \node[draw,text width=2cm,minimum height=1cm,line width=0.01cm,yshift=-8mm] (forpbox) at (forxbox.south){\normalsize{\texttt{\ \ \ \ \ \ \ \ \ }1}};
+    \node[yshift=15mm] (formemnodeanchor) at (fora.north){};
+    \node[yshift=15mm] (formemnode) at (fora.north){\normalsize{Memory for main}};
+    \node[xshift=-2mm] (forxnode) at (forxbox.west){\normalsize{x}};
+    \node[xshift=-2mm] (forpnode) at (forpbox.west){\normalsize{p}};
+    \draw[->,ultra thick] (formemnode.south) to (formemnodeanchor);
 
-Here's an old example (very very very old ...):
+    \node[draw,text width=4cm,minimum height=6cm,minimum width=3cm, line width=0.05cm, inner sep=0.3cm,yshift=-3.5cm] (for2a) at (fora.south) {};
+    \node[draw,text width=2cm,minimum height=1cm,line width=0.01cm,yshift=-8mm] (for2xbox) at (for2a.north){\normalsize{\texttt{\ \ \ \ \ \ \ \ \ }42}};
+    \node[draw,text width=2cm,minimum height=1cm,line width=0.01cm,yshift=-8mm] (for2pbox) at (for2xbox.south){\normalsize{\texttt{\ \ \ \ \ \ \ \ \ }1}};
+    \node[draw,yshift=-8mm,text width=3.5cm, line width=0.03cm,minimum height=2cm] (for2abox) at (for2a.center) {};
+    \node[draw,yshift=-10mm,text width=2cm, line width=0.01cm, minimum height=1cm] (for2ibox) at (for2a.center) {\normalsize{\texttt{\ \ \ \ \ \ \ \ \ }1}};
+    \node[xshift=-2mm] (for2inode) at (for2ibox.west){\normalsize{i}};
+    \node[xshift=-2mm] (for2xnode) at (for2xbox.west){\normalsize{x}};
+    \node[xshift=-2mm] (for2pnode) at (for2pbox.west){\normalsize{p}};
+    \node[yshift=-8mm] (for2memnode) at (for2a.south){\normalsize{Memory of for-loop}};
+    \draw[->,ultra thick] (for2memnode.north) to (for2abox.south);
 
-\begin{console}
-x = 42; // x not declared yet bozo!!!
-
-int x = 0;
-std::cout << x << std::endl;
-\end{console}
-
-In general the scope of a variable is from the \EMPHASIZE{point of declaration} to the \EMPHASIZE{end of the block where it is declared}. During the execution of the program, when the point of execution exits that block, the variable is destroyed. Try this:
-
+\end{tikzpicture}
+}
 \begin{consolethree}[escapeinside=||]
 #include <iostream>
 
 int main()
-{   
-    int x = 0;
-    std::cin >> x;
+{    
+     |\begin{tikzpicture}\node[draw=red, thick, inner sep=2pt]{int x = 42, p = 1;};\end{tikzpicture}|
 
-    if (x == 42)
-    {   
-       |\tikzmarknode{yboxtl}{}|std::cout << "here we go ..." << std::endl;   |\tikzmarknode{yboxtr}{}|
-        int y = x + 1;
-        std::cout << "y: " << y << std::endl;        |\tikzmarknode{yboxend}{}|
-    }  |\tikzmarknode{yboxbl}{}|                                              |\tikzmarknode{yboxbr}{}||\sidebox{scopeybox}{Scope of y}|
-    std::cout << "x: " << x << std::endl;
-
-    return 0;
+     for (int i = 1; i <= x; ++i)
+     {    
+          int y = i * i;
+          p *= y;
+     }
+     std::cout << p << std::endl;
+     
+     return 0;
 \end{consolethree}
-\DrawArrowPoints[dashed,red,thick]{yboxtr}{yboxend}{-- (yboxtl) -- (yboxbl) -- (yboxbr) -- (yboxtr) -- ++(0,-0.9) -- (scopeybox)}
 
-Of course you should know by now that this won't work (try it):
+As we enter the \texttt{for}-loop, we get a block of memory for the \texttt{for}-loop. Variable \texttt{i} in the \texttt{for}-loop resides in this block.
 
 \begin{consolethree}[escapeinside=||]
 #include <iostream>
 
 int main()
 {    
-     int x = 0;
-     std::cin >> x;
-     
-     if (x == 42)
-     {    
-          std::cout << "here we go ..." << std::endl;
-          int y = x + 1;
-          std::cout << "y: " << y << std::endl;
+     int x = 42, p = 1;
+     for (|\begin{tikzpicture}\node[draw=red, thick, inner sep=2pt]{int i = 1;};\end{tikzpicture}| i <= x; ++i)
+     {
+         int y = i * i;
+         p *= y;
      }
-     |\tikzmarknode{badynode}{std::cout << "y: " << y << std::endl;}||\sidebox{badtxbox}{BAD!!!}|
+     std::cout << p << std::endl;
 
      return 0;
-} 
 \end{consolethree}
-\DrawArrow{badtxbox}{badynode}
-\newpage %to keep sideboxes and consoles together on the same page
-You should visualize the variables in your code as being created in blocks of memory spaces. Suppose the user enters 42 for \texttt{x} and we are about to execute the print statement in the body of the \texttt{if} statement. The memory looks like this:
-%needs some additional direction adjustments, arrows pointing straight down instead of at an angle
-%also the boxes are cut off very slightly, the sidenote environment isnt letting me xshift/yshift to correct
+\newpage
 \sidenote
 {
 \begin{tikzpicture}
-    \node[draw,text width=5cm,minimum height=6cm,minimum width=3cm, line width=0.05cm, inner sep=0.3cm] (a) at (-3,-2) {};
-    \node[draw,text width=3cm, minimum height=1cm, line width=0.01cm, inner sep=0.3cm] (b) at (a.center) {};
-    \node (fortythree) at (b.center) {\large{43}};
-    \node[draw,text width=4cm, minimum height=2cm, line width=0.035cm, inner sep=0.3cm] (c) at (b.center) {};
-    \node[draw, yshift=-9mm, text width=2cm, minimum height=1cm, line width=0.01cm, inner sep=0.3cm] (d) at (a.north) {};
-    \node[xshift=-2mm] (ymemnode) at (b.west) {\large{y}};
-    \node[xshift=-2mm] (xmemnode) at (d.west) {\large{x}};
-    \node (fortytwo) at (d.center) {\large{42}};
-
-    \node[xshift=5mm,yshift=15mm, align=center] (memtxtnode) at (a.north west) {\normalsize{Memory} \\ \normalsize{for main}};
-    \node[xshift=-15mm, yshift=8mm, align=center] (bdytxtnode) at (a.north east) {\normalsize{Memory for} \\ \normalsize{if's body}};
+    \node[draw,text width=4cm,minimum height=7cm,minimum width=3cm, line width=0.05cm, inner sep=0.3cm,yshift=-3.5cm] (for3a) at (fora.south) {};
+    \node[draw,text width=2cm,minimum height=1cm,line width=0.05cm,yshift=-8mm] (for3xbox) at (for3a.north){\normalsize{\texttt{\ \ \ \ \ \ \ \ \ }\textbf{42}}};
+    \node[draw,text width=2cm,minimum height=1cm,line width=0.01cm,yshift=-8mm] (for3pbox) at (for3xbox.south){\normalsize{\texttt{\ \ \ \ \ \ \ \ \ }1}};
     
-    \draw [ultra thick, ->] (bdytxtnode.south east) to (c.north east);
-    \draw [ultra thick, ->] (memtxtnode.south) to (a.north west)[xshift=-5mm];
-
-    \node[draw,text width=5cm,minimum height=6cm,minimum width=3cm, line width=0.05cm, inner sep=0.3cm, yshift=-5cm] (a2) at (a.south) {};
-
-    \draw [ultra thick, dashed, ->] (a.south) to (a2.north);
+    \node[draw,yshift=-5mm,text width=2cm, line width=0.01cm, minimum height=1cm] (for3ibox) at (for3a.center) {\normalsize{\texttt{\ \ \ \ \ \ \ \ \ }1}};
     
-    \node[draw, yshift=-9mm, text width=2cm, minimum height=1cm, line width=0.01cm, inner sep=0.3cm] (d2) at (a2.north) {};
-    \node[xshift=-2mm] (xmemnode2) at (d2.west) {\large{x}};
-        \node (fortytwo2) at (d2.center) {\large{42}};    
+    \node[draw,xshift=2mm,yshift=-9mm,text width=2cm, line width=0.01cm, minimum height=1cm] (for3ybox) at (for3ibox.south) {\normalsize{\texttt{\ \ \ \ \ \ \ \ \ }1}};
+    
+    \node[xshift=-2mm,draw,text width=2.9cm,line width=0.05cm,minimum height=1.5cm] (for3abox) at (for3ybox.center) {};
+    \node[draw,yshift=-12mm,text width=3.5cm, line width=0.03cm,minimum height=3.8cm] (for3bbox) at (for3a.center) {};
+    \node (forarranchor) at (for3abox.south) {};
+    \node[xshift=-2mm] (for3inode) at (for3ibox.west){\normalsize{i}};
+    \node[xshift=-2mm] (for3xnode) at (for3xbox.west){\normalsize{x}};
+    \node[xshift=-2mm] (for3pnode) at (for3pbox.west){\normalsize{p}};
+    \node[xshift=-2mm] (for3ynode) at (for3ybox.west){\normalsize{y}};
+    \node[yshift=-10mm,xshift=-15mm,align=center] (for3memnode) at (for3a.south east){\normalsize{Memory of \textbf{body}}\\ \normalsize{of for-loop}};
+    \draw[->,ultra thick] (for3memnode.north) to (forarranchor);
+
+    \node[draw,yshift=-4cm,text width=4cm,minimum height=6cm,minimum width=3cm, line width=0.05cm, inner sep=0.3cm,yshift=-3.5cm] (for4a) at (for3a.south) {};
+    \node[draw,text width=2cm,minimum height=1cm,line width=0.01cm,yshift=-8mm] (for4xbox) at (for4a.north){\normalsize{\texttt{\ \ \ \ \ \ \ \ \ }42}};
+    \node[draw,text width=2cm,minimum height=1cm,line width=0.01cm,yshift=-8mm] (for4pbox) at (for4xbox.south){\normalsize{\texttt{\ \ \ \ \ \ \ \ \ }1}};
+    \node[draw,yshift=-5mm,text width=2cm, line width=0.01cm, minimum height=1cm] (for4ibox) at (for4a.center) {\normalsize{\texttt{\ \ \ \ \ \ \ \ \ }1}}; 
+    \node[draw,yshift=-12mm,text width=3.5cm, line width=0.03cm,minimum height=3cm] (for4bbox) at (for4a.center) {};
+    \node[xshift=-2mm] (for4inode) at (for4ibox.west){\normalsize{i}};
+    \node[xshift=-2mm] (for4xnode) at (for4xbox.west){\normalsize{x}};
+    \node[xshift=-2mm] (for4pnode) at (for4pbox.west){\normalsize{p}};
+\end{tikzpicture}
+}
+When we step into the body of the \texttt{for}-loop, we have \texttt{\textbf{another}} block. Variable \texttt{y} is created in this inner block:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int main()
+{    
+     int x = 42, p = 1;
+     for (int i = 1; i <= x; ++i)
+     {    
+          |\begin{tikzpicture}\node[draw=red, thick, inner sep=2pt]{int y = i * i;};\end{tikzpicture}|
+          p *= y;
+     }
+     std::cout << p << std::endl;
+
+     return 0;
+\end{consolethree}
+
+When the last statement of the body of the \texttt{for}-loop is executed, we exit the body and variable \texttt{y} is destroyed:
+
+\begin{consolethree}[escapeinside=||]
+#include <iostream>
+
+int main()
+{    
+     int x = 42, p = 1;
+
+     for (int i = 1; i <= x; |\begin{tikzpicture}\node[draw=red, thick, inner sep=2pt]{++i)};\end{tikzpicture}|
+     {    
+          int y = i * i;
+          p *= y;
+     }
+     std::cout << p << std::endl;
+
+     return 0;
+\end{consolethree}
+
+Of course when we enter the body of the \texttt{for}-loop the second time (when \texttt{i} = 2), variable \texttt{y} is created again.
+
+Get it?
+\newpage
+And when we exit the \texttt{for}-loop altogether, variable \texttt{i} is destroyed because it is created in the \texttt{for}-loop:
+\sidenote
+{
+\begin{tikzpicture}
+    \node[draw,yshift=-4cm,text width=4cm,minimum height=6cm,minimum width=3cm, line width=0.05cm, inner sep=0.3cm,yshift=-3.5cm] (for4a) at (for3a.south) {};
+    \node[draw,text width=2cm,minimum height=1cm,line width=0.01cm,yshift=-8mm] (for4xbox) at (for4a.north){\normalsize{\texttt{\ \ \ \ \ \ \ \ \ }42}};
+    \node[draw,text width=2cm,minimum height=1cm,line width=0.01cm,yshift=-8mm] (for4pbox) at (for4xbox.south){\normalsize{\texttt{\ \ \ \ \ \ \ \ \ }1}};
+    \node[xshift=-2mm] (for4xnode) at (for4xbox.west){\normalsize{x}};
+    \node[xshift=-2mm] (for4pnode) at (for4pbox.west){\normalsize{p}};
+
+    \node[draw,yshift=-12cm,text width=4cm,minimum height=6cm,minimum width=3cm, line width=0.05cm, inner sep=0.3cm,yshift=-3.5cm] (for5a) at (for3a.south) {};
+    \node[draw,text width=2cm,minimum height=1cm,line width=0.01cm,yshift=-8mm] (for5xbox) at (for5a.north){\normalsize{\texttt{\ \ \ \ \ \ \ \ \ }42}};
+    \node[draw,yshift=-15mm,xshift=3mm,text width=2cm,minimum height=1cm,line width=0.01cm,yshift=-8mm] (for5ybox) at (for5xbox.south){\normalsize{\texttt{\ \ \ \ \ \ \ \ \ }1}};
+    \node[draw,text width=4cm,minimum height=2.5cm,minimum width=4cm, line width=0.05cm, yshift=-0.5cm] (for5a2) at (for5a) {};
+    \node[draw,text width=3cm,minimum height=1.4cm,minimum width=3cm, line width=0.05cm] (for5ybox2) at (for5ybox) {};
+    \node[xshift=-2mm] (for5xnode) at (for5xbox.west){\normalsize{x}};
+    \node[xshift=-2mm] (for5ynode) at (for5ybox.west){\normalsize{y}};
+    \node[yshift=1cm] (for5mainnode) at (for5a.north) {\normalsize{main}};
+    \node[xshift=-1.5cm,yshift=-1cm] (for5whilenode) at (for5a.south) {\normalsize{while-loop}};
+    \node[xshift=1.5cm,yshift=-1cm,align=center] (for5whilebdynode) at (for5a.south) {\normalsize{body of} \\\normalsize{while-loop}};
+    \draw[ultra thick, ->] (for5mainnode.south) to (for5a.north);
+    \draw[ultra thick, ->] (for5whilenode.north) to (for5a2.south);
+    \draw[ultra thick, ->] (for5whilebdynode.north) to (for5ybox2.south);
 \end{tikzpicture}
 }
 
@@ -94,47 +167,74 @@ You should visualize the variables in your code as being created in blocks of me
 #include <iostream>
 
 int main()
-{    
-     int x = 0;
-     std::cin >> x;
+{   
+     int x = 42, p = 1;
      
-     if (x == 42)
-     {   
-         std::cout << "here we go ..." << std::endl;
-         int y = x + 1;
-         |\begin{tikzpicture}\node[draw=red, thick, inner sep=2pt]{std::cout << "y: " << y << std::endl;};\end{tikzpicture}|
+     for (int i = 1; i <= x; ++i)
+     {    
+          int y = i * i;
+          p *= y;
      }
-     std::cout << "y: " << y << std::endl;
+     |\begin{tikzpicture}\node[draw=red, thick, inner sep=2pt]{std::cout << p << std::endl;};\end{tikzpicture}|
 
      return 0;
-}
 \end{consolethree}
 
+Note that variable \texttt{x} and \texttt{p} are still in scope; they are not destroyed.
 
+What about the \texttt{while}-loop? The idea is similar: The \texttt{while}-loop has it' s memory and the body of the \texttt{while}-loop has an inner block.
 
 \begin{consolethree}[escapeinside=||]
 #include <iostream>
 
 int main()
 {    
-     int x = 0;
-     std::cin >> x;
+     ...
+     int x = 42;
 
-     if (x == 42)
-     {   
-         std::cout << "here we go ..." <<
-         std::endl;
-         int y = x + 1;
-         std::cout << "y: " << y << std::endl;
+     while (...)
+     {     
+           int y = 24;
+           |\begin{tikzpicture}\node[draw=red, thick, inner sep=2pt]{...};\end{tikzpicture}|
      }
-     |\begin{tikzpicture}\node[draw=red, thick, inner sep=2pt]{std::cout << "y: " << y << std::endl;};\end{tikzpicture}|
-             
-     return 0;
+
+     ...
 }
 \end{consolethree}
-As you can see, immediately on exiting the \texttt{if} statement, the \EMPHASIZE{variable in the body of the \texttt{if} statement is destroyed}.
 
-Of course \texttt{x} was created in the \texttt{main()} block. So \texttt{x} is not destroyed.
+So remember this: each loop has it' s own memory for
+variables and the body of the loop itself has its own memory.
 
-This is one of the reasons why proper indentation is so important. Not only does it help you read the logic of your code, it tells you when variables are destroyed.
+\input{exercises/0-16-scope/main.tex}If you need \textbf{several} temporary variables in a \texttt{for}-loop
+you can do this:
 
+\begin{consolethree}[escapeinside=||]
+for (|\textbf{int i = 0, s = 5, t = 100}|; i < 10; i++)
+{
+    ...
+}
+\end{consolethree}
+
+For instance if you want to print the running partial sums of summing 1
+to 100 you can do this:
+
+\begin{console}
+for (int i = 0, s = 0; i < 10; i++)
+{   
+    s += i;
+    std::cout << i << ' ' << s << '\n';
+}
+\end{console}
+
+Of course note that in this case \texttt{s} is local to the \texttt{for}-loop and hence goes out of scope when the \texttt{for}-loop is done, i.e., it cannot be referenced outside the \texttt{for}-loop:
+
+\begin{console}
+for (int i = 0, s = 0; i < 10; i++)
+{   
+    s += i;
+    std::cout << i << ' ' s << '\n';
+}
+std::cout << s << '\n'; // BADDDDDDDDDDDDD!!!!
+\end{console}
+
+\input{exercises/1-16-scope/main.tex}%\sectionthree{} requires solutions.tex, skipping for now

@@ -1,49 +1,105 @@
+\sectionthree{Random access}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Linear search for a value in an array}
 
-Suppose now we want to look for a value in an array and set a boolean
-variable to true exactly where the value is found. This is how you do
-it:
+It's important to understand that there's no reason that you must scan the array from the first index to the last or from the last to the first.
 
-\begin{consolethree}[escapeinside=||]
-char x[] = {'h', 'e', 'l', 'l', 'o'};
+You can and should think of the array as a collection of values and you have the freedom of accessing any value in the array.
 
-char target = '';
-std::cin >> target;
-bool found = false;
+This leads us to a useful idea. Recall some of the ASCII art problems. One of the difficulties is that print follows a strict direction. On the output window, your print cursor must move top-to-bottom, left-to-right.
 
-for (int i = 0; i < 5; ++i)
-{
-    if (x[i] == target)
-    {
-        found = true;
-        break;
-    }
-}
+Here's an ASCII problem. Prompt the user for two integers for variables i and j (from 0 to 9). The program prints two X's at column i and j. For instance if the user enters 0 and 3, the program prints
 
-std::cout << found << std::endl; 
+\begin{consolethree}
+X X 
 \end{consolethree}
 
-\input{exercises/14-17-one-dimensional-arrays/main.tex}
-\begin{consolethree}[escapeinside=||]
-char x[] = {'h', 'e', 'l', 'l', 'o'};
+And if the user enters 2 7 the program prints
 
-char target = '';
-std::cin >> target;
-int index = -1;
-for (int i = 0; i < 5; ++i)
-{
-    if (x[i] == target)
-    {
-        index = i;
-        break;
-    }
-}
-
-std::cout << index << std::endl; 
+\begin{consolethree}
+ X     X 
 \end{consolethree}
 
-\input{exercises/15-17-one-dimensional-arrays/main.tex}
-\input{exercises/16-17-one-dimensional-arrays/main.tex}
+Now your program's logic should be like this:\\
+
+\begin{tabular}{l}
+print i spaces\\
+print 'X'\\
+print j - i - 1 spaces\\
+print 'X'\\
+\end{tabular}
+
+Correct? For instance when the user enters 2 and 7, we have i = 2 and j = 7. So the above pseudocode will actually execute\\
+
+\begin{tabular}{l}
+print 2 spaces\\
+print 'X'\\
+print 4 spaces\\
+print 'X'\\
+\end{tabular}
+
+which does give this
+
+\begin{consolethree}[escapeinside=||]
+ X        X 
+\end{consolethree}
+
+But WAIT!!! What if the user enters 7 and then 2? Then the first two lines of your pseudocode executes:\\
+
+\begin{tabular}{l}
+print 7 spaces\\
+print 'X'\\
+...\\
+\end{tabular}
+
+But now you need to go backwards ... and you can't! The print cursor can only go forward! So you really need to sort i and j. The correct algorithm is\\
+
+\begin{tabular}{l}
+sort i, j in ascending order\\
+print i spaces\\
+print 'X'\\
+print j - i - 1 spaces\\
+print 'X'\\
+\end{tabular}
+
+But there's another way to solve this problem. You can create an array of characters, put the 'X'in the array of characters and then print the array. Why would you do that? Because you have complete control over where you want to put characters into the array!
+
+\begin{tabular}{l}\\
+declare array a of characters\\
+set a[i] to 'X'\\
+set a[j] to 'X'\\
+print all the values in a\\
+\end{tabular}
+
+In C++ you have
+
+\begin{consolethree}[escapeinside=||]
+std::cin >> char a[10];
+
+for (int i = 0; i < 10; i++)
+{
+    a[i] = ' ';
+}
+
+int i = 0, j = 0;
+std::cin >> i >> j;
+a[i] = 'X';
+a[j] = 'X';
+
+for (int i = 0; i < 10; i++)
+{
+    std::cout << a[i];
+} 
+\end{consolethree}
+
+The point here is to illustrate the fact that an array gives you random access to its values. At this point in the code:
+
+\begin{consolethree}[escapeinside=||]
+a[i] = 'X';
+a[j] = 'X'; 
+\end{consolethree}
+
+we don't really care if i is greater than j.
+
+\input{exercises/17-17-one-dimensional-arrays/main.tex}

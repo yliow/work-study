@@ -1,131 +1,73 @@
+\sectionthree{The \texttt{strlen()} function}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{C-strings}
 
-A \EMPHASIZE{C-string} is nothing more than an array of characters. The only thing different between a C-string and an array of integers (say) is that the \textbf{special escape character '\ 0'} (the 0 is the \textbf{number} 0, not the letter O) is used to mark the \textbf{end-of-string}. This is a special character just like \verb!'\n'! or \verb!'\t'! because \texttt{'\textbackslash 0'}, \verb!'\n'!, \verb!'\t'! are not ``visible'' characters.
-
-Try to print \texttt{'\textbackslash 0'} and you won't see a thing:
+C-strings are so useful that several functions are provided with your compiler so that you can work effectively with them. Depending on your compiler, you might need to do this when you want to use these C-string functions:
 
 \begin{consolethree}[escapeinside=||]
-std::cout << '\0' << std::endl;
+#include <iostream>
+#include <cstring>
+... YOUR PROGRAM ...
 \end{consolethree}
 
-(There are in fact lots of invisible characters.)
-
-The point of the end-of-string marker \texttt{'\textbackslash 0'}, is to end some string processing. This is what I mean. Try this:
+If your compiler is really old then you might need to do this instead:
 
 \begin{consolethree}[escapeinside=||]
-char spam[] = {'a', 'b', 'c', '\0', 'd', 'e'};
-std::cout << spam << std::endl;
+#include <iostream>
+#include "string.h"
+... YOUR PROGRAM ...
 \end{consolethree}
 
-In this case the ``processing'' is the print statement:
+Here's the first function ...
+
+The function strlen() returns the \EMPHASIZE{length} of the string parameter. This is called the \EMPHASIZE{string length function}. Try this:
 
 \begin{consolethree}[escapeinside=||]
-std::cout << spam << std::endl;
+std::cout << strlen("abc") << std::endl;
+std::cout << strlen("a\0c") << std::endl;
+std::cout << strlen("") << std::endl;
+char s[] = "abc";
+std::cout << strlen(s) << std::endl;
+char t[] = "ab\0c";
+std::cout << strlen(t) << std::endl;
+char u[100] = "";
+std::cout << strlen(u) << std::endl;
 \end{consolethree}
 
-The \texttt{'\textbackslash 0'} basically tells the print statement that printing should stop after printing the third character \texttt{'c'}. The output looks like this:
-
-\begin{center}
-\texttt{abc}
-\end{center}
-
-Note another thing ... \EMPHASIZE{You can actually print a character array!!!} Remember that you cannot do that for an array of integers, doubles, or booleans. You have to write a for-loop in those case. As a reminder try this:
+By the way, what if your compiler does not have the \verb!strlen()! function? Well the code to perform the same thing as the \verb!strlen()! function is very simple. You just loop through the character array until you see \texttt{'\textbackslash 0'}. You have a counter that counts the number of characters scanned until \texttt{'\textbackslash 0'}, not including the \texttt{'\textbackslash 0'} character. Here you go:
 
 \begin{consolethree}[escapeinside=||]
-int x[] = {1, 2, 3, 4, 5};
-std::cout << x << std::endl;
+char x[100] = "abc";
+int len = 0;
+while (x[len] != '\0')
+{
+    len++;
+}
+std::cout << len << '\n';
 \end{consolethree}
 
-Let's go back to the above example:
+Run the program. Change it to this and run it again:
 
 \begin{consolethree}[escapeinside=||]
-char spam[] = {'a', 'b', 'c', '\0', 'd', 'e'};
-std::cout << spam << std::endl;
+char x[100] = "hello world";
+int len = 0;
+while (x[len] != '\0')
+{
+    len++;
+}
+std::cout << len << '\n';
 \end{consolethree}
 
-Note that it does NOT mean that the size of the array is 3; it is true that three characters are printed. There are actually 6 characters in the array:
+There's actually a ``problem'' with the \texttt{strlen()} function. You see ... if a person accidentally calls the \texttt{strlen()} function with a character array that does \EMPHASIZE{\textit{not}} contain a \texttt{'\textbackslash 0'}, the function can actually go beyond the array bound. This might crash the program.
 
-\begin{center}
-\texttt{'a', 'b', 'c', \texttt{'\textbackslash 0'}, 'd', 'e'}
-\end{center}
-
-So you need to distinguish the difference between the \EMPHASIZE{\texttt{size}} of the string \texttt{spam} and its \EMPHASIZE{\texttt{length}} which is defined to be the number of characters up to, but not including, the first \texttt{'\textbackslash 0'}.
-
-Informally when we think of
+Here's an example:
 
 \begin{consolethree}[escapeinside=||]
-char spam[] = {'a', 'b', 'c', '\0', 'd', 'e'};
+char x[] = {'a', 'b', 'c'};
+std::cout << strlen(x) << std::endl;
 \end{consolethree}
 
-\EMPHASIZE{as a string}, we say that it is made up of 'a', 'b', 'c'. But \EMPHASIZE{as a character array} is made up of six characters. Make sure you remember that.
-
-You can think of the character \texttt{'\textbackslash 0'} in the array
-
-\begin{consolethree}[escapeinside=||]
-char spam[] = {'a', 'b', 'c', '\0', 'd', 'e'};
-\end{consolethree}
-
-as a sentinel value to mark the end of data for the string represented as an array. The character '\ 0' is also called the \EMPHASIZE{null character}. This is the reason why C-strings are also called \EMPHASIZE{null-terminated strings}.
-
-\input{exercises/4-18-characters-and-cstrings/main.tex}
-There is a shorthand for \{'a', 'b', 'c', '\ 0'\}. Try this:
-
-\begin{consolethree}[escapeinside=||]
-char spam[] = "abc"
-std::cout << spam << std::endl;
-\end{consolethree}
-
-Note in this case that spam has size 4 (there are 4 characters in the array) and length 3 (there are 3 characters before the first \texttt{'\textbackslash 0'}); "abc" is
-
-\begin{center}
-'a', 'b', 'c', \texttt{'\textbackslash 0'}.
-\end{center}
-
-\input{exercises/5-18-characters-and-cstrings/main.tex}
-\input{exercises/6-18-characters-and-cstrings/main.tex}
-\input{exercises/7-18-characters-and-cstrings/main.tex}
-Of course you can do this:
-
-\begin{consolethree}[escapeinside=||]
-std::cout << "abc\0de" << std::endl;
-\end{consolethree}
-
-You have already seen this ...
-
-\begin{consolethree}[escapeinside=||]
-std::cout << "hello world" << std::endl;
-\end{consolethree}
-
-during the first week of class. Now you know that \texttt{"hello world"} is an array of characters. It's just the character array made up of the following characters:
-
-\begin{center}
-\texttt{'h','e','l','l','o',' ','w','o','r','l','d','\textbackslash 0'}
-\end{center}
-
-(Don't forget the \texttt{'\textbackslash 0'}!!!!)
-
-\input{exercises/8-18-characters-and-cstrings/main.tex}
-If you have a long string you can break it up like this:
-
-\begin{consolethree}[escapeinside=||]
-char foo[] = "abc"
-             "def";
-std::cout << foo << std::endl;
-\end{consolethree}
-
-Basically C++ will join it up for you so that the above code is the same as this:
-
-\begin{consolethree}[escapeinside=||]
-char foo[] = "abcdef";
-std::cout << foo << std::endl;
-\end{consolethree}
-
-\input{exercises/9-18-characters-and-cstrings/main.tex}
-\input{exercises/10-18-characters-and-cstrings/main.tex}
-\input{exercises/11-18-characters-and-cstrings/main.tex}
-The problem with \texttt{std::cin} is that is that \texttt{std::cin} cuts up inputs at spaces, tabs, or newline (i.e. whitespaces). So for the above exercise, C++ will only give the string \texttt{"hello"} to variable s. If you do want spaces to go into your string variable, then you need to do something else for input. Check out a later section on the \texttt{getline()} function.
+This is what we call a \EMPHASIZE{buffer overflow}: Your string length function will access a value in the array \texttt{x} that is actually outside \texttt{x}. We'll come back to this issue later.
 
 

@@ -1,113 +1,71 @@
+\sectionthree{The dangling else problem}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Nested \texttt{if}-\texttt{else}}
 
-Now the plot thickens. Since we can put any statement inside an \texttt{if} or an \texttt{else}, and \texttt{if} and \texttt{if}-\texttt{else} are themselves statements, that means that we can nest if and if-else statements.
+Here's a trick question (and it's another reason why C/C++/Java programmers use { } even when the block has only one statement). So ...
+\begin{center}
+\EMPHASIZE{PAY ATTENTION}
+\end{center}
+First figure out the output (without a compiler) when x has a value of
+0.
 
-That's mind-boggling. Let's have an example.
-
-Run this with input 1. Run it again with input 2. Repeat that with 3.
-Finally try it with -1.
 \begin{console}
-int numHeads = 0;
-std::cout << "How many heads do you have? " << std::endl;
-std::cout << numHeads;
-
-if (numHeads == 1)
-{
-    std::cout << "Let me introduce you to our surgeons."
-              << std::endl;
-}
+if (x < 0)
+   if (x == -2) std::cout << "1" << std::endl;
 else
-{
-    if (numHeads == 2)
-    {
-        std::cout << "Are you Zaphod?" << std::endl;
-    }
-    else
-    {
-        std::cout << "Hmm ... neither 1 nor 2 ..."
-                  << std::endl;
-    }
-}
+   std::cout << "2" << std::endl; 
 \end{console}
+Now run the program.
 
-\input{exercises/14-08-if-part2/main.tex}Here's another example. Run this with inputs 1, 2, 3,
--1.
+Mamamia ... ?!?
 
-\begin{console}[commandchars=\~\@\$]
-int numHeads = 0;
-std::cout << "How many heads do you have? ");
-std::cin >> numHeads;
-~textbf@if (numHeads < 1)$
-~textbf@{$
-   ~textbf@std::cout << "Huh?" << std::endl;$
-~textbf@}$
-~textbf@else$
-~textbf@{$
-   if (numHeads == 1)
-   {
-      std::cout << "Let me introduce you to our "
-                << "surgeons." << std::endl;
-   }
+This is called the \lq\lq dangling else'' problem.
+
+What actually happens is that an \texttt{else} always follows the closest
+\texttt{if}. This means that the above code is better indented this way:
+\begin{console}
+if (x < 0)
+   if (x == -2) std::cout << "1" << std::endl;
    else
-   {
-        if (numHeads == 2)
-        {
-            std::cout << "Are you Zaphod?");
-        }
-        else
-        {
-            std::cout << "You have way too many."
-                      << std::endl;
-        }
-   }
-~textbf@}$
+       std::cout << "2" << std::endl; 
 \end{console}
 
+Of course the C++ compiler doesn't care about
+whitespaces. However this version of indentation makes it easier for
+human beings to follow the logic.
 
-\input{exercises/15-08-if-part2/main.tex}By the way look at this program:
+Now if what I intended was actually something like the previous version,
+then I would have to do this:
 \begin{console}
-if (score < 100)
+if (x < 0)
 {
-    std::cout << "lousy gamer" << std::endl;
+   if (x == -2) std::cout << "1" << std::endl;
 }
 else
-{
-    if (100 <= score && score < 200)
-    {
-        std::cout << "not bad" << std::endl;
-    }
-    else
-    {
-        if (200 <= score)
-        {
-            std::cout << "great!" << std::endl;
-        }
-     }
-}
+    std::cout << "2" << std::endl; 
 \end{console}
-Do you see why the above is the same as:
-\begin{console}[commandchars=\~\@\$]
-if (score < 100)
+In this case, the closest if-part that the else-part can attach to is
+the if-part on the first line since the else-part cannot \lq\lq go inside''
+the block.
+
+This is the reason why it's a good practice to ALWAYS
+use blocks even when the if-part or the else-part has only one line to
+execute. It prevents the misleading dangling else problem. So if I write
+this:
+\begin{console}
+if (x < 0)
 {
-    std::cout << "lousy gamer" << std::endl;
+   if (x == -2)
+   {
+       std::cout << "1" << std::endl;
+   }
 }
 else
 {
-    ~textbf@if (score < 200)$
-    {
-        std::cout << "not bad" << std::endl;
-    }
-    else
-    {
-        if (200 <= score)
-        {
-            std::cout << "great!" << std::endl;
-        }
-     }
+     std::cout << "2" << std::endl;
 }
 \end{console}
 
-\input{exercises/16-08-if-part2/main.tex}\input{exercises/17-08-if-part2/main.tex}
+there will be no confusion.
+

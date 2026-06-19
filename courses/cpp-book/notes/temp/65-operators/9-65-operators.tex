@@ -1,23 +1,35 @@
+\sectionthree{Commutation}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Operators <op> and <op>=}
 
-Defining \textit{+} does not give you \textit{+=} automatically.
+At this point for \textit{Int} objects \textit{a} and \textit{b}, \textit{a + b}
+and \textit{b + a} make sense.
 
-Here's some advice: define + in terms of \textit{+=},
-\textit{-} in terms of \textit{-=}, etc. For instance:
+\textit{a + b} is
+
+C++ will look for \textit{a.operator+(b)} or \textit{operator+(a,b)}. BUT
+... what if you want to do \textit{a + 1} or \textit{1 + a}? We'll talk
+about \textit{1 + a} first ...
+
+If \textit{a} is an \textit{Int} object,
+
+\textit{1 + a} is
+
+\textit{1} is not an object so \textit{1.operator+(a)} does not make sense.
+
+Therefore, \textbf{you will need to define this function outside the
+}\textit{\textbf{Int}}\textbf{ class:}
+
+\textit{Int operator+(int c, const Int \& a);}
 
 \begin{consolethree}[escapeinside=||]
+// Int.h
 class Int
 {
 public:
     ...
-    Int & operator+=(const Int & c)
-    {
-        x_ += c.x_;
-        return (*this);
-    }
+    Int & operator+=(const Int & c);
     Int operator+(Int c) const
     {
         return (Int(*this) += c);
@@ -26,57 +38,54 @@ public:
 private:
     int x_;
 };
+
+Int operator+(int, const Int &);
 \end{consolethree}
-
-A \textbf{nonmember function} is just a function not in a class (i.e.,
-not a method). If the function works with objects from a particular
-class, then the function is included with the class. You should
-
-\begin{enumerate}
-\item Put the function prototype in the header file (\textit{*.h})
-\item Define the function in the implementation file (\textit{*.cpp})
-\item Note that the function prototype is outside the class declaration
-\end{enumerate}
-
-Since the function prototype is out the class, it does \textbf{not} have
-access to the private members of the class. You can overwrite this for
-efficiency (later). Note that here \textit{+=} is more efficient than \textit{+}, same
-for integer \textit{+} and \textit{+=}. Also note that we want to do
-
-\textit{(a += b) += b;}
-
-\textit{c = (a += b); // i.e., a+=b; c=a;}
-
-That's why \textit{operator+=} returns a reference to
-\textit{*this}.
 
 \begin{consolethree}[escapeinside=||]
-class Int
+// Int.cpp
+...
+
+Int operator+(int a, const int & b)
 {
-public:
-    ...
-    |{\bf Int \&}| operator+=(const C & c)
-    {
-        x += c.x;
-        |{\bf return (*this);}|
-    }
-    ...
-};
+    return Int(a) + b;
+}
+...
 \end{consolethree}
 
-And \textit{operator+} can be written like this:
+You have the same issue if you want to do this:
 
-\begin{consolethree}[escapeinside=||]
-class Int
-{
-public:
-    ...
-    Int operator+(const Int c) const
-    {
-        |{\bf return (Int(*this) += c);}|
-    }
-    ...
-};
-\end{consolethree}
+\textit{Int a(6);}
 
+\textit{Int b = 5 * a;}
+
+is the same as
+
+\textit{Int b = operator*(5,a);}
+
+\textbf{You will need to define the function outside the
+}\textit{\textbf{Int}}\textbf{ class:}
+
+\textit{Int operator*(int c, const Int \& a);}
+
+Now back to the other case: \textit{a + 1}. If you have a class \textit{C},
+then
+
+\textit{C c = 1;}
+
+is the same as
+
+\textit{C c(1);}
+
+If \textit{C(1)} is a valid constructor call. In this case, the
+constructor was called \textbf{implicitly}. That means that for the
+\textit{Int} class,
+
+\textit{Int i(42), j(0);}
+
+\textit{j = i + 1; // becomes j = i + Int(1);}
+
+So you do \textbf{not} need \textit{operator+(const Int\&, int);}
+
+\input{exercises/1-65-operators/main.tex}
 

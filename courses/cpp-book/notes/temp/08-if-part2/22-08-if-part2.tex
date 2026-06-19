@@ -1,83 +1,77 @@
+\sectionthree{Count computation}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\input{exercises/28-08-if-part2/main.tex}\input{exercises/29-08-if-part2/main.tex}\sectionthree{Maximum/minimum computation}
 
-Recall I have already talked about the max/min computation. There are
-two ways of doing it.
-
-Here's the max computation that you have already seen:
+Here's the pseudocode for the count computation again:
 \begin{console}
-int w = 1, x = 3, y = 0, z = 5;
-int max;
+count = 0
+if target == a:
+   increment count by 1
+if target == b:
+   increment count by 1
+if target == c:
+   increment count by 1
+if target == d:
+   increment count by 1
+print count 
+\end{console}
+Again, you see repetition of code.
 
-max = w;
-if (max < x)
-   max = x;
-if (max < y)
-   max = y;
-if (max < z)
-   max = z; 
+Another way to do the above, a \EMPHASIZE{TERRIBLE} way, is to do this:
+\begin{console}
+count = 0
+if target != a && target != b && target != c && target != d
+   count = 0
+else if target == a && target != b && target != c && target != d
+   count 1
+else if target != a && target == b && target != c && target != d
+   count 1
+else if target != a && target != b && target == c && target != d
+   count 1
+else if target != a && target != b && target == c && target != d
+   count 1
+else if target != a && target != b && target != c && target == d
+   count 1
+else if target == a && target == b && target != c && target != d
+   count 2
+.... 
 \end{console}
 
-Notice that other than the first statement, the rest of the code is more
-or less a repetition of the same kind of code:
-\begin{console}
-max = w;
-if (max < [variable])
-   max = [variable]; 
+I don't even want to complete this!!! This is clearly a really TERRIBLE
+algorithm. There is a total of $2^4$ = 16 boolean
+expressions. (Why?) YIKES!
+
+And furthermore, if I add another variable e to the above, I would have
+to change a lot of code, as well as adding some more code.
+
+\input{exercises/31-08-if-part2/main.tex}Here's a test case
+\begin{console}[commandchars=\~\@\$]
+~textbf@2 3$
+2 3 
 \end{console}
 
-There's another \EMPHASIZE{TERRIBLE} way to do the above:
-\begin{consolethree}
-int w = 1, x = 3, y = 0, z = 5;
-if (w >= x && w >= y && w >= z)
-    max = w;
-else
-{
-     if (x >= w && x >= y && x >= z)
-         max = x;
-     else
-     {
-        if (y >= w && y >= x && y >= z)
-            max = y;
-        else
-            max = z;
-      }
-}
-\end{consolethree}
-
-Of course you can try to make it ``neater'':
-\begin{console}
-int w = 1, x = 3, y = 0, z = 5;
-
-if (w >= x && w >= y && w >= z)
-    max = w;
-else if (x >= w && x >= y && x >= z)
-    max = x;
-else if (y >= w && y >= x && y >= z)
-    max = y;
-else
-    max = z;
+Here's another test case
+\begin{console}[commandchars=\~\@\$]
+~textbf@-1 3$
+0 3 
 \end{console}
 
-But you are computing way too many boolean conditions. If z is the
-maximum value, how many boolean operators are you evaluating? Compare
-this to the first max computation.
-
-Secondly, and this is probably even more important:
-
-\input{exercises/30-08-if-part2/main.tex}Complete this using the first method and then using the second method.
-Do I need to explain anymore that the first method is way better?
-
-Part of the problem is that the boolean expression in
-\begin{console}
-if (w >= x && w >= y && w >= z)
-    max = w;  
+and another test:
+\begin{console}[commandchars=\~\@\$]
+~textbf@2 -2$
+2 0 
 \end{console}
-depends on a huge number of variables.
 
-The earlier better solution is to consider one variable at a time.
+and finally
 
-In general if the boolean is made up of expressions which \EMPHASIZE{do not depend on each other}, it's usually best to process them \EMPHASIZE{separately}.
+\begin{console}[commandchars=\~\@\$]
+~textbf@-5 -2$
+0 0 
+\end{console}
+
+You can write your program with boolean conditions where each boolean
+condition involves \EMPHASIZE{both} \texttt{x} and \texttt{y}. But instead of
+that, write your program so that you have boolean expressions where each
+boolean expression involves only \EMPHASIZE{one} variable.
 

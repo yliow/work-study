@@ -1,126 +1,131 @@
+\sectionthree{C-strings}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Digit Character to Integer Value}
 
-Here's a neat trick.
+A \EMPHASIZE{C-string} is nothing more than an array of characters. The only thing different between a C-string and an array of integers (say) is that the \textbf{special escape character '\ 0'} (the 0 is the \textbf{number} 0, not the letter O) is used to mark the \textbf{end-of-string}. This is a special character just like \verb!'\n'! or \verb!'\t'! because \texttt{'\textbackslash 0'}, \verb!'\n'!, \verb!'\t'! are not ``visible'' characters.
 
-Suppose you want to ``translate'' the character \texttt{'0'} to integer \texttt{0}, character \texttt{'1'} to integer \texttt{1}, ..., character \texttt{'9'} to \texttt{9}. One way is to do this: Suppose \texttt{c} is a character with character \texttt{'0'} or \texttt{'1'} or \ldots{} or \texttt{'9'}, and you want \texttt{i} which is an \texttt{int} to be \texttt{0} if \texttt{c} is \texttt{'0'}, \texttt{1} if \texttt{c} is \texttt{'1'}, etc. You can do this:
+Try to print \texttt{'\textbackslash 0'} and you won't see a thing:
 
 \begin{consolethree}[escapeinside=||]
-char c = ' ';
-std::cin >> c;
-int i = 0;
-switch (c)
-{
-    case '0': i = 0; break;
-    case '1': i = 1; break;
-    case '2': i = 2; break;
-    case '3': i = 3; break;
-    case '4': i = 4; break;
-    case '5': i = 5; break;
-    case '6': i = 6; break;
-    case '7': i = 7; break;
-    case '8': i = 8; break;
-    case '9': i = 9; break;
-}
-std::cout << i << std::endl;
+std::cout << '\0' << std::endl;
 \end{consolethree}
 
-Or you can also use a stack of if-else. Make sure you run this program.
+(There are in fact lots of invisible characters.)
 
-That's great. It works. But it shows you're a newbie!!! Here's the smart way to do it. Notice that the ASCII table for \texttt{'0', '1', ..., '9'} is this:
+The point of the end-of-string marker \texttt{'\textbackslash 0'}, is to end some string processing. This is what I mean. Try this:
 
-\begin{tabular}{lll}
-character & ASCII integer value & value that you want \\
-\hline
-'0' & 48 & 0 \\
-'1' & 49 & 1 \\
-'2' & 50 & 2 \\
-'3' & 51 & 3 \\
-'4' & 52 & 4 \\
-'5' & 53 & 5 \\
-'6' & 54 & 6 \\
-'7' & 55 & 7 \\
-'8' & 56 & 8 \\
-'9' & 57 & 9 \\
-\end{tabular}
+\begin{consolethree}[escapeinside=||]
+char spam[] = {'a', 'b', 'c', '\0', 'd', 'e'};
+std::cout << spam << std::endl;
+\end{consolethree}
 
-Do you see a pattern? (SPOILERS AHEAD)
+In this case the ``processing'' is the print statement:
 
-The point is that the character \texttt{'0', ..., '9'} appear in order in the ASCII table. Look at the table again:
+\begin{consolethree}[escapeinside=||]
+std::cout << spam << std::endl;
+\end{consolethree}
 
-\begin{tabular}{lll}
-character & ASCII integer value & translated value \\
-\hline
-'0' & 48 & 0 = 48 - 48 \\
-'1' & 49 & 1 = 49 - 48 \\
-'2' & 50 & 2 = 50 - 48 \\
-'3' & 51 & 3 = 51 - 48 \\
-'4' & 52 & 4 = 52 - 48 \\
-'5' & 53 & 5 = 53 - 48 \\
-'6' & 54 & 6 = 54 - 48 \\
-'7' & 55 & 7 = 55 - 48 \\
-'8' & 56 & 8 = 56 - 48 \\
-'9' & 57 & 9 = 57 - 48 \\
-\end{tabular}
-
-which is the same as
-
-\begin{tabular}{lll}
-character & ASCII integer value & translated value \\
-\hline
-'0' & 48 & 0 = int('0' - '0') \\
-'1' & 49 & 1 = int('1' - '0') \\
-'2' & 50 & 2 = int('2' - '0') \\
-'3' & 51 & 3 = int('3' - '0') \\
-'4' & 52 & 4 = int('4' - '0') \\
-'5' & 53 & 5 = int('5' - '0') \\
-'6' & 54 & 6 = int('6' - '0') \\
-'7' & 55 & 7 = int('7' - '0') \\
-'8' & 56 & 8 = int('8' - '0') \\
-'9' & 57 & 9 = int('9' - '0') \\
-\end{tabular}
-
-In all cases, if c is a character '0',...,'9' the integer value you want is ...
+The \texttt{'\textbackslash 0'} basically tells the print statement that printing should stop after printing the third character \texttt{'c'}. The output looks like this:
 
 \begin{center}
-\verb!c - '0'!
+\texttt{abc}
 \end{center}
 
-\EMPHASIZE{That's all!!!} In other words, this program:
+Note another thing ... \EMPHASIZE{You can actually print a character array!!!} Remember that you cannot do that for an array of integers, doubles, or booleans. You have to write a for-loop in those case. As a reminder try this:
 
 \begin{consolethree}[escapeinside=||]
-char c = ' ';
-std::cin >> c;
-int i = 0;
-switch (c)
-{
-    case '0': i = 0; break;
-    case '1': i = 1; break;
-    case '2': i = 2; break;
-    case '3': i = 3; break;
-    case '4': i = 4; break;
-    case '5': i = 5; break;
-    case '6': i = 6; break;
-    case '7': i = 7; break;
-    case '8': i = 8; break;
-    case '9': i = 9; break;
-}
-std::cout << i << std::endl;
+int x[] = {1, 2, 3, 4, 5};
+std::cout << x << std::endl;
 \end{consolethree}
 
-can be \EMPHASIZE{rewritten} as:
+Let's go back to the above example:
 
 \begin{consolethree}[escapeinside=||]
-char c = ' ';
-std::cin >> c;
-int i = c - '0';
-std::cout << i << std::endl;
+char spam[] = {'a', 'b', 'c', '\0', 'd', 'e'};
+std::cout << spam << std::endl;
 \end{consolethree}
 
-I don't know about you. But I prefer the second version!!! Make sure you run this program.
+Note that it does NOT mean that the size of the array is 3; it is true that three characters are printed. There are actually 6 characters in the array:
 
-\input{exercises/2-18-characters-and-cstrings/main.tex}
-\input{exercises/3-18-characters-and-cstrings/main.tex}
+\begin{center}
+\texttt{'a', 'b', 'c', \texttt{'\textbackslash 0'}, 'd', 'e'}
+\end{center}
+
+So you need to distinguish the difference between the \EMPHASIZE{\texttt{size}} of the string \texttt{spam} and its \EMPHASIZE{\texttt{length}} which is defined to be the number of characters up to, but not including, the first \texttt{'\textbackslash 0'}.
+
+Informally when we think of
+
+\begin{consolethree}[escapeinside=||]
+char spam[] = {'a', 'b', 'c', '\0', 'd', 'e'};
+\end{consolethree}
+
+\EMPHASIZE{as a string}, we say that it is made up of 'a', 'b', 'c'. But \EMPHASIZE{as a character array} is made up of six characters. Make sure you remember that.
+
+You can think of the character \texttt{'\textbackslash 0'} in the array
+
+\begin{consolethree}[escapeinside=||]
+char spam[] = {'a', 'b', 'c', '\0', 'd', 'e'};
+\end{consolethree}
+
+as a sentinel value to mark the end of data for the string represented as an array. The character '\ 0' is also called the \EMPHASIZE{null character}. This is the reason why C-strings are also called \EMPHASIZE{null-terminated strings}.
+
+\input{exercises/4-18-characters-and-cstrings/main.tex}
+There is a shorthand for \{'a', 'b', 'c', '\ 0'\}. Try this:
+
+\begin{consolethree}[escapeinside=||]
+char spam[] = "abc"
+std::cout << spam << std::endl;
+\end{consolethree}
+
+Note in this case that spam has size 4 (there are 4 characters in the array) and length 3 (there are 3 characters before the first \texttt{'\textbackslash 0'}); "abc" is
+
+\begin{center}
+'a', 'b', 'c', \texttt{'\textbackslash 0'}.
+\end{center}
+
+\input{exercises/5-18-characters-and-cstrings/main.tex}
+\input{exercises/6-18-characters-and-cstrings/main.tex}
+\input{exercises/7-18-characters-and-cstrings/main.tex}
+Of course you can do this:
+
+\begin{consolethree}[escapeinside=||]
+std::cout << "abc\0de" << std::endl;
+\end{consolethree}
+
+You have already seen this ...
+
+\begin{consolethree}[escapeinside=||]
+std::cout << "hello world" << std::endl;
+\end{consolethree}
+
+during the first week of class. Now you know that \texttt{"hello world"} is an array of characters. It's just the character array made up of the following characters:
+
+\begin{center}
+\texttt{'h','e','l','l','o',' ','w','o','r','l','d','\textbackslash 0'}
+\end{center}
+
+(Don't forget the \texttt{'\textbackslash 0'}!!!!)
+
+\input{exercises/8-18-characters-and-cstrings/main.tex}
+If you have a long string you can break it up like this:
+
+\begin{consolethree}[escapeinside=||]
+char foo[] = "abc"
+             "def";
+std::cout << foo << std::endl;
+\end{consolethree}
+
+Basically C++ will join it up for you so that the above code is the same as this:
+
+\begin{consolethree}[escapeinside=||]
+char foo[] = "abcdef";
+std::cout << foo << std::endl;
+\end{consolethree}
+
+\input{exercises/9-18-characters-and-cstrings/main.tex}
+\input{exercises/10-18-characters-and-cstrings/main.tex}
+\input{exercises/11-18-characters-and-cstrings/main.tex}
+The problem with \texttt{std::cin} is that is that \texttt{std::cin} cuts up inputs at spaces, tabs, or newline (i.e. whitespaces). So for the above exercise, C++ will only give the string \texttt{"hello"} to variable s. If you do want spaces to go into your string variable, then you need to do something else for input. Check out a later section on the \texttt{getline()} function.
+
 

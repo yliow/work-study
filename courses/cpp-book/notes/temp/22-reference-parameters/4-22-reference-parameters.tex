@@ -1,38 +1,49 @@
+\sectionthree{Array assignment function}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Gotcha}
 
-Warning!!! This code fragment
-
-\begin{consolethree}[escapeinside=||]
-int x = 42;
-int & a = x, b = x, c = x;
-\end{consolethree}
-
-means this:
+Let's get back to our array assignment function.
 
 \begin{consolethree}[escapeinside=||]
-int x = 42;
-int & a = x;
-int b = x;
-int c = x;
+#include <iostream>
+
+void println(int x[], int len)
+{
+    for (int i = 0; i < len; i++)
+    {
+        std::cout << x[i] << ' ';
+    }
+    std::cout << std::endl;
+}
+
+void arrayAssign(int y[], |\EMPHASIZE{int \& ylen}|,
+                 int x[], int xlen)
+{
+    ylen = xlen;
+    for (int i = 0; i < xlen; i++)
+    {
+        y[i] = x[i];
+    }
+}
+
+int main()
+{
+    int x[] = {1, 2, 3};
+    int y[100];
+    int ylen = 0;
+    arrayAssign(y, ylen, x, 3);
+    println(y, ylen);
+    return 0;
+}
 \end{consolethree}
 
-If you really want \texttt{b} and \texttt{c} to be references, then you should do this:
+(WARNING: the code does not check that \texttt{y} has enough space for the copying process.)
 
-\begin{consolethree}[escapeinside=||]
-int x = 42;
-int & a = x, |\EMPHASIZE{\& = x}, |\EMPHASIZE{\&}| c = x;
-\end{consolethree}
+Now's your turn:
 
-or just declare one thing per line:
-
-\begin{consolethree}[escapeinside=||]
-int x = 42;
-int & a = x;
-int & b = x;
-int & c = x;
-\end{consolethree}
-
+\input{exercises/3-22-reference-parameters/main.tex}
+\input{exercises/4-22-reference-parameters/main.tex}
+\input{exercises/5-22-reference-parameters/main.tex}
+\input{exercises/6-22-reference-parameters/main.tex}
 

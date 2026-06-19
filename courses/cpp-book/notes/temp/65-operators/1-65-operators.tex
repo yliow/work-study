@@ -1,14 +1,7 @@
+\sectionthree{Operator as a Method}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Review}
-
-The name of some methods are awkward to use.
-
-For certain data (objects) we are more used to operators rather than
-method names.
-
-Consider the following:
 
 \begin{consolethree}[escapeinside=||]
 // Fraction.h
@@ -18,8 +11,7 @@ public:
     Fraction(int n=0, int d=1)
         : n_(n), d_(d)
     {}
-    Fraction plus(const Fraction &) const;
-    void print() const;
+    Fraction operator+(const Fraction &) const;
 private:
     int n_, d_; // numerator,denominator
 };
@@ -29,27 +21,52 @@ private:
 // Fraction.cpp
 #include "Fraction.h"
 
-Fraction Fraction::plus(const Fraction & a) const
+Fraction Fraction::operator+(const Fraction & b) const
 {
-    return Fraction(n_ * a.d_ + d_ * a.n_, d_ * a.d_);
+    return Fraction(n_ * b.d_ + d_ * b.n_, d_ * b.d_);
 }
 \end{consolethree}
+
+Re-defining \textit{+}, so that we have \textit{+} for \textit{int},
+\textit{double}, and \textit{Fraction}.
 
 \begin{consolethree}[escapeinside=||]
 #include "Fraction.h"
 
 int main()
 {
-    Fraction a(1,3), b(1,4); // a=1/3 and b=1/4
-    Fraction c = a.plus(b); // basically, c = a + b
+    Fraction a(1,3), b(1,4);
+    Fraction c = a + b;
+    Fraction d = a.operator+(b);
     return 0;
 }
 \end{consolethree}
 
-So, if we want \textit{c = a + b * c -- d}, it would have to look like
+Most programming languages allow you to define operators (with their own
+syntax). There are languages that do not have operator overloading.
+Example: Java.
 
-\textit{c = (a.plus(b.mult(c))).subtract(d)}
+\begin{consolethree}[escapeinside=||]
+// Fraction.cpp
+#include "Fraction.h"
 
-YUCK!!!
+Fraction Fraction::operator*(const Fraction & b) const
+{
+    return Fraction(n_ * b.n_, d_ * b.d_);
+}
+\end{consolethree}
+
+Test it:
+
+\begin{consolethree}[escapeinside=||]
+#include "Fraction.h"
+
+int main()
+{
+    Fraction a(1, 3), b(1, 4);
+    Fraction c = a * b;
+    return 0;
+}
+\end{consolethree}
 
 

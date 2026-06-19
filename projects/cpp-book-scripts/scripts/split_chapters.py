@@ -10,6 +10,7 @@ solution_header = r'''\begin{python0}
 from solutions import *; clear()
 \end{python0}
 '''
+
 footer_chaptex = r'''\begin{python0}
 from solutions import *
 prepare_solutions()
@@ -64,12 +65,29 @@ for chap in chap_list:
     #sections collector for insertion into chap.tex file
     sections_list = []
     
+    #get first section introducing chapter to be set as chaptex header
+    chaptex_intro = sections[0]
+    
+    #split string to convert to "mychapter" format
+    #should look like "\mychapter{num[0]}{num[1]}{chapter_name}
+    num = chaptex_intro[0][chaptex_intro[0].find('{') + 1:chaptex_intro[0].find('.')]
+    chap_lead, chap_end = chaptex_intro[0].find('.') + 1, chaptex_intro[0].rfind('}')
+    chapter_name = chaptex_intro[0][chap_lead:chap_end]
+    chaptex_intro[0] = "\\mychapter{%s}{%s}{%s}\n" % (num[0], num[1], chapter_name)
+
+    print("***************************************\n***************************************\n***************************************\n", chap_lead, chap_end, chaptex_intro[0], chapter_name, "***************************************\n***************************************\n***************************************\n")
+    #update sections to keep ordering correct, remove first section
+    sections = sections[1:]
+
     #write sections to file in chapter folder
     for s in sections:
       chap_section = str(k) + '-' + chap + '.tex'
 
       #open section
       with open(dir_ + '/temp/' + chap + '/' + chap_section, 'w') as t:
+        #write chapter \sectionthree first, before solutions import/clear
+        t.write(s[0])
+        s = s[1:]
 
         #write solution header
         t.write(solution_header)
@@ -84,12 +102,15 @@ for chap in chap_list:
       k += 1
       
       #write sections to chap.tex file
-      with open(dir_ + '/temp/' + chap + '/chap.tex', 'w') as chaptex:
-        for entry in sections_list:
+      with open(dir_ + '/temp/' + chap + '/chap.tex', 'w') as chaptex:        
+        for c in chaptex_intro:
+          chaptex.write(str(c))
+        for entry in sections_list:    
           chaptex.write("\\input{%s}\n" % entry)
         
         #write footer for chap.tex
         chaptex.write(footer_chaptex)
+        
         if os.path.exists(dir_ + '/temp/' + chap + '/main.tex'):
           print("removing old main.tex...")
           os.system("rm %s" % (dir_ + '/temp/' + chap + '/main.tex'))

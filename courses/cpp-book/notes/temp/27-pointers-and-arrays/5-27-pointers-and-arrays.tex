@@ -1,184 +1,194 @@
+\sectionthree{Comparing pointers and arrays}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Dynamic arrays (in the heap)}
 
-With pointers you can allocate memory for an array (on the heap) with \EMPHASIZE{variable size}. Try this:
-
-\begin{consolethree}[escapeinside=||]
-int s;
-std::cin >> s;
-
-int * x = |\EMPHASIZE{new int[s]}|; // s can be a variable!!!
-
-// Do something with array that x points to.
-//
-// (Technically speaking x points to the first value
-// of the array in the heap.)
-
-|\textbf{delete [] x;}|
-\end{consolethree}
-
-Basically the command
-
-\verb!new int[s]!
-
-tells the heap:
-
-``hey heap \ldots{} gimme a chunk of an \texttt{int} array of \texttt{s} values''
-
-Note that \texttt{s} can be a variable!
-
-Mr Heap then goes through its memory and looks for an unused \EMPHASIZE{contiguous} chunk of memory for an array of \texttt{s} \texttt{int} values, marks this chunk as ``in use'' (i.e. not free) and \EMPHASIZE{returns the address of the }\texttt{\EMPHASIZE{first}}\EMPHASIZE{integer value of this array}. Therefore, after calling
-
-\begin{consolethree}[escapeinside=||]
-int * x = new int[s];
-\end{consolethree}
-
-x points to (i.e., has the address of) the \EMPHASIZE{first} int value of an array of s int values. Again, this array of values is in the heap and the number of int values allocated is exactly s. I will usually say x points to the array although technically speaking x has the address of the first int value of this array, If the value for s is 3, then the memory model looks like this (I just put random integers into the array):
-
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-p += Rect(0, 0, 6, 4)
-p += Rect(1, 1, 3, 2)
-p += Rect(0.5, 1.5, 0.5, 1.5, label='x', linewidth=0)
-
-p += Rect(8.25, 4.5, 8.25, 4.5, label='Free store', linewidth=0)
-p += Rect(7, 0, 15, 4)
-p += Rect(8.5, 2.5, 10.5, 3.5, label='512')
-p += Rect(10.5, 2.5, 12.5, 3.5, label='4')
-p += Rect(12.5, 2.5, 14.5, 3.5, label='-75')
-
-p += Rect(10.5, 5, 14.5, 7, linewidth=0.1, linecolor='red', innersep=0.25, s='The heap will mark these 3 integers as "in use".', align='c')
-
-p += Line(points=[(2, 1.5), (8.25, 3.25)], linewidth=0.15, endstyle='>')
-p += Line(points=[(12.5, 5), (13.5, 3.5)], linewidth=0.15, linecolor='red', endstyle='>')
-
-print(p)
-\end{python}
-
-When you do not need the array that \texttt{x} points to, you deallocate
-the memory of this array by doing this:
-
-\begin{consolethree}[escapeinside=||]
-delete [] x;
-\end{consolethree}
-
-This will release the whole array of \texttt{int} values at address \texttt{x} back to the heap so that the heap can reuse this memory for another memory allocation.
-
-A \EMPHASIZE{big mistake} is to do this:
-
-\begin{consolethree}[escapeinside=||]
-delete x;
-\end{consolethree}
-
-which will \EMPHASIZE{only release one value} (i.e. the single value that \texttt{x} points to), not the whole array, back to the heap. The problem is that the compiler will not tell you that this is a mistake! This will result in a \EMPHASIZE{memory leak}. This means that if you do
-
-\begin{consolethree}[escapeinside=||]
-int * x = new int[10];
-delete x;
-\end{consolethree}
-
-you are going to have a memory leak of 9 \texttt{int}s. For a 32-bit
-machine, that's a loss of 9x4=36 bytes. The right thing
-to do is
-
-\begin{consolethree}[escapeinside=||]
-int * x = new int[10];
-delete [] x;
-\end{consolethree}
-
-So remember that in general,
+There are three concepts here:
 
 \begin{itemize}
-\item If you use \texttt{new} for a single value, then you should do
-  \texttt{delete}.
-\item If you do \texttt{new []} for a whole array, you must do
-  \texttt{delete []}.
+\item static arrays,
+\item dynamic arrays in the heap, and
+\item pointers.
 \end{itemize}
 
-Here's an example:
+You have to be clear about the three because there are similarities and differences. Most of the comparisons below are already presented earlier. However, because of the similarities and differences, it's best I put everything here so that you can study all the facts in one place.
+
+A pointer can be used to access any value in your computer if you have the address of that value (and if you have access rights). In particular, if a pointer points to the first value of an array (static or dynamic array), using pointer arithmetic, you can access value of the
+array.
+
+In terms of syntax, there are many similarities between a pointer and an array (static of not). This is deliberate -- the designers of C++ made it so.
+
+\EMPHASIZE{Static and dynamic arrays}
+
+\textbf{SIMILARITY \#1: Array}
+Both static arrays and dynamic arrays are arrays (i.e., linear collection) of values, not just one value.
+
+\textbf{SIMILARITY \#2: Homogeneity}                           \tikzmarknode{hm2}{}                \xsidebox[0cm]{3cm}{}{hm2box}{ASIDE: Once you know more about pointers, even this can be blurred. For instance it's possible to store integers, doubles and characters in an integer array. But I won't go into this.}
+
+Both types of arrays are homogeneous, i.e., all the values in an array have the same type.
+\DrawArrowH{hm2box}{hm2}
+
+\textbf{SIMILARITY \#3: Bracket operator.}
+The i-th value of a static array and the i-value of a dynamic array can
+both be accessed using the bracket operator.
 
 \begin{consolethree}[escapeinside=||]
-int * x;
-
-x = new int;     // ask for one int value ...
-delete x;        // ... give back one
-
-x = new int[10]; // ask for 10 int values ...
-delete [] x;     // ... give back 10
-
-x = new int[42]; // ask for 42 int values ...
-delete [] x;     // ... give back 42
-
-x = new int;     // ask for one int value ...
-delete x;        // ... give back one
+char x[10] = {'a', 'b', 'c'};
+char * y = x;
+int size = 10;
+char * z = new char[size];
+//
+// index-2 value of x is x[2] or y[2]
+// index-2 value of array z is pointing to is z[2]
 \end{consolethree}
 
-As in the case of dynamic memory management, it's also a good idea to set a pointer to NULL after deallocation:
+Remember that \texttt{z[2]} is a shorthand for \texttt{*(z + 2)}.
+
+\textbf{SIMILARITY \#4: Bracket operator and out of bound access}      \tikzmarknode{hm4}{}                \xsidebox[0cm]{0cm}{}{hm4box}{ASIDE: I've said before that both data and code reside in your computer's memory. This means that a pointer can potentially access \textbf{CODE}. If you can change data, then you can change code in your code!}
+\DrawArrow{hm4box}{hm4}
+
+After you declare declare a static array or allocate memory for a dynamic array (in the heap) with a size s, the array has s values starting with index 0 and ending with index s - 1. HOWEVER, it's possible to access values \EMPHASIZE{OUTSIDE} the array -- remember what I said about pointers being able to access any value in your computer (as long as you have the address and the access rights). For instance is x is a static array of size 10 or a pointer to a dynamic array of size 10 in the heap, then \texttt{x[i]} is just the value at location \texttt{x + i}. You can have \texttt{x[42]}, \texttt{x[-5]}, etc.!!! You can access the value at address \texttt{x + 42} and \texttt{x + (-5)} as long as you have the access rights!!!
+
+Now for the differences \ldots{}
+
+\textbf{DIFFERENCE \#1:} \textbf{Memory location.}
+
+The most obvious difference is the location of the values of the array.
+In the case of
 
 \begin{consolethree}[escapeinside=||]
-int * x;
-
-x = new int;     // ask for one int value ...
-delete x;        // ... give back one
-x = NULL;
-
-x = new int[10]; // ask for 10 int values ...
-delete [] x;     // ... give back 10
-x = NULL;
+const int size = 10;
+char x[size];
 \end{consolethree}
 
-\input{exercises/31-27-pointers-and-arrays/main.tex}
-\input{exercises/32-27-pointers-and-arrays/main.tex}
-\input{exercises/33-27-pointers-and-arrays/main.tex}
-\input{exercises/34-27-pointers-and-arrays/main.tex}
-After
-
-\verb!int * x = new int[s];!
-
-your x points to the first value in the array. How do you get to the
-i-th value in this array? It's just
-
-\texttt{x[i]}
-
-Remember? Recall that the address of the \texttt{i}-th value in this array
-is
-
-\texttt{x + i}
-
-Therefore, dereferencing, the value at the address is
-
-\texttt{*(x + i)}
-
-Recall that \texttt{x[i]} is just a shorthand for \texttt{*(x + i):}
-
-\texttt{x[i]}         is the same as              \texttt{*(x + i)}
-
-Most programmers use \texttt{x[i]} since we want to think of \texttt{x} as an array (although technically it's a pointer.) The above explanation was already presented in the previous section. Why am I repeating? BECAUSE IT'S IMPORTANT!!!
-
-Try this:
+the memory allocation is local (i.e. in the current execution block).
+When you exit the block, the memory use for this array is reclaimed
+automatically. Therefore static arrays are automatic variables. Dynamic
+arrays created in the heap using \texttt{new[]}, i.e.
 
 \begin{consolethree}[escapeinside=||]
-int size;
-std::cin >> size;
-double * x = new double[size];
-for (int i = 0; i < size; i++)
-{
-    std::cin >> x[i];
-}
-double product = 1.0;
-for (int i = 0; i < size; i++)
-{
-    product *= x[i];
-    std::cout << product << '\n';
-}
-delete [] x;
+int size = 10;
+char * y = new char[size];
 \end{consolethree}
 
-\input{exercises/35-27-pointers-and-arrays/main.tex}
-\input{exercises/36-27-pointers-and-arrays/main.tex}
-\input{exercises/37-27-pointers-and-arrays/main.tex}
+lives in the heap, not in the local scope. (Of course the pointer
+\texttt{x} is local). The values of this array is not reclaimed
+automatically; \texttt{x} is local so the pointer value of \texttt{x} is
+reclaimed. You must deallocate the memory of this array yourself (when
+you're done using the array) by doing this:
+
+\begin{consolethree}[escapeinside=||]
+delete [] y;
+\end{consolethree}
+
+\textbf{DIFFERENCE \#2:} \textbf{Size.}
+
+The second difference is that the size of the array must be a constant
+for static array:
+
+\begin{consolethree}[escapeinside=||]
+const int size = 10;
+char x[size]; // size must be constant
+\end{consolethree}
+
+However the size used in creating an array in the heap can be any
+variable expression:
+
+\begin{consolethree}[escapeinside=||]
+int size = 10;
+char * y = new char[size];
+...
+delete [] y;
+\end{consolethree}
+
+\textbf{DIFFERENCE 3.} \textbf{Initialization.}
+
+An array can be initialized. For instance
+
+\begin{consolethree}[escapeinside=||]
+const int size = 10;
+char x[size] = {'a', 'b', 'c'};
+\end{consolethree}
+
+There is no corresponding syntax for the case for a dynamic array on the heap.
+
+\begin{consolethree}[escapeinside=||]
+int size = 10;
+char * y = new char[size] {'a', 'b', 'c'}; // WHAT?!?
+delete [] y;
+\end{consolethree}
+
+You have to perform assignment:
+
+\begin{consolethree}[escapeinside=||]
+int size = 10;
+char * y = new char[size];
+y[0] = 'a';
+y[1] = 'b';
+y[2] = 'c';
+delete [] y;
+\end{consolethree}
+
+\EMPHASIZE{Static arrays and pointers}
+
+\textbf{SIMILARITY 1. Array name is like a pointer.}
+
+You can do this:
+
+\begin{consolethree}[escapeinside=||]
+const int SIZE = 10;
+char x[SIZE];
+char * y = x; // Remember that x is &x[0]
+\end{consolethree}
+
+The reason (as stated above) is because in the above \texttt{x} is the same as \texttt{\&x[0]}. So the above make \texttt{x} like a pointer (syntactically speaking).
+
+\textbf{DIFFERENCE 1: Array name is constant pointer, not just pointer.}
+
+However static arrays are not exactly pointers. If x and y are pointers of the same type (with values), then you can assign between them:
+
+\verb!x = y;!
+
+But try this:
+
+\begin{consolethree}[escapeinside=||]
+char x[10];
+char * y;
+char * z = new char[10];
+char w[10];
+y = x; // OK
+x = z; // NOPE!!!
+\end{consolethree}
+
+So what's \texttt{x} if \texttt{x} is an array since it's not a pointer? You can view \texttt{x} as a constant pointer. In other words, you can think of \texttt{x} as a pointer but the address of \texttt{x} cannot be changed. So for this code fragment:
+
+\begin{consolethree}[escapeinside=||]
+char x[10];
+char * y;
+y = x; // OK
+\end{consolethree}
+
+If you want to make \texttt{y} as close to \texttt{x} as possible, you can do this:
+
+\begin{consolethree}[escapeinside=||]
+char x[10];
+char * const y = x; // OK
+\end{consolethree}
+
+In that case the address value in \texttt{y} cannot be changed.
+
+\textbf{DIFFERENCE 2:} \texttt{\textbf{sizeof().}}
+
+Another difference is in the behavior of the \texttt{sizeof()} function. Try this:
+
+\begin{consolethree}[escapeinside=||]
+char x[10];
+char * y = x;
+
+std::cout << sizeof(x) << '\n';
+std::cout << sizeof(y) << '\n';
+\end{consolethree}
+
+The \texttt{sizeof()} on an array returns the size of memory used for the array of values. The \texttt{sizeof()} on a pointer returns the size of memory used for the pointer itself, i.e., the memory used for the address of the first value of the array, not the array.
+
 

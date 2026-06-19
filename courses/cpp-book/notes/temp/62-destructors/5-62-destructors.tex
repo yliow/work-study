@@ -1,71 +1,142 @@
+\sectionthree{IntPointer}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Objects in the free store}
 
-The above is for an object in the local scope. For the case of an object
-in the free store, say a pointer \texttt{p} is pointing to this object,
-when we execute \texttt{delete p}, then the object will call its
-destructor automatically. For the case of a pointer \texttt{p} pointing to
-an array of objects in the free store, when we execute \texttt{delete
-[] p}, each object in the array will call its destructor. Again: You
-do \EMPHASIZE{not} call destructors explicitly. They are called
-automatically. (In fact you cannot call destructors in your code.)
+When you want a pointer, you declare it and allocate memory (using
+\texttt{new}) from the heap for the pointer to point to. You never forget
+to \texttt{new} the pointer because your program will not work immediately
+if you don't \texttt{new}.
+
+But it's easy to forget to deallocate / release the
+memory (using \texttt{delete}) after you're done with
+using the value that \texttt{p} points to. The problem is this: the
+program will continue to work until it runs out of memory which will be
+much later. By then you have to find that one bad pointer among hundreds
+or thousands of pointers in your code.
+
+Here's our \texttt{IntPointer}:
 
 \begin{consolethree}[escapeinside=||]
-class Thingy
+...
+class IntPointer
 {
 public:
-    Thingy()             // memory allocation
-        : y_(new char)   // during constructor call
-    {}
-    ~Thingy()
+    IntPointer(int x = 0)
+        : p_(new int)
     {
-        delete y_;
+        *p_ = x;
+    }
+    IntPointer(const IntPointer & intptr)
+        : p_(new int)
+    {
+        *p_ = *(intptr.p_);
+    }
+    int & operator*()
+    {
+        return *p_;
+    }
+    void deallocate()
+    {
+        delete p_;
     }
 private:
-    int x_;     // x_ is automatic
-    char * y_;  // y_ is automatic, but the *memory*
-                // that y_ points to, if allocated,
-                // is not automatic.
+    int * p_;
 };
-
-int main()
-{
-    int x = 1;
-    if (x > 0)
-    {
-        Thingy * pthing = new Thingy;
-        // do something with *pthing
-        delete pthing; // Memory used by the object
-                       // that pthing points to is
-                       // decallocated -- reclaimed
-                       // by the free store. But
-                       // before that, this object
-                       // (*pthing) calls its
-                       // destructor
-                       // (*pthing).~Thingy().
-    }
-    return 0;
-}
+...
 \end{consolethree}
-
-The story is similar if you have a pointer pointing to an array of
-objects in the free store:
 
 \begin{consolethree}[escapeinside=||]
+...
 int main()
 {
-    int x = 1;
-    if (x > 0)
+    for (int i = 0; i < 5; i++)
     {
-        Thingy * p = new Thingy[100];
-        // do something with p[0],...,p[99]
-        delete [] p; // p[0], ..., p[99] call
-                     // their destructors
+        IntPointer intptr(i);
     }
     return 0;
 }
 \end{consolethree}
 
+Note that each of the five \texttt{intptr} contain a pointer \texttt{p\_}
+which points to an allocated integer in the free store. Note however
+that the integer \texttt{intptr.p\_} points to is not deallocated. You can
+see the point in time when each \texttt{intptr} dies (and when one
+additional memory leak occurs). Add the following destructor:
+
+\begin{consolethree}[escapeinside=||]
+...
+class IntPointer
+{
+public:
+    ...
+    ~IntPointer()
+    {
+        std::cout << "memory leak ... :(\n";
+    }
+    ...
+\end{consolethree}
+
+Run your program again. If you don't believe me that
+you'll run out of memory, resulting in program abort,
+try this:
+
+\begin{consolethree}[escapeinside=||]
+...
+int main()
+{
+    while (1)
+    {
+        IntPointer intptr(0);
+    }
+    return 0;
+}
+\end{consolethree}
+
+(You may want to comment out the print statement in the destructor
+because printing slows down your program and delays the program from
+crashing.)
+
+Now we make our pointer object smart enough to deallocate memory used by
+itself:
+
+\begin{consolethree}[escapeinside=||]
+...
+class IntPointer
+{
+public:
+    ...
+    ~IntPointer()
+    {
+        delete p_;
+    }
+    ...
+\end{consolethree}
+
+Run this again and see if you have memory leaks:
+
+\begin{consolethree}[escapeinside=||]
+...
+int main()
+{
+    while (1)
+    {
+        IntPointer intptr(0);
+    }
+    return 0;
+}
+\end{consolethree}
+
+You won't.
+
+Now, if ever we need an integer pointer, we can use this class and we
+will never have to worry about memory leaks. (There are a few more
+things to add to this class to really complete it ...)
+
+Typically, if you have a class that grabs hold of some resource (not
+just memory) in the constructor of the class, you should probably
+include code in the destructor to release the resource.
+
+\input{exercises/9-62-destructors/main.tex}
+\input{exercises/10-62-destructors/main.tex}
 

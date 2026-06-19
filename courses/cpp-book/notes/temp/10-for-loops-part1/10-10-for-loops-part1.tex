@@ -1,123 +1,59 @@
+\input{exercises/42-10-for-loops-part1/main.tex}\input{exercises/43-10-for-loops-part1/main.tex}\sectionthree{Using for-loop to compute products}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Using \texttt{for}-loop to compute sums}
 
-Look at the following program:
-\begin{console}
-int sum = 0;
-int i = 1;
+\input{exercises/44-10-for-loops-part1/main.tex}
+What is the output (or is there an error)? Now run the program with your
+C++ compiler and verify.
 
-sum = sum + i;
-i = i + 1;
+By the way, the product of all positive integer from 1 to 5 (i.e.
+1x2x3x4x5) is called the \EMPHASIZE{factorial} of 5. The factorial of 10 is
+just
+\begin{center}
+1 x 2 x 3 x 4 x 5 x 6 x 7 x 8 x 9 x 10
+\end{center}
+In general, the factorial of n is such an important quantity that we
+have a shorthand notation for it: The factorial of n is written n!. So
+\begin{center}
+10! = 1 x 2 x 3 x 4 x 5 x 6 x 7 x 8 x 9 x 10
+\end{center}
+Note that the factorial of 0 is defined to be 1.
+\begin{center}
+0! = 1
+\end{center}
+Study the above code. Do you see that it computes the factorial of 5?
 
-sum = sum + i;
-i = i + 1;
+The factorial appears in Computer Science, Math, Physics, Chemistry,
+Finance, etc. So you bet it's important.
 
-sum = sum + i;
-i = i + 1;
+\input{exercises/45-10-for-loops-part1/main.tex}\input{exercises/46-10-for-loops-part1/main.tex}
+\input{exercises/47-10-for-loops-part1/main.tex}
+\input{exercises/48-10-for-loops-part1/main.tex}
+\input{exercises/49-10-for-loops-part1/main.tex}
+\input{exercises/50-10-for-loops-part1/main.tex}\input{exercises/51-10-for-loops-part1/main.tex}\begin{center}
+n! / (r! (n - r)!)
+\end{center}
+n-choose-r is the total numbers of ways to choose r things from n
+distinct things. For instance, suppose you are an IT manager and have a
+team of 40 programmers, and you have to form a team of 5 software
+engineers. The total numbers of ways to form this team is 40-choose-5,
+i.e.,
+\begin{center}
+40! / (5! x (40 - 5)!) = 40! / (5! x 35!)
+\end{center}
+However 40! is too huge to compute. Use your program to compute
+5-choose-2. Verify the correctness of your program by doing this
+computation by hand. Here are 5 symbols:
 
-sum = sum + i;
-i = i + 1;
+\begin{center}
+a, b, c, d, e
+\end{center}
+Write down all possible selections of 2 symbols. Let me begin for you:
+\begin{align*}
+\text{a, b}\\
+\text{a, c}
+\end{align*}
 
-sum = sum + i;
-i = i + 1;
+Note that the selection of a, b is considered the same as the selection of b, a. So do not include b, a. Likewise only include b, e and not e, b.
 
-sum = sum + i;
-i = i + 1;
-
-sum = sum + i;
-i = i + 1;
-
-sum = sum + i;
-i = i + 1;
-
-sum = sum + i;
-i = i + 1;
-
-sum = sum + i;
-i = i + 1;
-
-std::cout << sum << std::endl;
-\end{console}
-
-OK. \ldots looks like a long program \ldots but most of it repeats.
-
-Now look at this one:
-\begin{console}
-int sum = 0;
-for (int i = 1; i <= 10; i = i + 1)
-{   
-    sum = sum + i;
-}
-std::cout << sum << std::endl;
-\end{console}
-
-Do you see that they do the same thing? Make sure you trace both
-programs by hand and see that the actual computations are the same.
-
-\input{exercises/35-10-for-loops-part1/main.tex}\input{exercises/36-10-for-loops-part1/main.tex}
-Make sure you try this. This is a \EMPHASIZE{very basic technique} for
-slowing down a loop so that you can follow what's
-happening and do \EMPHASIZE{debugging}.
-
-\input{exercises/37-10-for-loops-part1/main.tex}
-\input{exercises/38-10-for-loops-part1/main.tex}
-\input{exercises/39-10-for-loops-part1/main.tex}
-\input{exercises/40-10-for-loops-part1/main.tex}
-\input{exercises/41-10-for-loops-part1/main.tex}
-In general the computation of a sum using a loop looks like this:
-\begin{flushleft}
-\text{sum = 0}\\
-\text{for i running from a, a+1, a+2, \ldots, b:}\\
-\tab[1em]{\text{sum = sum + (some term)}}
-\end{flushleft}
-For instance:
-\begin{flushleft}
-\texttt{sum = 0;}\\
-\texttt{for (int i = 1; i <= 100; ++i)}\\
-\{
-\tab[1em]{\texttt{sum += i;}}\\
-\}
-\end{flushleft}
-In this case the term to add to \texttt{sum} is \texttt{i}. If you want to
-sum squares you can do this:
-\begin{flushleft}
-\texttt{sum = 0;}\\
-\texttt{for (int i = 1; i <= 100; ++i)}\\
-\{\\
-\tab[1em]{\texttt{sum += i * i;}}\\
-\}\\
-\end{flushleft}
-or this:
-\begin{flushleft}
-\texttt{sum = 0;}\\
-\texttt{for (int i = 1; i <= 100; ++i)}\\
-\{\\
-\tab[1em]{\texttt{int term = i * i;}}\\
-\tab[1em]{\texttt{sum += term;}}\\
-\}\\
-\end{flushleft}
-Of course for such cases, the term can be computed from \texttt{i}.
-There's no reason why the term cannot be supplied by,
-for instance, a user. Here's one that adds integers
-specified by a user:
-\begin{console}
-int num_accts;
-std::cout << "how many bank accounts do you have? ";
-std::cin >> num_accts;
-
-double sum = 0;
-for (int i = 1; i <= num_accts; ++i)
-{
-        std::cout << "enter amt in bank acct #"
-                  << i << "? $";
-        double amt;
-        std::cin >> amt;
-        sum += amt;
-        std::cout << "so far ... you have $"
-                  << sum << std::endl;
-}
-std::cout << "total ... you have $"
-          << sum << std::endl;
-\end{console}

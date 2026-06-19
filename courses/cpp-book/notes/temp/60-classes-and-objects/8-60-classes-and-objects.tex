@@ -1,57 +1,36 @@
+\sectionthree{Passing and returning objects}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Class and Type}
 
-In C++, a class is a type (in the sense of C++!!!). This means that, two
-classes are different types even if their internals are the same:
+It's OK to have object parameters and
+it's also OK to return objects.
 
-\begin{consolethree}[escapeinside=||]
-class X
-{
-    int i;
-};
+\input{exercises/11-60-classes-and-objects/main.tex}
+\input{exercises/12-60-classes-and-objects/main.tex}
+\input{exercises/13-60-classes-and-objects/main.tex}
+\input{exercises/14-60-classes-and-objects/main.tex}
+Note that for the above methods, you should write them in such a way
+that they emulate expressions that you're used to using. For example, \texttt{x
+<= 2} would do something like this: \texttt{x.le(2)}. So the object passed into
+the \texttt{le()} (or other) function should be the value on the right of the
+expression, and the object calling the method is on the left. This will be
+discussed more later.
 
-class Y
-{
-    int i;
-};
-\end{consolethree}
-
-
-This means that the following will actually compile:
+With the above you can now do this:
 
 \begin{consolethree}[escapeinside=||]
-#include <iostream>
+Date start;
+start.init(1, 1, 1970);
+Date end;
+end.init(1, 1, 2015);
+Date oneday;
+oneday.init(0, 0, 1);
 
-class X
+for (Date d = start; d <= end; d = d.add(oneday))
 {
-};
-
-class Y
-{
-};
-
-void f(const X & obj)
-{
-    std::cout << "f(X)" << std::endl;
-}
-
-void f(const Y & obj)
-{
-    std::cout << "f(Y)" << std::endl;
-}
-
-int main()
-{
-    X a;
-    f(a);
-    Y b;
-    f(b);
+    d.print();
 }
 \end{consolethree}
-
-Why? Because in C++, a function is distinguished by the name of the
-function and its prototype, i.e., C++ supports function overloading.
 
 

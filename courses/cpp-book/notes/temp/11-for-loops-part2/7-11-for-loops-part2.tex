@@ -1,102 +1,123 @@
+\sectionthree{Unrolling the for-loop: Another example}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Unrolling the \texttt{for}-loop: How to see the \texttt{for}-loop}
 
-Sometimes it's hard to come up with the appropriate for-loop. In that case it's always easier to \EMPHASIZE{``unroll''} the for-loop for several special cases by hand. Unrolling a for-loop is just writing down what the program executes without using the for-loop. For instance, unrolling the following:
+What about this? If the user enters 3 your program has to draw:
 \begin{console}
-for (int i = 0; i < 3; i++)
-{   
-    std::cout << i << std::endl;
-}
-
-gives us
-\begin{console}
-std::cout << 0 << std::endl;
-std::cout << 1 << std::endl;
-std::cout << 2 << std::endl;
-\end{console}
-For instance, suppose you want the program to draw this:
-\begin{console}
-*
-**
+  ***
+ ***
 ***
+\end{console}
+If the user enters 4 your program has to draw
+\begin{console}
+   ****
+  ****
+ ****
 ****
 \end{console}
-if the user enters 4 (this is a triangle). And if he enters 3, the
-program draws:
+The pseudocode for the case when the user enters 3 is (without using the
+for-loop):
 \begin{console}
-*
-**
-***
+draw 2 spaces
+draw 3 stars
+draw 1 space
+draw 3 stars
+draw 3 stars
 \end{console}
-So just take a special case, say when the user enters 3, and write the
-pseudocode \EMPHASIZE{without the for-loop}:
-\begin{console}
-draw a line of length 1
-draw a line of length 2
-draw a line of length 3
+The trick is to make everything as uniform as possible. So write this:
+\begin{console}[commandchars=\~\@\$]
+draw 2 spaces
+draw 3 stars
+draw 1 space
+draw 3 stars
+~textbf@draw 0 space$
+draw 3 stars
 \end{console}
-The pseudocode for height 4 is
-\begin{console}
-draw a line of length 1
-draw a line of length 2
-draw a line of length 3
-draw a line of length 4
-\end{console}
-Of course you want to write one program and not two! The program must
-work for both cases. We must find a way to ``combine''them.
+See the pattern yet? No?
 
-The first pseudocode ... \EMPHASIZE{NOT C++!!!} ... can be written:
+The interleaving of two different things is confusing. Rewrite this as:
 \begin{console}
-for i = 1, 2, 3:
-           draw a line of length i
+draw 2 spaces; draw 3 stars
+draw 1 space; draw 3 stars
+draw 0 space; draw 3 stars
 \end{console}
-and the second can be written:
+What if the user enters 4? The pseudocode becomes
 \begin{console}
-for i = 1, 2, 3, 4:
-           draw a line of length i
+draw 3 spaces; draw 4 stars
+draw 2 spaces; draw 4 stars
+draw 1 space; draw 4 stars
+draw 0 space; draw 4 stars
 \end{console}
+How do you combine the above cases into one common pseudocode?
 
-Now they are almost the same! If the height entered by the user is kept
-in variable h, then the pseudocode is
+The first is
 \begin{console}
-for i = 1, 2, ..., h:
-           draw a line of length i
+for i = 2, 1, 0:
+        draw i spaces; draw 3 stars
 \end{console}
-AHA! \EMPHASIZE{This pseudocode works for both!!!}
-
-Of course you already know how to draw a line (of stars) of length i. So
-altogether the pseudocode becomes:
+The second is
 \begin{console}
-for i = 1, 2, ..., h:
-         for j = 1, 2, ..., i:
-                 draw a star
-         go to the next line
+for i = 3, 2, 1, 0:
+        draw i spaces; draw 4 stars
 \end{console}
 
-And finally a straightforward translation to C++ gives:
+Now both pseudocodes are almost the same!!! Suppose the value entered by
+the user is kept in a variable n. Then you can (finally!) combine both
+pseudocodes into one:
 \begin{console}
-for (int i = 1; i <= h; i++)
+for i = n-1, ..., 0:
+        draw i spaces; draw n stars
+\end{console}
+
+Now you add in the details:
+\begin{console}
+for i = n-1, ..., 0:
+      // draw i spaces
+      for j = 1, ..., i
+          draw a space
+      // draw n stars
+      for j = 1, ..., n
+          draw a star
+      go to next line
+\end{console}
+
+And finally a straightforward translation to C++ yields:
+\begin{console}
+for (int i = n - 1; i >= 0; i--)
 {   
     for (int j = 1; j <= i; j++)
+    {
+        std::cout << ' ';
+    }
+    for (int j = 1; j <= n; j++)
     {
         std::cout << '*';
     }
     std::cout << std::endl;
 }
 \end{console}
-Now we add the icing by prompting the user for h:
+Adding the prompt (and some comments) we get:
 \begin{console}
-int h = 0;
-std::cin >> h;
-for (int i = 1; i <= h; i++)
+int n = 0;
+std::cin >> n;
+for (int i = n-1; i >= 0; i--)
 {   
+    // Print i spaces
     for (int j = 1; j <= i; j++)
-    {   
+    {
+        std::cout << ' ';
+    }
+    // Print n stars
+    for (int j = 1; j <= n; j++)
+    {
         std::cout << '*';
     }
-std::cout << std::endl;
+    std::cout << std::endl;
 }
 \end{console}
+\input{exercises/10-11-for-loops-part2/main.tex}
+[See next page for hints.]
+
+\input{exercises/11-11-for-loops-part2/main.tex}[See next page for hints.]
 

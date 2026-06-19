@@ -1,66 +1,134 @@
+\sectionthree{Why scopes?}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Leaving things out}
 
-Refer to the diagram from the previous section.
-
-Actually it turns out that you can leave out \texttt{[stmt1]}. Try this
-\begin{console}
-for (int i = 0; i < 5; i++)
-{   
-    std::cout << "i have " << i
-              << " head(s)"
-              << std::endl;
-}
-\end{console}
-And now modify it as follows:
+Compare the following programs:
 \begin{console}
 int i = 0;
-for (; i < 5; i++)
+int sum = 0;
+
+for (i = 0; i < 10; i++)
 {   
-    std::cout << "i have " << i
-              << " head(s)"
-              << std::endl;
+    sum += i;
 }
+
+std::cout << sum << std::endl;
 \end{console}
-You can also leave the third part out as well!!!
+
 \begin{console}
-int i = 0;
-for (; i < 5;)
+int sum = 0;
+
+for (int i = 1; i < 11; i++)
 {   
-    std::cout << "i have " << i
-              << " head(s)"
-              << std::endl;
-    i++;
+    sum += i;
 }
+
+std::cout << sum << std::endl;
 \end{console}
-What if the second part is blank? Try this:
+
+Their goals are the same: To compute and print the sum of integers from
+1 to 10.
+
+The only difference is in the scope of variable \texttt{i}. The scope of
+\texttt{i} is a lot smaller in the second program.
+
+If you think about it, the variable \texttt{i} is sort of like a
+``scratch''variable when compared to \texttt{sum}. You
+don't really need it once the computation of \texttt{sum}
+is completed. When you read the second program, you can very easily
+deduce the fact that \texttt{i} is a ``scratch'' variable from
+it's scope: it exists only in the \texttt{for}-loop.
+
+A complex problem is solved by breaking the problem into smaller and
+simpler subproblems. Once that's done you solve the
+simpler subproblems and put these subsolutions together to solve the big
+problem. One should be careful of the unintended effects of a
+subsolution -- a small piece of the solution overall -- on another.
+
+Here's an example. This program prints the sum from 1 to
+10 and then the sum from 1 to 100:
 \begin{console}
-int i = 0;
-for (;;)
+int i;
+int sum = 0;
+
+for (i = 1; i < 11; i++)
 {   
-    std::cout << "i have " << i
-              << " head(s)"
-              << std::endl;
-    i++;
+    sum += i;
 }
+
+// Print sum from 1 to 10
+std::cout << sum << std::endl;
+
+// Continue the summing process
+for (; i < 101; i++)
+{   
+    sum += i;
+}
+
+std::cout << sum << std::endl;
 \end{console}
-(Pretty gross, isn't it? ...)
+If you're working on a project with someone and you both
+have agreed that i is a scratch variable, he might use it like this in a
+computation of a formula involving \texttt{a, b, c, d, e, f}
+\begin{console}
+i = a + b;
+result = i + c + d + e + f;
+\end{console}
+He might just insert this into your code:
+\begin{console}[commandchars=\~\@\$]
+int i;
+int sum = 0;
 
-This tells you that if the boolean expression is missing, C++ will
-assume you want the boolean value to be \EMPHASIZE{\texttt{true}}. Remember
-what I said before: you have to pay attention whenever C++ does
-something for you automatically.
+for (i = 1; i < 11; i++)
+{   
+    sum += i;
+}
 
-By the way, the above program is executing an \EMPHASIZE{infinite loop}
-(because it doesn't stop). This format of the for-loop is sometimes used in writing games, although we'll see that there's another type of loop called the
-\EMPHASIZE{\texttt{while-loop}} that is frequently used instead. Although in the above
+std::cout << sum << std::endl;
 
-\tab[3em]{\texttt{for (;;)}}\\
-\tab[3em]{...}
+~textbf@i = a + b;$
+~textbf@result = i + c + d + e + f;$
 
-it seems like you can't get out of the loop. But, in fact, \EMPHASIZE{you
-can get out of the loop in another way}. We'll talk
-about it later.
+for (; i < 101; i++)
+{   
+    sum += i;
+}
+
+std::cout << sum << std::endl;
+\end{console}
+
+Do you see how his work has now destroyed your computation?
+
+In general you want to have as little ``communication''as possible
+between your subsolutions when they are meant to be independent.
+
+One way to achieve that is to use small scopes. Look at this:
+\begin{console}[commandchars=\~\@\$]
+~EMPHASIZE@int i$;
+int sum = 0;
+
+for (~EMPHASIZE@int i = $}; i < 11; i++)
+{   
+    sum += i;
+}
+
+std::cout << sum << std::endl;
+
+i = a + b;
+result = i + c + d + e + f;
+
+for (~EMPHASIZE@int i = 1$; i < 101; i++)
+{   
+    sum += i;
+}
+
+std::cout << sum << std::endl;
+\end{console}
+
+There are really 3 i's. The first is outside both
+for-loops. The second is created only when you enter the first for-loop;
+this is destroyed when you exit the first for-loop. The third is created
+only when you enter the second for-loop; this is destroyed when you exit
+the second for-loop. They all live in different ``places''.
 

@@ -1,15 +1,61 @@
+\sectionthree{Return type warning}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Why Overloading?}
 
-The reason why we have function (and operator) overloading is clear: Many functions perform similar operations and we want to remember fewer names.
+I've already mentioned this \ldots{} but's it's such a common error that it's a good idea to repeat it \ldots{}
 
-This is also the case in Math. Not only is + used for addition of real numbers, it's also used for things like addition of functions, addition of vectors, addition of matrices, etc. So having function/operator overloading in a programming language allows us to design software to match the mathematical language/symbols that we are used to.
+\ldots{} the \EMPHASIZE{return type is \textit{\underline{not}} part of the identification of a function}. In other words the following is \EMPHASIZE{incorrect}:
 
-Even in daily use of the English language, we see the same word used similar but different situations: open a door, open a jar, open my wallet, open your mind, etc.
+\begin{consolethree}[escapeinside=||]
+int f(int);    // identified as f, int
+double f(int); // identified as f, int
+\end{consolethree}
 
-Overloading is a software technique for controlling software complexities.
+Why? Because of this ...
 
-(Some older programming languages do not have function overloading. Some don't even allow you to define your own operators. Also, there are programming languages where overloading is not allowed. In fact there are programming languages where the symbol for adding integers is different from the symbol for adding doubles.)
+Recall that it's OK \textit{\EMPHASIZE{not}} to use the return value of a function. For instance this is a valid piece of code:
+
+\begin{consolethree}[escapeinside=||]
+int f()
+{
+    return 42;
+}
+
+int main()
+{
+    f(); // return value is not used
+    return 0;
+}
+\end{consolethree}
+
+In fact even this is OK:
+
+\begin{consolethree}[escapeinside=||]
+int main()
+{
+    42;
+    return 0;
+}
+\end{consolethree}
+
+Now suppose you have a C++ compiler (called Crazy C++) that identifies function by their names, signatures \EMPHASIZE{and return types}. Then you have this \textbf{problem}:
+
+\begin{consolethree}[escapeinside=||]
+int f(int)
+{}
+
+double f(int) // should be different from above f()
+{}
+
+int main()
+{
+    f(42); // Crazy C++: ... which one to use???
+           // the return type is not indicated!!!
+    return 0;
+}
+\end{consolethree}
+
+Make sure you run this program.
+
 

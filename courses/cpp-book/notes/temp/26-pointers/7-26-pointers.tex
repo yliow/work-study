@@ -1,196 +1,200 @@
+\sectionthree{Assignment Operator}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Dereferencing Pointers}
 
-Recall: If \texttt{p} is a pointer, then the value of \texttt{p} is the \EMPHASIZE{memory address} of the value \texttt{p} is pointing to.
+It's not too surprising that you can do assignments on pointers \ldots{}
 
-You can access the \EMPHASIZE{value} \texttt{p} is pointing to. That's call \EMPHASIZE{dereferencing} \texttt{p} and you do it using \EMPHASIZE{*p}. The \texttt{*} used in this way is called the \EMPHASIZE{dereferencing operator}. It's also called the indirection operator.
-
-Try this:
+First try to guess what this does:
 
 \begin{consolethree}[escapeinside=||]
 int x = 42;
-int * p;
-p = \&x;
+int y = 123;
 
-std::cout << x << ' ' << *p << '\n';
-
-x = 0;
-std::cout << x << ' ' << *p << '\n';
-
-*p = 42;
-std::cout << x << ' ' << *p << '\n';
-\end{consolethree}
-Suppose \texttt{\&x} is 124500, then the memory model looks like this:
-
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-p += Rect(0, 1.5, 5, 5.5)
-
-xbawx = Rect(1, 2, 4, 3, label='124500')
-refbawx = Rect(8, 7, 12, 9, linecolor='red', linewidth=0.1, align='c', s='You can refer to this box using \\texttt{x} or \\texttt{*p}')
-p += xbawx
-p += refbawx
-p += Rect(0.5, 4.5, 0.5, 4.5, label='x')
-p += Rect(1, 4, 4, 5, label='42')
-p += Line(points = [(8, 8), (2.5, 5)], linewidth=0.1, linecolor='red', endstyle='>')
-pbawx = Rect(1.5, 5.25, 1.5, 5.25, label='124500')
-p += pbawx
-p += Rect(0.5, 2.5, 0.5, 2.5, label='p')
-
-p += Line(points=[(3.5, 2.5), (4.5, 2.5), (4.5, 4.5), (2.8, 4.5)], linewidth=0.15, endstyle='>')
-print(p)
-\end{python}
-
-
-\EMPHASIZE{MAKE SURE YOU SEE THE DIFFERENCE BETWEEN \texttt{p} and \texttt{*p}!!!:}
-
-\begin{itemize}
-\item
-  \EMPHASIZE{\texttt{p} is 124500}
-\item
-  \EMPHASIZE{\texttt{*p} is 42}
-\end{itemize}
-
-\EMPHASIZE{WARNING:}
-
-There are now \EMPHASIZE{3 different meanings for *}!!!
-
-\begin{consolethree}[escapeinside=||]
-int x = 2 * 3;           // * = multiplication
-int * p = &x;            // * = for pointer type
-std::cout << x
-          << ',' << *p   // * = for dereferencing
-          << '\n';
-\end{consolethree}
-It's really important to remember that if a pointer \texttt{p} points to a box, then the dereference of \texttt{p}, i.e. \texttt{*p}, refer to the contents or the ``inside'' of the box.
-
-In particular, if I give you this picture without showing you the name of the variable with a value of 23:
-
-\begin{python}
-from latextool_basic import *
-p = Plot()
-
-p += Rect(0,0, 8, 5)
-p += Rect(2, 3, 5, 4, label='23')
-p += Rect(2, 1, 5, 2)
-p += Rect(1.5, 1.5, 1.5, 1.5, label='p')
-p += Line(points=[(2.5, 1.5), (6.5, 1.5), (6.5, 3.5), (5, 3.5)], linewidth=0.05, endstyle='>')
-
-print(p)
-\end{python}
-
-you tell me right away that \texttt{*p} is 23. You don't need to know the variable name of that box.
-
-Note that \texttt{*p} refers to the contents of the box \texttt{p} points to in two ways and can be used in two ways, for reading and for writing:
-
-\begin{itemize}
-\item
-  you can use \texttt{*p} to \EMPHASIZE{read} the value that \texttt{p} points
-  to
-\item
-  you can use \texttt{*p} to \EMPHASIZE{overwrite} the value \texttt{p} points
-  to
-\end{itemize}
-
-For instance:
-
-\begin{consolethree}[escapeinside=||]
-int x = 42;
 int * p = &x;
-int i;
-i = *p;         // read the value that p points to (and
-                // give it to i)
-*p = 100;       // write the value (i.e. 100) onto the
-                // value that p points to
+int * q = &y;
+std::cout << *p << "\n";
+
+p = q;
+std::cout << *p << "\n";
 \end{consolethree}
+Now run it and verify.
 
-
-So \texttt{*p} can appear on either the right or the left of the
-assignment operator.
-
-\input{exercises/17-26-pointers/main.tex}
-Let me repeat the above. Suppose the address value in \texttt{p} is 124500. Then if you see something like
+Here are some pictures. Up to this point:
 
 \begin{consolethree}[escapeinside=||]
-a = b + *p + c;
+int x = 42;
+int y = 123;
+
+int * p = &x;
+int * q = &y;
+
+std::cout << *p << "\n";
 \end{consolethree}
-
-you should think of it as
-
-\begin{consolethree}[escapeinside=||]
-a = b + (the value at address 124500) + c;
-\end{consolethree}
-
-And if you see
-
-\begin{consolethree}[escapeinside=||]
-*p = b + c;
-\end{consolethree}
-
-you should think of it as
-
-\begin{consolethree}[escapeinside=||]
-store value of (b + c) at address 124500
-\end{consolethree}
-
-In summary,
+the memory model looks like this:
 \begin{python}
-from latextool_basic import table
-#print(table([(1, 2, 3), (2, 2, 5), (5, 2), (-1, 2, 6), (1, 2, 3), ]))
-print(table([("\\texttt{*p}", "Statement", "Same as"), ("lvalue", "\\texttt{*p = ...}", "store ... in memory at address \\texttt{p}"), ("rvalue", "\\texttt{... = ... *p}", "... = ... (value in memory at address \\texttt{p}) ...")]))
+from latextool_basic import *
+p = Plot()
+
+p += Rect(0, -1, 8, 8)
+p += Rect(2, 6, 5, 7, label='42')
+p += Rect(1.5, 6.5, 1.5, 6.5, label='x')
+p += Rect(2, 4, 5, 5, label='123')
+p += Rect(1.5, 4.5, 1.5, 4.5, label = 'y')
+p += Rect(2, 2, 5, 3)
+p += Rect(1.5, 2.5, 1.5, 2.5, label = 'p')
+p += Rect(2, 0, 5, 1)
+p += Rect(1.5, 0.5, 1.5, 0.5, label = 'q')
+p += Line(points=[(3, 2.5), (7, 2.5), (7, 6.5), (5, 6.5)], linewidth=0.05, endstyle='>')
+p += Line(points=[(3, 0.5), (6, 0.5), (6, 4.5), (5, 4.5)], linewidth=0.05, endstyle='>')
+
+print(p)
+\end{python}
+The next statement
+
+\begin{consolethree}[escapeinside=||]
+p = q;
+\end{consolethree}
+
+gives the memory address in \texttt{q} to \texttt{p}. Since \texttt{q} has the memory address of \texttt{y}, this means that \texttt{p} ends up with the memory address of \texttt{y}. So we get:
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(0, -1, 8, 8)
+p += Rect(2, 6, 5, 7, label='42')
+p += Rect(1.5, 6.5, 1.5, 6.5, label='x', linecolor='white')
+p += Rect(2, 4, 5, 5, label='123')
+p += Rect(1.5, 4.5, 1.5, 4.5, label = 'y', linecolor='white')
+p += Rect(2, 2, 5, 3)
+p += Rect(1.5, 2.5, 1.5, 2.5, label = 'p', linecolor='white')
+p += Rect(2, 0, 5, 1)
+p += Rect(1.5, 0.5, 1.5, 0.5, label = 'q', linecolor='white')
+p += Line(points=[(3, 2.5), (7, 2.5), (7, 4.75), (5, 4.75)], linewidth=0.05, endstyle='>')
+p += Line(points=[(3, 0.5), (6, 0.5), (6, 4.25), (5, 4.25)], linewidth=0.05, endstyle='>')
+
+print(p)
 \end{python}
 
-\input{exercises/18-26-pointers/main.tex}
-\input{exercises/19-26-pointers/main.tex}
-\input{exercises/20-26-pointers/main.tex}
-\input{exercises/21-26-pointers/main.tex}
-\input{exercises/22-26-pointers/main.tex}
-\input{exercises/23-26-pointers/main.tex}
-\input{exercises/24-26-pointers/main.tex}
-\input{exercises/25-26-pointers/main.tex}
-\input{exercises/26-26-pointers/main.tex}
-\input{exercises/27-26-pointers/main.tex}
-\input{exercises/28-26-pointers/main.tex}
-\begin{consolethree}[escapeinside=||]
-int s = 0;
-int * p = &s;
+Since \texttt{p} points to \texttt{y}, or rather, \texttt{p} point to the \texttt{int} box that contains the value of \texttt{y}, of course \texttt{*p} gives us \texttt{123}.
 
-// Modify code below so that variable name s is not
-// used.
+Let me explain everything above all over again, this time using (made up) memory addresses \ldots{} \EMPHASIZE{PAY ATTENTION!}
 
-for (int i = 0; i < 100; i++)
-
-{   
-    s += i;
-    std::cout << i << ' ' << s << '\n';
-}
-
-std::cout << "1 + ... + 100 = " << s << '\n';
-\end{consolethree}
-\input{exercises/29-26-pointers/main.tex}\input{exercises/30-26-pointers/main.tex}
-\input{exercises/31-26-pointers/main.tex}
-\input{exercises/32-26-pointers/main.tex}
-\input{exercises/33-26-pointers/main.tex}
-Do you need the parentheses? Can you apply the augmented assignment operators to \texttt{*p?}
-
-Note that if you do not assign a memory address to your pointer, it would have an arbitrary address value, pointing to some arbitrary value.
-Reading that value might result result in printing something that looks like garbage. It might even cause your program to crash if you do not have access rights to that location!!!
-
-Another thing to note is that the dereferencing operator works with an address -- it does not have to be applied to a pointer. In other words if you're doing this:
+Here's the above code again, except that I've included some made-up addresses for the value of \texttt{x} and the value of \texttt{y}:
 
 \begin{consolethree}[escapeinside=||]
-std::cout << *p << std::endl;
-\end{consolethree}
+int x = 42;         // value of x is at address 80000
+int y = 123;        // value of y is at address 80004
 
-and if you know that \texttt{p} has value 124500, then the above can also be
+...
+\end{consolethree}
+At this point in the code
+\xsidebox[0cm]{-1cm}{}{madeupx}{The addresses are made up. Don't worry about them. I just gave them values of x and y addresses to illustrate the concepts below}
+\begin{consolethree}[escapeinside=||]
+int x = 42;         // value of x is at address 80000
+int y = 123;        // value of y is at address 80004
+
+int * p = &x;       // p = 80000
+int * q = &y;       // q = 80004
+std::cout << *p << "\n";
+\end{consolethree}
+the picture looks like this:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(0, -1, 8, 8)
+p += Rect(2.5, 7.25, 2.5, 7.25, label = '80000', linecolor='white')
+p += Rect(2, 6, 5, 7, label='42')
+p += Rect(1.5, 6.5, 1.5, 6.5, label='x')
+p += Rect(2, 4, 5, 5, label='123')
+p += Rect(2.5, 5.25, 2.5, 5.25, label = '80004', linecolor='white')
+p += Rect(1.5, 4.5, 1.5, 4.5, label = 'y')
+p += Rect(2, 2, 5, 3,label = '80000')
+p += Rect(1.5, 2.5, 1.5, 2.5, label = 'p')
+p += Rect(2, 0, 5, 1, label = '80004')
+p += Rect(1.5, 0.5, 1.5, 0.5, label = 'q')
+
+print(p)
+\end{python}
+
+and if I draw in arrows for pointers to help us see the pointer-to-value
+relationship it would look like this:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(0, -1, 8, 8)
+p += Rect(2.5, 7.25, 2.5, 7.25, label = '80000', linecolor='white')
+p += Rect(2, 6, 5, 7, label='42')
+p += Rect(1.5, 6.5, 1.5, 6.5, label='x', linecolor='white')
+p += Rect(2, 4, 5, 5, label='123')
+p += Rect(2.5, 5.25, 2.5, 5.25, label = '80004', linecolor='white')
+p += Rect(1.5, 4.5, 1.5, 4.5, label = 'y', linecolor='white')
+p += Rect(2, 2, 5, 3, label = '80000')
+p += Rect(1.5, 2.5, 1.5, 2.5, label = 'p', linecolor='white')
+p += Rect(2, 0, 5, 1, label = '80004')
+p += Rect(1.5, 0.5, 1.5, 0.5, label = 'q', linecolor='white')
+p += Line(points=[(4, 2.5), (7, 2.5), (7, 6.5), (5, 6.5)], linewidth=0.05, endstyle='>')
+p += Line(points=[(4, 0.5), (6, 0.5), (6, 4.5), (5, 4.5)], linewidth=0.05, endstyle='>')
+
+print(p)
+\end{python}
+Next, the statement
 
 \begin{consolethree}[escapeinside=||]
-std::cout << *124500 << std::endl;
+p = q;
 \end{consolethree}
 
-\input{exercises/34-26-pointers/main.tex}
-\input{exercises/35-26-pointers/main.tex}
+gives the value of \texttt{q} to \texttt{p}. The value of \texttt{q} is 80004.
+Therefore the value of \texttt{p} becomes 80004. The diagram now looks like this:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(0, -1, 8, 8)
+p += Rect(2.5, 7.25, 2.5, 7.25, label = '80000', linecolor='white')
+p += Rect(2, 6, 5, 7, label='42')
+p += Rect(1.5, 6.5, 1.5, 6.5, label='x', linewidth=0.0,linecolor='white')
+p += Rect(2, 4, 5, 5, label='123')
+p += Rect(2.5, 5.25, 2.5, 5.25, label = '80004', linecolor='white')
+p += Rect(1.5, 4.5, 1.5, 4.5, label = 'y', linewidth=0.0,linecolor='white')
+p += Rect(2, 2, 5, 3, label = '80000')
+p += Rect(1.5, 2.5, 1.5, 2.5, label = 'p', linewidth=0.0,linecolor='white')
+p += Rect(2, 0, 5, 1, label = '80004')
+p += Rect(1.5, 0.5, 1.5, 0.5, label = 'q', linewidth=0.0,linecolor='white')
+
+print(p)
+\end{python}
+
+And if I now draw the arrows, I have
+
+\begin{python}
+from latextool_basic import *
+p = Plot()
+
+p += Rect(0, -1, 8, 8)
+p += Rect(2.5, 7.25, 2.5, 7.25, label = '80000', linecolor='white')
+p += Rect(2, 6, 5, 7, label='42')
+p += Rect(1.5, 6.5, 1.5, 6.5, label='x', linewidth=0.0,linecolor='white')
+p += Rect(2, 4, 5, 5, label='123')
+p += Rect(2.5, 5.25, 2.5, 5.25, label = '80004', linecolor='white')
+p += Rect(1.5, 4.5, 1.5, 4.5, label = 'y', linewidth=0.0,linecolor='white')
+p += Rect(2, 2, 5, 3,label = '80000')
+p += Rect(1.5, 2.5, 1.5, 2.5, label = 'p', linewidth=0.0,linecolor='white')
+p += Rect(2, 0, 5, 1, label = '80004')
+p += Rect(1.5, 0.5, 1.5, 0.5, label = 'q', linewidth=0.0,linecolor='white')
+p += Line(points=[(4, 2.5), (7, 2.5), (7, 4.75), (5, 4.75)], linewidth=0.05, endstyle='>')
+p += Line(points=[(4, 0.5), (6, 0.5), (6, 4.25), (5, 4.25)], linewidth=0.05, endstyle='>')
+
+print(p)
+\end{python}
+
+Get it?
+\input{exercises/36-26-pointers/main.tex}
+\input{exercises/37-26-pointers/main.tex}
+\input{exercises/38-26-pointers/main.tex}
+\input{exercises/39-26-pointers/main.tex}
+\input{exercises/40-26-pointers/main.tex}
+\input{exercises/41-26-pointers/main.tex}

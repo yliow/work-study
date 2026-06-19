@@ -1,22 +1,20 @@
+\sectionthree{Cascading operator<<}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{operator>> and operator<<}
 
-You've been using \textit{<<} and
-\textit{>>} since day 1 of CISS240. From your
-previous notes you know that you can overload
-\textit{operator>>} and
-\textit{operator<<}. You also know from CISS240 that you
-can output
+If you want to do the following:
 
-\textit{int, char[], double}, etc., i.e., C++ has overloaded
-\textit{operator>>} in iostream.h. You also know
-that you can do
+\textit{Int c(42);}
 
-\textit{std::cout << "A" << 3 << 5.5;}
+\textit{std::cout << c << "\textbackslash n";}
 
-So the operators return an object.
+you need to return an \textit{ostream} object from your
+\textit{operator<<} so that the above becomes
+
+\textit{Int c(42);}
+
+\textit{operator<<(operator<<(std::cout, c), "\textbackslash n");}
 
 \begin{consolethree}[escapeinside=||]
 #include <iostream>
@@ -27,14 +25,15 @@ So the operators return an object.
 class Int
 {
 public:
-    Int(int x0 = 0) : x_(x0) {}
-    int get() const { return x_; }
-    ...
-    void operator<<(std::ostream &, const Int &);
-    ...
+    Int(int a)
+        : x(a)
+    {}
+    int get() const { return x; }
 private:
-    int x_;
+    int x;
 };
+
+std::ostream & operator<<(std::ostream &, const Int &);
 
 #endif
 \end{consolethree}
@@ -42,9 +41,9 @@ private:
 \begin{consolethree}[escapeinside=||]
 #include "Int.h"
 
-void operator<<(std::ostream & cout, const Int & c)
-{
+std::ostream & operator<<(std::ostream & cout, const Int & c) {
     cout << c.get();
+    return cout;
 }
 \end{consolethree}
 
@@ -53,8 +52,8 @@ void operator<<(std::ostream & cout, const Int & c)
 
 int main()
 {
-    Int c(42);
-    std::cout << c;
+    Int c(42), d(43);
+    std::cout << c << "," << d << "\n";
     return 0;
 }
 \end{consolethree}

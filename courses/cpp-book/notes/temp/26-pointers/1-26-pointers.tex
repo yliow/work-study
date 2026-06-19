@@ -1,66 +1,159 @@
+\sectionthree{Memory addresses and memory address of a variable}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Memory}
 
-So far the model of the space where variables live does not have any organization. It's just a collection of cells with names and values.
+In C++, if \verb!x! is a variable, the \EMPHASIZE{memory address} of \verb!x! is \EMPHASIZE{\texttt{\&x}}.
 
-Now for a more accurate model \ldots{}
+Try this:
 
-\begin{itemize}
-\item
-  A computer's memory is made up of a linear collection of memory cells
-  - each is a byte (i.e. 8 bits)
-\item
-  Each memory cell has a numeric address, its memory address
-\item
-  Each memory cell can hold 1 byte of data (1 byte = 8 bits)
-\end{itemize}
+\begin{consolethree}[escapeinside=||]
+int x = 123;
 
+std::cout << "val of x = " << x << '\n'
+          << "addr of x = " << |\EMPHASIZE{\&x}| << '\n';
+\end{consolethree}
+
+My output:
+
+\begin{consolethree}[escapeinside=||]
+val of x is 123
+
+addr of x is 1245052
+\end{consolethree}
+(Your output is most probably going to be different from mine.) The \EMPHASIZE{\&} in the above is called the \EMPHASIZE{address-of operator}.
+
+Two things you must know right away \ldots{}
+
+First, technically speaking \emph{\&x} is the \EMPHASIZE{address of the }\emph{\EMPHASIZE{value}}\EMPHASIZE{ of }\texttt{\EMPHASIZE{x}}. But I will sometimes call \texttt{\&x} the \EMPHASIZE{address of }\texttt{\EMPHASIZE{x}} since that's the common practice.
+
+Second, in reality, an \texttt{int} value takes up more than 1 byte. For a 32-bit machine, the value of \texttt{x} is spread out among 4 bytes: Recall that to see how many bytes are used to store an integer value you can do this:
+
+\begin{consolethree}[escapeinside=||]
+std::cout << sizeof(int) << std::endl;
+\end{consolethree}
+So in the above example when the program says that the address of \texttt{x} is 1245052, it means that the \texttt{int} value 123 occupies the memory at addresses 1245052, 1245053, 1245054, 1245055. The \EMPHASIZE{address of }\texttt{\EMPHASIZE{x}} actually refers to the \EMPHASIZE{starting address}, i.e., address of the first byte, i.e. 1245052.
+\xsidebox[0cm]{0cm}{}{refx}{\texttt{\&x} = address of first byte of the value of variable \texttt{x}}
+
+You don't have to worry about how the value 123 is ``spread out'' among 4 bytes. But briefly, the integer 123 (to human beings) is a bunch of bits (to a 32-bit computer):
+\begin{center}
+00000000000000000000000001111011
+\end{center}
+(Details will be covered in CISS360.) So here's where you will find the value of our \texttt{x} from above:
 \begin{python}
 from latextool_basic import *
 p = Plot()
-#p += Grid(x0=-5, x1=5, y0=-2, y1=10)
-p += ellipse(-3, 4, 0, 5, linecolor='red')
 p += Rect(-3, 8, 0, 9, label='1245057', linewidth=0.0)
 p += Rect(-3, 7, 0, 8, label='1245056', linewidth=0.0)
 p += Rect(-3, 6, 0, 7, label='1245055', linewidth=0.0)
 p += Rect(-3, 5, 0, 6, label='1245054', linewidth=0.0)
 p += Rect(-3, 4, 0, 5, label='1245053', linewidth=0.0)
+p += Rect(-3, 3, 0, 4, label='1245052', linewidth=0.0)
+p += Rect(-3, 0, 0, 1, label='0', linewidth=0.0)
 p += Rect(0, 9, 3, 10, label='...', linewidth=0.0)
-p += Rect(0, 8, 3, 9, label='0101010', linewidth=0.1)
-p += Rect(0, 7, 3, 8, label='1010001', linewidth=0.1)
-p += Rect(0, 6, 3, 7, label='00011011', linewidth=0.1)
-p += Rect(0, 5, 3, 6, label='01000100', linewidth=0.1)
-p += Rect(0, 4, 3, 5, label='01100000', linewidth=0.2, linecolor='red')
-p += Rect(5, 4, 7, 5, label='Cell', linewidth=0.2, linecolor='red')
-p += Line(points=[(5,4.5), (3,4.5)], linecolor='red',linewidth=0.15, endstyle='>')
-p += Rect(-7, 4, -5, 5, label='Address', linewidth=0.2, linecolor='red')
-p += Line(points=[(-5,4.5),(-3,4.5)], linecolor='red',linewidth=0.15, endstyle='>')
-p += Rect(7, 6.5, 11.5, 8.5, label='VERY IMPORTANT!!!', linewidth=0.2, linecolor='red')
-p += Line(points=[(7, 7.5), (4, 7)], linecolor='red',linewidth=0.15, endstyle='>')
-p += Rect(-3, 2, 0, 3, label='3', linewidth=0)
-p += Rect(-3, 1, 0, 2, label='2', linewidth=0)
-p += Rect(-3, 0, 0, 1, label='1', linewidth=0)
-p += Rect(-3, -1, 0, 0, label='0', linewidth=0)
-#
-p += Rect(0, 3, 3, 4, label='...', linewidth=0.0)
-p += Rect(0, 2, 3, 3, label='00100101', linewidth=0.1)
-p += Rect(0, 1, 3, 2, label='11110010', linewidth=0.1)
-p += Rect(0, 0, 3, 1, label='00110101', linewidth=0.1)
-p += Rect(0, -1, 3, 0, label='10010001', linewidth=0.1)
-p += Rect(0, -2, 3, -1, label='...', linewidth=0.0)
+
+p += Rect(0, 8, 3, 9, label=' ', linewidth=0.1)
+p += Rect(0, 7, 3, 8, label=' ', linewidth=0.1)
+p += Rect(0, 6, 3, 7, label='01111011', linewidth=0.1)
+p += Rect(0, 5, 3, 6, label='00000000', linewidth=0.1)
+p += Rect(0, 4, 3, 5, label='00000000', linewidth=0.1)
+p += Rect(0, 3, 3, 4, label='00000000', linewidth=0.1)
+p += Rect(0, 2, 3, 3, label=' ', linewidth=0.1)
+p += Rect(0, 2, 3, 3, label=' ', linewidth=0.1)
+p += Rect(0, 1, 3, 2, label='...', linewidth=0.0)
+p += Rect(0, 0, 3, 1, label=' ', linewidth=0.1)
 
 print(p)
 \end{python}
+Notice that 123 is translated to 32 bits. Each byte can hold 8 bits. That's why the bits of an integer requires 4 bytes. At this point, we don't need to worry how the 123 is translated into bits. So I will usually simplify the above picture of your computer's memory by drawing this:
+\begin{python}
+from latextool_basic import *
+p = Plot()
+p += Rect(-3, 8, 0, 9, label='1245057', linewidth=0.0)
+p += Rect(-3, 7, 0, 8, label='1245056', linewidth=0.0)
+p += Rect(-3, 6, 0, 7, label='1245055', linewidth=0.0)
+p += Rect(-3, 5, 0, 6, label='1245054', linewidth=0.0)
+p += Rect(-3, 4, 0, 5, label='1245053', linewidth=0.0)
+p += Rect(-3, 3, 0, 4, label='1245052', linewidth=0.0)
+p += Rect(-3, 0, 0, 1, label='0', linewidth=0.0)
+p += Rect(0, 9, 3, 10, label='...', linewidth=0.0)
 
-Remember: Each memory cell has \EMPHASIZE{two} quantities, the \EMPHASIZE{memory address} and the \EMPHASIZE{content.}
+p += Rect(0, 3, 3, 7, label='\EMPHASIZE{123}', background='blue!10!white', linewidth=0.0)
+p += Rect(0, 8, 3, 9, label=' ', linewidth=0.1)
+p += Rect(0, 7, 3, 8, label=' ', linewidth=0.1)
+p += Rect(0, 6, 3, 7, label=' ', linewidth=0.02)
+p += Rect(0, 5, 3, 6, label=' ', linewidth=0.02)
+p += Rect(0, 4, 3, 5, label=' ', linewidth=0.02)
+p += Rect(0, 3, 3, 4, label=' ', linewidth=0.02)
+p += Rect(0, 2, 3, 3, label=' ', linewidth=0.1)
+p += Rect(0, 2, 3, 3, label=' ', linewidth=0.1)
+p += Rect(0, 1, 3, 2, label='...', linewidth=0.0)
+p += Rect(0, 0, 3, 1, label=' ', linewidth=0.1)
 
-Notice that memory addresses are \EMPHASIZE{integer values}.
+print(p)
+\end{python}
+Let me summarize ...
 
-When you declare a variable, based on the type, C++ will allocate the correct number of bytes for that variable. For example, for an \emph{int}, your
+\begin{itemize}
+\item
+  A computer's memory is made up of bytes.
+\item
+  Associated to each byte is its address and its contents (value).
+\item
+  The value of a variable occupies memory, possibly more than 1 byte.
+\item
+  If \texttt{x} is a variable, then in C++
+\item
+  \texttt{x} refers to the contents (value)
+\item
+  \texttt{\&x} refers to the beginning address of its value, i.e., the
+  address of the first byte of its value
+\end{itemize}
 
-C++ (on a 32-bit machine) will allocate 4 bytes.
+By the way the address printed when you run your program might contain things like a, c, e, etc. That's because the address is actually printed in \EMPHASIZE{hexadecimals}, i.e., \EMPHASIZE{numbers in base 16}. (You will also learn more about hexadecimals in CISS360.) Certain compilers allow you to typecast hexadecimal values into \texttt{int} value. Try the following (don't panic and call 911 if your compiler won't let you):
 
-Also, when you declare two variables in the same scope, the memory used do not overlap -- they occupy different memory spaces.
+\begin{consolethree}[escapeinside=||]
+int x = 123;
+
+std::cout << "val of x: " << x
+          << '\n' << "addr of x: " << |\textbf{int(\&x)}||\xsidebox[0cm]{0cm}{}{addrx}{'An integer can be written (expressed) in many ways ... in\\-base 10 or decimal (usual way)\\-base 16 or hexadecimal\\-base 8 or octals\\-base 2 or bits'}{}|
+          << '\n';
+\end{consolethree}
+
+If it does not work, you can use any scientific calculator to convert from hex to decimals yourself. Most scientific calculators nowadays have the ability to convert between base 10 to base 2, 8, and 16.
+
+In almost all programming languages, a hexadecimal number starts with 0x. So you might see something like this when working with address values:
+\begin{center}
+0x013251a2
+\end{center}
+The actual base 16 hexadecimal is 13251a2.
+
+Technically speaking the memory address is an \EMPHASIZE{unsigned integer}, i.e., it does not have a negative sign, i.e., it's a positive integer. So you can convert your memory address value to an unsigned integer like this:
+
+\begin{consolethree}[escapeinside=||]
+int x = 123;
+std::cout << "val of x: " << x
+          << '\n' << "addr of x: "
+          << |\EMPHASIZE{(unsigned int)(\&x)}|
+          << '\n';
+\end{consolethree}
+An \texttt{\textbf{unsigned int}} can only represent integers up to $2^{32} - 1$. If you have a newer laptop, your address values are very likely larger than $2^{32} - 1$. If your compiler yells at you, instead of type casting with \texttt{\textbf{unsigned int}}, use \texttt{\textbf{unsigned long long int}}.
+
+An \texttt{\textbf{unsigned int}} is really a type. So you can declare an \texttt{\textbf{unsigned int}} variable. By the way, you have actually already seen \texttt{\textbf{unsigned int}} when using \texttt{\textbf{srand()}}. Likewise \texttt{\textbf{unsigned long long int}} is also a type.
+
+\input{exercises/0-26-pointers/main.tex}
+\input{exercises/1-26-pointers/main.tex}\input{exercises/2-26-pointers/main.tex}
+\input{exercises/3-26-pointers/main.tex}
+\input{exercises/4-26-pointers/main.tex}
+\input{exercises/5-26-pointers/main.tex}
+\EMPHASIZE{WARNING!!!}
+
+Note that \texttt{\&} is now used in two totally different ways!!!
+
+\begin{consolethree}[escapeinside=||]
+int x;
+int & y = x;     // int & is a type
+std::cout << &x; // & is the address-of operator
+\end{consolethree}
+Remember that!
 

@@ -1,27 +1,40 @@
+\sectionthree{Combining cases}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Why? Why? Why?}
 
-So why do we need the switch when it' s clear that a
-switch can be written as a nested if-else?
-
-The reason is because the switch statement is extremely fast when there
-are many cases when compared to the if-else statement.
-
-Note that for a nested if statement:
+Now run this:
 \begin{console}
 int x = 0;
 std::cin >> x;
+switch (x)
+{
+     case 1:
+        std::cout << "what?" << std::endl;
+        break;
+        
+     case 2:
+     case 3:
+        std::cout << "oh?" << std::endl;
+        break;
+        
+     default:
+        std::cout << "huh?" << std::endl;
+}
+std::cout << "out of switch" << std::endl;
+\end{console}
+The above is a useful trick when two cases execute the same statements.
+The above has the same effect as the following (although the following
+is probably slower):
+\begin{console}
+int x = 0;
+std::cin >> x;
+
 if (x == 1)
 {
-     std::cout << "yo" << std::endl;
+     std::cout << "what?" << std::endl;
 }
-else if (x == 2)
-{
-     std::cout << "right ..." << std::endl;
-}
-else if (x == 3)
+else if (x == 2 || x == 3)
 {
      std::cout << "oh?" << std::endl;
 }
@@ -29,18 +42,29 @@ else
 {
      std::cout << "huh?" << std::endl;
 }
-std::cout << "out of if-else" << std::endl;
+std::cout << "out of nested if-else" << std::endl;
 \end{console}
-
-each time a boolean condition is false you have to go to the nested
-level in the if-else stack. This means that for instance to go into the
-final else block, C++ must evaluate three boolean expressions.
-
-(One optimization trick used by C/C++ programmers is therefore to always
-put the most likely case first in the stack of if-else statements.)
-
-This is however not the case for the switch statement. If the above is
-converted to the switch statement, the time taken to get to any case is
-the same. Even if you have 100 cases, the time to get to the first case
-is usually the same as the time to get to the last.
+One more example to make sure you get it:
+\begin{console}
+int x = 0;
+std::cin >> x;
+switch (x)
+{
+     case 1:
+          std::cout << "what?" << std::endl;
+          break;
+          
+     case 2:
+     case 3:
+     case 4:
+     case 5:
+          std::cout << "oh?" << std::endl;
+          break;
+          
+     default:
+          std::cout << "huh?" << std::endl;
+}
+std::cout << "out of switch" << std::endl;
+\end{console}
+Run it with several values for \texttt{x}.
 

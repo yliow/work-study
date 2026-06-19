@@ -1,9 +1,35 @@
+\sectionthree{The \texttt{strnlen(), strncmp(), strncat()} functions}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Other C-string functions}
 
-In fact there are MANY standard string functions that come with all C compilers. Here are some of the most basic ones. Experiment with this code and figure out what the string functions do:
+All the string functions we talked about run into problems if the character arrays passed into these function do not contain \texttt{'\textbackslash 0'} resulting in buffer overflow.
+
+In fact this is one scenario of the so-called \EMPHASIZE{buffer overflow attack}, a technique used in many virus software (malware).
+
+Accompanying these functions are similar functions that allow you to specify a stopping point. For instance in the case of \verb!strlen()! (the string length function) there is a function called \verb!strnlen()!
+
+Besides passing in a string, you also pass in a maximum possible length
+for the string.
+
+\begin{consolethree}[escapeinside=||]
+char s[100] = ""; // s[0] = '\0';
+std::cin >> s;
+std::cout << strnlen(s, 99) << std::endl;
+\end{consolethree}
+
+Note that I pass in 99 and not 100. If s has a \EMPHASIZE{size of 100} the \EMPHASIZE{maximum possible length is 99} since in this case the \EMPHASIZE{last character is used by '\textbackslash 0'}. Therefore \texttt{s} (of size 100) has a maximum length of 99.
+
+\input{exercises/12-18-characters-and-cstrings/main.tex}
+The accompanying safer functions for strcmp() and strcat() are strncmp() and strncat(). So we have the following \textbf{\underline{pairs}} of functions:
+
+\begin{tabular}{ll}
+strlen() & strnlen() \\
+strcmp() & strncmp() \\
+strcat() & strncat() \\
+\end{tabular}
+
+Try this program:
 
 \begin{consolethree}[escapeinside=||]
 char s[100] = "aaa";
@@ -11,45 +37,34 @@ char t[100] = "bbb";
 char u[100];
 
 // string copy function
-// overwrite the string in u with the string in
-// s
-strcpy(u, s);
+// In this case at most 100 chars are copied
+// from s to u
+strncpy(u, s, 100);
 std::cout << u << std::endl;
 
 // string concatenation function
-// put the string in t to the end of the string
-// in u
-strcat(u, t);
+// In this case at most 100 chars are
+// concatenated from t to u
+strncat(u, t, 100);
 std::cout << u << std::endl;
 
-// WARNING: You cannot do strcat(u, u), i.e., the
-// two arguments of the function must be different.
-
 // string comparison function
-// 0 is returned when the strings are
-// the same. Otherwise a nonzero value is
-// returned.
-int i = strcmp(u, s);
+// In this case at most 100 characters are
+// compared.
+int i = strncmp(u, s, 100);
 std::cout << i << std::endl;
 \end{consolethree}
 
-You might wonder what nonzero value is returned by \texttt{strcmp()} when the strings are different.
+The only problem in the above example is the call to strncat() function. You see if \texttt{u} already has a string of length 10, then only 90 characters are left for concatenation. If \texttt{t} has length greater than that, the program might crash. Therefore it's safe to write this:
 
 \begin{consolethree}[escapeinside=||]
-std::cout << strcmp("a", "b") << std::endl;
-std::cout << strcmp("a", "c") << std::endl;
-std::cout << strcmp("a", "d") << std::endl;
-std::cout << strcmp("a", "z") << std::endl;
-std::cout << strcmp("a", "!") << std::endl;
-std::cout << strcmp("a", "ba") << std::endl;
-std::cout << strcmp("b", "a") << std::endl;
-std::cout << strcmp("c", "a") << std::endl;
-std::cout << strcmp("d", "a") << std::endl;
-std::cout << strcmp("ba", "a") << std::endl;
+// string concatenation function
+// In this case at most 100 chars are
+// concatenated from t to u
+strncat(u, t, 100 - strnlen(u, 100));
+std::cout << u << std::endl;
 \end{consolethree}
 
-See it yet? (Hint: Check an ASCII table.)
-
-There are other C-string functions but you will need to know a little more in order to understand how to use them.
+But in this case some character might not be copied from \texttt{t} to \texttt{u}. Depending on what your program is supposed to do, you might want to print an error message and halt the program.
 
 

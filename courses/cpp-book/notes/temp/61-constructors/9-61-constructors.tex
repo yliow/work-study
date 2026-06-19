@@ -1,107 +1,63 @@
+\sectionthree{The FREE default constructor}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Default constructor}
 
-The \EMPHASIZE{default constructor} of a class is the constructor that does
-not have any parameters.
-
-Why use a default constructor? Because they make it easy to construct
-the most common objects.
-
-Let's add one more constructor (i.e. we are overloading the constructor)
-to our Date class.
+For any class, C, if you do not specify any constructor, C++ will
+automatically add the default constructor that does not do anything into
+the class:
 
 \begin{consolethree}[escapeinside=||]
-// Date.h
-...
-
-class Date
+class C
 {
 public:
-    Date(int, int, int);
-    |\EMPHASIZE{Date();}|
-    ...
+    C() {}
 };
+\end{consolethree}
 
+In fact, that's the reason why our first Date class
+works. Recall that for that version (without explicitly defining
+constructors), I was able to do this:
+
+\begin{consolethree}[escapeinside=||]
 ...
+
+int main()
+{
+    Date today;
+    today.init(2014, 12, 25);
+    ...
+    return 0;
+}
 \end{consolethree}
 
+Of course now you know that in fact:
+
 \begin{consolethree}[escapeinside=||]
-// Date.cpp
 ...
 
-Date::Date()
-    : yyyy_(1970), mm_(1), dd_(1)
-{}
-
-...
+int main()
+{
+    Date today; // default constructor Date::Date() was
+                // called to initialize the members of
+                // today. In particular today.yyyy_,
+                // today.mm_ and today.dd_ was initialized
+                // to random values.
+    today.init(2014, 12, 25);
+    ...
+    return 0;
+}
 \end{consolethree}
 
-How do you call the default constructor? Easy.
+This means that when using the default constructor, the object
+being initialized will have random initial values.
 
-If \texttt{C} is a class, the following are two different ways to call the
-default constructor:
+If you write one or more constructors in this class, C++ will
+\EMPHASIZE{not} add this do-nothing default constructor into this class.
+This is very important because later you will see that there are times
+when you need to have a default constructor, whether it is supplied by
+your C++ compiler (automatically) or by you (manually).
 
-\begin{consolethree}[escapeinside=||]
-C obj1;
-C obj2 = C();
-\end{consolethree}
-
-Try this with our \texttt{Date} class:
-
-\begin{consolethree}[escapeinside=||]
-Date date1;            // date1 calls Date::Date()
-date1.print();
-Date date2 = Date();   // date2 calls Date::Date()
-date2.print();
-Date * date3 = new Date(); // Date::Date() called
-date3->print();
-\end{consolethree}
-
-To verify that we did go into the default constructor, run the program
-again with a print statement in the default constructor.
-
-Here's an important \EMPHASIZE{WARNING} ... From this
-syntax of calling constructors:
-
-\begin{consolethree}[escapeinside=||]
-Date today(2014, 12, 25);
-\end{consolethree}
-
-you might be tempted to do this:
-
-\begin{consolethree}[escapeinside=||]
-Date date1();  // trying to call Date::Date() ...
-               // WRONG!!!
-\end{consolethree}
-
-This is a subtle problem as the compiler will not complain and in fact
-you can even run the program.
-
-The problem begins when you use \texttt{date1}:
-
-\begin{consolethree}[escapeinside=||]
-Date date1();  // Date::Date() ... WRONG!
-date1.print(); // Compiler now complains ... :(
-\end{consolethree}
-
-Why is that?!? Because when you write this:
-
-\begin{consolethree}[escapeinside=||]
-Date date1();
-\end{consolethree}
-
-Your compiler thinks that you're writing down a function
-prototype!!! In other words, your compilers thinks that \texttt{date1} is
-a function with no parameters and returns a \texttt{Date} value.
-
-Summary:
-
-\begin{consolethree}[escapeinside=||]
-Date date1;              // Date::Date() OK
-Date date2 = Date(); // Date::Date() OK
-Date date3();            // Date::Date() ... WRONG!!!
-\end{consolethree}
-
+\input{exercises/13-61-constructors/main.tex}
+\input{exercises/14-61-constructors/main.tex}
 

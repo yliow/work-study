@@ -1,33 +1,47 @@
+\sectionthree{Type conversion: numerics to C-strings}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Type conversion: C-strings to numerics}
 
-We've been using the \texttt{std::cin} for inputs and it works for input of integer values, double values, C-string values, etc. We saw above that the problem is that \texttt{std::cin} cuts up input at whitespaces. The \texttt{std::cin.getline()} does work by really taking in everything as input. But the problem is that it works for strings.
+Of course you also need to know how to convert an int or a double to a C-string. There are several ways to do this.
+
+Here's the first method in C-style (i.e. using a C function)
 
 \begin{consolethree}[escapeinside=||]
-#include <iostream>
-#include <cstdlib>
+|\textbf{\#include <cstdio> // or \#include <stdio.h>}|
 
-int main()
-{
-    char s[100] = "123";
-    char t[100] = "12.3";
-    int i = strtol(s, NULL, 10);
-    double d = strtod(t, NULL);
-    std::cout << i << '\n' << d << '\n';
-}
+...
+
+char c[100];
+int i = 42;
+double d = 3.14;
+
+|\textbf{sprintf(c, "\%d", i);}|
+std::cout << c << '\n';
+
+|\textbf{sprintf(c, "\%f", d);}|
+std::cout << c << '\n';
 \end{consolethree}
 
-The functions above are
+The second method uses C++ features:
 
-\begin{tabular}{ll}
-\texttt{strtol()} & string-to-long-integer \\
-\texttt{strtod()} & string-to-double \\
-\end{tabular}
+\begin{consolethree}[escapeinside=||]
+|\textbf{\#include <sstream>}|
 
-The \texttt{strtol()} converts the string to a \EMPHASIZE{\texttt{long int}} whose largest possible value might be larger than your usual \EMPHASIZE{\texttt{int}}.
+...
 
-I'll explain the \texttt{NULL} business later. Right now I just want to get the usage of the functions to you now so that you can use it.
+char c[100];
+int i = 123;
+double d = 3.14;
 
+|\textbf{std::stringstream out;}|
+
+|\textbf{out << i;}|
+|\textbf{strcpy(c, out.str().c\_str());}|
+std::cout << c << '\n';
+
+|\textbf{out << d;}|
+|\textbf{strcpy(c, out.str().c\_str());}|
+std::cout << c << '\n';
+\end{consolethree}
 

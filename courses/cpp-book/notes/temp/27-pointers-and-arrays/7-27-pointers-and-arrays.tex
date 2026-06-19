@@ -1,135 +1,54 @@
+\sectionthree{Default values}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Array and pointer parameters}
 
-I've already talked about pointers and arrays. Let's see what happens
-when they are used as parameters of functions.
-
-When you make a function call like this:
+There's another thing that we should investigate: What about default values? Let's try this:
 
 \begin{consolethree}[escapeinside=||]
-void f(int x)
+void f(int x[] = {1, 2, 3})
 {}
 
 int main()
 {
-    int y = 42;
-    f(y); // give value of y to x of
-          // function f()
+    f();
     return 0;
 }
 \end{consolethree}
 
-you can pretty much understand the data passed from \texttt{main()} to
-\texttt{f()} by running this code segment:
+You will get an error. Of course you will. You already know that pointers cannot be initialized with an array. In other words the following is invalid:
 
 \begin{consolethree}[escapeinside=||]
-int y = 42;
-int x = y; // give value of y to x
-\end{consolethree}
-
-(This is pass-by-value.)
-
-However there is one case where this does not work. The following that
-passes an array to a function does work:
-
-\begin{consolethree}[escapeinside=||]
-void f(int x[])
-{}
-
 int main()
 {
-    int y[100] = {1, 2, 3};
-    f(y);
+    int * x = {1, 2, 3};
     return 0;
 }
 \end{consolethree}
 
-You might be tempted to run this code segment:
+You can try other cases (with constantness):
 
 \begin{consolethree}[escapeinside=||]
-int y[100] = {1, 2, 3};
-int x[] = y;
+const int * a = {1, 2, 3};
+int * const b = {1, 2, 3};
+const int * const c = {1, 2, 3};
 \end{consolethree}
 
-You \textbf{\underline{will}} get an error.
+None of them will work.
 
-However \EMPHASIZE{this works}:
-
-\begin{consolethree}[escapeinside=||]
-int y[100] = {1, 2, 3};
-int * x = y;
-\end{consolethree}
-
-So here's the thing you need to know:
-\begin{center}
-\EMPHASIZE{An array parameter is like a pointer}
-\end{center}
-Now the question is this: Is the pointer parameter a
-\EMPHASIZE{constant} pointer? Let's try an experiment:
+In general the only default value you should use is NULL:
 
 \begin{consolethree}[escapeinside=||]
-void f(int x[])
-{
-    int * y = new int[10];
-    x = y; // can parameter x be changed?
-}
-
-int main()
-{
-    int y[100] = {1, 2, 3};
-    f(y);
-    return 0;
-}
-\end{consolethree}
-
-It turns out that the above does work. This means that the \EMPHASIZE{x is not a constant pointer}. This means that
-
-\begin{consolethree}[escapeinside=||]
-void f(int x[])
+void f(int x[] = NULL)
 {}
 \end{consolethree}
 
-is the same as
+There \EMPHASIZE{is} one case where a pointer can be initialized to point to values and only for certain compilers. Therefore you shouldn't use the following in real code:
 
-\begin{consolethree}[escapeinside=||]
-void f(int * x)
-{}
-\end{consolethree}
+\verb!const char * x = "hello world";!
 
-You can verify this piece of information using the following trick to get your compiler to tell you the truth. Compile this program:
+Again. Don't use this in real code. It's better to just be simple, like this:
 
-\begin{consolethree}[escapeinside=||]
-void f(int x[])
-{
-    abc; // a deliberate error
-}
+\verb!char x[] = "hello world";!
 
-int main()
-{
-    return 0;
-}
-\end{consolethree}
-
-Your compiler will give you an error. For g++, here's
-the error:
-
-\begin{consolethree}[escapeinside=||]
-c.cpp: In function 'void f(int*)':
-c.cpp:3:3: error: 'abc' was not declared in this scope
-\end{consolethree}
-
-AHA!!! The function header of \texttt{f()} is really
-
-\verb!void f(int *)!
-
-and \EMPHASIZE{not}
-
-\verb!void f(int [])!
-
-So here's the extremely important principle to remember:
-\begin{center}
-\EMPHASIZE{An array parameter is actually a non-constant pointer}
-\end{center}
 

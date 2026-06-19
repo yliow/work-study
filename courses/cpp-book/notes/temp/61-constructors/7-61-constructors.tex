@@ -1,69 +1,92 @@
+\sectionthree{Method overloading}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{Review: Function Overloading}
 
-A function is \EMPHASIZE{overloaded} if its name is used more than once.
-
-The signature of the functions with the same name must be different.
-That's because in C++, a function is identified not by
-its name, but by it name and its signature, i.e., the name and the list
-of types of its parameters.
-
-\input{exercises/8-61-constructors/main.tex}
-\input{exercises/9-61-constructors/main.tex}
-\input{exercises/10-61-constructors/main.tex}
-When a function is called in your code, C++ will use the function that
-matches both the function name and the type of the values passed in with
-the candidate's signature. If none is found, C++ will try to typecast
-the arguments. The one used is the one with the least number of
-typecasts. If there isn't one, you get an ambiguous invocation error.
-
-\input{exercises/11-61-constructors/main.tex}
-\input{exercises/12-61-constructors/main.tex}
-If you compile the following with g++:
+Methods in a class can also be overloaded as long as the signatures are
+different.
 
 \begin{consolethree}[escapeinside=||]
-void f(double x, int y) {}
-void f(int x, double y) {}
-int main() { f(1, 1); }
+class C
+{
+public:
+    void f(int);
+    void f(int, int);
+    void f(int, double);
+};
 \end{consolethree}
 
-it will complain with this message:
+In this case, all the following have different signatures.
+
+\tab[3em]{\texttt{C::f(int)}}\\
+
+\tab[3em]{\texttt{C::f(int, int)}}\\
+
+\tab[3em]{\texttt{C::f(int, double)}}\\
+
+Note that since every method is within a class scope, you can have
+methods with the same name and same signatures but in different classes.
+So the following is OK:
+
+\tab[3em]{\texttt{C::f(int x) \{\}}}\\
+
+\tab[3em]{\texttt{D::f(int x) \{\}}}\\
+
+since if an object \texttt{obj} is of class \texttt{C}, then
+\texttt{obj.f(42)} will result in \texttt{C::f} being executed. There's no
+ambiguity.
+
+We will be overloading the \texttt{Date} constructor: We will later write
+a ``default'' constructor and a ``copy constructor''.
+
+I'll write another constructor so that I can do something like this:
 
 \begin{consolethree}[escapeinside=||]
-a.cpp: In function int main():
-a.cpp:3:20: error: call of overloaded f(int, int) is
-    ambiguous
-a.cpp:1:6: note: candidates are: void f(double, int)
-a.cpp:2:6: note: void f(int, double)
+Date date1("December 25, 1985");
 \end{consolethree}
 
-Basically, when looking for a function to execute
+The prototype is of course like this:
 
-\texttt{f(1, 1);}
+\begin{consolethree}[escapeinside=||]
+Date(char s[]);
+\end{consolethree}
 
-there is no exact match. So C++ attempts to typecast. If C++ typecasts
-the first value to 1.0:
+The pseudocode should be like this:
 
-\verb!f(double(1), 1);!
+\begin{consolethree}[escapeinside=||]
+read enough character from s to compute the value for mm_
+read past a space
+read till a comma is reached, computing the value for dd_
+read past a space
+read remaining characters to compute the value for yyyy_
+\end{consolethree}
 
-it will be able to match this:
+And we get:
 
-\verb!void f(double x, int y) {}!
-
-and if C++ typecasts the second value to get 1.0:
-
-\verb!f(1, double(1));!
-
-it will match this:
-
-\verb!void f(int x, double y) {}!
-
-So, in this case, since both functions match \texttt{f(1, 1)} with 1
-typecast, your C++ compiler does not know what to do and will complain.
-Of course if there's no exact match and
-there's only one option with one typecast, then C++ will
-happily choose that function that matches\texttt{f(1, 1)} with one typecast.
+\begin{consolethree}[escapeinside=||]
+Date(char s[])
+{
+    int i = 0;
+    if (s[0] == 'J' && s[1] == 'a') mm_ = 1;
+    else if (s[0] == 'F' && s[1] == 'e') mm_ = 2;
+    ...
+    i = 2;
+    while (s[i] != ' ') i++;
+    i++;
+    dd_ = 0;
+    while ((0 <= s[i] - '0') && (s[i] - '0' <= 9))
+    {
+        dd_ *= 10; dd_ += (s[i] - '0'); i++;
+    }
+    while ((s[i] < '0') || (s[i] > '9')) i++;
+    yyyy_ = 0;
+    while ((0 <= s[i] - '0') && (s[i] - '0' <= 9))
+    {
+        yyyy_ *= 10;
+        yyyy_ += (s[i] - '0');
+        i++;
+    }
+}
+\end{consolethree}
 
 

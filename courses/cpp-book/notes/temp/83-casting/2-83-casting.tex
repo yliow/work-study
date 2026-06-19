@@ -1,74 +1,239 @@
+\sectionthree{\texttt{const\_cast}}
 \begin{python0}
 from solutions import *; clear()
 \end{python0}
-\sectionthree{static\_cast}
 
-The \texttt{\textbf{static\_cast}} is most similar to the basic
-typecasting of types which are very similar or only result in loss of
-precision, i.e., casting such as
-\begin{console}
-int i = 42;
-double d = 3.14;
-char c = 'A';
-bool flag = true;
-
-double j = double(i);        // or (double) i
-int e = int(d);              // or (int) i
-int d = int(c);              // or (int) c
-int flag2 = bool(flag);      // or (int) flag
-
-// ...
-\end{console}
-All the above can be executed using \textbf{\texttt{static\_cast}}:
+Look at this program:
 
 \begin{console}
-int i = 42;
-double d = 3.14;
-char c = 'A';
-bool flag = true;
+void g(int & y)
+{}
 
-double i1 = static_cast< double >(i);
-int d1 = static_cast< int >(d);
-int c1 = static_cast< int >(c);
-bool flag1 = static_cast< bool> (flag);
+void f(const int & x)
+{   
+    g(x);
+}
 
-// ...
+int main()
+{   
+    f(42);
+    return 0;
+}
 \end{console}
 
-In general static cast is allowed when automatic typecasting is allowed.
-For instance
+Will it compile? (I'll give you 5 seconds.) Next, try to compile it.
+
+Of course it won't.
+
+If you did not answer the above question correctly, you should review
+notes on references and also on pointers right away because the above is
+similar to
+\begin{console}
+void g(int * y)
+{}
+
+void f(const int * x)
+{    
+     g(x);
+}
+
+int main()
+{   
+    int i = 42;
+    f(&i);
+    return 0;
+}
+\end{console}
+
+
+In particular look at constantness of pointers (and of references).
+
+This will not compile
+
+\begin{console}
+void g(int & y)
+{}
+
+void f(const int & x)
+{    
+     g(x);
+}
+
+int main()
+{   
+    int i = 42;
+    f(i);
+    return 0;
+}
+\end{console}
+
+
+because the \texttt{y} of \texttt{g()} references the \texttt{x} of
+\texttt{f()}, but\texttt{y} is a reference while \texttt{x} is a reference to
+a constant. This means that \EMPHASIZE{x cannot change the value it is referencing} and yet \texttt{x} wants to \EMPHASIZE{allow y to reference that value with the power to change it.} That's \EMPHASIZE{not possible.} This is similar to this issue (for references):
 
 \begin{console}
 int i = 42;
-double i1 = i;                        // automatic
-double i2 = double(i);                // OK
-double i3 = static_cast< double >(i); // OK
+const int & x = i;   // x is weak ... change change i
+int & y = x;         // y wants to be strong and wants
+                     // to change i, through x. NOPE!!!
 \end{console}
 
-However this is not allowed:
+which has the same issue as this (for pointers):
 
 \begin{console}
 int i = 42;
-double * p = &i;
+const int * x = &i;
+int * y = x;
 \end{console}
 
-Therefore this will not compile:
+Going back to
 
 \begin{console}
-int i = 42;
-double * p = static_cast< double *>(&i); // BAD!!!
+void g(int & y)
+{}
+
+void f(const int & x)
+{    
+     g(x);
+}
+
+int main()
+{   
+    f(42);
+    return 0;
+}
 \end{console}
 
-Of course C-style casting allows you to do this:
+The issue is the \texttt{x} in \texttt{g(x)} \EMPHASIZE{cannot} be referencing a constant \texttt{int}, i.e., you want to \EMPHASIZE{remove the constantness} of the \texttt{x}:
+
+\begin{consolethree}[escapeinside=||]
+void g(int & y)
+{}
+
+void f (|\EMPHASIZE{const}| int & x)
+{    
+     g(x);
+}
+int main()
+{   
+    f(42);
+    return 0;
+}
+\end{consolethree}
+
+Of course one solution is this:
+\begin{consolethree}[escapeinside=||]
+void g(|\EMPHASIZE{const}| int & y)
+{}
+
+void f (const int & x)
+{    
+     g(x);
+}
+int main()
+{   
+    f(42);
+    return 0;
+}
+\end{consolethree}
+Then everything works. But if the function \texttt{g()} was written by someone else and you cannot change the source code, then what are you doing to do? (This does happen. For instance \texttt{g()} might be a function in a library that someone else wrote and you only have the header file and the compiled binary code, but not the source file. This means that although you can change the prototype in the header file it won't help because you cannot change \texttt{g()} in the cpp file.)
+
+You can remove the constantness of the \texttt{x} in \texttt{f()}:
+
+\begin{consolethree}[escapeinside=||]
+void g(int & y)
+{}
+
+void f(|\EMPHASIZE\sout\redtext{const}| int & x)
+{    
+     g(x);
+}
+
+int main()
+{   
+    f(42);
+    return 0;
+}
+\end{console}
+
+But what if the function \texttt{f()} should not change the value that \texttt{x} references? For instance what if \texttt{f()} is a printing function? Then \texttt{x} should be a constant reference \ldots \EMPHASIZE{except when calling \texttt{g()}}. In other words, you only want to remove the constantness of \texttt{x} \EMPHASIZE{temporarily.} Then you can use the constant cast:
+
+\begin{consolethree}[escapeinside=||]
+void g(int & y)
+{}
+
+void f(const int & x)
+{    
+     g(|\EMPHASIZE\texttt{const\_cast< int \& >}|(x));
+}
+int main()
+{   
+    f(42);
+    return 0;
+}
+\end{consolethree}
+
+Go ahead and compile it now.
+
+NOTE: This is (in my opinion) a wrong name. Because it makes you think that you are making something constant. In fact the point of this cast is to \EMPHASIZE{remove} the constantness. A better name would be ``remove\_const\_cast''!!!
+
+This can happen in the following scenario. Suppose in your \texttt{Date} class, you forgot to make the \texttt{get\_year()} method constant. Then this will not compile:
 
 \begin{console}
-int i = 42;
-double * p = (double *)(&i);
+class Date
+{
+public:
+     ...
+     int get_yyyy() // OOPS ... forgot to make method
+                    // constant!!!
+     {
+          return yyyy_;
+     }
+     ...
+};
+
+std::ostream & operator<<(std::ostream & cout,
+                          const Date & date)
+{    
+     cout << date.get_yyyy()
+          << ...
+     return cout;
+}
+
+int main()
+{   
+    f(42);
+    return 0;
+}
 \end{console}
 
-And this is \EMPHASIZE{the whole point of C++ typecasting}. It's to subdivide C style castings into various kinds of C++ type casting so as to provide finer control and to provide more warnings.
+\input{exercises/0-83-casting/main.tex}
+In general, use of \texttt{const\_cast} indicates an issue with the design
+of the code (just like the above scenario) -- the issue is really that
+\texttt{get\_yyyy()} should be made constant. But there are times when you
+have no choice when you don't have access to the source cpp file and the
+definition of the function/method is in the cpp file and not in the
+header file.
 
-That being said, note that in many areas of C++ programming, as long as you know what you are doing, i.e., you are only typecasting when automatic typecasting is allowed (and not crazy typecasting between pointers of different types), then you'll see that C-style typecasting is still used when writing C++ code.
+For the analogous pointer case, you can also use constant cast to
+resolve the issue:
 
-For instance when you look OpenCV programs (CV = computer vision, OpenCV is a very famous open source CV library written in C/C++), it's very common to see C-style typecasting rather than C++ style typecasting. Also, OpenGL C++ program (for computer graphics) tend to use C-style typecasting.
+\begin{consolethree}[escapeinside=||]
+void g(int * x)
+{}
+
+void f(const int * x)
+{    
+     g(|\EMPHASIZE\redtext{const\_cast< int * >(x)}|);
+}
+
+int main()
+{   
+    int i = 42;
+    f(&i);
+
+    return 0;
+}
+\end{consolethree}
 
